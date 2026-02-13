@@ -1,0 +1,66 @@
+.import-events-container {
+  padding: var(--space-6);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-header {
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.icon-box {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.icon-box i {
+  font-size: 2rem;
+  color: white;
+}
+
+.upload-card {
+  padding: var(--space-8);
+}
+
+.upload-area {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-12);
+  text-align: center;
+  margin: var(--space-6) 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-area:hover {
+  border-color: var(--brand-primary);
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.upload-area i {
+  font-size: 4rem;
+  color: var(--color-text-secondary);
+  display: block;
+  margin-bottom: var(--space-4);
+}
+
+.upload-area p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-4);
+}

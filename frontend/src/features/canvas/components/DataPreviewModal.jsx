@@ -1,0 +1,273 @@
+/**
+ * Data Preview Modal Component
+ * Displays preview data for HQL execution results
+ *
+ * Features:
+ * - Table view of result data
+ * - Pagination support
+ * - Loading states
+ * - Error handling
+ * - Export to CSV
+ *
+ * @version 1.0.0
+ * @date 2026-01-29
+ */
+
+import React, { useState, useEffect } from 'react';
+import { BaseModal } from '@shared/ui/BaseModal';
+import './DataPreviewModal.css';
+
+export default function DataPreviewModal({
+  isOpen,
+  onClose,
+  sql,
+  outputFields,
+  gameData
+}) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [exporting, setExporting] = useState(false);
+
+  // Reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setPage(1);
+      setError(null);
+      // Auto-load preview when modal opens
+      loadPreviewData();
+    }
+  }, [isOpen, sql]);
+
+  // Load preview data from backend
+  const loadPreviewData = async () => {
+    if (!sql) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/canvas/api/preview-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sql,
+          output_fields: outputFields || [],
+          limit: 100 // Get more rows for local pagination
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setData(result.data);
+      } else {
+        setError(result.message || 'Failed to load preview data');
+      }
+    } catch (err) {
+      console.error('[DataPreviewModal] Error loading preview:', err);
+      setError('Network error: Failed to load preview data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Export to CSV
+  const handleExportCSV = () => {
+    if (!data || !data.columns || !data.rows) return;
+
+    setExporting(true);
+
+    try {
+      // Create CSV content
+      const csvRows = [];
+      csvRows.push(data.columns.join(','));
+
+      data.rows.forEach(row => {
+        csvRows.push(row.map(cell =>
+          typeof cell === 'string' ? `"${cell.replace(/"/g, '""')}"` : cell
+        ).join(','));
+      });
+
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `preview_${gameData?.name || 'data'}_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('[DataPreviewModal] Export error:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Calculate pagination
+  const totalPages = data ? Math.ceil(data.row_count / pageSize) : 1;
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentRows = data ? data.rows.slice(startIndex, endIndex) : [];
+
+  // Format cell value for display
+  const formatCellValue = (value, column) => {
+    if (value === null || value === undefined) {
+      return <span className="null-value">NULL</span>;
+    }
+
+    if (typeof value === 'boolean') {
+      return <span className={`boolean-value ${value}`}>{value.toString()}</span>;
+    }
+
+    if (typeof value === 'number') {
+      return <span className="number-value">{value.toLocaleString()}</span>;
+    }
+
+    return String(value);
+  };
+
+  return (
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="数据预览"
+      className="data-preview-modal"
+    >
+      <div className="data-preview-content">
+        {/* Header Actions */}
+        <div className="preview-header">
+          <div className="preview-info">
+            {data && (
+              <>
+                <span className="row-count">{data.row_count} 行</span>
+                <span className="execution-time">
+                  执行时间: {data.execution_time_ms}ms
+                </span>
+              </>
+            )}
+          </div>
+          <div className="preview-actions">
+            <button
+              className="action-button refresh-button"
+              onClick={loadPreviewData}
+              disabled={loading}
+              title="刷新数据"
+            >
+              {loading ? '加载中...' : '🔄 刷新'}
+            </button>
+            {data && data.rows.length > 0 && (
+              <button
+                className="action-button export-button"
+                onClick={handleExportCSV}
+                disabled={exporting}
+                title="导出CSV"
+              >
+                {exporting ? '导出中...' : '📥 导出CSV'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {loading && !data && (
+          <div className="preview-loading">
+            <div className="spinner"></div>
+            <p>正在加载预览数据...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="preview-error">
+            <div className="error-icon">⚠️</div>
+            <div className="error-message">{error}</div>
+            <button
+              className="retry-button"
+              onClick={loadPreviewData}
+            >
+              重试
+            </button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && data && data.rows.length === 0 && (
+          <div className="preview-empty">
+            <div className="empty-icon">📭</div>
+            <p>无数据返回</p>
+          </div>
+        )}
+
+        {/* Data Table */}
+        {!loading && !error && data && data.rows.length > 0 && (
+          <div className="preview-table-container">
+            <table className="preview-table">
+              <thead>
+                <tr>
+                  <th className="row-number-header">#</th>
+                  {data.columns.map((column, index) => (
+                    <th key={index}>{column}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {currentRows.map((row, rowIndex) => (
+                  <tr key={startIndex + rowIndex}>
+                    <td className="row-number">{startIndex + rowIndex + 1}</td>
+                    {row.map((cell, cellIndex) => (
+                      <td key={cellIndex}>
+                        {formatCellValue(cell, data.columns[cellIndex])}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  className="pagination-button"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  ← 上一页
+                </button>
+                <span className="pagination-info">
+                  第 {page} / {totalPages} 页
+                </span>
+                <button
+                  className="pagination-button"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  下一页 →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Footer Info */}
+        {data && !loading && !error && (
+          <div className="preview-footer">
+            <div className="field-info">
+              <strong>字段数:</strong> {data.columns.length}
+            </div>
+            <div className="sample-notice">
+              ℹ️ 显示预览数据 (最多 {data.row_count} 行)
+            </div>
+          </div>
+        )}
+      </div>
+    </BaseModal>
+  );
+}

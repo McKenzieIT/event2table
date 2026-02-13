@@ -1,0 +1,221 @@
+/**
+ * BaseModal Component
+ * 统一基础模态框组件
+ *
+ * @description 提供ESC关闭、点击背景关闭、焦点管理等功能的模态框基础组件
+ */
+
+import React, { useState, useEffect, useRef, ReactNode } from 'react';
+import { useEscHandlerWithClosing } from './useEscHandler';
+import ConfirmDialog from './ConfirmDialog';
+
+/**
+ * 确认对话框配置
+ */
+export interface ConfirmConfig {
+  /** 对话框标题，默认"确认关闭" */
+  title?: string;
+  /** 对话框消息，默认"有未保存的内容，确定要关闭吗？" */
+  message?: string;
+  /** 确认按钮文字，默认"放弃修改" */
+  confirmText?: string;
+  /** 取消按钮文字，默认"继续编辑" */
+  cancelText?: string;
+}
+
+/**
+ * 组件属性
+ */
+export interface BaseModalProps {
+  /** 是否显示模态框 */
+  isOpen: boolean;
+  /** 关闭回调函数 */
+  onClose: () => void;
+  /** 子组件 */
+  children: ReactNode;
+
+  // ESC关闭控制
+  /** 是否启用ESC键关闭，默认true */
+  enableEscClose?: boolean;
+  /** 关闭前确认回调，返回true允许关闭，返回false显示确认对话框 */
+  onBeforeClose?: () => boolean | Promise<boolean>;
+  /** 确认对话框配置 */
+  confirmConfig?: ConfirmConfig;
+
+  // 样式
+  /** 背景遮罩的className */
+  overlayClassName?: string;
+  /** 内容区域的className */
+  contentClassName?: string;
+  /** 内容区域的内联样式 */
+  contentStyle?: React.CSSProperties;
+  /** 背景遮罩的z-index，默认1050 */
+  zIndex?: number;
+
+  // 其他
+  /** 点击背景是否关闭，默认true */
+  closeOnBackdropClick?: boolean;
+  /** 模态框关闭时的回调 */
+  onAfterClose?: () => void;
+}
+
+/**
+ * BaseModal组件
+ */
+export const BaseModal = React.memo(function BaseModal({
+  isOpen,
+  onClose,
+  children,
+  enableEscClose = true,
+  onBeforeClose,
+  confirmConfig = {},
+  overlayClassName = '',
+  contentClassName = '',
+  contentStyle,
+  zIndex = 1050,
+  closeOnBackdropClick = true,
+  onAfterClose,
+}: BaseModalProps) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [wasOpen, setWasOpen] = useState(false);
+  const triggerElementRef = useRef<HTMLElement | null>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
+
+  // 确认对话框默认配置
+  const defaultConfirmConfig: Required<ConfirmConfig> = {
+    title: confirmConfig.title || '确认关闭',
+    message: confirmConfig.message || '有未保存的内容，确定要关闭吗？',
+    confirmText: confirmConfig.confirmText || '放弃修改',
+    cancelText: confirmConfig.cancelText || '继续编辑',
+  };
+
+  // 处理关闭逻辑
+  const handleClose = async () => {
+    // 如果正在关闭中，忽略关闭请求
+    if (isClosing) return;
+
+    // 如果有关闭前确认回调
+    if (onBeforeClose) {
+      const canClose = await onBeforeClose();
+      if (!canClose) {
+        // 不能关闭，显示确认对话框
+        setShowConfirm(true);
+        return;
+      }
+    }
+
+    // 执行关闭
+    performClose();
+  };
+
+  // 执行实际的关闭操作
+  const performClose = () => {
+    setIsClosing(true);
+    setShowConfirm(false);
+
+    // 延迟一点时间让关闭动画播放
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+      onAfterClose?.();
+    }, 50); // 50ms延迟，让状态更新先执行
+  };
+
+  // 处理确认对话框的确认操作
+  const handleConfirm = () => {
+    setShowConfirm(false);
+    performClose();
+  };
+
+  // 处理确认对话框的取消操作
+  const handleCancelConfirm = () => {
+    setShowConfirm(false);
+  };
+
+  // 处理背景点击
+  const handleBackdropClick = () => {
+    if (closeOnBackdropClick && !isClosing) {
+      handleClose();
+    }
+  };
+
+  // ESC键处理
+  useEscHandlerWithClosing(isClosing, handleClose, {
+    enabled: enableEscClose && isOpen && !showConfirm,
+  });
+
+  // 焦点管理
+  useEffect(() => {
+    if (isOpen) {
+      // 保存当前焦点元素
+      triggerElementRef.current = document.activeElement as HTMLElement;
+
+      // 将焦点移到模态框
+      setTimeout(() => {
+        modalContentRef.current?.focus();
+      }, 50);
+
+      setWasOpen(true);
+    } else if (wasOpen) {
+      // 模态框关闭时，恢复焦点到触发元素
+      triggerElementRef.current?.focus();
+      setWasOpen(false);
+    }
+  }, [isOpen, wasOpen]);
+
+  // 如果模态框未打开，不渲染任何内容
+  if (!isOpen) return null;
+
+  return (
+    <>
+      {/* 背景遮罩 */}
+      <div
+        className={`modal-overlay ${overlayClassName}`}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex,
+        }}
+        onClick={handleBackdropClick}
+      >
+        {/* 模态框内容 */}
+        <div
+          ref={modalContentRef}
+          className={`modal-content ${contentClassName}`}
+          style={{
+            outline: 'none',
+            ...contentStyle,
+          }}
+          onClick={(e) => e.stopPropagation()}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+        >
+          {children}
+        </div>
+      </div>
+
+      {/* 确认对话框 */}
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title={defaultConfirmConfig.title}
+        message={defaultConfirmConfig.message}
+        confirmText={defaultConfirmConfig.confirmText}
+        cancelText={defaultConfirmConfig.cancelText}
+        onConfirm={handleConfirm}
+        onCancel={handleCancelConfirm}
+        type="warning"
+      />
+    </>
+  );
+});
+
+export default BaseModal;

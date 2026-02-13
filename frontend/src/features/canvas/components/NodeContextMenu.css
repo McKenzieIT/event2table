@@ -1,0 +1,78 @@
+/* 节点右键上下文菜单样式 */
+.node-context-menu {
+    position: fixed;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    min-width: 180px;
+    z-index: 1000;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.context-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.context-menu-header .node-icon {
+    font-size: 16px;
+}
+
+.context-menu-header .node-label {
+    font-size: 14px;
+}
+
+.context-menu-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 4px 0;
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    color: #374151;
+    transition: background 0.15s;
+    text-align: left;
+}
+
+.context-menu-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.context-menu-item.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.context-menu-item .menu-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}

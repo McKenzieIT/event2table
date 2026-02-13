@@ -1,0 +1,186 @@
+/**
+ * PerformanceMonitor Component Styles
+ *
+ * Real-time performance monitoring display
+ */
+
+.performance-monitor {
+  position: fixed;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-size: 12px;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.performance-monitor.top-left {
+  top: 20px;
+  left: 20px;
+}
+
+.performance-monitor.top-right {
+  top: 20px;
+  right: 20px;
+}
+
+.performance-monitor.bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+.performance-monitor.bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+.perf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.perf-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+  line-height: 1;
+}
+
+.perf-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.perf-close:active {
+  transform: scale(0.95);
+}
+
+.perf-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.perf-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.perf-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perf-value {
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.perf-status {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perf-status-good {
+  color: #52c41a;
+  animation: pulse-green 2s infinite;
+}
+
+.perf-status-warning {
+  color: #faad14;
+  animation: pulse-yellow 2s infinite;
+}
+
+.perf-status-bad {
+  color: #ff4d4f;
+  animation: pulse-red 1s infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-yellow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .performance-monitor {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    bottom: auto !important;
+    min-width: auto;
+  }
+
+  .perf-metrics {
+    gap: 4px;
+  }
+
+  .perf-metric {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}

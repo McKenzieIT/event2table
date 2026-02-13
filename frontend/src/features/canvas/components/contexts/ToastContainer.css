@@ -1,0 +1,94 @@
+/**
+ * Toast Container Styles
+ * Manages the positioning and stacking of toast notifications
+ */
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none; /* Allow clicks to pass through between toasts */
+}
+
+.toast-container .toast-notification {
+  pointer-events: auto; /* Re-enable clicks on individual toasts */
+}
+
+/* Stack from top to bottom */
+.toast-container {
+  align-items: flex-end;
+}
+
+/* Ensure animations work properly */
+.toast-container .toast-notification {
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Exit animation when toast is removed */
+.toast-container .toast-notification.removing {
+  animation: toastSlideOut 0.3s ease-in forwards;
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .toast-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .toast-container .toast-notification {
+    width: 100%;
+  }
+}
+
+/* Limit maximum number of visible toasts */
+.toast-container {
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+/* Scrollbar styling for toast container */
+.toast-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.toast-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.toast-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.toast-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}

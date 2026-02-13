@@ -1,0 +1,159 @@
+/**
+ * WHERE条件构建器样式
+ */
+
+.where-condition-builder-v2 {
+  background: white;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.builder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.builder-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.condition-count {
+  font-size: 12px;
+  color: #666;
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.conditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.condition-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.condition-item:hover {
+  background: #f0f0f0;
+  border-color: #d0d0d0;
+}
+
+.logical-op-select,
+.field-input,
+.operator-select,
+.value-input {
+  padding: 4px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.logical-op-select:focus,
+.field-input:focus,
+.operator-select:focus,
+.value-input:focus {
+  border-color: #1890ff;
+}
+
+.logical-op-select {
+  width: 60px;
+  font-weight: 600;
+  color: #666;
+}
+
+.field-input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.operator-select {
+  width: 100px;
+}
+
+.value-input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.delete-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #ff4d4f;
+  color: white;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.delete-btn:hover {
+  background: #ff7875;
+}
+
+.add-condition {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px dashed #d9d9d9;
+  border-radius: 4px;
+}
+
+.add-btn {
+  padding: 4px 12px;
+  background: #52c41a;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-btn:hover {
+  background: #73d13d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .condition-item {
+    flex-wrap: wrap;
+  }
+
+  .add-condition {
+    flex-wrap: wrap;
+  }
+
+  .field-input,
+  .value-input {
+    min-width: 100px;
+  }
+}

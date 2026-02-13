@@ -1,0 +1,34 @@
+.where-condition-item {
+  display: flex;
+  align-items: center;
+  gap: var(--en-space-sm);
+  padding: var(--en-space-md);
+  background: var(--glass-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  transition: all 200ms ease;
+}
+
+.where-condition-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.where-condition-item.dragging {
+  opacity: 0.5;
+  background: var(--primary-bg);
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--text-muted);
+  padding: var(--en-space-xs);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.logical-op-selector select {
+  min-width: 80px;
+}

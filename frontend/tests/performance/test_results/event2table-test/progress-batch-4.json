@@ -1,0 +1,199 @@
+[
+  {
+    "name": "ParameterDashboard",
+    "path": "/#/parameter-dashboard",
+    "phase": 4,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/parameter-dashboard",
+    "timestamp": "2026-02-13T04:11:08.994Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 11305,
+      "domContentLoaded": 10381.600000023842,
+      "fcp": 340,
+      "lcp": 0,
+      "resources": 250,
+      "statusCode": 200
+    },
+    "consoleErrors": [
+      {
+        "type": "pageerror",
+        "text": "The requested module '/src/features/games/AddGameModal.jsx' does not provide an export named 'AddGameModal'",
+        "stack": "",
+        "timestamp": "2026-02-13T04:11:19.939Z"
+      }
+    ],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ParameterUsage",
+    "path": "/#/parameter-usage",
+    "phase": 4,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/parameter-usage",
+    "timestamp": "2026-02-13T04:11:24.446Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 429,
+      "domContentLoaded": 10381.600000023842,
+      "fcp": 340,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ParameterHistory",
+    "path": "/#/parameter-history",
+    "phase": 4,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/parameter-history",
+    "timestamp": "2026-02-13T04:11:39.103Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 646,
+      "domContentLoaded": 10381.600000023842,
+      "fcp": 340,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ParameterCompare",
+    "path": "/#/parameters/compare",
+    "phase": 4,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/parameters/compare",
+    "timestamp": "2026-02-13T04:11:45.425Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 478,
+      "domContentLoaded": 10381.600000023842,
+      "fcp": 340,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ParameterAnalysis",
+    "path": "/#/parameter-analysis",
+    "phase": 4,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/parameter-analysis",
+    "timestamp": "2026-02-13T04:11:50.625Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 395,
+      "domContentLoaded": 10381.600000023842,
+      "fcp": 340,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ParameterNetwork",
+    "path": "/#/parameter-network",
+    "phase": 4,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/parameter-network",
+    "timestamp": "2026-02-13T04:11:56.569Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 430,
+      "domContentLoaded": 10381.600000023842,
+      "fcp": 340,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ParametersEnhanced",
+    "path": "/#/parameters/enhanced",
+    "phase": 4,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/parameters/enhanced",
+    "timestamp": "2026-02-13T04:12:02.365Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 395,
+      "domContentLoaded": 10381.600000023842,
+      "fcp": 340,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  }
+]

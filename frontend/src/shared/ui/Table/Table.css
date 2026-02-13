@@ -1,0 +1,214 @@
+/**
+ * Cyberpunk Lab Theme - Table Component Styles
+ *
+ * Subtle, professional table design with glassmorphism
+ */
+
+/* ========================================
+   Table Container
+   ======================================== */
+
+.cyber-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--bg-secondary, rgba(15, 23, 42, 0.6));
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.cyber-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+
+/* ========================================
+   Header
+   ======================================== */
+
+.cyber-table__header {
+  background: var(--bg-tertiary, rgba(15, 23, 42, 0.8));
+}
+
+.cyber-table__head {
+  padding: 16px 20px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #94A3B8);
+  border-bottom: 2px solid var(--border-default, rgba(6, 182, 212, 0.2));
+  transition: all 0.2s ease;
+}
+
+.cyber-table__head--sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.cyber-table__head--sortable:hover {
+  color: var(--text-primary, #F1F5F9);
+  background: rgba(6, 182, 212, 0.05);
+}
+
+.cyber-table__head--sorted-asc,
+.cyber-table__head--sorted-desc {
+  color: var(--color-primary, #06B6D4);
+}
+
+.cyber-table__head-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cyber-table__sort-indicator {
+  font-size: 10px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.cyber-table__head--sorted-asc .cyber-table__sort-indicator,
+.cyber-table__head--sorted-desc .cyber-table__sort-indicator {
+  opacity: 1;
+}
+
+/* Text alignment */
+.cyber-table__head--left { text-align: left; }
+.cyber-table__head--center { text-align: center; }
+.cyber-table__head--right { text-align: right; }
+
+/* ========================================
+   Body & Rows
+   ======================================== */
+
+.cyber-table__body {
+  background: transparent;
+}
+
+.cyber-table__row {
+  transition: background-color 0.2s ease;
+}
+
+.cyber-table__row--clickable {
+  cursor: pointer;
+}
+
+/* Striped rows */
+.cyber-table--striped .cyber-table__row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Subtle hover effect (user requested: background change, not full highlight) */
+.cyber-table--hoverable .cyber-table__row:hover {
+  background: rgba(6, 182, 212, 0.05); /* Very subtle cyan tint */
+}
+
+.cyber-table--hoverable .cyber-table__row--clickable:hover {
+  background: rgba(6, 182, 212, 0.08); /* Slightly stronger for clickable rows */
+}
+
+/* ========================================
+   Cells
+   ======================================== */
+
+.cyber-table__cell {
+  padding: 14px 20px;
+  font-size: 14px;
+  color: var(--text-primary, #F1F5F9);
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  transition: color 0.2s ease;
+}
+
+.cyber-table__row:last-child .cyber-table__cell {
+  border-bottom: none;
+}
+
+.cyber-table__row--clickable:hover .cyber-table__cell {
+  color: var(--color-primary-light, #22D3EE);
+}
+
+/* Text alignment */
+.cyber-table__cell--left { text-align: left; }
+.cyber-table__cell--center { text-align: center; }
+.cyber-table__cell--right { text-align: right; }
+
+/* ========================================
+   Size Variants
+   ======================================== */
+
+.cyber-table--sm .cyber-table__head,
+.cyber-table--sm .cyber-table__cell {
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+.cyber-table--lg .cyber-table__head,
+.cyber-table--lg .cyber-table__cell {
+  padding: 18px 24px;
+  font-size: 15px;
+}
+
+/* ========================================
+   Variant: Bordered
+   ======================================== */
+
+.cyber-table--bordered {
+  border: 1px solid var(--border-default, rgba(6, 182, 212, 0.2));
+}
+
+.cyber-table--bordered .cyber-table__cell {
+  border-right: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.cyber-table--bordered .cyber-table__cell:last-child {
+  border-right: none;
+}
+
+/* ========================================
+   Variant: Compact
+   ======================================== */
+
+.cyber-table--compact .cyber-table__head,
+.cyber-table--compact .cyber-table__cell {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.cyber-table--compact.cyber-table--striped .cyber-table__row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015); /* More subtle for compact */
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+
+.cyber-table__footer {
+  background: var(--bg-tertiary, rgba(15, 23, 42, 0.8));
+  border-top: 1px solid var(--border-default, rgba(6, 182, 212, 0.2));
+}
+
+.cyber-table__footer .cyber-table__cell {
+  font-weight: 500;
+  color: var(--text-secondary, #94A3B8);
+}
+
+/* ========================================
+   Empty State
+   ======================================== */
+
+.cyber-table__empty {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--text-tertiary, #64748B);
+  font-size: 14px;
+}
+
+.cyber-table__empty-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}

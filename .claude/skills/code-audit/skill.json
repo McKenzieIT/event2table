@@ -1,0 +1,9 @@
+{
+  "name": "code-audit",
+  "version": "1.0.0",
+  "description": "Comprehensive code quality audit tool for Event2Table project",
+  "author": "Event2Table Development Team",
+  "python_version": ">=3.9",
+  "dependencies": [],
+  "entry_point": ".claude/skills/code-audit/core/runner.py"
+}

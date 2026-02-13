@@ -1,0 +1,245 @@
+# HQL模板配置文件
+# 预定义的HQL模板，用户可以快速使用
+
+version: "1.0"
+last_updated: "2026-02-06"
+
+templates:
+  - id: "basic_single_event"
+    name: "基础单事件视图"
+    category: "basic"
+    description: "最基础的单事件视图模板"
+    icon: "table"
+    popular: true
+
+    # 默认配置
+    default_config:
+      events:
+        - game_gid: 10000147
+          event_id: 1
+      fields:
+        - fieldName: "ds"
+          fieldType: "base"
+        - fieldName: "role_id"
+          fieldType: "base"
+        - fieldName: "account_id"
+          fieldType: "base"
+      where_conditions:
+        - field: "ds"
+          operator: "="
+          value: "${ds}"
+      options:
+        mode: "single"
+        sql_mode: "VIEW"
+        include_comments: true
+
+    # 预览示例
+    preview_example:
+      description: "登录事件基础视图"
+      event_name: "login"
+      fields: ["ds", "role_id", "account_id", "zone_id"]
+
+  - id: "user_behavior_analysis"
+    name: "用户行为分析"
+    category: "analysis"
+    description: "用于分析用户行为的常用字段组合"
+    icon: "chart-bar"
+    popular: true
+
+    default_config:
+      events:
+        - game_gid: 10000147
+          event_id: 1
+      fields:
+        - fieldName: "ds"
+          fieldType: "base"
+        - fieldName: "role_id"
+          fieldType: "base"
+        - fieldName: "account_id"
+          fieldType: "base"
+        - fieldName: "utdid"
+          fieldType: "base"
+        - fieldName: "zone_id"
+          fieldType: "param"
+          jsonPath: "$.zone_id"
+        - fieldName: "level"
+          fieldType: "param"
+          jsonPath: "$.level"
+      where_conditions:
+        - field: "ds"
+          operator: "="
+          value: "${ds}"
+      options:
+        mode: "single"
+        sql_mode: "VIEW"
+
+    preview_example:
+      description: "分析用户登录和行为"
+      event_name: "login"
+      fields: ["ds", "role_id", "account_id", "utdid", "zone_id", "level"]
+
+  - id: "retention_analysis"
+    name: "用户留存分析"
+    category: "analysis"
+    description: "留存分析所需的字段配置"
+    icon: "users"
+    popular: true
+
+    default_config:
+      events:
+        - game_gid: 10000147
+          event_id: 1
+      fields:
+        - fieldName: "ds"
+          fieldType: "base"
+        - fieldName: "role_id"
+          fieldType: "base"
+        - fieldName: "account_id"
+          fieldType: "base"
+        - fieldName: "level"
+          fieldType: "param"
+          jsonPath: "$.level"
+        - fieldName: "zone_id"
+          fieldType: "param"
+          jsonPath: "$.zone_id"
+        - fieldName: "login_count"
+          fieldType: "param"
+          jsonPath: "$.loginCount"
+          aggregateFunc: "COUNT"
+          alias: "total_logins"
+      where_conditions:
+        - field: "ds"
+          operator: "="
+          value: "${ds}"
+      options:
+        mode: "single"
+        sql_mode: "VIEW"
+
+    preview_example:
+      description: "计算用户登录次数"
+      event_name: "login"
+      fields: ["ds", "role_id", "account_id", "level", "zone_id", "login_count"]
+
+  - id: "revenue_analysis"
+    name: "收入分析"
+    category: "business"
+    description: "分析游戏收入的字段配置"
+    icon: "dollar-sign"
+    popular: true
+
+    default_config:
+      events:
+        - game_gid: 10000147
+          event_id: 1
+      fields:
+        - fieldName: "ds"
+          fieldType: "base"
+        - fieldName: "role_id"
+          fieldType: "base"
+        - fieldName: "account_id"
+          fieldType: "base"
+        - fieldName: "coin"
+          fieldType: "param"
+          jsonPath: "$.coin"
+        - fieldName: "diamond"
+          fieldType: "param"
+          jsonPath: "$.diamond"
+        - fieldName: "item_id"
+          fieldType: "param"
+          jsonPath: "$.itemId"
+        - fieldName: "amount"
+          fieldType: "param"
+          jsonPath: "$.amount"
+      where_conditions:
+        - field: "ds"
+          operator: "="
+          value: "${ds}"
+      options:
+        mode: "single"
+        sql_mode: "VIEW"
+
+    preview_example:
+      description: "分析购买收入"
+      event_name: "purchase"
+      fields: ["ds", "role_id", "coin", "diamond", "item_id", "amount"]
+
+  - id: "device_analysis"
+    name: "设备分析"
+    category: "technical"
+    description: "分析设备相关信息"
+    icon: "mobile"
+    popular: false
+
+    default_config:
+      events:
+        - game_gid: 10000147
+          event_id: 1
+      fields:
+        - fieldName: "ds"
+          fieldType: "base"
+        - fieldName: "utdid"
+          fieldType: "base"
+        - fieldName: "ip"
+          fieldType: "param"
+          jsonPath: "$.ip"
+        - fieldName: "device_model"
+          fieldType: "param"
+          jsonPath: "$.deviceModel"
+        - fieldName: "os_version"
+          fieldType: "param"
+          jsonPath: "$.osVersion"
+        - fieldName: "app_version"
+          fieldType: "param"
+          jsonPath: "$.appVersion"
+      where_conditions:
+        - field: "ds"
+          operator: "="
+          value: "${ds}"
+      options:
+        mode: "single"
+        sql_mode: "VIEW"
+
+    preview_example:
+      description: "分析用户设备信息"
+      event_name: "login"
+      fields: ["ds", "utdid", "ip", "device_model", "os_version", "app_version"]
+
+# 模板分类
+categories:
+  - id: "basic"
+    name: "基础模板"
+    description: "基础HQL生成模板"
+    icon: "table"
+
+  - id: "analysis"
+    name: "分析模板"
+    description: "数据分析常用模板"
+    icon: "chart-line"
+
+  - id: "business"
+    name: "业务模板"
+    description: "业务分析模板"
+    icon: "briefcase"
+
+  - id: "technical"
+    name: "技术模板"
+    description: "技术分析模板"
+    icon: "code"
+
+# 模板标签（用于搜索和过滤）
+tags:
+  - id: "popular"
+    name: "热门"
+    description: "最常用的模板"
+  - id: "identity"
+    name: "身份识别"
+    description: "用户身份相关"
+  - id: "behavior"
+    name: "行为分析"
+    description: "用户行为分析"
+  - id: "revenue"
+    name: "收入分析"
+    description: "收入相关分析"
+  - id: "device"
+    name: "设备分析"
+    description: "设备相关分析"

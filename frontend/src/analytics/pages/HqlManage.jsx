@@ -1,0 +1,203 @@
+import React, { useState, useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { Button, SearchInput } from '@shared/ui';
+import './HqlManage.css';
+
+/**
+ * HQL管理页面
+ *
+ * 查看、编辑和管理已生成的HQL语句
+ * 迁移自: templates/hql_manage.html
+ * 最佳实践: useMemo + useCallback + 提前返回
+ */
+function HqlManage() {
+  const [typeFilter, setTypeFilter] = useState('');
+  const [editedOnly, setEditedOnly] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // 使用React Query加载数据
+  const { data: hqlData, isLoading } = useQuery({
+    queryKey: ['hql-list', typeFilter, editedOnly],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (typeFilter) params.append('hql_type', typeFilter);
+      if (editedOnly) params.append('edited_only', 'true');
+
+      const response = await fetch(`/api/hql?${params}`);
+      if (!response.ok) throw new Error('加载HQL失败');
+      return response.json();
+    }
+  });
+
+  // 提前返回优化
+  if (isLoading) {
+    return <div className="loading" data-testid="hql-manage-loading">加载中...</div>;
+  }
+
+  const hqlList = hqlData?.data?.data || [];
+
+  // 客户端过滤优化
+  const filteredHql = useMemo(() => {
+    if (!searchTerm) return hqlList;
+    return hqlList.filter(hql =>
+      hql.event_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [hqlList, searchTerm]);
+
+  const handleToggleActive = useCallback(async (hqlId) => {
+    // 切换激活状态
+    alert(`切换HQL ${hqlId} 激活状态 - 待实现`);
+  }, []);
+
+  const handleDelete = useCallback(async (hqlId) => {
+    if (!confirm('确定要删除这个HQL吗？')) return;
+    alert(`删除HQL ${hqlId} - 待实现`);
+  }, []);
+
+  return (
+    <div className="hql-manage-container" data-testid="hql-manage">
+      {/* Page Header */}
+      <div className="page-header glass-card">
+        <div className="header-content">
+          <div className="icon-box">
+            <span>📄</span>
+          </div>
+          <div>
+            <h1>HQL管理</h1>
+            <p>查看、编辑和管理所有已生成的HQL语句</p>
+          </div>
+        </div>
+        <Link to="/generate">
+          <Button variant="primary">
+            生成新HQL
+          </Button>
+        </Link>
+      </div>
+
+      {/* Filter Toolbar */}
+      <div className="filter-toolbar glass-card">
+        <select
+          className="glass-select"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+        >
+          <option value="">全部类型</option>
+          <option value="create">建表 (CREATE)</option>
+          <option value="join">关联 (JOIN)</option>
+        </select>
+
+        <select
+          className="glass-select"
+          value={editedOnly ? 'true' : 'false'}
+          onChange={(e) => setEditedOnly(e.target.value === 'true')}
+        >
+          <option value="false">全部</option>
+          <option value="true">仅已编辑</option>
+        </select>
+
+        <SearchInput
+          placeholder="搜索事件名..."
+          value={searchTerm}
+          onChange={(value) => setSearchTerm(value)}
+        />
+      </div>
+
+      {/* HQL Table */}
+      <div className="hql-table-card glass-card">
+        <table className="oled-table">
+          <thead>
+            <tr>
+              <th>类型</th>
+              <th>事件名</th>
+              <th>游戏</th>
+              <th>版本</th>
+              <th>状态</th>
+              <th>编辑状态</th>
+              <th>最后更新</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredHql.length === 0 ? (
+              <tr>
+                <td colSpan="8" className="text-center">
+                  <div className="empty-state">
+                    <span>📥</span>
+                    <p>未找到HQL记录</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              filteredHql.map(hql => (
+                <tr key={hql.id} className={hql.is_user_edited ? 'user-edited-row' : ''}>
+                  <td>
+                    <span className={`badge badge-${hql.hql_type === 'create' ? 'primary' : 'success'}`}>
+                      {hql.hql_type === 'create' ? '📊' : '🔗'}
+                      {hql.hql_type?.toUpperCase()}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="event-name">{hql.event_name}</div>
+                    <div className="event-name-cn">{hql.event_name_cn}</div>
+                  </td>
+                  <td>
+                    <span className="text-muted">🎮</span>
+                    {hql.game_name}
+                  </td>
+                  <td>
+                    <span className="badge badge-secondary">v{hql.hql_version}</span>
+                  </td>
+                  <td>
+                    {hql.is_active ? (
+                      <span className="badge badge-success">
+                        ✅ 激活
+                      </span>
+                    ) : (
+                      <span className="badge badge-secondary">
+                        ⏸️ 停用
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    {hql.is_user_edited && (
+                      <span className="badge badge-info">
+                        ✏️ 已编辑
+                      </span>
+                    )}
+                  </td>
+                  <td>{new Date(hql.updated_at).toLocaleString('zh-CN')}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <Link to={`/hql/${hql.id}/edit`}>
+                        <Button variant="outline-primary" size="sm">
+                          编辑
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => handleToggleActive(hql.id)}
+                      >
+                        切换
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDelete(hql.id)}
+                      >
+                        删除
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default HqlManage;

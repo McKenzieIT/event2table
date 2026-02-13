@@ -1,0 +1,51 @@
+.api-docs-container {
+  padding: var(--space-6);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.icon-box {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #F59E0B, #EF4444);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-box i {
+  font-size: 2rem;
+  color: white;
+}
+
+.docs-content {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.endpoint-card {
+  padding: var(--space-6);
+}
+
+.endpoint-card h3 {
+  margin: 0 0 var(--space-2) 0;
+  color: var(--brand-primary);
+  font-family: monospace;
+}
+
+.endpoint-card p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}

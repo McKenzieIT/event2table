@@ -1,0 +1,71 @@
+/* dwd_generator/static/js/react-app-shell/src/components/sidebar/SidebarGroup.css */
+.sidebar-group {
+  margin-bottom: 8px;
+}
+
+.menu-group-header {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 6px;
+}
+
+.menu-group-header:hover {
+  background: var(--bg-hover, #f5f5f5);
+}
+
+.menu-group-title {
+  flex: 1;
+}
+
+.menu-group-icon {
+  font-size: 10px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-group.expanded .menu-group-icon {
+  transform: rotate(0deg);
+}
+
+.sidebar-group.collapsed .menu-group-icon {
+  transform: rotate(-90deg);
+}
+
+.menu-group-content {
+  padding: 4px 8px;
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-group.collapsed .menu-group-content {
+  max-height: 0;
+}
+
+/* Collapsed sidebar styles */
+.app-sidebar.collapsed .menu-group-header {
+  padding: 12px;
+  justify-content: center;
+}
+
+.app-sidebar.collapsed .menu-group-title {
+  display: none;
+}
+
+.app-sidebar.collapsed .menu-group-content {
+  padding: 0;
+}
+
+.app-sidebar.collapsed .menu-group.expanded .menu-group-content {
+  display: none;
+}

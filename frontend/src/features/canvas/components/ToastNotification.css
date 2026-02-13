@@ -1,0 +1,132 @@
+/* Toast 通知样式 */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 300px;
+  max-width: 500px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* 淡入动画 */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 淡出动画 */
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* 不同类型的通知 */
+.toast-success {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.toast-error {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+.toast-warning {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.toast-info {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+/* 内容区域 */
+.toast-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.toast-icon {
+  font-size: 18px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+/* 关闭按钮 */
+.toast-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.toast-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.toast-close:active {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(0.95);
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .toast-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    max-width: none;
+    width: calc(100% - 20px);
+  }
+}
+
+/* 长文本处理 */
+.toast-notification.long-message {
+  max-width: 400px;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .toast-notification {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+}

@@ -1,0 +1,61 @@
+.where-builder-modal-overlay {
+  z-index: 1100;
+}
+
+.where-builder-modal {
+  max-width: 900px;
+  width: 90vw;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.where-builder-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--en-space-lg);
+}
+
+.where-preview-section {
+  background: var(--glass-bg);
+  border-radius: var(--border-radius);
+  padding: var(--en-space-md);
+  margin-bottom: var(--en-space-lg);
+}
+
+.where-preview-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--en-space-sm);
+}
+
+.where-preview-section .section-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.where-preview-code {
+  background: #1e1e1e;
+  color: #a9b7c6;
+  padding: var(--en-space-md);
+  border-radius: var(--border-radius);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: var(--en-space-sm);
+  margin-left: var(--en-space-md);
+}
+
+.mode-toggle .btn {
+  border-radius: var(--border-radius-sm);
+}

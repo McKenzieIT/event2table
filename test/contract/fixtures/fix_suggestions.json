@@ -1,0 +1,139 @@
+{
+  "missing_backend_routes": [
+    {
+      "issue": "Frontend calls GET /api/common-params but backend doesn't implement it",
+      "location": "analytics/pages/CommonParamsList.jsx:21",
+      "suggestion": "Add route handler for GET /api/common-params in backend",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend calls GET /api/common-params/batch but backend doesn't implement it",
+      "location": "analytics/pages/CommonParamsList.jsx:43",
+      "suggestion": "Add route handler for GET /api/common-params/batch in backend",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend calls GET /api/hql/results but backend doesn't implement it",
+      "location": "analytics/pages/HqlResults.jsx:17",
+      "suggestion": "Add route handler for GET /api/hql/results in backend",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend calls GET /api/preview-excel but backend doesn't implement it",
+      "location": "analytics/pages/ImportEvents.jsx:41",
+      "suggestion": "Add route handler for GET /api/preview-excel in backend",
+      "priority": "high"
+    }
+  ],
+  "method_mismatches": [
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/components/game-selection/GameSelectionSheet.jsx:19",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/components/layouts/MainLayout.jsx:50",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/CategoriesList.jsx:21",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['DELETE']",
+      "location": "analytics/pages/CategoriesList.jsx:43",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: DELETE",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/Dashboard.diagnostic.jsx:19",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/Dashboard.jsx:24",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/EventForm.jsx:54",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['DELETE']",
+      "location": "analytics/pages/EventsList.jsx:59",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: DELETE",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/FlowsList.jsx:19",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/GameForm.jsx:84",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/GamesList.jsx:32",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['DELETE']",
+      "location": "analytics/pages/GamesList.jsx:117",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: DELETE",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "analytics/pages/Generate.jsx:72",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "event-builder/pages/EventNodeBuilder.jsx:117",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "features/canvas/components/Toolbar.jsx:71",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "features/canvas/hooks/useFlowExecute.js:29",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "features/canvas/hooks/useFlowExecute.ts:50",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    },
+    {
+      "issue": "Frontend uses GET but backend supports ['POST']",
+      "location": "shared/utils/apiValidator.js:144",
+      "suggestion": "Either add GET method to backend route or change frontend to use one of: POST",
+      "priority": "high"
+    }
+  ],
+  "parameter_mismatches": []
+}

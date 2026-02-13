@@ -1,0 +1,42 @@
+{
+  "name": "update-docs",
+  "version": "1.0.0",
+  "description": "智能文档更新工具，自动检测代码变更并更新相关文档",
+  "author": "Event2Table Team",
+  "created": "2026-02-11",
+  "tags": ["documentation", "automation", "git", "ast-analysis"],
+  "capabilities": [
+    "detect_code_changes",
+    "map_to_documentation",
+    "generate_api_docs",
+    "update_prd",
+    "audit_documentation"
+  ],
+  "modes": {
+    "auto": {
+      "description": "自动检测并更新文档",
+      "default": true
+    },
+    "manual": {
+      "description": "手动指定要更新的文档"
+    },
+    "audit": {
+      "description": "文档合规性审计"
+    },
+    "dry-run": {
+      "description": "预览将要更新的文档（不实际修改）"
+    }
+  },
+  "output": {
+    "directory": ".claude/skills/update-docs/output/",
+    "formats": ["json", "markdown"],
+    "logs": "logs/skills/docs_update.log"
+  },
+  "dependencies": ["git", "ast", "pathlib"],
+  "settings": {
+    "project_root": "/Users/mckenzie/Documents/event2table",
+    "docs_root": "docs/",
+    "auto_commit": false,
+    "backup_docs": true
+  }
+}

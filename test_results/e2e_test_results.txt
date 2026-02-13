@@ -1,0 +1,112 @@
+================================================================================
+EVENT2TABLE E2E TEST RESULTS
+================================================================================
+
+Start Time: 2026-02-11T01:21:40.165319
+End Time: 2026-02-11T01:21:40.456650
+Base URL: http://localhost:5001
+
+SUMMARY
+----------------------------------------
+Total Tests: 12
+Passed: 11
+Failed: 1
+Success Rate: 91.7%
+
+Endpoints Tested: 11
+  - DELETE /api/games/90007798
+  - GET /api/canvas/health
+  - GET /api/categories
+  - GET /api/events?game_gid=10000147
+  - GET /api/games
+  - GET /api/games/90007798
+  - GET /api/parameters/all?game_gid=10000147
+  - POST /api/events
+  - POST /api/games
+  - POST /hql-preview-v2/api/generate
+  - PUT /api/games/90007798
+
+DETAILED RESULTS
+----------------------------------------
+✅ Server is running
+   Status: PASS
+   Time: 2026-02-11T01:21:40.219979
+   Endpoint: GET /api/games
+   Details: Status: 200
+
+✅ GET /api/games
+   Status: PASS
+   Time: 2026-02-11T01:21:40.249215
+   Endpoint: GET /api/games
+   Details: Found 10 games
+
+✅ POST /api/games
+   Status: PASS
+   Time: 2026-02-11T01:21:40.267138
+   Endpoint: POST /api/games
+   Details: Created game with GID: 90007798
+
+✅ GET /api/games/90007798
+   Status: PASS
+   Time: 2026-02-11T01:21:40.278869
+   Endpoint: GET /api/games/90007798
+   Details: Retrieved game
+
+✅ PUT /api/games/90007798
+   Status: PASS
+   Time: 2026-02-11T01:21:40.302777
+   Endpoint: PUT /api/games/90007798
+   Details: Game updated successfully
+
+✅ GET /api/events
+   Status: PASS
+   Time: 2026-02-11T01:21:40.324836
+   Endpoint: GET /api/events?game_gid=10000147
+   Details: Found 2 events
+
+✅ POST /api/events
+   Status: PASS
+   Time: 2026-02-11T01:21:40.359131
+   Endpoint: POST /api/events
+   Details: Created event: test_e2e_event_1770744100
+
+✅ POST /hql-preview-v2/api/generate
+   Status: PASS
+   Time: 2026-02-11T01:21:40.378313
+   Endpoint: POST /hql-preview-v2/api/generate
+   Details: HQL generated successfully
+
+✅ GET /api/canvas/health
+   Status: PASS
+   Time: 2026-02-11T01:21:40.390366
+   Endpoint: GET /api/canvas/health
+   Details: Canvas status: healthy
+
+✅ GET /api/parameters/all
+   Status: PASS
+   Time: 2026-02-11T01:21:40.402950
+   Endpoint: GET /api/parameters/all?game_gid=10000147
+   Details: Found 500 parameters
+
+✅ GET /api/categories
+   Status: PASS
+   Time: 2026-02-11T01:21:40.417199
+   Endpoint: GET /api/categories
+   Details: Found 8 categories
+
+❌ DELETE /api/games/90007798
+   Status: FAIL
+   Time: 2026-02-11T01:21:40.438829
+   Endpoint: DELETE /api/games/90007798
+   Details: Status: 409
+
+FAILED TESTS DETAILS
+----------------------------------------
+Test: DELETE /api/games/90007798
+Endpoint: DELETE /api/games/90007798
+Details: Status: 409
+Time: 2026-02-11T01:21:40.438812
+
+================================================================================
+END OF REPORT
+================================================================================

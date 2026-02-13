@@ -1,0 +1,38 @@
+.canvas-toolbar {
+    position: fixed;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.toolbar-group {
+    display: flex;
+    gap: 8px;
+}
+
+/* Note: .toolbar-btn and variant styles are now handled by @shared/ui Button component */
+/* These styles are kept for backward compatibility but can be removed in the future */
+
+.toolbar-info {
+    display: flex;
+    gap: 16px;
+    padding-left: 16px;
+    border-left: 2px solid #e0e0e0;
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.toolbar-info span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}

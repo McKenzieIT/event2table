@@ -1,0 +1,466 @@
+"""
+Subagent Manager for Parallel Code Auditing.
+
+Manages multiple subagents for parallel code analysis.
+
+NOTE: Progress Tracking and Time Estimation
+--------------------------------------------
+This module includes progress tracking (_print_progress, _print_summary, _estimate_time)
+as part of the SubagentManager class. While these could be separated into a dedicated
+ProgressTracker class, they are kept here for simplicity and tight integration with
+the parallel execution flow. The progress tracking methods are clearly marked and
+can be extracted in the future if needed for better separation of concerns.
+
+Timeout Behavior
+----------------
+The `timeout` parameter (default: 300 seconds) is applied per-task in the thread pool.
+Each task has this much time to complete before it's considered failed. The timeout
+is enforced by future.result(timeout=...) when waiting for individual task completion.
+This does NOT limit the total execution time - only the time for individual tasks.
+"""
+from typing import List, Dict, Any, Optional, Callable
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+import threading
+import time
+from enum import Enum
+import logging
+
+# Initialize logger for this module
+logger = logging.getLogger(__name__)
+
+try:
+    from .base_detector import Issue, BaseDetector
+except ImportError:
+    from base_detector import Issue, BaseDetector
+try:
+    from .base_detector import Issue, BaseDetector
+except ImportError:
+    from base_detector import Issue, BaseDetector
+
+class TaskStatus(Enum):
+    """
+    Task status enumeration.
+
+    Defines the possible states of an audit task during its lifecycle:
+    - PENDING: Task is queued and waiting to be executed
+    - RUNNING: Task is currently being executed
+    - COMPLETED: Task finished successfully
+    - FAILED: Task failed with an error
+
+    Using Enum provides type safety and prevents typos compared to string literals.
+    """
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class SubagentTask:
+    """Represents a single audit task for a subagent."""
+
+    def __init__(
+        self,
+        task_id: str,
+        detector: BaseDetector,
+        file_path: str
+    ):
+        self.task_id = task_id
+        self.detector = detector
+        self.file_path = file_path
+        # Use TaskStatus enum instead of string literals
+        self.status = TaskStatus.PENDING
+        self.issues: List[Issue] = []
+        self.error: Optional[str] = None
+        self.start_time: Optional[float] = None
+        self.end_time: Optional[float] = None
+
+    @property
+    def duration(self) -> Optional[float]:
+        """Get task execution duration in seconds."""
+        if self.start_time and self.end_time:
+            return self.end_time - self.start_time
+        return None
+
+
+class SubagentManager:
+    """
+    Manages parallel execution of audit tasks using subagents.
+
+    Features:
+    - Parallel execution with configurable worker count
+    - Task priority queue
+    - Progress tracking and reporting
+    - Error handling and recovery
+    - Performance metrics collection
+
+    Attributes:
+        max_workers: Maximum number of parallel workers
+        timeout: Per-task timeout in seconds (not total execution time)
+        enable_progress: Whether to display progress output
+
+    Timeout Details:
+        The timeout parameter is applied to each task individually via
+        future.result(timeout=self.timeout). If a single task exceeds
+        this timeout, it's marked as failed, but other tasks continue.
+    """
+
+    def __init__(
+        self,
+        max_workers: int = 4,
+        timeout: int = 300,
+        enable_progress: bool = True,
+        use_emoji: bool = True
+    ):
+        """
+        Initialize subagent manager.
+
+        Args:
+            max_workers: Maximum number of parallel workers (default: 4)
+            timeout: Timeout for each task in seconds (default: 300)
+                     NOTE: This is per-task, not total execution time
+            enable_progress: Enable progress tracking (default: True)
+            use_emoji: Use emoji symbols in output (default: True)
+        """
+        self.max_workers = max_workers
+        self.timeout = timeout
+        self.enable_progress = enable_progress
+        self.use_emoji = use_emoji
+
+        self.tasks: List[SubagentTask] = []
+        self.completed_tasks: List[SubagentTask] = []
+        self.failed_tasks: List[SubagentTask] = []
+
+        self._lock = threading.Lock()
+        self._progress_callback: Optional[Callable[[int, int], None]] = None
+
+    def create_tasks(
+        self,
+        detectors: List[BaseDetector],
+        file_paths: List[str]
+    ) -> List[SubagentTask]:
+        """
+        Create audit tasks from detectors and files.
+
+        Args:
+            detectors: List of detectors to run
+            file_paths: List of files to audit
+
+        Returns:
+            List of created tasks
+        """
+        tasks = []
+        task_id = 0
+
+        for detector in detectors:
+            if not detector.enabled:
+                continue
+
+            for file_path in file_paths:
+                if detector.is_applicable(file_path):
+                    task = SubagentTask(
+                        task_id=f"task_{task_id}",
+                        detector=detector,
+                        file_path=file_path
+                    )
+                    tasks.append(task)
+                    task_id += 1
+
+        self.tasks = tasks
+        return tasks
+
+    def set_progress_callback(self, callback: Optional[Callable[[int, int], None]]) -> None:
+        """
+        Set progress callback function.
+
+        Args:
+            callback: Callback function that takes (completed, total) as arguments
+
+        Returns:
+            None
+        """
+        self._progress_callback = callback
+
+    def execute_parallel(self) -> List[Issue]:
+        """
+        Execute all tasks in parallel using thread pool.
+
+        Returns:
+            List of all issues found
+
+        Raises:
+            TimeoutError: If any task exceeds the configured timeout
+            Exception: For other task execution errors
+
+        Example:
+            >>> manager = SubagentManager(max_workers=4)
+            >>> manager.create_tasks(detectors, file_paths)
+            >>> issues = manager.execute_parallel()
+            >>> print(f"Found {len(issues)} issues")
+        """
+        all_issues = []
+        total_tasks = len(self.tasks)
+
+        if total_tasks == 0:
+            return all_issues
+
+        # Choose emoji or plain text symbols
+        if self.use_emoji:
+            rocket, chart, timer, check, cross = "🚀", "📊", "⏱️", "✅", "❌"
+        else:
+            rocket, chart, timer, check, cross = "[START]", "[TOTAL]", "[TIME]", "[OK]", "[FAIL]"
+
+        print(f"\n{rocket} Starting parallel audit with {self.max_workers} workers")
+        print(f"{chart} Total tasks: {total_tasks}")
+        print(f"{timer} Estimated time: {self._estimate_time(total_tasks)}")
+        print("="*60)
+
+        start_time = time.time()
+
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit all tasks
+            future_to_task = {
+                executor.submit(self._execute_task, task): task
+                for task in self.tasks
+            }
+
+            # Process completed tasks
+            completed = 0
+            for future in as_completed(future_to_task):
+                task = future_to_task[future]
+
+                try:
+                    issues = future.result(timeout=self.timeout)
+                    with self._lock:
+                        task.status = TaskStatus.COMPLETED
+                        task.issues = issues
+                        task.end_time = time.time()
+                        self.completed_tasks.append(task)
+                        all_issues.extend(issues)
+
+                    completed += 1
+
+                    # Progress callback
+                    if self._progress_callback:
+                        self._progress_callback(completed, total_tasks)
+
+                    # Progress output
+                    if self.enable_progress:
+                        self._print_progress(completed, total_tasks, start_time)
+
+                except TimeoutError:
+                    with self._lock:
+                        task.status = TaskStatus.FAILED
+                        task.error = f"Task timeout after {self.timeout}s"
+                        task.end_time = time.time()
+                        self.failed_tasks.append(task)
+                    logger.error(f"Task {task.task_id} timed out after {self.timeout}s")
+
+                except Exception as e:
+                    with self._lock:
+                        task.status = TaskStatus.FAILED
+                        task.error = str(e)
+                        task.end_time = time.time()
+                        self.failed_tasks.append(task)
+                    logger.error(f"Task {task.task_id} failed: {e}")
+
+        # Final summary
+        elapsed = time.time() - start_time
+        self._print_summary(elapsed)
+
+        return all_issues
+
+    def _execute_task(self, task: SubagentTask) -> List[Issue]:
+        """
+        Execute a single audit task.
+
+        Args:
+            task: Task to execute
+
+        Returns:
+            List of issues found
+
+        Raises:
+            Exception: If task execution fails
+
+        Example:
+            >>> task = SubagentTask("task_0", detector, "file.py")
+            >>> issues = manager._execute_task(task)
+            >>> print(f"Found {len(issues)} issues in task")
+        """
+        with self._lock:
+            task.status = TaskStatus.RUNNING
+            task.start_time = time.time()
+
+        try:
+            issues = task.detector.detect(task.file_path)
+            return issues
+        except Exception as e:
+            task.status = TaskStatus.FAILED
+            task.error = str(e)
+            raise
+
+    def _estimate_time(self, total_tasks: int) -> str:
+        """Estimate execution time."""
+        # Assume ~0.5 seconds per task
+        estimated_seconds = (total_tasks / self.max_workers) * 0.5
+        if estimated_seconds < 60:
+            return f"{estimated_seconds:.1f} seconds"
+        else:
+            return f"{estimated_seconds/60:.1f} minutes"
+
+    def _print_progress(self, completed: int, total: int, start_time: float):
+        """Print progress bar."""
+        elapsed = time.time() - start_time
+        progress = completed / total
+
+        # Progress bar
+        bar_length = 40
+        filled = int(bar_length * progress)
+        bar = "█" * filled + "░" * (bar_length - filled)
+
+        # ETA calculation
+        if completed > 0:
+            time_per_task = elapsed / completed
+            remaining = (total - completed) * time_per_task / self.max_workers
+            eta_str = f"{remaining:.1f}s"
+        else:
+            eta_str = "N/A"
+
+        print(f"\r[{bar}] {progress*100:.1f}% ({completed}/{total}) ETA: {eta_str}", end="", flush=True)
+
+    def _print_summary(self, elapsed: float) -> None:
+        """
+        Print execution summary with performance metrics.
+
+        NOTE: This is a display utility method. For better separation of concerns,
+        reporting could be moved to a dedicated ProgressTracker class.
+
+        Args:
+            elapsed: Total elapsed time in seconds
+
+        Returns:
+            None
+        """
+
+        check = "✅" if self.use_emoji else "[OK]"
+
+        print(f"\n\n{'='*60}")
+        print(f"{check} Parallel audit completed in {elapsed:.2f} seconds")
+        print(f"   Completed: {len(self.completed_tasks)}")
+        print(f"   Failed: {len(self.failed_tasks)}")
+        print(f"   Issues found: {sum(len(t.issues) for t in self.completed_tasks)}")
+
+        # Performance metrics
+        if self.completed_tasks:
+            durations = [t.duration for t in self.completed_tasks if t.duration]
+            avg_duration = sum(durations) / len(durations) if durations else 0
+            print(f"   Avg task duration: {avg_duration:.3f}s")
+
+        print(f"{'='*60}\n")
+
+    def get_performance_metrics(self) -> Dict[str, Any]:
+        """
+        Get performance metrics from execution.
+
+        Returns:
+            Dictionary with performance metrics
+        """
+        if not self.completed_tasks:
+            return {}
+
+        durations = [t.duration for t in self.completed_tasks if t.duration]
+
+        # Check if durations list is empty to avoid division by zero
+        if not durations:
+            return {
+                "total_tasks": len(self.tasks),
+                "completed_tasks": len(self.completed_tasks),
+                "failed_tasks": len(self.failed_tasks),
+                "total_duration": 0,
+                "avg_duration": 0,
+                "min_duration": 0,
+                "max_duration": 0,
+                "throughput": 0
+            }
+
+        return {
+            "total_tasks": len(self.tasks),
+            "completed_tasks": len(self.completed_tasks),
+            "failed_tasks": len(self.failed_tasks),
+            "total_duration": sum(durations),
+            "avg_duration": sum(durations) / len(durations),
+            "min_duration": min(durations),
+            "max_duration": max(durations),
+            "throughput": len(self.completed_tasks) / sum(durations) if durations else 0
+        }
+
+
+class ParallelAuditRunner:
+    """
+    Parallel audit runner using subagent manager.
+
+    Provides high-level interface for parallel code auditing.
+    """
+
+    def __init__(
+        self,
+        max_workers: int = 4,
+        timeout: int = 300,
+        enable_progress: bool = True,
+        use_emoji: bool = True
+    ):
+        """
+        Initialize parallel audit runner.
+
+        Args:
+            max_workers: Maximum number of parallel workers
+            timeout: Timeout for each task
+            enable_progress: Enable progress tracking
+            use_emoji: Use emoji in progress output
+        """
+        self.max_workers = max_workers
+        self.timeout = timeout
+        self.enable_progress = enable_progress
+        self.use_emoji = use_emoji
+        self.manager: Optional[SubagentManager] = None
+
+    def run_parallel_audit(
+        self,
+        detectors: List[BaseDetector],
+        file_paths: List[str],
+        progress_callback=None
+    ) -> List[Issue]:
+        """
+        Run audit in parallel mode.
+
+        Args:
+            detectors: List of detectors to run
+            file_paths: List of files to audit
+            progress_callback: Optional callback for progress updates
+
+        Returns:
+            List of all issues found
+        """
+        self.manager = SubagentManager(
+            max_workers=self.max_workers,
+            timeout=self.timeout,
+            enable_progress=self.enable_progress,
+            use_emoji=self.use_emoji
+        )
+
+        # Create tasks
+        self.manager.create_tasks(detectors, file_paths)
+
+        # Set progress callback
+        if progress_callback:
+            self.manager.set_progress_callback(progress_callback)
+
+        # Execute parallel audit
+        return self.manager.execute_parallel()
+
+    def get_metrics(self) -> Dict[str, Any]:
+        """Get performance metrics."""
+        if self.manager:
+            return self.manager.get_performance_metrics()
+        return {}

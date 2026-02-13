@@ -1,0 +1,56 @@
+.join-node {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 2px solid #047857;
+  border-radius: 8px;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.join-node .node-header {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.join-node .node-icon {
+  font-size: 18px;
+}
+
+.join-node .node-title {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.join-node .join-type-badge {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.join-node .node-body {
+  padding: 12px;
+  color: white;
+}
+
+.join-node .node-description {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.join-node .input-port {
+  background: #fbbf24;
+  border: 2px solid #f59e0b;
+}
+
+.join-node .output-port {
+  background: #10b981;
+  border: 2px solid #059669;
+}

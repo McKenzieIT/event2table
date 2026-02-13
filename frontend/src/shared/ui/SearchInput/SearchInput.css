@@ -1,0 +1,128 @@
+/**
+ * SearchInput Styles - Cyberpunk Lab Theme
+ *
+ * 全功能搜索输入组件：
+ * - 搜索图标
+ * - 300ms防抖
+ * - Ctrl+K / Cmd+K 快捷键
+ * - 清除按钮
+ */
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+}
+
+.search-input {
+  flex: 1;
+  width: 100%;
+  height: 40px;
+  padding: 10px 16px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-primary, #F1F5F9);
+  background: var(--bg-elevated, rgba(22, 27, 34, 0.6));
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-md, 6px);
+  outline: none;
+  transition: all var(--transition-base, 200ms cubic-bezier(0.4, 0, 0.2, 1));
+  font-family: var(--font-family-base, -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+.search-input:focus {
+  background: var(--bg-elevated, rgba(22, 27, 34, 0.8));
+  border-color: var(--border-active, #06B6D4);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1),
+              0 0 12px rgba(6, 182, 212, 0.15);
+  transition: all var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.search-input::placeholder {
+  color: var(--text-tertiary, #64748B);
+  opacity: 0.7;
+}
+
+/* 搜索图标 */
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-tertiary, #64748B);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+/* 快捷键提示 */
+.shortcut-hint {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-elevated, rgba(15, 23, 42, 0.8));
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--text-secondary, #94A3B8);
+  opacity: 0;
+  transition: opacity var(--transition-base, 200ms);
+  pointer-events: none;
+}
+
+/* 显示快捷键时隐藏 */
+.search-input:has-focus ~ .shortcut-hint {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--transition-base, 200ms);
+}
+
+/* 清除按钮 */
+.clear-button {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary, #64748B);
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity var(--transition-base, 200ms);
+  pointer-events: auto;
+}
+
+.clear-button:hover {
+  color: var(--text-primary, #F1F5F9);
+}
+
+/* 有内容时显示清除按钮 */
+.search-input:not(:placeholder-shown) ~ .clear-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 加载状态 */
+.search-input--loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* 聚焦状态 */
+.search-input--focused {
+  border-color: var(--border-active, #06B6D4);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1),
+              0 0 12px rgba(6, 182, 212, 0.15);
+}

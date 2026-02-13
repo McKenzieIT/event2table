@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+backend/venv/
+backend/venv/
+
+# Pytest
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.cover
+.hypothesis/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+
+# Logs
+logs/
+*.log
+
+# Frontend
+node_modules/
+.vite/
+dist/
+test-results/
+playwright-report/
+debug-*.png
+console-test.png
+
+# Test outputs (unified location)
+test/output/
+frontend/playwright-report/
+frontend/test-results/
+
+# Test analysis reports (archived)
+docs/testing/reports/test-analysis-reports/
+
+# Performance test scripts (archived)
+frontend/tests/performance/*.js
+frontend/tests/performance/*.md
+
+# Environment variables
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+*.cache
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+build/
+*.egg-info/
+
+# Claude Code
+.claude/plans/
+.claude/sessions/
+
+# Ignore auto-generated folder context files
+**/CLAUDE.md
+
+# But keep the root CLAUDE.md if you want
+!CLAUDE.md

@@ -1,0 +1,137 @@
+/**
+ * Card Styles - Glassmorphism Theme
+ *
+ * Design: Frosted glass effect with subtle glow
+ * Background: Semi-transparent dark with blur
+ * Border: Thin glowing border on hover
+ */
+
+.cyber-card {
+  /* Base */
+  background: var(--bg-elevated, #161B22);
+  border-radius: 12px;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  /* Glass effect */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ========================================
+   Variants
+   ======================================== */
+
+/* Default - Elevated card */
+.cyber-card--default {
+  background: linear-gradient(135deg,
+    rgba(22, 27, 34, 0.95) 0%,
+    rgba(13, 17, 23, 0.98) 100%
+  );
+}
+
+/* Outlined - Minimal background */
+.cyber-card--outlined {
+  background: transparent;
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.15));
+}
+
+/* Elevated - Higher elevation */
+.cyber-card--elevated {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border-color: rgba(6, 182, 212, 0.15);
+}
+
+/* ========================================
+   Interactive States
+   ======================================== */
+
+/* Hoverable - Subtle lift and glow */
+.cyber-card--hoverable:hover {
+  transform: translateY(-2px);
+  border-color: rgba(6, 182, 212, 0.3);
+  box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15),
+              0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Glowing - Continuous glow effect */
+.cyber-card--glowing {
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow:
+    0 0 20px rgba(6, 182, 212, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.5),
+    inset 0 0 20px rgba(6, 182, 212, 0.05);
+}
+
+/* ========================================
+   Padding Options
+   ======================================== */
+
+.cyber-card--padding-sm { padding: 16px; }
+.cyber-card--padding-md { padding: 24px; }
+.cyber-card--padding-lg { padding: 32px; }
+
+/* ========================================
+   Card Sections
+   ======================================== */
+
+.cyber-card__header {
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.cyber-card__body {
+  padding: 24px;
+  color: var(--text-primary, #F1F5F9);
+}
+
+.cyber-card__footer {
+  padding: 16px 24px 24px 24px;
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.cyber-card__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #F1F5F9);
+  line-height: 1.4;
+}
+
+/* ========================================
+   Animation: Staggered entrance
+   ======================================== */
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cyber-card.animate-entrance {
+  animation: cardEntrance 0.6s ease-out backwards;
+}
+
+/* ========================================
+   Decorative: Grid overlay
+   ======================================== */
+
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}

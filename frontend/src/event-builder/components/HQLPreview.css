@@ -1,0 +1,163 @@
+/* HQL预览面板 */
+.hql-preview-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+/* 面板头部 */
+.hql-preview-panel .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.hql-preview-panel .panel-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* 模式切换器 */
+.mode-switcher {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* 头部操作区 */
+.header-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* 面板内容 */
+.hql-preview-panel .panel-content {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+/* CodeMirror编辑器容器 */
+.hql-editor-wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.hql-editor-wrapper .cm-editor {
+  height: 100%;
+}
+
+.hql-editor-wrapper .cm-scroller {
+  overflow: auto;
+}
+
+/* 预览容器 */
+.hql-preview-wrapper {
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+  height: 100%;
+}
+
+.hql-preview-wrapper code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--color-text-secondary);
+}
+
+.loading-state .spin {
+  font-size: 2rem;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--space-3);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--color-text-secondary);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: var(--space-3);
+  opacity: 0.5;
+}
+
+/* 面板底部 */
+.panel-footer {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: var(--font-size-sm);
+}
+
+/* 徽章 */
+.badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-warning {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.ml-2 {
+  margin-left: var(--space-2);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .hql-preview-panel .panel-header {
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .mode-switcher {
+    width: 100%;
+  }
+
+  .mode-switcher .btn {
+    flex: 1;
+  }
+}

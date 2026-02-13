@@ -1,0 +1,128 @@
+/**
+ * Component Showcase Page Styles
+ *
+ * Dark theme grid layout for component preview
+ */
+
+.component-showcase {
+  min-height: 100vh;
+  padding: 40px;
+  background: var(--bg-primary, #000000);
+  color: var(--text-primary, #F1F5F9);
+}
+
+/* ========================================
+   Header
+   ======================================== */
+
+.showcase-header {
+  text-align: center;
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.showcase-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.showcase-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary, #94A3B8);
+}
+
+/* ========================================
+   Sections
+   ======================================== */
+
+.showcase-section {
+  margin-bottom: 48px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--text-primary, #F1F5F9);
+  border-left: 4px solid var(--color-primary, #06B6D4);
+  padding-left: 12px;
+}
+
+/* ========================================
+   Component Rows
+   ======================================== */
+
+.showcase-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* ========================================
+   Cards Grid
+   ======================================== */
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ========================================
+   Inputs Grid
+   ======================================== */
+
+.inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.inputs-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ========================================
+   Animation: Staggered entrance
+   ======================================== */
+
+.component-showcase .cyber-card {
+  animation: cardEntrance 0.6s ease-out backwards;
+}
+
+.component-showcase .cyber-card:nth-child(1) { animation-delay: 0.1s; }
+.component-showcase .cyber-card:nth-child(2) { animation-delay: 0.2s; }
+.component-showcase .cyber-card:nth-child(3) { animation-delay: 0.3s; }
+.component-showcase .cyber-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   Utility
+   ======================================== */
+
+.text-sm {
+  font-size: 14px;
+}
+
+.text-gray-400 {
+  color: var(--text-tertiary, #64748B);
+}

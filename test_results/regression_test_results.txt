@@ -1,0 +1,246 @@
+================================================================================
+EVENT2TABLE REGRESSION TEST REPORT
+================================================================================
+Test Date: $(date '+%Y-%m-%d %H:%M:%S')
+Project: /Users/mckenzie/Documents/event2table
+Test Database: /Users/mckenzie/Documents/event2table/tests/test_database.db
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+Total Tests Collected: 450
+Tests Executed: 450
+  - Passed: 316 (70.2%)
+  - Failed: 54 (12.0%)
+  - Errors: 75 (16.7%)
+  - Skipped: 5 (1.1%)
+
+Execution Time: 46.80 seconds
+Success Rate: 70.2%
+
+================================================================================
+CRITICAL ISSUES (Immediate Action Required)
+================================================================================
+
+1. MODULE IMPORT ERRORS (75 errors - 16.7%)
+   Severity: CRITICAL
+   
+   Missing Modules:
+   - backend.services.categories (75 tests affected)
+   - backend.middleware (2 tests affected)
+   - backend.services.flows (5 tests affected)
+   - backend.services.bulk_operations (1 test affected)
+   - backend.services.hql_v2 (2 tests affected)
+   - backend.services.sql_optimizer (2 tests affected)
+   - playwright (1 test affected)
+   - automation_runner (1 test affected)
+   - modules (1 test affected)
+   - scripts.fix_event_nodes_game_gid (1 test affected)
+
+   Impact: 75 tests cannot run due to missing module dependencies
+   Recommendation: Install missing dependencies or remove/fix broken imports
+
+================================================================================
+FAILED TESTS BY CATEGORY
+================================================================================
+
+1. API TEST FAILURES (9 failed)
+   Severity: MEDIUM
+   
+   Tests:
+   - test_03_create_game_duplicate_gid: Duplicate GID validation not working
+   - test_01_get_common_params: Common params retrieval failed
+   - test_01_bulk_delete_events: Bulk delete operation failed
+   - test_02_bulk_update_category: Bulk category update failed
+   - test_03_bulk_toggle_common_params: Bulk toggle failed
+   - test_04_bulk_export_events: Bulk export failed
+   - test_05_bulk_validate_parameters: Bulk validation failed
+
+   Root Cause: API endpoints returning unexpected responses or missing functionality
+
+2. PERFORMANCE TEST FAILURES (4 failed)
+   Severity: MEDIUM
+   
+   Tests:
+   - test_multiple_aggregate_functions: 1217.65% performance degradation (threshold: 20%)
+   - test_find_isolated_nodes_100_nodes: 5.12ms average (threshold: 5.0ms)
+   - test_cache_hit_performance: 1.00x cache speedup (threshold: 10x)
+   - test_lru_eviction_performance: 460.30% instability (threshold: 20%)
+
+   Root Cause: Performance thresholds exceeded, potential optimization needed
+
+3. CONFIGURATION FAILURES (3 failed)
+   Severity: LOW
+   
+   Tests:
+   - test_env_test_file_should_exist: .env.test file missing
+   - test_env_development_file_should_exist: .env.development file missing
+   - test_env_production_file_should_exist: .env.production file missing
+
+   Root Cause: Environment configuration files not present
+
+4. DATABASE MIGRATION FAILURES (2 failed)
+   Severity: MEDIUM
+   
+   Tests:
+   - test_migration_from_v0_to_v18: Expected version 18, got 19
+   - test_migration_is_idempotent: Expected version 18, got 19
+
+   Root Cause: Database version mismatch, migration scripts may need update
+
+5. CONTEXT MANAGER FAILURE (1 failed)
+   Severity: MEDIUM
+   
+   Tests:
+   - test_context_manager_full_workflow: ModuleNotFoundError for backend.core.context_manager
+
+   Root Cause: Missing context_manager module
+
+6. BUSINESS PROCESS FAILURE (1 failed)
+   Severity: LOW
+   
+   Tests:
+   - test_event_creation_with_common_utils: AttributeError - 'dict' object has no attribute 'getlist'
+
+   Root Cause: Type mismatch in event creation utility
+
+================================================================================
+SKIPPED TESTS (5 skipped)
+================================================================================
+
+1. test_04_update_parameter_display_name - Feature not implemented
+2. test_02_search_and_export_workflow - Workflow dependency issue
+3. test_03_canvas_to_hql_workflow - Workflow dependency issue
+
+Reason: Features under development or dependency issues
+
+================================================================================
+COLLECTION ERRORS (14 tests cannot be imported)
+================================================================================
+
+These tests have import errors and cannot be executed:
+
+Archive/Diagnostics Tests (5 tests):
+- test_canvas_nodes.py: Missing backend.services.flows
+- test_event_nodes_complete.py: Missing playwright
+- test_join_fix.py: Missing backend.services.flows
+- test_join_hql.py: Missing modules
+- test_union_all_fix.py: Missing backend.services.flows
+
+Integration Tests (1 test):
+- test_create_batch_integration.py: Missing backend.services.bulk_operations
+
+Unit Tests (8 tests):
+- test_dashboard_change.py: Missing automation_runner
+- test_events_crud.py: Missing backend.middleware
+- test_hql_v2_incremental.py: Missing backend.services.hql_v2
+- test_hql_v2_integration.py: Missing backend.services.hql_v2
+- test_phase2.py: Missing backend.services.sql_optimizer
+- test_sql_optimizer.py: Missing backend.services.sql_optimizer
+- test_event_builder.py: Missing backend.middleware
+- test_event_nodes_migration.py: Missing scripts.fix_event_nodes_game_gid
+
+================================================================================
+INFRASTRUCTURE ISSUES DISCOVERED
+================================================================================
+
+1. Directory Naming Conflict (FIXED)
+   Issue: test/unit/backend was shadowing the actual backend module
+   Fix: Renamed to test/unit/backend_tests
+   Status: RESOLVED
+
+2. Missing Module Exports
+   Issue: backend/__init__.py and backend/core/__init__.py were empty
+   Fix: Added proper imports to both files
+   Status: RESOLVED
+
+3. Missing Root Conftest
+   Issue: No root conftest.py to set up Python path
+   Fix: Created conftest.py at project root
+   Status: RESOLVED
+
+================================================================================
+TEST DATABASE STATUS
+================================================================================
+
+Database Path: /Users/mckenzie/Documents/event2table/tests/test_database.db
+Size: 352 KB
+Status: Isolated test database (no production data impact)
+
+Note: Test database is properly isolated and does not affect production database
+(dwd_generator.db)
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+PRIORITY 1 - CRITICAL (Fix immediately):
+1. Install missing Python packages:
+   - playwright (for E2E testing)
+   - Create stub modules for missing services:
+     * backend.services.categories
+     * backend.middleware
+     * backend.services.flows
+     * backend.services.bulk_operations
+     * backend.services.hql_v2
+     * backend.services.sql_optimizer
+
+PRIORITY 2 - HIGH (Fix within 1 week):
+1. Fix duplicate GID validation in games API
+2. Fix bulk operations API endpoints (delete, update, toggle, export, validate)
+3. Fix common parameters API retrieval
+4. Update database migration tests to expect version 19
+
+PRIORITY 3 - MEDIUM (Fix within 2 weeks):
+1. Performance optimization:
+   - Aggregate function performance (1217% degradation)
+   - Graph traversal performance (5.12ms vs 5.0ms threshold)
+   - Cache hit performance (1.00x vs 10x threshold)
+   - LRU eviction stability (460% vs 20% threshold)
+
+2. Create environment configuration files:
+   - .env.test
+   - .env.development
+   - .env.production
+
+PRIORITY 4 - LOW (Fix when convenient):
+1. Fix event creation utility type mismatch
+2. Implement skipped test features
+3. Remove or fix archive diagnostic tests
+
+================================================================================
+TEST COVERAGE ANALYSIS
+================================================================================
+
+Working Tests: 316 tests (70.2%)
+Broken Tests: 129 tests (28.7%)
+  - Import Errors: 75 tests (16.7%)
+  - Failed Tests: 54 tests (12.0%)
+
+Core Functionality Coverage:
+- Games API: 17/18 tests passing (94.4%)
+- Events API: 24/24 tests passing (100%)
+- Parameters API: 22/23 tests passing (95.7%)
+- HQL Generation API: 5/5 tests passing (100%)
+- Canvas API: 5/5 tests passing (100%)
+- Cache Monitor API: 3/3 tests passing (100%)
+- Event Nodes API: 5/5 tests passing (100%)
+- Parameter Aliases API: 5/5 tests passing (100%)
+- Bulk Operations API: 1/6 tests passing (16.7%) - CRITICAL ISSUE
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Install missing dependencies (playwright)
+2. Create stub modules or implement missing services
+3. Re-run tests to verify fixes
+4. Fix failing API tests
+5. Address performance issues
+6. Create environment configuration files
+7. Re-run full regression test suite
+
+================================================================================
+END OF REPORT
+================================================================================

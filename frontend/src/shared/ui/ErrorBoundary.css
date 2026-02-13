@@ -1,0 +1,109 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
+  background: #0a0a0f;
+}
+
+.error-boundary-content {
+  max-width: 600px;
+  width: 100%;
+  padding: var(--space-8);
+  background: #1a1a1f;
+  border-radius: var(--radius-lg);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.error-boundary-content h2 {
+  margin: 0 0 var(--space-4) 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.error-boundary-content > p {
+  margin: 0 0 var(--space-6) 0;
+  color: var(--color-text-secondary);
+}
+
+.error-details {
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  background: #0f0f14;
+  border-radius: var(--radius-md);
+  border: 1px solid #374151;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+.error-details summary:hover {
+  color: var(--color-primary);
+}
+
+.error-message {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: #1e1e24;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #ef4444;
+  color: #fecaca;
+}
+
+.error-stack {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background: #1e1e24;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+
+.error-stack pre {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #d1d5db;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.error-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.error-actions .btn {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--color-primary, #3b82f6);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover, #2563eb);
+}
+
+.btn-secondary {
+  background: #374151;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}

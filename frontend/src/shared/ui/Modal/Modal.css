@@ -1,0 +1,259 @@
+/**
+ * Cyberpunk Lab Theme - Modal Component Styles
+ *
+ * Glassmorphism modal with backdrop blur and slide-up animation
+ */
+
+/* ========================================
+   Backdrop
+   ======================================== */
+
+.cyber-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 9998;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ========================================
+   Overlay
+   ======================================== */
+
+.cyber-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+  overflow-y: auto;
+}
+
+/* ========================================
+   Modal Container
+   ======================================== */
+
+.cyber-modal {
+  position: relative;
+  width: 100%;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary, rgba(15, 23, 42, 0.95));
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-default, rgba(6, 182, 212, 0.2));
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(6, 182, 212, 0.1);
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Size variants */
+.cyber-modal--sm { max-width: 400px; }
+.cyber-modal--md { max-width: 540px; }
+.cyber-modal--lg { max-width: 720px; }
+.cyber-modal--xl { max-width: 960px; }
+.cyber-modal--full {
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+}
+
+/* ========================================
+   Header
+   ======================================== */
+
+.cyber-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  background: var(--bg-tertiary, rgba(15, 23, 42, 0.8));
+}
+
+.cyber-modal__title {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary, #F1F5F9);
+  line-height: 1.3;
+}
+
+/* ========================================
+   Close Button
+   ======================================== */
+
+.cyber-modal__close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  color: var(--text-secondary, #94A3B8);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cyber-modal__close:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #EF4444;
+}
+
+.cyber-modal__close:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   Body
+   ======================================== */
+
+.cyber-modal__body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  color: var(--text-primary, #F1F5F9);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Custom scrollbar for modal body */
+.cyber-modal__body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cyber-modal__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cyber-modal__body::-webkit-scrollbar-thumb {
+  background: var(--border-default, rgba(6, 182, 212, 0.2));
+  border-radius: 4px;
+}
+
+.cyber-modal__body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #06B6D4);
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+
+.cyber-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  background: var(--bg-tertiary, rgba(15, 23, 42, 0.8));
+}
+
+.cyber-modal__footer .cyber-button {
+  min-width: 100px;
+}
+
+/* ========================================
+   Variant: Danger
+   ======================================== */
+
+.cyber-modal--danger {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.cyber-modal--danger .cyber-modal__title {
+  color: #EF4444;
+}
+
+.cyber-modal--danger .cyber-modal__header {
+  background: rgba(239, 68, 68, 0.05);
+  border-bottom-color: rgba(239, 68, 68, 0.2);
+}
+
+/* ========================================
+   Variant: Warning
+   ======================================== */
+
+.cyber-modal--warning {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.cyber-modal--warning .cyber-modal__title {
+  color: #FBBF24;
+}
+
+.cyber-modal--warning .cyber-modal__header {
+  background: rgba(251, 191, 36, 0.05);
+  border-bottom-color: rgba(251, 191, 36, 0.2);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 640px) {
+  .cyber-modal-overlay {
+    padding: 16px;
+    align-items: flex-end; /* Bottom sheet on mobile */
+  }
+
+  .cyber-modal {
+    max-height: calc(100vh - 16px);
+    max-width: 100%;
+    border-radius: 16px 16px 0 0; /* Rounded top corners only */
+  }
+
+  .cyber-modal__header,
+  .cyber-modal__body,
+  .cyber-modal__footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .cyber-modal__header {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .cyber-modal__body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .cyber-modal__title {
+    font-size: 18px;
+  }
+
+  .cyber-modal__footer {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}

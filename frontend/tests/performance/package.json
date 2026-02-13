@@ -1,0 +1,32 @@
+{
+  "name": "event2table-performance-tests",
+  "version": "1.0.0",
+  "description": "Performance testing suite for Event2Table using Chrome DevTools Protocol",
+  "main": "event2table-performance-test.js",
+  "scripts": {
+    "test": "node event2table-performance-test.js",
+    "test:cdp": "bash run-cdp-performance-test.sh",
+    "test:single": "node cdp-performance-measurer.js",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "performance",
+    "testing",
+    "chrome-devtools-protocol",
+    "lighthouse",
+    "web-vitals"
+  ],
+  "author": "Event2Table Development Team",
+  "license": "MIT",
+  "dependencies": {
+    "chrome-launcher": "^1.1.2",
+    "chrome-remote-interface": "^0.33.0"
+  },
+  "devDependencies": {
+    "lighthouse": "^11.5.0",
+    "chrome-devtools-frontend": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

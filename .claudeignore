@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+ENV/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Cache
+.cache/
+.vite/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Test results
+test-results/
+playwright-report/
+htmlcov/
+
+# Logs
+logs/
+*.log
+
+# Database
+data/*.db
+*.db
+*.sqlite
+
+# Coverage
+.coverage
+.coverage.*
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp

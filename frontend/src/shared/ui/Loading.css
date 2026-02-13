@@ -1,0 +1,16 @@
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #0a0a0f;
+}
+
+.loading-spinner {
+  text-align: center;
+}
+
+.loading-text {
+  margin-top: var(--space-4);
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,230 @@
+/**
+ * Switch Styles - Cyberpunk Lab Theme
+ *
+ * Design Tokens: Cyan (#06B6D4), Deep Black (#000000), Glass effect
+ * Animations: Smooth slider transition, glow effects
+ */
+
+.cyber-switch {
+  --switch-bg-off: rgba(0, 0, 0, 0.8);
+  --switch-bg-on: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+  --switch-border-off: rgba(6, 182, 212, 0.4);
+  --switch-border-on: #06B6D4;
+  --switch-focus-shadow: rgba(6, 182, 212, 0.1);
+  --switch-hover-shadow: rgba(6, 182, 212, 0.3);
+  --switch-glow-on: rgba(6, 182, 212, 0.6);
+  --switch-error: #F44336;
+}
+
+/* ========================================
+   Input (Hidden)
+   ======================================== */
+
+.cyber-switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* ========================================
+   Wrapper
+   ======================================== */
+
+.cyber-switch-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+
+.cyber-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  cursor: pointer;
+  user-select: none;
+  width: fit-content;
+}
+
+.cyber-switch-wrapper--disabled .cyber-switch-label {
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Switch Track
+   ======================================== */
+
+.cyber-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  background: var(--switch-bg-off);
+  border: 2px solid var(--switch-border-off);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.cyber-switch-label:hover .cyber-switch:not(.cyber-switch--disabled) {
+  border-color: var(--switch-border-off);
+  box-shadow: 0 0 10px var(--switch-hover-shadow);
+}
+
+.cyber-switch-input:focus-visible + .cyber-switch {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--switch-focus-shadow);
+}
+
+/* Checked State */
+.cyber-switch--checked {
+  background: var(--switch-bg-on);
+  border-color: var(--switch-border-on);
+  box-shadow: 0 0 15px var(--switch-glow-on);
+}
+
+.cyber-switch--checked:hover {
+  box-shadow: 0 0 20px var(--switch-glow-on);
+}
+
+/* Invalid State */
+.cyber-switch--invalid {
+  border-color: var(--switch-error);
+}
+
+.cyber-switch--invalid:not(.cyber-switch--checked) {
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.cyber-switch--invalid:hover {
+  border-color: var(--switch-error);
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+}
+
+.cyber-switch-input:focus-visible + .cyber-switch--invalid {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+/* Disabled State */
+.cyber-switch--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cyber-switch--disabled:hover {
+  box-shadow: none;
+}
+
+/* ========================================
+   Switch Slider
+   ======================================== */
+
+.cyber-switch-slider {
+  position: absolute;
+  left: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #94A3B8;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cyber-switch--checked .cyber-switch-slider {
+  left: calc(100% - 20px);
+  background: #FFFFFF;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+.cyber-switch--invalid .cyber-switch-slider {
+  background: var(--switch-error);
+}
+
+.cyber-switch--checked.cyber-switch--invalid .cyber-switch-slider {
+  background: #FFFFFF;
+}
+
+/* ========================================
+   Switch Icon
+   ======================================== */
+
+.cyber-switch-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #06B6D4;
+  animation: cyber-switch-check 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cyber-switch-check {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   Content
+   ======================================== */
+
+.cyber-switch-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+  flex: 1;
+}
+
+.cyber-switch-label-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #F1F5F9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+.cyber-switch-wrapper--disabled .cyber-switch-label-text {
+  opacity: 0.5;
+}
+
+.cyber-switch-description {
+  font-size: 13px;
+  font-weight: 400;
+  color: #94A3B8;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.4;
+}
+
+.cyber-switch-wrapper--disabled .cyber-switch-description {
+  opacity: 0.5;
+}
+
+.cyber-switch-required {
+  color: var(--switch-error);
+  margin-left: 2px;
+}
+
+/* ========================================
+   Error Message
+   ======================================== */
+
+.cyber-switch__error {
+  margin-top: var(--space-1, 4px);
+  margin-left: 56px;
+  font-size: 13px;
+  color: var(--switch-error);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.4;
+}

@@ -1,0 +1,154 @@
+/**
+ * Spinner Styles - Cyberpunk Lab Theme
+ *
+ * Design Tokens: Cyan (#06B6D4), Deep Black (#000000)
+ * Animations: Rotating circles with pulsing glow
+ */
+
+.cyber-spinner {
+  --spinner-color: #06B6D4;
+  --spinner-color-light: #22D3EE;
+  --spinner-glow: rgba(6, 182, 212, 0.5);
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3, 12px);
+  position: relative;
+}
+
+/* ========================================
+   Spinner Circles
+   ======================================== */
+
+.cyber-spinner-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  animation: cyber-spinner-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.cyber-spinner-circle:nth-child(1) {
+  border-top-color: var(--spinner-color);
+  border-right-color: var(--spinner-color);
+  animation-delay: -0.45s;
+}
+
+.cyber-spinner-circle:nth-child(2) {
+  border-top-color: var(--spinner-color-light);
+  border-left-color: var(--spinner-color-light);
+  animation-delay: -0.3s;
+}
+
+.cyber-spinner-circle:nth-child(3) {
+  border-bottom-color: var(--spinner-color);
+  border-left-color: var(--spinner-color-light);
+  animation-delay: -0.15s;
+}
+
+@keyframes cyber-spinner-spin {
+  0% {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   Sizes
+   ======================================== */
+
+/* Small */
+.cyber-spinner--sm {
+  --spinner-size: 20px;
+  --spinner-border-width: 2px;
+}
+
+.cyber-spinner--sm .cyber-spinner-circle {
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border-width: var(--spinner-border-width);
+}
+
+.cyber-spinner--sm .cyber-spinner-label {
+  font-size: 12px;
+}
+
+/* Medium */
+.cyber-spinner--md {
+  --spinner-size: 32px;
+  --spinner-border-width: 3px;
+}
+
+.cyber-spinner--md .cyber-spinner-circle {
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border-width: var(--spinner-border-width);
+  box-shadow: 0 0 10px var(--spinner-glow);
+}
+
+.cyber-spinner--md .cyber-spinner-label {
+  font-size: 14px;
+}
+
+/* Large */
+.cyber-spinner--lg {
+  --spinner-size: 48px;
+  --spinner-border-width: 4px;
+}
+
+.cyber-spinner--lg .cyber-spinner-circle {
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border-width: var(--spinner-border-width);
+  box-shadow: 0 0 20px var(--spinner-glow);
+}
+
+.cyber-spinner--lg .cyber-spinner-label {
+  font-size: 16px;
+}
+
+/* ========================================
+   Label
+   ======================================== */
+
+.cyber-spinner-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #F1F5F9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  animation: cyber-spinner-pulse 1.5s ease-in-out infinite;
+  margin-top: calc(var(--spinner-size) + 8px);
+}
+
+@keyframes cyber-spinner-pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   Screen Reader Only
+   ======================================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

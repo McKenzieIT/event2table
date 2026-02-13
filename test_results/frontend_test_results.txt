@@ -1,0 +1,607 @@
+================================================================================
+FRONTEND TEST RESULTS - EVENT2TABLE PROJECT
+================================================================================
+
+Project: event2table (DWD Generator)
+Frontend Root: /Users/mckenzie/Documents/event2table/frontend
+Test Date: 2026-02-11
+Test Environment: macOS Darwin 24.6.0
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+STATUS: BLOCKED - Node.js/npm NOT INSTALLED
+
+All frontend testing operations are blocked due to Node.js and npm not being
+available in the current environment. This prevents:
+- Running unit tests (Vitest/Jest)
+- Running end-to-end tests (Playwright)
+- Building the production bundle
+- Running linting and type checking
+- Installing dependencies
+
+The project structure and test configuration are in place, but runtime execution
+requires npm to be installed.
+
+================================================================================
+ENVIRONMENT CHECKS
+================================================================================
+
+1. Node.js Installation
+   Status: NOT INSTALLED
+   Command Checked: node --version
+   Result: command not found
+   Impact: BLOCKS ALL TESTS AND BUILDS
+
+2. npm Installation
+   Status: NOT INSTALLED
+   Command Checked: npm --version
+   Result: command not found
+   Impact: BLOCKS ALL TESTS AND BUILDS
+
+3. Dependencies Installation
+   Status: NOT INSTALLED
+   node_modules Directory: Does NOT exist
+   Impact: Cannot run any npm scripts or tests
+
+================================================================================
+PROJECT STRUCTURE ANALYSIS
+================================================================================
+
+Frontend Stack:
+- Framework: React 18.3.1
+- Build Tool: Vite 7.3.1
+- Language: TypeScript 5.9.3
+- State Management: TanStack React Query 5.17.0
+- Routing: React Router DOM 6.22.0
+- Forms: React Hook Form 7.71.1
+- Canvas/Flow: ReactFlow 11.10.4
+- Code Editor: CodeMirror 6.x (@uiw/react-codemirror)
+- Testing: Vitest 4.0.18, Playwright 1.58.0
+
+Codebase Metrics:
+- Total Source Files: 240 (TS, TSX, JS, JSX)
+- Total Lines of Code: 33,470 lines
+- Source Directory Size: 2.0 MB
+- CSS Files: 103 files
+- Test Files: 1 found (ParamSelector.test.jsx)
+- Performance Tests: 1 (canvas-performance.spec.ts)
+
+Module Structure:
+- src/
+  ├── analytics/           # Event nodes analytics
+  ├── canvas/              # Canvas flow editor (ReactFlow)
+  ├── event-builder/       # HQL event builder
+  ├── features/            # Feature-based modules
+  │   ├── canvas/          # Canvas feature
+  │   ├── events/          # Events feature
+  │   ├── games/           # Games feature
+  │   └── parameters/      # Parameters feature
+  └── shared/              # Shared utilities and components
+      ├── ui/              # UI components
+      ├── hooks/           # Custom hooks (20+)
+      ├── api/             # API clients (15+ endpoints)
+      └── utils/           # Utilities (includes performance monitor)
+
+================================================================================
+AVAILABLE TEST SCRIPTS (package.json)
+================================================================================
+
+The following test scripts are configured but CANNOT be executed without npm:
+
+1. npm test
+   - Command: vitest
+   - Purpose: Run unit tests with Vitest
+   - Status: BLOCKED (npm not installed)
+
+2. npm run test:ui
+   - Command: vitest --ui
+   - Purpose: Run tests with Vitest UI
+   - Status: BLOCKED (npm not installed)
+
+3. npm run test:e2e
+   - Command: bash scripts/run-e2e-tests.sh
+   - Purpose: Run Playwright end-to-end tests
+   - Status: BLOCKED (npm not installed)
+
+4. npm run test:e2e:ui
+   - Command: bash scripts/run-e2e-tests.sh --ui
+   - Purpose: Run E2E tests with Playwright UI
+   - Status: BLOCKED (npm not installed)
+
+5. npm run test:e2e:debug
+   - Command: bash scripts/run-e2e-tests.sh --debug
+   - Purpose: Run E2E tests in debug mode
+   - Status: BLOCKED (npm not installed)
+
+6. npm run test:e2e:headed
+   - Command: bash scripts/run-e2e-tests.sh --headed
+   - Purpose: Run E2E tests in headed mode
+   - Status: BLOCKED (npm not installed)
+
+7. npm run build
+   - Command: vite build && node update-template.js
+   - Purpose: Production build with template update
+   - Status: BLOCKED (npm not installed)
+   - Note: update-template.js script does NOT exist in the project
+
+8. npm run dev
+   - Command: vite
+   - Purpose: Start development server
+   - Status: BLOCKED (npm not installed)
+
+9. npm run preview
+   - Command: vite preview
+   - Purpose: Preview production build
+   - Status: BLOCKED (npm not installed)
+
+================================================================================
+BUILD CONFIGURATION ANALYSIS
+================================================================================
+
+Vite Configuration (vite.config.js):
+- Base Path: '/' (dev), '/frontend/dist/' (production)
+- Dev Server Port: 5173
+- Host: 0.0.0.0 (all network interfaces)
+- Output Directory: dist/
+- CSS Code Splitting: ENABLED (performance optimization)
+- Chunk Size Warning Limit: 1000 KB
+- Optimize Deps: ReactFlow excluded (to avoid TDZ errors)
+- External: @canvas-react/* (separate package)
+
+TypeScript Configuration (tsconfig.json):
+- Target: ES2020
+- Module: ESNext
+- JSX: react-jsx
+- Strict Mode: DISABLED (progressive migration approach)
+- Type Checking: Relaxed (allowJs: true, checkJs: false)
+- Path Aliases: Configured (@, @shared, @canvas, @event-builder, @analytics)
+
+Build Concerns:
+1. Missing update-template.js script referenced in build command
+2. No ESLint configuration files found
+3. No test configuration files (vitest.config.js, jest.config.js) found
+4. TypeScript strict mode disabled (should be enabled for production)
+
+================================================================================
+TEST FILES DISCOVERED
+================================================================================
+
+1. Unit Test:
+   Path: /Users/mckenzie/Documents/event2table/frontend/src/event-builder/__tests__/components/ParamSelector.test.jsx
+   Framework: Jest (imports @jest/globals)
+   Purpose: Test ParamSelector component API data parsing
+   Coverage: API response structure validation
+   Status: CANNOT RUN (npm not installed)
+
+2. Performance Test:
+   Path: /Users/mckenzie/Documents/event2table/frontend/tests/performance/canvas-performance.spec.ts
+   Framework: Playwright (from imports)
+   Purpose: Canvas rendering performance at 60 FPS
+   Status: CANNOT RUN (npm not installed)
+
+3. Performance Test Script:
+   Path: /Users/mckenzie/Documents/event2table/frontend/tests/performance/run-performance-tests.sh
+   Type: Shell script
+   Purpose: Automated performance testing
+   Status: CANNOT RUN (npm not installed)
+
+4. Performance Documentation:
+   - INDEX.md
+   - QUICK-START.md
+   - README.md
+   - frontend-performance-test-report.md
+
+================================================================================
+DEPENDENCY ANALYSIS
+================================================================================
+
+Major Dependencies and Estimated Bundle Impact:
+
+Heavy Dependencies (> 100 KB):
+- reactflow: ~500 KB (highest impact - core canvas library)
+- @codemirror/*: ~300 KB (HQL editor)
+- react-syntax-highlighter: ~200 KB (code display)
+- react-select: ~150 KB (dropdowns)
+- @dnd-kit/*: ~100 KB (drag & drop)
+
+Medium Dependencies (50-100 KB):
+- @tanstack/react-query: ~50 KB (data fetching)
+
+Estimated Total Bundle Size: ~1.5-2 MB (unminified)
+
+Bundle Size Concerns:
+- Large bundle size may impact initial load performance
+- No code splitting detected in main routes
+- No lazy loading components found
+- Heavy dependencies not tree-shaken effectively
+
+================================================================================
+CODE QUALITY CHECKS (STATIC ANALYSIS)
+================================================================================
+
+1. TypeScript Configuration:
+   - Strict Mode: DISABLED
+   - noUnusedLocals: DISABLED
+   - noUnusedParameters: DISABLED
+   - noImplicitAny: DISABLED
+   - strictNullChecks: DISABLED
+   Assessment: Type safety is relaxed for progressive migration
+   Recommendation: Enable strict mode gradually before production
+
+2. Linting Configuration:
+   - ESLint: NOT CONFIGURED (no config files found)
+   - ESLint packages installed: Yes (@typescript-eslint/eslint-plugin, etc.)
+   Assessment: Linting packages installed but not configured
+   Recommendation: Create .eslintrc.js and enable linting in CI/CD
+
+3. Test Configuration:
+   - Vitest: NOT CONFIGURED (no vitest.config.js found)
+   - Jest: NOT CONFIGURED (no jest.config.js found)
+   - Playwright: Referenced in scripts but config not visible
+   Assessment: Test frameworks installed but not properly configured
+   Recommendation: Create proper test configuration files
+
+4. Build Scripts:
+   - update-template.js referenced but MISSING
+   Assessment: Build command will fail
+   Recommendation: Create update-template.js or remove from build command
+
+================================================================================
+BUILD VERIFICATION
+================================================================================
+
+Status: CANNOT VERIFY - BLOCKED BY MISSING NPM
+
+Build Steps Attempted:
+1. Navigate to frontend directory: SUCCESS
+2. Check node_modules: NOT FOUND
+3. Run npm install: BLOCKED (npm not installed)
+4. Run npm run build: BLOCKED (npm not installed)
+
+Expected Build Output (if npm were available):
+- Directory: dist/
+- Contents:
+  - index.html
+  - assets/
+    - index-[hash].js (main bundle)
+    - index-[hash].css (main styles)
+  - Other chunks (if code splitting enabled)
+
+Bundle Size Verification:
+- Current Status: CANNOT MEASURE (no build output)
+- Expected: Check with `du -sh dist/` after build
+
+================================================================================
+TEST EXECUTION RESULTS
+================================================================================
+
+Unit Tests:
+- Status: NOT RUN
+- Reason: npm not installed
+- Test Files Found: 1 (ParamSelector.test.jsx)
+- Framework: Jest/Vitest hybrid
+- Coverage: Unknown (cannot run tests)
+
+E2E Tests:
+- Status: NOT RUN
+- Reason: npm not installed
+- Framework: Playwright
+- Test Scripts: 4 variants (e2e, e2e:ui, e2e:debug, e2e:headed)
+- Coverage: Unknown (cannot run tests)
+
+Performance Tests:
+- Status: NOT RUN
+- Reason: npm not installed
+- Framework: Playwright
+- Test Files: 1 (canvas-performance.spec.ts)
+- Focus: Canvas 60 FPS rendering
+- Coverage: Unknown (cannot run tests)
+
+Linting:
+- Status: NOT RUN
+- Reason: npm not installed, no ESLint config
+- Command: npm run lint (NOT DEFINED in package.json)
+- Assessment: Linting not configured
+
+Type Checking:
+- Status: NOT RUN
+- Reason: npm not installed
+- Command: npx tsc --noEmit (if npm available)
+- Assessment: TypeScript strict mode disabled, limited type safety
+
+================================================================================
+CRITICAL ISSUES IDENTIFIED
+================================================================================
+
+BLOCKERS (Must Fix Before Testing):
+1. Node.js not installed
+   - Impact: BLOCKS ALL frontend operations
+   - Priority: CRITICAL
+
+2. npm not installed
+   - Impact: BLOCKS ALL frontend operations
+   - Priority: CRITICAL
+
+3. node_modules not installed
+   - Impact: Cannot run any tests or builds
+   - Priority: CRITICAL (requires npm)
+
+4. update-template.js missing
+   - Impact: Build command will fail
+   - Priority: HIGH
+
+HIGH PRIORITY ISSUES:
+1. No ESLint configuration
+   - Impact: Cannot enforce code quality standards
+   - Recommendation: Create .eslintrc.js
+
+2. No Vitest configuration
+   - Impact: Test runner not properly configured
+   - Recommendation: Create vitest.config.js
+
+3. TypeScript strict mode disabled
+   - Impact: Reduced type safety, potential runtime errors
+   - Recommendation: Enable strict mode gradually
+
+4. Large bundle size (estimated 1.5-2 MB)
+   - Impact: Slow initial load
+   - Recommendation: Implement code splitting and lazy loading
+
+5. No test configuration files
+   - Impact: Tests may not run correctly
+   - Recommendation: Create vitest.config.js and playwright.config.js
+
+MEDIUM PRIORITY ISSUES:
+1. Only 1 unit test file found for 240 source files
+   - Impact: Low test coverage
+   - Recommendation: Increase test coverage
+
+2. No CI/CD configuration visible
+   - Impact: No automated testing in pipeline
+   - Recommendation: Set up GitHub Actions or similar
+
+3. 103 CSS files (potential performance impact)
+   - Impact: May slow down initial load
+   - Recommendation: Consider CSS optimization
+
+================================================================================
+INSTALLATION INSTRUCTIONS
+================================================================================
+
+To install Node.js and npm on macOS:
+
+Option 1: Using Homebrew (Recommended):
+```bash
+# Install Homebrew if not already installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Node.js (includes npm)
+brew install node
+
+# Verify installation
+node --version
+npm --version
+```
+
+Option 2: Using official installer:
+1. Download from https://nodejs.org/
+2. Install the LTS version (recommended)
+3. Verify installation:
+   node --version
+   npm --version
+
+Option 3: Using nvm (Node Version Manager):
+```bash
+# Install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Reload shell configuration
+source ~/.bashrc  # or source ~/.zshrc
+
+# Install Node.js LTS
+nvm install --lts
+
+# Use Node.js LTS
+nvm use --lts
+
+# Verify installation
+node --version
+npm --version
+```
+
+After installing Node.js and npm:
+
+```bash
+# Navigate to frontend directory
+cd /Users/mckenzie/Documents/event2table/frontend
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Run build
+npm run build
+
+# Check build output
+du -sh dist/
+```
+
+================================================================================
+RECOMMENDATIONS FOR FRONTEND IMPROVEMENTS
+================================================================================
+
+IMMEDIATE ACTIONS (Before Production):
+1. Install Node.js and npm
+2. Install dependencies (npm install)
+3. Create missing update-template.js or remove from build command
+4. Configure ESLint with .eslintrc.js
+5. Configure Vitest with vitest.config.js
+6. Enable TypeScript strict mode gradually
+
+SHORT-TERM (Next Sprint):
+1. Increase test coverage (target: 70%+)
+2. Set up CI/CD pipeline with automated testing
+3. Implement code splitting for routes
+4. Add lazy loading for heavy components
+5. Configure bundle size monitoring
+6. Add performance budgets to build process
+
+MEDIUM-TERM (Next Quarter):
+1. Optimize bundle size (target: < 1 MB initial load)
+2. Implement service worker for caching
+3. Add image optimization
+4. Set up Playwright E2E test suite
+5. Add performance regression testing
+6. Enable ESLint in CI/CD with --max-warnings=0
+
+LONG-TERM (Next 6 Months):
+1. Achieve 90%+ test coverage
+2. Implement comprehensive E2E test suite
+3. Set up performance monitoring in production
+4. Optimize Time to Interactive (TTI) to < 3s
+5. Implement progressive web app (PWA) features
+6. Add accessibility testing (axe-core)
+
+SPECIFIC TECHNICAL RECOMMENDATIONS:
+
+Performance:
+- Implement React.lazy() for route-based code splitting
+- Use @tanstack/react-query's caching more effectively
+- Add React.memo() to expensive components
+- Implement virtual scrolling for large lists
+- Optimize ReactFlow rendering with custom nodes
+
+Code Quality:
+- Enable TypeScript strict mode
+- Add ESLint rules for React hooks exhaustiveness
+- Implement pre-commit hooks with husky + lint-staged
+- Add TypeScript type checking to CI/CD
+- Use @typescript-eslint/eslint-plugin
+
+Testing:
+- Add unit tests for all API endpoints
+- Test React components with @testing-library/react
+- Add integration tests for critical user flows
+- Test canvas performance with Playwright
+- Add visual regression tests
+
+Build:
+- Create update-template.js script or remove from build
+- Add bundle analysis to build process (rollup-plugin-visualizer)
+- Implement automated bundle size checks
+- Add source maps for production debugging
+- Configure asset optimization (compression, minification)
+
+================================================================================
+BUNDLE SIZE METRICS
+================================================================================
+
+Status: CANNOT MEASURE (No build output available)
+
+Estimated Bundle Size (from dependency analysis):
+- Main Bundle: ~1.5-2 MB (unminified)
+- After Minification: ~500-700 KB (estimated)
+- After Gzip: ~150-200 KB (estimated)
+
+Breakdown by Major Dependencies:
+- ReactFlow: ~500 KB (26%)
+- CodeMirror: ~300 KB (16%)
+- React Syntax Highlighter: ~200 KB (11%)
+- React Select: ~150 KB (8%)
+- DnD Kit: ~100 KB (5%)
+- React Query: ~50 KB (3%)
+- Other Dependencies: ~700 KB (31%)
+
+Recommendations:
+- Implement code splitting to reduce initial bundle
+- Load ReactFlow and CodeMirror on-demand
+- Use dynamic imports for heavy components
+- Consider lighter alternatives for syntax highlighting
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+To proceed with frontend testing, follow these steps in order:
+
+1. INSTALL NODE.JS AND NPM
+   - Use one of the installation methods above
+   - Verify: node --version && npm --version
+
+2. INSTALL DEPENDENCIES
+   - cd /Users/mckenzie/Documents/event2table/frontend
+   - npm install
+   - Verify: test -d node_modules
+
+3. RESOLVE BUILD SCRIPT ISSUE
+   - Option A: Create update-template.js script
+   - Option B: Remove from build command in package.json
+   - Current: "build": "vite build && node update-template.js"
+   - Fixed: "build": "vite build"
+
+4. CONFIGURE TOOLS
+   - Create .eslintrc.js for linting
+   - Create vitest.config.js for unit tests
+   - Create playwright.config.js for E2E tests
+
+5. RUN TESTS
+   - npm test (unit tests)
+   - npm run test:e2e (end-to-end tests)
+   - npm run build (production build)
+
+6. VERIFY BUILD
+   - Check dist/ directory size
+   - Review bundle composition
+   - Test production build locally
+
+7. SET UP CI/CD
+   - Create GitHub Actions workflow
+   - Add automated testing
+   - Add bundle size checks
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The event2table frontend is a well-structured React application with modern tooling
+(Vite, TypeScript, React Query, ReactFlow). However, all testing and build operations
+are currently blocked due to Node.js and npm not being installed in the environment.
+
+Key Points:
+- Project structure is solid with feature-based architecture
+- Test scripts are defined but cannot execute
+- Build configuration has issues (missing update-template.js)
+- Code quality tools are installed but not configured
+- Test coverage is very low (1 test for 240 files)
+- Bundle size needs optimization (estimated 1.5-2 MB)
+
+Priority Actions:
+1. Install Node.js and npm (CRITICAL)
+2. Install dependencies with npm install (CRITICAL)
+3. Fix build script issue (HIGH)
+4. Configure ESLint and Vitest (HIGH)
+5. Increase test coverage (MEDIUM)
+6. Optimize bundle size (MEDIUM)
+
+Once Node.js is installed, the project should be able to:
+- Run unit tests with Vitest
+- Run E2E tests with Playwright
+- Build for production
+- Perform linting and type checking
+- Execute performance tests
+
+This report should be re-run after installing Node.js to get actual test results,
+build metrics, and performance data.
+
+================================================================================
+END OF REPORT
+================================================================================
+
+Generated: 2026-02-11
+Environment: macOS Darwin 24.6.0
+Project: event2table (DWD Generator)
+Frontend Framework: React 18.3.1 + Vite 7.3.1 + TypeScript 5.9.3

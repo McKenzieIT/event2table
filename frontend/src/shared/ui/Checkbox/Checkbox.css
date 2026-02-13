@@ -1,0 +1,193 @@
+/**
+ * Checkbox Styles - Cyberpunk Lab Theme
+ *
+ * Design Tokens: Cyan (#06B6D4), Deep Black (#000000), Glass effect
+ * Animations: Smooth check animation, glow on focus
+ */
+
+.cyber-checkbox {
+  --checkbox-bg: rgba(0, 0, 0, 0.8);
+  --checkbox-border: rgba(6, 182, 212, 0.4);
+  --checkbox-border-hover: rgba(6, 182, 212, 0.7);
+  --checkbox-checked-bg: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+  --checkbox-focus-shadow: rgba(6, 182, 212, 0.1);
+  --checkbox-hover-shadow: rgba(6, 182, 212, 0.3);
+  --checkbox-error: #F44336;
+}
+
+/* ========================================
+   Input (Hidden)
+   ======================================== */
+
+.cyber-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* ========================================
+   Wrapper
+   ======================================== */
+
+.cyber-checkbox-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+
+.cyber-checkbox-label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2, 8px);
+  cursor: pointer;
+  user-select: none;
+  width: fit-content;
+}
+
+.cyber-checkbox-wrapper--disabled .cyber-checkbox-label {
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Checkbox Box
+   ======================================== */
+
+.cyber-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background: var(--checkbox-bg);
+  border: 2px solid var(--checkbox-border);
+  border-radius: 4px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  margin-top: 2px;
+}
+
+.cyber-checkbox-label:hover .cyber-checkbox:not(.cyber-checkbox--disabled) {
+  border-color: var(--checkbox-border-hover);
+  box-shadow: 0 0 10px var(--checkbox-hover-shadow);
+}
+
+.cyber-checkbox-input:focus-visible + .cyber-checkbox {
+  outline: none;
+  border-color: var(--checkbox-border-hover);
+  box-shadow: 0 0 0 3px var(--checkbox-focus-shadow);
+}
+
+/* Checked State */
+.cyber-checkbox--checked {
+  background: var(--checkbox-checked-bg);
+  border-color: #06B6D4;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+.cyber-checkbox--checked:hover {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+}
+
+/* Indeterminate State */
+.cyber-checkbox--indeterminate {
+  background: var(--checkbox-checked-bg);
+  border-color: #06B6D4;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+/* Invalid State */
+.cyber-checkbox--invalid {
+  border-color: var(--checkbox-error);
+}
+
+.cyber-checkbox--invalid:hover {
+  border-color: var(--checkbox-error);
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+}
+
+.cyber-checkbox-input:focus-visible.cyber-checkbox--invalid + .cyber-checkbox {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+/* Disabled State */
+.cyber-checkbox--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cyber-checkbox--disabled:hover {
+  border-color: var(--checkbox-border);
+  box-shadow: none;
+}
+
+/* ========================================
+   Checkbox Icon
+   ======================================== */
+
+.cyber-checkbox-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  animation: cyber-checkbox-check 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cyber-checkbox-check {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cyber-checkbox-indeterminate {
+  width: 8px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+/* ========================================
+   Label Text
+   ======================================== */
+
+.cyber-checkbox-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #F1F5F9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.cyber-checkbox-wrapper--disabled .cyber-checkbox-text {
+  opacity: 0.5;
+}
+
+.cyber-checkbox-required {
+  color: var(--checkbox-error);
+  margin-left: 2px;
+}
+
+/* ========================================
+   Error Message
+   ======================================== */
+
+.cyber-checkbox__error {
+  margin-top: var(--space-1, 4px);
+  margin-left: 26px;
+  font-size: 13px;
+  color: var(--checkbox-error);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.4;
+}

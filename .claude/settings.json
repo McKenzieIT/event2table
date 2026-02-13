@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Read(//Users/mckenzie/.claude/plans/**)",
+      "Bash(tree:*)",
+      "Read(//Users/mckenzie/Documents/opencode test/dwd_generator/**)",
+      "mcp__zread__get_repo_structure",
+      "Read(//Users/mckenzie/Documents/**)",
+      "Bash(find:*)",
+      "Read(//Users/mckenzie/Documents/event2table/**)",
+      "Bash(python:*)",
+      "Read(//Users/mckenzie/Documents/event2table/frontend/src/features/**)",
+      "Bash(done:*)",
+      "Bash(black:*)",
+      "Bash(pip3 list:*)",
+      "Bash(pylint:*)",
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "Bash(npm --version)",
+      "Bash(source:*)",
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(sqlite3:*)",
+      "Bash(redis-cli:*)",
+      "Read(//Users/mckenzie/Documents/event2table/docs/**)",
+      "Read(//Users/mckenzie/**)",
+      "Read(//usr/local/**)",
+      "Bash(cat:*)",
+      "Bash(/usr/local/opt/python@3.9/bin/python3:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/mckenzie/Documents/event2table/frontend/src/features/games",
+      "/Users/mckenzie/Documents/event2table/frontend/src/features/events",
+      "/Users/mckenzie/Documents/event2table/frontend/src/features/canvas",
+      "/Users/mckenzie/Documents/opencode test/dwd_generator/frontend/src/canvas/hooks",
+      "/Users/mckenzie/Documents/opencode test/dwd_generator/frontend/src/canvas/api",
+      "/Users/mckenzie/Documents/event2table/test/unit/frontend"
+    ]
+  }
+}

@@ -1,0 +1,172 @@
+[
+  {
+    "name": "GameCreate",
+    "path": "/#/games/create",
+    "phase": 2,
+    "priority": "HIGH",
+    "url": "http://localhost:5173/#/games/create",
+    "timestamp": "2026-02-13T04:08:23.639Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 11736,
+      "domContentLoaded": 10543.200000047684,
+      "fcp": 212,
+      "lcp": 0,
+      "resources": 250,
+      "statusCode": 200
+    },
+    "consoleErrors": [
+      {
+        "type": "pageerror",
+        "text": "The requested module '/src/features/games/AddGameModal.jsx' does not provide an export named 'AddGameModal'",
+        "stack": "",
+        "timestamp": "2026-02-13T04:08:34.892Z"
+      }
+    ],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "GameEdit",
+    "path": "/#/games/10000147/edit",
+    "phase": 2,
+    "priority": "HIGH",
+    "url": "http://localhost:5173/#/games/10000147/edit",
+    "timestamp": "2026-02-13T04:08:39.402Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 826,
+      "domContentLoaded": 10543.200000047684,
+      "fcp": 212,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "EventCreate",
+    "path": "/#/events/create",
+    "phase": 2,
+    "priority": "HIGH",
+    "url": "http://localhost:5173/#/events/create",
+    "timestamp": "2026-02-13T04:08:44.150Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 864,
+      "domContentLoaded": 10543.200000047684,
+      "fcp": 212,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "EventEdit",
+    "path": "/#/events/1/edit",
+    "phase": 2,
+    "priority": "HIGH",
+    "url": "http://localhost:5173/#/events/1/edit",
+    "timestamp": "2026-02-13T04:08:48.905Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 706,
+      "domContentLoaded": 10543.200000047684,
+      "fcp": 212,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "CategoryCreate",
+    "path": "/#/categories/create",
+    "phase": 2,
+    "priority": "HIGH",
+    "url": "http://localhost:5173/#/categories/create",
+    "timestamp": "2026-02-13T04:08:53.424Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 591,
+      "domContentLoaded": 10543.200000047684,
+      "fcp": 212,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "CategoryEdit",
+    "path": "/#/categories/1/edit",
+    "phase": 2,
+    "priority": "HIGH",
+    "url": "http://localhost:5173/#/categories/1/edit",
+    "timestamp": "2026-02-13T04:08:57.963Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 575,
+      "domContentLoaded": 10543.200000047684,
+      "fcp": 212,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  }
+]

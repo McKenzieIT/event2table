@@ -1,0 +1,469 @@
+/**
+ * Sidebar Component Styles
+ * Based on base.html sidebar.css and design-system.css
+ */
+
+/* ==================== Sidebar Container ==================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width, 260px);
+  height: 100vh;
+  background: var(--bg-sidebar, var(--bg-secondary));
+  border-right: 1px solid var(--border-sidebar, var(--border-default));
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed-width, 60px);
+}
+
+/* ==================== Sidebar Header ==================== */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-sidebar, var(--border-subtle));
+  height: var(--header-height, 60px);
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: opacity 0.2s;
+  overflow: hidden;
+  flex: 1;
+}
+
+.sidebar-brand:hover {
+  opacity: 0.8;
+}
+
+.sidebar-brand-icon {
+  font-size: 1.5rem;
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+.sidebar-brand-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.sidebar.collapsed .sidebar-brand-text {
+  opacity: 0;
+  width: 0;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ==================== Sidebar Content ==================== */
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-3) 0;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* ==================== Menu Group ==================== */
+.menu-group {
+  margin-bottom: var(--space-2);
+}
+
+.menu-group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.menu-group-header:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.sidebar.collapsed .menu-group-header {
+  justify-content: center;
+  padding: var(--space-3);
+}
+
+.menu-group-title {
+  flex: 1;
+  text-align: left;
+}
+
+.sidebar.collapsed .menu-group-title {
+  display: none;
+}
+
+.menu-group-icon {
+  font-size: 0.625rem;
+  transition: transform 0.3s;
+}
+
+.menu-group.expanded .menu-group-icon {
+  transform: rotate(180deg);
+}
+
+.sidebar.collapsed .menu-group-icon {
+  display: none;
+}
+
+.menu-group-content {
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.menu-group.collapsed .menu-group-content {
+  max-height: 0;
+}
+
+.sidebar.collapsed .menu-group-content {
+  max-height: 0 !important;
+}
+
+/* ==================== Sidebar Group ==================== */
+.sidebar-group {
+  padding: 0 var(--space-2);
+}
+
+/* ==================== Sidebar Menu ==================== */
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-menu-item {
+  margin-bottom: var(--space-1);
+}
+
+/* ==================== Sidebar Menu Link ==================== */
+.sidebar-menu-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-menu-link:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.sidebar-menu-link.active {
+  background: var(--brand-primary-light, rgba(37, 99, 235, 0.1));
+  color: var(--brand-primary);
+  font-weight: 500;
+}
+
+.sidebar-menu-link:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Menu Icon */
+.sidebar-menu-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+/* Menu Text */
+.sidebar-menu-text {
+  font-size: 0.875rem;
+  flex: 1;
+  transition: opacity 0.2s;
+}
+
+.sidebar.collapsed .sidebar-menu-text {
+  opacity: 0;
+  width: 0;
+}
+
+/* ==================== Tooltip (Collapsed Mode) ==================== */
+.sidebar-menu-link[data-tooltip] {
+  position: relative;
+}
+
+.sidebar-menu-link[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: fixed;
+  left: calc(var(--sidebar-collapsed-width, 60px) + var(--space-2));
+  top: var(--tooltip-top, 50%);
+  transform: translateY(-50%);
+  background: var(--bg-tooltip, #1e293b);
+  color: var(--text-tooltip, #fff);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 1100;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar:not(.collapsed) .sidebar-menu-link[data-tooltip]::before {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-menu-link:hover[data-tooltip]::before {
+  opacity: 1;
+}
+
+/* ==================== Sidebar Footer ==================== */
+.sidebar-footer {
+  padding: var(--space-4);
+  border-top: 1px solid var(--border-sidebar, var(--border-subtle));
+  flex-shrink: 0;
+}
+
+/* Game Chip */
+.game-chip-sidebar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.game-chip-sidebar:hover {
+  background: var(--bg-hover);
+  border-color: var(--brand-primary);
+}
+
+.game-chip-sidebar-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.game-chip-sidebar-icon {
+  font-size: 1.125rem;
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+.game-chip-sidebar-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .game-chip-sidebar-text {
+  display: none;
+}
+
+.game-chip-sidebar-chevron {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .game-chip-sidebar-chevron {
+  display: none;
+}
+
+/* Game Management Button */
+.game-management-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: var(--text-primary);
+  margin-top: var(--space-2);
+}
+
+.game-management-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--brand-primary);
+}
+
+.game-management-btn-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.game-management-btn-icon {
+  font-size: 1.125rem;
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+.game-management-btn-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .game-management-btn-text {
+  display: none;
+}
+
+.sidebar.collapsed .game-management-btn {
+  justify-content: center;
+  padding: var(--space-3);
+}
+
+/* ==================== Responsive Behavior ==================== */
+@media (max-width: 767px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+/* ==================== Animations ==================== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-menu-item {
+  animation: slideIn 0.2s ease-out;
+}
+
+/* ==================== Dark Mode Support ==================== */
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    --bg-sidebar: #0f172a;
+    --border-sidebar: #1e293b;
+  }
+
+  .sidebar-menu-link[data-tooltip]::before {
+    --bg-tooltip: #334155;
+  }
+}
+
+/* ==================== Print Styles ==================== */
+@media print {
+  .sidebar {
+    display: none;
+  }
+}
+
+/* ==================== Accessibility ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar-brand,
+  .sidebar-toggle,
+  .menu-group-header,
+  .menu-group-content,
+  .sidebar-menu-link,
+  .game-chip-sidebar {
+    transition: none;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.sidebar-toggle:focus-visible,
+.menu-group-header:focus-visible,
+.sidebar-menu-link:focus-visible,
+.game-chip-sidebar:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}

@@ -1,0 +1,43 @@
+.output-node {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: 2px solid #b91c1c;
+  border-radius: 8px;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.output-node .node-header {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.output-node .node-icon {
+  font-size: 18px;
+}
+
+.output-node .node-title {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.output-node .node-body {
+  padding: 12px;
+  color: white;
+}
+
+.output-node .view-name {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.output-node .input-port {
+  background: #fbbf24;
+  border: 2px solid #f59e0b;
+}

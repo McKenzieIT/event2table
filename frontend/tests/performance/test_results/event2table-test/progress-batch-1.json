@@ -1,0 +1,145 @@
+[
+  {
+    "name": "Dashboard",
+    "path": "/",
+    "phase": 1,
+    "priority": "CRITICAL",
+    "url": "http://localhost:5173/",
+    "timestamp": "2026-02-13T04:07:39.513Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 8140,
+      "domContentLoaded": 7299.199999928474,
+      "fcp": 220,
+      "lcp": 0,
+      "resources": 250,
+      "statusCode": 200
+    },
+    "consoleErrors": [
+      {
+        "type": "pageerror",
+        "text": "The requested module '/src/features/games/AddGameModal.jsx' does not provide an export named 'AddGameModal'",
+        "stack": "",
+        "timestamp": "2026-02-13T04:07:47.241Z"
+      }
+    ],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "Canvas",
+    "path": "/#/canvas",
+    "phase": 1,
+    "priority": "CRITICAL",
+    "url": "http://localhost:5173/#/canvas",
+    "timestamp": "2026-02-13T04:07:51.304Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 408,
+      "domContentLoaded": 7299.199999928474,
+      "fcp": 220,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "EventNodeBuilder",
+    "path": "/#/event-node-builder",
+    "phase": 1,
+    "priority": "CRITICAL",
+    "url": "http://localhost:5173/#/event-node-builder",
+    "timestamp": "2026-02-13T04:07:55.110Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 371,
+      "domContentLoaded": 7299.199999928474,
+      "fcp": 220,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "Games",
+    "path": "/#/games",
+    "phase": 1,
+    "priority": "CRITICAL",
+    "url": "http://localhost:5173/#/games",
+    "timestamp": "2026-02-13T04:07:58.897Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 402,
+      "domContentLoaded": 7299.199999928474,
+      "fcp": 220,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "Events",
+    "path": "/#/events",
+    "phase": 1,
+    "priority": "CRITICAL",
+    "url": "http://localhost:5173/#/events",
+    "timestamp": "2026-02-13T04:08:02.877Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 409,
+      "domContentLoaded": 7299.199999928474,
+      "fcp": 220,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  }
+]

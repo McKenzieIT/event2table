@@ -1,0 +1,44 @@
+====================================================================================================
+EVENT2TABLE PERFORMANCE TEST REPORT
+Generated: 2026-02-11 00:37:36
+Base URL: http://127.0.0.1:5001
+Test Game GID: 10000147
+Iterations per test: 10
+====================================================================================================
+
+PERFORMANCE METRICS
+----------------------------------------------------------------------------------------------------
+Operation                                          Avg (ms)     P95 (ms)     Max (ms)     Success    Status    
+----------------------------------------------------------------------------------------------------
+GET /api/games                                     1747.99      2189.81      2189.81      100.0    % ✗ FAIL (>200ms)
+GET /api/events?game_gid=10000147                  22.99        35.77        35.77        100.0    % ✓ PASS    
+GET /api/parameters/all?game_gid=10000147          267.94       352.28       352.28       100.0    % ✗ FAIL (>200ms)
+HQL Generation - Single Event Mode                 25.28        97.90        97.90        100.0    % ✓ PASS    
+HQL Generation - Join Mode                         0.00         0.00         0.00         0.0      % ✓ PASS    
+HQL Generation - Union Mode                        24.74        27.99        27.99        100.0    % ✓ PASS    
+Database Query Performance                         5.02         13.80        13.80        100.0    % ✓ PASS    
+----------------------------------------------------------------------------------------------------
+
+PERFORMANCE BOTTLENECKS IDENTIFIED
+----------------------------------------------------------------------------------------------------
+1. GET /api/games: P95=2189.81ms exceeds threshold of 200ms
+2. GET /api/parameters/all?game_gid=10000147: P95=352.28ms exceeds threshold of 200ms
+3. HQL Generation - Join Mode: 10 errors encountered
+
+OPTIMIZATION RECOMMENDATIONS
+----------------------------------------------------------------------------------------------------
+1. GET /api/games: Average response time (1747.99ms) is close to threshold
+2. GET /api/parameters/all?game_gid=10000147: Average response time (267.94ms) is close to threshold
+
+CACHE EFFECTIVENESS ANALYSIS
+----------------------------------------------------------------------------------------------------
+Note: This test script runs all requests sequentially without warm-up.
+For cache effectiveness, observe if response times improve in later iterations.
+
+GET /api/games: 22.6% improvement in second half (first half: 1970.80ms, second half: 1525.18ms)
+HQL Generation - Single Event Mode: 45.3% improvement in second half (first half: 32.67ms, second half: 17.88ms)
+Database Query Performance: 27.1% improvement in second half (first half: 5.81ms, second half: 4.23ms)
+
+====================================================================================================
+END OF REPORT
+====================================================================================================

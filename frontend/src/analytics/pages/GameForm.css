@@ -1,0 +1,231 @@
+/* Game Form Styles */
+.game-form-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.game-form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.game-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.game-form .form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.game-form .required-indicator {
+  color: #dc3545;
+  margin-left: 0.25rem;
+}
+
+.game-form .input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.game-form .input-icon-wrapper i {
+  position: absolute;
+  left: 1rem;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.game-form .glass-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.game-form .glass-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff;
+}
+
+.game-form .glass-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.game-form .glass-input::placeholder {
+  color: #94a3b8;
+}
+
+.game-form .glass-input.is-invalid {
+  border-color: #dc3545;
+}
+
+.game-form .form-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+.game-form .invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* ODS Options */
+.game-form .ods-options {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.game-form .option-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #ffffff;
+}
+
+.game-form .option-card:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+}
+
+.game-form .option-card.selected {
+  border-color: #0d6efd;
+  background: #eff6ff;
+}
+
+.game-form .option-card.selected-green {
+  border-color: #198754;
+  background: #f0fdf4;
+}
+
+.game-form .option-card-content {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.game-form .option-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.game-form .option-card-icon {
+  font-size: 1.25rem;
+}
+
+.game-form .option-card-icon-blue {
+  color: #0d6efd;
+}
+
+.game-form .option-card-icon-green {
+  color: #198754;
+}
+
+.game-form .option-card-description {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.game-form .form-check-input {
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+/* Form Actions */
+.game-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Alert */
+.game-form .alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.game-form .alert-danger {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #f8d7da;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.25em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .game-form-container {
+    padding: 1rem;
+  }
+
+  .game-form {
+    padding: 1rem;
+  }
+
+  .game-form .form-actions {
+    flex-direction: column;
+  }
+
+  .game-form .ods-options {
+    grid-template-columns: 1fr;
+  }
+}

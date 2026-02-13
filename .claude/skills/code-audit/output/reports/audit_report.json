@@ -1,0 +1,171 @@
+{
+  "audit_metadata": {
+    "date": "2026-02-11",
+    "mode": "quick",
+    "target": "backend/",
+    "files_scanned": 103,
+    "tool": "Quick Code Audit Script"
+  },
+  "summary": {
+    "total_issues": 243,
+    "critical": 2,
+    "high": 47,
+    "medium": 100,
+    "low_info": 94
+  },
+  "issues": {
+    "critical": [
+      {
+        "file": "backend/core/database/database.py",
+        "line": 1436,
+        "category": "SECURITY",
+        "rule_id": "SQL_INJECTION_001",
+        "message": "SQL Injection risk: f-string in SQL query",
+        "code": "cursor.execute(f\"PRAGMA user_version = {version}\")",
+        "severity": "CRITICAL",
+        "recommendation": "Use parameterized query: cursor.execute('PRAGMA user_version = ?', (version,))"
+      },
+      {
+        "file": "backend/core/database/database.py",
+        "line": 2734,
+        "category": "SECURITY",
+        "rule_id": "SQL_INJECTION_002",
+        "message": "SQL Injection risk: f-string in SQL query",
+        "code": "cursor.execute(f\"PRAGMA user_version = {target_version}\")",
+        "severity": "CRITICAL",
+        "recommendation": "Use parameterized query: cursor.execute('PRAGMA user_version = ?', (target_version,))"
+      }
+    ],
+    "high_priority": {
+      "game_gid_compliance": {
+        "total_issues": 47,
+        "description": "Illegal game_id usage instead of game_gid for data associations",
+        "affected_files": [
+          "backend/core/database/database.py",
+          "backend/core/performance.py",
+          "backend/api/routes/events.py",
+          "backend/api/routes/games.py",
+          "backend/api/routes/parameters.py"
+        ],
+        "rule": "game_gid (business GID) must be used for all data associations, not game_id (database primary key)",
+        "examples": [
+          {
+            "wrong": "WHERE game_id = ?",
+            "correct": "WHERE game_gid = ?"
+          },
+          {
+            "wrong": "def get_events_api(game_id, page):",
+            "correct": "def get_events_api(game_gid, page):"
+          },
+          {
+            "wrong": "UNIQUE(game_id, param_id, alias)",
+            "correct": "UNIQUE(game_gid, param_id, alias)"
+          }
+        ]
+      }
+    },
+    "medium_priority": {
+      "complexity": {
+        "total_issues": 12,
+        "threshold": 50,
+        "files_requiring_refactor": [
+          {
+            "file": "backend/core/database/database.py",
+            "complexity": 210,
+            "functions": 29,
+            "severity": "HIGH",
+            "action": "Split into smaller modules"
+          },
+          {
+            "file": "backend/core/utils.py",
+            "complexity": 136,
+            "functions": 53,
+            "severity": "MEDIUM",
+            "action": "Group related functions"
+          },
+          {
+            "file": "backend/models/events.py",
+            "complexity": 109,
+            "functions": 39,
+            "severity": "MEDIUM",
+            "action": "Extract services"
+          },
+          {
+            "file": "backend/api/routes/parameters.py",
+            "complexity": 88,
+            "functions": 12,
+            "severity": "MEDIUM",
+            "action": "Simplify logic"
+          },
+          {
+            "file": "backend/api/routes/hql_preview_v2.py",
+            "complexity": 81,
+            "functions": 15,
+            "severity": "MEDIUM",
+            "action": "Extract helpers"
+          }
+        ]
+      }
+    },
+    "low_info": {
+      "testing_coverage": {
+        "total_missing_tests": 94,
+        "description": "Implementation files without corresponding test files",
+        "priority_areas": [
+          "Security-critical functions",
+          "Data access layer",
+          "API endpoints"
+        ],
+        "target_coverage": "80%"
+      }
+    }
+  },
+  "action_items": {
+    "immediate": [
+      {
+        "priority": "P0",
+        "issue_count": 2,
+        "description": "Fix SQL Injection Issues",
+        "estimated_effort": "15 minutes",
+        "files": ["backend/core/database/database.py"]
+      }
+    ],
+    "high_priority": [
+      {
+        "priority": "P1",
+        "issue_count": 47,
+        "description": "Fix Game GID Compliance",
+        "estimated_effort": "4-6 hours",
+        "affected_categories": ["Database queries", "API endpoints", "Function parameters"]
+      }
+    ],
+    "medium_priority": [
+      {
+        "priority": "P2",
+        "issue_count": 5,
+        "description": "Refactor High Complexity Files",
+        "estimated_effort": "2-3 weeks",
+        "files": [
+          "backend/core/database/database.py",
+          "backend/core/utils.py",
+          "backend/models/events.py",
+          "backend/api/routes/parameters.py",
+          "backend/api/routes/hql_preview_v2.py"
+        ]
+      },
+      {
+        "priority": "P2",
+        "issue_count": 94,
+        "description": "Improve Test Coverage",
+        "estimated_effort": "Ongoing",
+        "target": "80% coverage"
+      }
+    ]
+  },
+  "recommendations": [
+    "Set up pre-commit hooks to run quick audit",
+    "Integrate audit into CI/CD pipeline",
+    "Add game_gid compliance to code review checklist",
+    "Update CLAUDE.md with compliance examples"
+  ]
+}

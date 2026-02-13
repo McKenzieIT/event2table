@@ -1,0 +1,166 @@
+/**
+ * Button Styles - Cyberpunk Lab Theme
+ *
+ * Design Tokens: Cyan (#06B6D4), Deep Black (#000000), Glass effect
+ * Animations: Subtle glow on hover, smooth transitions
+ */
+
+.cyber-button {
+  /* Reset */
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 500;
+  border-radius: 6px;
+
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+
+  /* Transition */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Focus visible */
+  position: relative;
+}
+
+.cyber-button:focus-visible {
+  outline: 2px solid var(--color-primary, #06B6D4);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Sizes
+   ======================================== */
+
+.cyber-button--sm {
+  padding: 8px 16px;
+  font-size: 14px;
+  height: 32px;
+}
+
+.cyber-button--md {
+  padding: 10px 20px;
+  font-size: 15px;
+  height: 40px;
+}
+
+.cyber-button--lg {
+  padding: 12px 24px;
+  font-size: 16px;
+  height: 44px;
+}
+
+/* ========================================
+   Variants
+   ======================================== */
+
+/* Primary - Gradient with hover glow */
+.cyber-button--primary {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2);
+}
+
+.cyber-button--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #22D3EE 0%, #06B6D4 100%);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.5),
+              0 0 30px rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.6);
+  transform: translateY(-1px);
+}
+
+.cyber-button--primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(6, 182, 212, 0.3);
+}
+
+/* Secondary - Glass style */
+.cyber-button--secondary {
+  background: rgba(6, 182, 212, 0.1);
+  color: #06B6D4;
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+.cyber-button--secondary:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+}
+
+/* Ghost - Minimal */
+.cyber-button--ghost {
+  background: transparent;
+  color: #94A3B8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.cyber-button--ghost:hover:not(:disabled) {
+  color: #F1F5F9;
+  border-color: rgba(241, 245, 249, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Danger - Red gradient */
+.cyber-button--danger {
+  background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.cyber-button--danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #EF5350 0%, #F44336 100%);
+  box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
+  border-color: rgba(244, 67, 54, 0.6);
+}
+
+/* ========================================
+   States
+   ======================================== */
+
+/* Disabled */
+.cyber-button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Loading */
+.cyber-button--loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.cyber-button__spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: cyber-spin 0.6s linear infinite;
+}
+
+@keyframes cyber-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Icon */
+.cyber-button__icon {
+  display: flex;
+  align-items: center;
+  font-size: 1.2em;
+}

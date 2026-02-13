@@ -1,0 +1,20 @@
+repos:
+  - repo: local
+    hooks:
+      - id: format-backend
+        name: Format Backend Code
+        entry: black backend/ --config config/black.ini
+        language: system
+        pass_filenames: false
+
+      - id: lint-backend
+        name: Lint Backend Code
+        entry: flake8 backend/ --config=config/.flake8
+        language: system
+        pass_filenames: false
+
+      - id: format-frontend
+        name: Format Frontend Code
+        entry: prettier --write frontend/src/ --config config/.prettierrc
+        language: system
+        pass_filenames: false

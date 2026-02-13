@@ -1,0 +1,60 @@
+.event-node {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid #5a67d8;
+  border-radius: 8px;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.event-node .node-header {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-node .node-icon {
+  font-size: 18px;
+}
+
+.event-node .node-title {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.event-node .node-body {
+  padding: 12px;
+  color: white;
+}
+
+.event-node .event-name-cn {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.event-node .event-name-en {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.event-node .node-stats {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.event-node .node-placeholder {
+  text-align: center;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.event-node .output-port {
+  background: #10b981;
+  border: 2px solid #059669;
+}

@@ -1,0 +1,74 @@
+.parameter-network-container {
+  padding: var(--space-6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.network-canvas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.network-placeholder {
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.network-placeholder i {
+  font-size: 5rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.5;
+}
+
+.network-placeholder h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xl);
+}
+
+.network-placeholder p {
+  margin: 0 0 var(--space-6);
+}
+
+.network-info {
+  display: flex;
+  gap: var(--space-6);
+  justify-content: center;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dot.primary {
+  background: var(--brand-primary);
+}
+
+.dot.success {
+  background: var(--brand-success);
+}
+
+.dot.warning {
+  background: var(--brand-warning);
+}

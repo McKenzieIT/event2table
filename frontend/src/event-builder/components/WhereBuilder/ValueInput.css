@@ -1,0 +1,19 @@
+.value-input {
+  flex: 1;
+  padding: var(--en-space-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: var(--input-bg);
+  color: var(--text-color);
+}
+
+.value-range-input {
+  display: flex;
+  align-items: center;
+  gap: var(--en-space-sm);
+  flex: 1;
+}
+
+.value-range-input .value-input {
+  flex: 1;
+}

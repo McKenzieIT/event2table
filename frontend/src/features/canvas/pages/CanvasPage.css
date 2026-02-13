@@ -1,0 +1,85 @@
+/* Canvas Page Wrapper Styles */
+.canvas-page-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.canvas-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.canvas-page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f5f5f5;
+  gap: 1rem;
+}
+
+/* Note: Loading Spinner is now handled by @shared/ui Spinner component */
+
+/* Error Page */
+.canvas-page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f5f5f5;
+  padding: 2rem;
+  text-align: center;
+}
+
+.canvas-page-error i {
+  font-size: 4rem;
+  color: #e74c3c;
+  margin-bottom: 1.5rem;
+}
+
+.canvas-page-error h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.canvas-page-error p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Note: Button styles are now handled by @shared/ui Button component */
+.canvas-page-error button {
+  margin: 0.5rem;
+}
+
+/* Legacy error page styling */
+.canvas-page .error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #dc3545;
+  text-align: center;
+  padding: 2rem;
+}
+
+.canvas-page .error-page h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.canvas-page .error-page p {
+  color: #666;
+  margin-bottom: 1rem;
+}

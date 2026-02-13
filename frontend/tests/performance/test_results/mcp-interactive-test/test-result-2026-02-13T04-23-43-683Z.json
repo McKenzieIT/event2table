@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-02-13T04:23:05.883Z",
+  "tests": [
+    {
+      "page": "Dashboard",
+      "url": "http://localhost:5173/",
+      "timestamp": "2026-02-13T04:23:05.885Z",
+      "steps": [
+        {
+          "step": 1,
+          "action": "导航到 Dashboard",
+          "status": "success",
+          "loadTime": 5063,
+          "message": "页面加载完成，耗时 5063ms"
+        },
+        {
+          "step": 3,
+          "action": "收集性能指标",
+          "status": "success",
+          "metrics": {
+            "loadTime": 6472.699999928474,
+            "domContentLoaded": 6460.599999904633,
+            "fcp": 204,
+            "resources": 250
+          }
+        },
+        {
+          "step": 4,
+          "action": "点击快捷操作卡片",
+          "status": "success",
+          "cardText": "管理游戏创建和管理游戏项目",
+          "navigatedTo": "http://localhost:5173/#/games"
+        },
+        {
+          "step": 5,
+          "action": "检查控制台错误",
+          "status": "success",
+          "errorCount": 0
+        }
+      ],
+      "consoleErrors": [],
+      "performance": {
+        "initialLoad": 5063,
+        "metrics": {
+          "loadTime": 6472.699999928474,
+          "domContentLoaded": 6460.599999904633,
+          "fcp": 204,
+          "resources": 250
+        }
+      },
+      "screenshots": [
+        {
+          "step": 2,
+          "path": "test_results/mcp-interactive-test/dashboard-initial.png",
+          "description": "初始状态"
+        },
+        {
+          "step": 4,
+          "path": "test_results/mcp-interactive-test/dashboard-after-click.png",
+          "description": "点击卡片后"
+        },
+        {
+          "step": 6,
+          "path": "test_results/mcp-interactive-test/dashboard-final.png",
+          "description": "最终状态"
+        }
+      ]
+    },
+    {
+      "page": "Games",
+      "url": "http://localhost:5173/#/games",
+      "timestamp": "2026-02-13T04:23:33.051Z",
+      "status": "success",
+      "loadTime": 290,
+      "consoleErrors": [],
+      "screenshot": "test_results/mcp-interactive-test/games.png"
+    },
+    {
+      "page": "Events",
+      "url": "http://localhost:5173/#/events",
+      "timestamp": "2026-02-13T04:23:37.297Z",
+      "status": "success",
+      "loadTime": 304,
+      "consoleErrors": [],
+      "screenshot": "test_results/mcp-interactive-test/events.png"
+    },
+    {
+      "page": "Canvas",
+      "url": "http://localhost:5173/#/canvas",
+      "timestamp": "2026-02-13T04:23:40.855Z",
+      "status": "success",
+      "loadTime": 330,
+      "consoleErrors": [],
+      "screenshot": "test_results/mcp-interactive-test/canvas.png"
+    }
+  ]
+}

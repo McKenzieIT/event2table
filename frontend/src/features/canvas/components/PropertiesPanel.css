@@ -1,0 +1,417 @@
+/**
+ * Properties Panel Styles
+ * Glassmorphism design with smooth animations
+ */
+
+.properties-panel {
+    position: absolute;
+    right: 20px;
+    top: 80px;
+    width: 320px;
+    max-height: calc(100vh - 100px);
+    background: rgba(20, 20, 30, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Empty State */
+.properties-panel.empty {
+    background: rgba(20, 20, 30, 0.6);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.empty-description {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Header */
+.properties-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.panel-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Content */
+.properties-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.properties-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.properties-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.properties-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.properties-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Node Type Badge */
+.node-type-badge-large {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+}
+
+.type-icon {
+    font-size: 24px;
+}
+
+.type-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Properties Section */
+.properties-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.properties-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 12px 0;
+}
+
+/* Property Row */
+.property-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    gap: 12px;
+}
+
+.property-row-block {
+    display: block;
+    padding: 8px 0;
+}
+
+.property-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.property-value {
+    font-size: 13px;
+    color: #ffffff;
+    text-align: right;
+    flex: 1;
+    word-break: break-word;
+}
+
+.property-value.code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.property-value.code.small {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.property-value.join-type {
+    font-weight: 600;
+    color: #a855f7;
+}
+
+/* Label Editor */
+.label-editor {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.label-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.label-input:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.label-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.change-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.action-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.save-button {
+    color: #10b981;
+}
+
+.save-button:hover {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+.cancel-button {
+    color: #ef4444;
+}
+
+.cancel-button:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Conditions List */
+.conditions-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.condition-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.condition-item code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex: 1;
+}
+
+.condition-item .operator {
+    color: #f472b6;
+    font-weight: 600;
+}
+
+/* Messages */
+.no-config-message {
+    padding: 12px;
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 8px;
+    color: #fbbf24;
+    font-size: 13px;
+    text-align: center;
+}
+
+.no-connections-message {
+    padding: 12px;
+    background: rgba(107, 114, 128, 0.1);
+    border: 1px solid rgba(107, 114, 128, 0.2);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Connections */
+.connections-group {
+    margin-bottom: 12px;
+}
+
+.connections-group:last-child {
+    margin-bottom: 0;
+}
+
+.connections-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.connection-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.connection-item:last-child {
+    margin-bottom: 0;
+}
+
+.connection-type-badge {
+    font-size: 10px;
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.connection-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Configure Button */
+.configure-button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(168, 85, 247, 0.8));
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.configure-button:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 1), rgba(168, 85, 247, 1));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+}
+
+.configure-button:active {
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .properties-panel {
+        width: 280px;
+        right: 10px;
+        top: 70px;
+    }
+}

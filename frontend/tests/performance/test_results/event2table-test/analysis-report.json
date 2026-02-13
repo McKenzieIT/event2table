@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-02-13T04:16:03.226Z",
+  "summary": {
+    "totalPages": 41,
+    "avgLoadTime": 1767,
+    "maxLoadTime": 12650,
+    "minLoadTime": 371,
+    "consoleErrorCount": 5,
+    "uniqueErrorTypes": 1
+  },
+  "slowPages": [
+    {
+      "name": "Categories",
+      "loadTime": 12650,
+      "priority": "MEDIUM"
+    },
+    {
+      "name": "GameCreate",
+      "loadTime": 11736,
+      "priority": "HIGH"
+    },
+    {
+      "name": "ParameterDashboard",
+      "loadTime": 11305,
+      "priority": "LOW"
+    },
+    {
+      "name": "ImportEvents",
+      "loadTime": 9806,
+      "priority": "LOW"
+    },
+    {
+      "name": "Dashboard",
+      "loadTime": 8140,
+      "priority": "CRITICAL"
+    }
+  ],
+  "errors": [
+    {
+      "error": "The requested module '/src/features/games/AddGameModal.jsx' does not provide an export named 'AddGameModal'",
+      "count": 5,
+      "pages": [
+        "Dashboard",
+        "GameCreate",
+        "Categories",
+        "ParameterDashboard",
+        "ImportEvents"
+      ]
+    }
+  ],
+  "phaseStats": [
+    {
+      "phase": 1,
+      "count": 5,
+      "avgLoadTime": 1946
+    },
+    {
+      "phase": 2,
+      "count": 6,
+      "avgLoadTime": 2550
+    },
+    {
+      "phase": 3,
+      "count": 12,
+      "avgLoadTime": 1484
+    },
+    {
+      "phase": 4,
+      "count": 7,
+      "avgLoadTime": 2011
+    },
+    {
+      "phase": 5,
+      "count": 11,
+      "avgLoadTime": 1411
+    }
+  ]
+}

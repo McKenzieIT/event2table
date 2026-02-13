@@ -1,0 +1,4 @@
+.param-dashboard-container { padding: var(--space-6); }
+.page-header { padding: var(--space-8); margin-bottom: var(--space-6); }
+.dashboard-cards { display: grid; gap: var(--space-4); }
+.stat-card { padding: var(--space-6); }

@@ -1,0 +1,106 @@
+.canvas-flow-container {
+    width: 100%;
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: row;
+}
+
+.react-flow-wrapper {
+    flex: 1;
+    height: 100%;
+    position: relative;
+}
+
+.react-flow-canvas {
+    background: #f8f9fa;
+}
+
+.info-panel {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
+}
+
+.info-panel div {
+    margin: 4px 0;
+}
+
+.loading-indicator {
+    color: #667eea;
+    font-weight: 600;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ReactFlow自定义样式 - v1.0.16 修复外层容器尺寸 */
+.react-flow__node {
+    position: absolute;
+    width: auto !important;
+    height: auto !important;
+    min-width: 200px !important;
+    min-height: 120px !important;
+    display: block !important;
+    visibility: visible !important;
+    border-radius: 8px;
+}
+
+.react-flow__node.event-node,
+.react-flow__node.custom-node,
+.react-flow__node.union_all,
+.react-flow__node.join,
+.react-flow__node.output {
+    visibility: visible !important;
+}
+
+.react-flow__edge {
+    stroke: #5a67d8;
+    stroke-width: 3;
+}
+
+.react-flow__edge.selected {
+    stroke: #764ba2;
+}
+
+.react-flow__handle {
+    width: 10px;
+    height: 10px;
+    background: #667eea;
+    border: 2px solid white;
+    visibility: visible !important;
+    z-index: 9999 !important;
+}
+
+.react-flow__handle:hover {
+    background: #764ba2;
+}
+
+.react-flow__controls {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.react-flow__minimap {
+    background: white;
+    border-radius: 8px;
+}
+
+/* v1.0.16: 确保SVG可以正确应用transform */
+.react-flow svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0;
+    pointer-events: none;
+    overflow: visible !important;
+}

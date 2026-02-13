@@ -1,0 +1,150 @@
+[
+  {
+    "page": "Dashboard",
+    "url": "http://localhost:5174/",
+    "timestamp": "2026-02-13T04:56:21.136Z",
+    "status": "success",
+    "loadTime": 1072,
+    "metrics": {
+      "loadTime": 291.10000002384186,
+      "domContentLoaded": 290.8000000715256,
+      "fcp": 180,
+      "lcp": 0,
+      "totalResources": 6,
+      "jsCount": 4,
+      "jsSize": 1200,
+      "jsLoadTime": 1053,
+      "cssCount": 1,
+      "cssSize": 300,
+      "apiCount": 0,
+      "apiLoadTime": 0
+    },
+    "consoleErrors": [],
+    "resources": {
+      "js": {
+        "count": 4,
+        "size": 1200,
+        "loadTime": 1053
+      },
+      "css": {
+        "count": 1,
+        "size": 300
+      },
+      "api": {
+        "count": 0,
+        "loadTime": 0
+      }
+    }
+  },
+  {
+    "page": "Games",
+    "url": "http://localhost:5174/#/games",
+    "timestamp": "2026-02-13T04:56:24.505Z",
+    "status": "success",
+    "loadTime": 259,
+    "metrics": {
+      "loadTime": 291.10000002384186,
+      "domContentLoaded": 290.8000000715256,
+      "fcp": 180,
+      "lcp": 0,
+      "totalResources": 6,
+      "jsCount": 4,
+      "jsSize": 1200,
+      "jsLoadTime": 1053,
+      "cssCount": 1,
+      "cssSize": 300,
+      "apiCount": 0,
+      "apiLoadTime": 0
+    },
+    "consoleErrors": [],
+    "resources": {
+      "js": {
+        "count": 4,
+        "size": 1200,
+        "loadTime": 1053
+      },
+      "css": {
+        "count": 1,
+        "size": 300
+      },
+      "api": {
+        "count": 0,
+        "loadTime": 0
+      }
+    }
+  },
+  {
+    "page": "Events",
+    "url": "http://localhost:5174/#/events",
+    "timestamp": "2026-02-13T04:56:26.987Z",
+    "status": "success",
+    "loadTime": 235,
+    "metrics": {
+      "loadTime": 291.10000002384186,
+      "domContentLoaded": 290.8000000715256,
+      "fcp": 180,
+      "lcp": 0,
+      "totalResources": 6,
+      "jsCount": 4,
+      "jsSize": 1200,
+      "jsLoadTime": 1053,
+      "cssCount": 1,
+      "cssSize": 300,
+      "apiCount": 0,
+      "apiLoadTime": 0
+    },
+    "consoleErrors": [],
+    "resources": {
+      "js": {
+        "count": 4,
+        "size": 1200,
+        "loadTime": 1053
+      },
+      "css": {
+        "count": 1,
+        "size": 300
+      },
+      "api": {
+        "count": 0,
+        "loadTime": 0
+      }
+    }
+  },
+  {
+    "page": "Canvas",
+    "url": "http://localhost:5174/#/canvas",
+    "timestamp": "2026-02-13T04:56:29.441Z",
+    "status": "success",
+    "loadTime": 251,
+    "metrics": {
+      "loadTime": 291.10000002384186,
+      "domContentLoaded": 290.8000000715256,
+      "fcp": 180,
+      "lcp": 0,
+      "totalResources": 6,
+      "jsCount": 4,
+      "jsSize": 1200,
+      "jsLoadTime": 1053,
+      "cssCount": 1,
+      "cssSize": 300,
+      "apiCount": 0,
+      "apiLoadTime": 0
+    },
+    "consoleErrors": [],
+    "resources": {
+      "js": {
+        "count": 4,
+        "size": 1200,
+        "loadTime": 1053
+      },
+      "css": {
+        "count": 1,
+        "size": 300
+      },
+      "api": {
+        "count": 0,
+        "loadTime": 0
+      }
+    }
+  }
+]

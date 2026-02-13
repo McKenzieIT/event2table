@@ -1,0 +1,307 @@
+[
+  {
+    "name": "ImportEvents",
+    "path": "/#/import-events",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/import-events",
+    "timestamp": "2026-02-13T04:12:22.658Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 9806,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250,
+      "statusCode": 200
+    },
+    "consoleErrors": [
+      {
+        "type": "pageerror",
+        "text": "The requested module '/src/features/games/AddGameModal.jsx' does not provide an export named 'AddGameModal'",
+        "stack": "",
+        "timestamp": "2026-02-13T04:12:31.969Z"
+      }
+    ],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ApiDocs",
+    "path": "/#/api-docs",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/api-docs",
+    "timestamp": "2026-02-13T04:12:36.118Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 494,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "BatchOperations",
+    "path": "/#/batch-operations",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/batch-operations",
+    "timestamp": "2026-02-13T04:12:40.237Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 489,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "LogDetail",
+    "path": "/#/log-detail",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/log-detail",
+    "timestamp": "2026-02-13T04:12:44.373Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 500,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "LogFormCreate",
+    "path": "/#/logs/create",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/logs/create",
+    "timestamp": "2026-02-13T04:12:48.380Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 454,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "LogFormEdit",
+    "path": "/#/logs/1/edit",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/logs/1/edit",
+    "timestamp": "2026-02-13T04:12:52.510Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 537,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "ValidationRules",
+    "path": "/#/validation-rules",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/validation-rules",
+    "timestamp": "2026-02-13T04:12:56.760Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 511,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "HqlEdit",
+    "path": "/#/hql/1/edit",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/hql/1/edit",
+    "timestamp": "2026-02-13T04:13:01.008Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 516,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "AlterSql",
+    "path": "/#/alter-sql/1",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/alter-sql/1",
+    "timestamp": "2026-02-13T04:13:05.296Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 687,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "AlterSqlBuilder",
+    "path": "/#/alter-sql-builder",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/alter-sql-builder",
+    "timestamp": "2026-02-13T04:13:09.814Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 646,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  },
+  {
+    "name": "NotFound",
+    "path": "/#/not-found-page",
+    "phase": 5,
+    "priority": "LOW",
+    "url": "http://localhost:5173/#/not-found-page",
+    "timestamp": "2026-02-13T04:13:14.460Z",
+    "success": false,
+    "metrics": {
+      "loadTime": 878,
+      "domContentLoaded": 8940.700000047684,
+      "fcp": 140,
+      "lcp": 0,
+      "resources": 250
+    },
+    "consoleErrors": [],
+    "networkErrors": [],
+    "screenshot": null,
+    "issues": [
+      {
+        "type": "error",
+        "severity": "CRITICAL",
+        "message": "consoleErrors is not defined"
+      }
+    ],
+    "error": "consoleErrors is not defined"
+  }
+]

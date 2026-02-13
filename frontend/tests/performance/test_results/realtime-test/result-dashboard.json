@@ -1,0 +1,18 @@
+{
+  "page": "Dashboard",
+  "url": "http://localhost:5173/",
+  "timestamp": "2026-02-13T04:33:00.108Z",
+  "status": "success",
+  "loadTime": 7745,
+  "metrics": {
+    "loadTime": 10021.100000023842,
+    "domContentLoaded": 9960.100000023842,
+    "fcp": 208,
+    "lcp": 0,
+    "resources": 250,
+    "domNodes": 220
+  },
+  "consoleErrors": [],
+  "networkErrors": [],
+  "screenshot": "test_results/realtime-test/dashboard-1770957191289.png"
+}

@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-02-13T05:47:36.819Z",
+  "tests": [
+    {
+      "name": "Dashboard-点击管理游戏卡片",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dashboard-点击管理事件卡片",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Games-列表加载",
+      "status": "FAIL",
+      "details": "没有游戏数据"
+    },
+    {
+      "name": "Events-列表加载",
+      "status": "FAIL",
+      "details": "没有事件数据"
+    },
+    {
+      "name": "ImportEvents-页面加载",
+      "status": "FAIL",
+      "details": "页面标题不正确"
+    },
+    {
+      "name": "ImportEvents-文件上传",
+      "status": "FAIL",
+      "details": "找不到文件输入框"
+    },
+    {
+      "name": "Canvas-画布加载",
+      "status": "FAIL",
+      "details": "画布未加载"
+    }
+  ],
+  "passed": 2,
+  "failed": 5,
+  "total": 7
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DWD Generator - React App Shell</title>
+    <style>
+      /* Initial loading state - shown before React loads */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        background-color: #f8fafc;
+        z-index: 10000;
+      }
+      #initial-loader .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      #initial-loader .text {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      /* Hide loader when React mounts */
+      #app-root:not(:empty) + #initial-loader {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-root"></div>
+    <!-- Initial loading indicator - removed when React mounts -->
+    <div id="initial-loader">
+      <div class="spinner"></div>
+      <div class="text">Loading Event2Table...</div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

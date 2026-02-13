@@ -1,0 +1,31 @@
+{
+  "name": "event2table-test-suite",
+  "version": "1.0.0",
+  "description": "Event2Table Project - Test Suite and Scripts",
+  "scripts": {
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "pytest test/ -v",
+    "test:backend:unit": "pytest test/unit/backend -m unit",
+    "test:backend:integration": "pytest test/integration/backend",
+    "test:frontend": "cd frontend && npm run test:unit",
+    "test:e2e": "cd frontend && npm run test:e2e",
+    "test:contract": "python3 test/contract/api_contract_test.py",
+    "test:coverage": "pytest test/ --cov=backend --cov-report=html",
+    "test:performance": "pytest test/performance/ -v",
+    "verify": "npm run test:contract && npm run test:backend:unit && npm run test:frontend",
+    "lint:backend": "flake8 backend/",
+    "lint:frontend": "cd frontend && npm run lint",
+    "format:backend": "black backend/",
+    "format:frontend": "cd frontend && npm run format"
+  },
+  "keywords": [
+    "event2table",
+    "testing",
+    "dwd-generator"
+  ],
+  "author": "Event2Table Development Team",
+  "license": "MIT",
+  "devDependencies": {
+    "terser": "^5.46.0"
+  }
+}

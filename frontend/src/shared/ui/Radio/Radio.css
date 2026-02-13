@@ -1,0 +1,179 @@
+/**
+ * Radio Styles - Cyberpunk Lab Theme
+ *
+ * Design Tokens: Cyan (#06B6D4), Deep Black (#000000), Glass effect
+ * Animations: Smooth dot animation, glow on focus
+ */
+
+.cyber-radio {
+  --radio-bg: rgba(0, 0, 0, 0.8);
+  --radio-border: rgba(6, 182, 212, 0.4);
+  --radio-border-hover: rgba(6, 182, 212, 0.7);
+  --radio-checked-border: #06B6D4;
+  --radio-focus-shadow: rgba(6, 182, 212, 0.1);
+  --radio-hover-shadow: rgba(6, 182, 212, 0.3);
+  --radio-error: #F44336;
+}
+
+/* ========================================
+   Input (Hidden)
+   ======================================== */
+
+.cyber-radio-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* ========================================
+   Wrapper
+   ======================================== */
+
+.cyber-radio-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+
+.cyber-radio-label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2, 8px);
+  cursor: pointer;
+  user-select: none;
+  width: fit-content;
+}
+
+.cyber-radio-wrapper--disabled .cyber-radio-label {
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Radio Circle
+   ======================================== */
+
+.cyber-radio {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background: var(--radio-bg);
+  border: 2px solid var(--radio-border);
+  border-radius: 50%;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  margin-top: 2px;
+}
+
+.cyber-radio-label:hover .cyber-radio:not(.cyber-radio--disabled) {
+  border-color: var(--radio-border-hover);
+  box-shadow: 0 0 10px var(--radio-hover-shadow);
+}
+
+.cyber-radio-input:focus-visible + .cyber-radio {
+  outline: none;
+  border-color: var(--radio-border-hover);
+  box-shadow: 0 0 0 3px var(--radio-focus-shadow);
+}
+
+/* Checked State */
+.cyber-radio--checked {
+  border-color: var(--radio-checked-border);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+.cyber-radio--checked:hover {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+}
+
+/* Invalid State */
+.cyber-radio--invalid {
+  border-color: var(--radio-error);
+}
+
+.cyber-radio--invalid:hover {
+  border-color: var(--radio-error);
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+}
+
+.cyber-radio-input:focus-visible.cyber-radio--invalid + .cyber-radio {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+/* Disabled State */
+.cyber-radio--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cyber-radio--disabled:hover {
+  border-color: var(--radio-border);
+  box-shadow: none;
+}
+
+/* ========================================
+   Radio Dot
+   ======================================== */
+
+.cyber-radio-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%);
+  border-radius: 50%;
+  animation: cyber-radio-check 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+}
+
+@keyframes cyber-radio-check {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   Label Text
+   ======================================== */
+
+.cyber-radio-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #F1F5F9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.cyber-radio-wrapper--disabled .cyber-radio-text {
+  opacity: 0.5;
+}
+
+.cyber-radio-required {
+  color: var(--radio-error);
+  margin-left: 2px;
+}
+
+/* ========================================
+   Error Message
+   ======================================== */
+
+.cyber-radio__error {
+  margin-top: var(--space-1, 4px);
+  margin-left: 26px;
+  font-size: 13px;
+  color: var(--radio-error);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.4;
+}
