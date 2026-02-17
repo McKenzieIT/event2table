@@ -51,18 +51,25 @@ logs/
 node_modules/
 .vite/
 dist/
-test-results/
-playwright-report/
 debug-*.png
 console-test.png
 
+# Test outputs (frontend/test/output/)
+frontend/test/output/
+playwright-report/
+playwright-report-2/
+screenshots/
+test-results.json
+
 # Test outputs (unified location)
+test-output/
 test/output/
-frontend/playwright-report/
+backend/test/output/
+test-results/
 frontend/test-results/
 
 # Test analysis reports (archived)
-docs/testing/reports/test-analysis-reports/
+docs/testing/reports/test-analysis-reports//
 
 # Performance test scripts (archived)
 frontend/tests/performance/*.js
@@ -99,6 +106,9 @@ build/
 # Claude Code
 .claude/plans/
 .claude/sessions/
+
+# Git Worktrees
+.worktrees/
 
 # Ignore auto-generated folder context files
 **/CLAUDE.md
