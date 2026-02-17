@@ -64,8 +64,39 @@ logger = logging.getLogger(__name__)
 
 @api_bp.route("/api/categories", methods=["GET"])
 def api_list_categories():
-    """API: List all categories with event counts"""
+    """
+    API: List categories filtered by game_gid
+
+    Query Parameters:
+        game_gid (int, required): Game GID to filter categories by
+
+    Returns:
+        List of categories with event counts for the specified game
+
+    Error:
+        400: If game_gid parameter is missing or invalid
+        404: If game_gid does not exist
+    """
     try:
+        # Get and validate game_gid parameter (REQUIRED)
+        game_gid = request.args.get('game_gid', type=int)
+
+        # MANDATORY: game_gid must be provided
+        if not game_gid:
+            return json_error_response(
+                'game_gid is required',
+                status_code=400
+            )
+
+        # Verify game exists
+        game = fetch_one_as_dict('SELECT * FROM games WHERE gid = ?', (game_gid,))
+        if not game:
+            return json_error_response(
+                f'Game {game_gid} not found',
+                status_code=404
+            )
+
+        # Query all categories with event counts (including categories with 0 events)
         categories = fetch_all_as_dict("""
             SELECT
                 ec.id,
@@ -73,10 +104,13 @@ def api_list_categories():
                 ec.created_at,
                 COUNT(DISTINCT le.id) as event_count
             FROM event_categories ec
-            LEFT JOIN log_events le ON ec.id = le.category_id
+            LEFT JOIN log_events le
+                ON ec.id = le.category_id
+                AND le.game_gid = ?
             GROUP BY ec.id
             ORDER BY ec.name
-        """)
+        """, (game_gid,))
+
         return json_success_response(data=categories)
     except Exception as e:
         logger.error(f"Error fetching categories: {e}")
