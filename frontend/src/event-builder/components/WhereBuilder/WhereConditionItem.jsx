@@ -15,7 +15,9 @@ export default function WhereConditionItem({
   onUpdate,
   onDelete,
   index,
-  isFirst
+  isFirst,
+  canvasFields = [],
+  selectedEvent
 }) {
   const {
     attributes,
@@ -63,6 +65,8 @@ export default function WhereConditionItem({
       <FieldSelector
         value={condition.field}
         onChange={(value) => handleChange('field', value)}
+        canvasFields={canvasFields}
+        selectedEvent={selectedEvent}
       />
 
       {/* 操作符选择 */}

@@ -5,6 +5,7 @@ import React from 'react';
 import {
   Button,
   Input,
+  SearchInput,
   Checkbox,
   Select,
   Badge,
@@ -12,6 +13,7 @@ import {
   useToast,
   SelectGamePrompt
 } from '@shared/ui';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './EventsList.css';
 
 function EventsList() {
@@ -24,6 +26,7 @@ function EventsList() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
   const pageSize = 10;  // 减少默认pageSize从20到10（性能优化：避免一次渲染过多事件）
 
   // Game context check - show prompt if no game selected
@@ -48,7 +51,14 @@ function EventsList() {
       const response = await fetch(`/api/events?${params.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch events');
       const result = await response.json();
-      return result.data;
+
+      // Validate response structure
+      if (!result?.success) {
+        throw new Error(result?.message || 'Failed to fetch events');
+      }
+
+      // Return the data object containing events and pagination
+      return result.data || {};
     },
     enabled: !!currentGame // Only execute when currentGame exists
   });
@@ -108,10 +118,15 @@ function EventsList() {
       showError('请先选择要删除的事件');
       return;
     }
-    if (!confirm(`确定要删除选中的 ${selectedEvents.length} 个事件吗？\n\n警告：此操作将同时删除所有关联的参数，且不可恢复！`)) {
-      return;
-    }
-    deleteMutation.mutate(selectedEvents);
+    setConfirmState({
+      open: true,
+      title: '确认批量删除',
+      message: `确定要删除选中的 ${selectedEvents.length} 个事件吗？\n\n警告：此操作将同时删除所有关联的参数，且不可恢复！`,
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        deleteMutation.mutate(selectedEvents);
+      }
+    });
   }, [selectedEvents.length, deleteMutation, showError]);
 
   // Handle view event - using useCallback
@@ -128,10 +143,15 @@ function EventsList() {
 
   // Handle delete event - using useCallback
   const handleDeleteEvent = useCallback((eventId, eventName) => {
-    if (!confirm(`确定要删除事件「${eventName}」吗？\n\n警告：此操作将同时删除所有关联的参数，且不可恢复！`)) {
-      return;
-    }
-    deleteMutation.mutate([eventId]);
+    setConfirmState({
+      open: true,
+      title: '确认删除',
+      message: `确定要删除事件「${eventName}」吗？\n\n警告：此操作将同时删除所有关联的参数，且不可恢复！`,
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        deleteMutation.mutate([eventId]);
+      }
+    });
   }, [deleteMutation]);
 
   // Handle clear selection - using useCallback
@@ -141,18 +161,13 @@ function EventsList() {
 
   // 客户端过滤优化（useMemo记忆化）
   const filteredEvents = useMemo(() => {
-    // 显式验证：确保data和events存在
-    if (!data || typeof data !== 'object') {
-      console.warn('[EventsList] Invalid data object');
+    // Validate data structure with optional chaining
+    const events = data?.events;
+    if (!Array.isArray(events)) {
       return [];
     }
 
-    if (!Array.isArray(data.events)) {
-      console.warn('[EventsList] data.events is not an array');
-      return [];
-    }
-
-    return data.events.filter(event => {
+    return events.filter(event => {
       const matchesCategory = selectedCategory === 'all' ||
         event.category_name?.toLowerCase() === selectedCategory.toLowerCase();
       return matchesCategory;
@@ -161,16 +176,13 @@ function EventsList() {
 
   // 提取分类列表优化（useMemo记忆化）
   const categories = useMemo(() => {
-    // 显式验证：确保data和events存在
-    if (!data || typeof data !== 'object') {
+    // Validate data structure with optional chaining
+    const events = data?.events;
+    if (!Array.isArray(events)) {
       return ['all'];
     }
 
-    if (!Array.isArray(data.events)) {
-      return ['all'];
-    }
-
-    return ['all', ...new Set(data.events.map(e => e.category_name).filter(Boolean))];
+    return ['all', ...new Set(events.map(e => e.category_name).filter(Boolean))];
   }, [data]);
 
   // Page size options for Select component
@@ -181,15 +193,8 @@ function EventsList() {
     { value: '100', label: '100' }
   ], []);
 
-  // Get pagination info
-  // 显式验证：确保data和pagination存在
-  let pagination = {};
-  if (data && typeof data === 'object' && data.pagination && typeof data.pagination === 'object') {
-    pagination = data.pagination;
-  } else {
-    console.warn('[EventsList] Invalid or missing pagination data');
-  }
-
+  // Get pagination info with optional chaining
+  const pagination = data?.pagination || {};
   const totalPages = pagination.total_pages || 1;
   const total = pagination.total || 0;
 
@@ -198,7 +203,9 @@ function EventsList() {
       <div className="events-list-page">
         <div className="error-message">
           <p>加载事件列表失败: {fetchError.message}</p>
-          <Button variant="primary" onClick={() => window.location.reload()}>
+          <Button variant="primary" onClick={() => {
+            queryClient.invalidateQueries({ queryKey: ['events'] });
+          }}>
             重新加载
           </Button>
         </div>
@@ -244,44 +251,39 @@ function EventsList() {
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      {data?.events && data.events.length > 0 && (
-        <div className="stats-container">
-          <div className="stat-card">
-            <div className="stat-value">{total}</div>
-            <div className="stat-label">
-              <span>总事件数</span>
-            </div>
-          </div>
-          <div className="stat-card purple">
-            <div className="stat-value">
-              {data.events.filter(e => e.category_name).length}
-            </div>
-            <div className="stat-label">
-              <span>已分类</span>
-            </div>
-          </div>
-          <div className="stat-card orange">
-            <div className="stat-value">
-              {data.events.filter(e => !e.category_name).length}
-            </div>
-            <div className="stat-label">
-              <span>未分类</span>
-            </div>
+      {/* Statistics Cards - Always show */}
+      <div className="stats-container">
+        <div className="stat-card">
+          <div className="stat-value">{total}</div>
+          <div className="stat-label">
+            <span>总事件数</span>
           </div>
         </div>
-      )}
+        <div className="stat-card purple">
+          <div className="stat-value">
+            {data?.events ? data.events.filter(e => e.category_name).length : 0}
+          </div>
+          <div className="stat-label">
+            <span>已分类</span>
+          </div>
+        </div>
+        <div className="stat-card orange">
+          <div className="stat-value">
+            {data?.events ? data.events.filter(e => !e.category_name).length : 0}
+          </div>
+          <div className="stat-label">
+            <span>未分类</span>
+          </div>
+        </div>
+      </div>
 
       {/* Filters */}
       <div className="filters-bar">
-        <div className="search-input">
-          <Input
-            type="text"
-            placeholder="搜索事件名、中文名或分类..."
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          />
-        </div>
+        <SearchInput
+          placeholder="搜索事件名、中文名或分类..."
+          value={searchTerm}
+          onChange={(value) => handleSearchChange(value)}
+        />
 
         <div className="filter-actions">
           <label className="select-all-label">
@@ -485,13 +487,23 @@ function EventsList() {
               onChange={(value) => {
                 const newSize = parseInt(value);
                 setCurrentPage(1);
-                // Note: pageSize change would require refetching with different per_page
-                window.location.href = `?page=1&per_page=${newSize}`;
+                navigate(`?page=1&per_page=${newSize}`);
               }}
             />
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText="删除"
+        cancelText="取消"
+        variant="danger"
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+      />
     </div>
   );
 }

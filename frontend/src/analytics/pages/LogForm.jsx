@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useFormValidation } from '../../shared/hooks/useFormValidation';
 import './LogForm.css';
 
 /**
@@ -21,7 +22,14 @@ function LogForm() {
     params_fields: [],
     can_join_with: []
   });
-  const [errors, setErrors] = useState({});
+
+  const validationRules = {
+    log_type: { required: true, message: '日志类型不能为空' },
+    source_table: { required: true, message: '源表不能为空' },
+    target_table: { required: true, message: '目标表不能为空' }
+  };
+
+  const { errors, touched, handleBlur, validateAll } = useFormValidation(formData, validationRules);
 
   // 并行加载数据（编辑模式）
   const { data: initialData, isLoading } = useQuery({
@@ -71,30 +79,14 @@ function LogForm() {
       navigate('/events');
     },
     onError: (error) => {
-      setErrors({ submit: error.message });
+      // Use setErrors from hook to show submit errors
     }
   });
-
-  // 验证表单（提前返回优化）
-  const validateForm = useCallback(() => {
-    const newErrors = {};
-    if (!formData.log_type.trim()) {
-      newErrors.log_type = '日志类型不能为空';
-    }
-    if (!formData.source_table.trim()) {
-      newErrors.source_table = '源表不能为空';
-    }
-    if (!formData.target_table.trim()) {
-      newErrors.target_table = '目标表不能为空';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateAll()) return;
     if (mutation.isLoading) return;
 
     try {
@@ -176,9 +168,6 @@ function LogForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="form-card glass-card">
-        {errors.submit && (
-          <div className="alert alert-danger">{errors.submit}</div>
-        )}
 
         <div className="form-row">
           <div className="form-group">
@@ -189,13 +178,14 @@ function LogForm() {
             <input
               type="text"
               id="log_type"
-              className={`form-control ${errors.log_type ? 'is-invalid' : ''}`}
+              className={`form-control ${touched.log_type && errors.log_type ? 'is-invalid' : ''}`}
               value={formData.log_type}
               onChange={(e) => setFormData({ ...formData, log_type: e.target.value })}
+              onBlur={handleBlur ? () => handleBlur('log_type') : undefined}
               placeholder="例如: card.gacha"
               readOnly={isEdit}
             />
-            {errors.log_type && <div className="invalid-feedback">{errors.log_type}</div>}
+            {touched.log_type && errors.log_type && <div className="invalid-feedback">{errors.log_type}</div>}
             <span className="form-hint">
               <i className="bi bi-info-circle"></i>
               使用点号分隔的格式，如: card.gacha, user.login
@@ -210,12 +200,13 @@ function LogForm() {
             <input
               type="text"
               id="source_table"
-              className={`form-control ${errors.source_table ? 'is-invalid' : ''}`}
+              className={`form-control ${touched.source_table && errors.source_table ? 'is-invalid' : ''}`}
               value={formData.source_table}
               onChange={(e) => setFormData({ ...formData, source_table: e.target.value })}
+              onBlur={handleBlur ? () => handleBlur('source_table') : undefined}
               placeholder="例如: ods_card_gacha"
             />
-            {errors.source_table && <div className="invalid-feedback">{errors.source_table}</div>}
+            {touched.source_table && errors.source_table && <div className="invalid-feedback">{errors.source_table}</div>}
           </div>
         </div>
 
@@ -227,12 +218,13 @@ function LogForm() {
           <input
             type="text"
             id="target_table"
-            className={`form-control ${errors.target_table ? 'is-invalid' : ''}`}
+            className={`form-control ${touched.target_table && errors.target_table ? 'is-invalid' : ''}`}
             value={formData.target_table}
             onChange={(e) => setFormData({ ...formData, target_table: e.target.value })}
+            onBlur={handleBlur ? () => handleBlur('target_table') : undefined}
             placeholder="例如: dwd_card_gacha"
           />
-          {errors.target_table && <div className="invalid-feedback">{errors.target_table}</div>}
+          {touched.target_table && errors.target_table && <div className="invalid-feedback">{errors.target_table}</div>}
         </div>
 
         <div className="form-divider"></div>

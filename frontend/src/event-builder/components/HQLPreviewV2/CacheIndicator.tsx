@@ -4,9 +4,10 @@
  * 显示HQL V2 API缓存统计信息
  */
 
-import React, { useState, useEffect } from 'react';
-import { hqlApiV2 } from '../../shared/api/hqlApiV2';
-import type { CacheStatsResponse } from '../../shared/types';
+import React, { useState, useEffect, useCallback } from 'react';
+import { hqlApiV2 } from '../../../shared/api/hqlApiV2';
+import type { CacheStatsResponse } from '../../../shared/types';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './CacheIndicator.css';
 
 interface CacheIndicatorProps {
@@ -32,6 +33,7 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
   const [stats, setStats] = useState<CacheStatsResponse['data'] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [confirmState, setConfirmState] = useState({ open: false, title: '清空缓存', message: '确定要清空缓存吗？' });
 
   // 获取缓存统计
   const fetchStats = async () => {
@@ -51,10 +53,11 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
 
   // 清空缓存
   const clearCache = async () => {
-    if (!confirm('确定要清空缓存吗？')) {
-      return;
-    }
+    setConfirmState({ open: true, title: '清空缓存', message: '确定要清空缓存吗？' });
+  };
 
+  const handleConfirmClear = useCallback(async () => {
+    setConfirmState(prev => ({ ...prev, open: false }));
     setLoading(true);
     try {
       await hqlApiV2.clearCache(apiBaseUrl);
@@ -65,7 +68,11 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiBaseUrl]);
+
+  const handleCancelClear = useCallback(() => {
+    setConfirmState(prev => ({ ...prev, open: false }));
+  }, []);
 
   useEffect(() => {
     fetchStats();
@@ -135,6 +142,17 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
         </>
       )}
     </div>
+
+    <ConfirmDialog
+      open={confirmState.open}
+      title={confirmState.title}
+      message={confirmState.message}
+      confirmText="清空"
+      cancelText="取消"
+      variant="danger"
+      onConfirm={handleConfirmClear}
+      onCancel={handleCancelClear}
+    />
   );
 };
 

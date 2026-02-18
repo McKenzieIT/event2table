@@ -9,9 +9,14 @@
     "test:backend:integration": "pytest test/integration/backend",
     "test:frontend": "cd frontend && npm run test:unit",
     "test:e2e": "cd frontend && npm run test:e2e",
+    "test:e2e:critical": "cd frontend && npm run test:e2e:critical",
+    "test:e2e:smoke": "cd frontend && npm run test:e2e:smoke",
+    "test:e2e:contract": "cd frontend && npm run test:e2e:contract",
     "test:contract": "python3 test/contract/api_contract_test.py",
     "test:coverage": "pytest test/ --cov=backend --cov-report=html",
     "test:performance": "pytest test/performance/ -v",
+    "test:all": "npm run test:unit && npm run test:e2e && npm run test:backend",
+    "test:ci": "npm run test:all && pytest backend/test/",
     "verify": "npm run test:contract && npm run test:backend:unit && npm run test:frontend",
     "lint:backend": "flake8 backend/",
     "lint:frontend": "cd frontend && npm run lint",
@@ -26,6 +31,7 @@
   "author": "Event2Table Development Team",
   "license": "MIT",
   "devDependencies": {
+    "eslint-plugin-react-hooks": "^7.0.1",
     "terser": "^5.46.0"
   }
 }

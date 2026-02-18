@@ -173,7 +173,7 @@ function GameForm() {
         </Button>
       </div>
 
-      <Card className="game-form glass-card">
+      <Card className="game-form glass-card" padding="reset">
         <form onSubmit={handleSubmit}>
           {errors.submit && (
             <div className="alert alert-danger">
@@ -189,20 +189,18 @@ function GameForm() {
               游戏ID
               <span className="required-indicator">*</span>
             </label>
-            <div className="input-icon-wrapper">
-              <i className="bi bi-hash"></i>
-              <Input
-                type="text"
-                id="gid"
-                name="gid"
-                className="glass-input"
-                value={formData.gid}
-                onChange={handleChange}
-                disabled={isSubmitting || isEdit}
-                placeholder="例如: 10000147"
-                error={errors.gid}
-              />
-            </div>
+            <Input
+              type="text"
+              id="gid"
+              name="gid"
+              label=""
+              icon="bi-hash"
+              value={formData.gid}
+              onChange={handleChange}
+              disabled={isSubmitting || isEdit}
+              placeholder="例如: 10000147"
+              error={errors.gid}
+            />
             <span className="form-hint">
               <i className="bi bi-info-circle"></i>
               游戏唯一标识符，{isEdit ? '创建后不可修改' : '创建后不可修改，请谨慎填写'}
@@ -216,20 +214,18 @@ function GameForm() {
               游戏名称
               <span className="required-indicator">*</span>
             </label>
-            <div className="input-icon-wrapper">
-              <i className="bi bi-controller"></i>
-              <Input
-                type="text"
-                id="name"
-                name="name"
-                className="glass-input"
-                value={formData.name}
-                onChange={handleChange}
-                disabled={isSubmitting}
-                placeholder="例如: 我的游戏"
-                error={errors.name}
-              />
-            </div>
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              label=""
+              icon="bi-controller"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              placeholder="例如: 我的游戏"
+              error={errors.name}
+            />
           </div>
 
         {/* ODS Database Type */}

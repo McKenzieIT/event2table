@@ -5,19 +5,20 @@
  */
 
 import React from 'react';
+import type { Event, Field } from '@shared/types/api-types';
 import './DebugViewer.css';
 
 interface DebugStep {
   step: string;
-  result: any;
+  result: string;
   count?: number;
 }
 
 interface DebugTrace {
-  hql: string;
+  result: string;
   steps: DebugStep[];
-  events: any[];
-  fields: any[];
+  events: Event[];
+  fields: Field[];
 }
 
 interface DebugViewerProps {

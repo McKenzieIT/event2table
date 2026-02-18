@@ -6,7 +6,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { ensureArray, safeFilter, safeLength } from '@shared/utils/componentUtils';
 
-export default function StatsPanel({ fields, whereConditions }) {
+export default function StatsPanel({ fields = [], whereConditions = [] }) {
   const stats = useMemo(() => {
     // ✅ 添加空值检查
     const safeFields = ensureArray(fields);
@@ -74,9 +74,4 @@ StatsPanel.propTypes = {
       value: PropTypes.any
     })
   )
-};
-
-StatsPanel.defaultProps = {
-  fields: [],
-  whereConditions: []
 };

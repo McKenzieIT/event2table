@@ -43,8 +43,6 @@ export function useCanvasHistory(onRestore, maxHistory = 50) {
 
     // Clear future when new action is performed
     futureRef.current = [];
-
-    console.log('[useCanvasHistory] History pushed. Total entries:', pastRef.current.length);
   }, [maxHistory]);
 
   /**
@@ -53,7 +51,6 @@ export function useCanvasHistory(onRestore, maxHistory = 50) {
    */
   const undo = useCallback(() => {
     if (pastRef.current.length === 0) {
-      console.log('[useCanvasHistory] No history to undo');
       return null;
     }
 
@@ -67,8 +64,6 @@ export function useCanvasHistory(onRestore, maxHistory = 50) {
     // Save current to future for redo
     futureRef.current.push(current);
 
-    console.log('[useCanvasHistory] Undo performed. Remaining:', pastRef.current.length);
-
     return {
       nodes: JSON.parse(JSON.stringify(previous.nodes)),
       edges: JSON.parse(JSON.stringify(previous.edges))
@@ -81,14 +76,11 @@ export function useCanvasHistory(onRestore, maxHistory = 50) {
    */
   const redo = useCallback(() => {
     if (futureRef.current.length === 0) {
-      console.log('[useCanvasHistory] No future to redo');
       return null;
     }
 
     const next = futureRef.current.pop();
     pastRef.current.push(next);
-
-    console.log('[useCanvasHistory] Redo performed. Future remaining:', futureRef.current.length);
 
     return {
       nodes: JSON.parse(JSON.stringify(next.nodes)),
@@ -118,7 +110,6 @@ export function useCanvasHistory(onRestore, maxHistory = 50) {
   const clearHistory = useCallback(() => {
     pastRef.current = [];
     futureRef.current = [];
-    console.log('[useCanvasHistory] History cleared');
   }, []);
 
   /**

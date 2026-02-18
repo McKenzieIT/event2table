@@ -6,7 +6,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@shared/ui/Button';
 
-export default function PageHeader({ gameData, onClearCanvas, onSaveConfig, onLoadConfig, onOpenNodeConfig, useV2API, setUseV2API }) {
+export default function PageHeader({
+  gameData,
+  onClearCanvas,
+  onSaveConfig,
+  onLoadConfig,
+  onOpenNodeConfig,
+  useV2API,
+  setUseV2API,
+  showPerformancePanel,
+  setShowPerformancePanel,
+  showDebugPanel,
+  setShowDebugPanel
+}) {
   return (
     <header className="page-header">
       <div className="header-left">
@@ -22,32 +34,25 @@ export default function PageHeader({ gameData, onClearCanvas, onSaveConfig, onLo
         )}
       </div>
       <div className="header-right">
-        {/* V2 API 版本切换 */}
-        {setUseV2API && (
-          <div className="api-version-toggle">
-            <label htmlFor="v2-api-toggle" style={{ marginRight: '8px', fontSize: '14px' }}>
-              使用新版API (V2):
-            </label>
-            <input
-              id="v2-api-toggle"
-              type="checkbox"
-              checked={useV2API}
-              onChange={(e) => setUseV2API(e.target.checked)}
-              style={{ marginRight: '16px' }}
-            />
-            {useV2API && (
-              <span style={{
-                fontSize: '12px',
-                padding: '4px 8px',
-                background: 'rgba(6, 182, 212, 0.2)',
-                borderRadius: '4px',
-                color: '#06b6d4'
-              }}>
-                🚀 性能分析 + 调试模式
-              </span>
-            )}
-          </div>
-        )}
+        {/* 性能分析面板（可折叠） */}
+        <button
+          className={`btn btn-sm ${showPerformancePanel ? 'btn-info' : 'btn-outline-info'}`}
+          onClick={() => setShowPerformancePanel(!showPerformancePanel)}
+          style={{ marginRight: '8px' }}
+          title="性能分析面板"
+        >
+          <i className="bi bi-speedometer2"></i> 性能分析
+        </button>
+
+        {/* 调试模式面板（可折叠） */}
+        <button
+          className={`btn btn-sm ${showDebugPanel ? 'btn-secondary' : 'btn-outline-secondary'}`}
+          onClick={() => setShowDebugPanel(!showDebugPanel)}
+          style={{ marginRight: '12px' }}
+          title="调试模式面板"
+        >
+          <i className="bi bi-bug"></i> 调试模式
+        </button>
         {onClearCanvas && (
           <Button variant="secondary" onClick={onClearCanvas}>
             清空画布

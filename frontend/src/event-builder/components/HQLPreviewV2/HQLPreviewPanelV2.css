@@ -1,56 +1,59 @@
 /**
- * HQL预览面板 V2 样式
+ * HQL Preview Panel V2 - Cyberpunk Terminal Style
  */
 
 .hql-preview-panel-v2 {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 16px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  font-family: var(--font-mono);
 }
 
 .hql-preview-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid var(--border-default);
 }
 
 .hql-preview-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
 }
 
 .header-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   align-items: center;
 }
 
 .header-actions button {
-  padding: 6px 12px;
+  padding: var(--space-2) var(--space-3);
   border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-base);
 }
 
 .btn-primary {
-  background: #1890ff;
+  background: var(--cyan-600);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #40a9ff;
+  background: var(--cyan-500);
+  box-shadow: var(--shadow-glow);
 }
 
 .btn-primary:disabled {
@@ -59,53 +62,59 @@
 }
 
 .btn-secondary {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--bg-glass);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
 }
 
 .btn-secondary:hover {
-  background: #e0e0e0;
+  background: var(--bg-glass-light);
+  border-color: var(--cyan-500);
 }
 
 .debug-toggle {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #666;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   cursor: pointer;
   user-select: none;
 }
 
 .debug-toggle input {
   cursor: pointer;
+  accent-color: var(--cyan-500);
 }
 
 .error-message {
-  padding: 12px;
-  background: #fff2f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
-  color: #cf1322;
-  margin-bottom: 12px;
-  font-size: 13px;
+  padding: var(--space-3);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--danger);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
 }
 
 .hql-display {
   flex: 1;
-  background: white;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
   overflow: auto;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .hql-content {
   margin: 0;
-  padding: 16px;
-  font-size: 12px;
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   line-height: 1.6;
-  color: #262626;
+  color: var(--text-primary);
   white-space: pre-wrap;
   word-wrap: break-word;
 }
@@ -116,17 +125,19 @@
   justify-content: center;
   height: 100%;
   min-height: 200px;
-  color: #999;
-  font-size: 14px;
+  color: var(--text-tertiary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
 }
 
 .hql-metadata {
   display: flex;
-  gap: 16px;
-  font-size: 12px;
-  color: #666;
-  padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
+  gap: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-default);
 }
 
 .hql-metadata span {
@@ -146,9 +157,9 @@
   display: inline-block;
   width: 12px;
   height: 12px;
-  margin-left: 8px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #1890ff;
+  margin-left: var(--space-2);
+  border: 2px solid rgba(6, 182, 212, 0.2);
+  border-top: 2px solid var(--cyan-500);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -158,7 +169,7 @@
   .hql-preview-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: var(--space-3);
   }
 
   .header-actions {

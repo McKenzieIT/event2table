@@ -109,13 +109,6 @@ export function useAutoConnect(
   // 执行自动连接
   const autoConnect = useCallback(
     (newNodeId) => {
-      console.log(
-        "[useAutoConnect] autoConnect called with nodeId:",
-        newNodeId,
-        "enabled:",
-        autoConnectEnabled,
-      );
-
       if (!autoConnectEnabled) return false;
 
       // 🔧 v1.0.22: 使用ref获取最新nodes，而不是闭包中的nodes参数
@@ -123,21 +116,8 @@ export function useAutoConnect(
       const newNode = currentNodes.find((n) => n.id === newNodeId);
 
       if (!newNode) {
-        console.log(
-          "[useAutoConnect] Node not found:",
-          newNodeId,
-          "currentNodes.length:",
-          currentNodes.length,
-        );
         return false;
       }
-
-      console.log(
-        "[useAutoConnect] Node found:",
-        newNode.id,
-        "type:",
-        newNode.type,
-      );
 
       // 检查是否跳过
       if (skipNodes.has(newNodeId)) return false;
@@ -195,13 +175,7 @@ export function useAutoConnect(
         return false;
       }
 
-      console.log(
-        "[useAutoConnect] possibleConnections:",
-        possibleConnections.length,
-      );
-
       if (possibleConnections.length === 0) {
-        console.log("[useAutoConnect] No possible connections found");
         return false;
       }
 
@@ -224,11 +198,6 @@ export function useAutoConnect(
 
       // 如果有多个可能连接，显示提示
       if (showPrompt && possibleConnections.length > 0) {
-        console.log(
-          "[useAutoConnect] Showing connection modal with",
-          possibleConnections.length,
-          "options",
-        );
         // 对于连接节点（union_all/join）和输出节点，我们需要显示可以作为源的节点
         // Modal会显示sourceNode（新节点）和targetOptions（可选择的源节点）
         // 当用户选择时，会调用 onConnect(sourceNode.id, selectedTarget)
@@ -308,7 +277,6 @@ export function useAutoConnect(
             "success",
             2000,
           );
-          console.log("[useAutoConnect] Created edge:", newEdge);
         } else {
           // 正常情况：modalSourceId是源，selectedTargetId是目标
           const newEdge = {
@@ -328,7 +296,6 @@ export function useAutoConnect(
             },
           ]);
           showToastNotification("连接成功！", "success", 2000);
-          console.log("[useAutoConnect] Created edge:", newEdge);
         }
         setShowModal(false);
       } catch (error) {

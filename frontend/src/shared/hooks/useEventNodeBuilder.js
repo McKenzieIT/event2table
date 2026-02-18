@@ -48,26 +48,37 @@ export function useEventNodeBuilder(gameGid) {
    * @param {string} fieldName - 字段名
    * @param {string} displayName - 显示名称
    * @param {number|null} paramId - 参数ID（可选）
+   * @param {string|null} jsonPath - JSON路径（用于param类型）
    */
-  const addFieldToCanvas = useCallback((fieldType, fieldName, displayName, paramId = null) => {
-    console.log('[useEventNodeBuilder] addFieldToCanvas called with:', fieldType, fieldName, displayName, paramId);
+  const addFieldToCanvas = useCallback((fieldType, fieldName, displayName, paramId = null, jsonPath = null) => {
     setCanvasFields(prev => {
-      const newField = {
-        id: Date.now(),
-        fieldType,
-        fieldName,
-        displayName,
-        alias: fieldName,  // 修复：初始化为 fieldName 而非空字符串
-        order: prev.length + 1,
-        paramId,
+      // Map field types for UI and API compatibility
+      // FieldCanvas UI expects: type = 'basic'|'parameter'|'custom'|'fixed'
+      // Backend API expects: fieldType = 'base'|'param'|'custom'|'fixed'
+      const typeMapping = {
+        'base': 'basic',       // UI: 'basic', API: 'base'
+        'param': 'parameter',  // UI: 'parameter', API: 'param'
+        'custom': 'custom',    // Both: 'custom'
+        'fixed': 'fixed'       // Both: 'fixed'
       };
-      console.log('[useEventNodeBuilder] New field object:', newField);
-      console.log('[useEventNodeBuilder] Previous canvasFields length:', prev.length);
-      const updatedFields = [...prev, newField];
-      console.log('[useEventNodeBuilder] Updated fields length:', updatedFields.length);
-      return updatedFields;
+
+      const newField = {
+        id: String(Date.now()),  // Convert to string to match FieldCanvas PropTypes
+        type: typeMapping[fieldType] || fieldType,  // FieldCanvas expects mapped 'type'
+        name: fieldName,  // FieldCanvas expects 'name' not 'fieldName'
+        displayName,  // Human-readable name
+        alias: fieldName,
+        dataType: fieldType === 'param' ? 'STRING' : 'UNKNOWN',  // FieldCanvas requires dataType
+        isEditable: true,
+        // Keep original fieldType for backend API compatibility
+        fieldType,  // Backend expects: 'base', 'param', 'custom', 'fixed'
+        fieldName,
+        order: prev.length + 1,
+        paramId,  // Keep as number (valid type)
+        jsonPath,  // Add jsonPath for param type fields
+      };
+      return [...prev, newField];
     });
-    console.log('[useEventNodeBuilder] setCanvasFields called');
   }, []);
 
   /**

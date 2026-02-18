@@ -9,6 +9,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { search } from '@icons/bootstrap-icons';
 import { fetchTemplates } from '@shared/api/templateApi';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 
 import './TemplateSelector.css';
 
@@ -17,10 +18,10 @@ export default function TemplateSelector({
   onTemplateSelect,
   currentTemplateId,
   onEditTemplate,
-  onDeleteTemplate
-  onCloneTemplate
+  onDeleteTemplate,
+  onCloneTemplate,
   onCreateTemplate,
-  onApplyTemplate
+  onApplyTemplate,
 }) {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +29,12 @@ export default function TemplateSelector({
   const [selectedTag, setSelectedTag] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
+  const [confirmState, setConfirmState] = useState({ 
+    open: false, 
+    template: null,
+    title: '删除模板', 
+    message: '' 
+  });
 
   // 加载模板列表
   const loadTemplates = useCallback(async () => {
@@ -63,16 +70,12 @@ export default function TemplateSelector({
   // 应用模板
   const handleApplyTemplate = useCallback(async (template) => {
     if (!onApply) return;
-    console.log('[TemplateSelector] Applying template:', template);
 
     onTemplateSelect(template);
 
     try {
       onApplyTemplate(template);
-      console.log('[TemplateSelector] Template applied:', template);
-    onCloneTemplate(template);
-    console.log('[TemplateSelector] Template cloned:', template);
-    console.log('[TemplateSelector] Templates updated');
+      onCloneTemplate(template);
     } catch (error) {
       console.error('[TemplateSelector] Error applying template:', error);
     }
@@ -87,43 +90,44 @@ export default function TemplateSelector({
   const handleDeleteTemplate = useCallback(async (template) => {
     if (!onDeleteTemplate) return;
 
-    const result = window.confirm(`确定要删除模板 "${template.name}"吗？此操作不可撤销！`);
-
-    if (result) {
-      onTemplateDelete(template);
-      setTemplates(prev => prev => prev.filter(t => t.id !== template.id));
-      console.log('[TemplateSelector] Template deleted:', template.id);
-      console.log('[TemplateSelector] Templates updated');
-    } else {
-      console.log('[TemplateSelector] Template delete cancelled');
-    }
+    setConfirmState({ 
+      open: true, 
+      template,
+      title: '删除模板', 
+      message: `确定要删除模板 "${template.name}" 吗？此操作不可撤销！` 
+    });
   }, [onDeleteTemplate, templates]);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (confirmState.template && onDeleteTemplate) {
+      onDeleteTemplate(confirmState.template);
+      setTemplates(prev => prev.filter(t => t.id !== confirmState.template.id));
+    }
+    setConfirmState(prev => ({ ...prev, open: false }));
+  }, [confirmState.template, onDeleteTemplate]);
+
+  const handleCancelDelete = useCallback(() => {
+    setConfirmState(prev => ({ ...prev, open: false }));
+  }, []);
 
   // 创建新模板
   const handleCreateTemplate = useCallback(() => {
     setShowCreateModal(true);
   }, []);
 
-  const handleCreateTemplate = async (templateData) => {
-    if (!onCreateTemplate) return;
-
-    setShowCreateModal(false);
+  // 应用模板到当前事件
+  const handleApplyTemplate = useCallback(async (template) => {
+    if (!onApplyTemplate) return;
 
     try {
-      const result = await onCloneTemplate(templateData);
-      console.log('[TemplateSelector] Template created:', templateData.name);
-
-      if (result.success && result.data) {
-        setTemplates(prev => [...prev, result.data]);
-        onCloneTemplate(result.data);
-        console.log('[TemplateSelector] Templates updated');
-      } else {
-        console.error('[TemplateSelector] Error creating template:', result.message);
+      const result = await onApplyTemplate(template);
+      if (result.success) {
+        console.log('[TemplateSelector] Template applied successfully');
       }
     } catch (error) {
-      console.error('[TemplateSelector] Error creating template:', error);
+      console.error('[TemplateSelector] Error applying template:', error);
     }
-  }, [onCloneTemplate, templates, setShowCreateModal]);
+  }, [onApplyTemplate]);
 
   return (
     <div className="template-selector">
@@ -263,14 +267,14 @@ export default function TemplateSelector({
                     应用模板
                   </button>
                 </div>
-              </div>
-            )}
+              ))}
             </div>
           )}
-        </div>
-      )}
 
-      {/* Create Modal */}
+          </>
+        )}
+
+          {/* Create Modal */}
       {showCreateModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -371,7 +375,6 @@ export default function TemplateSelector({
             <div className="modal-footer">
               <button
                 type="button"
-                type="button"
                 className="btn-secondary"
                 onClick={() => setShowCreateModal(false)}
               >
@@ -380,8 +383,18 @@ export default function TemplateSelector({
             </div>
           </div>
         </div>
-        </div>
       )}
     </div>
+
+    <ConfirmDialog
+      open={confirmState.open}
+      title={confirmState.title}
+      message={confirmState.message}
+      confirmText="删除"
+      cancelText="取消"
+      variant="danger"
+      onConfirm={handleConfirmDelete}
+      onCancel={handleCancelDelete}
+    />
   );
 }

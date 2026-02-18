@@ -11,6 +11,7 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import toast from "react-hot-toast";
 import { eventNodesApi } from "@shared/api/eventNodes";
 import { Button } from "@shared/ui/Button";
+import { COPY_NOTIFICATION_DURATION } from "@shared/constants/timeouts";
 
 /**
  * Props接口
@@ -46,7 +47,7 @@ export function HQLViewModal({ show, nodeId, onClose }: HQLViewModalProps) {
         setHql(response.data.hql);
       } catch (err) {
         console.error("Failed to fetch HQL:", err);
-        error("加载HQL失败");
+        error("加载HQL失败: " + (err?.message || '请稍后重试'));
       } finally {
         setLoading(false);
       }
@@ -70,10 +71,10 @@ export function HQLViewModal({ show, nodeId, onClose }: HQLViewModalProps) {
       await navigator.clipboard.writeText(hql);
       setCopied(true);
       success("已复制到剪贴板");
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPY_NOTIFICATION_DURATION);
     } catch (err) {
       console.error("Failed to copy:", err);
-      error("复制失败");
+      error("复制失败: " + (err?.message || '请手动复制'));
     }
   };
 
@@ -88,7 +89,7 @@ export function HQLViewModal({ show, nodeId, onClose }: HQLViewModalProps) {
       success("HQL已重新生成");
     } catch (err) {
       console.error("Failed to regenerate HQL:", err);
-      error("重新生成失败");
+      error("重新生成失败: " + (err?.message || '请稍后重试'));
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSidebar } from '@shared/hooks/useSidebar';
 import { SIDEBAR_GROUPS, GAME_CHIP_CONFIG } from '@shared/config/sidebarConfig';
 import { SidebarGroup } from './SidebarGroup';
-import { SidebarMenuItem } from './SidebarMenuItem';
+import { SidebarMenuItemMemo } from './SidebarMenuItem';
 import { useGameStore } from '../../../stores/gameStore';
 import './Sidebar.css';
 
@@ -17,14 +17,19 @@ export function Sidebar() {
 
   const sidebarRef = useRef(null);
   const { openGameManagementModal } = useGameStore();
-  const [currentGame, setCurrentGame] = useState({
-    id: null,
-    name: GAME_CHIP_CONFIG.defaultText,
-    gid: null
-  });
+  const { currentGame, setCurrentGame } = useGameStore();
 
   // 需要游戏上下文的路由（这些路由会动态添加 game_gid 参数）
-  const routesRequiringGameContext = ['/event-node-builder', '/canvas'];
+  const routesRequiringGameContext = [
+    '/event-node-builder',
+    '/event-nodes',
+    '/events',
+    '/canvas',
+    '/parameters',
+    '/categories',
+    '/common-params',
+    '/flows'
+  ];
 
   // 响应式处理：小屏幕默认折叠
   useEffect(() => {
@@ -66,33 +71,6 @@ export function Sidebar() {
     }
   }, []);
 
-  // 加载当前游戏信息
-  useEffect(() => {
-    const loadCurrentGame = () => {
-      const gameId = localStorage.getItem('selectedGameId');
-      const gameName = localStorage.getItem('selectedGameName');
-      const gameGid = localStorage.getItem('selectedGameGid');
-
-      if (gameId && gameName && gameGid) {
-        setCurrentGame({
-          id: gameId,
-          name: gameName,
-          gid: gameGid
-        });
-      }
-    };
-
-    loadCurrentGame();
-
-    // 监听游戏切换事件
-    const handleGameChange = () => {
-      loadCurrentGame();
-    };
-
-    window.addEventListener('gameChanged', handleGameChange);
-    return () => window.removeEventListener('gameChanged', handleGameChange);
-  }, []);
-
   // 处理游戏选择点击
   const handleGameChipClick = () => {
     // 触发游戏选择模态框（需要与全局游戏选择系统集成）
@@ -115,15 +93,23 @@ export function Sidebar() {
       <div className="sidebar-header">
         <a href="/react-app-shell#/" className="sidebar-brand">
           <i className="bi bi-database-fill sidebar-brand-icon"></i>
-          <span className="sidebar-brand-text">DWD Generator</span>
+          <span className="sidebar-brand-text">Event2Table</span>
         </a>
         <button
           className="sidebar-toggle"
           onClick={toggleCollapsed}
-          aria-label="切换侧边栏"
+          aria-label={collapsed ? "展开侧边栏" : "折叠侧边栏"}
           title={collapsed ? "展开侧边栏" : "折叠侧边栏"}
         >
-          <i className={`bi bi-chevron-${collapsed ? 'right' : 'left'}`}></i>
+          {collapsed ? (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
         </button>
       </div>
 
@@ -138,7 +124,7 @@ export function Sidebar() {
             onToggle={toggleGroup}
           >
             {group.items.map((item) => (
-              <SidebarMenuItem
+              <SidebarMenuItemMemo
                 key={item.id}
                 item={item}
                 isSidebarCollapsed={collapsed}
@@ -160,7 +146,9 @@ export function Sidebar() {
           <div className="game-chip-sidebar-content">
             <i className={`bi ${GAME_CHIP_CONFIG.icon} game-chip-sidebar-icon`}></i>
             <span className="game-chip-sidebar-text">
-              {currentGame.name}
+              {collapsed && GAME_CHIP_CONFIG.shortLabel
+                ? GAME_CHIP_CONFIG.shortLabel
+                : (currentGame?.name || '选择游戏')}
             </span>
           </div>
           <i className="bi bi-chevron-down game-chip-sidebar-chevron"></i>
@@ -175,7 +163,9 @@ export function Sidebar() {
         >
           <div className="game-management-btn-content">
             <i className="bi bi-gear game-management-btn-icon"></i>
-            <span className="game-management-btn-text">游戏管理</span>
+            <span className="game-management-btn-text">
+              {collapsed ? '管理' : '游戏管理'}
+            </span>
           </div>
         </button>
       </div>

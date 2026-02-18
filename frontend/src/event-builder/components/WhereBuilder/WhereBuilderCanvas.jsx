@@ -15,7 +15,7 @@ const LARGE_LIST_THRESHOLD = 50;
 export default function WhereBuilderCanvas({
   conditions,
   canvasFields,
-  mode,
+  selectedEvent,
   onUpdate
 }) {
   const [activeId, setActiveId] = useState(null);
@@ -47,6 +47,25 @@ export default function WhereBuilderCanvas({
     ]);
   }, [conditions, onUpdate]);
 
+  // 添加分组
+  const handleAddGroup = useCallback(() => {
+    const newGroup = {
+      id: `group-${Date.now()}`,
+      type: 'group',
+      logicalOp: 'AND',
+      children: [],
+      isCollapsed: false
+    };
+
+    onUpdate([
+      ...conditions,
+      {
+        ...newGroup,
+        logicalOp: conditions.length > 0 ? 'AND' : undefined
+      }
+    ]);
+  }, [conditions, onUpdate]);
+
   // 判断是否使用性能模式
   const isLargeList = conditions.length > LARGE_LIST_THRESHOLD;
 
@@ -58,6 +77,8 @@ export default function WhereBuilderCanvas({
         condition={condition}
         index={index}
         isFirst={index === 0}
+        canvasFields={canvasFields}
+        selectedEvent={selectedEvent}
         onUpdate={(id, updates) => {
           const updated = conditions.map(c =>
             c.id === id ? { ...c, ...updates } : c
@@ -70,7 +91,7 @@ export default function WhereBuilderCanvas({
         }}
       />
     ));
-  }, [conditions, onUpdate]);
+  }, [conditions, onUpdate, canvasFields, selectedEvent]);
 
   return (
     <div className="where-builder-canvas">
@@ -79,11 +100,9 @@ export default function WhereBuilderCanvas({
         <button className="btn btn-sm btn-primary" onClick={handleAddCondition}>
           <i className="bi bi-plus-circle"></i> 添加条件
         </button>
-        {mode === 'advanced' && (
-          <button className="btn btn-sm btn-secondary">
-            <i className="bi bi-layer-group"></i> 添加分组
-          </button>
-        )}
+        <button className="btn btn-sm btn-secondary" onClick={handleAddGroup}>
+          <i className="bi bi-layer-group"></i> 添加分组
+        </button>
         <button className="btn btn-sm btn-outline-danger" onClick={() => onUpdate([])}>
           <i className="bi bi-trash"></i> 清空
         </button>

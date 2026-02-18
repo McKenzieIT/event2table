@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card } from '@shared/ui';
+import { Card } from '@shared/ui';
 import './NotFound.css';
 
 /**
@@ -12,23 +12,19 @@ function NotFound() {
   return (
     <div className="not-found-container">
       <Card className="not-found-content glass-card">
-        <Card.Body>
+        <div className="cyber-card__body">
           <div className="error-code">404</div>
           <h1>页面未找到</h1>
           <p className="text-secondary">抱歉，您访问的页面不存在。</p>
 
           <div className="not-found-actions">
-            <Link to="/">
-              <Button variant="primary">
-                <i className="bi bi-house"></i>
-                返回首页
-              </Button>
+            <Link to="/" className="btn btn-primary">
+              <i className="bi bi-house"></i>
+              返回首页
             </Link>
-            <Link to="/games">
-              <Button variant="ghost">
-                <i className="bi bi-controller"></i>
-                游戏管理
-              </Button>
+            <Link to="/games" className="btn btn-outline-secondary">
+              <i className="bi bi-controller"></i>
+              游戏管理
             </Link>
           </div>
 
@@ -40,7 +36,7 @@ function NotFound() {
               <li>联系管理员报告此问题</li>
             </ul>
           </div>
-        </Card.Body>
+        </div>
       </Card>
     </div>
   );

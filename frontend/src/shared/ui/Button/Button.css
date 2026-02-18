@@ -119,6 +119,126 @@
   border-color: rgba(244, 67, 54, 0.6);
 }
 
+/* Success - Green gradient */
+.cyber-button--success {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.cyber-button--success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5),
+              0 0 30px rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Warning - Yellow gradient */
+.cyber-button--warning {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.cyber-button--warning:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5),
+              0 0 30px rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Info - Blue gradient */
+.cyber-button--info {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.cyber-button--info:hover:not(:disabled) {
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5),
+              0 0 30px rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Outline variants */
+.cyber-button--outline-primary {
+  background: transparent;
+  color: #06B6D4;
+  border: 1px solid rgba(6, 182, 212, 0.5);
+}
+
+.cyber-button--outline-primary:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.8);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+}
+
+.cyber-button--outline-secondary {
+  background: transparent;
+  color: #9CA3AF;
+  border: 1px solid rgba(156, 163, 175, 0.5);
+}
+
+.cyber-button--outline-secondary:hover:not(:disabled) {
+  background: rgba(156, 163, 175, 0.1);
+  border-color: rgba(156, 163, 175, 0.8);
+}
+
+.cyber-button--outline-success {
+  background: transparent;
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.cyber-button--outline-success:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.8);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.cyber-button--outline-danger {
+  background: transparent;
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.cyber-button--outline-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+.cyber-button--outline-warning {
+  background: transparent;
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.cyber-button--outline-warning:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.8);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.cyber-button--outline-info {
+  background: transparent;
+  color: #3B82F6;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+.cyber-button--outline-info:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
 /* ========================================
    States
    ======================================== */

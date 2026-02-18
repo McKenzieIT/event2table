@@ -31,6 +31,7 @@ from . import (
     nodes,
     parameters,
     templates,
+    v1_adapter,  # V1-to-V2 adapter endpoints (2026-02-17)
 )
 
 __all__ = [
@@ -47,4 +48,5 @@ __all__ = [
     "field_builder",
     "join_configs",
     "legacy_api",
+    "v1_adapter",
 ]

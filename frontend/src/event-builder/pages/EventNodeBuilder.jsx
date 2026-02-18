@@ -19,13 +19,18 @@ import WhereBuilderModal from '@event-builder/components/WhereBuilder/WhereBuild
 import HQLPreviewModal from '@event-builder/components/HQLPreview/HQLPreviewModal';
 import NodeConfigModal from '@event-builder/components/modals/NodeConfigModal';
 import EventNodeBuilderErrorBoundary from '@event-builder/components/ErrorBoundary';
+import PerformanceIndicator from '@event-builder/components/HQLPreviewV2/PerformanceIndicator';
+import DebugViewer from '@event-builder/components/HQLPreviewV2/DebugViewer';
 import { Button } from '@shared/ui/Button';
+import { useToast } from '@shared/ui/Toast/Toast';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 
 // Hooks
 import { useEventNodeBuilder } from '@shared/hooks/useEventNodeBuilder';
+import { useGameContext } from '@shared/hooks/useGameContext';
 
 // API
-import { saveConfig, loadConfig } from '@shared/api/eventNodeBuilderApi';
+import { saveConfig, loadConfig } from '@shared/api/eventNodeBuilder';
 
 // 样式
 import './EventNodeBuilder.css';
@@ -36,12 +41,16 @@ export default function EventNodeBuilder() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // Toast
+  const { success, error, warning } = useToast();
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
+
   // URL 参数
   const configIdParam = searchParams.get('config_id');
   const gameGidParam = searchParams.get('game_gid');
 
-  // 游戏数据
-  const [gameData, setGameData] = useState(currentGame || window.gameData);
+  // 使用统一的useGameContext
+  const { currentGame: gameData, selectGame, currentGameGid } = useGameContext();
 
   // 自定义 Hook
   const {
@@ -68,100 +77,64 @@ export default function EventNodeBuilder() {
   const [showHQLDetails, setShowHQLDetails] = useState(false);
   const [showNodeConfig, setShowNodeConfig] = useState(false);
 
-  // V2 API功能切换
-  const [useV2API, setUseV2API] = useState(false);
+  // 性能分析和调试模式面板状态
+  const [showPerformancePanel, setShowPerformancePanel] = useState(false);
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
+
+  // V2 API功能切换（默认启用V2）
+  const [useV2API, setUseV2API] = useState(true);
 
   // 保存配置 mutation
   const saveMutation = useMutation({
     mutationFn: (configData) => saveConfig(configData),
     onSuccess: (result) => {
-      alert(`配置 "${result.data.name_en}" 保存成功！`);
+      success(`配置 "${result.data.name_en}" 保存成功！`);
     },
     onError: (error) => {
-      alert('保存失败: ' + (error.message || '未知错误'));
+      error('保存失败: ' + (error.message || '未知错误'));
     },
   });
 
-  // 加载游戏数据
+  // 加载游戏数据 - 简化版，使用统一useGameContext
   useEffect(() => {
-    // 尝试从多个来源获取游戏数据
     const loadGameData = async () => {
-      let targetGame = currentGame;
-
-      // 1. 如果MainLayout已经通过context提供了游戏数据，优先使用
-      if (targetGame && gameGidParam && String(targetGame.gid) === String(gameGidParam)) {
-        // MainLayout already has the correct game loaded
-        if (!gameData || String(gameData.gid) !== String(targetGame.gid)) {
-          window.gameData = {
-            id: targetGame.id,
-            gid: targetGame.gid,
-            name: targetGame.name,
-            ods_db: targetGame.ods_db,
-          };
-          setGameData(window.gameData);
-          console.log('[EventNodeBuilder] Using game from MainLayout context:', window.gameData);
-        }
+      // 1. 如果useGameContext已有游戏数据，直接使用
+      if (gameData) {
         return;
       }
 
-      // 2. 从URL参数的game_gid查找（仅当MainLayout未提供时）
-      if (gameGidParam && !targetGame) {
-        // 先尝试从游戏列表中查找
-        const games = window.gamesList || [];
-        targetGame = games.find(g => String(g.gid) === String(gameGidParam));
-
-        // 如果列表中没有，从API获取
-        if (!targetGame) {
-          try {
-            console.log('[EventNodeBuilder] Fetching game from API:', gameGidParam);
-            const response = await fetch('/api/games');
-            const result = await response.json();
-            if (result.success && Array.isArray(result.data)) {
-              const game = result.data.find(g => String(g.gid) === String(gameGidParam));
-              if (game) {
-                targetGame = game;
-                // 更新全局游戏列表
-                if (!window.gamesList) window.gamesList = [];
-                if (!window.gamesList.find(g => String(g.gid) === String(gameGidParam))) {
-                  window.gamesList.push(game);
-                }
-              }
+      // 2. 从URL参数加载（仅当没有游戏数据时）
+      if (gameGidParam) {
+        try {
+          const response = await fetch('/api/games');
+          const result = await response.json();
+          if (result.success && Array.isArray(result.data)) {
+            const game = result.data.find(g => String(g.gid) === String(gameGidParam));
+            if (game) {
+              selectGame(game);
+              return;
             }
-          } catch (error) {
-            console.error('[EventNodeBuilder] Failed to fetch game:', error);
           }
+        } catch (error) {
+          console.error('[EventNodeBuilder] Failed to fetch game:', error);
         }
       }
 
-      // 3. 使用window.gameData
-      if (!targetGame && window.gameData) {
-        targetGame = window.gameData;
-      }
-
-      // 4. 使用localStorage中的游戏
-      if (!targetGame) {
-        const storedGameGid = localStorage.getItem('selectedGameGid');
-        if (storedGameGid && window.gamesList) {
-          targetGame = window.gamesList.find(g => String(g.gid) === String(storedGameGid));
-        }
-      }
-
-      if (targetGame && (!gameData || String(gameData.gid) !== String(targetGame.gid))) {
-        window.gameData = {
-          id: targetGame.id,
-          gid: targetGame.gid,
-          name: targetGame.name,
-          ods_db: targetGame.ods_db,
-        };
-        setGameData(window.gameData);
-        console.log('[EventNodeBuilder] Game data loaded:', window.gameData);
-      } else if (!targetGame) {
+      // 3. 如果仍然没有游戏数据，显示警告
+      if (!gameData && !gameGidParam) {
         console.warn('[EventNodeBuilder] No game data available');
       }
     };
 
     loadGameData();
-  }, [gameGidParam, currentGame]);
+  }, [gameGidParam, gameData, selectGame]);
+
+  // Clear canvas when selected event changes
+  useEffect(() => {
+    // Clear canvas fields and WHERE conditions when switching events
+    // This ensures users start fresh with each new event selection
+    clearCanvas();
+  }, [selectedEvent, clearCanvas]);
 
   // 加载配置（编辑模式）
   useEffect(() => {
@@ -210,19 +183,19 @@ export default function EventNodeBuilder() {
   // 处理保存配置
   const handleSaveConfig = useCallback(() => {
     if (!selectedEvent) {
-      alert('请先选择事件');
+      warning('请先选择事件');
       return;
     }
     if (canvasFields.length === 0) {
-      alert('请至少添加一个字段');
+      warning('请至少添加一个字段');
       return;
     }
     if (!nodeConfig.nameEn.trim()) {
-      alert('请输入节点英文名称');
+      warning('请输入节点英文名称');
       return;
     }
     if (!nodeConfig.nameCn.trim()) {
-      alert('请输入节点中文名称');
+      warning('请输入节点中文名称');
       return;
     }
 
@@ -266,37 +239,36 @@ export default function EventNodeBuilder() {
   const handleFieldSave = useCallback(async (updates) => {
     // 检查是否需要同步更新参数中文名称
     if (editingField.fieldType === 'param' && updates.displayName && updates.displayName !== editingField.displayName) {
-      const confirmed = confirm(
-        `检测到您修改了参数字段的中文名称：\n\n` +
-        `原名称：${editingField.displayName}\n` +
-        `新名称：${updates.displayName}\n\n` +
-        `是否同步更新参数数据库中的中文名称？`
-      );
+      setConfirmState({
+        open: true,
+        title: '确认同步更新',
+        message: `检测到您修改了参数字段的中文名称：\n\n原名称：${editingField.displayName}\n新名称：${updates.displayName}\n\n是否同步更新参数数据库中的中文名称？`,
+        onConfirm: async () => {
+          setConfirmState(s => ({ ...s, open: false }));
+          try {
+            // 调用API更新参数中文名称
+            const response = await fetch('/event_node_builder/api/update-param-name', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                param_id: editingField.paramId,
+                new_name_cn: updates.displayName,
+              }),
+            });
 
-      if (confirmed) {
-        try {
-          // 调用API更新参数中文名称
-          const response = await fetch('/event_node_builder/api/update-param-name', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              param_id: editingField.paramId,
-              new_name_cn: updates.displayName,
-            }),
-          });
-
-          const result = await response.json();
-          if (result.success) {
-            console.log('[EventNodeBuilder] 参数中文名称已更新');
-          } else {
-            console.error('[EventNodeBuilder] 更新参数失败:', result.error);
-            alert(`更新参数失败：${result.error || '未知错误'}`);
+            const result = await response.json();
+            if (result.success) {
+              // 参数中文名称已更新
+            } else {
+              console.error('[EventNodeBuilder] 更新参数失败:', result.error);
+              error(`更新参数失败：${result.error || '未知错误'}`);
+            }
+          } catch (error) {
+            console.error('[EventNodeBuilder] 更新参数异常:', error);
+            error(`更新参数异常：${error.message}`);
           }
-        } catch (error) {
-          console.error('[EventNodeBuilder] 更新参数异常:', error);
-          alert(`更新参数异常：${error.message}`);
         }
-      }
+      });
     }
 
     // 更新字段
@@ -307,9 +279,15 @@ export default function EventNodeBuilder() {
   // 处理清空画布
   const handleClearCanvas = useCallback(() => {
     if (canvasFields.length === 0) return;
-    if (confirm('确定要清空画布吗？所有字段和WHERE条件将被删除。')) {
-      clearCanvas();
-    }
+    setConfirmState({
+      open: true,
+      title: '确认清空画布',
+      message: '确定要清空画布吗？所有字段和WHERE条件将被删除。',
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        clearCanvas();
+      }
+    });
   }, [canvasFields.length, clearCanvas]);
 
   // 加载状态
@@ -318,7 +296,7 @@ export default function EventNodeBuilder() {
       <div className="event-node-builder-loading">
         <h2>请先选择游戏</h2>
         <p>事件节点构建器需要游戏上下文才能正常工作</p>
-        <Button variant="primary" onClick={() => window.location.href = '/react-app-shell/#/games'}>
+        <Button variant="primary" onClick={() => navigate('/games')}>
           前往选择游戏
         </Button>
       </div>
@@ -336,11 +314,15 @@ export default function EventNodeBuilder() {
           onOpenNodeConfig={() => setShowNodeConfig(true)}
           useV2API={useV2API}
           setUseV2API={setUseV2API}
+          showPerformancePanel={showPerformancePanel}
+          setShowPerformancePanel={setShowPerformancePanel}
+          showDebugPanel={showDebugPanel}
+          setShowDebugPanel={setShowDebugPanel}
         />
 
         <div className="workspace" data-testid="event-node-builder-workspace">
           <LeftSidebar
-            gameGid={gameData.gid}
+            gameGid={Number(gameData.gid)}
             selectedEvent={selectedEvent}
             onEventSelect={setSelectedEvent}
             onAddField={addFieldToCanvas}
@@ -353,7 +335,6 @@ export default function EventNodeBuilder() {
             onRemoveField={handleFieldDelete}
             onReorderFields={reorderFields}
             onAddField={(field) => {
-              console.log('[EventNodeBuilder] FieldCanvas onAddField called with:', field);
               // Handle drag-drop from canvas
               if (field.fieldType) {
                 addFieldToCanvas(field.fieldType, field.fieldName, field.displayName, field.paramId);
@@ -366,7 +347,7 @@ export default function EventNodeBuilder() {
           />
 
           <RightSidebar
-            gameGid={gameData.gid}
+            gameGid={Number(gameData.gid)}
             selectedEvent={selectedEvent}
             fields={canvasFields}
             whereConditions={whereConditions}
@@ -402,10 +383,12 @@ export default function EventNodeBuilder() {
             isOpen={showWhereConfig}
             onClose={() => setShowWhereConfig(false)}
             conditions={whereConditions}
+            onConditionsChange={setWhereConditions} // ✅ 新增：实时更新
             onApply={(conditions) => {
               setWhereConditions(conditions);
             }}
             canvasFields={canvasFields}
+            selectedEvent={selectedEvent}
             data-testid="where-builder-modal"
           />
         )}
@@ -431,6 +414,63 @@ export default function EventNodeBuilder() {
             disabled={!selectedEvent || canvasFields.length === 0}
             data-testid="node-config-modal"
           />
+        )}
+
+        <ConfirmDialog
+          open={confirmState.open}
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmText="确认"
+          cancelText="取消"
+          variant="warning"
+          onConfirm={confirmState.onConfirm}
+          onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+        />
+
+        {/* 性能分析面板 */}
+        {showPerformancePanel && (
+          <div className="panel-overlay" onClick={() => setShowPerformancePanel(false)}>
+            <div className="panel-container performance-panel" onClick={(e) => e.stopPropagation()}>
+              <div className="panel-header">
+                <h3>
+                  <i className="bi bi-speedometer2"></i> 性能分析
+                </h3>
+                <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowPerformancePanel(false)}>
+                  <i className="bi bi-x"></i> 关闭
+                </button>
+              </div>
+              <div className="panel-body">
+                <div className="panel-placeholder">
+                  <i className="bi bi-info-circle"></i>
+                  <p>性能数据将在HQL生成后显示</p>
+                  <small>请先选择事件并添加字段，然后生成HQL以查看性能分析</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 调试模式面板 */}
+        {showDebugPanel && (
+          <div className="panel-overlay" onClick={() => setShowDebugPanel(false)}>
+            <div className="panel-container debug-panel" onClick={(e) => e.stopPropagation()}>
+              <div className="panel-header">
+                <h3>
+                  <i className="bi bi-bug"></i> 调试模式
+                </h3>
+                <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowDebugPanel(false)}>
+                  <i className="bi bi-x"></i> 关闭
+                </button>
+              </div>
+              <div className="panel-body">
+                <div className="panel-placeholder">
+                  <i className="bi bi-info-circle"></i>
+                  <p>调试信息将在HQL生成后显示</p>
+                  <small>请先选择事件并添加字段，然后生成HQL以查看调试信息</small>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </EventNodeBuilderErrorBoundary>

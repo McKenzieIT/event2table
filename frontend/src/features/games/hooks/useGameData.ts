@@ -11,16 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { fetchGameByGid } from '../api';
 import type { Game } from '../types';
-
-// Re-use queryKeys from canvas module (they're shared)
-// In a real setup, you might want to move queryKeys to a shared location
-const queryKeys = {
-  games: {
-    all: ['games'] as const,
-    details: () => [...queryKeys.games.all, 'detail'] as const,
-    detail: (gameGid: number) => [...queryKeys.games.details(), gameGid] as const,
-  },
-};
+import { queryKeys } from '../../canvas/api/queryKeys';
 
 /**
  * Hook to fetch game data by GID

@@ -27,7 +27,10 @@
       "Read(//Users/mckenzie/**)",
       "Read(//usr/local/**)",
       "Bash(cat:*)",
-      "Bash(/usr/local/opt/python@3.9/bin/python3:*)"
+      "Bash(/usr/local/opt/python@3.9/bin/python3:*)",
+      "Bash(ln:*)",
+      "Bash(/tmp/test-pkill.sh <<'EOF'\n#!/bin/bash\necho \"测试1: 清理Flask端口\"\nPIDS=$\\(lsof -i :5001 -t 2>/dev/null\\)\necho \"PIDS=$PIDS\"\nif [ -n \"$PIDS\" ]; then\n    echo \"$PIDS\" | xargs kill -9 2>/dev/null\n    echo \"✓ 已清理端口5001占用进程\"\nfi\n\necho \"\"\necho \"测试2: 清理Vite进程\"\necho \"执行: pkill -f 'vite' 2>/dev/null || true\"\npkill -f \"vite\" 2>/dev/null || true\necho \"✓ Vite进程清理完成\"\n\necho \"\"\necho \"测试3: 清理Python缓存\"\nfind backend -type d -name \"__pycache__\" -exec rm -rf {} + 2>/dev/null\necho \"✓ Python缓存清理完成\"\n\necho \"\"\necho \"✅ 所有清理步骤完成\"\nEOF)",
+      "Bash(1 sleep 1 tail -30 logs/flask.log)"
     ],
     "additionalDirectories": [
       "/Users/mckenzie/Documents/event2table/frontend/src/features/games",
@@ -35,7 +38,8 @@
       "/Users/mckenzie/Documents/event2table/frontend/src/features/canvas",
       "/Users/mckenzie/Documents/opencode test/dwd_generator/frontend/src/canvas/hooks",
       "/Users/mckenzie/Documents/opencode test/dwd_generator/frontend/src/canvas/api",
-      "/Users/mckenzie/Documents/event2table/test/unit/frontend"
+      "/Users/mckenzie/Documents/event2table/test/unit/frontend",
+      "/Users/mckenzie/.claude/plans"
     ]
   }
 }

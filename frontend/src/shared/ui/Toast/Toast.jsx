@@ -36,17 +36,19 @@ export const ToastProvider = ({ children }) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const showToast = useCallback((type, message, duration = 3000) => {
+  const showToast = useCallback((type, message, duration) => {
+    const defaultDuration = type === 'error' ? 5000 : type === 'warning' ? 4000 : 3000;
+    const actualDuration = duration ?? defaultDuration;
     const id = Math.random().toString(36).substring(7);
-    const newToast = { id, type, message, duration };
+    const newToast = { id, type, message, duration: actualDuration };
 
     setToasts(prev => [...prev, newToast]);
 
-    if (duration > 0) {
+    if (actualDuration > 0) {
       const timeout = setTimeout(() => {
         setToasts(prev => prev.filter(t => t.id !== id));
         toastTimeouts.current.delete(id);
-      }, duration);
+      }, actualDuration);
       toastTimeouts.current.set(id, timeout);
     }
 

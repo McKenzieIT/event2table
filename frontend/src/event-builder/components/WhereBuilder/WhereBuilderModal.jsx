@@ -13,14 +13,20 @@ export default function WhereBuilderModal({
   onClose,
   conditions,
   onApply,
-  canvasFields // 可用的字段列表
+  onConditionsChange, // ✅ 新增prop：实时回调
+  canvasFields, // 可用的字段列表
+  selectedEvent, // 当前选择的事件
 }) {
-  const [mode, setMode] = useState('simple'); // simple | advanced
   const [preview, setPreview] = useState('');
   const [localConditions, setLocalConditions] = useState(conditions);
 
   // 保存初始条件的引用，用于检测是否有修改
   const initialConditionsRef = useRef(conditions);
+
+  // ✅ 新增：当本地条件变化时，实时通知父组件
+  useEffect(() => {
+    onConditionsChange?.(localConditions);
+  }, [localConditions, onConditionsChange]);
 
   // 当外部conditions变化时，同步到本地状态
   useEffect(() => {
@@ -95,20 +101,6 @@ export default function WhereBuilderModal({
               <i className="bi bi-funnel"></i>
               WHERE条件构建器
             </h3>
-            <div className="mode-toggle">
-              <button
-                className={`btn btn-sm ${mode === 'simple' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => setMode('simple')}
-              >
-                简单模式
-              </button>
-              <button
-                className={`btn btn-sm ${mode === 'advanced' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => setMode('advanced')}
-              >
-                高级模式
-              </button>
-            </div>
           </div>
           <button className="modal-close" onClick={onClose}>
             <i className="bi bi-x"></i>
@@ -135,7 +127,7 @@ export default function WhereBuilderModal({
           <WhereBuilderCanvas
             conditions={localConditions}
             canvasFields={canvasFields}
-            mode={mode}
+            selectedEvent={selectedEvent}
             onUpdate={setLocalConditions}
           />
         </div>

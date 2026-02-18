@@ -5,4 +5,3 @@
  */
 
 export { HQLPreviewWrapper } from './HQLPreviewWrapper';
-export { default as HQLPreviewWrapper } from './HQLPreviewWrapper';

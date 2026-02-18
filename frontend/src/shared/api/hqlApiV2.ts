@@ -4,6 +4,13 @@
  * 提供与HQL V2 API交互的方法
  */
 
+import type { 
+  Event, 
+  Field, 
+  ConditionValue, 
+  HQLGenerateResponse 
+} from '@shared/types/api-types';
+
 /**
  * HQL生成请求接口
  * Interface for HQL generation request
@@ -19,13 +26,13 @@ interface GenerateRequest {
     alias?: string;
     jsonPath?: string;
     customExpression?: string;
-    fixedValue?: any;
+    fixedValue?: ConditionValue;
     aggregateFunc?: string;
   }>;
   where_conditions?: Array<{
     field: string;
     operator: string;
-    value?: any;
+    value?: ConditionValue;
     logicalOp?: 'AND' | 'OR';
   }>;
   options?: {
@@ -40,13 +47,7 @@ interface GenerateRequest {
  * HQL生成响应接口
  * Interface for HQL generation response
  */
-interface GenerateResponse {
-  success: boolean;
-  data: {
-    hql: string;
-    generated_at: string;
-  };
-}
+interface GenerateResponse extends HQLGenerateResponse {}
 
 /**
  * 调试跟踪响应接口
@@ -61,8 +62,8 @@ interface DebugTraceResponse {
       result: any;
       count?: number;
     }>;
-    events: any[];
-    fields: any[];
+    events: Event[];
+    fields: Field[];
   };
 }
 

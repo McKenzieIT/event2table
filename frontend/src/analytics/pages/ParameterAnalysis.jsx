@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
+import { NavLinkWithGameContext } from '@shared/components';
 import './ParameterAnalysis.css';
 
 /**
@@ -20,7 +21,7 @@ function ParameterAnalysis() {
   const { data: stats = {}, isLoading } = useQuery({
     queryKey: ['parameter-stats', currentGame.gid],
     queryFn: async () => {
-      const response = await fetch(`/api/parameters/stats?game_id=${currentGame.id}`);
+      const response = await fetch(`/api/parameters/stats?game_gid=${currentGame.gid}`);
       if (!response.ok) throw new Error('加载失败');
       return response.json();
     },
@@ -31,10 +32,10 @@ function ParameterAnalysis() {
     <div className="parameter-analysis-container">
       <div className="page-header">
         <h1>参数分析</h1>
-        <Link to="/parameters" className="btn btn-outline-secondary">
+        <NavLinkWithGameContext to="/parameters" className="btn btn-outline-secondary">
           <i className="bi bi-arrow-left"></i>
           返回
-        </Link>
+        </NavLinkWithGameContext>
       </div>
 
       <div className="stats-grid">

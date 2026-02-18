@@ -14,5 +14,5 @@ export * from './api';
 export * from './hooks';
 
 // Components
-export { GameManagementModal } from './GameManagementModal';
-export { AddGameModal } from './AddGameModal';
+export { default as GameManagementModal } from './GameManagementModal';
+export { default as AddGameModal } from './AddGameModal';

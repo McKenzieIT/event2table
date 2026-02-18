@@ -8,7 +8,7 @@ import './Card.css';
  * Props:
  * - as: React.ElementType - 渲染的HTML元素类型（默认'div'）
  * - variant: 'default' | 'elevated' | 'outlined' | 'glass' | 'glass-dark'
- * - padding: 'none' | 'sm' | 'md' | 'lg'
+ * - padding: 'none' | 'sm' | 'md' | 'lg' | 'reset' - 'reset'表示不使用默认padding，由子元素控制
  * - hover: boolean - 是否启用hover效果
  * - className: string
  * - children: React.ReactNode
@@ -23,10 +23,13 @@ export const Card = React.forwardRef(({
   children,
   ...props
 }, ref) => {
+  // padding='reset' 时不添加padding类，由子元素自行控制padding
+  const paddingClass = padding === 'reset' ? '' : `card-padding-${padding}`;
+  
   return (
     <Component
       ref={ref}
-      className={`card card-${variant} card-padding-${padding} ${hover ? 'card-hover' : ''} ${className}`}
+      className={`card card-${variant} ${paddingClass} ${hover ? 'card-hover' : ''} ${className}`}
       {...props}
     >
       {children}

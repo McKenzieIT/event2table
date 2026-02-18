@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput, useToast } from '@shared/ui';
@@ -114,10 +114,13 @@ export default function CategoriesList() {
     }
   });
 
-  // Filter categories
-  const filteredCategories = categories.filter(category => {
-    return category.name?.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  // FIX: 使用useMemo优化过滤逻辑，避免每次渲染都重新计算
+  const filteredCategories = useMemo(() => 
+    categories.filter(category => {
+      return category.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    }), 
+    [categories, searchTerm]
+  );
 
   // Selection handlers
   const toggleSelect = (id) => {

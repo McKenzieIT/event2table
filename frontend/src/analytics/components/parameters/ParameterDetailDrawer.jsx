@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchParameterDetails } from '@shared/api/parameters';
 import './ParameterDetailDrawer.css';
 
@@ -10,6 +11,7 @@ export default function ParameterDetailDrawer({ show, paramName, gameGid, onClos
   const [details, setDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // 加载参数详情
   useEffect(() => {
@@ -130,7 +132,7 @@ export default function ParameterDetailDrawer({ show, paramName, gameGid, onClos
                         <div className="event-actions">
                           <button
                             className="btn btn-sm btn-outline-primary"
-                            onClick={() => window.location.href = `/#/events/${event.event_id}`}
+                            onClick={() => navigate(`/events/${event.event_id}`)}
                           >
                             <i className="bi bi-arrow-right-circle"></i>
                             查看事件

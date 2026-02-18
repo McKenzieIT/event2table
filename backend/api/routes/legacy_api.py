@@ -102,8 +102,22 @@ def api_hql_results():
 
 @api_bp.route("/api/common-params", methods=["GET"])
 def api_list_common_params():
-    """API: List all common parameters"""
+    """API: List common parameters for a specific game"""
     try:
+        # Get game_gid from query parameters
+        game_gid = request.args.get('game_gid', type=int)
+
+        if not game_gid:
+            return json_error_response("game_gid is required", status_code=400)
+
+        # Get game_id from game_gid
+        game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+        if not game:
+            return json_error_response(f"Game {game_gid} not found", status_code=404)
+
+        game_id = game['id']
+
+        # Fetch common params for this game only
         common_params = fetch_all_as_dict("""
             SELECT
                 id,
@@ -116,8 +130,9 @@ def api_list_common_params():
                 created_at,
                 updated_at
             FROM common_params
+            WHERE game_id = ?
             ORDER BY created_at DESC
-        """)
+        """, (game_id,))
 
         # Map param_type to data_type for frontend compatibility
         for param in common_params:

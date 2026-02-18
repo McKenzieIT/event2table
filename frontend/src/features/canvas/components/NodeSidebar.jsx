@@ -19,7 +19,6 @@ export default function NodeSidebar({
   // Call onConfigsLoad when data changes
   useEffect(() => {
     if (data && onConfigsLoad) {
-      console.log("[NodeSidebar] Loaded configs:", data.length);
       onConfigsLoad(data);
     }
   }, [data, onConfigsLoad]);
@@ -56,8 +55,6 @@ export default function NodeSidebar({
 
   // 拖拽已保存的配置节点
   const onDragConfigStart = (event, config) => {
-    console.log("[NodeSidebar] Dragging config:", config);
-
     event.dataTransfer.setData(
       "application/reactflow",
       JSON.stringify({
@@ -75,8 +72,6 @@ export default function NodeSidebar({
 
   // 拖拽连接节点
   const onDragConnectionStart = (event, connectionType) => {
-    console.log("[NodeSidebar] Dragging connection node:", connectionType);
-
     event.dataTransfer.setData(
       "application/reactflow",
       JSON.stringify({
@@ -90,8 +85,6 @@ export default function NodeSidebar({
 
   // 拖拽输出节点
   const onDragOutputStart = (event) => {
-    console.log("[NodeSidebar] Dragging output node");
-
     event.dataTransfer.setData(
       "application/reactflow",
       JSON.stringify({

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
+import { NavLinkWithGameContext } from '@shared/components';
 import './ParameterNetwork.css';
 
 /**
@@ -20,10 +21,10 @@ function ParameterNetwork() {
     <div className="parameter-network-container">
       <div className="page-header">
         <h1>参数关系网络</h1>
-        <Link to="/parameters" className="btn btn-outline-secondary">
+        <NavLinkWithGameContext to="/parameters" className="btn btn-outline-secondary">
           <i className="bi bi-arrow-left"></i>
           返回
-        </Link>
+        </NavLinkWithGameContext>
       </div>
 
       <div className="network-canvas glass-card">

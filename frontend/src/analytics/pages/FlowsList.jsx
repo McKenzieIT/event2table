@@ -1,26 +1,51 @@
 // FlowsList.jsx
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, SearchInput } from '@shared/ui';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './FlowsList.css';
 
+/**
+ * Flows List Page
+ * Displays HQL flow templates with search and CRUD operations
+ *
+ * Requires: game_gid URL parameter (enforced by backend API)
+ */
 export default function FlowsList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedFlow, setSelectedFlow] = useState(null);
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
 
-  // 获取流程列表
+  // Read game_gid from URL parameters
+  const gameGid = new URLSearchParams(location.search).get('game_gid');
+
+  // 获取流程列表（requires game_gid）
   const { data: apiResponse, isLoading, error } = useQuery({
-    queryKey: ['flows'],
+    queryKey: ['flows', gameGid],
     queryFn: async () => {
-      const response = await fetch('/api/flows');
-      if (!response.ok) throw new Error('Failed to fetch flows');
+      if (!gameGid) {
+        throw new Error('game_gid is required');
+      }
+
+      const response = await fetch(`/api/flows?game_gid=${gameGid}`);
+      if (!response.ok) {
+        if (response.status === 400) {
+          throw new Error('game_gid is required');
+        }
+        if (response.status === 404) {
+          throw new Error(`Game ${gameGid} not found`);
+        }
+        throw new Error('Failed to fetch flows');
+      }
       const result = await response.json();
       return result;
-    }
+    },
+    enabled: !!gameGid // Only run query if gameGid exists
   });
 
   // Extract flows from API response
@@ -40,18 +65,49 @@ export default function FlowsList() {
     }
   });
 
-  // 过滤流程
-  const filteredFlows = flows?.filter(flow =>
-    flow.flow_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
-
-  const handleCreateFlow = () => {
-    navigate('/flows/create');
+  // Handle delete flow confirmation
+  const handleDeleteFlow = (flow) => {
+    setConfirmState({
+      open: true,
+      title: '确认删除',
+      message: `确定要删除流程"${flow.flow_name}"吗？`,
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        deleteMutation.mutate(flow.id);
+      }
+    });
   };
+
+  // FIX: 使用useMemo优化过滤逻辑
+  const filteredFlows = useMemo(() => 
+    flows?.filter(flow =>
+      flow.flow_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [],
+    [flows, searchTerm]
+  );
 
   const handleEditFlow = (flowId) => {
-    navigate(`/flows/${flowId}/edit`);
+    navigate(`/flows/${flowId}/edit?game_gid=${gameGid}`);
   };
+
+  const handleCreateFlow = () => {
+    navigate('/flows/create' + (gameGid ? `?game_gid=${gameGid}` : ''));
+  };
+
+  // Show error if game_gid is missing
+  if (!gameGid) {
+    return (
+      <div className="flows-list-page">
+        <div className="error-message">
+          <h2>请先选择游戏</h2>
+          <p>流程管理需要选择一个游戏才能查看。</p>
+          <Button onClick={() => navigate('/')}>
+            返回首页选择游戏
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -59,7 +115,7 @@ export default function FlowsList() {
         <div className="error-message">
           <span>⚠️</span>
           <p>加载流程列表失败: {error.message}</p>
-          <Button onClick={() => window.location.reload()}>重新加载</Button>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['flows', gameGid] })}>重新加载</Button>
         </div>
       </div>
     );
@@ -137,11 +193,7 @@ export default function FlowsList() {
                 </Button>
                 <Button
                   variant="danger"
-                  onClick={() => {
-                    if (confirm(`确定要删除流程"${flow.flow_name}"吗？`)) {
-                      deleteMutation.mutate(flow.id);
-                    }
-                  }}
+                  onClick={() => handleDeleteFlow(flow)}
                   title="删除流程"
                   disabled={deleteMutation.isLoading}
                 >
@@ -151,7 +203,18 @@ export default function FlowsList() {
             </div>
           ))}
         </div>
-      )}
+        )}
+
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText="删除"
+        cancelText="取消"
+        variant="danger"
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+      />
     </div>
   );
 }

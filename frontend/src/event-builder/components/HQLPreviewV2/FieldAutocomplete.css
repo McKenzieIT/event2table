@@ -11,15 +11,17 @@
   width: 100%;
   padding: 10px 12px;
   padding-right: 32px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  background: var(--bg-glass-light);
+  color: var(--text-primary);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
 }
 
 .loading-spinner {
@@ -27,7 +29,7 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 .suggestions-dropdown {
@@ -35,39 +37,39 @@
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: 4px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: var(--space-1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   max-height: 300px;
   overflow: hidden;
-  z-index: 1000;
+  z-index: var(--z-dropdown);
 }
 
 .dropdown-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-default);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
 }
 
 .close-button {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: var(--text-base);
   cursor: pointer;
-  padding: 4px;
-  color: #6b7280;
+  padding: var(--space-1);
+  color: var(--text-tertiary);
 }
 
 .close-button:hover {
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .suggestions-list {
@@ -78,12 +80,12 @@
 .suggestion-item {
   padding: 10px 12px;
   cursor: pointer;
-  border-bottom: 1px solid #f3f4f6;
-  transition: background-color 0.15s;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color var(--transition-fast);
 }
 
 .suggestion-item:hover {
-  background: #f9fafb;
+  background: var(--bg-elevated);
 }
 
 .suggestion-item:last-child {
@@ -93,39 +95,39 @@
 .field-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
 .field-name {
-  font-weight: 500;
-  color: #1f2937;
-  font-size: 14px;
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
 }
 
 .field-type-badge {
-  padding: 2px 8px;
-  border-radius: 12px;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
   color: white;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: var(--font-medium);
 }
 
 .field-description {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 4px;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-1);
 }
 
 .field-frequency {
   font-size: 11px;
-  color: #9ca3af;
-  margin-top: 4px;
+  color: var(--text-muted);
+  margin-top: var(--space-1);
 }
 
 .no-suggestions {
-  padding: 20px;
+  padding: var(--space-5);
   text-align: center;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
 }

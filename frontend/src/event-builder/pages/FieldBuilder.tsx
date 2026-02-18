@@ -14,6 +14,8 @@ import FieldEventSelector from '@event-builder/components/FieldEventSelector';
 import FieldCanvas from '@event-builder/components/FieldCanvas';
 import HQLPreview from '@event-builder/components/HQLPreview';
 import { Button } from '@shared/ui/Button';
+import { useToast } from '@shared/ui/Toast/Toast';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './FieldBuilder.css';
 
 /**
@@ -60,6 +62,10 @@ function FieldBuilder() {
   const [configName, setConfigName] = useState('');
   const [customHQL, setCustomHQL] = useState('');
   const [hqlLoading, setHqlLoading] = useState(false);
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
+
+  // Toast
+  const { warning, error } = useToast();
 
   // Refs
   const hqlPreviewRef = useRef(null);
@@ -120,38 +126,23 @@ function FieldBuilder() {
     onSuccess: (data) => {
       setHasUnsavedChanges(false);
       queryClient.invalidateQueries({ queryKey: ['field-config'] });
-      // Show success message (could use a toast notification here)
-      console.log('Configuration saved successfully:', data);
     },
     onError: (error) => {
       console.error('Failed to save configuration:', error);
-      // Show error message (could use a toast notification here)
+      error('保存失败: ' + (error?.message || '请稍后重试'));
     }
   });
 
-  // Generate HQL preview with loading state
-  const [hqlPreview, setHqlPreview] = useState('');
-
-  useEffect(() => {
-    const generateHQL = async () => {
-      if (fields.length === 0 || !selectedEventId) {
-        setHqlPreview('');
-        return;
-      }
-
-      setHqlLoading(true);
-      try {
-        const hql = previewHQL(fields, selectedEventId, sqlMode);
-        setHqlPreview(hql);
-      } catch (error) {
-        console.error('[FieldBuilder] Failed to generate HQL:', error);
-        setHqlPreview('-- HQL生成失败: ' + error.message);
-      } finally {
-        setHqlLoading(false);
-      }
-    };
-
-    generateHQL();
+  // Generate HQL preview using useMemo for derived state
+  const hqlPreview = useMemo(() => {
+    if (fields.length === 0 || !selectedEventId) return '';
+    try {
+      return previewHQL(fields, selectedEventId, sqlMode);
+    } catch (error) {
+      console.error('[FieldBuilder] Failed to generate HQL:', error);
+      error('HQL生成失败: ' + (error?.message || '未知错误'));
+      return '';
+    }
   }, [fields, selectedEventId, sqlMode]);
 
   // Update URL when selected event changes
@@ -196,9 +187,18 @@ function FieldBuilder() {
   // Handle event selection
   const handleEventSelect = useCallback((eventId) => {
     if (hasUnsavedChanges) {
-      if (!window.confirm('有未保存的更改，确定要切换事件吗？')) {
-        return;
-      }
+      setConfirmState({
+        open: true,
+        title: '确认切换事件',
+        message: '有未保存的更改，确定要切换事件吗？',
+        onConfirm: () => {
+          setConfirmState(s => ({ ...s, open: false }));
+          setSelectedEventId(eventId);
+          setFields([]);
+          setHasUnsavedChanges(false);
+        }
+      });
+      return;
     }
     setSelectedEventId(eventId);
     setFields([]); // Clear fields for new event
@@ -236,14 +236,14 @@ function FieldBuilder() {
   // Handle save
   const handleSave = useCallback(async () => {
     if (!selectedEventId) {
-      alert('请先选择一个事件');
+      warning('请先选择一个事件');
       return;
     }
 
     // Validate fields
     const errors = fields.flatMap(field => validateField(field));
     if (errors.length > 0) {
-      alert('字段配置有错误:\n' + errors.join('\n'));
+      error('字段配置有错误:\n' + errors.join('\n'));
       return;
     }
 
@@ -264,9 +264,16 @@ function FieldBuilder() {
   // Handle close
   const handleClose = useCallback(() => {
     if (hasUnsavedChanges) {
-      if (!window.confirm('有未保存的更改，确定要关闭吗？')) {
-        return;
-      }
+      setConfirmState({
+        open: true,
+        title: '确认关闭',
+        message: '有未保存的更改，确定要关闭吗？',
+        onConfirm: () => {
+          setConfirmState(s => ({ ...s, open: false }));
+          navigate(-1);
+        }
+      });
+      return;
     }
     navigate(-1); // Go back to previous page
   }, [hasUnsavedChanges, navigate]);
@@ -490,6 +497,17 @@ function FieldBuilder() {
           data-testid="hql-preview-panel"
         />
       </div>
+
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText="确认"
+        cancelText="取消"
+        variant="warning"
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+      />
     </div>
   );
 }

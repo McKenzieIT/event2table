@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Button, SearchInput } from '@shared/ui';
+import { Button, SearchInput, useToast } from '@shared/ui';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './HqlManage.css';
 
 /**
@@ -9,14 +10,17 @@ import './HqlManage.css';
  *
  * 查看、编辑和管理已生成的HQL语句
  * 迁移自: templates/hql_manage.html
- * 最佳实践: useMemo + useCallback + 提前返回
+ * 最佳实践: useMemo + useCallback + 所有Hooks在顶层（修复React Hooks顺序错误）
  */
 function HqlManage() {
+  // 1. 状态声明（5个 Hooks）
   const [typeFilter, setTypeFilter] = useState('');
   const [editedOnly, setEditedOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
+  const { info } = useToast();
 
-  // 使用React Query加载数据
+  // 2. 数据获取（1个 Hook）
   const { data: hqlData, isLoading } = useQuery({
     queryKey: ['hql-list', typeFilter, editedOnly],
     queryFn: async () => {
@@ -30,14 +34,9 @@ function HqlManage() {
     }
   });
 
-  // 提前返回优化
-  if (isLoading) {
-    return <div className="loading" data-testid="hql-manage-loading">加载中...</div>;
-  }
-
+  // 3. 计算值和事件处理（必须在所有渲染时调用）
   const hqlList = hqlData?.data?.data || [];
 
-  // 客户端过滤优化
   const filteredHql = useMemo(() => {
     if (!searchTerm) return hqlList;
     return hqlList.filter(hql =>
@@ -47,13 +46,25 @@ function HqlManage() {
 
   const handleToggleActive = useCallback(async (hqlId) => {
     // 切换激活状态
-    alert(`切换HQL ${hqlId} 激活状态 - 待实现`);
-  }, []);
+    info(`切换HQL ${hqlId} 激活状态 - 待实现`);
+  }, [info]);
 
   const handleDelete = useCallback(async (hqlId) => {
-    if (!confirm('确定要删除这个HQL吗？')) return;
-    alert(`删除HQL ${hqlId} - 待实现`);
-  }, []);
+    setConfirmState({
+      open: true,
+      title: '确认删除',
+      message: '确定要删除这个HQL吗？',
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        info(`删除HQL ${hqlId} - 待实现`);
+      }
+    });
+  }, [info]);
+
+  // 4. 条件返回 - 放在所有Hooks之后
+  if (isLoading) {
+    return <div className="loading" data-testid="hql-manage-loading">加载中...</div>;
+  }
 
   return (
     <div className="hql-manage-container" data-testid="hql-manage">
@@ -196,6 +207,17 @@ function HqlManage() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText="删除"
+        cancelText="取消"
+        variant="danger"
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+      />
     </div>
   );
 }

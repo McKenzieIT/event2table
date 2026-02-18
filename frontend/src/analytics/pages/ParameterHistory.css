@@ -1,3 +1,62 @@
-.param-history-container { padding: var(--space-6); }
-.page-header { padding: var(--space-8); margin-bottom: var(--space-6); }
-.history-card { padding: var(--space-6); }
+/* Parameter History - Cyberpunk Terminal Style */
+
+.param-history-container {
+  padding: var(--space-6);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.page-header {
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  animation: fadeInUp var(--transition-slow) ease-out;
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  background: linear-gradient(135deg, var(--cyan-300) 0%, var(--violet-300) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 var(--space-2);
+}
+
+.page-header p {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.history-card {
+  padding: var(--space-6);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.history-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-500), transparent);
+  opacity: 0.6;
+}
+
+.history-card:hover {
+  border-color: var(--cyan-500);
+  box-shadow: var(--shadow-glow);
+}

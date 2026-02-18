@@ -15,7 +15,6 @@ import GamesList from "@analytics/pages/GamesList";
 import EventsList from "@analytics/pages/EventsList";
 import FlowsList from "@analytics/pages/FlowsList";
 import GameForm from "@analytics/pages/GameForm";
-import CategoryForm from "@analytics/pages/CategoryForm";
 import EventForm from "@analytics/pages/EventForm";
 import CategoriesList from "@analytics/pages/CategoriesList";
 import CommonParamsList from "@analytics/pages/CommonParamsList";
@@ -37,17 +36,23 @@ const NotFound = lazy(() => import("@analytics/pages/NotFound"));
 const HqlEdit = lazy(() => import("@analytics/pages/HqlEdit"));
 const FlowBuilder = lazy(() => import("@features/canvas/pages/FlowBuilder"));
 const ImportEvents = lazy(() => import("@analytics/pages/ImportEvents"));
-const ApiDocs = lazy(() => import("@analytics/pages/ApiDocs"));
+
+// 🔧 FIX: 移除不必要的 lazy loading（修复加载超时问题）
+// ApiDocs 和 ValidationRules 都是极简组件（<50行），lazy loading 的收益极小
+// 但会导致双重 Suspense 嵌套问题，使页面卡在 "Loading Event2Table..." 状态
+import ApiDocs from "@analytics/pages/ApiDocs";
+import ValidationRules from "@analytics/pages/ValidationRules";
+
 const BatchOperations = lazy(() => import("@analytics/pages/BatchOperations"));
 const LogDetail = lazy(() => import("@analytics/pages/LogDetail"));
-const ValidationRules = lazy(() => import("@analytics/pages/ValidationRules"));
-const ParameterDashboard = lazy(
-  () => import("@analytics/pages/ParameterDashboard"),
-);
-const ParameterUsage = lazy(() => import("@analytics/pages/ParameterUsage"));
-const ParameterHistory = lazy(
-  () => import("@analytics/pages/ParameterHistory"),
-);
+
+// 🔧 FIX: 移除不必要的 lazy loading（修复加载超时问题）
+// Parameter 系列页面都是小型组件，lazy loading 会导致双重 Suspense 嵌套问题
+import ParameterDashboard from "@analytics/pages/ParameterDashboard";
+import ParameterUsage from "@analytics/pages/ParameterUsage";
+import ParameterHistory from "@analytics/pages/ParameterHistory";
+import ParameterNetwork from "@analytics/pages/ParameterNetwork";
+
 const FieldBuilder = lazy(() => import("@event-builder/pages/FieldBuilder"));
 const Generate = lazy(() => import("@analytics/pages/Generate"));
 const GenerateResult = lazy(() => import("@analytics/pages/GenerateResult"));
@@ -55,9 +60,6 @@ const GenerateResult = lazy(() => import("@analytics/pages/GenerateResult"));
 import AlterSql from "@analytics/pages/AlterSql";
 // Lazy load AlterSqlBuilder (manual tool, no fetch)
 const AlterSqlBuilder = lazy(() => import("@analytics/pages/AlterSqlBuilder"));
-const ParameterNetwork = lazy(
-  () => import("@analytics/pages/ParameterNetwork"),
-);
 
 // Route configuration
 // Note: More specific routes must come before general routes
@@ -72,8 +74,6 @@ export const routes = [
       { path: "games/create", element: <GameForm /> },
       { path: "games/:gid/edit", element: <GameForm /> },
       { path: "games", element: <GamesList /> },
-      { path: "categories/create", element: <CategoryForm /> },
-      { path: "categories/:id/edit", element: <CategoryForm /> },
       { path: "categories", element: <CategoriesList /> },
       { path: "events/create", element: <EventForm /> },
       { path: "events/:id", element: <EventDetail /> },

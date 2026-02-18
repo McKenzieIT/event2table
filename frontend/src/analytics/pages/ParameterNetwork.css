@@ -1,8 +1,11 @@
+/* Parameter Network - Cyberpunk Terminal Style */
+
 .parameter-network-container {
   padding: var(--space-6);
   height: 100vh;
   display: flex;
   flex-direction: column;
+  animation: fadeInUp var(--transition-slow) ease-out;
 }
 
 .page-header {
@@ -10,6 +13,23 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--space-6);
+  padding: var(--space-4) var(--space-6);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  background: linear-gradient(135deg, var(--cyan-300) 0%, var(--violet-300) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
 }
 
 .network-canvas {
@@ -17,28 +37,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
 .network-placeholder {
   text-align: center;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
 .network-placeholder i {
-  font-size: 5rem;
+  font-size: var(--text-6xl);
   margin-bottom: var(--space-4);
-  opacity: 0.5;
+  color: var(--text-tertiary);
 }
 
 .network-placeholder h3 {
-  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
   font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-2);
 }
 
 .network-placeholder p {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
   margin: 0 0 var(--space-6);
 }
 
@@ -46,13 +72,16 @@
   display: flex;
   gap: var(--space-6);
   justify-content: center;
+  margin-top: var(--space-4);
 }
 
 .info-item {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
+  color: var(--text-secondary);
 }
 
 .dot {
@@ -62,13 +91,16 @@
 }
 
 .dot.primary {
-  background: var(--brand-primary);
+  background: var(--cyan-500);
+  box-shadow: 0 0 8px var(--cyan-500);
 }
 
 .dot.success {
-  background: var(--brand-success);
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
 }
 
 .dot.warning {
-  background: var(--brand-warning);
+  background: var(--warning);
+  box-shadow: 0 0 8px var(--warning);
 }

@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchConfigList, deleteConfig, copyNode } from '@shared/api/eventNodeBuilderApi';
+import { fetchConfigList, deleteConfig, copyNode } from '@shared/api/eventNodeBuilder';
 
 export default function ConfigListModal({ gameGid, onSelect, onClose }) {
   const [page, setPage] = useState(1);

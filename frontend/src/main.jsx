@@ -4,6 +4,7 @@ import { HashRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { ToastProvider } from "@shared/ui";
+import ErrorBoundary from "@shared/components/ErrorBoundary";
 import App from "./App";
 
 // CSS imports - Order is critical for Vite
@@ -17,12 +18,14 @@ import "./index.css";
 import { queryClient } from "@analytics/components/lib/queryClient";
 
 ReactDOM.createRoot(document.getElementById("app-root")).render(
-  <HashRouter>
-    <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </QueryClientProvider>
-    <Toaster position="top-right" />
-  </HashRouter>,
+  <ErrorBoundary>
+    <HashRouter>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </QueryClientProvider>
+      <Toaster position="top-right" />
+    </HashRouter>
+  </ErrorBoundary>,
 );

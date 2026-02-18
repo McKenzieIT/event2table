@@ -1,5 +1,5 @@
 /**
- * Input Styles - Cyberpunk Lab Theme
+ * Input Styles - Cyberpunk Terminal Theme
  *
  * Design: Minimal tech aesthetic with subtle glow on focus
  * Background: Dark glass effect
@@ -7,8 +7,7 @@
  */
 
 .cyber-input {
-  /* Base */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-body);
   width: 100%;
 }
 
@@ -18,15 +17,16 @@
 
 .cyber-input__label {
   display: block;
-  margin-bottom: var(--space-2, 8px);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary, #94A3B8);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
   letter-spacing: 0.01em;
 }
 
 .cyber-input__required {
-  color: var(--color-warning, #FF9800);
+  color: var(--warning);
   margin-left: 2px;
 }
 
@@ -44,21 +44,21 @@
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   background: transparent;
   pointer-events: none;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow var(--transition-base);
   z-index: 1;
 }
 
-/* Focus state - subtle glow */
+/* Focus state - cyan glow */
 .cyber-input-wrapper:not(.cyber-input-wrapper--disabled):focus-within::before {
   box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
 }
 
 /* Invalid state - red glow */
 .cyber-input-wrapper--invalid::before {
-  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
 
 /* ========================================
@@ -66,46 +66,61 @@
    ======================================== */
 
 .cyber-input {
+  /* 修复：在flex容器中使用flex: 1而非width: 100% */
+  flex: 1;
   width: 100%;
-  height: 40px;
-  padding: 10px 16px;
-  font-size: 15px;
+  height: 44px;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
   line-height: 1.5;
-  color: var(--text-primary, #F1F5F9);
-  background: rgba(22, 27, 34, 0.6);
-  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
-  border-radius: 6px;
+  color: var(--text-primary);
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
   outline: none;
-  transition: all 0.2s ease;
-
-  /* Placeholder */
-  color: var(--text-tertiary, #64748B);
+  transition: all var(--transition-base);
+  /* 修复：移除position: relative避免双重层叠上下文 */
+  /* position: relative; */
+  box-sizing: border-box; /* 确保box-sizing一致 */
 }
 
 .cyber-input::placeholder {
-  color: var(--text-tertiary, #64748B);
+  color: var(--text-muted);
   opacity: 0.7;
 }
 
 /* Focus state */
 .cyber-input:not(.cyber-input--disabled):focus {
-  background: rgba(22, 27, 34, 0.8);
-  border-color: var(--color-primary, #06B6D4);
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1),
-              0 0 12px rgba(6, 182, 212, 0.15);
+  background: var(--bg-glass);
+  border-color: var(--cyan-500);
+  box-shadow: 
+    0 0 0 3px rgba(6, 182, 212, 0.1),
+    0 0 20px rgba(6, 182, 212, 0.15);
+}
+
+/* Hover state */
+.cyber-input:not(.cyber-input--disabled):hover:not(:focus) {
+  border-color: var(--border-medium);
 }
 
 /* Invalid state */
 .cyber-input--invalid {
-  border-color: var(--color-danger, #F44336);
-  background: rgba(244, 67, 54, 0.05);
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.cyber-input--invalid:focus {
+  box-shadow: 
+    0 0 0 3px rgba(239, 68, 68, 0.1),
+    0 0 20px rgba(239, 68, 68, 0.15);
 }
 
 /* Disabled state */
 .cyber-input--disabled {
-  background: rgba(13, 17, 23, 0.4);
-  border-color: var(--border-subtle, rgba(255, 255, 255, 0.06));
-  color: var(--text-disabled, #475569);
+  background: rgba(3, 7, 18, 0.6);
+  border-color: var(--border-subtle);
+  color: var(--text-disabled);
   cursor: not-allowed;
 }
 
@@ -115,16 +130,22 @@
 
 .cyber-input__icon {
   position: absolute;
-  left: 12px;
-  color: var(--text-tertiary, #64748B);
+  left: var(--space-4);
+  color: var(--text-tertiary);
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2;
+  transition: color var(--transition-base);
+}
+
+.cyber-input-wrapper:focus-within .cyber-input__icon {
+  color: var(--cyan-400);
 }
 
 .cyber-input-wrapper--with-icon .cyber-input {
-  padding-left: 40px;
+  padding-left: calc(var(--space-4) + 24px);
 }
 
 /* ========================================
@@ -132,25 +153,27 @@
    ======================================== */
 
 .cyber-input__helper {
-  margin-top: var(--space-2, 8px);
-  font-size: 13px;
-  color: var(--text-tertiary, #64748B);
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
   line-height: 1.4;
 }
 
 .cyber-input__error {
-  margin-top: var(--space-2, 8px);
-  font-size: 13px;
-  color: var(--color-danger, #F44336);
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--danger);
   line-height: 1.4;
   display: flex;
   align-items: center;
-  gap: var(--space-1, 4px);
+  gap: var(--space-1);
 }
 
 .cyber-input__error::before {
   content: '⚠';
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 /* ========================================
@@ -165,4 +188,35 @@
 
 .cyber-input-wrapper--invalid .cyber-input {
   animation: shake 0.3s ease-in-out;
+}
+
+/* ========================================
+   Textarea Variant
+   ======================================== */
+
+.cyber-input--textarea {
+  height: auto;
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* ========================================
+   Search Input Variant
+   ======================================== */
+
+.cyber-input--search {
+  padding-left: calc(var(--space-4) + 24px);
+}
+
+.cyber-input--search + .cyber-input__icon {
+  left: var(--space-4);
+}
+
+/* ========================================
+   Focus Visible for Accessibility
+   ======================================== */
+
+.cyber-input:focus-visible {
+  outline: none;
 }

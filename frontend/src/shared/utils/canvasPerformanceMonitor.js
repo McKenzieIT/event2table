@@ -26,7 +26,6 @@ export class CanvasPerformanceMonitor {
         this.lastTime = performance.now();
         this.measureFPS();
         this.measureMemory();
-        console.log('[CanvasPerfMonitor] Monitoring started');
     }
 
     /**
@@ -42,8 +41,6 @@ export class CanvasPerformanceMonitor {
             this.metrics.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastTime));
             this.frameCount = 0;
             this.lastTime = currentTime;
-
-            console.log(`[PerfMonitor] FPS: ${this.metrics.fps}`);
         }
 
         requestAnimationFrame(() => this.measureFPS());
@@ -57,9 +54,7 @@ export class CanvasPerformanceMonitor {
 
         if (performance.memory) {
             this.metrics.memory = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
-            console.log(`[PerfMonitor] Memory: ${this.metrics.memory}MB`);
         } else {
-            console.log('[PerfMonitor] Memory API not available in this browser');
         }
 
         setTimeout(() => this.measureMemory(), 5000);
@@ -70,7 +65,6 @@ export class CanvasPerformanceMonitor {
      */
     measureLoadTime(startTime) {
         this.metrics.loadTime = Math.round(performance.now() - startTime);
-        console.log(`[PerfMonitor] Load Time: ${this.metrics.loadTime}ms`);
         return this.metrics.loadTime;
     }
 
@@ -81,7 +75,6 @@ export class CanvasPerformanceMonitor {
         const startTime = performance.now();
         callback();
         this.metrics.interactionTime = Math.round(performance.now() - startTime);
-        console.log(`[PerfMonitor] Interaction Time: ${this.metrics.interactionTime}ms`);
         return this.metrics.interactionTime;
     }
 
@@ -97,7 +90,6 @@ export class CanvasPerformanceMonitor {
      */
     stopMonitoring() {
         this.isMonitoring = false;
-        console.log('[PerfMonitor] Monitoring stopped', this.metrics);
         return this.metrics;
     }
 
@@ -111,7 +103,6 @@ export class CanvasPerformanceMonitor {
             loadTime: 0,
             interactionTime: 0
         };
-        console.log('[PerfMonitor] Metrics reset');
     }
 }
 

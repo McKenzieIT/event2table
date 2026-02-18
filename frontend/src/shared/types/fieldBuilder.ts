@@ -1,7 +1,7 @@
 // 字段类型枚举
 export enum FieldType {
-  PARAMETER = 'parameter',
-  BASIC = 'basic',
+  PARAMETER = 'param',
+  BASIC = 'base',
   CUSTOM = 'custom',
   FIXED = 'fixed'
 }

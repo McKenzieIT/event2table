@@ -1,5 +1,5 @@
 /**
- * Card Styles - Glassmorphism Theme
+ * Card Styles - Cyberpunk Terminal Theme
  *
  * Design: Frosted glass effect with subtle glow
  * Background: Semi-transparent dark with blur
@@ -7,41 +7,74 @@
  */
 
 .cyber-card {
-  /* Base */
-  background: var(--bg-elevated, #161B22);
-  border-radius: 12px;
-  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+}
 
-  /* Glass effect */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+/* Top border glow */
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(6, 182, 212, 0.3),
+    transparent
+  );
+  opacity: 0.6;
+}
+
+/* Grid pattern overlay */
+.cyber-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cyber-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ========================================
    Variants
    ======================================== */
 
-/* Default - Elevated card */
+/* Default - Glass card */
 .cyber-card--default {
-  background: linear-gradient(135deg,
-    rgba(22, 27, 34, 0.95) 0%,
-    rgba(13, 17, 23, 0.98) 100%
-  );
+  background: var(--bg-glass);
 }
 
 /* Outlined - Minimal background */
 .cyber-card--outlined {
   background: transparent;
-  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.15));
+  border: 1px solid var(--border-medium);
+}
+
+.cyber-card--outlined::before {
+  display: none;
 }
 
 /* Elevated - Higher elevation */
 .cyber-card--elevated {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   border-color: rgba(6, 182, 212, 0.15);
 }
 
@@ -51,54 +84,85 @@
 
 /* Hoverable - Subtle lift and glow */
 .cyber-card--hoverable:hover {
-  transform: translateY(-2px);
-  border-color: rgba(6, 182, 212, 0.3);
-  box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15),
-              0 4px 16px rgba(0, 0, 0, 0.5);
+  transform: translateY(-4px);
+  border-color: var(--cyan-500);
+  box-shadow: 
+    var(--shadow-glow),
+    var(--shadow-lg);
 }
 
 /* Glowing - Continuous glow effect */
 .cyber-card--glowing {
   border-color: rgba(6, 182, 212, 0.4);
   box-shadow:
-    0 0 20px rgba(6, 182, 212, 0.3),
-    0 4px 16px rgba(0, 0, 0, 0.5),
-    inset 0 0 20px rgba(6, 182, 212, 0.05);
+    0 0 30px rgba(6, 182, 212, 0.2),
+    var(--shadow-lg),
+    inset 0 0 30px rgba(6, 182, 212, 0.05);
+}
+
+/* Accent variant */
+.cyber-card--accent {
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.cyber-card--accent::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.5),
+    transparent
+  );
+}
+
+.cyber-card--accent:hover {
+  border-color: var(--violet-500);
+  box-shadow:
+    0 0 30px rgba(139, 92, 246, 0.2),
+    var(--shadow-lg);
 }
 
 /* ========================================
    Padding Options
    ======================================== */
 
-.cyber-card--padding-sm { padding: 16px; }
-.cyber-card--padding-md { padding: 24px; }
-.cyber-card--padding-lg { padding: 32px; }
+.cyber-card--padding-sm { padding: var(--space-4); }
+.cyber-card--padding-md { padding: var(--space-6); }
+.cyber-card--padding-lg { padding: var(--space-8); }
 
 /* ========================================
    Card Sections
    ======================================== */
 
 .cyber-card__header {
-  padding: 24px 24px 16px 24px;
-  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .cyber-card__body {
-  padding: 24px;
-  color: var(--text-primary, #F1F5F9);
+  padding: var(--space-6);
+  color: var(--text-primary);
 }
 
 .cyber-card__footer {
-  padding: 16px 24px 24px 24px;
-  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .cyber-card__title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary, #F1F5F9);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
   line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.cyber-card__subtitle {
+  margin: var(--space-1) 0 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
 }
 
 /* ========================================
@@ -117,21 +181,22 @@
 }
 
 .cyber-card.animate-entrance {
-  animation: cardEntrance 0.6s ease-out backwards;
+  animation: cardEntrance 0.5s ease-out backwards;
 }
 
+/* Staggered animation delays */
+.cyber-card.animate-entrance:nth-child(1) { animation-delay: 0.05s; }
+.cyber-card.animate-entrance:nth-child(2) { animation-delay: 0.1s; }
+.cyber-card.animate-entrance:nth-child(3) { animation-delay: 0.15s; }
+.cyber-card.animate-entrance:nth-child(4) { animation-delay: 0.2s; }
+.cyber-card.animate-entrance:nth-child(5) { animation-delay: 0.25s; }
+.cyber-card.animate-entrance:nth-child(6) { animation-delay: 0.3s; }
+
 /* ========================================
-   Decorative: Grid overlay
+   Interactive click effect
    ======================================== */
 
-.cyber-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
-  background-size: 20px 20px;
-  pointer-events: none;
-  z-index: 0;
+.cyber-card--clickable:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
 }

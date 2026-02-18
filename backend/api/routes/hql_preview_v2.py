@@ -249,8 +249,11 @@ def generate_hql_debug():
 
         generator = DebuggableHQLGenerator()
 
+        # 使用options中的debug值，避免参数重复
+        debug_mode = options.pop('debug', True)
+
         trace = generator.generate(
-            events=events, fields=fields, conditions=conditions, debug=True, **options
+            events=events, fields=fields, conditions=conditions, debug=debug_mode, **options
         )
 
         # 重命名 final_hql 为 hql 以匹配API契约
@@ -871,7 +874,7 @@ def preview_hql():
 @hql_preview_v2_bp.route("/hql-preview-v2/api/history/save", methods=["POST"])
 def save_history():
     """
-    保存HQL生成历史
+    保存HQL生成历史（增强版）
 
     Request Body:
     {
@@ -880,10 +883,24 @@ def save_history():
         "where_conditions": [...],
         "mode": "single",
         "hql": "CREATE OR REPLACE VIEW ...",
+        "hql_type": "select",      // NEW: select/ddl/dml/canvas
+        "game_gid": 10000147,      // NEW: game filtering
+        "name_en": "Login Event",  // NEW: English name
+        "name_cn": "登录事件",     // NEW: Chinese name
         "performance_score": 85,
         "user_id": 0,
         "session_id": "optional-session-id",
         "metadata": {...}
+    }
+
+    For hql_type="canvas", hql should be a JSON object:
+    {
+        "hql_type": "canvas",
+        "hql": {
+            "create_table": "CREATE TABLE...",
+            "insert_overwrite": "INSERT OVERWRITE...",
+            "select": "SELECT..."
+        }
     }
 
     Response:
@@ -927,6 +944,10 @@ def save_history():
             user_id=data.get("user_id", 0),
             session_id=data.get("session_id"),
             metadata=data.get("metadata"),
+            hql_type=data.get("hql_type", "select"),
+            game_gid=data.get("game_gid"),
+            name_en=data.get("name_en"),
+            name_cn=data.get("name_cn"),
         )
 
         return jsonify(
@@ -1139,5 +1160,210 @@ def delete_history(history_id: int):
         traceback.print_exc()
         return (
             jsonify(error_response(f"Failed to delete history: {str(e)}", status_code=500)[0]),
+            500,
+        )
+
+
+@hql_preview_v2_bp.route("/hql-preview-v2/api/history/search", methods=["POST"])
+def search_history():
+    """
+    搜索HQL历史记录（支持模糊搜索和多条件过滤）
+
+    Request Body:
+    {
+        "keyword": "login",           // Fuzzy search keyword
+        "hql_type": "select",        // Filter by HQL type (select/ddl/dml/canvas)
+        "game_gid": 10000147,        // Filter by game
+        "user_id": 0,                // Filter by user (optional)
+        "date_from": "2026-02-01T00:00:00Z",  // Date range start
+        "date_to": "2026-02-17T23:59:59Z",    // Date range end
+        "limit": 50,                 // Result limit (default 50)
+        "offset": 0                  // Pagination offset
+    }
+
+    Response:
+    {
+        "success": true,
+        "data": {
+            "history": [
+                {
+                    "id": 123,
+                    "mode": "single",
+                    "hql_type": "select",
+                    "game_gid": 10000147,
+                    "name_en": "Login Event",
+                    "name_cn": "登录事件",
+                    "hql": "CREATE OR REPLACE VIEW ...",
+                    "performance_score": 85,
+                    "created_at": "2026-02-07T10:00:00Z",
+                    ...
+                }
+            ],
+            "count": 1,
+            "limit": 50,
+            "offset": 0
+        }
+    }
+    """
+    try:
+        from werkzeug.exceptions import BadRequest
+
+        try:
+            data = request.get_json(force=False)
+        except BadRequest:
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
+
+        if data is None:
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
+
+        from backend.services.hql.services.history_service import HQLHistoryService
+
+        service = HQLHistoryService()
+
+        # Extract search parameters
+        keyword = data.get("keyword")
+        hql_type = data.get("hql_type")
+        game_gid = data.get("game_gid")
+        user_id = data.get("user_id")
+        date_from = data.get("date_from")
+        date_to = data.get("date_to")
+        limit = data.get("limit", 50)
+        offset = data.get("offset", 0)
+
+        # Validate limit and offset
+        if not isinstance(limit, int) or limit < 1 or limit > 500:
+            return jsonify(error_response("limit must be between 1 and 500", status_code=400)[0]), 400
+
+        if not isinstance(offset, int) or offset < 0:
+            return jsonify(error_response("offset must be a non-negative integer", status_code=400)[0]), 400
+
+        # Validate hql_type
+        valid_hql_types = ["select", "ddl", "dml", "canvas"]
+        if hql_type is not None and hql_type not in valid_hql_types:
+            return (
+                jsonify(
+                    error_response(
+                        f"hql_type must be one of {valid_hql_types}", status_code=400
+                    )[0]
+                ),
+                400,
+            )
+
+        # Perform search
+        history_list = service.search_history(
+            keyword=keyword,
+            hql_type=hql_type,
+            game_gid=game_gid,
+            user_id=user_id,
+            date_from=date_from,
+            date_to=date_to,
+            limit=limit,
+            offset=offset,
+        )
+
+        return jsonify(
+            success_response(
+                data={"history": history_list, "count": len(history_list), "limit": limit, "offset": offset}
+            )[0]
+        )
+
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        return jsonify(error_response(f"Failed to search history: {str(e)}", status_code=500)[0]), 500
+
+
+@hql_preview_v2_bp.route("/hql-preview-v2/api/history/global", methods=["GET"])
+def global_search_history():
+    """
+    全局搜索HQL历史记录（跨所有用户和会话）
+
+    Query Parameters:
+        keyword: Fuzzy search keyword
+        hql_type: Filter by HQL type (select/ddl/dml/canvas)
+        limit: Result limit (default 50)
+        offset: Pagination offset (default 0)
+
+    Example:
+        GET /hql-preview-v2/api/history/global?keyword=login&hql_type=select&limit=10
+
+    Response:
+    {
+        "success": true,
+        "data": {
+            "history": [
+                {
+                    "id": 123,
+                    "user_id": 0,
+                    "session_id": "session-abc",
+                    "mode": "single",
+                    "hql_type": "select",
+                    "game_gid": 10000147,
+                    "name_en": "Login Event",
+                    "name_cn": "登录事件",
+                    "hql": "CREATE OR REPLACE VIEW ...",
+                    "performance_score": 85,
+                    "created_at": "2026-02-07T10:00:00Z"
+                }
+            ],
+            "count": 1,
+            "limit": 10,
+            "offset": 0,
+            "note": "Global query requires authentication. This is a development preview."
+        }
+    }
+    """
+    try:
+        from backend.services.hql.services.history_service import HQLHistoryService
+
+        service = HQLHistoryService()
+
+        # Extract query parameters
+        keyword = request.args.get("keyword")
+        hql_type = request.args.get("hql_type")
+        limit = request.args.get("limit", 50, type=int)
+        offset = request.args.get("offset", 0, type=int)
+
+        # Validate limit and offset
+        if limit < 1 or limit > 500:
+            return jsonify(error_response("limit must be between 1 and 500", status_code=400)[0]), 400
+
+        if offset < 0:
+            return jsonify(error_response("offset must be a non-negative integer", status_code=400)[0]), 400
+
+        # Validate hql_type
+        valid_hql_types = ["select", "ddl", "dml", "canvas"]
+        if hql_type is not None and hql_type not in valid_hql_types:
+            return (
+                jsonify(
+                    error_response(f"hql_type must be one of {valid_hql_types}", status_code=400)[0]
+                ),
+                400,
+            )
+
+        # Perform global search
+        history_list = service.global_search_history(
+            keyword=keyword, hql_type=hql_type, limit=limit, offset=offset
+        )
+
+        return jsonify(
+            success_response(
+                data={
+                    "history": history_list,
+                    "count": len(history_list),
+                    "limit": limit,
+                    "offset": offset,
+                    "note": "Global query requires authentication. This is a development preview.",
+                }
+            )[0]
+        )
+
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        return (
+            jsonify(error_response(f"Failed to perform global search: {str(e)}", status_code=500)[0]),
             500,
         )

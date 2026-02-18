@@ -970,3 +970,126 @@
     height: auto;
   }
 }
+
+/* ===== 性能分析和调试模式面板 ===== */
+.panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: var(--en-space-md);
+  animation: panelFadeIn 0.2s ease-out;
+}
+
+@keyframes panelFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.panel-container {
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+  border: 1px solid var(--border-default);
+  border-radius: var(--en-radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: panelSlideIn 0.3s ease-out;
+}
+
+@keyframes panelSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--en-space-md) var(--en-space-lg);
+  border-bottom: 1px solid var(--border-default);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: var(--en-font-lg);
+  font-weight: var(--en-font-semibold);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--en-space-sm);
+}
+
+.panel-body {
+  flex: 1;
+  padding: var(--en-space-lg);
+  overflow-y: auto;
+}
+
+.panel-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--en-space-2xl);
+  text-align: center;
+  color: var(--text-secondary);
+  min-height: 300px;
+}
+
+.panel-placeholder i {
+  font-size: 3rem;
+  margin-bottom: var(--en-space-md);
+  opacity: 0.5;
+}
+
+.panel-placeholder p {
+  font-size: var(--en-font-base);
+  margin: var(--en-space-sm) 0;
+}
+
+.panel-placeholder small {
+  font-size: var(--en-font-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--en-space-xs);
+}
+
+/* 性能面板特定样式 */
+.performance-panel .panel-header {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(15, 23, 42, 0.3) 100%);
+  border-bottom-color: rgba(6, 182, 212, 0.3);
+}
+
+.performance-panel .panel-header h3 {
+  color: var(--color-primary);
+}
+
+/* 调试面板特定样式 */
+.debug-panel .panel-header {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(15, 23, 42, 0.3) 100%);
+  border-bottom-color: rgba(139, 92, 246, 0.3);
+}
+
+.debug-panel .panel-header h3 {
+  color: #8b5cf6;
+}

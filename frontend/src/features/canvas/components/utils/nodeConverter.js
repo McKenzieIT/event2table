@@ -10,10 +10,6 @@
  * @returns {Object} ReactFlow节点
  */
 export function configToReactFlowNode(config, position) {
-  console.log(
-    "[nodeConverter] Creating node with type: event, configId:",
-    config.id,
-  );
   const node = {
     id: `node_${config.id}_${Date.now()}`,
     type: "event", // Use 'event' type to match EventNode component
@@ -34,7 +30,6 @@ export function configToReactFlowNode(config, position) {
       eventConfig: config,
     },
   };
-  console.log("[nodeConverter] Created node:", node.id, "type:", node.type);
   return node;
 }
 

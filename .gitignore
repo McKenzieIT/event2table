@@ -107,6 +107,9 @@ build/
 .claude/plans/
 .claude/sessions/
 
+# Ralph Loop E2E Testing
+docs/ralph/
+
 # Git Worktrees
 .worktrees/
 

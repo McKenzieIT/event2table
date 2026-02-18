@@ -33,22 +33,28 @@ class WhereBuilder:
             ...     Condition(field="level", operator=">", value=10, logical_op="AND")
             ... ]
             >>> builder.build(conditions, {})
-            'role_id = 123 AND level > 10'
+            'ds = '${ds}' AND event_name = 'zmpvp.vis' AND role_id = 123 AND level > 10'
         """
-        if not conditions:
-            # 默认只返回分区过滤
-            return self._build_partition_filter(context)
-
-        # 构建条件SQL
         condition_clauses = []
-        for cond in conditions:
-            clause = self._build_single_condition(cond, context)
-            condition_clauses.append(clause)
 
         # 添加分区过滤（总是作为第一个条件）
         partition_filter = self._build_partition_filter(context)
         if partition_filter:
-            condition_clauses.insert(0, partition_filter)
+            condition_clauses.append(partition_filter)
+
+        # 添加事件名称过滤（如果有event上下文）
+        event_filter = self._build_event_filter(context)
+        if event_filter:
+            condition_clauses.append(event_filter)
+
+        # 如果没有用户自定义条件，只返回系统过滤条件
+        if not conditions:
+            return self._join_conditions(condition_clauses)
+
+        # 构建用户自定义条件SQL
+        for cond in conditions:
+            clause = self._build_single_condition(cond, context)
+            condition_clauses.append(clause)
 
         # 用逻辑操作符连接
         where_clause = self._join_conditions(condition_clauses)
@@ -100,6 +106,28 @@ class WhereBuilder:
             return f"{event.partition_field} = '${{ds}}'"
 
         return "ds = '${ds}'"
+
+    def _build_event_filter(self, context: Optional[dict]) -> Optional[str]:
+        """
+        构建事件名称过滤条件
+
+        总是添加事件名称过滤以限定查询范围
+        格式: event_name = 'zmpvp.vis'
+
+        Args:
+            context: 上下文信息（包含event对象）
+
+        Returns:
+            str: 事件过滤条件字符串，如果没有event上下文则返回None
+        """
+        if not context:
+            return None
+
+        event = context.get("event")
+        if event and event.name:
+            return f"event_name = '{event.name}'"
+
+        return None
 
     def _join_conditions(self, clauses: List[str]) -> str:
         """

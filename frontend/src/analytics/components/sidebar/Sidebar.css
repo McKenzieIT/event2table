@@ -1,6 +1,5 @@
 /**
- * Sidebar Component Styles
- * Based on base.html sidebar.css and design-system.css
+ * Sidebar Component - Cyberpunk Terminal Style
  */
 
 /* ==================== Sidebar Container ==================== */
@@ -10,8 +9,10 @@
   left: 0;
   width: var(--sidebar-width, 260px);
   height: 100vh;
-  background: var(--bg-sidebar, var(--bg-secondary));
-  border-right: 1px solid var(--border-sidebar, var(--border-default));
+  background: rgba(3, 7, 18, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -19,8 +20,25 @@
   overflow: hidden;
 }
 
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--cyan-500) 20%,
+    var(--cyan-500) 80%,
+    transparent 100%
+  );
+  opacity: 0.3;
+}
+
 .sidebar.collapsed {
-  width: var(--sidebar-collapsed-width, 60px);
+  width: var(--sidebar-collapsed, 72px);
 }
 
 /* ==================== Sidebar Header ==================== */
@@ -28,9 +46,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4);
-  border-bottom: 1px solid var(--border-sidebar, var(--border-subtle));
-  height: var(--header-height, 60px);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+  height: var(--header-height, 64px);
   flex-shrink: 0;
 }
 
@@ -51,15 +69,22 @@
 
 .sidebar-brand-icon {
   font-size: 1.5rem;
-  color: var(--brand-primary);
+  color: var(--cyan-400);
   flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
 }
 
 .sidebar-brand-text {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
   white-space: nowrap;
   transition: opacity 0.2s;
+  background: linear-gradient(135deg, var(--cyan-300), var(--violet-300));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
 }
 
 .sidebar.collapsed .sidebar-brand-text {
@@ -70,7 +95,7 @@
 /* Sidebar Toggle Button */
 .sidebar-toggle {
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-default);
   color: var(--text-secondary);
   cursor: pointer;
   padding: var(--space-2);
@@ -83,8 +108,10 @@
 }
 
 .sidebar-toggle:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+  background: var(--bg-glass-light);
+  border-color: var(--cyan-500);
+  color: var(--cyan-400);
+  box-shadow: var(--glow-cyan-sm);
 }
 
 /* ==================== Sidebar Content ==================== */
@@ -96,7 +123,7 @@
 }
 
 .sidebar-content::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .sidebar-content::-webkit-scrollbar-track {
@@ -104,12 +131,12 @@
 }
 
 .sidebar-content::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: 3px;
+  background: var(--border-medium);
+  border-radius: 2px;
 }
 
 .sidebar-content::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
+  background: var(--cyan-600);
 }
 
 /* ==================== Menu Group ==================== */
@@ -122,49 +149,44 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-5);
   background: transparent;
   border: none;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 600;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--font-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.15em;
   cursor: pointer;
   transition: all 0.2s;
   user-select: none;
 }
 
 .menu-group-header:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+  background: var(--bg-glass-light);
+  color: var(--cyan-400);
 }
 
 .sidebar.collapsed .menu-group-header {
   justify-content: center;
-  padding: var(--space-3);
-}
-
-.menu-group-title {
-  flex: 1;
-  text-align: left;
+  padding: var(--space-2);
+  min-height: 32px;
 }
 
 .sidebar.collapsed .menu-group-title {
   display: none;
 }
 
-.menu-group-icon {
-  font-size: 0.625rem;
-  transition: transform 0.3s;
-}
-
-.menu-group.expanded .menu-group-icon {
-  transform: rotate(180deg);
-}
-
 .sidebar.collapsed .menu-group-icon {
-  display: none;
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.sidebar.collapsed .menu-group-header:hover .menu-group-icon {
+  color: var(--cyan-400);
 }
 
 .menu-group-content {
@@ -177,8 +199,23 @@
   max-height: 0;
 }
 
+/* Collapsed state: show compact menu items */
 .sidebar.collapsed .menu-group-content {
-  max-height: 0 !important;
+  max-height: none !important;
+  overflow: visible;
+}
+
+.sidebar.collapsed .menu-group-header {
+  justify-content: center;
+  padding: var(--space-2);
+}
+
+.sidebar.collapsed .menu-group-title {
+  display: none;
+}
+
+.sidebar.collapsed .menu-group-icon {
+  display: block;
 }
 
 /* ==================== Sidebar Group ==================== */
@@ -202,7 +239,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   color: var(--text-secondary);
   text-decoration: none;
   border-radius: var(--radius-md);
@@ -210,21 +247,40 @@
   position: relative;
   white-space: nowrap;
   overflow: hidden;
+  margin: 0 var(--space-2);
+}
+
+.sidebar-menu-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: var(--cyan-400);
+  border-radius: 0 2px 2px 0;
+  transition: height 0.2s ease-out;
+  box-shadow: 0 0 10px var(--cyan-400);
 }
 
 .sidebar-menu-link:hover {
-  background: var(--bg-hover);
+  background: var(--bg-glass-light);
   color: var(--text-primary);
 }
 
 .sidebar-menu-link.active {
-  background: var(--brand-primary-light, rgba(37, 99, 235, 0.1));
-  color: var(--brand-primary);
-  font-weight: 500;
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--cyan-400);
+  font-weight: var(--font-medium);
+}
+
+.sidebar-menu-link.active::before {
+  height: 60%;
 }
 
 .sidebar-menu-link:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--cyan-500);
   outline-offset: 2px;
 }
 
@@ -232,18 +288,75 @@
 .sidebar-menu-icon {
   font-size: 1.125rem;
   flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.sidebar-menu-link:hover .sidebar-menu-icon {
+  color: var(--cyan-400);
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+.sidebar-menu-link.active .sidebar-menu-icon {
+  color: var(--cyan-400);
 }
 
 /* Menu Text */
 .sidebar-menu-text {
-  font-size: 0.875rem;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
   flex: 1;
   transition: opacity 0.2s;
 }
 
+/* ==================== Collapsed State: Icon + Label ==================== */
+.sidebar.collapsed .sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.sidebar.collapsed .sidebar-menu-item {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-menu-link {
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  margin: 0;
+  width: 100%;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+.sidebar.collapsed .sidebar-menu-icon {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
 .sidebar.collapsed .sidebar-menu-text {
-  opacity: 0;
-  width: 0;
+  opacity: 1;
+  width: auto;
+  font-size: 9px;
+  text-align: center;
+  line-height: 1.2;
+  color: var(--text-tertiary);
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-menu-link:hover .sidebar-menu-text {
+  color: var(--text-secondary);
+}
+
+.sidebar.collapsed .sidebar-menu-link.active .sidebar-menu-text {
+  color: var(--cyan-400);
 }
 
 /* ==================== Tooltip (Collapsed Mode) ==================== */
@@ -251,37 +364,39 @@
   position: relative;
 }
 
-.sidebar-menu-link[data-tooltip]::before {
+.sidebar-menu-link[data-tooltip]::after {
   content: attr(data-tooltip);
   position: fixed;
-  left: calc(var(--sidebar-collapsed-width, 60px) + var(--space-2));
+  left: calc(var(--sidebar-collapsed, 72px) + var(--space-2));
   top: var(--tooltip-top, 50%);
   transform: translateY(-50%);
-  background: var(--bg-tooltip, #1e293b);
-  color: var(--text-tooltip, #fff);
+  background: var(--bg-surface);
+  color: var(--text-primary);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
   z-index: 1100;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
 }
 
-.sidebar:not(.collapsed) .sidebar-menu-link[data-tooltip]::before {
+.sidebar:not(.collapsed) .sidebar-menu-link[data-tooltip]::after {
   display: none;
 }
 
-.sidebar.collapsed .sidebar-menu-link:hover[data-tooltip]::before {
+.sidebar.collapsed .sidebar-menu-link:hover[data-tooltip]::after {
   opacity: 1;
 }
 
 /* ==================== Sidebar Footer ==================== */
 .sidebar-footer {
-  padding: var(--space-4);
-  border-top: 1px solid var(--border-sidebar, var(--border-subtle));
+  padding: var(--space-4) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
 
@@ -292,8 +407,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-3);
-  background: var(--bg-card);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-glass);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -303,8 +418,9 @@
 }
 
 .game-chip-sidebar:hover {
-  background: var(--bg-hover);
-  border-color: var(--brand-primary);
+  background: var(--bg-glass-light);
+  border-color: var(--cyan-500);
+  box-shadow: var(--shadow-glow-sm);
 }
 
 .game-chip-sidebar-content {
@@ -318,20 +434,25 @@
 
 .game-chip-sidebar-icon {
   font-size: 1.125rem;
-  color: var(--brand-primary);
+  color: var(--cyan-400);
   flex-shrink: 0;
 }
 
 .game-chip-sidebar-text {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .sidebar.collapsed .game-chip-sidebar-text {
-  display: none;
+  display: block;
+  font-size: 9px;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 60px;
 }
 
 .game-chip-sidebar-chevron {
@@ -345,6 +466,18 @@
   display: none;
 }
 
+/* Collapsed footer: icon + label layout */
+.sidebar.collapsed .game-chip-sidebar {
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  justify-content: center;
+}
+
+.sidebar.collapsed .game-chip-sidebar-content {
+  justify-content: center;
+}
+
 /* Game Management Button */
 .game-management-btn {
   width: 100%;
@@ -352,8 +485,8 @@
   align-items: center;
   justify-content: flex-start;
   gap: var(--space-2);
-  padding: var(--space-3);
-  background: var(--bg-card);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-glass);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -364,8 +497,9 @@
 }
 
 .game-management-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--brand-primary);
+  background: var(--bg-glass-light);
+  border-color: var(--cyan-500);
+  box-shadow: var(--shadow-glow-sm);
 }
 
 .game-management-btn-content {
@@ -379,25 +513,36 @@
 
 .game-management-btn-icon {
   font-size: 1.125rem;
-  color: var(--brand-primary);
+  color: var(--cyan-400);
   flex-shrink: 0;
 }
 
 .game-management-btn-text {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .sidebar.collapsed .game-management-btn-text {
-  display: none;
+  display: block;
+  font-size: 9px;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 60px;
 }
 
 .sidebar.collapsed .game-management-btn {
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
   justify-content: center;
-  padding: var(--space-3);
+}
+
+.sidebar.collapsed .game-management-btn-content {
+  justify-content: center;
 }
 
 /* ==================== Responsive Behavior ==================== */
@@ -424,26 +569,7 @@
 }
 
 .sidebar-menu-item {
-  animation: slideIn 0.2s ease-out;
-}
-
-/* ==================== Dark Mode Support ==================== */
-@media (prefers-color-scheme: dark) {
-  .sidebar {
-    --bg-sidebar: #0f172a;
-    --border-sidebar: #1e293b;
-  }
-
-  .sidebar-menu-link[data-tooltip]::before {
-    --bg-tooltip: #334155;
-  }
-}
-
-/* ==================== Print Styles ==================== */
-@media print {
-  .sidebar {
-    display: none;
-  }
+  animation: slideIn 0.3s ease-out;
 }
 
 /* ==================== Accessibility ==================== */
@@ -464,6 +590,6 @@
 .menu-group-header:focus-visible,
 .sidebar-menu-link:focus-visible,
 .game-chip-sidebar:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--cyan-500);
   outline-offset: 2px;
 }

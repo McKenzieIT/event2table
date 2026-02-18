@@ -279,7 +279,7 @@ describe('Memory Leak Tests', () => {
     });
   });
 
-  describe('Card Component', ()() => {
+  describe('Card Component', () => {
     test('should not retain children after unmount', () => {
       let childMountCount = 0;
       let childUnmountCount = 0;

@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { Z_INDICES } from '@shared/constants/zIndices';
 
 /**
  * 对话框类型
@@ -96,7 +97,7 @@ export function ConfirmDialog({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1500, // 比普通模态框更高的z-index
+          zIndex: Z_INDICES.CONFIRM_DIALOG, // 比普通模态框更高的z-index
         }}
         onClick={onCancel}
       >

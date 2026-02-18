@@ -1,58 +1,32 @@
 import React from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './CanvasPage.css';
 import CanvasFlow from '../components/CanvasFlow';
 import '../components/CanvasFlow.css';
 import { Button, Spinner } from '@shared/ui';
+import { useGameContext } from '@shared/hooks/useGameContext';
 import { useGameData } from '../hooks/useGameData';
 
 export default function CanvasPage() {
-  const { currentGame } = useOutletContext() || {};
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  // Determine targetGameGid from URL/context/window.gameData
   const gameGidFromUrl = searchParams.get('game_gid');
   const gameIdFromUrl = searchParams.get('game_id');  // 向后兼容
 
-  // 优先级: game_gid > game_id (legacy)
-  let targetGameGid = gameGidFromUrl || gameIdFromUrl;
+  // 使用 useGameContext 获取游戏上下文
+  const { currentGame, currentGameGid: storeGameGid } = useGameContext();
 
-  if (!targetGameGid && currentGame) {
-    targetGameGid = currentGame.gid || currentGame.id;
-  }
-
-  if (!targetGameGid && window.gameData) {
-    targetGameGid = window.gameData.gid || window.gameData.id;
-  }
+  // 简化优先级逻辑
+  const targetGameGid = gameGidFromUrl || gameIdFromUrl || storeGameGid;
 
   // Use React Query hook
   const { data: queryData, isLoading, error, refetch } = useGameData(targetGameGid);
 
-  // Convert to expected format for backward compatibility
-  const gameData = React.useMemo(() => {
-    // Check if window.gameData already has the data
-    if (window.gameData && window.gameData.gid == targetGameGid) {
-      return window.gameData;
-    }
-
-    // Convert query data to expected format
-    if (queryData) {
-      const data = {
-        id: queryData.id,      // 保留向后兼容
-        gid: queryData.gid,    // 主键
-        name: queryData.name,
-        ods_db: queryData.ods_db
-      };
-      // Update window.gameData for backward compatibility
-      window.gameData = data;
-      console.log('[CanvasPage] Game data loaded:', data);
-      return data;
-    }
-
-    return null;
-  }, [queryData, targetGameGid]);
+  // 简化 gameData：优先使用查询数据，回退到当前游戏
+  const gameData = queryData || currentGame;
 
   // Determine error message
   const errorMessage = React.useMemo(() => {
@@ -83,7 +57,7 @@ export default function CanvasPage() {
         <Button onClick={() => refetch()} variant="primary" data-testid="retry-button">
           重试
         </Button>
-        <Button onClick={() => window.history.back()} variant="secondary" data-testid="back-button">
+        <Button onClick={() => navigate(-1)} variant="secondary" data-testid="back-button">
           返回
         </Button>
       </div>

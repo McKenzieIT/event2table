@@ -345,39 +345,205 @@ def api_update_game(gid):
         return json_error_response("Failed to update game", status_code=500)
 
 
+def check_deletion_impact(game_gid: int) -> Dict[str, Any]:
+    """
+    检查删除游戏的影响范围
+
+    Args:
+        game_gid: 游戏业务GID
+
+    Returns:
+        影响统计字典
+    """
+    # fetch_one_as_dict is already imported from backend.core.utils (line 27)
+
+    impact = {
+        "game_gid": game_gid,
+        "has_associated_data": False,
+        "event_count": 0,
+        "param_count": 0,
+        "node_config_count": 0,
+    }
+
+    # 检查事件数量
+    event_count = fetch_one_as_dict(
+        "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
+        (game_gid,)
+    )
+    impact["event_count"] = event_count["count"]
+
+    # 检查参数数量（通过事件关联）
+    param_count = fetch_one_as_dict("""
+        SELECT COUNT(*) as count
+        FROM event_params ep
+        INNER JOIN log_events le ON ep.event_id = le.id
+        WHERE le.game_gid = ?
+    """, (game_gid,))
+    impact["param_count"] = param_count["count"]
+
+    # 检查Canvas节点配置
+    node_count = fetch_one_as_dict(
+        "SELECT COUNT(*) as count FROM event_node_configs WHERE game_gid = ?",
+        (game_gid,)
+    )
+    impact["node_config_count"] = node_count["count"]
+
+    # 判断是否有关联数据
+    impact["has_associated_data"] = any([
+        impact["event_count"] > 0,
+        impact["param_count"] > 0,
+        impact["node_config_count"] > 0,
+    ])
+
+    logger.debug(
+        f"Deletion impact for game_gid={game_gid}: "
+        f"events={impact['event_count']}, "
+        f"params={impact['param_count']}, "
+        f"nodes={impact['node_config_count']}"
+    )
+
+    return impact
+
+
+def execute_cascade_delete(
+    game: Dict[str, Any],
+    impact: Dict[str, Any]
+) -> Tuple[Dict[str, Any], int]:
+    """
+    执行级联删除游戏及其所有关联数据
+
+    Args:
+        game: 游戏数据（包含id和gid）
+        impact: 影响统计
+
+    Returns:
+        (响应字典, HTTP状态码)
+    """
+    from backend.core.database import get_db_connection
+
+    game_gid = game["gid"]
+    game_id = game["id"]
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("BEGIN IMMEDIATE")  # 立即锁，防止并发修改
+
+            # 验证游戏仍然存在（防止已被其他请求删除）
+            cursor.execute(
+                "SELECT id FROM games WHERE id = ?", (game_id,)
+            )
+            game_exists = cursor.fetchone()
+
+            if not game_exists:
+                conn.rollback()
+                return json_error_response(
+                    "Game not found (may have been deleted)",
+                    status_code=404
+                )
+
+            # 1. 删除事件参数（通过事件ID）
+            cursor.execute("""
+                DELETE FROM event_params
+                WHERE event_id IN (
+                    SELECT id FROM log_events WHERE game_gid = ?
+                )
+            """, (game_gid,))
+
+            # 2. 删除事件记录
+            cursor.execute("DELETE FROM log_events WHERE game_gid = ?", (game_gid,))
+
+            # 3. 删除Canvas节点配置
+            cursor.execute(
+                "DELETE FROM event_node_configs WHERE game_gid = ?",
+                (game_gid,)
+            )
+
+            # 4. 删除游戏记录（在同一事务中完成）
+            cursor.execute("DELETE FROM games WHERE id = ?", (game_id,))
+
+            conn.commit()
+
+            logger.info(
+                f"Cascade deleted game {game['name']} (GID: {game_gid}): "
+                f"{impact['event_count']} events, "
+                f"{impact['param_count']} params, "
+                f"{impact['node_config_count']} node configs"
+            )
+
+            return json_success_response(
+                message="Game and all associated data deleted successfully",
+                data={
+                    "deleted_event_count": impact["event_count"],
+                    "deleted_param_count": impact["param_count"],
+                    "deleted_node_config_count": impact["node_config_count"]
+                }
+            )
+
+        except Exception as e:
+            conn.rollback()
+            raise e
+
+        finally:
+            conn.close()
+
+    except Exception as e:
+        logger.error(f"Error cascade deleting game: {e}")
+        return json_error_response("Failed to delete game", status_code=500)
+
+
 @api_bp.route("/api/games/<int:gid>", methods=["DELETE"])
 def api_delete_game(gid):
-    """API: Delete a game by business GID"""
-    # 使用Repository模式按gid查询
+    """API: Delete a game by business GID (with confirmation)"""
+    logger.info(f"*** api_delete_game CALLED with gid={gid}, force_delete={request.get_json() or {}.get('confirm', False)} ***")
+
+    # 获取确认标志
+    data = request.get_json() or {}
+    force_delete = data.get("confirm", False)
+
+    # 查询游戏
     game = Repositories.GAMES.find_by_field("gid", gid)
     if not game:
         return json_error_response("Game not found", status_code=404)
 
-    # Check for associated events using game_gid (new standard)
-    event_count = fetch_one_as_dict(
-        """SELECT COUNT(*) as count FROM log_events
-           WHERE game_gid = ?""",
-        (gid,),
-    )
+    # 检查删除影响
+    impact = check_deletion_impact(gid)
 
-    if event_count["count"] > 0:
+    # 如果没有确认标志且有关联数据，返回影响统计
+    if not force_delete and impact["has_associated_data"]:
         return json_error_response(
-            f"Cannot delete game with {event_count['count']} associated events. "
-            "Delete events first.",
-            status_code=409,  # Conflict
-        )
+            f"Game has {impact['event_count']} events, "
+            f"{impact['param_count']} parameters, "
+            f"{impact['node_config_count']} node configs. "
+            f"Set confirm=true to force delete.",
+            status_code=409,
+            data={
+                "event_count": impact["event_count"],
+                "param_count": impact["param_count"],
+                "node_config_count": impact["node_config_count"],
+            }
+)
 
-    try:
-        # Delete by gid using the database id from the game record
-        Repositories.GAMES.delete(game["id"])
-        clear_game_cache()  # Clear cache after delete
-        clear_cache_pattern("dashboard_statistics")  # Clear dashboard cache
-        logger.info(f"Game deleted: {game['name']} (GID: {gid})")
-        return json_success_response(message="Game deleted successfully")
-    except Exception as e:
-        logger.error(f"Error deleting game: {e}")
-        return json_error_response("Failed to delete game", status_code=500)
+    # 执行级联删除
+    result, status_code = execute_cascade_delete(game, impact)
 
+    # 清理缓存
+    if status_code == 200:
+        clear_game_cache()
+        clear_cache_pattern("dashboard_statistics")
+
+        # ✅ 显式清除Flask-Caching的列表缓存
+        try:
+            from flask import current_app
+            if hasattr(current_app, 'cache'):
+                current_app.cache.delete("games:list:v1")
+                logger.info("✅ Cleared games:list:v1 Flask-Caching after deletion")
+        except (AttributeError, RuntimeError) as e:
+            logger.warning(f"Failed to clear Flask-Caching games:list cache: {e}")
+
+    return result, status_code
 
 @api_bp.route("/api/games/batch", methods=["DELETE"])
 def api_batch_delete_games():

@@ -16,6 +16,7 @@ import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Input } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
+import { BaseModal } from '@shared/ui/BaseModal';
 import './CategoryModal.css';
 
 /**
@@ -102,8 +103,8 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }) {
       return response.json();
     },
     onSuccess: (data) => {
-      // 刷新分类列表
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      // 刷新分类列表（包含 gameGid）
+      queryClient.invalidateQueries({ queryKey: ['categories', gameGid] });
 
       // 成功提示
       const action = isEditMode ? '更新' : '创建';
@@ -145,31 +146,25 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }) {
     submitMutation.mutate(submitData);
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="category-modal-overlay">
-      <div className="category-modal" onClick={(e) => e.stopPropagation()}>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={
+        <span>
+          {isEditMode ? '编辑分类' : '新增分类'}
+          <span className={`category-modal__mode-hint ${isEditMode ? 'edit' : 'create'}`}>
+            {isEditMode ? '✎ 编辑模式' : '➕ 新增模式'}
+          </span>
+        </span>
+      }
+      animation="slideUp"
+      glassmorphism
+      size="lg"
+      closeOnBackdropClick={false}
+    >
+      <div className="category-modal">
         <div className="category-modal__container">
-          {/* 头部 */}
-          <div className="category-modal__header">
-            <h2 className="category-modal__title">
-              {isEditMode ? '编辑分类' : '新增分类'}
-              <span className={`category-modal__mode-hint ${isEditMode ? 'edit' : 'create'}`}>
-                {isEditMode ? '✎ 编辑模式' : '➕ 新增模式'}
-              </span>
-            </h2>
-            <button
-              className="category-modal__close-btn"
-              onClick={handleClose}
-              aria-label="关闭"
-            >
-              ×
-            </button>
-          </div>
-
           {/* 表单 */}
           <form className="category-modal__form" onSubmit={handleSubmit}>
             {/* 分类名称 */}
@@ -231,7 +226,7 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }) {
           </form>
         </div>
       </div>
-    </div>
+    </BaseModal>
   );
 }
 

@@ -14,7 +14,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Modal, Button, Input, useToast } from '@shared/ui';
+import { BaseModal, Button, Input, useToast } from '@shared/ui';
 import './CategoryManagementModal.css';
 
 const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
@@ -149,7 +149,7 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="分类管理" size="lg">
+    <BaseModal isOpen={isOpen} onClose={onClose} title="分类管理" animation="slideUp" glassmorphism size="lg">
       <div className="category-management-modal">
         {/* Left Panel: Category List */}
         <div className="category-list-panel">
@@ -236,7 +236,7 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
           )}
         </div>
       </div>
-    </Modal>
+    </BaseModal>
   );
 };
 

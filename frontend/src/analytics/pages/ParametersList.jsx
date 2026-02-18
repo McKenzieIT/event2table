@@ -13,6 +13,8 @@ import {
 } from '@shared/ui';
 import { fetchAllParameters } from '@shared/api/parameters';
 import ParameterDetailDrawer from '@analytics/components/parameters/ParameterDetailDrawer';
+import { NavLinkWithGameContext } from '@shared/components';
+import { MemoizedTableRowMemo } from '@shared/components/MemoizedTableRow';
 import './ParametersList.css';
 
 /**
@@ -91,24 +93,10 @@ function ParametersList() {
     staleTime: 10000
   });
 
-  // 显式验证：确保paramsData和data存在
-  let parameters = [];
-  let total = 0;
-
-  if (paramsData && typeof paramsData === 'object') {
-    if (paramsData.data && typeof paramsData.data === 'object') {
-      if (Array.isArray(paramsData.data.parameters)) {
-        parameters = paramsData.data.parameters;
-      } else {
-        console.warn('[ParametersList] paramsData.data.parameters is not an array');
-      }
-      total = paramsData.data.total || 0;
-    } else {
-      console.warn('[ParametersList] paramsData.data is missing');
-    }
-  } else {
-    console.warn('[ParametersList] Invalid paramsData object');
-  }
+  // Validate parameters data with optional chaining
+  // paramsData structure: { parameters: [...], total: N, page: N, has_more: bool }
+  const parameters = paramsData?.parameters || [];
+  const total = paramsData?.total || 0;
 
   // 处理参数点击 - 打开详情抽屉
   const handleParameterClick = useCallback((param) => {
@@ -193,18 +181,18 @@ function ParametersList() {
           </div>
         </div>
         <div className="header-actions">
-          <Link to="/parameter-usage" className="btn btn-outline-info">
+          <NavLinkWithGameContext to="/parameter-usage" className="btn btn-outline-info">
             <i className="bi bi-graph-up-arrow"></i>
             使用分析
-          </Link>
-          <Link to="/parameter-history" className="btn btn-outline-dark">
+          </NavLinkWithGameContext>
+          <NavLinkWithGameContext to="/parameter-history" className="btn btn-outline-dark">
             <i className="bi bi-clock-history"></i>
             变更历史
-          </Link>
-          <Link to="/parameter-network" className="btn btn-outline-secondary">
+          </NavLinkWithGameContext>
+          <NavLinkWithGameContext to="/parameter-network" className="btn btn-outline-secondary">
             <i className="bi bi-diagram-3"></i>
             关系网络
-          </Link>
+          </NavLinkWithGameContext>
           <Link to={`/common-params?game_gid=${gameGid}`} className="btn btn-outline-success">
             <i className="bi bi-table"></i>
             进入公参管理
@@ -334,40 +322,44 @@ function ParametersList() {
                 </tr>
               ) : (
                 filteredParameters.map((param, index) => (
-                  <tr
+                  <MemoizedTableRowMemo
                     key={`${param.param_name}-${index}`}
-                    className="parameter-row"
-                    style={{cursor: 'pointer'}}
-                    onClick={() => handleParameterClick(param)}
+                    item={param}
+                    compareKey="param_name"
+                    onClick={handleParameterClick}
                   >
-                    <td><code>{param.param_name}</code></td>
-                    <td>{param.param_name_cn || '-'}</td>
-                    <td>
-                      <Badge variant={getTypeBadgeVariant(param.base_type)}>
-                        {param.base_type}
-                      </Badge>
-                    </td>
-                    <td>{param.events_count || 0}</td>
-                    <td>{param.usage_count || 0}</td>
-                    <td>
-                      {param.is_common ? (
-                        <Badge variant="success">是</Badge>
-                      ) : (
-                        <Badge variant="secondary">否</Badge>
-                      )}
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleParameterClick(param);
-                        }}
-                      >
-                        <i className="bi bi-eye"></i>
-                      </button>
-                    </td>
-                  </tr>
+                    {(param) => (
+                      <>
+                        <td><code>{param.param_name}</code></td>
+                        <td>{param.param_name_cn || '-'}</td>
+                        <td>
+                          <Badge variant={getTypeBadgeVariant(param.base_type)}>
+                            {param.base_type}
+                          </Badge>
+                        </td>
+                        <td>{param.events_count || 0}</td>
+                        <td>{param.usage_count || 0}</td>
+                        <td>
+                          {param.is_common ? (
+                            <Badge variant="success">是</Badge>
+                          ) : (
+                            <Badge variant="secondary">否</Badge>
+                          )}
+                        </td>
+                        <td>
+                          <button
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleParameterClick(param);
+                            }}
+                          >
+                            <i className="bi bi-eye"></i>
+                          </button>
+                        </td>
+                      </>
+                    )}
+                  </MemoizedTableRowMemo>
                 ))
               )}
             </tbody>

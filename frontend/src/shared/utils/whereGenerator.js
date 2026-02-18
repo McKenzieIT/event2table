@@ -82,7 +82,6 @@ function generateCondition(condition) {
       return `${field} IS NOT NULL`;
 
     default:
-      console.warn('[whereGenerator] Unknown operator:', operator);
       return `${field} = '${escapeValue(value)}'`;
   }
 }

@@ -24,9 +24,12 @@
 .search-input {
   flex: 1;
   width: 100%;
-  height: 40px;
-  padding: 10px 16px;
-  font-size: 15px;
+  /* 统一高度为44px，与Input组件一致 */
+  height: 44px;
+  /* 统一padding为var(--space-3) var(--space-4)，与Input组件一致 */
+  padding: var(--space-3) var(--space-4);
+  /* 统一字体大小为var(--text-sm)，与Input组件一致 */
+  font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--text-primary, #F1F5F9);
   background: var(--bg-elevated, rgba(22, 27, 34, 0.6));
@@ -35,6 +38,7 @@
   outline: none;
   transition: all var(--transition-base, 200ms cubic-bezier(0.4, 0, 0.2, 1));
   font-family: var(--font-family-base, -apple-system, BlinkMacSystemFont, sans-serif);
+  box-sizing: border-box; /* 确保box-sizing一致 */
 }
 
 .search-input:focus {
@@ -53,11 +57,16 @@
 /* 搜索图标 */
 .search-icon {
   position: absolute;
-  left: 12px;
+  /* 统一左偏移为var(--space-4) (16px)，与Input组件一致 */
+  left: var(--space-4);
   color: var(--text-tertiary, #64748B);
   pointer-events: none;
   display: flex;
   align-items: center;
+  justify-content: center;
+  /* 统一图标尺寸为24px，与Input组件一致 */
+  width: 24px;
+  height: 24px;
   justify-content: center;
   width: 20px;
   height: 20px;

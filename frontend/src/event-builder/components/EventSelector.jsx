@@ -4,7 +4,7 @@
  */
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchEvents } from '@shared/api/eventNodeBuilderApi';
+import { fetchEvents } from '@shared/api/events';
 import { SearchInput } from '@shared/ui';
 
 export default function EventSelector({ gameGid, onSelect, selectedEvent }) {

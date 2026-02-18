@@ -7,7 +7,8 @@
 
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Modal, Button, Input, useToast } from '@shared/ui';
+import { BaseModal } from '@shared/ui/BaseModal/BaseModal';
+import { Button, Input, useToast } from '@shared/ui';
 import { useGameStore } from '../../stores/gameStore';
 import './AddGameModal.css';
 
@@ -126,11 +127,14 @@ const AddGameModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal
+    <BaseModal
       isOpen={isOpen}
       onClose={handleClose}
       title="添加游戏"
-      size="md"
+      animation="slideUp"
+      glassmorphism
+      size="lg"
+      variant="default"
       className="add-game-modal"
     >
       <div className="add-game-modal__content">
@@ -232,7 +236,7 @@ const AddGameModal = ({ isOpen, onClose }) => {
           </Button>
         </div>
       </div>
-    </Modal>
+    </BaseModal>
   );
 };
 

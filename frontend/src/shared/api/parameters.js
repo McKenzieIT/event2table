@@ -38,13 +38,14 @@
  *
  * @param {number} gameGid - 游戏GID
  * @param {FetchParametersOptions} options - 查询选项
- * @returns {Promise<Parameter[]>} 参数列表
+ * @returns {Promise<ParameterResponse>} 参数响应对象 (包含 data.parameters, data.total 等)
  * @throws {Error} 当API响应无效或请求失败时
  *
  * @example
  * // 获取游戏的第一个参数
- * const params = await fetchAllParameters(10000147, { page: 1, limit: 20 });
- * console.log(params[0].param_name); // "zone_id"
+ * const response = await fetchAllParameters(10000147, { page: 1, limit: 20 });
+ * const paramName = response.parameters[0].param_name;
+ * const total = response.total;
  */
 export async function fetchAllParameters(gameGid, options = {}) {
   const {
@@ -69,19 +70,20 @@ export async function fetchAllParameters(gameGid, options = {}) {
     throw new Error(`Failed to fetch parameters: ${response.statusText}`);
   }
 
-  const data = /** @type {ParameterResponse} */ (await response.json());
+  const result = /** @type {ParameterResponse} */ (await response.json());
 
   // 显式验证响应结构
-  if (!data.success) {
-    throw new Error(data.message || 'Parameters API request failed');
+  if (!result.success) {
+    throw new Error(result.message || 'Parameters API request failed');
   }
 
-  // API返回结构: { success: true, data: { parameters: [...], has_more, page } }
-  if (!data.data || !Array.isArray(data.data.parameters)) {
+  // API返回结构: { success: true, data: { parameters: [...], total, page, has_more } }
+  if (!result.data || !Array.isArray(result.data.parameters)) {
     throw new Error('Invalid API response: data.data.parameters is not an array');
   }
 
-  return data.data.parameters;
+  // 返回完整响应对象，包含 data.parameters, data.total, data.page, data.has_more
+  return result.data;
 }
 
 /**
@@ -111,8 +113,8 @@ export async function fetchAllParameters(gameGid, options = {}) {
  * @example
  * // 获取参数详情
  * const details = await fetchParameterDetails('zone_id', 10000147);
- * console.log(details.total_usage); // 15
- * console.log(details.usage_in_events.length); // 5个事件使用
+ * const usage = details.total_usage;
+ * const eventCount = details.usage_in_events.length;
  */
 export async function fetchParameterDetails(paramName, gameGid) {
   const response = await fetch(

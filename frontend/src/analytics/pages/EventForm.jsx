@@ -47,15 +47,22 @@ function EventForm() {
   const [errors, setErrors] = React.useState({});
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  // Fetch categories for dropdown
+  // Fetch categories for dropdown (requires game_gid)
+  const gameGid = searchParams.get('game_gid');
   const { data: categoriesData } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ['categories', gameGid],
     queryFn: async () => {
-      const response = await fetch('/api/categories');
+      if (!gameGid) {
+        // Return empty categories if no game selected
+        return { data: [] };
+      }
+
+      const response = await fetch(`/api/categories?game_gid=${gameGid}`);
       if (!response.ok) throw new Error('获取分类失败');
       const result = await response.json();
       return result;
-    }
+    },
+    enabled: !!gameGid // Only run query if gameGid exists
   });
 
   // Fetch event data (edit mode)
@@ -195,7 +202,7 @@ function EventForm() {
         </Button>
       </div>
 
-      <Card className="event-form-card">
+      <Card className="event-form-card" padding="reset">
         <form onSubmit={handleSubmit} className="event-form">
           {errors.submit && (
             <div className="form-error-alert">

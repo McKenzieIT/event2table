@@ -55,10 +55,9 @@ const hiveFunctions = [
  *
  * @constant {SQLDialect}
  */
-const hiveSQL = new SQLDialect({
-  dialect: 'Hive',
-  keywords: hiveKeywords,
-  functions: hiveFunctions
+const hiveSQL = SQLDialect.define({
+  keywords: hiveKeywords.join(' '),
+  types: "BIGINT BINARY BOOLEAN DECIMAL DOUBLE FLOAT INT SMALLINT TIMESTAMP TINYINT VARCHAR STRING DATE"
 });
 
 /**
@@ -216,7 +215,7 @@ export function getBasicExtensions(readonly = false) {
  *
  * @example
  * const state = getEditorConfig('-- HQL here', false, (value) => {
- *   console.log('Content changed:', value);
+ *   // handle content change
  * });
  */
 export function getEditorConfig(value, readonly = false, onChange) {

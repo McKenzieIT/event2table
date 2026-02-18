@@ -7,6 +7,7 @@ export { default as Button } from './Button/Button';
 
 // Card Components
 export { default as Card } from './Card/Card';
+export { CardBody, CardHeader, CardFooter } from './Card/Card';
 
 // Form Components
 export { default as Input } from './Input/Input';
@@ -24,7 +25,8 @@ export { default as Table } from './Table/Table';
 
 // Feedback Components
 export { ToastProvider, useToast } from './Toast/Toast';
-export { default as Modal } from './Modal/Modal';
+export { BaseModal } from './BaseModal/BaseModal';
+export { default as Modal } from './BaseModal/BaseModal';
 
 // Special Components
 export { SelectGamePrompt } from './SelectGamePrompt';

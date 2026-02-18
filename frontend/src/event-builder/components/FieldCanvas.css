@@ -484,6 +484,23 @@
   z-index: 1000;
 }
 
+/* Drop animation (replaces JavaScript DOM manipulation) */
+@keyframes dropBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.field-item.drop-animation {
+  animation: dropBounce 0.5s ease-out;
+}
+
 /* Selection state */
 .field-item.selected {
   background: rgba(102, 126, 234, 0.2);

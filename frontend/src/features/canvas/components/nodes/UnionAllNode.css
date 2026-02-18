@@ -1,47 +1,50 @@
+/* Union All Node - Cyberpunk Terminal Style */
+
 .union-all-node {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, var(--warning), #d97706);
   border: 2px solid #b45309;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   min-width: 160px;
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
 }
 
 .union-all-node .node-header {
   background: rgba(255, 255, 255, 0.1);
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .union-all-node .node-icon {
-  font-size: 18px;
+  font-size: var(--text-lg);
 }
 
 .union-all-node .node-title {
   color: white;
-  font-weight: 600;
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
 }
 
 .union-all-node .node-body {
-  padding: 12px;
+  padding: var(--space-3);
   color: white;
 }
 
 .union-all-node .node-description {
-  font-size: 12px;
+  font-size: var(--text-xs);
   opacity: 0.9;
 }
 
 .union-all-node .input-port {
-  background: #fbbf24;
+  background: var(--warning);
   border: 2px solid #f59e0b;
 }
 
 .union-all-node .output-port {
-  background: #10b981;
+  background: var(--success);
   border: 2px solid #059669;
 }

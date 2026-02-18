@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { Button, Card, Spinner } from "@shared/ui";
-import { useToast } from "@shared/ui";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Card, Spinner, useToast } from "@shared/ui";
+import { useGameContext } from "@shared/hooks/useGameContext";
 import "./Generate.css";
 
 /**
@@ -20,15 +20,19 @@ function Generate() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const navigate = useNavigate();
 
   const { success, error: toastError } = useToast();
+  const { currentGameGid } = useGameContext();
 
   // 加载事件列表
   useEffect(() => {
+    // Priority: useGameContext > localStorage
+    const gameGid = currentGameGid || localStorage.getItem("selectedGameGid") || "10000147";
+    
     const fetchEvents = async () => {
       setIsLoadingEvents(true);
       try {
-        const gameGid = localStorage.getItem("selectedGameGid") || "10000147";
         const response = await fetch(`/api/events?game_gid=${gameGid}`);
 
         if (!response.ok) {
@@ -53,7 +57,7 @@ function Generate() {
     };
 
     fetchEvents();
-  }, [toastError]);
+  }, [toastError, currentGameGid]);
 
   // 使用 useCallback 优化事件处理
   const handleEventSelect = useCallback((eventName) => {
@@ -89,7 +93,7 @@ function Generate() {
       if (result.success) {
         success("HQL生成成功");
         // 跳转到结果页面
-        window.location.href = `/#/generate-result?event=${selectedEvent}`;
+        navigate(`/generate-result?event=${selectedEvent}`);
       } else {
         toastError(result.error || "HQL生成失败");
       }

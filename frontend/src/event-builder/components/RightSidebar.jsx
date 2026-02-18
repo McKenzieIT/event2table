@@ -10,7 +10,7 @@ import StatsPanel from './StatsPanel';
 
 export default function RightSidebar({
   gameGid,
-  selectedEvent,
+  selectedEvent = null,
   fields = [],
   whereConditions = [],
   onWhereConditionsChange,
@@ -43,17 +43,13 @@ RightSidebar.propTypes = {
   gameGid: PropTypes.number.isRequired,
   selectedEvent: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired
+    event_name: PropTypes.string,  // 英文事件名
+    event_name_cn: PropTypes.string,  // 中文事件名
+    display_name: PropTypes.string,  // 显示名称
   }),
   fields: PropTypes.arrayOf(PropTypes.object),
   whereConditions: PropTypes.arrayOf(PropTypes.object),
   onWhereConditionsChange: PropTypes.func.isRequired,
   onShowWhereModal: PropTypes.func.isRequired,
   onShowHQLDetails: PropTypes.func
-};
-
-RightSidebar.defaultProps = {
-  fields: [],
-  whereConditions: [],
-  selectedEvent: null
 };

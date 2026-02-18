@@ -26,7 +26,7 @@
  * />
  */
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './SearchInput.css';
 
 /**
@@ -60,40 +60,42 @@ function SearchInput({
   const [isFocused, setIsFocused] = useState(false);
   const [showClearButton, setShowClearButton] = useState(false);
   const [internalValue, setInternalValue] = useState(value);
+  
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 300ms防抖实现
-  const debounce = useCallback((fn: Function) => {
-    const timeoutRef = useRef<NodeJS.Timeout>();
-
-    return (...args: any[]) => {
+  // 使用useEffect处理防抖
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    if (onChange && internalValue !== value) {
+      timeoutRef.current = setTimeout(() => {
+        onChange(internalValue);
+      }, debounceMs);
+    }
+    
+    return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      timeoutRef.current = setTimeout(() => {
-        fn(...args);
-        timeoutRef.current = null;
-      }, debounceMs);
     };
-  }, [debounceMs]);
+  }, [internalValue, debounceMs, onChange]);
 
-  // 处理输入变化（带防抖）
-  const debouncedOnChange = useCallback(
-    (newValue: string) => {
-      setInternalValue(newValue);
-      setShowClearButton(newValue.length > 0);
-      debounce.onChange?.(newValue);
-    },
-    [debounce, debounce.onChange]
-  );
+  // 处理输入变化
+  const handleChange = useCallback((newValue: string) => {
+    setInternalValue(newValue);
+    setShowClearButton(newValue.length > 0);
+  }, []);
 
   // 处理清除操作
   const handleClear = useCallback(() => {
     setInternalValue('');
     setShowClearButton(false);
     onClear?.();
-    debounce.onChange?.('');
+    onChange?.('');
     inputRef.current?.focus();
-  }, [onClear, debounce.onChange]);
+  }, [onClear, onChange]);
 
   // 处理焦点变化
   const handleFocus = useCallback(() => {
@@ -134,7 +136,7 @@ function SearchInput({
   return (
     <div className={wrapperClass}>
       {/* 搜索图标 */}
-      {icon && <div className="search-icon">{<SearchIcon />}</div>}
+      {SearchIcon && <div className="search-icon">{<SearchIcon />}</div>}
 
       {/* 输入框 */}
       <input
@@ -143,7 +145,7 @@ function SearchInput({
         className={inputClass}
         placeholder={placeholder}
         value={internalValue}
-        onChange={(e) => debouncedOnChange(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         onFocus={handleFocus}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}

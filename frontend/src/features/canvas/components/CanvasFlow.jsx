@@ -106,7 +106,6 @@ export default function CanvasFlow({ gameData, flowId }) {
             if (data.edges) {
                 setEdges(data.edges || []);
             }
-            console.log('[CanvasFlow] Flow loaded:', flowId, data);
         }
     }, [flowData, flowError, flowId, setNodes, setEdges, toastWarning]);
 
@@ -155,14 +154,11 @@ export default function CanvasFlow({ gameData, flowId }) {
 
     // 连接节点
     const onConnect = useCallback((params) => {
-        console.log('[CanvasFlow] Connecting nodes:', params);
         setEdges((eds) => addEdge(params, eds));
     }, []);
 
     // 节点双击 - 编辑配置
     const onNodeDoubleClick = useCallback((event, node) => {
-        console.log('[CanvasFlow] Node double-clicked:', node);
-
         // 处理JOIN节点双击
         if (node.type === 'join') {
             setSelectedNode(node);
@@ -189,7 +185,6 @@ export default function CanvasFlow({ gameData, flowId }) {
 
     // 节点点击 - 显示属性面板
     const onNodeClick = useCallback((event, node) => {
-        console.log('[CanvasFlow] Node clicked:', node);
         setSelectedForProperties(node);
         setShowPropertiesPanel(true);
     }, []);
@@ -203,13 +198,10 @@ export default function CanvasFlow({ gameData, flowId }) {
                     : node
             )
         );
-        console.log('[CanvasFlow] Node updated from properties panel:', nodeId, updates);
     }, [setNodes]);
 
     // 从属性面板打开配置
     const openConfigFromProperties = useCallback((node) => {
-        console.log('[CanvasFlow] Opening config from properties panel:', node);
-
         // 处理JOIN节点
         if (node.type === 'join') {
             setSelectedNode(node);
@@ -243,8 +235,6 @@ export default function CanvasFlow({ gameData, flowId }) {
                     : node
             )
         );
-
-        console.log('[CanvasFlow] JOIN config applied:', config);
     }, [selectedNode, setNodes]);
 
     // 删除选中节点（带级联删除）
@@ -276,7 +266,6 @@ export default function CanvasFlow({ gameData, flowId }) {
             setNodes(result.nodes);
             setEdges(result.edges);
 
-            console.log('[CanvasFlow] Cascade delete completed:', result.summary);
             toastSuccess(`已删除 ${result.summary.deletedNodes} 个节点和 ${result.summary.deletedEdges} 条连接`);
         }
     }, [nodes, edges, setNodes, setEdges, toastWarning, toastSuccess]);

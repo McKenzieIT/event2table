@@ -1,9 +1,12 @@
+/* Not Found - Cyberpunk Terminal Style */
+
 .not-found-container {
   min-height: 60vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-6);
+  animation: fadeInUp var(--transition-slow) ease-out;
 }
 
 .not-found-content {
@@ -12,20 +15,29 @@
 }
 
 .error-code {
-  font-size: 8rem;
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: var(--text-8xl);
+  font-weight: var(--font-black);
   line-height: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--cyan-300) 0%, var(--violet-300) 50%, var(--cyan-400) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: var(--space-4);
+  letter-spacing: -0.02em;
 }
 
 .not-found-content h1 {
-  font-size: 2rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
   margin-bottom: var(--space-2);
+}
+
+.not-found-content p {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
 }
 
 .not-found-actions {
@@ -38,10 +50,12 @@
 .help-text {
   margin-top: var(--space-8);
   padding-top: var(--space-6);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-default);
 }
 
 .help-text p {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
   margin-bottom: var(--space-2);
 }
 
@@ -54,11 +68,12 @@
 
 .help-text li {
   padding: var(--space-1) 0;
-  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  color: var(--text-tertiary);
 }
 
 .help-text li::before {
   content: "→";
   margin-right: var(--space-2);
-  color: #667eea;
+  color: var(--cyan-400);
 }

@@ -5,10 +5,12 @@
 import React, { useState, useEffect } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import CodeMirror from '@uiw/react-codemirror';
 import './HQLPreviewModal.css';
 import { BaseModal } from '@shared/ui/BaseModal';
 import PerformanceIndicator from '../HQLPreviewV2/PerformanceIndicator';
 import DebugViewer from '../HQLPreviewV2/DebugViewer';
+import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
 
 export default function HQLPreviewModal({
   isOpen,
@@ -60,14 +62,34 @@ export default function HQLPreviewModal({
 
   // V2 API 调用函数
   const generateHQLWithV2API = async () => {
+    // Validate selectedEvent before making API call
+    if (!selectedEvent || !selectedEvent.id) {
+      setApiError('请先选择事件');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!canvasFields || canvasFields.length === 0) {
+      setApiError('请至少添加一个字段');
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setApiError(null);
 
     try {
       // 转换字段格式为V2 API期望的格式
+      // 字段类型映射：basic -> base (V2 API期望base而不是basic)
+      const normalizeFieldType = (type) => {
+        if (!type) return 'base';
+        if (type === 'basic') return 'base';  // V2 API使用base
+        return type;
+      };
+
       const v2Fields = canvasFields.map(field => ({
         fieldName: field.field_name || field.name,
-        fieldType: field.field_type || field.type || 'base',
+        fieldType: normalizeFieldType(field.field_type || field.type),
         jsonPath: field.json_path,
         customExpression: field.custom_expression,
         alias: field.alias
@@ -245,38 +267,52 @@ export default function HQLPreviewModal({
 
           {/* 编辑器 */}
           <div className="editor-container">
-            <div className="line-numbers">
-              {currentHQL.split('\n').map((_, i) => (
-                <div key={i}>{i + 1}</div>
-              ))}
-            </div>
-            <div className="code-editor">
-              {isEditing ? (
-                <textarea
-                  className="code-textarea"
+            {isEditing ? (
+              // ✅ 编辑模式：使用CodeMirror组件，带语法高亮和深色主题
+              <div className="code-editor code-editor-editing">
+                <CodeMirror
                   value={currentHQL}
-                  onChange={(e) => setCurrentHQL(e.target.value)}
-                  spellCheck={false}
+                  height="100%"
+                  extensions={getBasicExtensions(false)}
+                  onChange={(value) => setCurrentHQL(value)}
+                  basicSetup={{
+                    lineNumbers: true,
+                    highlightSpecialChars: true,
+                    foldGutter: true,
+                    dropCursor: true,
+                    allowMultipleSelections: true,
+                    indentOnInput: true
+                  }}
                 />
-              ) : (
-                <div className="code-display">
-                  <SyntaxHighlighter
-                    language="sql"
-                    style={vscDarkPlus}
-                    showLineNumbers={false}
-                    customStyle={{
-                      background: 'transparent',
-                      padding: 0,
-                      margin: 0,
-                      fontSize: '0.875rem',
-                      fontFamily: "'JetBrains Mono', 'Courier New', monospace"
-                    }}
-                  >
-                    {currentHQL}
-                  </SyntaxHighlighter>
+              </div>
+            ) : (
+              // ✅ 预览模式：使用SyntaxHighlighter
+              <>
+                <div className="line-numbers">
+                  {currentHQL.split('\n').map((_, i) => (
+                    <div key={i}>{i + 1}</div>
+                  ))}
                 </div>
-              )}
-            </div>
+                <div className="code-editor">
+                  <div className="code-display">
+                    <SyntaxHighlighter
+                      language="sql"
+                      style={vscDarkPlus}
+                      showLineNumbers={false}
+                      customStyle={{
+                        background: 'transparent',
+                        padding: 0,
+                        margin: 0,
+                        fontSize: '0.875rem',
+                        fontFamily: "'JetBrains Mono', 'Courier New', monospace"
+                      }}
+                    >
+                      {currentHQL}
+                    </SyntaxHighlighter>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* 字段映射表 */}

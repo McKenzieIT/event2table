@@ -1,11 +1,13 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useReactFlow } from "reactflow";
 import { Button, useToast } from "@shared/ui";
+import { ConfirmDialog } from "@shared/ui/ConfirmDialog/ConfirmDialog";
 import "./Toolbar.css";
 
 export default function Toolbar({ gameData, onExecute, onLocateNodes }) {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { success: toastSuccess, error: toastError, warning: toastWarning } = useToast();
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
 
   // 删除选中的节点
   const deleteSelected = useCallback(() => {
@@ -15,23 +17,35 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }) {
       return;
     }
 
-    if (confirm(`确定要删除 ${selectedNodes.length} 个节点吗？`)) {
-      const selectedIds = new Set(selectedNodes.map((n) => n.id));
-      setNodes((nodes) => nodes.filter((n) => !selectedIds.has(n.id)));
-      setEdges((edges) =>
-        edges.filter(
-          (e) => !selectedIds.has(e.source) && !selectedIds.has(e.target),
-        ),
-      );
-    }
+    setConfirmState({
+      open: true,
+      title: '确认删除节点',
+      message: `确定要删除 ${selectedNodes.length} 个节点吗？`,
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        const selectedIds = new Set(selectedNodes.map((n) => n.id));
+        setNodes((nodes) => nodes.filter((n) => !selectedIds.has(n.id)));
+        setEdges((edges) =>
+          edges.filter(
+            (e) => !selectedIds.has(e.source) && !selectedIds.has(e.target),
+          ),
+        );
+      }
+    });
   }, [getNodes, setNodes, setEdges, toastWarning]);
 
   // 清空画布
   const clearCanvas = useCallback(() => {
-    if (confirm("确定要清空画布吗？此操作不可撤销。")) {
-      setNodes([]);
-      setEdges([]);
-    }
+    setConfirmState({
+      open: true,
+      title: '确认清空画布',
+      message: '确定要清空画布吗？此操作不可撤销。',
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        setNodes([]);
+        setEdges([]);
+      }
+    });
   }, [setNodes, setEdges]);
 
   // 保存流程
@@ -105,7 +119,6 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }) {
         toastError(`保存失败: ${result.message || result.error}`);
       }
     } catch (error) {
-      console.error("Save flow error:", error);
       toastError(`保存失败: ${error.message}`);
     }
   }, [getNodes, getEdges, gameData, toastWarning, toastSuccess, toastError]);
@@ -156,27 +169,32 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }) {
       if (result.success) {
         // 显示HQL结果
         const hqlWindow = window.open("", "_blank", "width=800,height=600");
-        hqlWindow.document.write(`
-                    <html>
-                        <head>
-                            <title>HQL生成结果</title>
-                            <style>
-                                body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
-                                pre { background: #2d2d2d; padding: 20px; border-radius: 8px; overflow-x: auto; }
-                                h1 { color: #4ec9b0; }
-                            </style>
-                        </head>
-                        <body>
-                            <h1>🎉 HQL生成成功</h1>
-                            <pre>${result.data.hql || "无HQL内容"}</pre>
-                        </body>
-                    </html>
-                `);
+        if (hqlWindow) {
+          const doc = hqlWindow.document;
+          doc.open();
+          doc.write(`
+            <html>
+              <head>
+                <title>HQL生成结果</title>
+                <style>
+                  body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+                  pre { background: #2d2d2d; padding: 20px; border-radius: 8px; overflow-x: auto; }
+                  h1 { color: #4ec9b0; }
+                </style>
+              </head>
+              <body>
+                <h1>HQL生成成功</h1>
+                <pre></pre>
+              </body>
+            </html>
+          `);
+          doc.querySelector('pre').textContent = result.data.hql || '无HQL内容';
+          doc.close();
+        }
       } else {
         toastError(`生成失败: ${result.message}`);
       }
     } catch (error) {
-      console.error("Generate HQL error:", error);
       toastError("生成失败，请检查网络连接");
     }
   }, [getNodes, getEdges, toastWarning, toastError]);
@@ -184,7 +202,6 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }) {
   // 适应视图
   const fitView = useCallback(() => {
     // ReactFlow的Controls组件已包含此功能
-    console.log("[Toolbar] Fit view requested");
   }, []);
 
   return (
@@ -247,6 +264,17 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }) {
         <span>节点: {getNodes().length}</span>
         <span>连接: {getEdges().length}</span>
       </div>
+
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText="确认"
+        cancelText="取消"
+        variant="danger"
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+      />
     </div>
   );
 }

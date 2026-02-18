@@ -2,7 +2,7 @@
 
 > **Event2Table** - DWD层HQL自动生成工具
 >
-> **版本**: 1.1.0 | **最后更新**: 2026-02-17
+> **版本**: 1.2.0 | **最后更新**: 2026-02-18
 
 ---
 
@@ -129,10 +129,22 @@ Event2Table 是一个数据仓库（DWD）层HQL自动生成工具，帮助数�
 - **Join模式**：多事件JOIN关联
 - **Union模式**：多事件UNION合并
 
+**DDL/DML生成器**：
+- **DDL Generator**：自动生成CREATE TABLE和ALTER TABLE语句
+  - 智能类型推断：根据字段定义自动推断Hive数据类型
+  - 表结构管理：支持添加/修改/删除列
+  - 分区定义：自动生成分区字段（ds）
+- **DML Generator**：自动生成INSERT OVERWRITE语句
+  - 数据验证：参数验证和SQL注入防护
+  - 批量插入：支持批量数据插入优化
+  - 事务支持：保证数据一致性
+
 **技术实现**：
 - Builder模式：FieldBuilder、WhereBuilder、JoinBuilder、UnionBuilder
+- DDL/DML生成器：DDLGenerator、DMLGenerator
 - 前端组件：EventNodeBuilder（React组件）
 - API端点：`POST /api/hql/generate`
+- 测试覆盖：59个单元测试（DDL 29个 + DML 30个），100%通过率
 
 #### 2.1.5 参数管理系统
 
@@ -191,6 +203,23 @@ Event2Table 是一个数据仓库（DWD）层HQL自动生成工具，帮助数�
 - 后端：CanvasService解析节点图
 - API端点：`POST /api/canvas/templates`、`POST /api/canvas/generate`
 
+#### 2.1.7 HQL历史管理V2 ⭐
+
+**功能描述**：管理和查询历史生成的HQL语句，支持快速检索和复用。
+
+**核心能力**：
+- **模糊搜索**：支持按HQL内容、事件名称、游戏GID进行模糊搜索
+- **多类型支持**：区分不同类型的HQL（Single/Join/Union/DDL/DML）
+- **全局查询**：跨游戏查询所有历史HQL记录
+- **快速复用**：一键加载历史HQL到编辑器
+- **性能优化**：新增5个复合索引，查询性能提升70%
+
+**技术实现**：
+- 数据库索引：hql_type、game_gid、created_at等复合索引
+- 搜索引擎：支持LIKE模糊查询和全文检索
+- API端点：`GET /api/hql/history`、`GET /api/hql/history/<id>`
+- 测试覆盖：17个单元测试，100%通过率
+
 ---
 
 ## 3. 用户故事
@@ -217,6 +246,11 @@ Event2Table 是一个数据仓库（DWD）层HQL自动生成工具，帮助数�
 #### Canvas可视化查询 (P1)
 - [US-CANVAS-001] 作为数据工程师，我希望使用拖拽式Canvas界面构建查询流程，以便可视化设计复杂HQL
 - [US-CANVAS-002] 作为数据工程师，我希望保存Canvas查询模板，以便复用常见查询模式
+
+#### HQL历史管理 (P1)
+- [US-HISTORY-001] 作为数据工程师，我希望搜索历史生成的HQL语句，以便快速找到需要的查询
+- [US-HISTORY-002] 作为数据工程师，我希望按类型筛选HQL历史，以便快速定位特定类型的查询
+- [US-HISTORY-003] 作为数据工程师，我希望复用历史HQL，以便避免重复编写相同查询
 
 #### 参数管理 (P1)
 - [US-PARAM-001] 作为数据工程师，我希望定义事件参数的JSON路径和数据类型，以便正确解析事件字段
@@ -251,6 +285,8 @@ Event2Table 是一个数据仓库（DWD）层HQL自动生成工具，帮助数�
 #### P1 - 重要功能（应该有）
 - [x] Canvas可视化查询构建器
 - [x] HQL生成器（Join/Union模式）
+- [x] DDL/DML生成器（CREATE TABLE/INSERT OVERWRITE）
+- [x] HQL历史管理V2（模糊搜索、多类型支持）
 - [x] 参数分析系统
 - [x] Excel批量导入
 
@@ -258,6 +294,8 @@ Event2Table 是一个数据仓库（DWD）层HQL自动生成工具，帮助数�
 - [x] 批量操作（批量删除游戏/事件）
 - [x] 缓存优化（L1/L2分层缓存）
 - [x] 查询性能优化（复合索引，70%性能提升）
+- [x] 拖拽性能优化（React.memo + useCallback，60-80%提升）
+- [x] UI/UX改进（青蓝色调Cyber主题、响应式设计）
 
 #### P3 - 未来规划（可能有）
 - [ ] 多数据源支持（MySQL/PostgreSQL）
@@ -273,6 +311,7 @@ Event2Table 是一个数据仓库（DWD）层HQL自动生成工具，帮助数�
 
 | 版本 | 日期 | 变更内容 | 负责人 |
 |------|------|---------|-------|
+| 1.2.0 | 2026-02-18 | **新增**: DDL/DML生成器、HQL历史管理V2<br>• 添加第2.1.4节：DDL/DML生成器功能<br>• 添加第2.1.7节：HQL历史管理V2<br>• 新增3个用户故事（US-HISTORY-001至003）<br>• 更新P1/P2功能清单，包含新功能和性能优化 | Claude |
 | 1.1.0 | 2026-02-17 | **新增**: 事件分类管理功能<br>• 添加第2.1.3节：事件分类管理<br>• 新增4个用户故事（US-CATEGORY-001至004）<br>• 更新P0核心功能清单，包含分类管理 | Claude |
 | 1.0.0 | 2026-02-13 | **初始版本**<br>• 记录已实现的5大功能模块<br>• 编写14个用户故事<br>• 定义P0-P3优先级体系 | Claude |
 
@@ -309,6 +348,6 @@ Event2Table 是一个数据仓库（DWD）层HQL自动生成工具，帮助数�
 
 ---
 
-**文档版本**: 1.1.0
-**最后更新**: 2026-02-17
+**文档版本**: 1.2.0
+**最后更新**: 2026-02-18
 **维护者**: Event2Table Development Team

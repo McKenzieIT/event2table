@@ -65,7 +65,7 @@
  * @example
  * // 获取第一页事件列表
  * const events = await fetchEvents(10000147, 1, '');
- * console.log(events[0].display_name); // "登录事件"
+ * const firstEventName = events[0].display_name;
  */
 export const fetchEvents = (gameGid, page = 1, search = '') => {
   const params = new URLSearchParams({
@@ -78,7 +78,7 @@ export const fetchEvents = (gameGid, page = 1, search = '') => {
     params.append('search', search);
   }
 
-  return fetch(`/event_node_builder/api/events?${params}`)
+  return fetch(`/api/events?${params}`)
     .then(r => {
       if (!r.ok) {
         throw new Error(`Failed to fetch events: ${r.statusText}`);
@@ -120,7 +120,7 @@ export const fetchEvents = (gameGid, page = 1, search = '') => {
  * @example
  * // 获取事件的参数列表
  * const params = await fetchParams(123);
- * console.log(params[0].param_name); // "zone_id"
+ * const firstParam = params[0].param_name;
  */
 export const fetchParams = (eventId) => {
   return fetch(`/event_node_builder/api/params?event_id=${eventId}`)
@@ -172,7 +172,7 @@ export const fetchParams = (eventId) => {
  *   fields: [{ field_name: 'zone_id', display_name: '区服ID', data_type: 'int', is_required: true }],
  *   where_conditions: []
  * });
- * console.log(preview.hql); // "CREATE OR REPLACE VIEW..."
+ * const hql = preview.hql;
  */
 export const previewHQL = (data) => {
   return fetch('/event_node_builder/api/preview-hql', {
@@ -227,7 +227,7 @@ export const previewHQL = (data) => {
  *   fields: [],
  *   where_conditions: []
  * });
- * console.log(config.id); // 新配置ID
+ * const newConfigId = config.id;
  */
 export const saveConfig = (configData) => {
   return fetch('/event_node_builder/api/save', {
@@ -264,7 +264,7 @@ export const saveConfig = (configData) => {
  * @example
  * // 更新配置
  * const updated = await updateConfig(456, { name_cn: '新名称' });
- * console.log(updated.name_cn); // "新名称"
+ * const newName = updated.name_cn;
  */
 export const updateConfig = (configId, configData) => {
   // configId应该作为node_id放在请求体中，而不是路径参数
@@ -303,7 +303,7 @@ export const updateConfig = (configId, configData) => {
  * @example
  * // 加载配置
  * const config = await loadConfig(456);
- * console.log(config.name_cn); // "登录事件"
+ * const configName = config.name_cn;
  */
 export const loadConfig = (configId) => {
   return fetch(`/event_node_builder/api/load/${configId}`)
@@ -337,7 +337,7 @@ export const loadConfig = (configId) => {
  * @example
  * // 获取第一页配置列表
  * const configs = await fetchConfigList(10000147, 1, 20);
- * console.log(configs.length); // 20
+ * const configCount = configs.length;
  */
 export const fetchConfigList = (gameGid, page = 1, limit = 20) => {
   return fetch(`/event_node_builder/api/list?game_gid=${gameGid}&page=${page}&limit=${limit}`)
@@ -372,7 +372,7 @@ export const fetchConfigList = (gameGid, page = 1, limit = 20) => {
  * @example
  * // 删除配置
  * const result = await deleteConfig(456);
- * console.log(result.message); // "Config deleted successfully"
+ * const message = result.message;
  */
 export const deleteConfig = (configId) => {
   return fetch(`/event_node_builder/api/delete/${configId}`, {
@@ -406,7 +406,7 @@ export const deleteConfig = (configId) => {
  * @example
  * // 复制节点
  * const newNode = await copyNode(456);
- * console.log(newNode.id); // 新节点ID（不同于456）
+ * const newNodeId = newNode.id;
  */
 export const copyNode = (nodeId) => {
   return fetch(`/event_node_builder/api/copy/${nodeId}`, {

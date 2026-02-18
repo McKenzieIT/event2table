@@ -55,8 +55,8 @@ export function useEventNodesTable(
     meta: {
       // 存储额外的meta信息
       updateData: (rowIndex: number, columnId: string, value: unknown) => {
-        // 可选：实现内联编辑
-        console.log('Update data:', rowIndex, columnId, value);
+        // TODO: 实现数据更新逻辑
+        console.log('updateData called:', rowIndex, columnId, value);
       },
     },
   });

@@ -3,9 +3,9 @@
 }
 
 .where-builder-modal {
-  max-width: 900px;
-  width: 90vw;
-  height: 80vh;
+  max-width: 1200px;
+  width: 95vw;
+  height: 90vh;
   display: flex;
   flex-direction: column;
 }
@@ -20,7 +20,9 @@
   background: var(--glass-bg);
   border-radius: var(--border-radius);
   padding: var(--en-space-md);
-  margin-bottom: var(--en-space-lg);
+  margin-bottom: var(--en-space-md);
+  max-height: 25vh;
+  overflow-y: auto;
 }
 
 .where-preview-section .section-header {
@@ -48,6 +50,8 @@
   white-space: pre-wrap;
   word-break: break-all;
   margin: 0;
+  max-height: 20vh;
+  overflow-y: auto;
 }
 
 .mode-toggle {

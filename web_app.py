@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-DWD Generator Web Application
+Event2Table - Data Warehouse HQL Generator
 Main application file that registers all modules
 """
 
@@ -22,13 +22,16 @@ logger = get_logger(__name__)
 # API Blueprints - from backend/api
 from backend.api import api_bp
 from backend.api.routes.hql_preview_v2 import hql_preview_v2_bp  # V2 HQL Preview API
+from backend.api.routes.v1_adapter import v1_adapter_bp  # V1-to-V2 Adapter API (2026-02-17)
 
 # Service Blueprints - from backend/services (standardized package imports)
-from backend.services.games import games_bp
+# NOTE: games_bp routes are now in api_bp (backend.api.routes.games)
+# Old games_bp from backend.services.games has conflicting routes - DO NOT USE
 from backend.services.events import events_bp, event_nodes_bp
 from backend.services.parameters import common_params_bp, parameter_aliases_bp
 from backend.services.canvas import canvas_bp
 from backend.services.cache_monitor import cache_monitor_bp
+from backend.services.event_node_builder import event_node_builder_bp  # Event Node Builder API
 
 # Optional blueprints (may not exist in all deployments)
 try:
@@ -222,7 +225,7 @@ def index():
         return send_from_directory(str(FRONTEND_DIST_DIR), 'index.html')
     except FileNotFoundError:
         return """
-        <h1>DWD Generator - API Server</h1>
+        <h1>Event2Table API</h1>
         <p>Frontend not built. Please run:</p>
         <pre>cd frontend && npm run build</pre>
         <h2>Available API Endpoints:</h2>
@@ -270,6 +273,8 @@ except Exception as e:
 # Note: Register API blueprints first, then React shell as catch-all
 app.register_blueprint(api_bp)  # API endpoints (/api/*)
 app.register_blueprint(hql_preview_v2_bp)  # HQL Preview V2 API (/hql-preview-v2/*)
+app.register_blueprint(v1_adapter_bp)  # V1-to-V2 Adapter API (/api/v1-adapter/*) (2026-02-17)
+app.register_blueprint(event_node_builder_bp)  # Event Node Builder API (/event_node_builder/*)
 if bulk_bp:
     app.register_blueprint(bulk_bp)  # Bulk operations
 app.register_blueprint(cache_monitor_bp)  # Cache monitoring (/admin/cache/*)
@@ -286,9 +291,10 @@ if hql_bp:
     app.register_blueprint(hql_bp)  # HQL management
 
 # Register module blueprints (API endpoints must be registered BEFORE React shell)
-app.register_blueprint(games_bp)
-if categories_bp:
-    app.register_blueprint(categories_bp)
+# NOTE: games_bp routes are now in api_bp (backend.api.routes.games)
+# Old games_bp from backend.services.games has conflicting routes - DO NOT USE
+if react_bp:
+    app.register_blueprint(react_bp)
 app.register_blueprint(events_bp)
 app.register_blueprint(common_params_bp)
 
@@ -439,7 +445,7 @@ def diagnostics():
 
 if __name__ == '__main__':
     logger.info("=" * 80)
-    logger.info("DWD Generator Web Application")
+    logger.info("Event2Table application started")
     logger.info("=" * 80)
     logger.info(f"Database: {get_db_path()}")
     logger.info(f"Output Directory: {OUTPUT_DIR}")

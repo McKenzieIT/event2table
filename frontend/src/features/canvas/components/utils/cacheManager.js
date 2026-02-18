@@ -43,11 +43,9 @@ class CacheManager {
         cacheString
       );
 
-      console.log(`[CacheManager] Set: ${key} (${this._formatSize(cacheString.length)})`);
       return true;
     } catch (e) {
       if (e.name === 'QuotaExceededError') {
-        console.warn('[CacheManager] Storage quota exceeded, clearing old cache...');
         this.clear();
         try {
           localStorage.setItem(this._getKey(key), JSON.stringify({
@@ -82,11 +80,9 @@ class CacheManager {
       // Check if expired
       if (now - cacheData.timestamp > cacheData.duration) {
         this.remove(key);
-        console.log(`[CacheManager] Expired: ${key}`);
         return null;
       }
 
-      console.log(`[CacheManager] Hit: ${key}`);
       return cacheData.data;
     } catch (e) {
       console.error('[CacheManager] Get error:', e);
@@ -109,7 +105,6 @@ class CacheManager {
    */
   remove(key) {
     localStorage.removeItem(this._getKey(key));
-    console.log(`[CacheManager] Remove: ${key}`);
   }
 
   /**
@@ -127,7 +122,6 @@ class CacheManager {
       }
     });
 
-    console.log(`[CacheManager] Clear: ${cleared} items`);
     return cleared;
   }
 
@@ -159,7 +153,6 @@ class CacheManager {
       }
     });
 
-    console.log(`[CacheManager] ClearExpired: ${cleared} items`);
     return cleared;
   }
 
@@ -175,7 +168,6 @@ class CacheManager {
       localStorage.removeItem(testKey);
       return true;
     } catch (e) {
-      console.warn('[CacheManager] Storage quota exceeded');
       return false;
     }
   }

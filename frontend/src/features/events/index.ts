@@ -4,8 +4,8 @@
  * Centralized exports for all events-related functionality
  */
 
-// Types
-export * from './types';
+// Types - use shared types
+export type { Event, Field } from '@shared/types';
 
 // API
 export * from './api';

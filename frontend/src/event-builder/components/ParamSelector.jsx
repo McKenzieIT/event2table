@@ -4,7 +4,7 @@
  */
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchParams } from "@shared/api/eventNodeBuilderApi";
+import { fetchParams } from "@shared/api/eventNodeBuilder";
 import { SearchInput } from "@shared/ui";
 
 export default function ParamSelector({ eventId, onAddField, disabled }) {
@@ -38,30 +38,22 @@ export default function ParamSelector({ eventId, onAddField, disabled }) {
   }, [data]);
 
   // 过滤参数
-  const filteredParams = debouncedSearch
+  const filteredParams = searchQuery
     ? params.filter(
         (p) =>
-          (p.param_name_cn && p.param_name_cn.includes(debouncedSearch)) ||
-          (p.param_name && p.param_name.includes(debouncedSearch)),
+          (p.param_name_cn && p.param_name_cn.includes(searchQuery)) ||
+          (p.param_name && p.param_name.includes(searchQuery)),
       )
     : params;
 
   const handleDoubleClick = (param) => {
-    console.log("[ParamSelector] Double clicked param:", param);
-    console.log(
-      "[ParamSelector] Calling onAddField with:",
-      "param",
-      param.param_name,
-      param.param_name_cn || param.param_name,
-      param.id,
-    );
     onAddField(
       "param",
       param.param_name,
       param.param_name_cn || param.param_name,
       param.id,
+      param.json_path || `$.${param.param_name}`, // 添加 json_path 参数
     );
-    console.log("[ParamSelector] onAddField called completed");
 
     // Add success animation
     const element = document.querySelector(
@@ -76,7 +68,6 @@ export default function ParamSelector({ eventId, onAddField, disabled }) {
   };
 
   const handleDragStart = (e, param) => {
-    console.log("[ParamSelector] Drag started:", param);
     e.dataTransfer.effectAllowed = "copy";
     // 设置多种格式以确保兼容性
     const dragData = {

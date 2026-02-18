@@ -18,6 +18,10 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, './src/shared'),
       '@canvas': path.resolve(__dirname, './src/canvas'),
       '@features': path.resolve(__dirname, './src/features'),
+      '@event-builder': path.resolve(__dirname, './src/event-builder'),
+      '@analytics': path.resolve(__dirname, './src/analytics'),
+      '@canvas-react': path.resolve(__dirname, '../canvas-react/src'),
+      '@types': path.resolve(__dirname, './src/types'),
     }
   }
 });

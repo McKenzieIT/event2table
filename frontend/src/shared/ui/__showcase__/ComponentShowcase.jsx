@@ -18,7 +18,7 @@ import { Button } from '../Button/Button';
 import { Card } from '../Card/Card';
 import { Input } from '../Input/Input';
 import { Table } from '../Table/Table';
-import { Modal } from '../Modal/Modal';
+import { BaseModal } from '../BaseModal/BaseModal';
 import { Badge } from '../Badge/Badge';
 import { useToast, ToastProvider } from '../Toast/Toast';
 import { TextArea } from '../TextArea/TextArea';
@@ -258,22 +258,13 @@ function ComponentShowcaseContent() {
         </div>
       </section>
 
-      <Modal
+      <BaseModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         title="Confirm Action"
+        animation="slideUp"
+        glassmorphism
         size="md"
-        showFooter
-        footerActions={
-          <>
-            <Button variant="ghost" onClick={() => setModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={() => setModalOpen(false)}>
-              Confirm
-            </Button>
-          </>
-        }
       >
         <p style={{ marginBottom: '16px' }}>
           This is a modal dialog with glassmorphism effect and backdrop blur.
@@ -281,7 +272,7 @@ function ComponentShowcaseContent() {
         <p>
           Modals support different sizes (sm, md, lg, xl, full) and variants (default, danger, warning).
         </p>
-      </Modal>
+      </BaseModal>
 
       {/* Toast Section */}
       <section className="showcase-section">

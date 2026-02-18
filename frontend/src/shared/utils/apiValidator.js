@@ -17,9 +17,9 @@
  * @example
  * const validated = validateApiResponse(response, 'Events API');
  * if (validated.success) {
- *   console.log(validated.data); // 安全访问data
+ *   // handle validated.data
  * } else {
- *   console.error(validated.error); // 清晰的错误消息
+ *   // handle validated.error
  * }
  */
 export function validateApiResponse(data, apiName = 'API') {
@@ -64,7 +64,7 @@ export function validateApiResponse(data, apiName = 'API') {
  * @example
  * const validated = validateArrayResponse(data, 'Events API');
  * if (validated.success) {
- *   console.log(validated.data.length); // 安全访问数组
+ *   // handle validated.data
  * }
  */
 export function validateArrayResponse(data, apiName = 'API') {
@@ -96,9 +96,9 @@ export function validateArrayResponse(data, apiName = 'API') {
  * @example
  * try {
  *   const data = assertApiResponse(response, 'Events API');
- *   console.log(data); // 安全访问，无需额外检查
+ *   // use data safely
  * } catch (error) {
- *   console.error(error.message); // 清晰的错误消息
+ *   // handle error.message
  * }
  */
 export function assertApiResponse(data, apiName = 'API') {
@@ -121,7 +121,7 @@ export function assertApiResponse(data, apiName = 'API') {
  *
  * @example
  * const events = assertArrayResponse(data, 'Events API');
- * console.log(events.length); // TypeScript知道这是数组
+ * // TypeScript knows this is an array
  */
 export function assertArrayResponse(data, apiName = 'API') {
   const validated = validateArrayResponse(data, apiName);
@@ -200,7 +200,6 @@ export function validateRequiredFields(obj, requiredFields, objectName = 'Object
  * const params = data?.data || [];
  * if (params.length === 0) {
  *   // 可能是data为undefined，也可能是真的空数组
- *   console.log('No params found');
  * }
  *
  * @example
@@ -208,17 +207,14 @@ export function validateRequiredFields(obj, requiredFields, objectName = 'Object
  * const params = assertArrayResponse(data, 'Parameters API');
  * if (params.length === 0) {
  *   // 现在我们知道是真的空数组
- *   console.log('No params found (verified empty array)');
  * }
  *
  * @example
  * // 带错误处理
  * try {
  *   const events = assertArrayResponse(data, 'Events API');
- *   console.log(`Loaded ${events.length} events`);
  * } catch (error) {
  *   // 错误消息: "Events API response missing 'data' field"
  *   // 或: "Events API response data is not an array"
- *   console.error(error.message);
  * }
  */

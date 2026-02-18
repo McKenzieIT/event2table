@@ -1,29 +1,62 @@
+/* Log Form - Cyberpunk Terminal Style */
+
 .log-form-container {
   padding: var(--space-6);
   max-width: 960px;
   margin: 0 auto;
+  animation: fadeInUp var(--transition-slow) ease-out;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-8);
+  animation: fadeInUp var(--transition-slow) ease-out;
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  background: linear-gradient(135deg, var(--cyan-300) 0%, var(--violet-300) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
 }
 
 .form-card {
   padding: var(--space-8);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-500), transparent);
+  opacity: 0.6;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .form-group {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .form-group label {
@@ -31,23 +64,31 @@
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-2);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
 }
 
 .form-control {
   width: 100%;
-  padding: var(--space-3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--color-text-primary);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-family: var(--font-body);
   font-size: var(--text-base);
+  transition: all var(--transition-base);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  border-color: var(--cyan-500);
+  box-shadow: var(--shadow-glow);
+}
+
+.form-control::placeholder {
+  color: var(--text-placeholder);
 }
 
 .form-hint {
@@ -55,45 +96,52 @@
   align-items: center;
   gap: var(--space-1);
   margin-top: var(--space-1);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  color: var(--text-tertiary);
 }
 
 .is-invalid {
-  border-color: rgba(239, 68, 68, 0.5) !important;
+  border-color: var(--danger) !important;
 }
 
 .invalid-feedback {
-  color: #f87171;
+  color: var(--danger);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   margin-top: var(--space-1);
 }
 
 .form-divider {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--border-default);
   margin: var(--space-6) 0;
 }
 
 .section-title {
-  color: var(--color-primary);
+  font-family: var(--font-display);
   font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--cyan-400);
   margin-bottom: var(--space-2);
 }
 
 .section-description {
-  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  color: var(--text-secondary);
   margin-bottom: var(--space-4);
   font-size: var(--text-sm);
 }
 
 .fields-container {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .field-row {
   margin-bottom: var(--space-4);
   padding: var(--space-4);
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
 }
 
 .field-grid {
@@ -119,8 +167,10 @@
 
 .field-item label {
   margin-bottom: var(--space-2);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
 }
 
 .joinable-logs-container {
@@ -137,18 +187,18 @@
 .alert {
   padding: var(--space-4);
   border-radius: var(--radius-md);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .alert-danger {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  color: var(--danger);
 }
 
 .form-actions {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin-top: var(--space-8);
   justify-content: center;
   padding-top: var(--space-6);
@@ -162,4 +212,5 @@
 .loading {
   text-align: center;
   padding: var(--space-8);
+  color: var(--text-secondary);
 }

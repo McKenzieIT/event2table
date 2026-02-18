@@ -46,6 +46,7 @@ const Input = React.forwardRef(({
   className = '',
   value,
   onChange,
+  onBlur,
   ...props
 }, ref) => {
   const inputId = React.useId();
@@ -89,6 +90,7 @@ const Input = React.forwardRef(({
           disabled={disabled}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           aria-invalid={isInvalid}
           aria-describedby={
             isInvalid ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined

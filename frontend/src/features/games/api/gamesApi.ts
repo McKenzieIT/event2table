@@ -58,7 +58,7 @@ export async function fetchGames(
  * @example
  * ```ts
  * const game = await fetchGameByGid(10000147);
- * console.log(game.game_name); // "Poker"
+ * const gameName = game.game_name;
  * ```
  */
 export async function fetchGameByGid(gameGid: number): Promise<Game> {
@@ -87,7 +87,7 @@ export async function fetchGameByGid(gameGid: number): Promise<Game> {
  * @example
  * ```ts
  * const game = await fetchGameById(1);
- * console.log(game.game_name); // "Poker"
+ * const gameName = game.game_name;
  * ```
  */
 export async function fetchGameById(gameId: number): Promise<Game> {

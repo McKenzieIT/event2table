@@ -22,8 +22,25 @@ common_params_bp = Blueprint("common_params", __name__)
 
 @common_params_bp.route("/api/common-params", methods=["GET"])
 def list_common_params():
-    """API: List all common parameters"""
+    """API: List common parameters for a specific game"""
     try:
+        # Get game_gid from query parameters
+        game_gid = request.args.get('game_gid', type=int)
+
+        logger.info(f"[DEBUG] list_common_params called with game_gid={game_gid}")
+
+        if not game_gid:
+            return json_error_response("game_gid is required", status_code=400)
+
+        # Get game_id from game_gid
+        game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+        if not game:
+            return json_error_response(f"Game {game_gid} not found", status_code=404)
+
+        game_id = game['id']
+        logger.info(f"[DEBUG] Found game_id={game_id} for game_gid={game_gid}")
+
+        # Fetch common params for this game only
         common_params = fetch_all_as_dict("""
             SELECT
                 id,
@@ -36,15 +53,16 @@ def list_common_params():
                 created_at,
                 updated_at
             FROM common_params
+            WHERE game_id = ?
             ORDER BY created_at DESC
-        """)
+        """, (game_id,))
 
         # Map param_type to data_type for frontend compatibility
         for param in common_params:
-            param['data_type'] = param.get('param_type', 'string')
-            param['key'] = param.get('param_name', '')
-            param['name'] = param.get('param_name_cn', param.get('param_name', ''))
-            param['description'] = param.get('param_description', '')
+            param["data_type"] = param.get("param_type", "string")
+            param["key"] = param.get("param_name", "")
+            param["name"] = param.get("param_name_cn", param.get("param_name", ""))
+            param["description"] = param.get("param_description", "")
 
         return json_success_response(data=common_params)
 
@@ -53,7 +71,7 @@ def list_common_params():
         return json_error_response("Failed to fetch common params", status_code=500)
 
 
-@common_params_bp.route("/common-params/sync", methods=["POST"])
+@common_params_bp.route("/api/common-params/sync", methods=["POST"])
 def sync_common_params():
     """
     API: Sync common parameters for a game
@@ -75,8 +93,7 @@ def sync_common_params():
     try:
         # Get all events for this game
         events = fetch_all_as_dict(
-            "SELECT id, event_name FROM log_events WHERE game_gid = ?",
-            (game_gid,)
+            "SELECT id, event_name FROM log_events WHERE game_gid = ?", (game_gid,)
         )
 
         if not events:
@@ -86,7 +103,19 @@ def sync_common_params():
         threshold = 0.8  # 80% threshold (more practical)
         min_occurrences = int(total_events * threshold)
 
-        logger.info(f"Analyzing {total_events} events for game_gid={game_gid}, threshold={min_occurrences}")
+        logger.info(
+            f"Analyzing {total_events} events for game_gid={game_gid}, threshold={min_occurrences}"
+        )
+
+        # Convert game_gid to database id for common_params table
+        game_record = fetch_one_as_dict(
+            "SELECT id FROM games WHERE gid = ?", (game_gid,)
+        )
+        if not game_record:
+            return json_error_response(
+                f"Game not found: gid={game_gid}", status_code=404
+            )
+        common_params_game_id = game_record["id"]
 
         # Count parameter occurrences across all events
         param_counts = {}
@@ -99,7 +128,7 @@ def sync_common_params():
                 FROM event_params ep
                 WHERE ep.event_id = ? AND ep.is_active = 1
                 """,
-                (event_id,)
+                (event_id,),
             )
 
             for param in params:
@@ -107,7 +136,7 @@ def sync_common_params():
                 if param_key not in param_counts:
                     param_counts[param_key] = {
                         "count": 0,
-                        "param_name_cn": param.get("param_name_cn", "")
+                        "param_name_cn": param.get("param_name_cn", ""),
                     }
                 param_counts[param_key]["count"] += 1
 
@@ -118,15 +147,17 @@ def sync_common_params():
                 # Check if already exists
                 existing = fetch_one_as_dict(
                     "SELECT id FROM common_params WHERE game_id = ? AND param_name = ?",
-                    (game_gid, param_name)
+                    (common_params_game_id, param_name),
                 )
 
                 if not existing:
-                    common_params_to_add.append({
-                        "param_name": param_name,
-                        "param_name_cn": data["param_name_cn"],
-                        "count": data["count"]
-                    })
+                    common_params_to_add.append(
+                        {
+                            "param_name": param_name,
+                            "param_name_cn": data["param_name_cn"],
+                            "count": data["count"],
+                        }
+                    )
 
         # Insert new common parameters
         added_count = 0
@@ -140,10 +171,18 @@ def sync_common_params():
                         table_name, status, created_at, updated_at
                     ) VALUES (?, ?, ?, ?, ?, 'synced', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                     """,
-                    (game_gid, param["param_name"], param["param_name_cn"], "string", "common")
+                    (
+                        common_params_game_id,
+                        param["param_name"],
+                        param["param_name_cn"],
+                        "string",
+                        "common",
+                    ),
                 )
                 added_count += 1
-                logger.info(f"Added common param: {param['param_name']} (appeared in {param['count']} events)")
+                logger.info(
+                    f"Added common param: {param['param_name']} (appeared in {param['count']} events)"
+                )
             except Exception as e:
                 logger.error(f"Failed to add common param {param['param_name']}: {e}")
 
@@ -152,14 +191,16 @@ def sync_common_params():
                 "total_events": total_events,
                 "threshold": min_occurrences,
                 "added": added_count,
-                "analyzed": len(param_counts)
+                "analyzed": len(param_counts),
             },
-            message=f"Synced {added_count} common parameters from {total_events} events"
+            message=f"Synced {added_count} common parameters from {total_events} events",
         )
 
     except Exception as e:
         logger.error(f"Error syncing common params: {e}", exc_info=True)
-        return json_error_response(f"Failed to sync common parameters: {str(e)}", status_code=500)
+        return json_error_response(
+            f"Failed to sync common parameters: {str(e)}", status_code=500
+        )
 
 
 @common_params_bp.route("/api/common-params/<int:param_id>", methods=["DELETE"])
@@ -178,6 +219,7 @@ def delete_common_param(param_id):
 
 
 @common_params_bp.route("/api/common-params/bulk-delete", methods=["DELETE", "POST"])
+@common_params_bp.route("/api/common-params/batch", methods=["DELETE"])  # Alias for frontend compatibility
 def bulk_delete_common_params():
     """API: Bulk delete common parameters"""
     data = request.get_json() if request.data else {}
@@ -197,5 +239,6 @@ def bulk_delete_common_params():
     )
 
     return json_success_response(
-        data={"deleted": deleted_count}, message=f"Deleted {deleted_count} common parameters"
+        data={"deleted": deleted_count},
+        message=f"Deleted {deleted_count} common parameters",
     )

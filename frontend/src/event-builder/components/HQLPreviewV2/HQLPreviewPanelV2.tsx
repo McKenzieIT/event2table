@@ -6,8 +6,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { hqlApiV2 } from '../../shared/api/hqlApiV2';
-import type { GenerateRequest } from '../../shared/types';
+import { hqlApiV2 } from '../../../shared/api/hqlApiV2';
+import type { GenerateRequest } from '../../../shared/types';
+import type { HQLGenerateResponse } from '@shared/types/api-types';
+import { HQL_PREVIEW_DEBOUNCE } from '@shared/constants/timeouts';
 import { DebugViewer } from './DebugViewer';
 import { PerformanceIndicator } from './PerformanceIndicator';
 import { WhereConditionBuilderV2 } from './WhereConditionBuilderV2';
@@ -32,12 +34,12 @@ interface HQLPreviewPanelV2Props {
 }
 
 interface GenerateResponse {
-  hql: string;
+  result: string;
   generated_at: string;
 }
 
 interface DebugTrace {
-  hql: string;
+  result: string;
   steps: Array<{
     step: string;
     result: any;
@@ -45,6 +47,12 @@ interface DebugTrace {
   }>;
   events: ApiEvent[];
   fields: ApiField[];
+}
+
+interface PerformanceReport {
+  score: number;
+  issues: string[];
+  suggestions: string[];
 }
 
 export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
@@ -62,7 +70,7 @@ export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
   // State
   const [hql, setHql] = useState<string>('');
   const [debugTrace, setDebugTrace] = useState<DebugTrace | null>(null);
-  const [performanceReport, setPerformanceReport] = useState<any>(null);
+  const [performanceReport, setPerformanceReport] = useState<PerformanceReport | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [lastGenerated, setLastGenerated] = useState<Date | null>(null);
@@ -117,7 +125,7 @@ export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
       }
 
       setLastGenerated(new Date());
-    } catch (err: any) {
+    } catch (err: Error) {
       const errorMessage = err.response?.data?.error || err.message || 'Failed to generate HQL';
       setError(errorMessage);
       if (onError) {
@@ -134,7 +142,7 @@ export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
       if (events.length > 0 && fields.length > 0) {
         generateHQL();
       }
-    }, 500); // 防抖500ms
+    }, HQL_PREVIEW_DEBOUNCE);
 
     return () => clearTimeout(timer);
   }, [events, fields, conditions, mode, debugMode]);

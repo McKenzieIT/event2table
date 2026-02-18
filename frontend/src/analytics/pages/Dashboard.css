@@ -1,115 +1,154 @@
+/* Dashboard - Cyberpunk Data Terminal v3.0 */
+/* Uses unified metric-card from components.css */
+
+/* Dashboard Header */
 .dashboard-container {
   padding: var(--space-6);
-  max-width: 1400px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
 }
 
 .dashboard-header {
   margin-bottom: var(--space-8);
+  animation: fadeInUp var(--transition-slow) ease-out;
 }
 
 .dashboard-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
   margin-bottom: var(--space-2);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--cyan-300) 0%, var(--violet-300) 50%, var(--cyan-400) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.02em;
 }
 
-/* Statistics Grid */
+.dashboard-header p {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+}
+
+/* Stats Grid - Updated for metric-card */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-5);
+  margin-bottom: var(--space-10);
 }
 
-/* Stat Card customization on top of @shared/ui Card */
-.stat-card {
+/* Metric Card - Dashboard specific overrides */
+.metric-card {
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  /* Card component provides padding, background, border */
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--space-6);
+  animation: fadeInUp var(--transition-slow) ease-out forwards;
 }
 
-.stat-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.stat-content h3 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: var(--space-1);
-}
-
-.stat-content p {
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-}
+.metric-card:nth-child(1) { animation-delay: 0.1s; }
+.metric-card:nth-child(2) { animation-delay: 0.15s; }
+.metric-card:nth-child(3) { animation-delay: 0.2s; }
+.metric-card:nth-child(4) { animation-delay: 0.25s; }
 
 /* Quick Actions */
 .quick-actions {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-10);
 }
 
 .quick-actions h2 {
-  margin-bottom: var(--space-4);
-  font-size: 1.5rem;
+  font-family: var(--font-display);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-xl);
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
+/* Actions Grid */
 .actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--space-4);
 }
 
-/* Action Card customization on top of @shared/ui Card */
+/* Action Card */
 .action-card {
-  /* Card component provides padding, background, border */
-  text-decoration: none;
-  color: inherit;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-base);
+  animation: fadeInUp var(--transition-slow) ease-out forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-400), transparent);
+  opacity: 0.4;
+}
+
+.action-card:nth-child(1) { animation-delay: 0.2s; }
+.action-card:nth-child(2) { animation-delay: 0.3s; }
+.action-card:nth-child(3) { animation-delay: 0.4s; }
+.action-card:nth-child(4) { animation-delay: 0.5s; }
+
+.action-card:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+  box-shadow: var(--glow-cyan-data);
+  transform: translateY(-2px);
 }
 
 .action-card i {
-  font-size: 2.5rem;
-  color: #667eea;
+  font-size: var(--text-3xl);
+  background: linear-gradient(135deg, var(--cyan-400), var(--violet-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .action-card h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
   margin: 0;
+  color: var(--text-primary);
 }
 
 .action-card p {
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
   margin: 0;
 }
 
-/* Recent Games */
+/* Recent Section */
 .recent-section {
   margin-bottom: var(--space-8);
 }
 
 .recent-section h2 {
-  margin-bottom: var(--space-4);
-  font-size: 1.5rem;
+  font-family: var(--font-display);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-xl);
+  color: var(--text-primary);
 }
 
 .games-list {
@@ -118,40 +157,64 @@
   gap: var(--space-3);
 }
 
-/* Game Item Card customization on top of @shared/ui Card */
+/* Game Item */
 .game-item {
-  /* Card component provides padding, background, border */
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
   text-decoration: none;
   color: inherit;
+  transition: all var(--transition-base);
 }
 
 .game-item:hover {
-  /* Card component provides hover effect */
+  border-color: rgba(34, 211, 238, 0.3);
+  box-shadow: var(--glow-cyan-sm);
+  transform: translateX(4px);
 }
 
 .game-info h3 {
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
   margin-bottom: var(--space-1);
+  color: var(--text-primary);
 }
 
 .game-info p {
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   margin: 0;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* Game Stats - using @shared/ui Badge component */
+/* Game Stats */
 .game-stats {
   display: flex;
   gap: var(--space-3);
 }
 
-/* Badge styles are now provided by @shared/ui Badge component */
+/* Badge overrides for Dashboard */
+.badge-events {
+  background: var(--color-accent-subtle);
+  color: var(--violet-400);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+}
 
-/* Skeleton Loading Styles */
+.badge-params {
+  background: var(--color-primary-subtle);
+  color: var(--cyan-400);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+/* Skeleton Loading */
 .skeleton-card {
   display: flex;
   align-items: center;
@@ -160,14 +223,14 @@
 }
 
 .skeleton-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
   background: linear-gradient(
     90deg,
-    rgba(102, 126, 234, 0.1) 25%,
-    rgba(102, 126, 234, 0.2) 50%,
-    rgba(102, 126, 234, 0.1) 75%
+    rgba(34, 211, 238, 0.1) 25%,
+    rgba(34, 211, 238, 0.2) 50%,
+    rgba(34, 211, 238, 0.1) 75%
   );
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
@@ -178,24 +241,10 @@
 }
 
 .skeleton-number {
-  width: 60px;
-  height: 32px;
-  border-radius: 4px;
-  margin-bottom: var(--space-2);
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.1) 25%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.1) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
-}
-
-.skeleton-text {
   width: 80px;
-  height: 16px;
-  border-radius: 4px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.05) 25%,
@@ -206,11 +255,21 @@
   animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 
+.skeleton-text {
+  width: 100px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
 @keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

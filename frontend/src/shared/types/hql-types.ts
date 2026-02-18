@@ -9,6 +9,8 @@
  * 所有修改应在schema文件中进行
  */
 
+import { ConditionValue } from './api-types';
+
 // ========== 枚举类型 ==========
 
 /** 字段类型枚举 */
@@ -110,14 +112,14 @@ export interface Field {
   aggregate_func?: AggregateFunction
   json_path?: string
   custom_expression?: string
-  fixed_value?: any
+  fixed_value?: ConditionValue
 }
 
 /** WHERE条件模型 */
 export interface Condition {
   field: string
   operator: Operator
-  value?: any
+  value?: ConditionValue
   logical_op?: LogicalOperator; // default: AND
 }
 

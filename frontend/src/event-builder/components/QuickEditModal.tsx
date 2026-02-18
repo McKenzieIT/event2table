@@ -67,6 +67,7 @@ export function QuickEditModal({
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isDirty, dirtyFields },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -76,6 +77,9 @@ export function QuickEditModal({
       description: "",
     },
   });
+
+  // 监听description字段变化
+  const watchedDescription = watch("description");
 
   // 重置表单当节点改变或模态框关闭
   useEffect(() => {
@@ -237,7 +241,7 @@ export function QuickEditModal({
                       {errors.description.message}
                     </div>
                   )}
-                  <div className="form-text">{`${(register("description").value || "").length}/500`}</div>
+                  <div className="form-text">{`${(watchedDescription || "").length}/500`}</div>
                 </div>
 
                 {/* 变更警告 */}

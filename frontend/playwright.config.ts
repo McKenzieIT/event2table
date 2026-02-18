@@ -7,7 +7,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Backend API: http://127.0.0.1:5001
  *
  * Test directories:
- * - tests/e2e/ - End-to-end smoke tests
+ * - test/e2e/ - End-to-end smoke tests
  * - tests/performance/ - Performance tests
  *
  * Test Projects:
@@ -16,12 +16,12 @@ import { defineConfig, devices } from '@playwright/test';
  * - Responsive tests: Separate project for viewport testing
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: './test',
 
   // Run tests in parallel
   fullyParallel: true,
 
-  // Fail the build on CI if you accidentally left test.only in the source code
+  // Fail the build on CI if you accidentally left test.only in your source code
   forbidOnly: !!process.env.CI,
 
   // Retry on CI only
@@ -32,9 +32,9 @@ export default defineConfig({
 
   // Reporter configuration
   reporter: [
-    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['html', { outputFolder: '../test-output/playwright/report', open: 'never' }],
     ['list'],
-    ['json', { outputFile: 'test-results.json' }],
+    ['json', { outputFile: '../test-output/playwright/results/results.json' }],
   ],
 
   // Shared settings for all tests
@@ -60,7 +60,7 @@ export default defineConfig({
 
   // Configure projects for major browsers
   projects: [
-    // Desktop browsers
+    // Desktop browsers - Chromium runs all tests
     {
       name: 'chromium',
       testMatch: '**/*.spec.ts',
@@ -71,9 +71,10 @@ export default defineConfig({
       },
     },
 
+    // Firefox and WebKit run only smoke tests (critical path validation)
     {
       name: 'firefox',
-      testMatch: '**/*.spec.ts',
+      testMatch: '**/smoke/*.spec.ts',
       use: {
         ...devices['Desktop Firefox'],
         // Firefox needs longer timeouts
@@ -84,7 +85,7 @@ export default defineConfig({
 
     {
       name: 'webkit',
-      testMatch: '**/*.spec.ts',
+      testMatch: '**/smoke/*.spec.ts',
       use: {
         ...devices['Desktop Safari'],
         actionTimeout: 15000,

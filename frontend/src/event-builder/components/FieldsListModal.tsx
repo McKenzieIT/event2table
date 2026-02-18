@@ -9,6 +9,7 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { eventNodesApi } from "@shared/api/eventNodes";
 import type { EventNodeField } from "@shared/types/eventNodes";
+import type { Field } from "@shared/types/api-types";
 
 /**
  * Props接口
@@ -50,7 +51,7 @@ export function FieldsListModal({
         const rawFields = response.data?.fields || [];
 
         // 转换后端 snake_case 到前端 camelCase
-        const transformedFields = rawFields.map((field: any) => ({
+        const transformedFields = rawFields.map((field: Field) => ({
           name: field.name || "",
           alias: field.alias || "",
           dataType: field.data_type || "unknown", // snake_case → camelCase
@@ -61,7 +62,7 @@ export function FieldsListModal({
         setFields(transformedFields);
       } catch (err) {
         console.error("Failed to fetch fields:", err);
-        // 不在这里调用 error，避免循环
+        error("加载字段列表失败: " + (err?.message || '请稍后重试'));
       } finally {
         setLoading(false);
       }

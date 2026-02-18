@@ -5,19 +5,10 @@
  */
 
 export { HQLPreviewPanelV2 } from './HQLPreviewPanelV2';
-export { default as HQLPreviewPanelV2 } from './HQLPreviewPanelV2';
-
 export { DebugViewer } from './DebugViewer';
-export { default as DebugViewer } from './DebugViewer';
-
 export { WhereConditionBuilderV2 } from './WhereConditionBuilderV2';
-export { default as WhereConditionBuilderV2 } from './WhereConditionBuilderV2';
-
 export { PerformanceIndicator } from './PerformanceIndicator';
-export { default as PerformanceIndicator } from './PerformanceIndicator';
-
 export { CacheIndicator } from './CacheIndicator';
-export { default as CacheIndicator } from './CacheIndicator';
 
 // 导出MultiEventConfigV2和HQLHistoryV2
 export { default as MultiEventConfigV2 } from './MultiEventConfigV2';

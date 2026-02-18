@@ -25,7 +25,7 @@ import type {
  * @example
  * ```ts
  * const params = await fetchAllParameters(10000147, { page: 1, limit: 20 });
- * console.log(params[0].param_name); // "zone_id"
+ * const firstParam = params[0].param_name;
  * ```
  */
 export async function fetchAllParameters(
@@ -77,8 +77,8 @@ export async function fetchAllParameters(
  * @example
  * ```ts
  * const details = await fetchParameterDetails('zone_id', 10000147);
- * console.log(details.total_usage); // 15
- * console.log(details.usage_in_events.length); // 5 events
+ * const usage = details.total_usage;
+ * const eventCount = details.usage_in_events.length;
  * ```
  */
 export async function fetchParameterDetails(

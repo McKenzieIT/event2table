@@ -27,7 +27,7 @@ import type {
  * @example
  * ```ts
  * const configs = await listEventConfigs(10000147);
- * console.log(configs[0].name_cn); // "登录事件"
+ * const firstConfigName = configs[0].name_cn;
  * ```
  */
 export async function listEventConfigs(
@@ -70,7 +70,7 @@ export async function listEventConfigs(
  * @example
  * ```ts
  * const config = await loadEventConfig(456, 10000147);
- * console.log(config.fields); // Field list
+ * const fields = config.fields;
  * ```
  */
 export async function loadEventConfig(
@@ -115,7 +115,7 @@ export async function loadEventConfig(
  *     edges: []
  *   }
  * });
- * console.log(flow.id); // New flow ID
+ * const flowId = flow.id;
  * ```
  */
 export async function saveFlow(
@@ -162,7 +162,7 @@ export async function saveFlow(
  * @example
  * ```ts
  * const flow = await loadFlow(789);
- * console.log(flow.flow_data.nodes); // Node list
+ * const nodes = flow.flow_data.nodes;
  * ```
  */
 export async function loadFlow(flowId: number): Promise<SavedFlow> {
@@ -199,7 +199,7 @@ export async function loadFlow(flowId: number): Promise<SavedFlow> {
  *   nodes: [...],
  *   edges: [...]
  * });
- * console.log(result.hql); // "CREATE OR REPLACE VIEW..."
+ * const hql = result.hql;
  * ```
  */
 export async function executeFlow(flowData: FlowData): Promise<ExecutionResult> {
@@ -238,7 +238,7 @@ export async function executeFlow(flowData: FlowData): Promise<ExecutionResult> 
  * @example
  * ```ts
  * const health = await healthCheck();
- * console.log(health.healthy); // true
+ * const isHealthy = health.healthy;
  * ```
  */
 export async function healthCheck(): Promise<HealthCheckResponse> {

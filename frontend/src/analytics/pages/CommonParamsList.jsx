@@ -1,28 +1,52 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput } from '@shared/ui';
+import { useToast } from '@shared/ui/Toast/Toast';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './CommonParamsList.css';
 
 /**
  * Common Parameters Management Page
  * Displays common parameter cards with search and CRUD operations
+ *
+ * Requires: game_gid URL parameter (enforced by backend API)
  */
 export default function CommonParamsList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
+  const { success, error, warning } = useToast();
 
-  // Fetch common parameters with React Query
-  const { data: params = [], isLoading, error } = useQuery({
-    queryKey: ['common-params'],
+  // Read game_gid from URL parameters
+  const gameGid = new URLSearchParams(location.search).get('game_gid');
+
+  // Fetch common parameters with React Query (requires game_gid)
+  const { data: params = [], isLoading, error: queryError } = useQuery({
+    queryKey: ['common-params', gameGid],
     queryFn: async () => {
-      const res = await fetch('/api/common-params');
-      if (!res.ok) throw new Error('Failed to fetch common parameters');
+      if (!gameGid) {
+        throw new Error('game_gid is required');
+      }
+
+      const res = await fetch(`/api/common-params?game_gid=${gameGid}`);
+      if (!res.ok) {
+        if (res.status === 400) {
+          throw new Error('game_gid is required');
+        }
+        if (res.status === 404) {
+          throw new Error(`Game ${gameGid} not found`);
+        }
+        throw new Error('Failed to fetch common parameters');
+      }
+
       const result = await res.json();
       return result.data || [];
-    }
+    },
+    enabled: !!gameGid // Only run query if gameGid exists
   });
 
   // Delete mutation
@@ -57,51 +81,58 @@ export default function CommonParamsList() {
   // Sync common params mutation
   const syncMutation = useMutation({
     mutationFn: async () => {
-      const gameGid = localStorage.getItem('selectedGameGid');
       if (!gameGid) {
-        throw new Error('Please select a game first');
+        throw new Error('game_gid is required');
       }
 
-      const res = await fetch('/common-params/sync', {
+      const res = await fetch('/api/common-params/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ game_gid: parseInt(gameGid) })
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to sync common parameters');
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to sync common parameters');
       }
 
       return res.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['common-params'] });
-      alert(`同步成功！\n分析了 ${data.data.analyzed} 个参数\n添加了 ${data.data.added} 个新公参（来自 ${data.data.total_events} 个事件）`);
+      queryClient.invalidateQueries({ queryKey: ['common-params', gameGid] });
+      success(`同步成功！\n分析了 ${data.data.analyzed} 个参数\n添加了 ${data.data.added} 个新公参（来自 ${data.data.total_events} 个事件）`);
     },
-    onError: (error) => {
-      alert(`同步失败：${error.message}`);
+    onError: (err) => {
+      error(`同步失败：${err.message}`);
     }
   });
 
   const handleSync = () => {
-    const gameGid = localStorage.getItem('selectedGameGid');
     if (!gameGid) {
-      alert('请先选择一个游戏');
+      warning('请先选择一个游戏');
       return;
     }
 
-    if (confirm('确定要同步公共参数吗？\n\n系统将自动分析该游戏的所有事件，找出在90%以上事件中出现的参数并标记为公共参数。')) {
-      syncMutation.mutate();
-    }
+    setConfirmState({
+      open: true,
+      title: '确认同步',
+      message: '确定要同步公共参数吗？\n\n系统将自动分析该游戏的所有事件，找出在90%以上事件中出现的参数并标记为公共参数。',
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        syncMutation.mutate();
+      }
+    });
   };
 
-  // Filter parameters
-  const filteredParams = params.filter(param => {
-    return param.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           param.key?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           param.data_type?.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  // FIX: 使用useMemo优化过滤逻辑
+  const filteredParams = useMemo(() => 
+    params.filter(param => {
+      return param.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             param.key?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             param.data_type?.toLowerCase().includes(searchTerm.toLowerCase());
+    }),
+    [params, searchTerm]
+  );
 
   // Selection handlers
   const toggleSelect = (id) => {
@@ -126,15 +157,27 @@ export default function CommonParamsList() {
 
   const handleBatchDelete = () => {
     if (selectedIds.size === 0) return;
-    if (confirm(`确定删除选中的 ${selectedIds.size} 个公参吗？`)) {
-      batchDeleteMutation.mutate(selectedIds);
-    }
+    setConfirmState({
+      open: true,
+      title: '确认批量删除',
+      message: `确定删除选中的 ${selectedIds.size} 个公参吗？`,
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        batchDeleteMutation.mutate(selectedIds);
+      }
+    });
   };
 
   const handleDelete = (id) => {
-    if (confirm('确定删除此公参吗？')) {
-      deleteMutation.mutate(id);
-    }
+    setConfirmState({
+      open: true,
+      title: '确认删除',
+      message: '确定删除此公参吗？',
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        deleteMutation.mutate(id);
+      }
+    });
   };
 
   const getDataTypeBadge = (dataType) => {
@@ -148,8 +191,21 @@ export default function CommonParamsList() {
     return badges[dataType] || { color: '#9ca3af', label: dataType };
   };
 
+  // Show error if game_gid is missing
+  if (!gameGid) {
+    return (
+      <div className="error-state">
+        <h2>请先选择游戏</h2>
+        <p>公参管理需要选择一个游戏才能查看。</p>
+        <Button onClick={() => navigate('/')}>
+          返回首页选择游戏
+        </Button>
+      </div>
+    );
+  }
+
   if (isLoading) return <div className="loading-state">加载中...</div>;
-  if (error) return <div className="error-state">加载失败: {error.message}</div>;
+  if (queryError) return <div className="error-state">加载失败: {queryError.message}</div>;
 
   return (
     <div className="common-params-page">
@@ -160,7 +216,7 @@ export default function CommonParamsList() {
         </div>
         <div className="header-actions">
           <Button
-            variant="secondary"
+            variant="primary"
             onClick={handleSync}
             disabled={syncMutation.isPending}
             className="sync-button"
@@ -176,12 +232,6 @@ export default function CommonParamsList() {
                 同步公共参数
               </>
             )}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => navigate('/common-params/create')}
-          >
-            新建公参
           </Button>
         </div>
       </div>
@@ -260,12 +310,6 @@ export default function CommonParamsList() {
               </div>
               <div className="card-footer">
                 <Button
-                  variant="secondary"
-                  onClick={() => navigate(`/common-params/${param.id}/edit`)}
-                >
-                  编辑
-                </Button>
-                <Button
                   variant="danger"
                   onClick={() => handleDelete(param.id)}
                   disabled={deleteMutation.isPending}
@@ -277,6 +321,17 @@ export default function CommonParamsList() {
           ))
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText="确认"
+        cancelText="取消"
+        variant="danger"
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+      />
     </div>
   );
 }

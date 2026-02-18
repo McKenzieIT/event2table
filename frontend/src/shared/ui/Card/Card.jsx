@@ -84,7 +84,7 @@ const MemoizedCard = React.memo(Card, (prevProps, nextProps) => {
 MemoizedCard.displayName = 'MemoizedCard';
 
 // Memoized sub-components
-Card.Header = React.memo(function CardHeader({ children, className = '', ...props }) {
+const CardHeader = React.memo(function CardHeader({ children, className = '', ...props }) {
   return (
     <div className={[`cyber-card__header`, className].filter(Boolean).join(' ')} {...props}>
       {children}
@@ -92,7 +92,7 @@ Card.Header = React.memo(function CardHeader({ children, className = '', ...prop
   );
 });
 
-Card.Body = React.memo(function CardBody({ children, className = '', ...props }) {
+const CardBody = React.memo(function CardBody({ children, className = '', ...props }) {
   return (
     <div className={[`cyber-card__body`, className].filter(Boolean).join(' ')} {...props}>
       {children}
@@ -100,7 +100,7 @@ Card.Body = React.memo(function CardBody({ children, className = '', ...props })
   );
 });
 
-Card.Footer = React.memo(function CardFooter({ children, className = '', ...props }) {
+const CardFooter = React.memo(function CardFooter({ children, className = '', ...props }) {
   return (
     <div className={[`cyber-card__footer`, className].filter(Boolean).join(' ')} {...props}>
       {children}
@@ -108,7 +108,7 @@ Card.Footer = React.memo(function CardFooter({ children, className = '', ...prop
   );
 });
 
-Card.Title = React.memo(function CardTitle({ children, className = '', ...props }) {
+const CardTitle = React.memo(function CardTitle({ children, className = '', ...props }) {
   return (
     <h3 className={[`cyber-card__title`, className].filter(Boolean).join(' ')} {...props}>
       {children}
@@ -116,6 +116,21 @@ Card.Title = React.memo(function CardTitle({ children, className = '', ...props 
   );
 });
 
-Card.Content = Card.Body; // Alias
+// Attach sub-components to Card first
+Card.Header = CardHeader;
+Card.Body = CardBody;
+Card.Footer = CardFooter;
+Card.Title = CardTitle;
+Card.Content = CardBody; // Alias
+
+// Then attach to MemoizedCard
+MemoizedCard.Header = CardHeader;
+MemoizedCard.Body = CardBody;
+MemoizedCard.Footer = CardFooter;
+MemoizedCard.Title = CardTitle;
+MemoizedCard.Content = CardBody;
+
+// Export sub-components as named exports
+export { Card, CardHeader, CardBody, CardFooter, CardTitle };
 
 export default MemoizedCard;

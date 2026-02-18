@@ -202,7 +202,7 @@ export function createArrayGuard<T>(
  * @example
  * const isEventResponse = createApiResponseGuard(isEventArray);
  * if (isEventResponse(data)) {
- *   console.log(data.data); // TypeScript知道这是Event[]
+ *   // TypeScript knows data.data is Event[]
  * }
  */
 export function createApiResponseGuard<T>(

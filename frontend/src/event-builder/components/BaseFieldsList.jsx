@@ -18,10 +18,7 @@ export default function BaseFieldsList({ onAddField }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleDoubleClick = (field) => {
-    console.log('[BaseFieldsList] Double clicked field:', field);
-    console.log('[BaseFieldsList] Calling onAddField with:', 'base', field.fieldName, field.displayName);
     onAddField('base', field.fieldName, field.displayName);
-    console.log('[BaseFieldsList] onAddField called completed');
 
     // Add success animation
     const element = document.querySelector(`[data-field="${field.fieldName}"]`);
@@ -34,7 +31,6 @@ export default function BaseFieldsList({ onAddField }) {
   };
 
   const handleDragStart = (e, field) => {
-    console.log('[BaseFieldsList] Drag started:', field);
     e.dataTransfer.effectAllowed = 'copy';
     // 设置多种格式以确保兼容性
     const dragData = {

@@ -9,12 +9,37 @@
 
 import React, { useState } from 'react';
 import HQLPreview from '../HQLPreview';
-import { HQLPreviewPanelV2, MultiEventConfigV2, HQLHistoryV2 } from './HQLPreviewV2';
+import { HQLPreviewPanelV2, MultiEventConfigV2, HQLHistoryV2 } from '../HQLPreviewV2';
+import type { Event, Field, ConditionValue } from '@shared/types/api-types';
 import './HQLPreviewWrapper.css';
+
+interface V1Props {
+  events: Array<{
+    game_gid: number;
+    event_id: number;
+    event_name?: string;
+    fields?: Field[];
+  }>;
+  fields: Field[];
+  conditions?: Array<{
+    field: string;
+    operator: string;
+    value?: ConditionValue;
+    logicalOp?: 'AND' | 'OR';
+  }>;
+}
+
+interface JoinCondition {
+  leftEvent: Event;
+  rightEvent: Event;
+  leftField: string;
+  rightField: string;
+  operator: string;
+}
 
 interface HQLPreviewWrapperProps {
   // V1 props
-  v1Props?: any;
+  v1Props?: V1Props;
 
   // V2 props
   events: Array<{
@@ -23,26 +48,18 @@ interface HQLPreviewWrapperProps {
     event_name?: string;
     fields?: any[];
   }>;
-  fields: Array<{
-    fieldName: string;
-    fieldType: 'base' | 'param' | 'custom' | 'fixed';
-    alias?: string;
-    jsonPath?: string;
-    customExpression?: string;
-    fixedValue?: any;
-    aggregateFunc?: string;
-  }>;
+  fields: Field[];
   conditions?: Array<{
     field: string;
     operator: string;
-    value?: any;
+    value?: ConditionValue;
     logicalOp?: 'AND' | 'OR';
   }>;
 
   // 可选配置
   defaultVersion?: 'v1' | 'v2';
   showVersionSwitcher?: boolean;
-  availableEvents?: any[];
+  availableEvents?: Event[];
 
   // 回调函数
   onHQLGenerated?: (hql: string, version: 'v1' | 'v2') => void;
@@ -61,9 +78,9 @@ export const HQLPreviewWrapper: React.FC<HQLPreviewWrapperProps> = ({
   onError
 }) => {
   const [version, setVersion] = useState<'v1' | 'v2'>(defaultVersion);
-  const [v2History, setV2History] = useState<any[]>([]);
-  const [selectedEvents, setSelectedEvents] = useState<any[]>([]);
-  const [joinConditions, setJoinConditions] = useState<any[]>([]);
+  const [v2History, setV2History] = useState<Field[]>([]);
+  const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
+  const [joinConditions, setJoinConditions] = useState<JoinCondition[]>([]);
   const [mode, setMode] = useState<'single' | 'join' | 'union'>('single');
 
   // V1模式渲染
@@ -155,7 +172,6 @@ export const HQLPreviewWrapper: React.FC<HQLPreviewWrapperProps> = ({
                   }
                 }}
                 onCompare={(v1, v2) => {
-                  console.log('Comparing versions:', v1, v2);
                   // TODO: 实现版本对比功能
                 }}
               />

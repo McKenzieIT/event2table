@@ -14,19 +14,24 @@
  * @component FieldCanvas
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import {
   DndContext,
   useDroppable,
   DragOverlay,
-  closestCenter
+  closestCenter,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor
 } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
-  arrayMove
+  arrayMove,
+  sortableKeyboardCoordinates
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Field, FieldType, DataType, Parameter } from '@shared/types/fieldBuilder';
@@ -68,9 +73,9 @@ function DropZone({ children, onDrop, onNativeDrop, onNativeDragOver, onNativeDr
 }
 
 /**
- * Sortable field item component
+ * Sortable field item component (memoized for performance)
  */
-function SortableFieldItem({ field, onEdit, onDelete }) {
+const SortableFieldItem = React.memo(({ field, onEdit, onDelete }) => {
   const {
     attributes,
     listeners,
@@ -173,7 +178,14 @@ function SortableFieldItem({ field, onEdit, onDelete }) {
       </div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for React.memo
+  // Only re-render if critical properties change
+  return prevProps.field.id === nextProps.field.id &&
+         prevProps.field.name === nextProps.field.name &&
+         prevProps.field.alias === nextProps.field.alias &&
+         prevProps.field.fieldType === nextProps.field.fieldType;
+});
 
 /**
  * Main FieldCanvas component
@@ -210,21 +222,21 @@ export default function FieldCanvas({
     field: null
   });
 
-  // Handle drag end for reordering
-  const handleDragEnd = (event) => {
+  // Configure dnd-kit sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement before drag starts (prevents accidental drags)
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end for reordering (optimized with useCallback)
+  const handleDragEnd = useCallback((event) => {
     const { active, over } = event;
-
-    // Remove dragging source class from original element
-    const sourceElement = document.querySelector(`[data-field-id="${active.id}"]`);
-    if (sourceElement) {
-      sourceElement.classList.remove('dragging-source');
-
-      // Add drop animation
-      sourceElement.classList.add('drop-animation');
-      setTimeout(() => {
-        sourceElement.classList.remove('drop-animation');
-      }, 500);
-    }
 
     if (over && active.id !== over.id) {
       const oldIndex = safeFields.findIndex((f) => f.id === active.id);
@@ -237,18 +249,12 @@ export default function FieldCanvas({
     }
 
     setActiveId(null);
-  };
+  }, [safeFields, onReorderFields]);
 
-  // Handle drag start
-  const handleDragStart = (event) => {
+  // Handle drag start (optimized with useCallback)
+  const handleDragStart = useCallback((event) => {
     setActiveId(event.active.id);
-
-    // Add dragging source class to original element
-    const sourceElement = document.querySelector(`[data-field-id="${event.active.id}"]`);
-    if (sourceElement) {
-      sourceElement.classList.add('dragging-source');
-    }
-  };
+  }, []);
 
   // Handle drop from event selector
   const handleDrop = (parameter) => {
@@ -266,7 +272,6 @@ export default function FieldCanvas({
 
   // Handle native HTML5 drag and drop (from BaseFieldsList and ParamSelector)
   const handleNativeDrop = (e) => {
-    console.log('[FieldCanvas] Native drop event:', e);
     e.preventDefault();
     e.stopPropagation();
 
@@ -286,11 +291,8 @@ export default function FieldCanvas({
       }
 
       if (!dragData) {
-        console.warn('[FieldCanvas] No drag data found');
         return;
       }
-
-      console.log('[FieldCanvas] Drag data:', dragData);
 
       // Call onAddField with the correct format
       if (onAddField && dragData.fieldType && dragData.fieldName) {
@@ -326,9 +328,15 @@ export default function FieldCanvas({
           id: generateId(),
           type: FieldType.BASIC,
           name: 'ds',
+          displayName: '分区',
           alias: 'ds',
           dataType: DataType.STRING,
-          isEditable: true
+          isEditable: true,
+          // Additional properties for HQLPreviewContainer
+          fieldType: 'base',  // Backend API expects 'base'
+          fieldName: 'ds',
+          paramId: null,
+          jsonPath: null
         };
         break;
       case FieldType.CUSTOM:
@@ -336,10 +344,16 @@ export default function FieldCanvas({
           id: generateId(),
           type: FieldType.CUSTOM,
           name: 'custom_field',
+          displayName: '自定义字段',
           alias: 'custom_field',
           dataType: DataType.STRING,
           mapping: '',
-          isEditable: true
+          isEditable: true,
+          // Additional properties for HQLPreviewContainer
+          fieldType: 'custom',
+          fieldName: 'custom_field',
+          paramId: null,
+          jsonPath: null
         };
         break;
       case FieldType.FIXED:
@@ -347,10 +361,16 @@ export default function FieldCanvas({
           id: generateId(),
           type: FieldType.FIXED,
           name: 'fixed_value',
+          displayName: '固定值',
           alias: 'fixed_value',
           dataType: DataType.STRING,
           fixedValue: '',
-          isEditable: true
+          isEditable: true,
+          // Additional properties for HQLPreviewContainer
+          fieldType: 'fixed',
+          fieldName: 'fixed_value',
+          paramId: null,
+          jsonPath: null
         };
         break;
       default:
@@ -360,17 +380,16 @@ export default function FieldCanvas({
     onAddField(newField);
   };
 
-  // Handle field edit
-  const handleEditField = (field) => {
-    console.log('[FieldCanvas] Edit field clicked:', field);
+  // Handle field edit (optimized with useCallback)
+  const handleEditField = useCallback((field) => {
     if (onUpdateField) {
       // Call parent's edit handler which will open the modal
       onUpdateField(field);
     }
-  };
+  }, [onUpdateField]);
 
-  // Handle field delete - show confirmation modal
-  const handleDeleteField = (fieldId) => {
+  // Handle field delete - show confirmation modal (optimized with useCallback)
+  const handleDeleteField = useCallback((fieldId) => {
     const field = safeFields.find(f => f.id === fieldId);
     if (!field) return;
 
@@ -378,15 +397,15 @@ export default function FieldCanvas({
       show: true,
       field: field
     });
-  };
+  }, [safeFields]);
 
-  // Confirm field deletion
-  const confirmDeleteField = () => {
+  // Confirm field deletion (optimized with useCallback)
+  const confirmDeleteField = useCallback(() => {
     if (deleteModal.field) {
       onRemoveField(deleteModal.field.id);
       setDeleteModal({ show: false, field: null });
     }
-  };
+  }, [deleteModal, onRemoveField]);
 
   // Helper function to get field type label
   const getFieldTypeLabel = (fieldType) => {
@@ -494,6 +513,7 @@ export default function FieldCanvas({
             collisionDetection={closestCenter}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
+            sensors={sensors}
           >
             <SortableContext
               items={safeFields.map(f => f.id)}
@@ -623,11 +643,4 @@ FieldCanvas.propTypes = {
   onReorderFields: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
   hasError: PropTypes.bool
-};
-
-FieldCanvas.defaultProps = {
-  fields: [],
-  parameters: [],
-  isLoading: false,
-  hasError: false
 };

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { ensureArray, safeLength } from '@shared/utils/componentUtils';
 
-export default function WhereBuilder({ conditions, onChange, onOpenModal }) {
+export default function WhereBuilder({ conditions = [], onChange, onOpenModal }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   // ✅ 添加空值保护
@@ -14,19 +14,19 @@ export default function WhereBuilder({ conditions, onChange, onOpenModal }) {
 
   const generateWhereClause = () => {
     if (safeLength(safeConditions) === 0) {
-      return '<span class="text-muted">暂无WHERE条件</span>';
+      return '暂无WHERE条件';
     }
 
     const parts = safeConditions.map((condition, index) => {
       if (condition.type === 'group') {
-        return `<span class="where-group">(${condition.conditions?.length || 0} 个条件)</span>`;
+        return `(${condition.conditions?.length || 0} 个条件)`;
       } else {
         const operator = condition.logicalOperator ? ` ${condition.logicalOperator} ` : '';
-        return `${operator}<span class="where-condition">${condition.field || '?'} ${condition.operator || '='} '${condition.value || ''}'</span>`;
+        return `${operator}${condition.field || '?'} ${condition.operator || '='} '${condition.value || ''}'`;
       }
     });
 
-    return '<code>' + parts.join(' ') + '</code>';
+    return parts.join(' ');
   };
 
   return (
@@ -56,10 +56,9 @@ export default function WhereBuilder({ conditions, onChange, onOpenModal }) {
       </div>
       {!isCollapsed && (
         <div className="section-content">
-          <div
-            className="where-summary"
-            dangerouslySetInnerHTML={{ __html: generateWhereClause() }}
-          />
+          <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
+            {generateWhereClause()}
+          </pre>
           <p className="help-text">点击"配置"按钮编辑WHERE条件</p>
         </div>
       )}
@@ -80,8 +79,4 @@ WhereBuilder.propTypes = {
   ),
   onChange: PropTypes.func.isRequired,
   onOpenModal: PropTypes.func.isRequired
-};
-
-WhereBuilder.defaultProps = {
-  conditions: []
 };

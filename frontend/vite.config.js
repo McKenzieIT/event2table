@@ -29,9 +29,21 @@ export default defineConfig(({ mode }) => {
     port: 5173,
     host: '0.0.0.0', // 🆕 监听所有网络接口（localhost, 127.0.0.1, 局域网IP）
     strictPort: true, // 如果端口被占用则失败
-    // 🆕 API代理：将 /api 请求转发到Flask后端
+    // 🆕 API代理：将 /api、/event_node_builder 和 /common-params 请求转发到Flask后端
     proxy: {
       '/api': {
+        target: 'http://127.0.0.1:5001',
+        changeOrigin: true,
+      },
+      '/event_node_builder': {
+        target: 'http://127.0.0.1:5001',
+        changeOrigin: true,
+      },
+      '/common-params': {
+        target: 'http://127.0.0.1:5001',
+        changeOrigin: true,
+      },
+      '/hql-preview-v2': {
         target: 'http://127.0.0.1:5001',
         changeOrigin: true,
       }

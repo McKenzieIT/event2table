@@ -1,7 +1,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@shared/ui';
+import { useGameContext } from '@shared/hooks/useGameContext';
 import './EventDetail.css';
 
 /**
@@ -17,10 +18,12 @@ import './EventDetail.css';
 function EventDetail() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { currentGameGid } = useGameContext();
 
-  // 优先从URL参数获取game_gid，其次从localStorage
+  // Priority: URL params > useGameContext > localStorage
   const gameGidFromUrl = searchParams.get('game_gid');
-  const gameGid = gameGidFromUrl || localStorage.getItem('selectedGameGid');
+  const gameGid = gameGidFromUrl || currentGameGid || localStorage.getItem('selectedGameGid');
 
   // 并行加载事件数据和参数数据
   const { data: eventData, isLoading: eventLoading } = useQuery({
@@ -60,7 +63,7 @@ function EventDetail() {
     return (
       <div className="error">
         <p>{isMissingGameContext ? '请先选择游戏' : '事件不存在'}</p>
-        <Button variant="primary" onClick={() => window.history.back()}>
+        <Button variant="primary" onClick={() => navigate(-1)}>
           返回
         </Button>
       </div>

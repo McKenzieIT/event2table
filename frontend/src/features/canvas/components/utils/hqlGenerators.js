@@ -11,29 +11,6 @@ export class HQLGenerators {
    * @returns {string} HQL语句
    */
   static generateEventHQL(eventConfig, gameData) {
-    // 🔧 v1.0.25.2: 添加调试日志
-    console.log("[HQLGenerators] generateEventHQL called");
-    console.log(
-      "[HQLGenerators] eventConfig keys:",
-      Object.keys(eventConfig || {}),
-    );
-    console.log(
-      "[HQLGenerators] eventConfig.base_fields:",
-      eventConfig.base_fields,
-    );
-    console.log(
-      "[HQLGenerators] eventConfig.baseFields:",
-      eventConfig.baseFields,
-    );
-    console.log(
-      "[HQLGenerators] base_fields length:",
-      eventConfig.base_fields?.length || 0,
-    );
-    console.log(
-      "[HQLGenerators] baseFields length:",
-      eventConfig.baseFields?.length || 0,
-    );
-
     // Validate required parameters
     if (!gameData || !gameData.ods_db || !gameData.gid) {
       throw new Error(
@@ -48,14 +25,8 @@ export class HQLGenerators {
     // 🔧 v1.0.25.2: 优先使用 base_fields (API返回的字段名)，然后 baseFields
     let baseFields = eventConfig.base_fields || eventConfig.baseFields || [];
 
-    console.log("[HQLGenerators] Selected baseFields:", baseFields);
-    console.log("[HQLGenerators] baseFields length:", baseFields.length);
-
     // 🔧 v1.0.25.2: 如果仍然为空，使用默认字段
     if (baseFields.length === 0) {
-      console.warn(
-        "[HQLGenerators] ⚠️ baseFields/base_fields 均为空，使用默认字段",
-      );
       baseFields = [
         { field_name: "ds", field_type: "column", alias: "ds" },
         { field_name: "role_id", field_type: "column", alias: "role_id" },
@@ -65,10 +36,6 @@ export class HQLGenerators {
         { field_name: "tm", field_type: "column", alias: "tm" },
         { field_name: "ts", field_type: "column", alias: "ts" },
       ];
-      console.log(
-        "[HQLGenerators] 使用默认字段:",
-        baseFields.map((f) => f.field_name),
-      );
     }
 
     const hqlFields = baseFields
@@ -81,7 +48,6 @@ export class HQLGenerators {
         const alias = f.alias;
 
         if (!fieldName) {
-          console.warn("[HQLGenerators] ⚠️ 字段缺少fieldName/field_name:", f);
           return "";
         }
 
@@ -97,9 +63,6 @@ export class HQLGenerators {
     const tableName = `${gameData.ods_db}.ods_${gameData.gid}_all_view`;
 
     const hql = `-- ${eventConfig.event_name_cn || eventConfig.event_name}\nSELECT\n${hqlFields}\nFROM ${tableName}\nWHERE event = '${eventConfig.event_name}';`;
-
-    console.log("[HQLGenerators] Generated HQL length:", hql.length);
-    console.log("[HQLGenerators] HQL preview:", hql.substring(0, 200) + "...");
 
     return hql;
   }

@@ -121,7 +121,6 @@ export default function HQLResultModal({
 
   // Save edit
   const handleSaveEdit = () => {
-    console.log('[HQLResultModal] Edited HQL:', editedHQL);
     showToastNotification("编辑已保存（仅用于展示）", "success", 2000);
     setIsEditing(false);
   };

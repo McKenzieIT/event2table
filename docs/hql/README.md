@@ -61,6 +61,54 @@ This directory contains comprehensive documentation for the HQL Generator in the
 
 ---
 
+### 4. V2 Architecture Analysis 🆕
+**File**: [HQL_V2_INDEPENDENCE_ANALYSIS.md](./HQL_V2_INDEPENDENCE_ANALYSIS.md)
+
+**For**: Architects and developers understanding V2 architecture
+
+**Contents**:
+- V2 vs V1 feature comparison
+- Adapter pattern design
+- Project dependency analysis
+- Independence evaluation
+- Migration strategy
+
+**Read this if**: You want to understand V2 architecture decisions and the adapter pattern.
+
+---
+
+### 5. V2 Migration Roadmap 🆕
+**File**: [HQL_V2_MIGRATION_ROADMAP.md](./HQL_V2_MIGRATION_ROADMAP.md)
+
+**For**: Developers planning V2 migration
+
+**Contents**:
+- Migration phases
+- Adapter pattern implementation
+- API compatibility strategy
+- Testing and validation
+- Rollback plan
+
+**Read this if**: You're involved in V1 to V2 migration.
+
+---
+
+### 6. DML Generator Quick Reference 🆕
+**File**: [dml-generator-quick-reference.md](./dml-generator-quick-reference.md)
+
+**For**: Developers using DML generation features
+
+**Contents**:
+- INSERT OVERWRITE generation
+- DDL statement generation
+- Canvas HQL composition
+- Code examples
+- Best practices
+
+**Read this if**: You need to generate INSERT OVERWRITE or CREATE TABLE statements.
+
+---
+
 ## Key Concepts
 
 ### What is the HQL Generator?
@@ -126,21 +174,32 @@ This provides maximum flexibility for different use cases.
 ## Related Files
 
 ### Source Code
-- **Generator**: `/Users/mckenzie/Documents/event2table/backend/services/hql/core/generator.py`
-- **Models**: `/Users/mckenzie/Documents/event2table/backend/services/hql/models/event.py`
-- **Builders**: `/Users/mckenzie/Documents/event2table/backend/services/hql/builders/`
+- **V2 Generator**: `backend/services/hql/core/generator.py`
+- **DML Generator**: `backend/services/hql/core/dml_generator.py` 🆕
+- **DDL Generator**: `backend/services/hql/core/ddl_generator.py` 🆕
+- **V1→V2 Transformer**: `backend/services/hql/adapters/v1_to_v2_transformer.py` 🆕
+- **V2→V1 Transformer**: `backend/services/hql/adapters/v2_to_v1_transformer.py` 🆕
+- **Models**: `backend/services/hql/models/event.py`
+- **Builders**: `backend/services/hql/builders/`
 
-### Tests
-- **Verification Suite**: `/Users/mckenzie/Documents/event2table/test_hql_generator_verification.py`
-- **Functional Tests**: `/Users/mckenzie/Documents/event2table/manual_functional_test.py`
+### API Endpoints
+- **V2 API**: `backend/api/routes/hql_preview_v2.py`
+- **V1 Adapter API**: `backend/api/routes/v1_adapter.py` 🆕
 
-### Integration
-- **Flask API**: `/Users/mckenzie/Documents/event2table/backend/api/routes/hql_preview_v2.py`
-- **Canvas Component**: `/Users/mckenzie/Documents/event2table/frontend/src/features/canvas/`
+### Frontend Components
+- **Canvas**: `frontend/src/features/canvas/`
+- **Event Builder**: `frontend/src/event-builder/`
 
 ---
 
 ## Version History
+
+### v2.1 (2026-02-18) 🆕
+- Added V1/V2 API adapter pattern
+- Added DML/DDL generators
+- Added V2 architecture analysis documentation
+- Added migration roadmap
+- Event node builder fixes (6 issues)
 
 ### v2.0 (2025-02-10)
 - Added `alias` field to Event model
@@ -174,6 +233,6 @@ This provides maximum flexibility for different use cases.
 
 ---
 
-**Last Updated**: 2025-02-10
+**Last Updated**: 2026-02-18
 **Status**: ✅ Production Ready
-**Version**: 2.0
+**Version**: 2.1

@@ -16,8 +16,8 @@
  * ```ts
  * const { mutateAsync, isLoading, error } = useFlowExecute();
  * const result = await mutateAsync({ flowId: 1 });
- * console.log(result.hql); // "CREATE OR REPLACE VIEW..."
- * console.log(result.execution_time); // 1.23
+ * const hql = result.hql;
+ * const execTime = result.execution_time;
  * ```
  */
 

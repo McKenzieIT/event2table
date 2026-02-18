@@ -1,7 +1,10 @@
+/* Import Events - Cyberpunk Terminal Style */
+
 .import-events-container {
   padding: var(--space-6);
   max-width: 1000px;
   margin: 0 auto;
+  animation: fadeInUp var(--transition-slow) ease-out;
 }
 
 .page-header {
@@ -10,6 +13,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  animation: fadeInUp var(--transition-slow) ease-out;
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  background: linear-gradient(135deg, var(--cyan-300) 0%, var(--violet-300) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
 }
 
 .header-content {
@@ -21,46 +41,79 @@
 .icon-box {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--cyan-500), var(--violet-500));
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-glow);
+  position: relative;
+}
+
+.icon-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  filter: blur(16px);
+  opacity: 0.4;
+  z-index: -1;
 }
 
 .icon-box i {
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   color: white;
+  position: relative;
+  z-index: 1;
 }
 
 .upload-card {
   padding: var(--space-8);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-500), transparent);
+  opacity: 0.6;
 }
 
 .upload-area {
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border: 2px dashed var(--border-default);
   border-radius: var(--radius-lg);
   padding: var(--space-12);
   text-align: center;
   margin: var(--space-6) 0;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-base);
 }
 
 .upload-area:hover {
-  border-color: var(--brand-primary);
-  background: rgba(102, 126, 234, 0.05);
+  border-color: var(--cyan-500);
+  background: rgba(6, 182, 212, 0.05);
 }
 
 .upload-area i {
-  font-size: 4rem;
-  color: var(--color-text-secondary);
+  font-size: var(--text-5xl);
+  color: var(--text-tertiary);
   display: block;
   margin-bottom: var(--space-4);
 }
 
 .upload-area p {
-  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  color: var(--text-secondary);
   margin-bottom: var(--space-4);
 }

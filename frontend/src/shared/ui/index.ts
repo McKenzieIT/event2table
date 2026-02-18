@@ -47,9 +47,10 @@ export { default as Card } from './Card/Card';
 export { default as Input } from './Input/Input';
 export { default as TextArea } from './TextArea/TextArea';
 export { default as Table } from './Table/Table';
-export { default as Modal } from './Modal/Modal';
+export { default as Modal } from './BaseModal/BaseModal';
 export { default as Badge } from './Badge/Badge';
-export { ToastProvider, useToast, ToastType } from './Toast/Toast';
+export { ToastProvider, useToast } from './Toast/Toast';
+export type { ToastType } from './Toast/Toast';
 export { default as Select } from './Select/Select';
 export { default as Checkbox } from './Checkbox/Checkbox';
 export { default as Radio } from './Radio/Radio';
@@ -58,17 +59,3 @@ export { default as Spinner } from './Spinner/Spinner';
 
 // Special components
 export { SelectGamePrompt } from './SelectGamePrompt';
-
-// Re-export for named imports (optional, for better IDE support)
-export { Button } from './Button/Button';
-export { Card } from './Card/Card';
-export { Input } from './Input/Input';
-export { TextArea } from './TextArea/TextArea';
-export { Table } from './Table/Table';
-export { Modal } from './Modal/Modal';
-export { Badge } from './Badge/Badge';
-export { Select } from './Select/Select';
-export { Checkbox } from './Checkbox/Checkbox';
-export { Radio } from './Radio/Radio';
-export { Switch } from './Switch/Switch';
-export { Spinner } from './Spinner/Spinner';

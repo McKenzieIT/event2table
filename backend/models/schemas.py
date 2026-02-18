@@ -392,3 +392,123 @@ class ExportResponse(BaseModel):
     file_size: int = Field(..., description="文件大小（字节）")
     record_count: int = Field(..., description="记录数")
     download_url: str = Field(..., description="下载链接")
+
+
+# ============================================================================
+# HQL History V2 相关 Schema
+# ============================================================================
+
+
+class HQLHistorySaveRequest(BaseModel):
+    """HQL历史保存请求模型"""
+
+    events: List[Dict[str, Any]] = Field(..., description="事件列表")
+    fields: List[Dict[str, Any]] = Field(..., description="字段列表")
+    where_conditions: List[Dict[str, Any]] = Field(default_factory=list, description="WHERE条件列表")
+    mode: str = Field("single", description="生成模式 (single/join/union)")
+    hql: str = Field(..., min_length=1, description="生成的HQL语句")
+    hql_type: Literal["select", "ddl", "dml", "canvas"] = Field("select", description="HQL类型")
+    game_gid: Optional[int] = Field(None, ge=0, description="游戏GID")
+    name_en: Optional[str] = Field(None, max_length=200, description="英文名称")
+    name_cn: Optional[str] = Field(None, max_length=200, description="中文名称")
+    performance_score: Optional[int] = Field(None, ge=0, le=100, description="性能评分")
+    user_id: int = Field(0, description="用户ID")
+    session_id: Optional[str] = Field(None, description="会话ID")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="额外元数据")
+
+    @validator("name_en")
+    def sanitize_name_en(cls, v):
+        """防止XSS攻击"""
+        if v:
+            return html.escape(v.strip())
+        return v
+
+    @validator("name_cn")
+    def sanitize_name_cn(cls, v):
+        """防止XSS攻击"""
+        if v:
+            return html.escape(v.strip())
+        return v
+
+    @validator("hql_type")
+    def validate_hql_for_canvas(cls, v, values):
+        """验证canvas类型时hql格式"""
+        if v == "canvas":
+            hql = values.get("hql")
+            if hql:
+                try:
+                    hql_obj = json.loads(hql) if isinstance(hql, str) else hql
+                    if not isinstance(hql_obj, dict):
+                        raise ValueError("canvas类型的hql必须是JSON对象")
+                    required_keys = ["create_table", "insert_overwrite", "select"]
+                    for key in required_keys:
+                        if key not in hql_obj:
+                            raise ValueError(f"canvas类型的hql缺少{key}字段")
+                except json.JSONDecodeError:
+                    raise ValueError("canvas类型的hql必须是有效的JSON字符串")
+        return v
+
+
+class HQLHistorySaveResponse(BaseModel):
+    """HQL历史保存响应模型"""
+
+    history_id: int = Field(..., description="历史记录ID")
+    created_at: str = Field(..., description="创建时间")
+
+
+class HQLHistorySearchRequest(BaseModel):
+    """HQL历史搜索请求模型"""
+
+    keyword: Optional[str] = Field(None, max_length=100, description="搜索关键词")
+    hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(None, description="HQL类型过滤")
+    game_gid: Optional[int] = Field(None, ge=0, description="游戏GID过滤")
+    user_id: Optional[int] = Field(None, ge=0, description="用户ID过滤")
+    date_from: Optional[str] = Field(None, description="起始日期 (ISO 8601)")
+    date_to: Optional[str] = Field(None, description="结束日期 (ISO 8601)")
+    limit: int = Field(50, ge=1, le=500, description="返回数量限制")
+    offset: int = Field(0, ge=0, description="偏移量")
+
+    @validator("date_from", "date_to")
+    def validate_iso_date(cls, v):
+        """验证ISO 8601日期格式"""
+        if v:
+            try:
+                datetime.fromisoformat(v.replace("Z", "+00:00"))
+            except ValueError:
+                raise ValueError(f"日期格式必须为ISO 8601格式，如: 2026-02-17T10:00:00Z")
+        return v
+
+
+class HQLHistorySearchResponse(BaseModel):
+    """HQL历史搜索响应模型"""
+
+    history: List[Dict[str, Any]] = Field(..., description="历史记录列表")
+    count: int = Field(..., description="记录数量")
+    limit: int = Field(..., description="查询限制")
+    offset: int = Field(..., description="查询偏移量")
+
+
+class HQLHistoryGlobalQueryRequest(BaseModel):
+    """HQL历史全局查询请求模型"""
+
+    keyword: Optional[str] = Field(None, max_length=100, description="搜索关键词")
+    hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(None, description="HQL类型过滤")
+    limit: int = Field(50, ge=1, le=500, description="返回数量限制")
+    offset: int = Field(0, ge=0, description="偏移量")
+
+
+class HQLHistoryGlobalQueryResponse(BaseModel):
+    """HQL历史全局查询响应模型"""
+
+    history: List[Dict[str, Any]] = Field(..., description="历史记录列表")
+    count: int = Field(..., description="记录数量")
+    limit: int = Field(..., description="查询限制")
+    offset: int = Field(..., description="查询偏移量")
+    note: str = Field(
+        "Global query requires authentication. This is a development preview.",
+        description="提示信息",
+    )
+
+
+# 导入json用于canvas验证
+import json

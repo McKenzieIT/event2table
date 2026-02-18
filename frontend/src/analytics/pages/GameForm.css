@@ -1,224 +1,192 @@
-/* Game Form Styles */
+/* Game Form - Cyberpunk Terminal Style */
+
 .game-form-container {
-  padding: 2rem;
+  padding: var(--space-6);
   max-width: 1200px;
   margin: 0 auto;
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: fadeInUp var(--transition-slow) ease-out;
 }
 
 .game-form {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--space-8);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.game-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-500), transparent);
+  opacity: 0.6;
 }
 
 .game-form .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
 }
 
 .game-form .form-label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #1e293b;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
 }
 
 .game-form .required-indicator {
-  color: #dc3545;
-  margin-left: 0.25rem;
+  color: var(--danger);
+  margin-left: var(--space-1);
 }
 
-.game-form .input-icon-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.game-form .input-icon-wrapper i {
-  position: absolute;
-  left: 1rem;
-  color: #64748b;
-  pointer-events: none;
-}
-
-.game-form .glass-input {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  color: #1e293b;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-}
-
-.game-form .glass-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  background: #ffffff;
-}
-
-.game-form .glass-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: #f8fafc;
-  color: #64748b;
-}
+/* 表单样式由Input组件内部处理 */
 
 .game-form .glass-input::placeholder {
-  color: #94a3b8;
+  color: var(--text-placeholder);
 }
 
 .game-form .glass-input.is-invalid {
-  border-color: #dc3545;
+  border-color: var(--danger);
 }
 
 .game-form .form-hint {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #64748b;
-  margin-top: 0.5rem;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--space-2);
 }
 
 .game-form .invalid-feedback {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
+  color: var(--danger);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
 }
 
-/* ODS Options */
 .game-form .ods-options {
   display: grid;
-  gap: 1rem;
+  gap: var(--space-4);
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .game-form .option-card {
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  padding: 1rem;
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: #ffffff;
+  transition: all var(--transition-base);
+  background: var(--bg-elevated);
 }
 
 .game-form .option-card:hover {
-  border-color: #3b82f6;
-  background: #f8fafc;
+  border-color: var(--cyan-500);
+  background: var(--bg-glass);
 }
 
 .game-form .option-card.selected {
-  border-color: #0d6efd;
-  background: #eff6ff;
+  border-color: var(--cyan-500);
+  background: rgba(6, 182, 212, 0.1);
 }
 
 .game-form .option-card.selected-green {
-  border-color: #198754;
-  background: #f0fdf4;
+  border-color: var(--success);
+  background: rgba(6, 182, 212, 0.1);
 }
 
 .game-form .option-card-content {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4);
   align-items: flex-start;
 }
 
 .game-form .option-card-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
 }
 
 .game-form .option-card-icon {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
 }
 
 .game-form .option-card-icon-blue {
-  color: #0d6efd;
+  color: var(--cyan-400);
 }
 
 .game-form .option-card-icon-green {
-  color: #198754;
+  color: var(--success);
 }
 
 .game-form .option-card-description {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .game-form .form-check-input {
   cursor: pointer;
-  margin-top: 0.25rem;
+  margin-top: var(--space-1);
+  accent-color: var(--cyan-500);
 }
 
-/* Form Actions */
 .game-form .form-actions {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border-color);
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-default);
 }
 
-/* Alert */
 .game-form .alert {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-6);
 }
 
 .game-form .alert-danger {
-  background: rgba(220, 53, 69, 0.1);
-  border: 1px solid rgba(220, 53, 69, 0.3);
-  color: #f8d7da;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
 }
 
-/* Loading */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
-  gap: 1rem;
+  padding: var(--space-16) var(--space-8);
+  gap: var(--space-4);
 }
 
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-  border-width: 0.25em;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
   .game-form-container {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 
   .game-form {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 
   .game-form .form-actions {

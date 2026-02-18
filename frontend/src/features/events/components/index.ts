@@ -4,4 +4,4 @@
  * Centralized exports for all events components
  */
 
-export * from './HQLPreviewV2';
+export * from '../../../event-builder/components/HQLPreviewV2';

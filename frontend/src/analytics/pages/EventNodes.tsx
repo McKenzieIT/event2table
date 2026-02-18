@@ -14,7 +14,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useSearchParams, useOutletContext } from "react-router-dom";
+import { Link, useSearchParams, useOutletContext, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useEventNodesTable } from "@shared/hooks/useEventNodesTable";
 import { createEventNodesColumns } from "@analytics/components/columns/eventNodesColumns";
@@ -26,6 +26,7 @@ import { FieldsListModal } from "@event-builder/components/FieldsListModal";
 import { AdvancedFilterPanel } from "@event-builder/components/AdvancedFilterPanel";
 import { useDebounce } from "@shared/hooks/useDebounce";
 import { Button } from "@shared/ui/Button";
+import { ConfirmDialog } from "@shared/ui/ConfirmDialog/ConfirmDialog";
 import type {
   EventNode,
   EventNodeFilters,
@@ -39,7 +40,7 @@ import "./EventNodes.css";
 function GameSelectionPrompt() {
   return (
     <div className="glass-card text-center p-5 m-4">
-      <span className="display-4 text-primary mb-3">🎮</span>
+      <i className="bi bi-controller display-4 text-primary mb-3 d-block"></i>
       <h3 className="mb-3">请先选择游戏</h3>
       <p className="text-muted mb-4">事件节点管理需要先选择一个游戏</p>
       <Link to="/games">
@@ -52,23 +53,18 @@ function GameSelectionPrompt() {
 }
 
 /**
- * 统计卡片组件
+ * 统计卡片组件 - 使用metric-card系统
  */
 function StatisticsCards({ stats }: { stats: EventNodeStats | null }) {
   if (!stats) {
     return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "1.5rem",
-          marginBottom: "1.5rem",
-        }}
-      >
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="glass-card" style={{ padding: "1.5rem" }}>
-            <div className="placeholder-glow">
-              <div className="placeholder bg-secondary col-6"></div>
+      <div className="stats-grid">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="metric-card skeleton-card">
+            <div className="skeleton-icon"></div>
+            <div className="skeleton-content">
+              <div className="skeleton-number"></div>
+              <div className="skeleton-text"></div>
             </div>
           </div>
         ))}
@@ -77,115 +73,41 @@ function StatisticsCards({ stats }: { stats: EventNodeStats | null }) {
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-        gap: "1.5rem",
-        marginBottom: "1.5rem",
-      }}
-    >
+    <div className="stats-grid">
       {/* 总节点数 */}
-      <div
-        className="glass-card animate-slide-in"
-        style={{ padding: "1.5rem", animationDelay: "0s" }}
-      >
-        <div className="d-flex align-items-center gap-3">
-          <div
-            style={{
-              width: "56px",
-              height: "56px",
-              borderRadius: "12px",
-              background:
-                "linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-info) 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.5rem",
-            }}
-          >
-            🔷
-          </div>
-          <div>
-            <p className="text-secondary mb-1" style={{ fontSize: "0.875rem" }}>
-              事件节点总数
-            </p>
-            <h3
-              className="mb-0"
-              style={{ fontSize: "1.5rem", fontWeight: 700 }}
-            >
-              {stats.total_nodes}
-            </h3>
-          </div>
+      <div className="metric-card metric-card--cyan">
+        <div className="metric-card__icon metric-card__icon--cyan">
+          <i className="bi bi-diagram-3-fill"></i>
         </div>
+        <div className="metric-card__value">{stats.total_nodes}</div>
+        <div className="metric-card__label">事件节点总数</div>
       </div>
 
       {/* 关联事件数 */}
-      <div
-        className="glass-card animate-slide-in"
-        style={{ padding: "1.5rem", animationDelay: "0.1s" }}
-      >
-        <div className="d-flex align-items-center gap-3">
-          <div
-            style={{
-              width: "56px",
-              height: "56px",
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.5rem",
-            }}
-          >
-            📦
-          </div>
-          <div>
-            <p className="text-secondary mb-1" style={{ fontSize: "0.875rem" }}>
-              关联事件数
-            </p>
-            <h3
-              className="mb-0"
-              style={{ fontSize: "1.5rem", fontWeight: 700 }}
-            >
-              {stats.unique_events}
-            </h3>
-          </div>
+      <div className="metric-card metric-card--violet">
+        <div className="metric-card__icon metric-card__icon--violet">
+          <i className="bi bi-box-seam-fill"></i>
         </div>
+        <div className="metric-card__value">{stats.unique_events}</div>
+        <div className="metric-card__label">关联事件数</div>
       </div>
 
       {/* 平均字段数 */}
-      <div
-        className="glass-card animate-slide-in"
-        style={{ padding: "1.5rem", animationDelay: "0.2s" }}
-      >
-        <div className="d-flex align-items-center gap-3">
-          <div
-            style={{
-              width: "56px",
-              height: "56px",
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.5rem",
-            }}
-          >
-            ✅
-          </div>
-          <div>
-            <p className="text-secondary mb-1" style={{ fontSize: "0.875rem" }}>
-              平均字段数
-            </p>
-            <h3
-              className="mb-0"
-              style={{ fontSize: "1.5rem", fontWeight: 700 }}
-            >
-              {stats.avg_fields.toFixed(1)}
-            </h3>
-          </div>
+      <div className="metric-card metric-card--warning">
+        <div className="metric-card__icon metric-card__icon--warning">
+          <i className="bi bi-list-ul"></i>
         </div>
+        <div className="metric-card__value">{stats.avg_fields.toFixed(1)}</div>
+        <div className="metric-card__label">平均字段数</div>
+      </div>
+
+      {/* 今日修改 */}
+      <div className="metric-card metric-card--success">
+        <div className="metric-card__icon metric-card__icon--success">
+          <i className="bi bi-clock-history"></i>
+        </div>
+        <div className="metric-card__value">{stats.today_modified || 0}</div>
+        <div className="metric-card__label">今日修改</div>
       </div>
     </div>
   );
@@ -219,52 +141,40 @@ function SearchFilterBar({
   }, [debouncedInput, updateFilters]);
 
   return (
-    <div
-      className="glass-card"
-      style={{ padding: "1.5rem", marginBottom: "1.5rem" }}
-    >
-      <div
-        className="d-flex justify-content-between gap-3"
-        style={{ flexWrap: "wrap" }}
-      >
+    <div className="glass-card filter-bar">
+      <div className="filter-bar__main">
         {/* 基础搜索 */}
-        <div
-          className="flex-grow-1"
-          style={{ maxWidth: "500px", minWidth: "280px" }}
-        >
-          <div className="position-relative">
-            <i
-              className="bi bi-search position-absolute top-50 start-3 translate-middle-y text-muted"
-              style={{ fontSize: "1.1rem" }}
-            ></i>
-            <input
-              type="text"
-              className="form-control ps-5"
-              placeholder="搜索节点名称、别名..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-          </div>
+        <div className="search-input-wrapper">
+          <i className="bi bi-search search-icon"></i>
+          <input
+            type="text"
+            className="input-cyber"
+            placeholder="搜索节点名称、别名..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
         </div>
 
         {/* 右侧操作区 */}
-        <div className="d-flex gap-2 align-items-center">
+        <div className="filter-actions">
           {selectedCount > 0 && (
-            <>
-              <span className="text-muted">
-                已选择 <strong className="text-primary">{selectedCount}</strong>{" "}
-                个节点
+            <div className="bulk-actions">
+              <span className="selection-count">
+                已选择 <strong>{selectedCount}</strong> 个节点
               </span>
               <Button variant="outline-danger" onClick={onBulkDelete}>
+                <i className="bi bi-trash me-2"></i>
                 批量删除
               </Button>
-            </>
+            </div>
           )}
           <Button
             variant={showAdvanced ? "primary" : "outline-primary"}
             onClick={onToggleAdvanced}
           >
-            高级筛选 {showAdvanced ? "▲" : "▼"}
+            <i className="bi bi-funnel me-2"></i>
+            高级筛选
+            {showAdvanced ? <i className="bi bi-chevron-up ms-2"></i> : <i className="bi bi-chevron-down ms-2"></i>}
           </Button>
         </div>
       </div>
@@ -296,7 +206,7 @@ function NodesTable({
   if (empty) {
     return (
       <div className="glass-card text-center p-5">
-        <span className="display-4 text-muted">📊</span>
+        <i className="bi bi-diagram-3 display-4 text-muted d-block mb-3"></i>
         <h3 className="mt-3 text-muted">暂无事件节点</h3>
         <p className="text-muted">您还没有创建任何事件节点</p>
         <Link to="/event-node-builder">
@@ -420,6 +330,8 @@ function EventNodes() {
   const gameGid = currentGame?.gid || null;
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
 
   // Toast 辅助函数
   const success = (message: string) => {
@@ -449,28 +361,25 @@ function EventNodes() {
     fields: { show: false, nodeId: null as number | null },
   });
 
-  // 更新筛选条件并同步到URL
+  // 更新筛选条件（仅更新本地状态）
   const updateFilters = useCallback(
     (updates: Partial<EventNodeFilters>) => {
-      setFilters((prevFilters) => {
-        const newFilters = { ...prevFilters, ...updates };
-
-        // 同步到URL
-        const params: Record<string, string> = {};
-        if (newFilters.keyword) params.q = newFilters.keyword;
-        if (newFilters.todayModified) params.today = "true";
-        if (newFilters.eventId) params.event = newFilters.eventId;
-        if (newFilters.fieldCountMin)
-          params.field_min = newFilters.fieldCountMin;
-        if (newFilters.fieldCountMax)
-          params.field_max = newFilters.fieldCountMax;
-
-        setSearchParams(params);
-        return newFilters;
-      });
+      setFilters((prevFilters) => ({ ...prevFilters, ...updates }));
     },
-    [setSearchParams],
+    []
   );
+
+  // URL同步：将filters变化同步到URL参数（独立useEffect）
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (filters.keyword) params.q = filters.keyword;
+    if (filters.todayModified) params.today = "true";
+    if (filters.eventId) params.event = filters.eventId;
+    if (filters.fieldCountMin) params.field_min = filters.fieldCountMin;
+    if (filters.fieldCountMax) params.field_max = filters.fieldCountMax;
+
+    setSearchParams(params);
+  }, [filters, setSearchParams]);
 
   // 游戏上下文验证
   if (!gameGid) {
@@ -513,7 +422,7 @@ function EventNodes() {
     onEditInBuilder: (nodeId) => {
       const node = data?.nodes.find((n) => n.id === nodeId);
       if (node) {
-        window.location.href = `/event-node-builder?node_id=${nodeId}`;
+        navigate(`/event-node-builder?node_id=${nodeId}`);
       }
     },
     onCopy: async (nodeId) => {
@@ -521,7 +430,7 @@ function EventNodes() {
       if (newName) {
         try {
           await eventNodesApi.copy(nodeId, newName);
-          queryClient.invalidateQueries(["event-nodes"]);
+          queryClient.invalidateQueries({ queryKey: ["event-nodes"] });
           success("复制成功");
         } catch (error) {
           toastError("复制失败");
@@ -529,9 +438,15 @@ function EventNodes() {
       }
     },
     onDelete: (nodeId) => {
-      if (confirm("确定要删除这个节点吗？")) {
-        deleteMutation.mutate(nodeId);
-      }
+      setConfirmState({
+        open: true,
+        title: '确认删除',
+        message: '确定要删除这个节点吗？',
+        onConfirm: () => {
+          setConfirmState(s => ({ ...s, open: false }));
+          deleteMutation.mutate(nodeId);
+        }
+      });
     },
     onViewFields: (nodeId) =>
       setModals((prev) => ({ ...prev, fields: { show: true, nodeId } })),
@@ -567,7 +482,7 @@ function EventNodes() {
       toastError("删除失败，请重试");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["event-nodes-stats"]);
+      queryClient.invalidateQueries({ queryKey: ["event-nodes-stats"] });
       success("删除成功");
     },
   });
@@ -576,8 +491,8 @@ function EventNodes() {
   const bulkDeleteMutation = useMutation({
     mutationFn: (ids: number[]) => eventNodesApi.bulkDelete(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries(["event-nodes"]);
-      queryClient.invalidateQueries(["event-nodes-stats"]);
+      queryClient.invalidateQueries({ queryKey: ["event-nodes"] });
+      queryClient.invalidateQueries({ queryKey: ["event-nodes-stats"] });
       clearSelection();
       success("批量删除成功");
     },
@@ -588,7 +503,10 @@ function EventNodes() {
     return (
       <ErrorFallback
         error={error as Error}
-        resetErrorBoundary={() => window.location.reload()}
+        resetErrorBoundary={() => {
+          queryClient.invalidateQueries({ queryKey: ["event-nodes"] });
+          queryClient.invalidateQueries({ queryKey: ["event-nodes-stats"] });
+        }}
       />
     );
   }
@@ -596,62 +514,42 @@ function EventNodes() {
   return (
     <ErrorBoundary>
       <div className="event-nodes-page" data-testid="event-nodes-page">
-        {/* 页面头部 */}
-        <div
-          className="glass-card"
-          style={{
-            padding: "2rem",
-            marginBottom: "1.5rem",
-            position: "relative",
-            overflow: "hidden",
-          }}
-          data-testid="event-nodes-header"
-        >
-          <div className="header-gradient"></div>
-          <div
-            className="d-flex justify-content-between align-items-center"
-            style={{ position: "relative", zIndex: 1 }}
-          >
-            <div className="d-flex align-items-center gap-3">
+        {/* 页面头部 - 优雅两栏布局 */}
+        <div className="page-header" data-testid="event-nodes-header">
+          <div className="page-header-content">
+            <div className="d-flex align-items-center gap-4 mb-2">
               <div className="hero-icon-box">
-                <span className="icon-2xl">📊</span>
+                <i className="bi bi-diagram-3"></i>
               </div>
               <div>
-                <h2
-                  className="text-primary"
-                  style={{
-                    fontSize: "1.5rem",
-                    fontWeight: 700,
-                    marginBottom: "0.25rem",
-                  }}
-                >
-                  事件节点管理
-                </h2>
-                <p className="text-secondary" style={{ fontSize: "0.875rem" }}>
+                <h1 className="page-header-title">事件节点管理</h1>
+                <p className="page-header-description">
                   管理和配置事件节点，批量导出HQL
                 </p>
               </div>
             </div>
-            <div className="d-flex gap-2">
-              <Link to="/event-node-builder">
-                <Button
-                  variant="light-secondary"
-                  data-testid="new-node-button"
-                >
-                  新建节点
-                </Button>
-              </Link>
+          </div>
+          <div className="page-header-actions">
+            <Link to="/event-node-builder" style={{ textDecoration: 'none' }}>
               <Button
-                variant="light-primary"
-                onClick={() => {
-                  // 批量导出HQL（后续实现）
-                  success("批量导出功能开发中...");
-                }}
-                data-testid="bulk-export-button"
+                variant="primary"
+                className="me-3"
+                data-testid="new-node-button"
               >
-                批量导出HQL
+                <i className="bi bi-plus-lg me-2"></i>
+                新建节点
               </Button>
-            </div>
+            </Link>
+            <Button
+              variant="outline-primary"
+              onClick={() => {
+                success("批量导出功能开发中...");
+              }}
+              data-testid="bulk-export-button"
+            >
+              <i className="bi bi-download me-2"></i>
+              批量导出HQL
+            </Button>
           </div>
         </div>
 
@@ -665,9 +563,15 @@ function EventNodes() {
           selectedCount={selectedCount}
           onClearSelection={clearSelection}
           onBulkDelete={() => {
-            if (confirm(`确定要删除选中的 ${selectedCount} 个节点吗？`)) {
-              bulkDeleteMutation.mutate(selectedIds);
-            }
+            setConfirmState({
+              open: true,
+              title: '确认批量删除',
+              message: `确定要删除选中的 ${selectedCount} 个节点吗？`,
+              onConfirm: () => {
+                setConfirmState(s => ({ ...s, open: false }));
+                bulkDeleteMutation.mutate(selectedIds);
+              }
+            });
           }}
           onToggleAdvanced={() => setShowAdvanced(!showAdvanced)}
           showAdvanced={showAdvanced}
@@ -711,7 +615,7 @@ function EventNodes() {
               quickEdit: { show: false, nodeId: null },
             }))
           }
-          onUpdate={() => queryClient.invalidateQueries(["event-nodes"])}
+          onUpdate={() => queryClient.invalidateQueries({ queryKey: ["event-nodes"] })}
           data-testid="quick-edit-modal"
         />
 
@@ -728,6 +632,17 @@ function EventNodes() {
             }))
           }
           data-testid="fields-list-modal"
+        />
+
+        <ConfirmDialog
+          open={confirmState.open}
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmText="删除"
+          cancelText="取消"
+          variant="danger"
+          onConfirm={confirmState.onConfirm}
+          onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
         />
       </div>
     </ErrorBoundary>

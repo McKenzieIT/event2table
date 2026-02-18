@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, useToast } from "@shared/ui";
+import { useGameContext } from "@shared/hooks/useGameContext";
 import { ImportPreviewModal } from "../components/ImportPreviewModal";
 import "./ImportEvents.css";
 
@@ -15,7 +16,9 @@ function ImportEvents() {
   const [showPreview, setShowPreview] = useState(false);
   const [parameters, setParameters] = useState([]);
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
   const { success, error } = useToast();
+  const { currentGameGid } = useGameContext();
 
   // 使用 useCallback 优化事件处理
   const handleFileChange = useCallback((e) => {
@@ -83,8 +86,8 @@ function ImportEvents() {
     const formData = new FormData();
     formData.append("file", file);
 
-    // 获取game_gid
-    const gameGid = localStorage.getItem("selectedGameGid") || "10000147";
+    // Priority: useGameContext > localStorage
+    const gameGid = currentGameGid || localStorage.getItem("selectedGameGid") || "10000147";
     formData.append("game_gid", gameGid);
 
     try {
@@ -110,7 +113,7 @@ function ImportEvents() {
           fileInputRef.current.value = "";
         }
         // 跳转到事件列表页
-        window.location.href = "/#/events";
+        navigate("/events");
       } else {
         error(result.error || "导入失败");
       }

@@ -8,6 +8,24 @@
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { useEscHandlerWithClosing } from './useEscHandler';
 import ConfirmDialog from './ConfirmDialog';
+import { MODAL_ANIMATION_DELAY } from '@shared/constants/timeouts';
+import { Z_INDICES } from '@shared/constants/zIndices';
+import './BaseModal.css';
+
+/**
+ * 动画类型
+ */
+export type ModalAnimation = 'slideUp' | 'fadeIn' | 'none';
+
+/**
+ * 尺寸类型
+ */
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+/**
+ * 变体类型
+ */
+export type ModalVariant = 'default' | 'danger' | 'warning';
 
 /**
  * 确认对话框配置
@@ -52,6 +70,16 @@ export interface BaseModalProps {
   /** 背景遮罩的z-index，默认1050 */
   zIndex?: number;
 
+  // 新增样式属性
+  /** 动画类型，默认slideUp */
+  animation?: ModalAnimation;
+  /** 是否启用毛玻璃效果，默认false */
+  glassmorphism?: boolean;
+  /** 模态框尺寸，默认md */
+  size?: ModalSize;
+  /** 模态框变体，默认default */
+  variant?: ModalVariant;
+
   // 其他
   /** 点击背景是否关闭，默认true */
   closeOnBackdropClick?: boolean;
@@ -72,7 +100,11 @@ export const BaseModal = React.memo(function BaseModal({
   overlayClassName = '',
   contentClassName = '',
   contentStyle,
-  zIndex = 1050,
+  zIndex = Z_INDICES.MODAL,
+  animation = 'slideUp',
+  glassmorphism = false,
+  size = 'md',
+  variant = 'default',
   closeOnBackdropClick = true,
   onAfterClose,
 }: BaseModalProps) {
@@ -81,6 +113,24 @@ export const BaseModal = React.memo(function BaseModal({
   const [wasOpen, setWasOpen] = useState(false);
   const triggerElementRef = useRef<HTMLElement | null>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
+
+  // 构建遮罩层className
+  const overlayClasses = [
+    'modal-overlay',
+    animation === 'fadeIn' && 'modal-overlay--fadeIn',
+    glassmorphism && 'modal-overlay--glassmorphism',
+    overlayClassName,
+  ].filter(Boolean).join(' ');
+
+  // 构建内容className
+  const contentClasses = [
+    'modal-content',
+    `modal-content--${animation}`,
+    glassmorphism && 'modal-content--glassmorphism',
+    `modal-content--${size}`,
+    `modal-content--${variant}`,
+    contentClassName,
+  ].filter(Boolean).join(' ');
 
   // 确认对话框默认配置
   const defaultConfirmConfig: Required<ConfirmConfig> = {
@@ -119,7 +169,7 @@ export const BaseModal = React.memo(function BaseModal({
       onClose();
       setIsClosing(false);
       onAfterClose?.();
-    }, 50); // 50ms延迟，让状态更新先执行
+    }, MODAL_ANIMATION_DELAY);
   };
 
   // 处理确认对话框的确认操作
@@ -171,14 +221,13 @@ export const BaseModal = React.memo(function BaseModal({
     <>
       {/* 背景遮罩 */}
       <div
-        className={`modal-overlay ${overlayClassName}`}
+        className={overlayClasses}
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -189,7 +238,7 @@ export const BaseModal = React.memo(function BaseModal({
         {/* 模态框内容 */}
         <div
           ref={modalContentRef}
-          className={`modal-content ${contentClassName}`}
+          className={contentClasses}
           style={{
             outline: 'none',
             ...contentStyle,

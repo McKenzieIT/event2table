@@ -22,7 +22,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/Button';
 import toast from 'react-hot-toast';
 
-export function BindToLibraryModal({ paramId, paramName, templateId, onClose }) {
+export function BindToLibraryModal({ paramId, paramName, templateId, onClose, onSuccess }) {
   const [matchedParams, setMatchedParams] = useState([]);
   const [selectedLibraryId, setSelectedLibraryId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,8 +63,11 @@ export function BindToLibraryModal({ paramId, paramName, templateId, onClose }) 
       if (data.success) {
         toast.success('参数已绑定到库');
         onClose();
-        // 刷新页面或更新状态
-        window.location.reload();
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          window.location.reload();
+        }
       } else {
         toast.error('绑定失败：' + (data.error || '未知错误'));
       }

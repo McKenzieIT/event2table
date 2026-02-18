@@ -4,9 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DWD Generator - React App Shell</title>
+    <title>Event2Table - Data Warehouse HQL Generator</title>
+    
+    <!-- Google Fonts: Outfit + DM Sans + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-      /* Initial loading state - shown before React loads */
+      /* Initial loading state - Cyberpunk Terminal Style */
       #initial-loader {
         position: fixed;
         top: 0;
@@ -17,23 +24,57 @@
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        gap: 16px;
-        background-color: #f8fafc;
+        gap: 24px;
+        background: 
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(6, 182, 212, 0.03) 2px,
+            rgba(6, 182, 212, 0.03) 4px
+          ),
+          radial-gradient(ellipse at top, #0c4a6e 0%, #0f172a 50%, #000 100%);
         z-index: 10000;
+        overflow: hidden;
+      }
+      #initial-loader::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(
+          180deg,
+          transparent 0%,
+          rgba(6, 182, 212, 0.05) 50%,
+          transparent 100%
+        );
+        animation: scan 2s linear infinite;
+      }
+      @keyframes scan {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100%); }
       }
       #initial-loader .spinner {
-        width: 48px;
-        height: 48px;
-        border: 4px solid #e2e8f0;
-        border-top: 4px solid #3b82f6;
-        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        border: 3px solid rgba(6, 182, 212, 0.2);
+        border-top: 3px solid #06B6D4;
+        border-radius: 8px;
         animation: spin 1s linear infinite;
+        box-shadow: 
+          0 0 20px rgba(6, 182, 212, 0.3),
+          inset 0 0 20px rgba(6, 182, 212, 0.1);
       }
       #initial-loader .text {
-        color: #64748b;
+        color: #06B6D4;
         font-size: 14px;
         font-weight: 500;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        font-family: 'JetBrains Mono', monospace;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
       }
       @keyframes spin {
         0% { transform: rotate(0deg); }
