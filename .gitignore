@@ -78,6 +78,9 @@ frontend/tests/performance/*.md
 # Environment variables
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
 
 # IDE
 .vscode/
@@ -118,3 +121,9 @@ docs/ralph/
 
 # But keep the root CLAUDE.md if you want
 !CLAUDE.md
+# Test directories (new structure, currently in development)
+backend/test/
+frontend/test/
+
+# Update-docs skill output (temporary working documents)
+.claude/skills/update-docs/output/
