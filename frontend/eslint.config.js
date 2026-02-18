@@ -1,0 +1,90 @@
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import { plugin as noHardcodedColorsPlugin } from './eslint-plugin-no-hardcoded-colors.js';
+import basemodalMigration from './eslint-plugin-basemodal-migration.js';
+
+export default tseslint.config(
+  { ignores: ['dist', 'node_modules'] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx,js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        FormData: 'readonly',
+        Blob: 'readonly',
+        File: 'readonly',
+        URL: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
+        Promise: 'readonly',
+        Array: 'readonly',
+        Object: 'readonly',
+        String: 'readonly',
+        Number: 'readonly',
+        Boolean: 'readonly',
+        Math: 'readonly',
+        Date: 'readonly',
+        JSON: 'readonly',
+        RegExp: 'readonly',
+        Error: 'readonly',
+        TypeError: 'readonly',
+        SyntaxError: 'readonly',
+        RangeError: 'readonly',
+        ReferenceError: 'readonly',
+        XMLHttpRequest: 'readonly',
+        Worker: 'readonly',
+        navigator: 'readonly',
+        location: 'readonly',
+        history: 'readonly',
+        performance: 'readonly',
+        MutationObserver: 'readonly',
+        IntersectionObserver: 'readonly',
+        Element: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        Event: 'readonly',
+        MouseEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        CustomEvent: 'readonly',
+      },
+    },
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+      'no-hardcoded-colors': noHardcodedColorsPlugin,
+      'basemodal-migration': basemodalMigration,
+    },
+    rules: {
+      ...react.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'react/prop-types': 'off',
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+      'no-console': ['warn', {
+        allow: ['warn', 'error'],
+      }],
+      'no-hardcoded-colors/no-hardcoded-colors': 'warn',
+      'basemodal-migration/use-content-class-name': 'error',
+      'basemodal-migration/invalid-size-value': 'error',
+      'basemodal-migration/use-modal-body': 'error',
+    },
+  },
+);

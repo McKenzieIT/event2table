@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Git Pre-commit Hook - Database File Location Check
+
+检查是否在错误位置创建了数据库文件（*.db, *.db-shm, *.db-wal）
+
+运行时机：每次 git commit 前
+阻止条件：发现 data/ 目录之外的数据库文件
+
+使用方法：
+1. 自动安装：python scripts/git-hooks/install_hooks.py
+2. 手动安装：cp scripts/git-hooks/pre-commit .git/hooks/pre-commit
+3. 赋予执行权限：chmod +x .git/hooks/pre-commit
+"""
+
+import os
+import sys
+from pathlib import Path
+
+# ANSI color codes
+RED = '\033[91m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+RESET = '\033[0m'
+BOLD = '\033[1m'
+
+def find_misplaced_database_files():
+    """
+    查找错误放置的数据库文件
+
+    Returns:
+        list: 错误放置的数据库文件路径列表
+    """
+    # 获取项目根目录（.git所在位置的父目录）
+    git_dir = Path(__file__).parent.parent.parent / '.git'
+    if not git_dir.exists():
+        # fallback: 使用当前脚本位置向上查找
+        root_dir = Path(__file__).parent.parent.parent
+    else:
+        root_dir = git_dir.parent
+
+    # 允许的数据库文件目录
+    allowed_dirs = {
+        root_dir / 'data',
+        root_dir / '.git',
+    }
+
+    # 查找所有数据库文件
+    misplaced_files = []
+
+    for ext in ['*.db', '*.db-shm', '*.db-wal']:
+        # 使用 rglob 进行递归搜索
+        for db_file in root_dir.rglob(ext):
+            # 检查文件是否在允许的目录中
+            in_allowed_dir = any(
+                db_file.is_relative_to(allowed_dir)
+                for allowed_dir in allowed_dirs
+            )
+
+            # 检查是否在虚拟环境中（venv/）
+            in_venv = 'venv' in db_file.parts or 'venv' in str(db_file)
+
+            # 检查是否在node_modules中
+            in_node_modules = 'node_modules' in db_file.parts
+
+            # 检查是否在git worktrees中
+            in_worktrees = '.worktrees' in db_file.parts
+
+            if not in_allowed_dir and not in_venv and not in_node_modules and not in_worktrees:
+                misplaced_files.append(db_file)
+
+    return misplaced_files
+
+def main():
+    """主函数"""
+    print(f"{YELLOW}🔍 Running pre-commit hook: Database file location check...{RESET}")
+
+    # 查找错误放置的数据库文件
+    misplaced_files = find_misplaced_database_files()
+
+    if misplaced_files:
+        # 发现错误放置的文件，阻止提交
+        print(f"\n{RED}{BOLD}❌ Database files found outside data/ directory!{RESET}\n")
+        print(f"{RED}{BOLD}ERROR: Found {len(misplaced_files)} database file(s) in incorrect locations:{RESET}\n")
+
+        for file in misplaced_files:
+            rel_path = file.relative_to(Path(__file__).parent.parent.parent)
+            size = file.stat().st_size if file.exists() else 0
+            print(f"  {RED}✗{RESET} {rel_path} ({size} bytes)")
+
+        print(f"\n{YELLOW}📋 How to fix:{RESET}")
+        print(f"  1. Move database files to data/ directory:")
+        print(f"     {GREEN}mv dwd_generator.db data/{RESET}")
+        print(f"     {GREEN}mv backend/core/config/dwd_generator.db data/{RESET}")
+        print(f"\n  2. Or delete if outdated/test files:")
+        print(f"     {GREEN}rm <file-path>{RESET}")
+        print(f"\n  3. For more information, see:")
+        print(f"     {GREEN}CLAUDE.md - 数据库文件位置规范{RESET}")
+        print(f"\n{YELLOW}⚠️  Commit blocked! Please fix before committing.{RESET}\n")
+
+        sys.exit(1)
+    else:
+        # 没有发现错误放置的文件
+        print(f"{GREEN}✅ Database file location check passed!{RESET}")
+        print(f"{GREEN}✅ Pre-commit hook passed!{RESET}\n")
+        sys.exit(0)
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        print(f"{RED}❌ Pre-commit hook error: {e}{RESET}\n")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
