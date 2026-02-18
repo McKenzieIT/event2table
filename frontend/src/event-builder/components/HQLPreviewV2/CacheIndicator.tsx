@@ -103,56 +103,58 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
   }
 
   return (
-    <div className="cache-indicator">
-      <div className="cache-header">
-        <h4>缓存统计</h4>
-        <div className="cache-actions">
-          <button onClick={fetchStats} disabled={loading} className="btn-sm">
-            刷新
-          </button>
-          <button onClick={clearCache} disabled={loading} className="btn-sm btn-danger">
-            清空
-          </button>
+    <>
+      <div className="cache-indicator">
+        <div className="cache-header">
+          <h4>缓存统计</h4>
+          <div className="cache-actions">
+            <button onClick={fetchStats} disabled={loading} className="btn-sm">
+              刷新
+            </button>
+            <button onClick={clearCache} disabled={loading} className="btn-sm btn-danger">
+              清空
+            </button>
+          </div>
         </div>
+
+        {error && <div className="cache-error">{error}</div>}
+
+        {stats && (
+          <>
+            <div className="cache-hitrate">
+              <span>命中率: {(stats.hit_rate * 100).toFixed(1)}%</span>
+              <span style={{
+                padding: '2px 8px',
+                borderRadius: '4px',
+                backgroundColor: getHitRateColor(stats.hit_rate),
+                color: 'white'
+              }}>
+                {stats.hit_rate >= 0.7 ? '优秀' : stats.hit_rate >= 0.4 ? '良好' : '较低'}
+              </span>
+            </div>
+
+            {showDetails && (
+              <div className="cache-metrics">
+                <div>大小: {stats.cache_size} / {stats.cache_maxsize}</div>
+                <div>命中: {stats.cache_hits}</div>
+                <div>未命中: {stats.cache_misses}</div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-      {error && <div className="cache-error">{error}</div>}
-
-      {stats && (
-        <>
-          <div className="cache-hitrate">
-            <span>命中率: {(stats.hit_rate * 100).toFixed(1)}%</span>
-            <span style={{
-              padding: '2px 8px',
-              borderRadius: '4px',
-              backgroundColor: getHitRateColor(stats.hit_rate),
-              color: 'white'
-            }}>
-              {stats.hit_rate >= 0.7 ? '优秀' : stats.hit_rate >= 0.4 ? '良好' : '较低'}
-            </span>
-          </div>
-
-          {showDetails && (
-            <div className="cache-metrics">
-              <div>大小: {stats.cache_size} / {stats.cache_maxsize}</div>
-              <div>命中: {stats.cache_hits}</div>
-              <div>未命中: {stats.cache_misses}</div>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-
-    <ConfirmDialog
-      open={confirmState.open}
-      title={confirmState.title}
-      message={confirmState.message}
-      confirmText="清空"
-      cancelText="取消"
-      variant="danger"
-      onConfirm={handleConfirmClear}
-      onCancel={handleCancelClear}
-    />
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmText="清空"
+        cancelText="取消"
+        variant="danger"
+        onConfirm={handleConfirmClear}
+        onCancel={handleCancelClear}
+      />
+    </>
   );
 };
 

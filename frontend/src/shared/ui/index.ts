@@ -47,7 +47,7 @@ export { default as Card } from './Card/Card';
 export { default as Input } from './Input/Input';
 export { default as TextArea } from './TextArea/TextArea';
 export { default as Table } from './Table/Table';
-export { default as Modal } from './BaseModal/BaseModal';
+export { default as Modal, BaseModal } from './BaseModal/BaseModal';
 export { default as Badge } from './Badge/Badge';
 export { ToastProvider, useToast } from './Toast/Toast';
 export type { ToastType } from './Toast/Toast';
@@ -59,3 +59,5 @@ export { default as Spinner } from './Spinner/Spinner';
 
 // Special components
 export { SelectGamePrompt } from './SelectGamePrompt';
+export { ConfirmDialog } from './BaseModal/ConfirmDialog';
+export { SearchInput } from './SearchInput/SearchInput';

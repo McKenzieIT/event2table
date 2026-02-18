@@ -1,0 +1,7 @@
+export const Z_INDICES = {
+  TOAST: 9999,
+  CONFIRM_DIALOG: 1500,
+  MODAL: 1050,
+  DRAWER: 100,
+  DROPDOWN: 1000,
+} as const;

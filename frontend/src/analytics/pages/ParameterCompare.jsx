@@ -24,12 +24,13 @@ function ParameterCompare() {
 
   // 加载所有参数
   const { data: allParameters = [], isLoading } = useQuery({
-    queryKey: ['parameters', 'all', currentGame.gid],
+    queryKey: ['parameters', 'all', currentGame.gid, 'v2'], // v2 to force cache refresh
     queryFn: async () => {
       const response = await fetch(`/api/parameters/all?game_gid=${currentGame.gid}`);
       if (!response.ok) throw new Error('加载参数失败');
       const result = await response.json();
-      return result.data || [];
+      // API 返回格式: { data: { parameters: [...], total: 100 } }
+      return result.data?.parameters || [];
     },
     enabled: !!currentGame // Only execute when currentGame exists
   });

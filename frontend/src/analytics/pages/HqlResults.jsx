@@ -16,7 +16,9 @@ function HqlResults() {
     queryFn: async () => {
       const response = await fetch('/api/hql/results');
       if (!response.ok) throw new Error('加载失败');
-      return response.json();
+      const result = await response.json();
+      // API 返回格式: { success: true, data: [...] }
+      return result.data || [];
     }
   });
 
