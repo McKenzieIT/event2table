@@ -1,0 +1,442 @@
+{
+  "analysis_summary": {
+    "total_unit_test_files_found": 42,
+    "duplicates_identified": 6,
+    "obsolete_tests": 8,
+    "performance_tests": 2,
+    "active_unit_tests": 28,
+    "analysis_date": "2026-02-13",
+    "analyzer": "Claude Code Test Analysis Agent"
+  },
+  "duplicates": [
+    {
+      "test_name": "Games API Tests",
+      "files": [
+        "test/unit/backend_tests/unit/test_games_api.py",
+        "test/unit/test_games_api_simple.py"
+      ],
+      "similarity": "70%",
+      "action": "merge",
+      "keep_file": "test/unit/backend_tests/unit/test_games_api.py",
+      "delete_file": "test/unit/test_games_api_simple.py",
+      "reason": "test_games_api.py是完整版本（230行），test_games_api_simple.py是简化版本，应该合并",
+      "content_summary": "测试游戏API的CRUD操作：list, create, get, update, delete, batch_delete, batch_update",
+      "api_coverage": [
+        "GET /api/games",
+        "POST /api/games",
+        "GET /api/games/<gid>",
+        "PUT /api/games/<gid>",
+        "DELETE /api/games/<gid>",
+        "DELETE /api/games/batch",
+        "PUT /api/games/batch-update"
+      ],
+      "differences": "test_games_api.py有完整的TODO注释和测试结构，test_games_api_simple.py只有基础测试"
+    },
+    {
+      "test_name": "Core Utils Tests",
+      "files": [
+        "test/unit/backend_tests/unit/test_core_utils.py",
+        "test/unit/backend_tests/unit/test_utils_comprehensive.py"
+      ],
+      "similarity": "60%",
+      "action": "merge",
+      "keep_file": "test/unit/backend_tests/unit/test_utils_comprehensive.py",
+      "delete_file": "test/unit/backend_tests/unit/test_core_utils.py",
+      "reason": "test_utils_comprehensive.py扩展了test_core_utils.py，增加了安全验证和字符串测试",
+      "content_summary": "测试核心工具函数：sanitize_html, sanitize_and_validate_string, validate_game_gid",
+      "coverage": [
+        "HTML清理（script标签、iframe标签、事件处理器、javascript协议）",
+        "字符串验证（空值、长度限制、XSS防护）",
+        "game_gid验证（类型、范围、有效性）"
+      ],
+      "differences": "test_utils_comprehensive.py有更全面的XSS防护测试和安全函数测试"
+    },
+    {
+      "test_name": "Event Nodes Tests",
+      "files": [
+        "test/unit/backend_tests/unit/test_event_nodes_migration.py",
+        "test/unit/backend_tests/diagnostics/archive/test_event_nodes_complete.py"
+      ],
+      "similarity": "80%",
+      "action": "delete",
+      "keep_file": "test/unit/backend_tests/unit/test_event_nodes_migration.py",
+      "delete_file": "test/unit/backend_tests/diagnostics/archive/test_event_nodes_complete.py",
+      "reason": "archive目录中的是旧版本，unit/目录中的是新版本",
+      "content_summary": "测试事件节点迁移、字段映射、数据转换"
+    },
+    {
+      "test_name": "Database Tests",
+      "files": [
+        "test/unit/backend_tests/unit/test_database.py",
+        "test/unit/backend_tests/unit/test_database_module.py"
+      ],
+      "similarity": "50%",
+      "action": "merge",
+      "keep_file": "test/unit/backend_tests/unit/test_database_module.py",
+      "delete_file": "test/unit/backend_tests/unit/test_database.py",
+      "reason": "test_database_module.py更全面，测试数据库模块的所有功能",
+      "content_summary": "测试数据库连接、查询、事务、连接池",
+      "coverage": [
+        "数据库连接",
+        "参数化查询（防SQL注入）",
+        "事务管理（commit/rollback）",
+        "连接池"
+      ]
+    },
+    {
+      "test_name": "HQL V1 vs V2 Comparison Tests",
+      "files": [
+        "test/unit/backend_tests/test_hql_v1_v2_comparison.py",
+        "test/unit/backend_tests/test_hql_v2_incremental.py"
+      ],
+      "similarity": "40%",
+      "action": "keep_both",
+      "reason": "两个测试不同方面：hql_v1_v2_comparison.py对比两个版本，hql_v2_incremental.py测试V2增量生成",
+      "content_summary": "hql_v1_v2_comparison.py: V1和V2性能对比；hql_v2_incremental.py: V2增量更新测试",
+      "recommendation": "重命名为hql_version_comparison.py和hql_v2_incremental.py以更清晰"
+    },
+    {
+      "test_name": "Join Configs Tests",
+      "files": [
+        "test/unit/backend_tests/unit/test_join_configs_game_gid.py"
+      ],
+      "similarity": "N/A",
+      "action": "rename",
+      "reason": "测试文件命名不够清晰",
+      "current_name": "test_join_configs_game_gid.py",
+      "recommended_name": "test_join_configs_game_gid_migration.py",
+      "content_summary": "测试JOIN配置中game_gid到game_id的迁移"
+    }
+  ],
+  "obsolete_tests": [
+    {
+      "file": "test/unit/backend_tests/test_phase2.py",
+      "status": "obsolete",
+      "reason": "Phase 2开发已完成，这些测试已过时",
+      "recommendation": "保留作为历史参考，移到archive/目录"
+    },
+    {
+      "file": "test/unit/backend_tests/diagnostics/archive/test_join_fix.py",
+      "status": "archived",
+      "reason": "JOIN功能已修复，这是调试测试",
+      "recommendation": "保留在archive/作为修复历史"
+    },
+    {
+      "file": "test/unit/backend_tests/diagnostics/archive/test_union_all_fix.py",
+      "status": "archived",
+      "reason": "UNION ALL功能已修复，这是调试测试",
+      "recommendation": "保留在archive/作为修复历史"
+    },
+    {
+      "file": "test/unit/backend_tests/diagnostics/test_canvas_automation.py",
+      "status": "obsolete",
+      "reason": "Canvas自动化已集成到主测试，这是独立的自动化测试",
+      "recommendation": "合并到test_canvas_api.py或移到archive/"
+    },
+    {
+      "file": "test/unit/backend_tests/diagnostics/test_sql_optimizer_api.py",
+      "status": "obsolete",
+      "reason": "SQL优化器API已重构，这是旧版API测试",
+      "recommendation": "更新测试以匹配新API或移到archive/"
+    },
+    {
+      "file": "test/unit/backend_tests/test_sql_optimizer.py",
+      "status": "needs_update",
+      "reason": "SQL优化器已重构，测试需要更新",
+      "recommendation": "更新测试以覆盖新的优化器功能"
+    },
+    {
+      "file": "test/canvas_import_fix.py",
+      "status": "obsolete",
+      "reason": "Canvas导入修复已完成，这是临时修复脚本",
+      "recommendation": "移到scripts/archive/或删除"
+    },
+    {
+      "file": "test/game_gid_type_consistency.py",
+      "status": "obsolete",
+      "reason": "game_gid类型一致性已修复，这是验证脚本",
+      "recommendation": "移到scripts/verify/或删除"
+    }
+  ],
+  "performance_tests": [
+    {
+      "file": "test/unit/backend_tests/test_performance_benchmark.py",
+      "type": "performance",
+      "measures": [
+        "execution_time",
+        "memory_usage",
+        "cache_hit_rate"
+      ],
+      "is_benchmark": true,
+      "coverage": [
+        "validate_form_fields() - 1000次调用",
+        "AggregateFunctionBuilder.build_aggregate_sql() - 1000次调用",
+        "find_isolated_nodes() - 100个节点图",
+        "缓存命中率",
+        "LRU淘汰性能",
+        "并发访问性能（100线程）"
+      ],
+      "performance_targets": {
+        "validate_form_fields": "<1ms (平均)",
+        "build_aggregate_sql": "<0.1ms (平均)",
+        "find_isolated_nodes": "<5ms (平均)",
+        "bfs_traversal": "<3ms (平均)",
+        "cache_hit_rate": "≥90%",
+        "l1_response_time": "<1ms",
+        "l2_response_time": "5-10ms",
+        "qps": "≥1000"
+      }
+    },
+    {
+      "file": "test/unit/backend_tests/test_cache_performance.py",
+      "type": "performance",
+      "measures": [
+        "execution_time",
+        "cache_hit_rate",
+        "memory_usage",
+        "concurrent_access"
+      ],
+      "is_benchmark": true,
+      "coverage": [
+        "三级分层缓存系统性能",
+        "L1缓存（内存）",
+        "L2缓存（Redis）",
+        "L3缓存（数据库）",
+        "LRU淘汰策略",
+        "并发访问（100线程）"
+      ],
+      "performance_targets": {
+        "l1_hit_rate": "≥60%",
+        "l2_hit_rate": "≥30%",
+        "total_hit_rate": "≥90%",
+        "l1_response_time": "<1ms",
+        "l2_response_time": "5-10ms",
+        "l3_response_time": "50-200ms",
+        "qps": "≥1000"
+      }
+    }
+  ],
+  "active_unit_tests": [
+    {
+      "file": "test/unit/backend_tests/unit/test_games_api.py",
+      "status": "active",
+      "coverage": "游戏API CRUD测试（完整）",
+      "priority": "HIGH"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_events_api.py",
+      "status": "active",
+      "coverage": "事件API CRUD测试（完整）",
+      "priority": "HIGH"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_utils_comprehensive.py",
+      "status": "active",
+      "coverage": "核心工具函数测试（全面）",
+      "priority": "HIGH"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_security.py",
+      "status": "active",
+      "coverage": "安全功能测试",
+      "priority": "HIGH"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_cache_system.py",
+      "status": "active",
+      "coverage": "缓存系统单元测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_hierarchical_cache.py",
+      "status": "active",
+      "coverage": "分层缓存测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_db_isolation.py",
+      "status": "active",
+      "coverage": "数据库隔离测试（测试环境）",
+      "priority": "HIGH"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_environment_config.py",
+      "status": "active",
+      "coverage": "环境配置测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_graph_utils.py",
+      "status": "active",
+      "coverage": "图工具测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_sql_builder.py",
+      "status": "active",
+      "coverage": "SQL构建器测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_common.py",
+      "status": "active",
+      "coverage": "通用工具测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_database_module.py",
+      "status": "active",
+      "coverage": "数据库模块测试",
+      "priority": "HIGH"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_event_builder.py",
+      "status": "active",
+      "coverage": "事件构建器测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/unit/test_crypto.py",
+      "status": "active",
+      "coverage": "加密功能测试",
+      "priority": "LOW"
+    },
+    {
+      "file": "test/unit/backend_tests/test_migrations.py",
+      "status": "active",
+      "coverage": "数据库迁移测试",
+      "priority": "HIGH"
+    },
+    {
+      "file": "test/unit/backend_tests/test_api_validation.py",
+      "status": "active",
+      "coverage": "API验证测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_param_library_api.py",
+      "status": "active",
+      "coverage": "参数库API测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_hql_preview_api.py",
+      "status": "active",
+      "coverage": "HQL预览API测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_cache_e2e.py",
+      "status": "active",
+      "coverage": "缓存端到端测试",
+      "priority": "MEDIUM"
+    },
+    {
+      "file": "test/unit/backend_tests/test_performance_modes.py",
+      "status": "active",
+      "coverage": "性能模式测试",
+      "priority": "LOW"
+    },
+    {
+      "file": "test/unit/backend_tests/diagnostics/test_canvas_api.py",
+      "status": "active",
+      "coverage": "Canvas API诊断测试",
+      "priority": "MEDIUM"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "action": "删除重复测试",
+      "details": "删除test/unit/test_games_api_simple.py（已合并到test_games_api.py）"
+    },
+    {
+      "priority": "HIGH",
+      "action": "合并工具测试",
+      "details": "将test_core_utils.py合并到test_utils_comprehensive.py，删除前者"
+    },
+    {
+      "priority": "HIGH",
+      "action": "归档过时测试",
+      "details": "将test/unit/backend_tests/test_phase2.py移到archive/目录"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "更新过时测试",
+      "details": "更新test_sql_optimizer.py以匹配新的优化器API"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "重命名测试文件",
+      "details": "将test_join_configs_game_gid.py重命名为test_join_configs_game_gid_migration.py"
+    },
+    {
+      "priority": "LOW",
+      "action": "清理临时脚本",
+      "details": "将test/canvas_import_fix.py和test/game_gid_type_consistency.py移到scripts/archive/"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "组织测试目录",
+      "details": "重组test/unit/backend_tests/目录结构，分离unit/、integration/、performance/、diagnostics/"
+    }
+  ],
+  "consolidated_structure": {
+    "recommended": {
+      "test/unit/backend/": {
+        "unit/": [
+          "test_games_api.py",
+          "test_events_api.py",
+          "test_utils_comprehensive.py",
+          "test_security.py",
+          "test_database_module.py",
+          "test_event_builder.py",
+          "test_environment_config.py",
+          "test_crypto.py"
+        ],
+        "integration/": [
+          "test_graph_utils.py",
+          "test_sql_builder.py",
+          "test_common.py",
+          "test_cache_system.py",
+          "test_param_library_api.py",
+          "test_hql_preview_api.py",
+          "test_api_validation.py",
+          "test_canvas_api.py"
+        ],
+        "performance/": [
+          "test_performance_benchmark.py",
+          "test_cache_performance.py",
+          "test_performance_modes.py"
+        ],
+        "e2e/": [
+          "test_cache_e2e.py",
+          "test_hql_v1_v2_comparison.py",
+          "test_hql_v2_incremental.py"
+        ],
+        "system/": [
+          "test_hierarchical_cache.py",
+          "test_db_isolation.py",
+          "test_migrations.py"
+        ],
+        "diagnostics/": [
+          "保留所有诊断测试（用于调试）"
+        ],
+        "archive/": [
+          "test_phase2.py",
+          "所有diagnostics/archive/中的文件"
+        ]
+      },
+      "test/scripts/": {
+        "archive/": [
+          "canvas_import_fix.py",
+          "game_gid_type_consistency.py"
+        ]
+      }
+    },
+    "to_delete": [
+      "test/unit/test_games_api_simple.py",
+      "test/unit/backend_tests/unit/test_core_utils.py"
+    ]
+  }
+}
