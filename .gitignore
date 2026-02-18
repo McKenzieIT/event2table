@@ -127,3 +127,16 @@ frontend/test/
 
 # Update-docs skill output (temporary working documents)
 .claude/skills/update-docs/output/
+
+# Temporary backup and test files
+test-cleanup-backup-*.tar.gz
+test-game-deletion.md
+test-reports/
+
+# Database backups (keep production backups in data/)
+data/*.backup
+data/*.backup_*
+
+# Migration scripts (run once)
+scripts/migrate/*.sql
+scripts/migrate/*.py
