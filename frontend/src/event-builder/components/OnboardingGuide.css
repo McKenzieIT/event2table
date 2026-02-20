@@ -1,0 +1,546 @@
+/**
+ * OnboardingGuide Styles - Cyberpunk Glass Morphism
+ * 首次访问引导样式 - 赛博朋克玻璃拟态
+ */
+
+/* ========================================
+   Overlay Backdrop - 全息遮罩层
+   ======================================== */
+.onboarding-guide-overlay {
+  /* Layout */
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  /* Visual: Cyberpunk dark backdrop with blur */
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* Pattern: Subtle grid for tech feel */
+  background-image:
+    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+
+  /* Z-index */
+  z-index: 2000;
+
+  /* Animation */
+  animation: overlayFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   Animations - 入场动画
+   ======================================== */
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes guideScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes guideItemSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================================
+   Guide Card - 全息信息卡片
+   ======================================== */
+.onboarding-guide {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+
+  /* Visual: Enhanced glass morphism */
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+  /* Border: Cyan glow effect */
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 16px;
+
+  /* Shadow: Multi-layer glow */
+  box-shadow:
+    0 0 0 1px rgba(6, 182, 212, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(6, 182, 212, 0.15);
+
+  /* Overflow hidden for rounded corners */
+  overflow: hidden;
+  padding: 0;
+
+  /* Animation: Scale + Fade entrance */
+  animation: guideScaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Ambient glow animation */
+.onboarding-guide::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 17px;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.4),
+    rgba(6, 182, 212, 0.1),
+    rgba(6, 182, 212, 0.4)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes guideSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ========================================
+   Header - 标题区域
+   ======================================== */
+.onboarding-guide .guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+
+  /* Border with cyan accent */
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.05), transparent);
+}
+
+.onboarding-guide .guide-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  /* Typography */
+  font-size: 19px;
+  font-family:
+    var(--font-sans),
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.98);
+
+  /* Text shadow for glow */
+  text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.onboarding-guide .guide-header h2 i {
+  font-size: 26px;
+
+  /* Cyan glow effect */
+  color: #06b6d4;
+  filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.6));
+
+  /* Animation: Subtle pulse */
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.9));
+  }
+}
+
+.onboarding-guide .btn-close-guide {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+
+  /* Visual */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+
+  /* Typography */
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Transition */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.onboarding-guide .btn-close-guide:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: rgba(239, 68, 68, 0.9);
+
+  /* Glow effect */
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+
+  /* Rotate slightly */
+  transform: rotate(90deg);
+}
+
+.onboarding-guide .btn-close-guide:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+/* ========================================
+   Guide Sections with Stagger Animation
+   ======================================== */
+.onboarding-guide .guide-section {
+  margin-bottom: 16px;
+  opacity: 0; /* Start hidden for animation */
+  animation: guideItemSlideIn 0.5s ease forwards;
+}
+
+.onboarding-guide .guide-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Stagger delays for each tip */
+.onboarding-guide .guide-section:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.onboarding-guide .guide-section:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.onboarding-guide .guide-section:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.onboarding-guide .guide-section:nth-child(4) {
+  animation-delay: 0.5s;
+}
+
+/* ========================================
+   Content - 内容区域
+   ======================================== */
+.onboarding-guide .guide-content {
+  padding: 24px 28px;
+}
+
+.onboarding-guide .guide-intro {
+  margin: 0 0 20px 0;
+
+  /* Typography */
+  font-size: 15px;
+  font-weight: 600;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0.01em;
+  color: rgba(6, 182, 212, 0.9);
+
+  /* Text shadow */
+  text-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+/* Guide Items - Cyberpunk style cards */
+.onboarding-guide .guide-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 14px 16px;
+
+  /* Visual: Glass card with subtle gradient */
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  border-radius: 10px;
+
+  /* Transition for hover effect */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Initial state */
+  transform: translateX(0);
+}
+
+.onboarding-guide .guide-item:hover {
+  /* Hover: Glow effect */
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.1),
+    rgba(255, 255, 255, 0.03)
+  );
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow:
+    0 0 20px rgba(6, 182, 212, 0.15),
+    inset 0 0 20px rgba(6, 182, 212, 0.03);
+
+  /* Subtle lift */
+  transform: translateX(4px);
+}
+
+.onboarding-guide .guide-icon {
+  font-size: 30px;
+  line-height: 1;
+  flex-shrink: 0;
+
+  /* Subtle glow for emoji */
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+
+  /* Animation */
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.onboarding-guide .guide-text {
+  flex: 1;
+}
+
+.onboarding-guide .guide-text strong {
+  display: block;
+  margin-bottom: 6px;
+
+  /* Typography */
+  font-size: 15px;
+  font-weight: 700;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.98);
+
+  /* Subtle text shadow */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.onboarding-guide .guide-text p {
+  margin: 0;
+
+  /* Typography */
+  font-size: 14px;
+  font-weight: 400;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ========================================
+   Footer - 按钮区域
+   ======================================== */
+.onboarding-guide .guide-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 20px 28px;
+
+  /* Border with cyan accent */
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
+  background: linear-gradient(0deg, rgba(6, 182, 212, 0.03), transparent);
+}
+
+/* Button common styles */
+.onboarding-guide .btn-guide-secondary,
+.onboarding-guide .btn-guide-primary {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  gap: 8px;
+
+  /* Typography */
+  font-size: 14px;
+  font-weight: 600;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0.01em;
+  border-radius: 8px;
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Transition */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Prevent text selection */
+  user-select: none;
+}
+
+/* Secondary button - 稍后再看 */
+.onboarding-guide .btn-guide-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.75);
+
+  /* Subtle backdrop blur */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.onboarding-guide .btn-guide-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.95);
+
+  /* Glow effect */
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.onboarding-guide .btn-guide-secondary:active {
+  transform: scale(0.97);
+}
+
+/* Primary button - 我知道了 (Cyan) */
+.onboarding-guide .btn-guide-primary {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  border: 1px solid #06b6d4;
+  color: white;
+
+  /* Glow effect */
+  box-shadow:
+    0 0 20px rgba(6, 182, 212, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  /* Text shadow */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.onboarding-guide .btn-guide-primary:hover {
+  background: linear-gradient(135deg, #22d3ee, #06b6d4);
+  border-color: #22d3ee;
+
+  /* Enhanced glow */
+  box-shadow:
+    0 0 30px rgba(6, 182, 212, 0.5),
+    0 4px 12px rgba(6, 182, 212, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+
+  /* Subtle lift */
+  transform: translateY(-2px);
+}
+
+.onboarding-guide .btn-guide-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 0 15px rgba(6, 182, 212, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .onboarding-guide {
+    margin: 20px;
+    max-width: calc(100% - 40px);
+  }
+
+  .onboarding-guide .guide-header h2 {
+    font-size: 16px;
+  }
+
+  .onboarding-guide .guide-icon {
+    font-size: 24px;
+  }
+}
+
+/* ========================================
+   Accessibility - 无障碍访问
+   ======================================== */
+
+.onboarding-guide .btn-close-guide:focus-visible,
+.onboarding-guide .btn-guide-secondary:focus-visible,
+.onboarding-guide .btn-guide-primary:focus-visible {
+  /* Cyan focus ring with glow */
+  outline: 2px solid #06b6d4;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.2);
+}
+
+/* ========================================
+   Reduce Motion - 减少动画
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-guide-overlay,
+  .onboarding-guide,
+  .onboarding-guide .guide-section,
+  .onboarding-guide .btn-close-guide,
+  .onboarding-guide .btn-guide-secondary,
+  .onboarding-guide .btn-guide-primary,
+  .onboarding-guide .guide-header h2 i,
+  .onboarding-guide .guide-icon {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .onboarding-guide .guide-section {
+    opacity: 1 !important;
+  }
+
+  .onboarding-guide .guide-item:hover {
+    transform: none !important;
+  }
+}

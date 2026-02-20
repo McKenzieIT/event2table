@@ -1,0 +1,584 @@
+/**
+ * Advanced Animations
+ * 高级动画效果 - 用于增强UI交互体验
+ *
+ * 包含：
+ * - Stagger animations (交错动画)
+ * - Ripple effects (波纹效果)
+ * - Glow effects (发光效果)
+ * - Micro-interactions (微交互)
+ */
+
+/* ========================================
+   Stagger Animations (交错动画)
+   用于字段列表项依次显示
+   ======================================== */
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes staggerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes staggerScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Stagger animation utility classes */
+.stagger-fade-in {
+  animation: staggerFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.stagger-slide-in {
+  animation: staggerSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.stagger-scale-in {
+  animation: staggerScaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Stagger delays */
+.stagger-delay-1 {
+  animation-delay: 0.05s;
+}
+.stagger-delay-2 {
+  animation-delay: 0.1s;
+}
+.stagger-delay-3 {
+  animation-delay: 0.15s;
+}
+.stagger-delay-4 {
+  animation-delay: 0.2s;
+}
+.stagger-delay-5 {
+  animation-delay: 0.25s;
+}
+.stagger-delay-6 {
+  animation-delay: 0.3s;
+}
+.stagger-delay-7 {
+  animation-delay: 0.35s;
+}
+.stagger-delay-8 {
+  animation-delay: 0.4s;
+}
+.stagger-delay-9 {
+  animation-delay: 0.45s;
+}
+.stagger-delay-10 {
+  animation-delay: 0.5s;
+}
+
+/* ========================================
+   Ripple Effects (波纹效果)
+   按钮点击时的 Material Design 风格波纹
+   ======================================== */
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  background: rgba(6, 182, 212, 0.4);
+  border-radius: 50%;
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ripple-effect:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* ========================================
+   Glow Effects (发光效果)
+   增强hover状态的视觉反馈
+   ======================================== */
+
+@keyframes subtleGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+  }
+}
+
+.glow-subtle {
+  animation: subtleGlow 3s ease-in-out infinite;
+}
+
+.glow-pulse {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Hover glow effects */
+.glow-hover:hover {
+  animation: pulseGlow 1s ease-in-out;
+}
+
+/* ========================================
+   Micro-interactions (微交互)
+   小巧的交互动画增强用户体验
+   ======================================== */
+
+/* Button press effect */
+@keyframes buttonPress {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.button-press:active {
+  animation: buttonPress 0.2s ease;
+}
+
+/* Checkbox check animation */
+@keyframes checkPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.check-pop:checked {
+  animation: checkPop 0.3s ease;
+}
+
+/* Success bounce */
+@keyframes successBounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.success-bounce {
+  animation: successBounce 0.8s ease;
+}
+
+/* Error shake */
+@keyframes errorShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.error-shake {
+  animation: errorShake 0.5s ease;
+}
+
+/* ========================================
+   Loading Animations (加载动画)
+   各种加载状态动画
+   ======================================== */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes dotPulse {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Loading dots */
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  background: #06b6d4;
+  border-radius: 50%;
+  animation: dotPulse 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+.loading-dots span:nth-child(3) {
+  animation-delay: 0s;
+}
+
+/* ========================================
+   Transition Enhancements (过渡增强)
+   平滑的过渡效果
+   ======================================== */
+
+/* Smooth fade */
+.transition-fade {
+  transition: opacity 0.3s ease;
+}
+
+.transition-fade-enter {
+  opacity: 0;
+}
+
+.transition-fade-enter-active {
+  opacity: 1;
+}
+
+.transition-fade-exit {
+  opacity: 1;
+}
+
+.transition-fade-exit-active {
+  opacity: 0;
+}
+
+/* Smooth slide */
+.transition-slide {
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.transition-slide-enter {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.transition-slide-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.transition-slide-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.transition-slide-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Smooth scale */
+.transition-scale {
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.transition-scale-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.transition-scale-enter-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.transition-scale-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.transition-scale-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* ========================================
+   Special Effects (特殊效果)
+   特殊场景的动画效果
+   ======================================== */
+
+/* Shimmer effect for loading skeletons */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Typing cursor */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.typing-cursor::after {
+  content: "|";
+  animation: blink 1s step-end infinite;
+}
+
+/* Progress bar fill */
+@keyframes fillProgress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.progress-fill {
+  transform-origin: left;
+  animation: fillProgress 0.6s ease-out;
+}
+
+/* ========================================
+   Utility Classes (工具类)
+   快速应用常用动画
+   ======================================== */
+
+/* Duration utilities */
+.duration-150 {
+  animation-duration: 150ms;
+}
+.duration-200 {
+  animation-duration: 200ms;
+}
+.duration-300 {
+  animation-duration: 300ms;
+}
+.duration-500 {
+  animation-duration: 500ms;
+}
+.duration-700 {
+  animation-duration: 700ms;
+}
+.duration-1000 {
+  animation-duration: 1000ms;
+}
+
+/* Easing utilities */
+.ease-linear {
+  animation-timing-function: linear;
+}
+.ease-in {
+  animation-timing-function: ease-in;
+}
+.ease-out {
+  animation-timing-function: ease-out;
+}
+.ease-in-out {
+  animation-timing-function: ease-in-out;
+}
+.ease-bounce {
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Delay utilities */
+.delay-75 {
+  animation-delay: 75ms;
+}
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-150 {
+  animation-delay: 150ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Reduce animation duration on mobile for better performance */
+  .stagger-fade-in,
+  .stagger-slide-in,
+  .stagger-scale-in {
+    animation-duration: 0.2s;
+  }
+
+  /* Reduce stagger delays on mobile */
+  .stagger-delay-1 {
+    animation-delay: 0.02s;
+  }
+  .stagger-delay-2 {
+    animation-delay: 0.04s;
+  }
+  .stagger-delay-3 {
+    animation-delay: 0.06s;
+  }
+  .stagger-delay-4 {
+    animation-delay: 0.08s;
+  }
+  .stagger-delay-5 {
+    animation-delay: 0.1s;
+  }
+}
+
+/* ========================================
+   Accessibility - Reduce Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all animations for users who prefer reduced motion */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

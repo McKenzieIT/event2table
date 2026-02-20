@@ -14,7 +14,7 @@
  * @component FieldCanvas
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   DndContext,
@@ -38,7 +38,13 @@ import { Field, FieldType, DataType, Parameter } from '@shared/types/fieldBuilde
 import { generateId } from '@shared/utils/fieldBuilder';
 import { Button } from '@shared/ui/Button';
 import { DeleteConfirmModal } from '@shared/components/DeleteConfirmModal';
+import CanvasStatsDisplay from './CanvasStatsDisplay';
+import EdgeToolbar from './EdgeToolbar';
+import FieldContextMenu from './FieldContextMenu';
 import './FieldCanvas.css';
+import './CanvasHeader.css';
+import './EdgeToolbar/EdgeToolbar.css';
+import './FieldContextMenu.css';
 
 /**
  * Drop zone component for accepting dragged items
@@ -75,7 +81,12 @@ function DropZone({ children, onDrop, onNativeDrop, onNativeDragOver, onNativeDr
 /**
  * Sortable field item component (memoized for performance)
  */
-const SortableFieldItem = React.memo(({ field, onEdit, onDelete }) => {
+const SortableFieldItem = React.memo(({
+  field,
+  onEdit,
+  onDelete,
+  compact = false  // Compact mode prop (default false for backward compatibility)
+}) => {
   const {
     attributes,
     listeners,
@@ -142,24 +153,39 @@ const SortableFieldItem = React.memo(({ field, onEdit, onDelete }) => {
       style={style}
       {...attributes}
       data-field-id={field.id}
-      className={`field-item ${isDragging ? 'dragging' : ''}`}
+      className={`field-item ${compact ? 'compact' : ''} ${isDragging ? 'dragging' : ''}`}
     >
       <div {...listeners} className="field-handle">
-        <i className="bi bi-grip-vertical"></i>
+        <i className="bi bi-grip-vertical" aria-hidden="true"></i>
       </div>
-      <div className="field-info">
-        <span className="field-type-badge">
-          <i className={`bi ${getFieldTypeIcon(field.fieldType)}`}></i>
-          <span className="field-type-label">{getFieldTypeLabel(field.fieldType)}</span>
+
+      {/* Type Badge */}
+      <span className="field-type-badge">
+        <i className={`bi ${getFieldTypeIcon(field.fieldType)}`}></i>
+        <span className="field-type-label">{getFieldTypeLabel(field.fieldType)}</span>
+      </span>
+
+      {/* Field Alias - 扁平化 */}
+      <strong
+        className="field-alias"
+        title={field.fieldName}  // Tooltip for truncated text
+      >
+        {field.alias || field.fieldName}
+      </strong>
+
+      {/* Original Name - 扁平化 */}
+      <span className="field-original-name">
+        {field.fieldName !== field.alias ? `(${field.displayName || field.fieldName})` : ''}
+      </span>
+
+      {/* Data Type Badge - 可选显示 */}
+      {field.dataType && (
+        <span className={`badge badge-secondary data-type-badge ${field.dataType}`}>
+          {field.dataType}
         </span>
-        <div className="field-names">
-          <strong className="field-alias">{field.fieldName}</strong>
-          <span className="field-original-name">({field.displayName})</span>
-        </div>
-        <span className={`badge badge-secondary data-type-badge ${field.dataType || 'string'}`}>
-          {field.dataType || 'string'}
-        </span>
-      </div>
+      )}
+
+      {/* Actions */}
       <div className="field-actions">
         <Button
           variant="outline-primary"
@@ -184,7 +210,8 @@ const SortableFieldItem = React.memo(({ field, onEdit, onDelete }) => {
   return prevProps.field.id === nextProps.field.id &&
          prevProps.field.name === nextProps.field.name &&
          prevProps.field.alias === nextProps.field.alias &&
-         prevProps.field.fieldType === nextProps.field.fieldType;
+         prevProps.field.fieldType === nextProps.field.fieldType &&
+         prevProps.compact === nextProps.compact;  // Compare compact prop
 });
 
 /**
@@ -204,6 +231,7 @@ const SortableFieldItem = React.memo(({ field, onEdit, onDelete }) => {
 export default function FieldCanvas({
   fields = [],
   parameters = [],
+  whereConditions = [],
   onFieldsChange,
   onAddField,
   onRemoveField,
@@ -216,10 +244,20 @@ export default function FieldCanvas({
   const safeFields = Array.isArray(fields) ? fields : [];
   const safeParameters = Array.isArray(parameters) ? parameters : [];
 
+  // Compact mode state (default true as per user request)
+  const [compactMode, setCompactMode] = useState(true);
+
   const [activeId, setActiveId] = useState(null);
   const [deleteModal, setDeleteModal] = useState({
     show: false,
     field: null
+  });
+
+  // Right click context menu state
+  const [contextMenu, setContextMenu] = useState({
+    isOpen: false,
+    x: 0,
+    y: 0
   });
 
   // Configure dnd-kit sensors for drag and drop
@@ -380,6 +418,71 @@ export default function FieldCanvas({
     onAddField(newField);
   };
 
+  // Quick add common base fields
+  const handleQuickAddCommon = useCallback(() => {
+    const commonFields = [
+      { name: 'ds', displayName: '分区', alias: 'ds', dataType: DataType.STRING },
+      { name: 'role_id', displayName: '角色ID', alias: 'role_id', dataType: DataType.BIGINT },
+      { name: 'account_id', displayName: '账号ID', alias: 'account_id', dataType: DataType.BIGINT },
+      { name: 'tm', displayName: '上报时间', alias: 'tm', dataType: DataType.STRING }
+    ];
+
+    commonFields.forEach(field => {
+      // Check if field already exists
+      const exists = safeFields.some(f => f.name === field.name);
+      if (!exists) {
+        const newField = {
+          id: generateId(),
+          type: FieldType.BASIC,
+          name: field.name,
+          displayName: field.displayName,
+          alias: field.alias,
+          dataType: field.dataType,
+          isEditable: true,
+          fieldType: 'base',
+          fieldName: field.name,
+          paramId: null,
+          jsonPath: null
+        };
+        onAddField(newField);
+      }
+    });
+  }, [safeFields, onAddField]);
+
+  // Quick add all base fields
+  const handleQuickAddAll = useCallback(() => {
+    const allFields = [
+      { name: 'ds', displayName: '分区', alias: 'ds', dataType: DataType.STRING },
+      { name: 'role_id', displayName: '角色ID', alias: 'role_id', dataType: DataType.BIGINT },
+      { name: 'account_id', displayName: '账号ID', alias: 'account_id', dataType: DataType.BIGINT },
+      { name: 'utdid', displayName: '设备ID', alias: 'utdid', dataType: DataType.STRING },
+      { name: 'tm', displayName: '上报时间', alias: 'tm', dataType: DataType.STRING },
+      { name: 'ts', displayName: '上报时间戳', alias: 'ts', dataType: DataType.BIGINT },
+      { name: 'envinfo', displayName: '环境信息', alias: 'envinfo', dataType: DataType.STRING }
+    ];
+
+    allFields.forEach(field => {
+      // Check if field already exists
+      const exists = safeFields.some(f => f.name === field.name);
+      if (!exists) {
+        const newField = {
+          id: generateId(),
+          type: FieldType.BASIC,
+          name: field.name,
+          displayName: field.displayName,
+          alias: field.alias,
+          dataType: field.dataType,
+          isEditable: true,
+          fieldType: 'base',
+          fieldName: field.name,
+          paramId: null,
+          jsonPath: null
+        };
+        onAddField(newField);
+      }
+    });
+  }, [safeFields, onAddField]);
+
   // Handle field edit (optimized with useCallback)
   const handleEditField = useCallback((field) => {
     if (onUpdateField) {
@@ -407,6 +510,35 @@ export default function FieldCanvas({
     }
   }, [deleteModal, onRemoveField]);
 
+  // Handle context menu (right-click)
+  const handleContextMenu = useCallback((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setContextMenu({
+      isOpen: true,
+      x: event.clientX,
+      y: event.clientY
+    });
+  }, []);
+
+  // Close context menu
+  const closeContextMenu = useCallback(() => {
+    setContextMenu({
+      isOpen: false,
+      x: 0,
+      y: 0
+    });
+  }, []);
+
+  // Generate delete confirmation message
+  const getDeleteMessage = useCallback(() => {
+    if (!deleteModal.field) return '';
+    const fieldType = getFieldTypeLabel(deleteModal.field.fieldType);
+    const fieldName = deleteModal.field.alias || deleteModal.field.name;
+    return `确定要删除${fieldType}"${fieldName}"吗？`;
+  }, [deleteModal]);
+
   // Helper function to get field type label
   const getFieldTypeLabel = (fieldType) => {
     const labels = {
@@ -426,13 +558,13 @@ export default function FieldCanvas({
       <div className="field-canvas">
         <div className="panel-header">
           <h3>
-            <i className="bi bi-grid-3x3"></i>
+            <i className="bi bi-grid-3x3" aria-hidden="true"></i>
             字段画布
           </h3>
         </div>
         <div className="panel-content">
           <div className="loading-state">
-            <i className="bi bi-arrow-repeat spin"></i>
+            <i className="bi bi-arrow-repeat spin" aria-hidden="true"></i>
             <p>加载参数中...</p>
           </div>
         </div>
@@ -445,13 +577,13 @@ export default function FieldCanvas({
       <div className="field-canvas">
         <div className="panel-header">
           <h3>
-            <i className="bi bi-grid-3x3"></i>
+            <i className="bi bi-grid-3x3" aria-hidden="true"></i>
             字段画布
           </h3>
         </div>
         <div className="panel-content">
           <div className="error-state">
-            <i className="bi bi-exclamation-triangle"></i>
+            <i className="bi bi-exclamation-triangle" aria-hidden="true"></i>
             <p>加载参数失败</p>
           </div>
         </div>
@@ -459,19 +591,34 @@ export default function FieldCanvas({
     );
   }
 
+  // Calculate statistics for display
+  const stats = useMemo(() => {
+    const baseFields = safeFields.filter(f => f.fieldType === 'base' || f.fieldType === FieldType.BASIC).length;
+    const paramFields = safeFields.filter(f => f.fieldType === 'param' || f.fieldType === FieldType.PARAMETER).length;
+    return {
+      total: safeFields.length,
+      baseFields,
+      paramFields,
+      whereCount: whereConditions ? whereConditions.length : 0,
+    };
+  }, [safeFields, whereConditions]);
+
   return (
     <div className="field-canvas">
-      <div className="panel-header">
+      <div className="panel-header compact">
         <h3>
-          <i className="bi bi-grid-3x3"></i>
+          <i className="bi bi-grid-3x3" aria-hidden="true"></i>
           字段画布
         </h3>
-        {safeFields.length > 0 && (
-          <span className="badge badge-primary">{safeFields.length}</span>
-        )}
+
+        {/* Statistics Display - 紧凑型统计信息 */}
+        <CanvasStatsDisplay stats={stats} />
       </div>
 
-      <div className="panel-content">
+      <div
+        className="panel-content"
+        onContextMenu={handleContextMenu}
+      >
         {safeFields.length === 0 ? (
           <DropZone
             onDrop={handleDrop}
@@ -481,31 +628,8 @@ export default function FieldCanvas({
             isActive={true}
           >
             <div className="empty-state">
-              <i className="bi bi-hand-index"></i>
+              <i className="bi bi-hand-index" aria-hidden="true"></i>
               <p>从左侧拖拽参数到此处添加字段</p>
-              <div className="add-field-buttons">
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={() => handleAddFieldClick(FieldType.BASIC)}
-                >
-                  <i className="bi bi-plus-circle"></i>
-                  添加基础字段
-                </button>
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={() => handleAddFieldClick(FieldType.CUSTOM)}
-                >
-                  <i className="bi bi-plus-circle"></i>
-                  添加自定义字段
-                </button>
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={() => handleAddFieldClick(FieldType.FIXED)}
-                >
-                  <i className="bi bi-plus-circle"></i>
-                  添加固定值字段
-                </button>
-              </div>
             </div>
           </DropZone>
         ) : (
@@ -533,6 +657,7 @@ export default function FieldCanvas({
                       field={field}
                       onEdit={handleEditField}
                       onDelete={handleDeleteField}
+                      compact={compactMode}
                     />
                   ))}
                 </div>
@@ -544,7 +669,7 @@ export default function FieldCanvas({
               {activeField ? (
                 <div className="field-item dragging-overlay">
                   <div className="field-handle">
-                    <i className="bi bi-grip-vertical"></i>
+                    <i className="bi bi-grip-vertical" aria-hidden="true"></i>
                   </div>
                   <div className="field-info">
                     <strong>{activeField.alias || activeField.name}</strong>
@@ -555,61 +680,52 @@ export default function FieldCanvas({
           </DndContext>
         )}
 
-        {safeFields.length > 0 && (
-          <div className="add-field-section">
-            <div className="dropdown">
-              <button
-                className="btn btn-outline-primary btn-sm dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-              >
-                <i className="bi bi-plus-circle"></i>
-                添加字段
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => handleAddFieldClick(FieldType.BASIC)}
-                  >
-                    <i className="bi bi-type"></i>
-                    基础字段
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => handleAddFieldClick(FieldType.CUSTOM)}
-                  >
-                    <i className="bi bi-code"></i>
-                    自定义字段
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => handleAddFieldClick(FieldType.FIXED)}
-                  >
-                    <i className="bi bi-pin"></i>
-                    固定值字段
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
+        {/* Edge Toolbar - 底部边缘激活栏 */}
+        <EdgeToolbar
+          canvasFields={safeFields}
+          onAddBaseField={() => handleAddFieldClick(FieldType.BASIC)}
+          onAddCustomField={() => handleAddFieldClick(FieldType.CUSTOM)}
+          onAddFixedField={() => handleAddFieldClick(FieldType.FIXED)}
+          onQuickAddCommon={handleQuickAddCommon}
+          onQuickAddAll={handleQuickAddAll}
+          onAddField={onAddField}
+        />
       </div>
+
+      {/* Field Context Menu - 右键菜单 */}
+      <FieldContextMenu
+        isOpen={contextMenu.isOpen}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        onClose={closeContextMenu}
+        onAddBaseField={() => {
+          handleAddFieldClick(FieldType.BASIC);
+          closeContextMenu();
+        }}
+        onAddCustomField={() => {
+          handleAddFieldClick(FieldType.CUSTOM);
+          closeContextMenu();
+        }}
+        onAddFixedField={() => {
+          handleAddFieldClick(FieldType.FIXED);
+          closeContextMenu();
+        }}
+        onQuickAddCommon={() => {
+          handleQuickAddCommon();
+          closeContextMenu();
+        }}
+      />
 
       {/* Delete Confirmation Modal */}
       {deleteModal.show && (
         <DeleteConfirmModal
-          itemName="字段"
-          itemDetails={{
-            name: deleteModal.field?.alias || deleteModal.field?.name,
-            type: getFieldTypeLabel(deleteModal.field?.fieldType)
-          }}
+          isOpen={deleteModal.show}
+          title="确认删除字段"
+          message={getDeleteMessage()}
+          confirmText="删除"
+          cancelText="取消"
           onConfirm={confirmDeleteField}
-          onClose={() => setDeleteModal({ show: false, field: null })}
+          onCancel={() => setDeleteModal({ show: false, field: null })}
         />
       )}
     </div>
@@ -625,7 +741,9 @@ FieldCanvas.propTypes = {
       name: PropTypes.string.isRequired,
       alias: PropTypes.string,
       dataType: PropTypes.string.isRequired,
-      isEditable: PropTypes.bool
+      isEditable: PropTypes.bool,
+      fieldType: PropTypes.oneOf(['base', 'param', 'basic', 'custom', 'fixed']),
+      fieldName: PropTypes.string,
     })
   ),
   parameters: PropTypes.arrayOf(
@@ -634,6 +752,14 @@ FieldCanvas.propTypes = {
       name: PropTypes.string.isRequired,
       alias: PropTypes.string,
       dataType: PropTypes.string.isRequired
+    })
+  ),
+  whereConditions: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      field: PropTypes.string.isRequired,
+      operator: PropTypes.string.isRequired,
+      value: PropTypes.any,
     })
   ),
   onFieldsChange: PropTypes.func.isRequired,

@@ -5,6 +5,9 @@
  * Includes drop zone, sortable field items, and visual feedback.
  */
 
+/* Import advanced animations */
+@import './AdvancedAnimations.css';
+
 /* Field Canvas Container */
 .field-canvas {
   position: relative;
@@ -42,6 +45,31 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.field-canvas .panel-header.compact {
+  padding: var(--space-3);
+  gap: var(--space-2);
+  flex-wrap: wrap;  /* 允许换行 */
+}
+
+.field-canvas .panel-header.compact h3 {
+  flex-shrink: 0;  /* 防止标题压缩 */
+}
+
+/* 调整compact模式下工具栏的位置 */
+.field-canvas .panel-header.compact .field-canvas-stats {
+  order: 1;  /* 统计信息 */
+  flex-shrink: 0;
+}
+
+.field-canvas .panel-header.compact .base-fields-compact {
+  order: 2;  /* 工具栏 */
+  margin-left: auto;  /* 推到右侧 */
+}
+
+.field-canvas .panel-header.compact .base-fields-compact {
+  margin-left: auto;
 }
 
 .field-canvas .panel-content {
@@ -315,62 +343,6 @@
   gap: var(--space-2);
 }
 
-/* Add Field Section */
-.add-field-section {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-4);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.add-field-section .dropdown {
-  position: relative;
-}
-
-.add-field-section .dropdown-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.add-field-section .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: var(--space-2);
-  min-width: 200px;
-  background: var(--color-bg-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-}
-
-.add-field-section .dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  color: var(--color-text-primary);
-  text-decoration: none;
-  transition: all 0.2s;
-  cursor: pointer;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  font-size: var(--text-sm);
-}
-
-.add-field-section .dropdown-item:hover {
-  background: rgba(102, 126, 234, 0.15);
-  color: var(--brand-primary);
-}
-
-.add-field-section .dropdown-item i {
-  font-size: var(--text-base);
-}
-
 /* Loading State */
 .loading-state {
   flex: 1;
@@ -520,4 +492,190 @@
   color: var(--color-warning);
   font-size: var(--text-sm);
   margin-top: var(--space-2);
+}
+
+/* ========================================
+   Compact Field Item - Pure Flexbox (纯 Flexbox 方案)
+   ======================================== */
+
+.field-item.compact {
+  /* 布局 - 纯 Flexbox，无绝对定位 */
+  display: flex;
+  flex-direction: row !important;  /* ✅ 显式设置水平布局，强制覆盖 */
+  align-items: center;
+  gap: 4px;
+
+  /* 尺寸 */
+  min-height: 48px;
+  padding: 4px 8px;
+
+  /* 视觉增强 */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+
+  /* 仅对背景、边框、阴影进行过渡 - 避免 transform 冲突 */
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+
+  /* 允许内容收缩 */
+  min-width: 0;
+}
+
+.field-item.compact:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(6, 182, 212, 0.3);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.15);
+  /* ❌ 移除 transform: translateY(-1px) - 避免与 dragging 冲突 */
+}
+
+.field-item.compact.dragging {
+  opacity: 0.6;
+  /* ✅ 仅在 dragging 状态使用 transform */
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Field Handle - 紧凑版（固定大小） */
+.field-item.compact .field-handle {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.field-item.compact .field-handle i {
+  font-size: 14px;
+}
+
+/* Field Type Badge - 紧凑版（固定大小） */
+.field-item.compact .field-type-badge {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  gap: 2px;
+  min-width: 50px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.field-item.compact .field-type-badge i {
+  font-size: 10px;
+}
+
+/* Field Alias - 主标题（弹性收缩） */
+.field-item.compact .field-alias {
+  display: inline-block !important;  /* ✅ 强制覆盖 <strong> 默认 block */
+  flex: 1 1 80px;
+  min-width: 0;
+  max-width: 160px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* cursor: help;  已移除 - 继承父元素的 cursor: move */
+}
+
+/* Field Original Name - 副标题（可收缩） */
+.field-item.compact .field-original-name {
+  display: inline-block !important;  /* ✅ 强制覆盖浏览器默认 */
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 120px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Data Type Badge - 紧凑版（固定大小） */
+.field-item.compact .data-type-badge {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  min-width: 50px;
+}
+
+/* Field Actions - 纯 Flexbox（不使用绝对定位） */
+.field-item.compact .field-actions {
+  /* ✅ 使用 margin-left: auto 推到右侧，而非绝对定位 */
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+}
+
+.field-item.compact .field-actions .btn-sm {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 11px !important;
+  min-width: 56px;
+  height: 28px;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: #06B6D4;
+  /* ✅ 仅对必要的属性进行过渡 */
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.field-item.compact .field-actions .btn-sm:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: #06B6D4;
+  /* ❌ 移除 transform: scale(1.05) - 避免与其他 transform 冲突 */
+}
+
+.field-item.compact .field-actions .btn-outline-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.field-item.compact .field-actions .btn-outline-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
+/* 响应式调整 - 渐进式隐藏 */
+@media (max-width: 768px) {
+  .field-item.compact {
+    min-height: 52px;
+    padding: 4px 6px;
+  }
+
+  .field-item.compact .field-alias {
+    max-width: 80px;
+  }
+
+  .field-item.compact .field-original-name {
+    display: none;
+  }
+
+  .field-item.compact .field-actions .btn-sm {
+    min-width: 48px;
+    padding: 0.2rem 0.4rem !important;
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .field-item.compact .data-type-badge {
+    display: none;
+  }
+
+  .field-item.compact .field-actions {
+    gap: 2px;
+  }
+
+  .field-item.compact .field-actions .btn-sm {
+    min-width: 40px;
+    font-size: 10px !important;
+  }
 }
