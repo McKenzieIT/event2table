@@ -111,12 +111,14 @@ def sync_common_params():
 
         # Convert game_gid to database id for common_params table
         game_record = fetch_one_as_dict(
-            "SELECT id FROM games WHERE gid = ?", (game_gid,)
+            "SELECT id, gid FROM games WHERE gid = ?", (game_gid,)
         )
         if not game_record:
             return json_error_response(
                 f"Game not found: gid={game_gid}", status_code=404
             )
+
+        game_id = game_record["id"]
 
         # Count parameter occurrences across all events
         param_counts = {}
@@ -175,14 +177,16 @@ def sync_common_params():
         for param in common_params_to_add:
             try:
                 # Determine data type (default to string for now)
+                # Store both game_id and game_gid for migration support
                 execute_write(
                     """
                     INSERT INTO common_params (
-                        game_gid, param_name, param_name_cn, param_type,
+                        game_id, game_gid, param_name, param_name_cn, param_type,
                         table_name, status, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, 'synced', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    ) VALUES (?, ?, ?, ?, ?, ?, 'synced', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                     """,
                     (
+                        game_id,
                         game_gid,
                         param["param_name"],
                         param["param_name_cn"],

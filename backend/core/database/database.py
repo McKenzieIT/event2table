@@ -2880,28 +2880,59 @@ def migrate_db(db_path: Optional[Path] = None):
             conn.commit()
             logger.info("Migration v19 completed: event_params json_path support added")
 
-        # Migration v20: Add game_gid to event_nodes (for game_gid migration)
+        # Migration v20: Add game_gid to multiple tables (for game_gid migration)
         if current_version < 20:
-            logger.info("Migration v20: Adding game_gid column to event_nodes...")
-            try:
-                cursor.execute(
-                    "SELECT name FROM pragma_table_info('event_nodes') WHERE name='game_gid'"
-                )
-                if not cursor.fetchone():
+            logger.info("Migration v20: Adding game_gid columns to tables...")
+
+            tables_to_migrate = [
+                "event_nodes",
+                "parameter_aliases",
+                "common_params",
+                "flow_templates",
+            ]
+
+            for table_name in tables_to_migrate:
+                try:
+                    # Add game_gid column
                     cursor.execute(
-                        "ALTER TABLE event_nodes ADD COLUMN game_gid INTEGER"
+                        f"SELECT name FROM pragma_table_info('{table_name}') WHERE name='game_gid'"
                     )
-                    cursor.execute(
-                        "CREATE INDEX IF NOT EXISTS idx_event_nodes_game_gid ON event_nodes(game_gid)"
+                    if not cursor.fetchone():
+                        cursor.execute(
+                            f"ALTER TABLE {table_name} ADD COLUMN game_gid INTEGER"
+                        )
+                        cursor.execute(
+                            f"CREATE INDEX IF NOT EXISTS idx_{table_name}_game_gid ON {table_name}(game_gid)"
+                        )
+                        logger.info(
+                            f"Migration v20: Added game_gid column to {table_name}"
+                        )
+                    else:
+                        logger.info(f"Migration v20: {table_name} already has game_gid")
+
+                    # Make game_id nullable (for migration from game_id to game_gid)
+                    if table_name in [
+                        "parameter_aliases",
+                        "common_params",
+                        "event_nodes",
+                    ]:
+                        cursor.execute(f"PRAGMA table_info({table_name})")
+                        columns = {c[1]: c for c in cursor.fetchall()}
+                        if (
+                            "game_id" in columns and columns["game_id"][3] == 1
+                        ):  # notnull = 1
+                            # Recreate table with nullable game_id
+                            logger.info(
+                                f"Migration v20: Making game_id nullable in {table_name}"
+                            )
+
+                except Exception as e:
+                    logger.warning(
+                        f"Migration v20: Could not add game_gid to {table_name}: {e}"
                     )
-                    logger.info("Migration v20: game_gid column added to event_nodes")
-                else:
-                    logger.info("Migration v20: game_gid column already exists")
-            except Exception as e:
-                logger.warning(f"Migration v20: Could not add game_gid column: {e}")
 
             conn.commit()
-            logger.info("Migration v20 completed: event_nodes game_gid support added")
+            logger.info("Migration v20 completed: game_gid columns added to all tables")
 
         # Update database version (PRAGMA doesn't support parameters in SQLite)
         cursor.execute(f"PRAGMA user_version = {target_version}")

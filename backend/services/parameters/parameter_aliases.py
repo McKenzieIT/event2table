@@ -71,9 +71,12 @@ def create_parameter_alias():
     is_preferred = data.get("is_preferred", 0)
 
     # Validate game exists
-    game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
+    game = fetch_one_as_dict("SELECT id, gid FROM games WHERE gid = ?", (game_gid,))
     if not game:
         return json_error_response("Game not found", status_code=404)
+
+    # Get game_id for legacy support (both game_id and game_gid are stored)
+    game_id = game["id"]
 
     # Validate parameter exists (param_id references event_params table)
     param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (param_id,))
@@ -105,13 +108,13 @@ def create_parameter_alias():
             (game_gid, param_id),
         )
 
-    # Create alias
+    # Create alias (store both game_id and game_gid for migration support)
     alias_id = execute_write(
         """
-        INSERT INTO parameter_aliases (game_gid, param_id, alias, display_name, is_preferred, usage_count, last_used_at)
-        VALUES (?, ?, ?, ?, ?, 0, NULL)
+        INSERT INTO parameter_aliases (game_id, game_gid, param_id, alias, display_name, is_preferred, usage_count, last_used_at)
+        VALUES (?, ?, ?, ?, ?, ?, 0, NULL)
     """,
-        (game_gid, param_id, alias, display_name, is_preferred),
+        (game_id, game_gid, param_id, alias, display_name, is_preferred),
         return_last_id=True,
     )
 

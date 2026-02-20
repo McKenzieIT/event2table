@@ -190,9 +190,11 @@ def create_event_node():
     config = data["config"]
 
     # Validate game exists
-    game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
+    game = fetch_one_as_dict("SELECT id, gid FROM games WHERE gid = ?", (game_gid,))
     if not game:
         return json_error_response("Game not found", status_code=404)
+
+    game_id = game["id"]
 
     # Validate event exists
     event = fetch_one_as_dict("SELECT * FROM log_events WHERE id = ?", (event_id,))
@@ -208,14 +210,14 @@ def create_event_node():
             "Event node with this name already exists", status_code=400
         )
 
-    # Create event node
+    # Create event node (store both game_id and game_gid for migration support)
     config_json = json.dumps(config, ensure_ascii=False)
     node_id = execute_write(
         """
-        INSERT INTO event_nodes (game_gid, name, event_id, config_json)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO event_nodes (game_id, game_gid, name, event_id, config_json)
+        VALUES (?, ?, ?, ?, ?)
     """,
-        (game_gid, name, event_id, config_json),
+        (game_id, game_gid, name, event_id, config_json),
     )
 
     # Save parameter aliases if provided
