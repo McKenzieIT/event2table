@@ -18,7 +18,7 @@ vi.mock('@/stores/gameStore', () => ({
 describe('useGameContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    delete (window as any).gameData;
+    delete (window as unknown as { gameData?: unknown }).gameData;
   });
 
   it('should update store when selectGame is called', () => {

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt, SearchInput } from '@shared/ui';
+import { SelectGamePrompt, SearchInput, EmptyState } from '@shared/ui';
 import './ParameterCompare.css';
 
 /**
@@ -77,7 +77,13 @@ function ParameterCompare() {
   // 渲染参数列表
   const renderParamList = useCallback((params, selectedParam, onSelect) => {
     if (params.length === 0) {
-      return <div className="empty-state">未找到匹配的参数</div>;
+      return (
+        <EmptyState
+          icon={<i className="bi bi-inbox" aria-hidden="true"></i>}
+          title="未找到匹配的参数"
+          description="尝试调整搜索条件"
+        />
+      );
     }
 
     return params.map(param => (

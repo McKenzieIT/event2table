@@ -3,6 +3,7 @@
  * 节点配置模态框组件
  */
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 export default function NodeConfigModal({ config, onChange, onClose, disabled }) {
   const [localConfig, setLocalConfig] = useState({
@@ -32,11 +33,11 @@ export default function NodeConfigModal({ config, onChange, onClose, disabled })
   const handleSave = () => {
     // 验证
     if (!localConfig.nameEn.trim()) {
-      alert('请输入节点英文名称');
+      toast.error('请输入节点英文名称');
       return;
     }
     if (!localConfig.nameCn.trim()) {
-      alert('请输入节点中文名称');
+      toast.error('请输入节点中文名称');
       return;
     }
 

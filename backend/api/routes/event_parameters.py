@@ -60,8 +60,8 @@ def api_update_event_parameter(id):
         else:
             return json_error_response("参数不存在", status_code=404)
     except Exception as e:
-        logger.error(f"Error updating event parameter {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error updating event parameter {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/event-parameters/<int:id>", methods=["DELETE"])
@@ -78,8 +78,8 @@ def api_delete_event_parameter(id):
         else:
             return json_error_response("参数不存在", status_code=404)
     except Exception as e:
-        logger.error(f"Error deleting event parameter {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error deleting event parameter {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/event-parameters/<int:id>/history", methods=["GET"])
@@ -92,8 +92,8 @@ def api_get_parameter_history(id):
 
         return json_success_response(data=history)
     except Exception as e:
-        logger.error(f"Error getting parameter history for {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error getting parameter history for {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/event-parameters/<int:id>/config", methods=["GET"])
@@ -106,8 +106,8 @@ def api_get_parameter_config(id):
 
         return json_success_response(data=config)
     except Exception as e:
-        logger.error(f"Error getting parameter config for {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error getting parameter config for {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/event-parameters/<int:id>/config", methods=["PUT"])
@@ -124,8 +124,8 @@ def api_set_parameter_config(id):
         else:
             return json_error_response("配置更新失败", status_code=500)
     except Exception as e:
-        logger.error(f"Error setting parameter config for {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error setting parameter config for {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/event-parameters/<int:id>/rollback", methods=["POST"])
@@ -147,8 +147,8 @@ def api_rollback_parameter(id):
         else:
             return json_error_response("回滚失败", status_code=500)
     except Exception as e:
-        logger.error(f"Error rolling back parameter {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error rolling back parameter {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/event-parameters/<int:id>/validation-rules", methods=["GET"])
@@ -161,8 +161,8 @@ def api_get_validation_rules(id):
 
         return json_success_response(data=rules)
     except Exception as e:
-        logger.error(f"Error getting validation rules for {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error getting validation rules for {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/event-parameters/<int:id>/validation-rules", methods=["POST"])
@@ -177,7 +177,9 @@ def api_create_validation_rule(id):
         required_fields = ["rule_type", "rule_config"]
         for field in required_fields:
             if field not in data:
-                return json_error_response(f"Missing required field: {field}", status_code=400)
+                return json_error_response(
+                    f"Missing required field: {field}", status_code=400
+                )
 
         rule_id = validation_manager.create_validation_rule(
             event_param_id=id,
@@ -186,9 +188,13 @@ def api_create_validation_rule(id):
             error_message=data.get("error_message"),
         )
 
-        return json_success_response(data={"rule_id": rule_id}, message="Validation rule created")
+        return json_success_response(
+            data={"rule_id": rule_id}, message="Validation rule created"
+        )
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
     except Exception as e:
-        logger.error(f"Error creating validation rule for parameter {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(
+            f"Error creating validation rule for parameter {id}: {e}", exc_info=True
+        )
+        return json_error_response("An internal error occurred", status_code=500)

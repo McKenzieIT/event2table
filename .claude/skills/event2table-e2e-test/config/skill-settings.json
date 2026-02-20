@@ -1,0 +1,104 @@
+{
+  "skillName": "event2table-e2e-test",
+  "version": "2.0.0",
+  "projectRoot": "/Users/mckenzie/Documents/event2table",
+
+  "servers": {
+    "frontend": {
+      "url": "http://localhost:5173",
+      "startCommand": "cd frontend && npm run dev",
+      "healthCheckPath": "/"
+    },
+    "backend": {
+      "url": "http://127.0.0.1:5001",
+      "startCommand": "python web_app.py",
+      "healthCheckPath": "/api/health"
+    }
+  },
+
+  "databases": {
+    "production": "data/dwd_generator.db",
+    "testing": "data/test_database.db",
+    "development": "data/dwd_generator_dev.db"
+  },
+
+  "testing": {
+    "defaultModule": "all",
+    "timeout": 30000,
+    "screenshotOnFailure": true,
+    "retryAttempts": 3,
+    "isolation": {
+      "mode": "smart",
+      "autoCleanup": true,
+      "preserveGIDs": [10000147]
+    },
+    "testGIDRange": {
+      "start": 90000000,
+      "end": 99999999
+    }
+  },
+
+  "modules": {
+    "analytics": {
+      "name": "Analytics Module",
+      "configFile": "analytics-tests.json",
+      "testCount": 30
+    },
+    "event-builder": {
+      "name": "Event Builder Module",
+      "configFile": "event-builder-tests.json",
+      "testCount": 20
+    },
+    "canvas": {
+      "name": "Canvas Module",
+      "configFile": "canvas-tests.json",
+      "testCount": 15
+    }
+  },
+
+  "output": {
+    "reportsPath": "output/reports",
+    "screenshotsPath": "output/screenshots",
+    "tracesPath": "output/traces",
+    "formats": ["markdown", "json"],
+    "keepHistory": true,
+    "maxHistorySize": 100
+  },
+
+  "performance": {
+    "enabled": true,
+    "baseline": "data/performance-baseline.json",
+    "threshold": 0.2,
+    "metrics": ["LCP", "FID", "CLS", "pageLoadTime", "apiResponseTime"]
+  },
+
+  "quality": {
+    "enabled": true,
+    "dimensions": {
+      "testCoverage": 0.25,
+      "testPassRate": 0.25,
+      "performanceScore": 0.20,
+      "codeQuality": 0.15,
+      "securityScore": 0.10,
+      "accessibilityScore": 0.05
+    },
+    "targets": {
+      "overall": 85,
+      "testCoverage": 80,
+      "testPassRate": 95,
+      "performance": 90
+    }
+  },
+
+  "ai": {
+    "testGeneration": {
+      "enabled": true,
+      "maxTestsPerPage": 20,
+      "includeBoundaryTests": true
+    },
+    "defectPrediction": {
+      "enabled": true,
+      "lookbackDays": 30
+    }
+  }
+}

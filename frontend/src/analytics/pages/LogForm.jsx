@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { Button } from '@shared/ui';
 import { useFormValidation } from '../../shared/hooks/useFormValidation';
 import './LogForm.css';
 
@@ -322,18 +323,18 @@ function LogForm() {
         </div>
 
         <div className="form-actions">
-          <button
+          <Button
+            variant="primary"
             type="submit"
-            className="btn btn-primary"
-            disabled={mutation.isLoading}
+            loading={mutation.isLoading}
           >
-            <i className="bi bi-check-circle"></i>
+            <i className="bi bi-check-circle" aria-hidden="true"></i>
             {mutation.isLoading ? '提交中...' : (isEdit ? '保存修改' : '创建日志')}
-          </button>
-          <Link to="/events" className="btn btn-outline-secondary">
-            <i className="bi bi-x-circle"></i>
+          </Button>
+          <Button variant="secondary" onClick={() => navigate('/events')}>
+            <i className="bi bi-x-circle" aria-hidden="true"></i>
             取消
-          </Link>
+          </Button>
         </div>
       </form>
     </div>

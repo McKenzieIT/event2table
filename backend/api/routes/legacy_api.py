@@ -1,4 +1,17 @@
 """
+⚠️ DEPRECATED: 此API已废弃，不建议使用
+⚠️ DEPRECATED: This API is deprecated, do not use
+
+废弃原因:
+- 安全风险：多处未验证的用户输入
+- 维护困难：代码结构混乱
+- 功能重复：新API已替代
+
+建议迁移到:
+- events.py
+- games.py
+- parameters.py
+
 Legacy API Routes Module
 
 This module contains legacy/compatibility API endpoints for frontend compatibility.
@@ -65,8 +78,8 @@ def api_hql_query():
         )
 
     except Exception as e:
-        logger.error(f"Error in HQL query: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error in HQL query: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/hql/results", methods=["GET"])
@@ -91,8 +104,8 @@ def api_hql_results():
         return json_success_response(data=result or [])
 
     except Exception as e:
-        logger.error(f"Error fetching HQL results: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error fetching HQL results: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 # ============================================================================
@@ -105,7 +118,7 @@ def api_list_common_params():
     """API: List common parameters for a specific game"""
     try:
         # Get game_gid from query parameters
-        game_gid = request.args.get('game_gid', type=int)
+        game_gid = request.args.get("game_gid", type=int)
 
         if not game_gid:
             return json_error_response("game_gid is required", status_code=400)
@@ -115,10 +128,11 @@ def api_list_common_params():
         if not game:
             return json_error_response(f"Game {game_gid} not found", status_code=404)
 
-        game_id = game['id']
+        game_id = game["id"]
 
         # Fetch common params for this game only
-        common_params = fetch_all_as_dict("""
+        common_params = fetch_all_as_dict(
+            """
             SELECT
                 id,
                 game_id,
@@ -132,14 +146,16 @@ def api_list_common_params():
             FROM common_params
             WHERE game_id = ?
             ORDER BY created_at DESC
-        """, (game_id,))
+        """,
+            (game_id,),
+        )
 
         # Map param_type to data_type for frontend compatibility
         for param in common_params:
-            param['data_type'] = param.get('param_type', 'string')
-            param['key'] = param.get('param_name', '')
-            param['name'] = param.get('param_name_cn', param.get('param_name', ''))
-            param['description'] = param.get('param_description', '')
+            param["data_type"] = param.get("param_type", "string")
+            param["key"] = param.get("param_name", "")
+            param["name"] = param.get("param_name_cn", param.get("param_name", ""))
+            param["description"] = param.get("param_description", "")
 
         return json_success_response(data=common_params)
 
@@ -186,7 +202,11 @@ def api_batch_get_common_params():
             return json_success_response(data=common_params)
 
         # Parse IDs from comma-separated string
-        ids_list = [int(id_str.strip()) for id_str in param_ids.split(",") if id_str.strip().isdigit()]
+        ids_list = [
+            int(id_str.strip())
+            for id_str in param_ids.split(",")
+            if id_str.strip().isdigit()
+        ]
 
         if not ids_list:
             return json_error_response("Invalid ids parameter", status_code=400)
@@ -202,7 +222,7 @@ def api_batch_get_common_params():
             WHERE cp.id IN ({placeholders})
             ORDER BY cp.name
         """,
-            tuple(ids_list)
+            tuple(ids_list),
         )
 
         return json_success_response(data=common_params)
@@ -229,7 +249,8 @@ def api_batch_delete_common_params():
 
         logger.info(f"Batch deleted {affected} common params")
         return json_success_response(
-            message=f"Deleted {affected} parameters successfully", data={"deleted_count": affected}
+            message=f"Deleted {affected} parameters successfully",
+            data={"deleted_count": affected},
         )
 
     except Exception as e:
@@ -280,7 +301,7 @@ def api_preview_excel():
         if not (file.filename.endswith(".xlsx") or file.filename.endswith(".xls")):
             return json_error_response(
                 "Invalid file format. Please upload an Excel file (.xlsx or .xls)",
-                status_code=400
+                status_code=400,
             )
 
         # Read file
@@ -298,7 +319,9 @@ def api_preview_excel():
         # Extract headers
         headers = []
         if 0 <= header_row < len(all_data):
-            headers = [str(cell) if cell is not None else "" for cell in all_data[header_row]]
+            headers = [
+                str(cell) if cell is not None else "" for cell in all_data[header_row]
+            ]
 
         # Extract data rows
         data_rows = []
@@ -313,11 +336,15 @@ def api_preview_excel():
                 data_rows.append(processed_row)
 
         # Get column count
-        column_count = len(headers) if headers else (len(all_data[0]) if all_data else 0)
+        column_count = (
+            len(headers) if headers else (len(all_data[0]) if all_data else 0)
+        )
 
         workbook.close()
 
-        logger.info(f"Excel preview: {file.filename}, {len(data_rows)} rows, {column_count} columns")
+        logger.info(
+            f"Excel preview: {file.filename}, {len(data_rows)} rows, {column_count} columns"
+        )
 
         return json_success_response(
             data={
@@ -326,22 +353,21 @@ def api_preview_excel():
                 "rows": data_rows,
                 "total_rows": len(all_data),
                 "column_count": column_count,
-                "preview_rows_count": len(data_rows)
+                "preview_rows_count": len(data_rows),
             },
-            message=f"Successfully previewed {len(data_rows)} rows from {file.filename}"
+            message=f"Successfully previewed {len(data_rows)} rows from {file.filename}",
         )
 
     except openpyxl.utils.exceptions.InvalidFileException as e:
         logger.error(f"Invalid Excel file: {e}")
         return json_error_response(
             "Invalid Excel file format. Please upload a valid .xlsx or .xls file.",
-            status_code=400
+            status_code=400,
         )
     except Exception as e:
         logger.error(f"Error previewing Excel file: {e}", exc_info=True)
         return json_error_response(
-            f"Failed to preview Excel file: {str(e)}",
-            status_code=500
+            f"Failed to preview Excel file: {str(e)}", status_code=500
         )
 
 

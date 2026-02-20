@@ -71,13 +71,15 @@ class CacheWarmer:
                 LEFT JOIN log_events le ON le.game_gid = g.gid
                 LEFT JOIN event_params ep ON ep.event_id = le.id
                 LEFT JOIN event_node_configs enc ON enc.game_gid = CAST(g.gid AS INTEGER)
-                LEFT JOIN flow_templates ft ON ft.game_id = g.id  # Note: flow_templates uses game_id FK
+                LEFT JOIN flow_templates ft ON ft.game_gid = g.gid
                 GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
                 ORDER BY g.id
             """)
 
             # Cache with 1 hour TTL (static data)
-            hierarchical_cache.set("games.list", games, ttl=CacheConfig.CACHE_TIMEOUT_STATIC)
+            hierarchical_cache.set(
+                "games.list", games, ttl=CacheConfig.CACHE_TIMEOUT_STATIC
+            )
 
             logger.info(f"✅ 预热游戏列表API完成: {len(games)}个游戏")
 
@@ -93,7 +95,9 @@ class CacheWarmer:
         """
         logger.info(f"🔥 预热热门事件(Top {limit})...")
         try:
-            events = fetch_all_as_dict("SELECT * FROM log_events ORDER BY id LIMIT ?", (limit,))
+            events = fetch_all_as_dict(
+                "SELECT * FROM log_events ORDER BY id LIMIT ?", (limit,)
+            )
             for event in events:
                 hierarchical_cache.set("events.detail", event, id=event["id"])
 
@@ -107,9 +111,13 @@ class CacheWarmer:
         """预热参数模板（系统模板）"""
         logger.info("🔥 预热参数模板...")
         try:
-            templates = fetch_all_as_dict("SELECT * FROM param_templates WHERE is_system = 1")
+            templates = fetch_all_as_dict(
+                "SELECT * FROM param_templates WHERE is_system = 1"
+            )
             for template in templates:
-                hierarchical_cache.set("param_templates.detail", template, id=template["id"])
+                hierarchical_cache.set(
+                    "param_templates.detail", template, id=template["id"]
+                )
 
             self.warmed_templates = len(templates)
             logger.info(f"✅ 预热参数模板完成: {len(templates)}个模板")
@@ -154,7 +162,7 @@ class CacheWarmer:
             for event in events:
                 hierarchical_cache.set("events.detail", event, id=event["id"])
 
-            logger.info(f"✅ 预热游戏{game_gid}事件完成: " f"{len(events)}个事件")
+            logger.info(f"✅ 预热游戏{game_gid}事件完成: {len(events)}个事件")
 
         except Exception as e:
             logger.error(f"❌ 预热游戏{game_gid}事件失败: {e}")

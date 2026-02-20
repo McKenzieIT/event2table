@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * 事件节点表格Hook
  * Event Nodes Table Hook

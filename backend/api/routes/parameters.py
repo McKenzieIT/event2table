@@ -19,9 +19,23 @@ Performance Optimization (2026-02-11):
 - Hierarchical caching (L1: 60s, L2: 300s)
 - Cache invalidation on mutations
 - Query optimization for 70% performance improvement
+
+================================================================================
+SCHEMA USAGE RECOMMENDATION (Phase 3)
+================================================================================
+This module currently uses manual validation via validate_json_request().
+For better type safety and automatic validation, consider using Pydantic Schemas.
+
+Available Schemas in backend/models/schemas.py:
+- ParameterCreate: For creating new parameters
+- ParameterUpdate: For updating existing parameters
+- ParameterResponse: For API responses
+================================================================================
 """
 
 import logging
+from functools import lru_cache
+from typing import Optional
 
 from flask import request, session
 
@@ -56,6 +70,21 @@ from backend.core.cache.cache_system import (
 from .. import api_bp
 
 logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=128)
+def _get_game_id_from_gid(game_gid: int) -> Optional[int]:
+    """Cached game_gid to game_id conversion"""
+    game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+    return game["id"] if game else None
+
+
+@lru_cache(maxsize=128)
+def _get_game_gid_from_id(game_id: int) -> Optional[int]:
+    """Cached game_id to game_gid conversion"""
+    game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
+    return game["gid"] if game else None
+
 
 # Cache invalidator for parameter-related cache
 cache_invalidator = CacheInvalidator(hierarchical_cache)
@@ -101,14 +130,18 @@ def api_get_all_parameters():
         # 尝试从缓存获取
         cached_result = hierarchical_cache.get("parameters.all", **cache_key_params)
         if cached_result is not None:
-            logger.debug(f"✅ Cache HIT: parameters.all for game_id={game_id}, page={page}")
+            logger.debug(
+                f"✅ Cache HIT: parameters.all for game_id={game_id}, page={page}"
+            )
             return json_success_response(
                 data=cached_result,
                 message="Parameters retrieved successfully (cached)",
             )
 
         # 缓存未命中，执行查询
-        logger.debug(f"❌ Cache MISS: parameters.all for game_id={game_id}, page={page}")
+        logger.debug(
+            f"❌ Cache MISS: parameters.all for game_id={game_id}, page={page}"
+        )
 
         # 使用helper函数获取WHERE子句(统一game_gid关联)
         where_clause, query_value = get_where_clause_for_game(game_gid=game_gid)
@@ -180,7 +213,12 @@ def api_get_all_parameters():
         }
 
         # 写入缓存
-        hierarchical_cache.set("parameters.all", result_data, ttl=PARAMETERS_ALL_CACHE_TTL, **cache_key_params)
+        hierarchical_cache.set(
+            "parameters.all",
+            result_data,
+            ttl=PARAMETERS_ALL_CACHE_TTL,
+            **cache_key_params,
+        )
         logger.debug(f"💾 Cache SET: parameters.all for game_id={game_id}, page={page}")
 
         return json_success_response(
@@ -201,29 +239,32 @@ def api_get_parameter_details(param_name):
     Args:
         param_name: Parameter name
     Query Parameters:
-        - game_gid: Game GID (required, recommended)
-        - game_id: Game database ID (optional, for backward compatibility)
+        - game_gid: Game GID (required)
     """
     try:
-        # 优先使用game_gid(业务GID),回退到game_id(数据库ID)
         game_gid = request.args.get("game_gid", type=str)
-        game_id = request.args.get("game_id", type=int)
+
+        if not game_gid:
+            game_gid = session.get("current_game_gid")
+
+        if not game_gid:
+            return json_error_response("game_gid required", status_code=400)
 
         # Fix: Always use game_gid for data association (log_events table)
-        if game_gid:
-            where_clause = "le.game_gid = ?"
-            query_value = game_gid
-            # common_params表使用game_id，需要转换
-            game_record = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
-            if not game_record:
-                return json_error_response(f"Game not found: gid={game_gid}", status_code=404)
-            common_query_value = game_record["id"]
+        where_clause = "le.game_gid = ?"
+        query_value = game_gid
+        # common_params表使用game_id，需要转换（使用缓存函数）
+        common_query_value = _get_game_id_from_gid(int(game_gid))
+        if not common_query_value:
+            return json_error_response(
+                f"Game not found: gid={game_gid}", status_code=404
+            )
         elif game_id:
             # Legacy support: convert game_id to game_gid
-            game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
-            if game:
+            game_gid = _get_game_gid_from_id(game_id)
+            if game_gid:
                 where_clause = "le.game_gid = ?"
-                query_value = game["gid"]
+                query_value = game_gid
             else:
                 where_clause = "le.game_gid = ?"
                 query_value = game_id
@@ -236,10 +277,10 @@ def api_get_parameter_details(param_name):
                     "Game context required (game_gid or game_id)", status_code=400
                 )
             # Legacy support: convert game_id to game_gid
-            game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
-            if game:
+            game_gid = _get_game_gid_from_id(game_id)
+            if game_gid:
                 where_clause = "le.game_gid = ?"
-                query_value = game["gid"]
+                query_value = game_gid
             else:
                 where_clause = "le.game_gid = ?"
                 query_value = game_id
@@ -301,7 +342,9 @@ def api_get_parameter_details(param_name):
         return json_success_response(data=param_info)
 
     except Exception as e:
-        logger.error(f"Error fetching parameter details for {param_name}: {e}", exc_info=True)
+        logger.error(
+            f"Error fetching parameter details for {param_name}: {e}", exc_info=True
+        )
         return json_error_response("Failed to fetch parameter details", status_code=500)
 
 
@@ -311,54 +354,40 @@ def api_get_parameter_stats():
     API: Get parameter statistics
 
     Query Parameters:
-        - game_gid: Game GID (required, recommended)
-        - game_id: Game database ID (optional, for backward compatibility)
+        - game_gid: Game GID (required)
     """
     try:
-        # 优先使用game_gid(业务GID),回退到game_id(数据库ID)
         game_gid = request.args.get("game_gid", type=str)
-        game_id = request.args.get("game_id", type=int)
+
+        if not game_gid:
+            game_gid = session.get("current_game_gid")
+
+        if not game_gid:
+            return json_error_response("game_gid required", status_code=400)
 
         # Fix: Always use game_gid for data association (log_events table)
-        if game_gid:
-            where_clause = "le.game_gid = ?"
-            query_value = game_gid
-            # common_params表使用game_id，需要转换
-            game_record = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
-            if not game_record:
-                return json_error_response(f"Game not found: gid={game_gid}", status_code=404)
-            common_query_value = game_record["id"]
-        elif game_id:
-            # Legacy support: convert game_id to game_gid
-            game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
-            if game:
+        where_clause = "le.game_gid = ?"
+        query_value = game_gid
+        # common_params表使用game_id，需要转换（使用缓存函数）
+        common_query_value = _get_game_id_from_gid(int(game_gid))
+        if not common_query_value:
+            return json_error_response(
+                f"Game not found: gid={game_gid}", status_code=404
+            )
+            if game_gid:
                 where_clause = "le.game_gid = ?"
-                query_value = game["gid"]
-            else:
-                where_clause = "le.game_gid = ?"
-                query_value = game_id
-            common_query_value = game_id
-        else:
-            # 尝试从session获取
-            game_id = session.get("current_game_id")
-            if not game_id:
-                return json_error_response(
-                    "Game context required (game_gid or game_id)", status_code=400
-                )
-            # Legacy support: convert game_id to game_gid
-            game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
-            if game:
-                where_clause = "le.game_gid = ?"
-                query_value = game["gid"]
+                query_value = game_gid
             else:
                 where_clause = "le.game_gid = ?"
                 query_value = game_id
             common_query_value = game_id
 
-        # 统计参数总数
-        total_params = fetch_one_as_dict(
+        # 合并统计查询为单个查询
+        stats = fetch_one_as_dict(
             f"""
-            SELECT COUNT(DISTINCT ep.param_name) as count
+            SELECT
+                COUNT(DISTINCT ep.param_name) as total_unique_params,
+                SUM(CASE WHEN ep.is_active = 1 THEN 1 ELSE 0 END) as total_event_params
             FROM event_params ep
             JOIN log_events le ON ep.event_id = le.id
             WHERE {where_clause}
@@ -366,7 +395,7 @@ def api_get_parameter_stats():
             (query_value,),
         )
 
-        # 统计数据类型分布
+        # 统计数据类型分布（保持独立查询因为需要分组）
         type_stats = fetch_all_as_dict(
             f"""
             SELECT pt.base_type, COUNT(DISTINCT ep.param_name) as count
@@ -391,21 +420,10 @@ def api_get_parameter_stats():
             (common_query_value,),
         )
 
-        # 统计事件参数总数
-        total_event_params = fetch_one_as_dict(
-            f"""
-            SELECT COUNT(*) as count
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            WHERE {where_clause} AND ep.is_active = 1
-        """,
-            (query_value,),
-        )
-
         return json_success_response(
             data={
-                "total_unique_params": total_params["count"] if total_params else 0,
-                "total_event_params": (total_event_params["count"] if total_event_params else 0),
+                "total_unique_params": stats["total_unique_params"] if stats else 0,
+                "total_event_params": stats["total_event_params"] if stats else 0,
                 "common_params_count": common_params["count"] if common_params else 0,
                 "data_type_distribution": type_stats,
             }
@@ -413,7 +431,9 @@ def api_get_parameter_stats():
 
     except Exception as e:
         logger.error(f"Error fetching parameter stats: {e}", exc_info=True)
-        return json_error_response("Failed to fetch parameter statistics", status_code=500)
+        return json_error_response(
+            "Failed to fetch parameter statistics", status_code=500
+        )
 
 
 @api_bp.route("/api/parameters/<int:id>", methods=["PUT"])
@@ -439,7 +459,9 @@ def api_update_parameter(id):
         # Invalidate all pages for this parameter
         try:
             # Get event_id to determine game_id
-            event = fetch_one_as_dict("SELECT game_id FROM log_events WHERE id = ?", (param["event_id"],))
+            event = fetch_one_as_dict(
+                "SELECT game_id FROM log_events WHERE id = ?", (param["event_id"],)
+            )
             if event:
                 game_id = event["game_id"]
 
@@ -447,9 +469,13 @@ def api_update_parameter(id):
                 cache_invalidator.invalidate_pattern("parameters.all", game_id=game_id)
 
                 # Invalidate parameter details cache
-                cache_invalidator.invalidate("parameters.details", param_name=param["param_name"])
+                cache_invalidator.invalidate(
+                    "parameters.details", param_name=param["param_name"]
+                )
 
-                logger.info(f"✅ Cache invalidated for parameter update: id={id}, game_id={game_id}")
+                logger.info(
+                    f"✅ Cache invalidated for parameter update: id={id}, game_id={game_id}"
+                )
         except Exception as cache_error:
             logger.warning(f"⚠️ Cache invalidation failed: {cache_error}")
 
@@ -514,49 +540,26 @@ def api_get_common_parameters():
     API: Get common parameters list
 
     Query Parameters:
-        - game_gid: Game GID (required, recommended)
-        - game_id: Game database ID (optional, for backward compatibility)
+        - game_gid: Game GID (required)
     """
     try:
-        # 优先使用game_gid(业务GID),回退到game_id(数据库ID)
         game_gid = request.args.get("game_gid", type=str)
-        game_id = request.args.get("game_id", type=int)
+
+        if not game_gid:
+            game_gid = session.get("current_game_gid")
+
+        if not game_gid:
+            return json_error_response("game_gid required", status_code=400)
 
         # Fix: Always use game_gid for data association (log_events table)
-        if game_gid:
-            where_clause = "le.game_gid = ?"
-            query_value = game_gid
-            # common_params表使用game_id，需要转换
-            game_record = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
-            if not game_record:
-                return json_error_response(f"Game not found: gid={game_gid}", status_code=404)
-            common_query_value = game_record["id"]
-        elif game_id:
-            # Legacy support: convert game_id to game_gid
-            game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
-            if game:
-                where_clause = "le.game_gid = ?"
-                query_value = game["gid"]
-            else:
-                where_clause = "le.game_gid = ?"
-                query_value = game_id
-            common_query_value = game_id
-        else:
-            # 尝试从session获取
-            game_id = session.get("current_game_id")
-            if not game_id:
-                return json_error_response(
-                    "Game context required (game_gid or game_id)", status_code=400
-                )
-            # Legacy support: convert game_id to game_gid
-            game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
-            if game:
-                where_clause = "le.game_gid = ?"
-                query_value = game["gid"]
-            else:
-                where_clause = "le.game_gid = ?"
-                query_value = game_id
-            common_query_value = game_id
+        where_clause = "le.game_gid = ?"
+        query_value = game_gid
+        # common_params表使用game_id，需要转换（使用缓存函数）
+        common_query_value = _get_game_id_from_gid(int(game_gid))
+        if not common_query_value:
+            return json_error_response(
+                f"Game not found: gid={game_gid}", status_code=404
+            )
 
         common_params = fetch_all_as_dict(
             f"""
@@ -665,7 +668,9 @@ def api_check_param_library():
 
     exists = library_param is not None
 
-    return json_success_response(data={"exists": exists, "library_param": library_param})
+    return json_success_response(
+        data={"exists": exists, "library_param": library_param}
+    )
 
 
 @api_bp.route("/api/event-params/<int:param_id>/link-library", methods=["POST"])
@@ -678,12 +683,16 @@ def api_link_event_param_to_library(param_id):
     library_id = data.get("library_id")
 
     # Verify event parameter exists
-    event_param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (param_id,))
+    event_param = fetch_one_as_dict(
+        "SELECT * FROM event_params WHERE id = ?", (param_id,)
+    )
     if not event_param:
         return json_error_response("Event parameter not found", status_code=404)
 
     # Verify library parameter exists
-    library_param = fetch_one_as_dict("SELECT * FROM param_library WHERE id = ?", (library_id,))
+    library_param = fetch_one_as_dict(
+        "SELECT * FROM param_library WHERE id = ?", (library_id,)
+    )
     if not library_param:
         return json_error_response("Library parameter not found", status_code=404)
 
@@ -697,7 +706,8 @@ def api_link_event_param_to_library(param_id):
 
     # Update usage count
     execute_write(
-        "UPDATE param_library SET usage_count = usage_count + 1 WHERE id = ?", (library_id,)
+        "UPDATE param_library SET usage_count = usage_count + 1 WHERE id = ?",
+        (library_id,),
     )
 
     logger.info(f"Linked event param {param_id} to library param {library_id}")
@@ -717,37 +727,62 @@ def api_batch_check_param_library():
     parameters = data.get("parameters", [])
 
     if not parameters or len(parameters) > 100:
-        return json_error_response("Invalid parameters count (max 100)", status_code=400)
+        return json_error_response(
+            "Invalid parameters count (max 100)", status_code=400
+        )
 
     matched = []
     unmatched = []
 
-    for param in parameters:
-        param_name = param.get("param_name")
-        template_id = param.get("template_id")
+    if parameters:
+        conditions = []
+        values = []
+        for param in parameters:
+            param_name = param.get("param_name")
+            template_id = param.get("template_id")
 
-        if not param_name or template_id is None:
-            continue
+            if not param_name or template_id is None:
+                continue
 
-        library_param = fetch_one_as_dict(
-            """SELECT pl.*, pt.template_name
-               FROM param_library pl
-               JOIN param_templates pt ON pl.template_id = pt.id
-               WHERE pl.param_name = ? AND pl.template_id = ?""",
-            (param_name, template_id),
-        )
+            conditions.append("(pl.param_name = ? AND pl.template_id = ?)")
+            values.extend([param_name, template_id])
 
-        if library_param:
-            matched.append(
-                {
-                    "param_name": param_name,
-                    "template_id": template_id,
-                    "library_id": library_param["id"],
-                    "library_param": library_param,
-                }
+        if conditions:
+            where_clause = " OR ".join(conditions)
+            library_params = fetch_all_as_dict(
+                f"""SELECT pl.*, pt.template_name
+                   FROM param_library pl
+                   JOIN param_templates pt ON pl.template_id = pt.id
+                   WHERE {where_clause}""",
+                tuple(values),
             )
-        else:
-            unmatched.append({"param_name": param_name, "template_id": template_id})
+
+            library_map = {
+                (p["param_name"], p["template_id"]): p for p in library_params
+            }
+
+            for param in parameters:
+                param_name = param.get("param_name")
+                template_id = param.get("template_id")
+
+                if not param_name or template_id is None:
+                    continue
+
+                key = (param_name, template_id)
+                if key in library_map:
+                    library_param = library_map[key]
+                    matched.append(
+                        {
+                            "param_name": param_name,
+                            "template_id": template_id,
+                            "library_id": library_param["id"],
+                            "library_param": library_param,
+                        }
+                    )
+                else:
+                    unmatched.append(
+                        {"param_name": param_name, "template_id": template_id}
+                    )
 
     return json_success_response(data={"matched": matched, "unmatched": unmatched})
 
@@ -799,7 +834,7 @@ def api_get_alter_table_sql(param_id):
                 g.name as game_name,
                 g.gid
             FROM common_params p
-            JOIN games g ON p.game_id = g.id
+            JOIN games g ON p.game_gid = g.gid
             WHERE p.id = ?
         """,
             (param_id,),
@@ -822,5 +857,8 @@ def api_get_alter_table_sql(param_id):
         return json_success_response(data={"param": param, "alter_sql": alter_sql})
 
     except Exception as e:
-        logger.error(f"Error generating ALTER TABLE SQL for param_id={param_id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(
+            f"Error generating ALTER TABLE SQL for param_id={param_id}: {e}",
+            exc_info=True,
+        )
+        return json_error_response("An internal error occurred", status_code=500)

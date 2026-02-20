@@ -30,6 +30,21 @@ from backend.core.utils import (
     validate_json_request,
 )
 
+# Allowed fields for dynamic UPDATE
+ALLOWED_UPDATE_FIELDS = {
+    "name",
+    "display_name",
+    "source_events",
+    "join_condition",
+    "output_fields",
+    "output_table",
+    "join_type",
+    "where_conditions",
+    "field_mappings",
+    "description",
+    "game_id",
+}
+
 sys.path.append("..")
 try:
     from backend.core.cache.cache_system import clear_cache_pattern
@@ -66,32 +81,24 @@ def api_list_join_configs():
     API: List all join configurations with optional filtering
 
     Query params:
-    - game_gid: Filter by game GID (recommended)
-    - game_id: Filter by game database ID (deprecated, for backward compatibility)
+    - game_gid: Filter by game GID (required)
     - join_type: Filter by join type (union_all|join|where_in)
     """
-    # Support both game_gid (new) and game_id (legacy) parameters
     game_gid = request.args.get("game_gid", type=int)
-    game_id = request.args.get("game_id", type=int)
+
+    if not game_gid:
+        game_gid = session.get("current_game_gid")
+
+    if not game_gid:
+        return json_error_response("game_gid required", status_code=400)
 
     join_type = request.args.get("join_type")
 
     query = "SELECT * FROM join_configs WHERE 1=1"
     params = []
 
-    # Use game_gid if provided, otherwise convert game_id to game_gid
-    filter_column = "game_gid"
-    filter_value = None
-
-    if game_gid:
-        filter_value = game_gid
-    elif game_id:
-        # Convert game_id to game_gid for backward compatibility
-        game = Repositories.GAMES.find_by_id(game_id)
-        if game:
-            filter_value = game["gid"]
-        else:
-            return json_error_response("Game not found", status_code=404)
+    # Use game_gid for filtering
+    filter_value = game_gid
 
     if filter_value:
         query += f" AND {filter_column} = ?"
@@ -147,7 +154,14 @@ def api_create_join_config():
     }
     """
     is_valid, data, error = validate_json_request(
-        ["name", "display_name", "source_events", "output_fields", "output_table", "game_gid"]
+        [
+            "name",
+            "display_name",
+            "source_events",
+            "output_fields",
+            "output_table",
+            "game_gid",
+        ]
     )
     if not is_valid:
         return json_error_response(error, status_code=400)
@@ -161,24 +175,31 @@ def api_create_join_config():
             output_fields_list = json.loads(data["output_fields"])
         except json.JSONDecodeError as e:
             return json_error_response(
-                f"Invalid JSON in source_events or output_fields: {str(e)}", status_code=400
+                f"Invalid JSON in source_events or output_fields: {str(e)}",
+                status_code=400,
             )
 
         # Validate join_type
         join_type = data.get("join_type", "join")
         if join_type not in ["union_all", "join", "where_in"]:
-            return json_error_response(f"Invalid join_type: {join_type}", status_code=400)
+            return json_error_response(
+                f"Invalid join_type: {join_type}", status_code=400
+            )
 
         # Prepare join_condition based on type
         join_condition = data.get("join_condition", "{}")
         if join_type == "join" and not join_condition:
-            return json_error_response("join_condition required for JOIN type", status_code=400)
+            return json_error_response(
+                "join_condition required for JOIN type", status_code=400
+            )
 
         # Convert game_gid to game_id for database storage (if needed)
         game_gid = data["game_gid"]
         game = Repositories.GAMES.find_by_field("gid", game_gid)
         if not game:
-            return json_error_response(f"Game with GID {game_gid} not found", status_code=404)
+            return json_error_response(
+                f"Game with GID {game_gid} not found", status_code=404
+            )
 
         # Insert join config (store game_id internally for foreign key)
         config_id = execute_write(
@@ -209,7 +230,8 @@ def api_create_join_config():
         logger.info(f"Created join config {config_id}: {data['name']}")
 
         return json_success_response(
-            data={"config_id": config_id}, message="Join configuration created successfully"
+            data={"config_id": config_id},
+            message="Join configuration created successfully",
         )
 
     except sqlite3.IntegrityError:
@@ -242,19 +264,23 @@ def api_update_join_config(id):
             try:
                 json.loads(data["source_events"])
             except json.JSONDecodeError:
-                return json_error_response("Invalid JSON in source_events", status_code=400)
+                return json_error_response(
+                    "Invalid JSON in source_events", status_code=400
+                )
 
         if "output_fields" in data:
             try:
                 json.loads(data["output_fields"])
             except json.JSONDecodeError:
-                return json_error_response("Invalid JSON in output_fields", status_code=400)
+                return json_error_response(
+                    "Invalid JSON in output_fields", status_code=400
+                )
 
         # Validate join_type if provided
         if "join_type" in data:
             if data["join_type"] not in ["union_all", "join", "where_in"]:
                 return json_error_response(
-                    f'Invalid join_type: {data["join_type"]}', status_code=400
+                    f"Invalid join_type: {data['join_type']}", status_code=400
                 )
 
         # Handle game_gid conversion to game_id for database storage
@@ -262,7 +288,9 @@ def api_update_join_config(id):
             game_gid = data["game_gid"]
             game = Repositories.GAMES.find_by_field("gid", game_gid)
             if not game:
-                return json_error_response(f"Game with GID {game_gid} not found", status_code=404)
+                return json_error_response(
+                    f"Game with GID {game_gid} not found", status_code=404
+                )
             # Store game_id internally for foreign key
             data["game_id"] = game["id"]
             # Remove game_gid from data as it's not a database column
@@ -272,19 +300,17 @@ def api_update_join_config(id):
         update_fields = []
         update_values = []
 
-        for field in [
-            "name",
-            "display_name",
-            "source_events",
-            "join_condition",
-            "output_fields",
-            "output_table",
-            "join_type",
-            "where_conditions",
-            "field_mappings",
-            "description",
-            "game_id",
-        ]:
+        # Validate input fields against whitelist
+        provided_fields = set(data.keys())
+        invalid_fields = provided_fields - ALLOWED_UPDATE_FIELDS
+        if invalid_fields:
+            return json_error_response(
+                f"Invalid fields: {', '.join(sorted(invalid_fields))}. "
+                f"Allowed fields: {', '.join(sorted(ALLOWED_UPDATE_FIELDS))}",
+                status_code=400,
+            )
+
+        for field in ALLOWED_UPDATE_FIELDS:
             if field in data:
                 update_fields.append(f"{field} = ?")
                 update_values.append(data[field])

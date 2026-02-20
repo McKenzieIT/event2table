@@ -29,6 +29,12 @@ from backend.core.utils import (
     json_success_response,
 )
 
+
+def escape_like_wildcards(search: str) -> str:
+    """Escape SQL LIKE wildcards in search string."""
+    return search.replace("%", r"\%").replace("_", r"\_")
+
+
 sys.path.append("..")
 try:
     from backend.core.cache.cache_system import clear_cache_pattern
@@ -88,8 +94,11 @@ def api_list_templates():
             params.append(category)
 
         if search:
-            where_clauses.append("(name LIKE ? OR flow_name LIKE ? OR description LIKE ?)")
-            params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+            where_clauses.append(
+                "(name LIKE ? ESCAPE '\\' OR flow_name LIKE ? ESCAPE '\\' OR description LIKE ? ESCAPE '\\')"
+            )
+            escaped = escape_like_wildcards(search)
+            params.extend([f"%{escaped}%", f"%{escaped}%", f"%{escaped}%"])
 
         where_sql = " AND ".join(where_clauses)
 
@@ -136,13 +145,17 @@ def api_create_template():
         required_fields = ["name", "game_gid", "category"]
         for field in required_fields:
             if field not in data:
-                return json_error_response(f"Missing required field: {field}", status_code=400)
+                return json_error_response(
+                    f"Missing required field: {field}", status_code=400
+                )
 
         # Validate game_gid exists
-        game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (data["game_gid"],))
+        game = fetch_one_as_dict(
+            "SELECT gid FROM games WHERE gid = ?", (data["game_gid"],)
+        )
         if not game:
             return json_error_response(
-                f'Game with gid {data["game_gid"]} not found', status_code=404
+                f"Game with gid {data['game_gid']} not found", status_code=404
             )
 
         template_id = execute_write(
@@ -258,5 +271,5 @@ def api_apply_template(template_id):
         )
 
     except Exception as e:
-        logger.error(f"Error applying template {template_id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error applying template {template_id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)

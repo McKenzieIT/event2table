@@ -8,11 +8,14 @@ in HQL preview endpoints, reducing code duplication.
 """
 
 from typing import Tuple, Any, Dict
-from flask import jsonify
 from werkzeug.exceptions import BadRequest
 import logging
 
-from backend.core.utils import success_response, error_response
+from backend.core.utils import (
+    json_success_response,
+    json_error_response,
+    success_response,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,8 +39,7 @@ def parse_json_request() -> Tuple[bool, Any, str]:
 
 
 def validate_required_fields(
-    data: Dict[str, Any],
-    required_fields: list
+    data: Dict[str, Any], required_fields: list
 ) -> Tuple[bool, str]:
     """
     Validate that required fields are present in data
@@ -55,7 +57,9 @@ def validate_required_fields(
     return True, ""
 
 
-def handle_hql_generation_error(e: Exception, endpoint_name: str = "") -> Tuple[Any, int]:
+def handle_hql_generation_error(
+    e: Exception, endpoint_name: str = ""
+) -> Tuple[Any, int]:
     """
     Standardized error handling for HQL generation endpoints
 
@@ -68,19 +72,16 @@ def handle_hql_generation_error(e: Exception, endpoint_name: str = "") -> Tuple[
     """
     error_msg = str(e)
 
-    # Check if it's a "not found" error, return 404 instead of 400
     if "not found" in error_msg.lower():
         logger.warning(f"{endpoint_name} - Resource not found: {error_msg}")
-        return jsonify(error_response(error_msg, status_code=404)[0]), 404
+        return json_error_response(error_msg, status_code=404)
 
-    # Log validation errors
     if isinstance(e, ValueError):
         logger.warning(f"{endpoint_name} - Validation error: {error_msg}")
-        return jsonify(error_response(error_msg, status_code=400)[0]), 400
+        return json_error_response(error_msg, status_code=400)
 
-    # Log unexpected errors with traceback
     logger.exception(f"{endpoint_name} - Unexpected error: {error_msg}")
-    return jsonify(error_response(f"Failed to generate HQL: {error_msg}", status_code=500)[0]), 500
+    return json_error_response(f"Failed to generate HQL: {error_msg}", status_code=500)
 
 
 def format_timestamp() -> str:
@@ -91,12 +92,12 @@ def format_timestamp() -> str:
         ISO formatted timestamp string
     """
     from datetime import datetime
+
     return datetime.utcnow().isoformat() + "Z"
 
 
 def build_success_response(
-    data: Dict[str, Any],
-    include_timestamp: bool = True
+    data: Dict[str, Any], include_timestamp: bool = True
 ) -> Dict[str, Any]:
     """
     Build a standardized success response

@@ -1,0 +1,65 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2026-02-20",
+  "modules": ["analytics", "event-builder", "canvas"],
+
+  "globalSettings": {
+    "baseUrl": "http://localhost:5173",
+    "defaultTimeout": 5000,
+    "screenshotFormat": "png",
+    "retryOnFailure": true,
+    "maxRetries": 3
+  },
+
+  "testPriority": {
+    "critical": {
+      "description": "Core functionality tests",
+      "timeout": 10000,
+      "mustPass": true
+    },
+    "high": {
+      "description": "Important features",
+      "timeout": 7000,
+      "mustPass": true
+    },
+    "medium": {
+      "description": "Nice-to-have features",
+      "timeout": 5000,
+      "mustPass": false
+    }
+  },
+
+  "commonSteps": {
+    "navigate": {
+      "action": "navigate_page",
+      "type": "url"
+    },
+    "waitForLoad": {
+      "action": "wait_for",
+      "timeout": 5000
+    },
+    "checkConsoleErrors": {
+      "action": "list_console_messages",
+      "types": ["error"]
+    },
+    "takeScreenshot": {
+      "action": "take_screenshot",
+      "fullPage": true
+    }
+  },
+
+  "commonValidations": {
+    "noConsoleErrors": {
+      "type": "console_errors",
+      "expected": "none"
+    },
+    "elementVisible": {
+      "type": "element_visible",
+      "expected": true
+    },
+    "pageLoaded": {
+      "type": "page_loaded",
+      "expected": true
+    }
+  }
+}

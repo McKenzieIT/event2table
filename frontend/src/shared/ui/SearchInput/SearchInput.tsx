@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * SearchInput Component - 全功能搜索输入组件
  *

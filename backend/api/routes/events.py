@@ -11,6 +11,18 @@ Core endpoints:
 - PUT/PATCH /api/events/<int:id> - Update an event
 - GET /api/events/<int:id>/parameters - Get event parameters
 - GET /api/events/<int:event_id>/params - Get event params (alias)
+
+================================================================================
+SCHEMA USAGE RECOMMENDATION (Phase 3)
+================================================================================
+This module currently uses manual validation via validate_json_request().
+For better type safety and automatic validation, consider using Pydantic Schemas.
+
+Available Schemas in backend/models/schemas.py:
+- EventCreate: For creating new events
+- EventUpdate: For updating existing events
+- EventResponse: For API responses
+================================================================================
 """
 
 import html
@@ -96,6 +108,10 @@ def api_list_events() -> Tuple[Dict[str, Any], int]:
     game_gid_str = request.args.get("game_gid")
     game_gid = safe_int_convert(game_gid_str) if game_gid_str else None
 
+    logger.info(
+        f"API: game_gid_str={game_gid_str}, game_gid={game_gid}, type={type(game_gid)}"
+    )
+
     page = safe_int_convert(request.args.get("page"), 1, 1)
     per_page = safe_int_convert(request.args.get("per_page"), 20, 1)
     search = request.args.get("search", "").strip()
@@ -133,7 +149,9 @@ def api_list_events() -> Tuple[Dict[str, Any], int]:
 
     # Search filter
     if search:
-        where_clauses.append("(le.event_name LIKE ? OR le.event_name_cn LIKE ? OR ec.name LIKE ?)")
+        where_clauses.append(
+            "(le.event_name LIKE ? OR le.event_name_cn LIKE ? OR ec.name LIKE ?)"
+        )
         search_pattern = f"%{search}%"
         params.extend([search_pattern, search_pattern, search_pattern])
 
@@ -199,7 +217,8 @@ def api_create_event():
             )
         if len(event_name_cn) > 200:
             return json_error_response(
-                "event_name_cn exceeds maximum length of 200 characters", status_code=400
+                "event_name_cn exceeds maximum length of 200 characters",
+                status_code=400,
             )
 
         # Sanitize input to prevent XSS attacks
@@ -216,7 +235,7 @@ def api_create_event():
         )
         if not category:
             return json_error_response(
-                f'Category with id {data["category_id"]} not found', status_code=400
+                f"Category with id {data['category_id']} not found", status_code=400
             )
         event_category = category["name"]
 
@@ -226,7 +245,7 @@ def api_create_event():
         )
         if not game:
             return json_error_response(
-                f'Game with gid {data["game_gid"]} not found', status_code=400
+                f"Game with gid {data['game_gid']} not found", status_code=400
             )
 
         # Get database game_id and game_gid
@@ -236,7 +255,7 @@ def api_create_event():
 
         # Generate source_table and target_table names
         source_table = f"{ods_db}.ods_{game_gid}_all_view"
-        target_table = f'dwd.v_dwd_{game_gid}_{data["event_name"]}_di'
+        target_table = f"dwd.v_dwd_{game_gid}_{data['event_name']}_di"
 
         event_id = execute_write(
             """INSERT INTO log_events (game_id, game_gid, event_name, event_name_cn, category_id, source_table, target_table, include_in_common_params)
@@ -296,24 +315,15 @@ def api_get_event_detail(id):
     API: Get detailed information for a single event
 
     Query params:
-        - game_gid: Game GID (optional, falls back to session)
-        - game_id: Legacy parameter for backward compatibility (deprecated)
+        - game_gid: Game GID (required)
     """
-    # Try game_gid first, then fall back to game_id for backward compatibility
     game_gid = request.args.get("game_gid", type=int)
-    if not game_gid:
-        game_id = request.args.get("game_id", type=int)
-        if game_id:
-            # Convert game_id to game_gid
-            game = Repositories.GAMES.find_by_id(game_id)
-            if game:
-                game_gid = game["gid"]
 
     if not game_gid:
         game_gid = session.get("current_game_gid")
 
     if not game_gid:
-        return json_error_response("Game context required", status_code=400)
+        return json_error_response("game_gid required", status_code=400)
 
     try:
         event = fetch_one_as_dict(
@@ -338,8 +348,8 @@ def api_get_event_detail(id):
         return json_success_response(data=event)
 
     except Exception as e:
-        logger.error(f"Error getting event detail for {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error getting event detail for {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/events/<int:id>", methods=["PUT", "PATCH"])
@@ -350,7 +360,9 @@ def api_update_event(id):
     if not event:
         return json_error_response("Event not found", status_code=404)
 
-    is_valid, data, error = validate_json_request(["event_name", "event_name_cn", "category_id"])
+    is_valid, data, error = validate_json_request(
+        ["event_name", "event_name_cn", "category_id"]
+    )
     if not is_valid:
         return json_error_response(error, status_code=400)
 
@@ -482,7 +494,8 @@ def api_batch_delete_events():
         clear_cache_pattern("events")  # Clear cache after delete
         logger.info(f"Batch deleted {deleted_count} events")
         return json_success_response(
-            message=f"Deleted {deleted_count} events", data={"deleted_count": deleted_count}
+            message=f"Deleted {deleted_count} events",
+            data={"deleted_count": deleted_count},
         )
     except Exception as e:
         logger.error(f"Error batch deleting events: {e}")
@@ -514,10 +527,13 @@ def api_batch_update_events():
         if "event_name" in updates:
             event_name = updates["event_name"].strip()
             if len(event_name) == 0:
-                return json_error_response("event_name cannot be empty", status_code=400)
+                return json_error_response(
+                    "event_name cannot be empty", status_code=400
+                )
             if len(event_name) > 200:
                 return json_error_response(
-                    "event_name exceeds maximum length of 200 characters", status_code=400
+                    "event_name exceeds maximum length of 200 characters",
+                    status_code=400,
                 )
             updates["event_name"] = html.escape(event_name)
 
@@ -525,7 +541,8 @@ def api_batch_update_events():
             event_name_cn = updates["event_name_cn"].strip()
             if len(event_name_cn) > 200:
                 return json_error_response(
-                    "event_name_cn exceeds maximum length of 200 characters", status_code=400
+                    "event_name_cn exceeds maximum length of 200 characters",
+                    status_code=400,
                 )
             updates["event_name_cn"] = html.escape(event_name_cn)
 
@@ -535,7 +552,8 @@ def api_batch_update_events():
         clear_cache_pattern("events")  # Clear cache after update
         logger.info(f"Batch updated {updated_count} events")
         return json_success_response(
-            message=f"Updated {updated_count} events", data={"updated_count": updated_count}
+            message=f"Updated {updated_count} events",
+            data={"updated_count": updated_count},
         )
     except Exception as e:
         logger.error(f"Error batch updating events: {e}")

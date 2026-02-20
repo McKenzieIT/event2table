@@ -6,6 +6,16 @@
  *
  * Optimized with React.memo to prevent unnecessary re-renders.
  *
+ * @typedef {Object} ButtonProps
+ * @property {React.ReactNode} [children] - Button text or content
+ * @property {string} [variant] - Button variant: primary, secondary, ghost, danger, outline-primary, outline-danger
+ * @property {string} [size] - Button size: sm, md, lg
+ * @property {boolean} [disabled] - Disabled state
+ * @property {boolean} [loading] - Loading state
+ * @property {React.ComponentType} [icon] - Icon component
+ * @property {() => void} [onClick] - Click handler
+ * @property {string} [className] - Additional CSS classes
+ *
  * @example
  * // Primary button with hover glow
  * <Button variant="primary">Generate HQL</Button>
@@ -21,6 +31,9 @@
 import React from 'react';
 import './Button.css';
 
+/**
+ * @type {import('react').ForwardRefRenderFunction<HTMLButtonElement, ButtonProps>}
+ */
 const Button = React.forwardRef(({
   children,
   variant = 'primary',

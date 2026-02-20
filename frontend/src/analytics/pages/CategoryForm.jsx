@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { Button } from '@shared/ui';
 import './CategoryForm.css';
 
 /**
@@ -99,10 +100,10 @@ function CategoryForm() {
     <div className="category-form-container">
       <div className="page-header">
         <h1>{isEdit ? '编辑分类' : '添加分类'}</h1>
-        <Link to="/categories" className="btn btn-outline-secondary">
-          <i className="bi bi-arrow-left"></i>
+        <Button variant="secondary" onClick={() => navigate('/categories')}>
+          <i className="bi bi-arrow-left" aria-hidden="true"></i>
           返回
-        </Link>
+        </Button>
       </div>
 
       <form onSubmit={handleSubmit} className="form-card glass-card">
@@ -136,19 +137,16 @@ function CategoryForm() {
         </div>
 
         <div className="form-actions">
-          <button
+          <Button
+            variant="primary"
             type="submit"
-            className="btn btn-primary"
-            disabled={mutation.isLoading}
+            loading={mutation.isLoading}
           >
             {mutation.isLoading ? '提交中...' : (isEdit ? '保存修改' : '创建分类')}
-          </button>
-          <Link
-            to="/categories"
-            className="btn btn-outline-secondary"
-          >
+          </Button>
+          <Button variant="secondary" onClick={() => navigate('/categories')}>
             取消
-          </Link>
+          </Button>
         </div>
       </form>
     </div>

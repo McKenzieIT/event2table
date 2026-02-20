@@ -3,6 +3,7 @@
  * 字段配置模态框组件
  */
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 export default function FieldConfigModal({ field, onSave, onClose }) {
   const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ export default function FieldConfigModal({ field, onSave, onClose }) {
 
   const handleSubmit = () => {
     if (!formData.displayName.trim()) {
-      alert('请输入中文名称');
+      toast.error('请输入中文名称');
       return;
     }
     onSave({

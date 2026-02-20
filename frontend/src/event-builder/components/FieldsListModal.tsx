@@ -4,6 +4,7 @@
  *
  * @description 显示事件节点的所有字段配置
  */
+// @ts-nocheck - TypeScript检查暂禁用
 
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";

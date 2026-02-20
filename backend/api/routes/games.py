@@ -12,6 +12,32 @@ This module contains all game-related API endpoints:
 - PUT /api/games/batch-update - Batch update games
 
 NOTE: All game queries use business GID (e.g., 10000147), not database ID.
+
+================================================================================
+SCHEMA USAGE RECOMMENDATION (Phase 3)
+================================================================================
+This module currently uses manual validation via validate_json_request().
+For better type safety and automatic validation, consider using Pydantic Schemas:
+
+  # Before (manual validation):
+  is_valid, data, error = validate_json_request(["gid", "name", "ods_db"])
+  if not is_valid:
+      return json_error_response(error, status_code=400)
+
+  # After (using Schema):
+  from backend.models.schemas import GameCreate
+  from pydantic import ValidationError
+
+  try:
+      game_data = GameCreate(**request.json)
+  except ValidationError as e:
+      return json_error_response(f"Validation error: {e}", status_code=400)
+
+Available Schemas in backend/models/schemas.py:
+- GameCreate: For creating new games
+- GameUpdate: For updating existing games
+- GameResponse: For API responses
+================================================================================
 """
 
 import logging
@@ -35,8 +61,15 @@ from backend.core.utils import (
     validate_json_request,
 )
 
+# Import Schema for recommended validation (Phase 3)
+# from backend.models.schemas import GameCreate, GameUpdate, GameResponse
+# from pydantic import ValidationError
+
 # Import Repository pattern for data access
 from backend.core.data_access import Repositories
+
+# Allowed fields for dynamic UPDATE
+ALLOWED_UPDATE_FIELDS = {"name", "ods_db"}
 
 sys.path.append("..")
 try:
@@ -151,7 +184,7 @@ def api_list_games() -> Tuple[Dict[str, Any], int]:
         LEFT JOIN log_events le ON le.game_gid = g.gid
         LEFT JOIN event_params ep ON ep.event_id = le.id
         LEFT JOIN event_node_configs enc ON enc.game_gid = CAST(g.gid AS INTEGER)
-        LEFT JOIN flow_templates ft ON ft.game_id = g.id
+        LEFT JOIN flow_templates ft ON ft.game_gid = g.gid
         GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
         ORDER BY g.id
     """)
@@ -194,7 +227,9 @@ def api_create_game() -> Tuple[Dict[str, Any], int]:
 
     # 验证游戏ID格式
     if not isinstance(data["gid"], int) or data["gid"] <= 0:
-        return json_error_response("Game GID must be a positive integer", status_code=400)
+        return json_error_response(
+            "Game GID must be a positive integer", status_code=400
+        )
 
     # 验证和清理游戏名称
     is_valid, result = sanitize_and_validate_string(
@@ -302,6 +337,16 @@ def api_update_game(gid):
     update_fields = []
     update_values = []
 
+    # Validate input fields against whitelist
+    provided_fields = set(data.keys())
+    invalid_fields = provided_fields - ALLOWED_UPDATE_FIELDS
+    if invalid_fields:
+        return json_error_response(
+            f"Invalid fields: {', '.join(sorted(invalid_fields))}. "
+            f"Allowed fields: {', '.join(sorted(ALLOWED_UPDATE_FIELDS))}",
+            status_code=400,
+        )
+
     # Validate and sanitize name if provided
     if "name" in data:
         is_valid, result = sanitize_and_validate_string(
@@ -325,8 +370,7 @@ def api_update_game(gid):
     # Check if at least one field is being updated
     if not update_fields:
         return json_error_response(
-            "No valid fields to update. Provide 'name' and/or 'ods_db'",
-            status_code=400
+            "No valid fields to update. Provide 'name' and/or 'ods_db'", status_code=400
         )
 
     # Add gid to the values for the WHERE clause
@@ -367,33 +411,37 @@ def check_deletion_impact(game_gid: int) -> Dict[str, Any]:
 
     # 检查事件数量
     event_count = fetch_one_as_dict(
-        "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
-        (game_gid,)
+        "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?", (game_gid,)
     )
     impact["event_count"] = event_count["count"]
 
     # 检查参数数量（通过事件关联）
-    param_count = fetch_one_as_dict("""
+    param_count = fetch_one_as_dict(
+        """
         SELECT COUNT(*) as count
         FROM event_params ep
         INNER JOIN log_events le ON ep.event_id = le.id
         WHERE le.game_gid = ?
-    """, (game_gid,))
+    """,
+        (game_gid,),
+    )
     impact["param_count"] = param_count["count"]
 
     # 检查Canvas节点配置
     node_count = fetch_one_as_dict(
         "SELECT COUNT(*) as count FROM event_node_configs WHERE game_gid = ?",
-        (game_gid,)
+        (game_gid,),
     )
     impact["node_config_count"] = node_count["count"]
 
     # 判断是否有关联数据
-    impact["has_associated_data"] = any([
-        impact["event_count"] > 0,
-        impact["param_count"] > 0,
-        impact["node_config_count"] > 0,
-    ])
+    impact["has_associated_data"] = any(
+        [
+            impact["event_count"] > 0,
+            impact["param_count"] > 0,
+            impact["node_config_count"] > 0,
+        ]
+    )
 
     logger.debug(
         f"Deletion impact for game_gid={game_gid}: "
@@ -406,8 +454,7 @@ def check_deletion_impact(game_gid: int) -> Dict[str, Any]:
 
 
 def execute_cascade_delete(
-    game: Dict[str, Any],
-    impact: Dict[str, Any]
+    game: Dict[str, Any], impact: Dict[str, Any]
 ) -> Tuple[Dict[str, Any], int]:
     """
     执行级联删除游戏及其所有关联数据
@@ -432,33 +479,32 @@ def execute_cascade_delete(
             cursor.execute("BEGIN IMMEDIATE")  # 立即锁，防止并发修改
 
             # 验证游戏仍然存在（防止已被其他请求删除）
-            cursor.execute(
-                "SELECT id FROM games WHERE id = ?", (game_id,)
-            )
+            cursor.execute("SELECT id FROM games WHERE id = ?", (game_id,))
             game_exists = cursor.fetchone()
 
             if not game_exists:
                 conn.rollback()
                 return json_error_response(
-                    "Game not found (may have been deleted)",
-                    status_code=404
+                    "Game not found (may have been deleted)", status_code=404
                 )
 
             # 1. 删除事件参数（通过事件ID）
-            cursor.execute("""
+            cursor.execute(
+                """
                 DELETE FROM event_params
                 WHERE event_id IN (
                     SELECT id FROM log_events WHERE game_gid = ?
                 )
-            """, (game_gid,))
+            """,
+                (game_gid,),
+            )
 
             # 2. 删除事件记录
             cursor.execute("DELETE FROM log_events WHERE game_gid = ?", (game_gid,))
 
             # 3. 删除Canvas节点配置
             cursor.execute(
-                "DELETE FROM event_node_configs WHERE game_gid = ?",
-                (game_gid,)
+                "DELETE FROM event_node_configs WHERE game_gid = ?", (game_gid,)
             )
 
             # 4. 删除游戏记录（在同一事务中完成）
@@ -478,8 +524,8 @@ def execute_cascade_delete(
                 data={
                     "deleted_event_count": impact["event_count"],
                     "deleted_param_count": impact["param_count"],
-                    "deleted_node_config_count": impact["node_config_count"]
-                }
+                    "deleted_node_config_count": impact["node_config_count"],
+                },
             )
 
         except Exception as e:
@@ -497,7 +543,9 @@ def execute_cascade_delete(
 @api_bp.route("/api/games/<int:gid>", methods=["DELETE"])
 def api_delete_game(gid):
     """API: Delete a game by business GID (with confirmation)"""
-    logger.info(f"*** api_delete_game CALLED with gid={gid}, force_delete={request.get_json() or {}.get('confirm', False)} ***")
+    logger.info(
+        f"*** api_delete_game CALLED with gid={gid}, force_delete={request.get_json() or {}.get('confirm', False)} ***"
+    )
 
     # 获取确认标志
     data = request.get_json() or {}
@@ -523,8 +571,8 @@ def api_delete_game(gid):
                 "event_count": impact["event_count"],
                 "param_count": impact["param_count"],
                 "node_config_count": impact["node_config_count"],
-            }
-)
+            },
+        )
 
     # 执行级联删除
     result, status_code = execute_cascade_delete(game, impact)
@@ -537,13 +585,15 @@ def api_delete_game(gid):
         # ✅ 显式清除Flask-Caching的列表缓存
         try:
             from flask import current_app
-            if hasattr(current_app, 'cache'):
+
+            if hasattr(current_app, "cache"):
                 current_app.cache.delete("games:list:v1")
                 logger.info("✅ Cleared games:list:v1 Flask-Caching after deletion")
         except (AttributeError, RuntimeError) as e:
             logger.warning(f"Failed to clear Flask-Caching games:list cache: {e}")
 
     return result, status_code
+
 
 @api_bp.route("/api/games/batch", methods=["DELETE"])
 def api_batch_delete_games():
@@ -564,17 +614,21 @@ def api_batch_delete_games():
         if not games:
             return json_error_response("No games found", status_code=404)
 
+        # Batch check for associated events (single query)
+        gids = [g["gid"] for g in games]
+        placeholders = ",".join(["?"] * len(gids))
+        event_counts = fetch_all_as_dict(
+            f"SELECT game_gid, COUNT(*) as count FROM log_events WHERE game_gid IN ({placeholders}) GROUP BY game_gid",
+            tuple(gids),
+        )
+        count_map = {e["game_gid"]: e["count"] for e in event_counts}
+
         # Check if any game has associated events
         for game in games:
-            event_count = fetch_one_as_dict(
-                """SELECT COUNT(*) as count FROM log_events
-                   WHERE game_gid = ?""",
-                (game["gid"],),
-            )
-
-            if event_count["count"] > 0:
+            event_count = count_map.get(game["gid"], 0)
+            if event_count > 0:
                 return json_error_response(
-                    f"Cannot delete game '{game['name']}' with {event_count['count']} associated events. "
+                    f"Cannot delete game '{game['name']}' with {event_count} associated events. "
                     "Delete events first.",
                     status_code=409,
                 )
@@ -586,7 +640,8 @@ def api_batch_delete_games():
         clear_cache_pattern("dashboard_statistics")  # Clear dashboard cache
         logger.info(f"Batch deleted {deleted_count} games")
         return json_success_response(
-            message=f"Deleted {deleted_count} games", data={"deleted_count": deleted_count}
+            message=f"Deleted {deleted_count} games",
+            data={"deleted_count": deleted_count},
         )
     except Exception as e:
         logger.error(f"Error batch deleting games: {e}")
@@ -625,7 +680,10 @@ def api_batch_update_games():
 
         if "ods_db" in updates:
             is_valid, result = sanitize_and_validate_string(
-                updates["ods_db"], max_length=100, field_name="ods_db", allow_empty=False
+                updates["ods_db"],
+                max_length=100,
+                field_name="ods_db",
+                allow_empty=False,
             )
             if not is_valid:
                 return json_error_response(result, status_code=400)
@@ -638,7 +696,8 @@ def api_batch_update_games():
         clear_cache_pattern("dashboard_statistics")  # Clear dashboard cache
         logger.info(f"Batch updated {updated_count} games")
         return json_success_response(
-            message=f"Updated {updated_count} games", data={"updated_count": updated_count}
+            message=f"Updated {updated_count} games",
+            data={"updated_count": updated_count},
         )
     except Exception as e:
         logger.error(f"Error batch updating games: {e}")

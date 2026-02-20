@@ -1,0 +1,319 @@
+/**
+ * CanvasHeader Styles
+ * 包含统计显示和基础字段工具栏的样式
+ */
+
+/* ========================================
+   Canvas Stats Display - 字段统计显示（纯显示）
+   样式完全参照"⚡ 基础字段 0/7"的btn-quick-add
+   ======================================== */
+
+.field-canvas-stats {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  /* Visual: Glass morphism（完全参照btn-quick-add） */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 4px 10px;
+
+  /* Typography（完全参照btn-quick-add） */
+  font-size: 11px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+
+  /* 纯显示组件，无交互 */
+  user-select: none;
+
+  /* Performance: containment */
+  contain: layout style paint;
+}
+
+.field-canvas-stats .stats-icon {
+  font-size: 12px;
+}
+
+.field-canvas-stats .stats-text {
+  /* Typography */
+  font-size: 11px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ========================================
+   Base Fields Quick Toolbar - 基础字段快速工具栏
+   ======================================== */
+
+.base-fields-compact {
+  /* Layout */
+  position: relative;
+  display: inline-block;
+
+  /* Performance: containment */
+  contain: layout style paint;
+}
+
+/* Quick Add Button */
+.btn-quick-add {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  /* Visual: Glass button */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 4px 10px;
+
+  /* Typography */
+  font-size: 11px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+
+  /* Cursor */
+  cursor: pointer;
+  user-select: none;
+
+  /* Animation: hover-only */
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-quick-add:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(6, 182, 212, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2);
+  color: rgba(255, 255, 255, 1);
+}
+
+.btn-quick-add:active {
+  transform: translateY(0);
+}
+
+.btn-quick-add .icon {
+  font-size: 12px;
+}
+
+/* Quick Add Panel - Dropdown */
+.quick-add-panel {
+  /* Layout */
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  min-width: 280px;
+
+  /* Visual: Glass panel */
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Animation */
+  transform-origin: top right;
+  animation: quickAddPanelSlideIn 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Performance */
+  contain: layout style paint;
+}
+
+@keyframes quickAddPanelSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Batch Actions */
+.batch-actions {
+  /* Layout */
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-add-all,
+.btn-add-common {
+  /* Layout */
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  /* Visual */
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 4px;
+  padding: 6px 10px;
+
+  /* Typography */
+  font-size: 11px;
+  font-family: var(--font-sans), sans-serif;
+  color: rgba(6, 182, 212, 1);
+  font-weight: 600;
+
+  /* Cursor */
+  cursor: pointer;
+  user-select: none;
+
+  /* Animation */
+  transition: all 150ms ease;
+}
+
+.btn-add-all:hover,
+.btn-add-common:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+.btn-add-all:active,
+.btn-add-common:active {
+  transform: translateY(0);
+}
+
+/* Field Buttons Grid */
+.field-buttons-grid {
+  /* Layout */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.field-btn {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Visual */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 6px 8px;
+
+  /* Typography */
+  font-size: 11px;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+
+  /* Cursor */
+  cursor: pointer;
+  user-select: none;
+
+  /* Text overflow */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* Animation */
+  transition: all 150ms ease;
+
+  /* Performance */
+  contain: layout style;
+}
+
+.field-btn:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: rgba(6, 182, 212, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(6, 182, 212, 0.2);
+}
+
+.field-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.field-btn:disabled {
+  /* Added state */
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: rgba(6, 182, 212, 0.5);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.field-btn.added::before {
+  /* Checkmark indicator */
+  content: '✓';
+  margin-right: 4px;
+  font-weight: bold;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .field-canvas-stats {
+    font-size: 10px;
+    padding: 3px 8px;
+    gap: 6px;
+  }
+
+  .stat-value {
+    font-size: 11px;
+  }
+
+  .stat-label {
+    font-size: 9px;
+  }
+
+  .quick-add-panel {
+    min-width: 240px;
+    left: 0;
+    right: 0;
+  }
+
+  .field-buttons-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ========================================
+   Accessibility - Focus Styles
+   ======================================== */
+
+.btn-quick-add:focus-visible,
+.btn-add-all:focus-visible,
+.btn-add-common:focus-visible,
+.field-btn:focus-visible {
+  outline: 2px solid rgba(6, 182, 212, 0.6);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .btn-quick-add,
+  .btn-add-all,
+  .btn-add-common,
+  .field-btn,
+  .quick-add-panel {
+    transition: none;
+    animation: none;
+  }
+
+  .quick-add-panel {
+    transform: none;
+  }
+}

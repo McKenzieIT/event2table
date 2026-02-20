@@ -80,7 +80,9 @@ def cache_status():
                         "hit_rate": f"{hit_rate}%",
                         "total_keys": redis_client.dbsize(),
                         "memory_used": info.get("used_memory_human", "0B"),
-                        "uptime_days": round(info.get("uptime_in_seconds", 0) / 86400, 2),
+                        "uptime_days": round(
+                            info.get("uptime_in_seconds", 0) / 86400, 2
+                        ),
                     },
                 },
             }
@@ -132,7 +134,11 @@ def list_cache_keys():
             full_key = f"{key_prefix}{key}"
             ttl = redis_client.ttl(full_key)
             keys_with_ttl.append(
-                {"key": key, "ttl_seconds": ttl, "expires_in": f"{ttl}s" if ttl > 0 else "永久"}
+                {
+                    "key": key,
+                    "ttl_seconds": ttl,
+                    "expires_in": f"{ttl}s" if ttl > 0 else "永久",
+                }
             )
 
         return jsonify(
@@ -146,7 +152,8 @@ def list_cache_keys():
         )
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        logger.error(f"Error listing cache keys: {e}", exc_info=True)
+        return jsonify({"success": False, "error": "An internal error occurred"})
 
 
 @cache_monitor_bp.route("/admin/cache/stats")
@@ -210,8 +217,10 @@ def cache_stats():
         )
 
     except Exception as e:
-        logger.error(f"获取缓存统计失败: {e}")
-        return jsonify({"error": str(e), "message": "获取缓存统计失败"}), 500
+        logger.error(f"获取缓存统计失败: {e}", exc_info=True)
+        return jsonify(
+            {"error": "An internal error occurred", "message": "获取缓存统计失败"}
+        ), 500
 
 
 @cache_monitor_bp.route("/admin/cache/performance")
@@ -275,7 +284,9 @@ def cache_performance():
                         / max(total_requests, 1)
                     ),
                     "misses_per_sec": round(
-                        instantaneous_ops_per_sec * l1_stats["misses"] / max(total_requests, 1)
+                        instantaneous_ops_per_sec
+                        * l1_stats["misses"]
+                        / max(total_requests, 1)
                     ),
                 },
                 "efficiency": {
@@ -293,7 +304,9 @@ def cache_performance():
                     "l2": {
                         "total_keys": redis_client.dbsize() if redis_client else 0,
                         "memory_used": (
-                            redis_info.get("used_memory_human", "0B") if redis_info else "0B"
+                            redis_info.get("used_memory_human", "0B")
+                            if redis_info
+                            else "0B"
                         ),
                     },
                 },
@@ -301,8 +314,10 @@ def cache_performance():
         )
 
     except Exception as e:
-        logger.error(f"获取性能指标失败: {e}")
-        return jsonify({"error": str(e), "message": "获取性能指标失败"}), 500
+        logger.error(f"获取性能指标失败: {e}", exc_info=True)
+        return jsonify(
+            {"error": "An internal error occurred", "message": "获取性能指标失败"}
+        ), 500
 
 
 @cache_monitor_bp.route("/admin/cache/clear", methods=["POST"])
@@ -345,8 +360,8 @@ def clear_all_cache():
         )
 
     except Exception as e:
-        logger.error(f"清空缓存失败: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        logger.error(f"清空缓存失败: {e}", exc_info=True)
+        return jsonify({"success": False, "error": "An internal error occurred"}), 500
 
 
 # ============================================================================

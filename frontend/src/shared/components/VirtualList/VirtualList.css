@@ -1,0 +1,90 @@
+/* Virtual List Styles */
+
+.virtual-list-container {
+  width: 100%;
+  position: relative;
+  /* 使用CSS变量保持一致性 */
+  font-family: var(--font-body);
+}
+
+.virtual-list-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+}
+
+/* 骨架屏样式 */
+.virtual-list-skeleton {
+  width: 100%;
+  padding: var(--space-2);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-2);
+  background: var(--surface-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.skeleton-cell {
+  flex: 1;
+  height: 20px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-hover) 25%,
+    var(--surface-active) 50%,
+    var(--surface-hover) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-animate {
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 滚动条样式优化 */
+.virtual-list-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.virtual-list-container::-webkit-scrollbar-track {
+  background: var(--surface-base);
+  border-radius: var(--radius-sm);
+}
+
+.virtual-list-container::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-base);
+}
+
+.virtual-list-container::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* 平滑滚动 */
+.virtual-list-container {
+  scroll-behavior: smooth;
+}
+
+/* 虚拟项过渡动画 */
+.virtual-list-container > div > div {
+  transition: opacity var(--transition-fast) ease-out;
+}

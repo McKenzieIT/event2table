@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Games Management Module (API Only)
-===================================
+Games Management Module (API Only) - PARTIALLY DEPRECATED
+=========================================================
 
-Handles all game-related API endpoints.
-Frontend is now handled by React SPA (modules/react_shell.py).
+Handles game-related API endpoints for session context.
+Most routes have been migrated to backend/api/routes/games.py.
+
+MIGRATION STATUS (2026-02-20):
+  ✅ GET /api/games -> backend/api/routes/games.py::api_list_games()
+  ✅ POST /api/games -> backend/api/routes/games.py::api_create_game()
+  ✅ GET /api/games/<gid> -> backend/api/routes/games.py::api_get_game()
+  ✅ PUT /api/games/<gid> -> backend/api/routes/games.py::api_update_game()
+  ✅ DELETE /api/games/<gid> -> backend/api/routes/games.py::api_delete_game()
+
+ACTIVE ROUTES (still using games_bp):
+  - POST /api/set-game-context -> Session management
+  - GET /api/games/by-gid/<gid> -> Alias route
 
 Legacy template routes have been removed as part of frontend-backend separation.
 Created: 2026-01-25
+Updated: 2026-02-20
 """
 
 import sqlite3
@@ -52,30 +64,32 @@ def set_game_context():
             return jsonify(error_response("Missing game_gid", status_code=400)[0]), 400
 
         # 查询游戏信息 - 使用 game_gid 而非 id
-        game = fetch_one_as_dict("SELECT id, gid, name FROM games WHERE gid = ?", (game_gid,))
+        game = fetch_one_as_dict(
+            "SELECT id, gid, name FROM games WHERE gid = ?", (game_gid,)
+        )
 
         if not game:
             logger.warning(f"[SetGameContext] Game not found: game_gid={game_gid}")
             return jsonify(error_response("Game not found", status_code=404)[0]), 404
 
-        # 设置session（同时设置id和gid，兼容旧代码）
-        session["current_game_gid"] = game["id"]
         session["current_game_gid"] = game["gid"]
 
         logger.info(
-            f'[SetGameContext] Session set: game_gid={game["id"]}, '
-            f'game_gid={game["gid"]}, game_name={game["name"]}'
+            f"[SetGameContext] Session set: game_gid={game['gid']}, "
+            f"game_name={game['name']}"
         )
 
         return jsonify(
-            success_response(
-                data={"game_gid": game["id"], "game_gid": game["gid"], "game_name": game["name"]}
-            )[0]
+            success_response(data={"game_gid": game["gid"], "game_name": game["name"]})[
+                0
+            ]
         )
 
     except Exception as e:
         logger.error(f"[SetGameContext] Error: {str(e)}", exc_info=True)
-        return jsonify(error_response(f"Server error: {str(e)}", status_code=500)[0]), 500
+        return jsonify(
+            error_response(f"Server error: {str(e)}", status_code=500)[0]
+        ), 500
 
 
 # @games_bp.route('/api/games/<int:id>')  # CONFLICTS with api_bp
@@ -265,7 +279,9 @@ def update_game(id):
         updated_game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (id,))
 
         logger.info(f"[UpdateGame] Game updated: {name} (ID: {id}, ODS: {ods_db})")
-        response, _ = success_response(data=updated_game, message="Game updated successfully")
+        response, _ = success_response(
+            data=updated_game, message="Game updated successfully"
+        )
         return jsonify(response)
 
     except Exception as e:
@@ -296,7 +312,7 @@ def delete_game(id):
         execute_write("DELETE FROM games WHERE id = ?", (id,))
         clear_game_cache()
 
-        logger.info(f'[DeleteGame] Game deleted: {game["name"]} (ID: {id})')
+        logger.info(f"[DeleteGame] Game deleted: {game['name']} (ID: {id})")
         response, _ = success_response(message="Game deleted successfully")
         return jsonify(response)
 

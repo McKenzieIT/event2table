@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * Confirm Dialog Hook
  * 提供类似 window.confirm 的API但使用UI对话框

@@ -9,6 +9,7 @@
  */
 
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import './MultiEventConfigV2.css';
 
 export default function MultiEventConfigV2({
@@ -44,7 +45,7 @@ export default function MultiEventConfigV2({
   // 添加JOIN条件
   const handleAddJoinCondition = () => {
     if (!newJoinCondition.leftEvent || !newJoinCondition.rightEvent) {
-      alert('请选择左右两侧事件');
+      toast.error('请选择左右两侧事件');
       return;
     }
 

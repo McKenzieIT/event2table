@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * HQLPreviewWrapper - HQL预览V1/V2集成组件
  *

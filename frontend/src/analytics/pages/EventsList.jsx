@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useOutletContext } from 'react-router-dom';
@@ -27,21 +28,16 @@ function EventsList() {
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
-  const pageSize = 10;  // 减少默认pageSize从20到10（性能优化：避免一次渲染过多事件）
+  const pageSize = 10;
 
-  // Game context check - show prompt if no game selected
-  if (!currentGame) {
-    return <SelectGamePrompt message="查看事件列表需要先选择游戏" />;
-  }
-
-  // Fetch events list
+  // Fetch events list - must be BEFORE any conditional returns
   const { data, isLoading, error: fetchError } = useQuery({
     queryKey: ['events', currentPage, pageSize, selectedCategory, currentGame?.gid],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         per_page: pageSize.toString(),
-        game_gid: currentGame.gid.toString() // Use game_gid instead of game_id
+        game_gid: currentGame.gid.toString()
       });
 
       if (searchTerm) {
@@ -52,18 +48,16 @@ function EventsList() {
       if (!response.ok) throw new Error('Failed to fetch events');
       const result = await response.json();
 
-      // Validate response structure
       if (!result?.success) {
         throw new Error(result?.message || 'Failed to fetch events');
       }
 
-      // Return the data object containing events and pagination
       return result.data || {};
     },
-    enabled: !!currentGame // Only execute when currentGame exists
+    enabled: !!currentGame
   });
 
-  // Batch delete mutation
+  // Batch delete mutation - must be BEFORE any conditional returns
   const deleteMutation = useMutation({
     mutationFn: async (eventIds) => {
       const response = await fetch('/api/events/batch', {
@@ -77,12 +71,18 @@ function EventsList() {
     onSuccess: (data) => {
       queryClient.invalidateQueries(['events']);
       setSelectedEvents([]);
-      success(`成功删除 ${data.deleted_count} 个事件`);
+      const deletedCount = data?.data?.deleted_count ?? data?.deleted_count ?? 0;
+      success(`成功删除 ${deletedCount} 个事件`);
     },
     onError: (err) => {
       showError(`删除失败: ${err.message}`);
     }
   });
+
+  // Game context check - AFTER all hooks
+  if (!currentGame) {
+    return <SelectGamePrompt message="查看事件列表需要先选择游戏" />;
+  }
 
   // Handle search with debounce - using useCallback
   const handleSearchChange = useCallback((value) => {

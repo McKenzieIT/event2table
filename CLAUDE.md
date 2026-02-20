@@ -462,7 +462,32 @@ games = fetch_all_as_dict("SELECT * FROM games WHERE name = ?", (name,))
 query = f"SELECT * FROM games WHERE name = '{name}'"  # SQL注入风险！
 ```
 
-**3. 错误处理不暴露敏感信息**：
+**3. SQLValidator强制使用**：
+> **🚨 所有动态SQL标识符必须使用SQLValidator验证**
+
+```python
+from backend.core.security.sql_validator import SQLValidator
+
+# ✅ 正确：验证动态表名
+table_name = request.args.get("table")
+validated_table = SQLValidator.validate_table_name(table_name)
+query = f"SELECT * FROM {validated_table}"
+
+# ✅ 正确：验证动态列名
+column = request.args.get("column")
+validated_column = SQLValidator.validate_column_name(column)
+
+# ✅ 正确：使用白名单验证
+ALLOWED_FIELDS = {"name", "created_at", "id"}
+SQLValidator.validate_field_whitelist(sort_by, ALLOWED_FIELDS)
+
+# ❌ 错误：未验证的动态标识符
+query = f"SELECT * FROM {table_name} WHERE {column} = ?"  # SQL注入风险！
+```
+
+**详细指南**: [sql-validator-guidelines.md](docs/development/sql-validator-guidelines.md)
+
+**4. 错误处理不暴露敏感信息**：
 ```python
 # ✅ 正确：通用错误消息
 try:
@@ -482,6 +507,7 @@ except Exception as e:
 - [ ] 输入验证（必填字段、数据类型、长度限制）
 - [ ] XSS防护（HTML转义用户输入）
 - [ ] SQL注入防护（参数化查询）
+- [ ] SQLValidator验证（动态标识符）
 - [ ] 输出编码（JSON响应，不暴露内部信息）
 - [ ] 错误处理（适当的HTTP状态码：400/404/409/500）
 

@@ -79,25 +79,20 @@ def api_list_categories():
     """
     try:
         # Get and validate game_gid parameter (REQUIRED)
-        game_gid = request.args.get('game_gid', type=int)
+        game_gid = request.args.get("game_gid", type=int)
 
         # MANDATORY: game_gid must be provided
         if not game_gid:
-            return json_error_response(
-                'game_gid is required',
-                status_code=400
-            )
+            return json_error_response("game_gid is required", status_code=400)
 
         # Verify game exists
-        game = fetch_one_as_dict('SELECT * FROM games WHERE gid = ?', (game_gid,))
+        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
         if not game:
-            return json_error_response(
-                f'Game {game_gid} not found',
-                status_code=404
-            )
+            return json_error_response(f"Game {game_gid} not found", status_code=404)
 
         # Query all categories with event counts (including categories with 0 events)
-        categories = fetch_all_as_dict("""
+        categories = fetch_all_as_dict(
+            """
             SELECT
                 ec.id,
                 ec.name,
@@ -109,7 +104,9 @@ def api_list_categories():
                 AND le.game_gid = ?
             GROUP BY ec.id
             ORDER BY ec.name
-        """, (game_gid,))
+        """,
+            (game_gid,),
+        )
 
         return json_success_response(data=categories)
     except Exception as e:
@@ -199,7 +196,9 @@ def api_delete_category(id):
 
     try:
         # Delete category relations first
-        execute_write("DELETE FROM event_category_relations WHERE category_id = ?", (id,))
+        execute_write(
+            "DELETE FROM event_category_relations WHERE category_id = ?", (id,)
+        )
         # Delete category
         Repositories.EVENT_CATEGORIES.delete(id)
 
@@ -222,18 +221,29 @@ def api_batch_delete_categories():
         return json_error_response("Invalid category IDs", status_code=400)
 
     try:
+        ids = data["ids"]
+        if len(ids) > 100:
+            return json_error_response(
+                f"Too many IDs: {len(ids)} > 100", status_code=400
+            )
+        if not all(isinstance(id, int) and id > 0 for id in ids):
+            return json_error_response(
+                "All IDs must be positive integers", status_code=400
+            )
+
         # Delete category relations first
         execute_write(
-            f'DELETE FROM event_category_relations WHERE category_id IN ({",".join(["?"] * len(data["ids"]))})',
-            data["ids"],
+            f"DELETE FROM event_category_relations WHERE category_id IN ({','.join(['?'] * len(ids))})",
+            ids,
         )
         # Delete categories using Repository batch delete
-        deleted_count = Repositories.EVENT_CATEGORIES.delete_batch(data["ids"])
+        deleted_count = Repositories.EVENT_CATEGORIES.delete_batch(ids)
 
         clear_cache_pattern("categories")
         logger.info(f"Batch deleted {deleted_count} categories")
         return json_success_response(
-            message=f"Deleted {deleted_count} categories", data={"deleted_count": deleted_count}
+            message=f"Deleted {deleted_count} categories",
+            data={"deleted_count": deleted_count},
         )
     except Exception as e:
         logger.error(f"Error batch deleting categories: {e}")
@@ -271,12 +281,15 @@ def api_batch_update_categories():
             updates["name"] = result
 
         # Use Repository batch update
-        updated_count = Repositories.EVENT_CATEGORIES.update_batch(category_ids, updates)
+        updated_count = Repositories.EVENT_CATEGORIES.update_batch(
+            category_ids, updates
+        )
 
         clear_cache_pattern("categories")
         logger.info(f"Batch updated {updated_count} categories")
         return json_success_response(
-            message=f"Updated {updated_count} categories", data={"updated_count": updated_count}
+            message=f"Updated {updated_count} categories",
+            data={"updated_count": updated_count},
         )
     except Exception as e:
         logger.error(f"Error batch updating categories: {e}")

@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import CodeMirror from '@uiw/react-codemirror';
+import toast from 'react-hot-toast';
 import './HQLPreviewModal.css';
 import { BaseModal } from '@shared/ui/BaseModal';
 import PerformanceIndicator from '../HQLPreviewV2/PerformanceIndicator';
@@ -226,7 +227,7 @@ export default function HQLPreviewModal({
           <div className="editor-toolbar">
             <button className="btn btn-sm btn-outline-primary" onClick={() => {
               navigator.clipboard.writeText(currentHQL);
-              alert('已复制到剪贴板');
+              toast.success('已复制到剪贴板');
             }}>
               <i className="bi bi-clipboard"></i> 复制
             </button>

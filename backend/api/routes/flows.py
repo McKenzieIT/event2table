@@ -29,6 +29,7 @@ from backend.core.utils import (
     json_error_response,
     json_success_response,
     sanitize_and_validate_string,
+    validate_json_request,
 )
 
 # Import Repository pattern for data access
@@ -63,9 +64,15 @@ logger = logging.getLogger(__name__)
 
 @api_bp.route("/api/flows", methods=["GET"])
 def api_list_flows():
-    """API: List all flows"""
+    """API: List all flows with pagination"""
     try:
         game_gid = request.args.get("game_gid", type=int)
+
+        page = request.args.get("page", 1, type=int)
+        page_size = request.args.get("page_size", 50, type=int)
+        page_size = min(max(page_size, 1), 100)
+
+        offset = (page - 1) * page_size
 
         where_clauses = ["1=1"]
         params = []
@@ -76,16 +83,31 @@ def api_list_flows():
 
         where_sql = " AND ".join(where_clauses)
 
+        total_result = fetch_one_as_dict(
+            f"SELECT COUNT(*) as count FROM flow_templates WHERE {where_sql}",
+            tuple(params),
+        )
+        total = total_result["count"] if total_result else 0
+
         flows = fetch_all_as_dict(
             f"""
             SELECT * FROM flow_templates
             WHERE {where_sql}
             ORDER BY updated_at DESC
+            LIMIT ? OFFSET ?
         """,
-            params,
+            tuple(params) + (page_size, offset),
         )
 
-        return json_success_response(data=flows)
+        return json_success_response(
+            data={
+                "flows": flows,
+                "page": page,
+                "page_size": page_size,
+                "total": total,
+                "total_pages": (total + page_size - 1) // page_size if total > 0 else 0,
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error fetching flows: {e}")
@@ -108,12 +130,15 @@ def api_create_flow():
         game = Repositories.GAMES.find_by_field("gid", data["game_gid"])
         if not game:
             return json_error_response(
-                f'Game with gid {data["game_gid"]} not found', status_code=404
+                f"Game with gid {data['game_gid']} not found", status_code=404
             )
 
         # 验证和清理流程名称
         is_valid, result = sanitize_and_validate_string(
-            data.get("flow_name"), max_length=200, field_name="flow_name", allow_empty=False
+            data.get("flow_name"),
+            max_length=200,
+            field_name="flow_name",
+            allow_empty=False,
         )
         if not is_valid:
             return json_error_response(result, status_code=400)
@@ -121,7 +146,10 @@ def api_create_flow():
 
         # 验证和清理分类
         is_valid, result = sanitize_and_validate_string(
-            data.get("category", "custom"), max_length=100, field_name="category", allow_empty=True
+            data.get("category", "custom"),
+            max_length=100,
+            field_name="category",
+            allow_empty=True,
         )
         if not is_valid:
             return json_error_response(result, status_code=400)
@@ -129,7 +157,10 @@ def api_create_flow():
 
         # 验证和清理描述
         is_valid, result = sanitize_and_validate_string(
-            data.get("description", ""), max_length=1000, field_name="description", allow_empty=True
+            data.get("description", ""),
+            max_length=1000,
+            field_name="description",
+            allow_empty=True,
         )
         if not is_valid:
             return json_error_response(result, status_code=400)
@@ -151,7 +182,9 @@ def api_create_flow():
 
         clear_cache_pattern("flows")
         logger.info(f"Flow created: {flow_name} (ID: {flow_id})")
-        return json_success_response(data={"flow_id": flow_id}, message="Flow created successfully")
+        return json_success_response(
+            data={"flow_id": flow_id}, message="Flow created successfully"
+        )
 
     except Exception as e:
         logger.error(f"Error creating flow: {e}")
@@ -198,7 +231,10 @@ def api_update_flow(flow_id):
         # 验证和清理分类
         if "category" in data:
             is_valid, result = sanitize_and_validate_string(
-                data.get("category"), max_length=100, field_name="category", allow_empty=True
+                data.get("category"),
+                max_length=100,
+                field_name="category",
+                allow_empty=True,
             )
             if not is_valid:
                 return json_error_response(result, status_code=400)
@@ -209,7 +245,10 @@ def api_update_flow(flow_id):
         # 验证和清理描述
         if "description" in data:
             is_valid, result = sanitize_and_validate_string(
-                data.get("description"), max_length=1000, field_name="description", allow_empty=True
+                data.get("description"),
+                max_length=1000,
+                field_name="description",
+                allow_empty=True,
             )
             if not is_valid:
                 return json_error_response(result, status_code=400)
@@ -273,8 +312,8 @@ def api_load_flow(flow_id):
         return json_success_response(data=flow_data)
 
     except Exception as e:
-        logger.error(f"Error loading flow {flow_id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error loading flow {flow_id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/flows/generate", methods=["POST"])
@@ -290,13 +329,17 @@ def api_generate_flow():
             return json_error_response("Missing flow_id", status_code=400)
 
         # Generate HQL using HQL generator
-        result = hql_generator.generate_flow_hql(data["flow_id"], data.get("options", {}))
+        result = hql_generator.generate_flow_hql(
+            data["flow_id"], data.get("options", {})
+        )
 
-        return json_success_response(data=result, message="Flow HQL generated successfully")
+        return json_success_response(
+            data=result, message="Flow HQL generated successfully"
+        )
 
     except Exception as e:
-        logger.error(f"Error generating flow HQL: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error generating flow HQL: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 # ============================================================================
@@ -336,7 +379,8 @@ def api_flows_execute():
 def canvas_api_health():
     """API: Canvas health check endpoint"""
     return json_success_response(
-        data={"status": "healthy", "service": "canvas"}, message="Canvas service is healthy"
+        data={"status": "healthy", "service": "canvas"},
+        message="Canvas service is healthy",
     )
 
 
@@ -367,8 +411,8 @@ def canvas_api_preview_results():
         )
 
     except Exception as e:
-        logger.error(f"Error previewing flow results: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error previewing flow results: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/flows/batch", methods=["DELETE"])
@@ -390,7 +434,8 @@ def api_batch_delete_flows():
         clear_cache_pattern("flows")  # Clear cache after delete
         logger.info(f"Batch deleted {deleted_count} flows")
         return json_success_response(
-            message=f"Deleted {deleted_count} flows", data={"deleted_count": deleted_count}
+            message=f"Deleted {deleted_count} flows",
+            data={"deleted_count": deleted_count},
         )
     except Exception as e:
         logger.error(f"Error batch deleting flows: {e}")
@@ -433,7 +478,8 @@ def api_batch_update_flows():
         clear_cache_pattern("flows")  # Clear cache after update
         logger.info(f"Batch updated {updated_count} flows")
         return json_success_response(
-            message=f"Updated {updated_count} flows", data={"updated_count": updated_count}
+            message=f"Updated {updated_count} flows",
+            data={"updated_count": updated_count},
         )
     except Exception as e:
         logger.error(f"Error batch updating flows: {e}")

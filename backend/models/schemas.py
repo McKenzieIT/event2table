@@ -83,8 +83,12 @@ class EventParameterBase(BaseModel):
     param_name: str = Field(..., min_length=1, max_length=100, description="参数英文名")
     param_name_cn: Optional[str] = Field(None, max_length=100, description="参数中文名")
     template_id: int = Field(default=1, description="参数模板ID")
-    param_description: Optional[str] = Field(None, max_length=500, description="参数描述")
-    json_path: Optional[str] = Field(None, max_length=200, description="JSON路径，用于从事件JSON中提取参数值")
+    param_description: Optional[str] = Field(
+        None, max_length=500, description="参数描述"
+    )
+    json_path: Optional[str] = Field(
+        None, max_length=200, description="JSON路径，用于从事件JSON中提取参数值"
+    )
 
     @validator("param_name")
     def sanitize_param_name(cls, v):
@@ -151,7 +155,9 @@ class EventBase(BaseModel):
 
     game_gid: int = Field(..., description="游戏GID")
     event_name: str = Field(..., min_length=1, max_length=100, description="事件英文名")
-    event_name_cn: str = Field(..., min_length=1, max_length=100, description="事件中文名")
+    event_name_cn: str = Field(
+        ..., min_length=1, max_length=100, description="事件中文名"
+    )
     category_id: int = Field(..., description="事件分类ID")
     source_table: Optional[str] = Field(None, max_length=200, description="源表名")
     target_table: Optional[str] = Field(None, max_length=200, description="目标表名")
@@ -174,11 +180,20 @@ class EventBase(BaseModel):
             return html.escape(v.strip())
         return v
 
+    @validator("source_table", "target_table", pre=True)
+    def sanitize_table_names(cls, v):
+        """防止XSS攻击：转义HTML字符"""
+        if v:
+            return html.escape(str(v).strip())
+        return v
+
 
 class EventCreate(EventBase):
     """事件创建模型"""
 
-    parameters: List[EventParameterCreate] = Field(default_factory=list, description="事件参数列表")
+    parameters: List[EventParameterCreate] = Field(
+        default_factory=list, description="事件参数列表"
+    )
 
     @validator("parameters")
     def validate_parameters(cls, v):
@@ -234,16 +249,23 @@ class FieldDefinition(BaseModel):
 
     field_name: str = Field(..., description="字段名称")
     field_alias: Optional[str] = Field(None, description="字段别名")
-    aggregation: Optional[Literal["COUNT", "SUM", "AVG", "MAX", "MIN", "GROUP_CONCAT"]] = Field(
-        None, description="聚合函数"
-    )
+    aggregation: Optional[
+        Literal["COUNT", "SUM", "AVG", "MAX", "MIN", "GROUP_CONCAT"]
+    ] = Field(None, description="聚合函数")
 
     @validator("field_name")
     def sanitize_field_name(cls, v):
-        """验证字段名"""
+        """验证字段名并防止XSS攻击"""
         v = v.strip()
         if not v:
             raise ValueError("field_name不能为空")
+        return html.escape(v)
+
+    @validator("field_alias")
+    def sanitize_field_alias(cls, v):
+        """防止XSS攻击"""
+        if v:
+            return html.escape(v.strip())
         return v
 
 
@@ -251,11 +273,18 @@ class ConditionDefinition(BaseModel):
     """条件定义模型"""
 
     field: str = Field(..., description="条件字段")
-    operator: Literal["=", "!=", ">", "<", ">=", "<=", "IN", "NOT IN", "LIKE", "BETWEEN"] = Field(
-        ..., description="操作符"
-    )
+    operator: Literal[
+        "=", "!=", ">", "<", ">=", "<=", "IN", "NOT IN", "LIKE", "BETWEEN"
+    ] = Field(..., description="操作符")
     value: Any = Field(..., description="条件值")
     logical_op: Literal["AND", "OR"] = Field("AND", description="逻辑操作符")
+
+    @validator("field")
+    def sanitize_field(cls, v):
+        """防止XSS攻击"""
+        if v:
+            return html.escape(str(v).strip())
+        return v
 
 
 class HQLGenerationRequest(BaseModel):
@@ -263,9 +292,13 @@ class HQLGenerationRequest(BaseModel):
 
     event_ids: List[int] = Field(..., min_length=1, description="事件ID列表")
     fields: List[FieldDefinition] = Field(..., min_length=1, description="字段定义列表")
-    conditions: List[ConditionDefinition] = Field(default_factory=list, description="条件列表")
+    conditions: List[ConditionDefinition] = Field(
+        default_factory=list, description="条件列表"
+    )
     group_by: Optional[List[str]] = Field(None, description="分组字段")
-    order_by: Optional[Dict[str, Literal["ASC", "DESC"]]] = Field(None, description="排序字段")
+    order_by: Optional[Dict[str, Literal["ASC", "DESC"]]] = Field(
+        None, description="排序字段"
+    )
     limit: Optional[int] = Field(None, ge=1, le=10000, description="限制数量")
 
     @validator("event_ids")
@@ -352,7 +385,7 @@ class BatchOperationResponse(BaseModel):
 class GameStatsResponse(BaseModel):
     """游戏统计响应模型"""
 
-    game_id: int
+    game_gid: int
     game_name: str
     total_events: int
     total_parameters: int
@@ -404,10 +437,14 @@ class HQLHistorySaveRequest(BaseModel):
 
     events: List[Dict[str, Any]] = Field(..., description="事件列表")
     fields: List[Dict[str, Any]] = Field(..., description="字段列表")
-    where_conditions: List[Dict[str, Any]] = Field(default_factory=list, description="WHERE条件列表")
+    where_conditions: List[Dict[str, Any]] = Field(
+        default_factory=list, description="WHERE条件列表"
+    )
     mode: str = Field("single", description="生成模式 (single/join/union)")
     hql: str = Field(..., min_length=1, description="生成的HQL语句")
-    hql_type: Literal["select", "ddl", "dml", "canvas"] = Field("select", description="HQL类型")
+    hql_type: Literal["select", "ddl", "dml", "canvas"] = Field(
+        "select", description="HQL类型"
+    )
     game_gid: Optional[int] = Field(None, ge=0, description="游戏GID")
     name_en: Optional[str] = Field(None, max_length=200, description="英文名称")
     name_cn: Optional[str] = Field(None, max_length=200, description="中文名称")
@@ -460,7 +497,9 @@ class HQLHistorySearchRequest(BaseModel):
     """HQL历史搜索请求模型"""
 
     keyword: Optional[str] = Field(None, max_length=100, description="搜索关键词")
-    hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(None, description="HQL类型过滤")
+    hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(
+        None, description="HQL类型过滤"
+    )
     game_gid: Optional[int] = Field(None, ge=0, description="游戏GID过滤")
     user_id: Optional[int] = Field(None, ge=0, description="用户ID过滤")
     date_from: Optional[str] = Field(None, description="起始日期 (ISO 8601)")
@@ -475,7 +514,9 @@ class HQLHistorySearchRequest(BaseModel):
             try:
                 datetime.fromisoformat(v.replace("Z", "+00:00"))
             except ValueError:
-                raise ValueError(f"日期格式必须为ISO 8601格式，如: 2026-02-17T10:00:00Z")
+                raise ValueError(
+                    f"日期格式必须为ISO 8601格式，如: 2026-02-17T10:00:00Z"
+                )
         return v
 
 
@@ -492,7 +533,9 @@ class HQLHistoryGlobalQueryRequest(BaseModel):
     """HQL历史全局查询请求模型"""
 
     keyword: Optional[str] = Field(None, max_length=100, description="搜索关键词")
-    hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(None, description="HQL类型过滤")
+    hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(
+        None, description="HQL类型过滤"
+    )
     limit: int = Field(50, ge=1, le=500, description="返回数量限制")
     offset: int = Field(0, ge=0, description="偏移量")
 

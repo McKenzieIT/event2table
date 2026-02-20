@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, SearchInput, useToast } from '@shared/ui';
+import { Button, SearchInput, useToast, EmptyState } from '@shared/ui';
 import { useGameStore } from '@/stores/gameStore';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import CategoryModal from '../components/categories/CategoryModal';
@@ -238,10 +238,11 @@ export default function CategoriesList() {
       {/* Category Cards Grid */}
       <div className="categories-grid">
         {filteredCategories.length === 0 ? (
-          <div className="empty-state">
-            <span>📥</span>
-            <p>没有找到分类</p>
-          </div>
+          <EmptyState
+            icon={<span aria-hidden="true">📥</span>}
+            title="没有找到分类"
+            description="尝试调整搜索条件"
+          />
         ) : (
           filteredCategories.map(category => (
             <div key={category.id} className="category-card">

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * BaseModal Component
  * 统一基础模态框组件

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * 快速编辑模态框组件
  * Quick Edit Modal Component

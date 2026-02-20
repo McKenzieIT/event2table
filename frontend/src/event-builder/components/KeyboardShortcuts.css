@@ -1,0 +1,373 @@
+/**
+ * KeyboardShortcuts Styles
+ * 键盘快捷键帮助面板样式
+ */
+
+/* ========================================
+   Keyboard Shortcuts Help Overlay
+   ======================================== */
+
+.keyboard-shortcuts-help-overlay {
+  /* Layout */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  /* Visual */
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 3000;
+
+  /* Animation */
+  animation: helpOverlayFadeIn 0.3s ease;
+}
+
+@keyframes helpOverlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ========================================
+   Keyboard Shortcuts Help Card
+   ======================================== */
+
+.keyboard-shortcuts-help {
+  position: relative;
+  max-width: 640px;
+  margin: 80px auto;
+
+  /* Visual: Glass card */
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+
+  /* Animation */
+  animation: helpCardSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes helpCardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.keyboard-shortcuts-help .help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 182, 212, 0.05);
+}
+
+.keyboard-shortcuts-help .help-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  /* Typography */
+  font-size: 20px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.keyboard-shortcuts-help .help-header h2 i {
+  font-size: 24px;
+  color: #06B6D4;
+}
+
+.keyboard-shortcuts-help .btn-close-help {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+
+  /* Visual */
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+
+  /* Typography */
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Transition */
+  transition: all 0.15s ease;
+}
+
+.keyboard-shortcuts-help .btn-close-help:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Content */
+.keyboard-shortcuts-help .help-content {
+  padding: 24px 32px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Scrollbar styling */
+.keyboard-shortcuts-help .help-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.keyboard-shortcuts-help .help-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.keyboard-shortcuts-help .help-content::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.3);
+  border-radius: 4px;
+}
+
+.keyboard-shortcuts-help .help-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.5);
+}
+
+/* Help Section */
+.keyboard-shortcuts-help .help-section {
+  margin-bottom: 24px;
+}
+
+.keyboard-shortcuts-help .help-section:last-child {
+  margin-bottom: 0;
+}
+
+.keyboard-shortcuts-help .help-section h3 {
+  margin: 0 0 16px 0;
+
+  /* Typography */
+  font-size: 14px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+  color: #06B6D4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Help Items */
+.keyboard-shortcuts-help .help-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.keyboard-shortcuts-help .help-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+
+  /* Visual */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+
+  /* Transition */
+  transition: all 0.15s ease;
+}
+
+.keyboard-shortcuts-help .help-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(6, 182, 212, 0.2);
+  transform: translateX(4px);
+}
+
+/* Keyboard Key Styling */
+.keyboard-shortcuts-help .help-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 80px;
+  padding: 6px 12px;
+
+  /* Visual */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Typography */
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.keyboard-shortcuts-help .help-key i {
+  font-size: 14px;
+  color: #06B6D4;
+}
+
+/* Description */
+.keyboard-shortcuts-help .help-description {
+  flex: 1;
+
+  /* Typography */
+  font-size: 14px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Footer */
+.keyboard-shortcuts-help .help-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 182, 212, 0.05);
+}
+
+.keyboard-shortcuts-help .btn-help-close {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+
+  /* Visual */
+  background: #06B6D4;
+  border: 1px solid #06B6D4;
+  border-radius: 8px;
+
+  /* Typography */
+  font-size: 14px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  color: white;
+  font-weight: 600;
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Transition */
+  transition: all 0.15s ease;
+}
+
+.keyboard-shortcuts-help .btn-help-close:hover {
+  background: #0891b2;
+  border-color: #0891b2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.keyboard-shortcuts-help .btn-help-close:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   Keyboard Shortcuts Hint (Small Badge)
+   ======================================== */
+
+.keyboard-shortcuts-hint {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+
+  /* Visual */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+
+  /* Typography */
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
+.keyboard-shortcuts-hint i {
+  font-size: 10px;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .keyboard-shortcuts-help {
+    margin: 20px;
+    max-width: calc(100% - 40px);
+  }
+
+  .keyboard-shortcuts-help .help-header {
+    padding: 20px 24px;
+  }
+
+  .keyboard-shortcuts-help .help-header h2 {
+    font-size: 18px;
+  }
+
+  .keyboard-shortcuts-help .help-content {
+    padding: 20px 24px;
+  }
+
+  .keyboard-shortcuts-help .help-footer {
+    padding: 12px 24px;
+  }
+
+  .keyboard-shortcuts-help .help-key {
+    min-width: 60px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .keyboard-shortcuts-help .help-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+
+.keyboard-shortcuts-help .btn-close-help:focus-visible,
+.keyboard-shortcuts-help .btn-help-close:focus-visible {
+  outline: 2px solid rgba(6, 182, 212, 0.6);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Reduce Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .keyboard-shortcuts-help-overlay,
+  .keyboard-shortcuts-help,
+  .keyboard-shortcuts-help .help-item,
+  .keyboard-shortcuts-help .btn-help-close {
+    animation: none;
+    transition: none;
+  }
+}
