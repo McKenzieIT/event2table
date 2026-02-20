@@ -80,7 +80,9 @@ def init_db(db_path: Optional[Path] = None):
     cursor = conn.cursor()
 
     # Check if hql_statements table exists, if not create it
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='hql_statements'")
+    cursor.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='hql_statements'"
+    )
     if not cursor.fetchone():
         logger.info("Creating hql_statements table...")
         cursor.execute("""
@@ -290,11 +292,13 @@ def _seed_default_categories(cursor: sqlite3.Cursor):
         ("战斗/PVP", "Battle"),
         ("系统", "System"),
         ("充值/付费", "Payment"),
-        ("行为/点击", "Behavior")
+        ("行为/点击", "Behavior"),
     ]
 
     for category_name in default_categories:
-        cursor.execute("INSERT INTO event_categories (name) VALUES (?)", (category_name[0],))
+        cursor.execute(
+            "INSERT INTO event_categories (name) VALUES (?)", (category_name[0],)
+        )
         logger.info(f"  - Created category: {category_name[0]}")
 
     logger.info(f"Successfully seeded {len(default_categories)} default categories")
@@ -333,14 +337,20 @@ class MigrationV1_AddCategoryId(BaseMigration):
             cursor.execute("ALTER TABLE log_events ADD COLUMN category_id INTEGER")
 
             # Create default category
-            cursor.execute('INSERT OR IGNORE INTO event_categories (name) VALUES ("默认分类")')
+            cursor.execute(
+                'INSERT OR IGNORE INTO event_categories (name) VALUES ("默认分类")'
+            )
             cursor.execute('SELECT id FROM event_categories WHERE name = "默认分类"')
             default_category = cursor.fetchone()
 
             if default_category:
-                cursor.execute("UPDATE log_events SET category_id = ?", (default_category[0],))
+                cursor.execute(
+                    "UPDATE log_events SET category_id = ?", (default_category[0],)
+                )
 
-            logger.info("Migration v1 completed: category_id column added to log_events")
+            logger.info(
+                "Migration v1 completed: category_id column added to log_events"
+            )
 
 
 class MigrationV2_EventCategoryRelations(BaseMigration):
@@ -378,7 +388,9 @@ class MigrationV3_IncludeInCommonParams(BaseMigration):
         columns = [column[1] for column in cursor.fetchall()]
 
         if "include_in_common_params" not in columns:
-            logger.info("Migration v3: Adding include_in_common_params column to log_events...")
+            logger.info(
+                "Migration v3: Adding include_in_common_params column to log_events..."
+            )
             cursor.execute(
                 "ALTER TABLE log_events ADD COLUMN include_in_common_params INTEGER DEFAULT 1"
             )
@@ -413,7 +425,9 @@ class MigrationV5_EditTracking(BaseMigration):
 
         if "is_user_edited" not in columns:
             logger.info("Migration v5: Adding is_user_edited column...")
-            cursor.execute("ALTER TABLE hql_statements ADD COLUMN is_user_edited INTEGER DEFAULT 0")
+            cursor.execute(
+                "ALTER TABLE hql_statements ADD COLUMN is_user_edited INTEGER DEFAULT 0"
+            )
 
         if "edit_notes" not in columns:
             logger.info("Migration v5: Adding edit_notes column...")
@@ -421,9 +435,13 @@ class MigrationV5_EditTracking(BaseMigration):
 
         if "original_content" not in columns:
             logger.info("Migration v5: Adding original_content column...")
-            cursor.execute("ALTER TABLE hql_statements ADD COLUMN original_content TEXT")
+            cursor.execute(
+                "ALTER TABLE hql_statements ADD COLUMN original_content TEXT"
+            )
 
-        logger.info("Migration v5 completed: edit tracking fields added to hql_statements")
+        logger.info(
+            "Migration v5 completed: edit tracking fields added to hql_statements"
+        )
 
 
 class MigrationV6_ParameterManagementRefactoring(BaseMigration):
@@ -667,8 +685,12 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
 
         if old_table_exists:
             # Migrate existing parameters to event_params
-            logger.info("Migration v6: Migrating existing parameters to event_params...")
-            cursor.execute('SELECT id FROM param_templates WHERE template_name = "string" LIMIT 1')
+            logger.info(
+                "Migration v6: Migrating existing parameters to event_params..."
+            )
+            cursor.execute(
+                'SELECT id FROM param_templates WHERE template_name = "string" LIMIT 1'
+            )
             default_template = cursor.fetchone()
             default_template_id = default_template[0] if default_template else None
 
@@ -702,7 +724,9 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
 
             # Rename old table
             cursor.execute("ALTER TABLE parameters RENAME TO parameters_old_v5")
-            logger.info("Migration v6: renamed old parameters table to parameters_old_v5")
+            logger.info(
+                "Migration v6: renamed old parameters table to parameters_old_v5"
+            )
 
         logger.info("Migration v6 completed: parameter management refactoring finished")
 
@@ -713,7 +737,9 @@ class MigrationV7_ParameterValidationAndBatchOperations(BaseMigration):
     version = 7
 
     def upgrade(self, cursor: sqlite3.Cursor, conn: sqlite3.Connection):
-        logger.info("Migration v7: Starting parameter validation and batch operations...")
+        logger.info(
+            "Migration v7: Starting parameter validation and batch operations..."
+        )
 
         # 1. Create param_validation_rules table
         logger.info("Migration v7: Creating param_validation_rules table...")
@@ -788,7 +814,9 @@ class MigrationV7_ParameterValidationAndBatchOperations(BaseMigration):
             ON batch_import_details(import_id)
         """)
 
-        logger.info("Migration v7 completed: validation rules and batch operations created")
+        logger.info(
+            "Migration v7 completed: validation rules and batch operations created"
+        )
 
 
 class MigrationV8_ParameterDependencies(BaseMigration):
@@ -844,7 +872,9 @@ class MigrationV9_EnhancedHQLGeneration(BaseMigration):
         logger.info("Migration v9: Enhanced HQL generation features...")
 
         # Check if join_configs table exists and add new columns
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='join_configs'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='join_configs'"
+        )
         join_configs_exists = cursor.fetchone() is not None
 
         if join_configs_exists:
@@ -853,13 +883,19 @@ class MigrationV9_EnhancedHQLGeneration(BaseMigration):
             columns = [column[1] for column in cursor.fetchall()]
 
             if "join_type" not in columns:
-                cursor.execute("ALTER TABLE join_configs ADD COLUMN join_type TEXT DEFAULT 'join'")
+                cursor.execute(
+                    "ALTER TABLE join_configs ADD COLUMN join_type TEXT DEFAULT 'join'"
+                )
 
             if "where_conditions" not in columns:
-                cursor.execute("ALTER TABLE join_configs ADD COLUMN where_conditions TEXT")
+                cursor.execute(
+                    "ALTER TABLE join_configs ADD COLUMN where_conditions TEXT"
+                )
 
             if "field_mappings" not in columns:
-                cursor.execute("ALTER TABLE join_configs ADD COLUMN field_mappings TEXT")
+                cursor.execute(
+                    "ALTER TABLE join_configs ADD COLUMN field_mappings TEXT"
+                )
 
             if "description" not in columns:
                 cursor.execute("ALTER TABLE join_configs ADD COLUMN description TEXT")
@@ -920,7 +956,9 @@ class MigrationV10_ArrayParameterHierarchy(BaseMigration):
         logger.info("Migration v10: Adding array parameter hierarchy support...")
 
         # Check if param_configs table exists
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='param_configs'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='param_configs'"
+        )
         if cursor.fetchone():
             logger.info("Migration v10: Extending param_configs table...")
             cursor.execute("PRAGMA table_info(param_configs)")
@@ -930,7 +968,9 @@ class MigrationV10_ArrayParameterHierarchy(BaseMigration):
                 cursor.execute("ALTER TABLE param_configs ADD COLUMN child_params TEXT")
 
             if "array_element_structure" not in columns:
-                cursor.execute("ALTER TABLE param_configs ADD COLUMN array_element_structure TEXT")
+                cursor.execute(
+                    "ALTER TABLE param_configs ADD COLUMN array_element_structure TEXT"
+                )
 
         # Create index for parameter hierarchy
         logger.info("Migration v10: Creating indexes for parameter hierarchy...")
@@ -955,7 +995,9 @@ class MigrationV11_FieldBuilderSupport(BaseMigration):
         columns = [column[1] for column in cursor.fetchall()]
 
         if "field_mapping_v2" not in columns:
-            logger.info("Migration v11: Adding field_mapping_v2 column to join_configs...")
+            logger.info(
+                "Migration v11: Adding field_mapping_v2 column to join_configs..."
+            )
             cursor.execute("ALTER TABLE join_configs ADD COLUMN field_mapping_v2 TEXT")
 
         # Create node_templates table
@@ -1025,20 +1067,28 @@ class MigrationV12_FlowTemplates(BaseMigration):
         table_exists = cursor.fetchone() is not None
 
         if table_exists:
-            logger.info("Migration v12: flow_templates table exists, checking structure...")
+            logger.info(
+                "Migration v12: flow_templates table exists, checking structure..."
+            )
             cursor.execute("PRAGMA table_info(flow_templates)")
             columns = {column[1] for column in cursor.fetchall()}
 
             # Add missing columns
             if "game_id" not in columns:
                 cursor.execute("ALTER TABLE flow_templates ADD COLUMN game_id INTEGER")
-                cursor.execute("UPDATE flow_templates SET game_id = 1 WHERE game_id IS NULL")
+                cursor.execute(
+                    "UPDATE flow_templates SET game_id = 1 WHERE game_id IS NULL"
+                )
 
             if "is_active" not in columns:
-                cursor.execute("ALTER TABLE flow_templates ADD COLUMN is_active INTEGER DEFAULT 1")
+                cursor.execute(
+                    "ALTER TABLE flow_templates ADD COLUMN is_active INTEGER DEFAULT 1"
+                )
 
             if "version" not in columns:
-                cursor.execute("ALTER TABLE flow_templates ADD COLUMN version INTEGER DEFAULT 1")
+                cursor.execute(
+                    "ALTER TABLE flow_templates ADD COLUMN version INTEGER DEFAULT 1"
+                )
 
         else:
             # Table doesn't exist, create it
@@ -1084,7 +1134,9 @@ class MigrationV13_EventNodesAndParameterAliases(BaseMigration):
         logger.info("Migration v13: Adding event_nodes and parameter_aliases tables...")
 
         # Create event_nodes table
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='event_nodes'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='event_nodes'"
+        )
         if not cursor.fetchone():
             logger.info("Migration v13: Creating event_nodes table...")
             cursor.execute("""
@@ -1147,7 +1199,9 @@ class MigrationV13_EventNodesAndParameterAliases(BaseMigration):
         except Exception as e:
             logger.warning(f"Migration v13: Could not create indexes: {e}")
 
-        logger.info("Migration v13 completed: event nodes and parameter aliases support added")
+        logger.info(
+            "Migration v13 completed: event nodes and parameter aliases support added"
+        )
 
 
 class MigrationV14_FieldNameMappings(BaseMigration):
@@ -1268,7 +1322,9 @@ class MigrationV16_AsyncTasks(BaseMigration):
     def upgrade(self, cursor: sqlite3.Cursor, conn: sqlite3.Connection):
         logger.info("Migration v16: Creating async_tasks table...")
 
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='async_tasks'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='async_tasks'"
+        )
         if not cursor.fetchone():
             logger.info("Migration v16: Creating async_tasks table...")
             cursor.execute("""
@@ -1424,7 +1480,9 @@ class MigrationRunner:
             logger.info(f"Database is already at version {current_version}")
             return
 
-        logger.info(f"Migrating database from version {current_version} to {target_version}...")
+        logger.info(
+            f"Migrating database from version {current_version} to {target_version}..."
+        )
 
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -1510,14 +1568,16 @@ def migrate_db(db_path: Optional[Path] = None):
         # Get current database version
         cursor.execute("PRAGMA user_version")
         current_version = cursor.fetchone()[0]
-        target_version = 19  # Increment this for each migration
+        target_version = 20  # Increment this for each migration
 
         if current_version >= target_version:
             logger.info(f"Database is up to date (version {current_version})")
             conn.close()
             return
 
-        logger.info(f"Migrating database from version {current_version} to {target_version}...")
+        logger.info(
+            f"Migrating database from version {current_version} to {target_version}..."
+        )
 
         # Migration 1: Add category_id column to log_events
         if current_version < 1:
@@ -1529,15 +1589,23 @@ def migrate_db(db_path: Optional[Path] = None):
                 cursor.execute("ALTER TABLE log_events ADD COLUMN category_id INTEGER")
 
                 # Create a default category if it doesn't exist
-                cursor.execute('INSERT OR IGNORE INTO event_categories (name) VALUES ("默认分类")')
-                cursor.execute('SELECT id FROM event_categories WHERE name = "默认分类"')
+                cursor.execute(
+                    'INSERT OR IGNORE INTO event_categories (name) VALUES ("默认分类")'
+                )
+                cursor.execute(
+                    'SELECT id FROM event_categories WHERE name = "默认分类"'
+                )
                 default_category = cursor.fetchone()
 
                 # Update existing records with default category
                 if default_category:
-                    cursor.execute("UPDATE log_events SET category_id = ?", (default_category[0],))
+                    cursor.execute(
+                        "UPDATE log_events SET category_id = ?", (default_category[0],)
+                    )
 
-                logger.info("Migration v1 completed: category_id column added to log_events")
+                logger.info(
+                    "Migration v1 completed: category_id column added to log_events"
+                )
 
         # Migration 2: Add event_category_relations table
         if current_version < 2:
@@ -1557,7 +1625,9 @@ def migrate_db(db_path: Optional[Path] = None):
                         UNIQUE(event_id, category_id)
                     )
                 """)
-                logger.info("Migration v2 completed: event_category_relations table added")
+                logger.info(
+                    "Migration v2 completed: event_category_relations table added"
+                )
 
         # Migration 3: Add include_in_common_params column to log_events
         if current_version < 3:
@@ -1565,7 +1635,9 @@ def migrate_db(db_path: Optional[Path] = None):
             columns = [column[1] for column in cursor.fetchall()]
 
             if "include_in_common_params" not in columns:
-                logger.info("Migration v3: Adding include_in_common_params column to log_events...")
+                logger.info(
+                    "Migration v3: Adding include_in_common_params column to log_events..."
+                )
                 cursor.execute(
                     "ALTER TABLE log_events ADD COLUMN include_in_common_params INTEGER DEFAULT 1"
                 )
@@ -1601,10 +1673,14 @@ def migrate_db(db_path: Optional[Path] = None):
 
             if "original_content" not in columns:
                 logger.info("Migration v5: Adding original_content column...")
-                cursor.execute("ALTER TABLE hql_statements ADD COLUMN original_content TEXT")
+                cursor.execute(
+                    "ALTER TABLE hql_statements ADD COLUMN original_content TEXT"
+                )
 
             conn.commit()
-            logger.info("Migration v5 completed: edit tracking fields added to hql_statements")
+            logger.info(
+                "Migration v5 completed: edit tracking fields added to hql_statements"
+            )
 
         # Migration 6: Parameter management refactoring
         if current_version < 6:
@@ -1826,7 +1902,9 @@ def migrate_db(db_path: Optional[Path] = None):
 
             # 7. Migrate existing parameters to event_params
             # First, get the default string template ID
-            cursor.execute('SELECT id FROM param_templates WHERE template_name = "string" LIMIT 1')
+            cursor.execute(
+                'SELECT id FROM param_templates WHERE template_name = "string" LIMIT 1'
+            )
             default_template = cursor.fetchone()
             default_template_id = default_template[0] if default_template else None
 
@@ -1859,7 +1937,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 (default_template_id,),
             )
             migrated_count = cursor.rowcount
-            logger.info(f"Migration v6: migrated {migrated_count} parameters from parameters table")
+            logger.info(
+                f"Migration v6: migrated {migrated_count} parameters from parameters table"
+            )
 
             # 8. Extract common parameters to param_library
             # Use INSERT OR IGNORE to skip duplicate param_name conflicts
@@ -1881,7 +1961,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 HAVING COUNT(*) >= 2
             """)
             extracted_count = cursor.rowcount
-            logger.info(f"Migration v6: extracted {extracted_count} common parameters to library")
+            logger.info(
+                f"Migration v6: extracted {extracted_count} common parameters to library"
+            )
 
             # 9. Mark parameters from library
             cursor.execute("""
@@ -1898,7 +1980,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 )
             """)
             marked_count = cursor.rowcount
-            logger.info(f"Migration v6: marked {marked_count} parameters as from library")
+            logger.info(
+                f"Migration v6: marked {marked_count} parameters as from library"
+            )
 
             # 10. Rename old table (keep for rollback)
             # Check if old backup already exists to avoid conflicts
@@ -1916,14 +2000,20 @@ def migrate_db(db_path: Optional[Path] = None):
             cursor.execute("""
                 ALTER TABLE parameters RENAME TO parameters_old_v5
             """)
-            logger.info("Migration v6: renamed old parameters table to parameters_old_v5")
+            logger.info(
+                "Migration v6: renamed old parameters table to parameters_old_v5"
+            )
 
             conn.commit()
-            logger.info("Migration v6 completed: parameter management refactoring finished")
+            logger.info(
+                "Migration v6 completed: parameter management refactoring finished"
+            )
 
         # Migration v7: Parameter validation rules and batch operations
         if current_version < 7:
-            logger.info("Migration v7: Starting parameter validation and batch operations...")
+            logger.info(
+                "Migration v7: Starting parameter validation and batch operations..."
+            )
 
             # 1. Create param_validation_rules table
             cursor.execute("""
@@ -1999,7 +2089,9 @@ def migrate_db(db_path: Optional[Path] = None):
             logger.info("Migration v7: created indexes for batch_import tables")
 
             conn.commit()
-            logger.info("Migration v7 completed: validation rules and batch operations created")
+            logger.info(
+                "Migration v7 completed: validation rules and batch operations created"
+            )
 
         # Migration v8: Parameter dependencies
         if current_version < 8:
@@ -2051,18 +2143,30 @@ def migrate_db(db_path: Optional[Path] = None):
 
             if "join_type" not in columns:
                 logger.info("Migration v9: Adding join_type column to join_configs...")
-                cursor.execute("ALTER TABLE join_configs ADD COLUMN join_type TEXT DEFAULT 'join'")
+                cursor.execute(
+                    "ALTER TABLE join_configs ADD COLUMN join_type TEXT DEFAULT 'join'"
+                )
 
             if "where_conditions" not in columns:
-                logger.info("Migration v9: Adding where_conditions column to join_configs...")
-                cursor.execute("ALTER TABLE join_configs ADD COLUMN where_conditions TEXT")
+                logger.info(
+                    "Migration v9: Adding where_conditions column to join_configs..."
+                )
+                cursor.execute(
+                    "ALTER TABLE join_configs ADD COLUMN where_conditions TEXT"
+                )
 
             if "field_mappings" not in columns:
-                logger.info("Migration v9: Adding field_mappings column to join_configs...")
-                cursor.execute("ALTER TABLE join_configs ADD COLUMN field_mappings TEXT")
+                logger.info(
+                    "Migration v9: Adding field_mappings column to join_configs..."
+                )
+                cursor.execute(
+                    "ALTER TABLE join_configs ADD COLUMN field_mappings TEXT"
+                )
 
             if "description" not in columns:
-                logger.info("Migration v9: Adding description column to join_configs...")
+                logger.info(
+                    "Migration v9: Adding description column to join_configs..."
+                )
                 cursor.execute("ALTER TABLE join_configs ADD COLUMN description TEXT")
 
             if "game_id" not in columns:
@@ -2070,7 +2174,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 cursor.execute("ALTER TABLE join_configs ADD COLUMN game_id INTEGER")
 
             # 2. Migrate existing join_configs to new format
-            logger.info("Migration v9: Migrating existing join_configs to new format...")
+            logger.info(
+                "Migration v9: Migrating existing join_configs to new format..."
+            )
             cursor.execute("""
                 UPDATE join_configs
                 SET join_type = 'join',
@@ -2205,7 +2311,9 @@ def migrate_db(db_path: Optional[Path] = None):
             logger.info("Migration v9: indexes created")
 
             conn.commit()
-            logger.info("Migration v9 completed: Enhanced HQL generation features added")
+            logger.info(
+                "Migration v9 completed: Enhanced HQL generation features added"
+            )
 
         # Migration v10: Array参数层级结构优化
         if current_version < 10:
@@ -2220,8 +2328,12 @@ def migrate_db(db_path: Optional[Path] = None):
                 columns = [column[1] for column in cursor.fetchall()]
 
                 if "child_params" not in columns:
-                    logger.info("Migration v10: Adding child_params column to param_configs...")
-                    cursor.execute("ALTER TABLE param_configs ADD COLUMN child_params TEXT")
+                    logger.info(
+                        "Migration v10: Adding child_params column to param_configs..."
+                    )
+                    cursor.execute(
+                        "ALTER TABLE param_configs ADD COLUMN child_params TEXT"
+                    )
 
                 if "array_element_structure" not in columns:
                     logger.info(
@@ -2231,7 +2343,9 @@ def migrate_db(db_path: Optional[Path] = None):
                         "ALTER TABLE param_configs ADD COLUMN array_element_structure TEXT"
                     )
 
-                logger.info("Migration v10: param_configs table extended with hierarchy fields")
+                logger.info(
+                    "Migration v10: param_configs table extended with hierarchy fields"
+                )
 
             # 2. 创建索引优化查询
             logger.info("Migration v10: Creating indexes for parameter hierarchy...")
@@ -2242,7 +2356,9 @@ def migrate_db(db_path: Optional[Path] = None):
             logger.info("Migration v10: index idx_event_params_event_template created")
 
             conn.commit()
-            logger.info("Migration v10 completed: array parameter hierarchy support added")
+            logger.info(
+                "Migration v10 completed: array parameter hierarchy support added"
+            )
 
         # Migration v11: Phase 1 - Field Builder Support
         if current_version < 11:
@@ -2253,8 +2369,12 @@ def migrate_db(db_path: Optional[Path] = None):
             columns = [column[1] for column in cursor.fetchall()]
 
             if "field_mapping_v2" not in columns:
-                logger.info("Migration v11: Adding field_mapping_v2 column to join_configs...")
-                cursor.execute("ALTER TABLE join_configs ADD COLUMN field_mapping_v2 TEXT")
+                logger.info(
+                    "Migration v11: Adding field_mapping_v2 column to join_configs..."
+                )
+                cursor.execute(
+                    "ALTER TABLE join_configs ADD COLUMN field_mapping_v2 TEXT"
+                )
                 logger.info("Migration v11: field_mapping_v2 column added")
 
             # 2. 创建 node_templates 表(为阶段2准备)
@@ -2298,7 +2418,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 logger.info("Migration v11: flow_templates table created")
 
             # 4. 创建索引优化查询性能
-            logger.info("Migration v11: Creating indexes for node and flow templates...")
+            logger.info(
+                "Migration v11: Creating indexes for node and flow templates..."
+            )
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_node_templates_type
                 ON node_templates(node_type)
@@ -2335,16 +2457,22 @@ def migrate_db(db_path: Optional[Path] = None):
 
             if table_exists:
                 # Table exists, check if we need to add columns
-                logger.info("Migration v12: flow_templates table exists, checking structure...")
+                logger.info(
+                    "Migration v12: flow_templates table exists, checking structure..."
+                )
                 cursor.execute("PRAGMA table_info(flow_templates)")
                 columns = {column[1] for column in cursor.fetchall()}
 
                 # Add missing columns if needed
                 if "game_id" not in columns:
                     logger.info("Migration v12: Adding game_id column...")
-                    cursor.execute("ALTER TABLE flow_templates ADD COLUMN game_id INTEGER")
+                    cursor.execute(
+                        "ALTER TABLE flow_templates ADD COLUMN game_id INTEGER"
+                    )
                     # Set default game_id for existing records (use game 1 as default)
-                    cursor.execute("UPDATE flow_templates SET game_id = 1 WHERE game_id IS NULL")
+                    cursor.execute(
+                        "UPDATE flow_templates SET game_id = 1 WHERE game_id IS NULL"
+                    )
                     logger.info("Migration v12: game_id column added")
 
                 if "is_active" not in columns:
@@ -2365,9 +2493,13 @@ def migrate_db(db_path: Optional[Path] = None):
                 if "flow_name" in columns and "name" not in columns:
                     # SQLite doesn't support RENAME COLUMN directly, need to recreate table
                     # For now, we'll just add the name column
-                    logger.info("Migration v12: Adding name column (alongside flow_name)...")
+                    logger.info(
+                        "Migration v12: Adding name column (alongside flow_name)..."
+                    )
                     cursor.execute("ALTER TABLE flow_templates ADD COLUMN name TEXT")
-                    cursor.execute("UPDATE flow_templates SET name = flow_name WHERE name IS NULL")
+                    cursor.execute(
+                        "UPDATE flow_templates SET name = flow_name WHERE name IS NULL"
+                    )
                     logger.info("Migration v12: name column added")
 
             else:
@@ -2414,7 +2546,9 @@ def migrate_db(db_path: Optional[Path] = None):
 
         # Migration 13: Add event_nodes and parameter_aliases tables
         if current_version < 13:
-            logger.info("Migration v13: Adding event_nodes and parameter_aliases tables...")
+            logger.info(
+                "Migration v13: Adding event_nodes and parameter_aliases tables..."
+            )
 
             # Create event_nodes table
             cursor.execute(
@@ -2486,7 +2620,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 logger.warning(f"Migration v13: Could not create indexes: {e}")
 
             conn.commit()
-            logger.info("Migration v13 completed: event nodes and parameter aliases support added")
+            logger.info(
+                "Migration v13 completed: event nodes and parameter aliases support added"
+            )
 
         # Migration 14: Add field_name_mappings and field_name_history tables
         if current_version < 14:
@@ -2650,7 +2786,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 columns = [column[1] for column in cursor.fetchall()]
 
                 if "display_name" not in columns:
-                    cursor.execute("ALTER TABLE common_params ADD COLUMN display_name TEXT")
+                    cursor.execute(
+                        "ALTER TABLE common_params ADD COLUMN display_name TEXT"
+                    )
 
                     # Update existing records with default display names
                     cursor.execute("""
@@ -2665,7 +2803,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 logger.warning(f"Migration v17: Could not add display_name column: {e}")
 
             conn.commit()
-            logger.info("Migration v17 completed: common_params display_name support added")
+            logger.info(
+                "Migration v17 completed: common_params display_name support added"
+            )
 
         # Migration 18: Add game_gid column to log_events table
         if current_version < 18:
@@ -2676,7 +2816,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 columns = [column[1] for column in cursor.fetchall()]
 
                 if "game_gid" not in columns:
-                    logger.info("Migration v18: Adding game_gid column to log_events...")
+                    logger.info(
+                        "Migration v18: Adding game_gid column to log_events..."
+                    )
                     cursor.execute("ALTER TABLE log_events ADD COLUMN game_gid INTEGER")
 
                     # Migrate existing data: copy game_id to game_gid by joining with games table
@@ -2696,7 +2838,9 @@ def migrate_db(db_path: Optional[Path] = None):
                         ON log_events(game_gid)
                     """)
 
-                    logger.info("Migration v18: game_gid column added and data migrated")
+                    logger.info(
+                        "Migration v18: game_gid column added and data migrated"
+                    )
                 else:
                     logger.info("Migration v18: game_gid column already exists")
 
@@ -2715,7 +2859,9 @@ def migrate_db(db_path: Optional[Path] = None):
                 columns = [column[1] for column in cursor.fetchall()]
 
                 if "json_path" not in columns:
-                    logger.info("Migration v19: Adding json_path column to event_params...")
+                    logger.info(
+                        "Migration v19: Adding json_path column to event_params..."
+                    )
                     cursor.execute("ALTER TABLE event_params ADD COLUMN json_path TEXT")
 
                     # Create index on json_path for better query performance
@@ -2734,10 +2880,35 @@ def migrate_db(db_path: Optional[Path] = None):
             conn.commit()
             logger.info("Migration v19 completed: event_params json_path support added")
 
+        # Migration v20: Add game_gid to event_nodes (for game_gid migration)
+        if current_version < 20:
+            logger.info("Migration v20: Adding game_gid column to event_nodes...")
+            try:
+                cursor.execute(
+                    "SELECT name FROM pragma_table_info('event_nodes') WHERE name='game_gid'"
+                )
+                if not cursor.fetchone():
+                    cursor.execute(
+                        "ALTER TABLE event_nodes ADD COLUMN game_gid INTEGER"
+                    )
+                    cursor.execute(
+                        "CREATE INDEX IF NOT EXISTS idx_event_nodes_game_gid ON event_nodes(game_gid)"
+                    )
+                    logger.info("Migration v20: game_gid column added to event_nodes")
+                else:
+                    logger.info("Migration v20: game_gid column already exists")
+            except Exception as e:
+                logger.warning(f"Migration v20: Could not add game_gid column: {e}")
+
+            conn.commit()
+            logger.info("Migration v20 completed: event_nodes game_gid support added")
+
         # Update database version (PRAGMA doesn't support parameters in SQLite)
         cursor.execute(f"PRAGMA user_version = {target_version}")
         conn.commit()
-        logger.info(f"Database migration completed successfully. Version: {target_version}")
+        logger.info(
+            f"Database migration completed successfully. Version: {target_version}"
+        )
 
     except Exception as e:
         conn.rollback()
@@ -2816,7 +2987,9 @@ def create_indexes():
         try:
             cursor.execute(index_sql)
             index_name = (
-                index_sql.split("idx_")[1].split(" ")[0] if "idx_" in index_sql else "unknown"
+                index_sql.split("idx_")[1].split(" ")[0]
+                if "idx_" in index_sql
+                else "unknown"
             )
             logger.debug(f"Created index: {index_name}")
         except sqlite3.OperationalError as e:

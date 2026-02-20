@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt, SearchInput, EmptyState } from '@shared/ui';
+import { SelectGamePrompt, SearchInput } from '@shared/ui';
+import EmptyState from '@shared/ui/EmptyState/EmptyState';
 import './ParameterCompare.css';
 
 /**

@@ -144,7 +144,8 @@ class DDLGenerator:
         ddl_parts.append(f"{create_clause} IF NOT EXISTS {table_name}")
 
         # 字段定义
-        ddl_parts.append(f"(\n  {',\n  '.join(field_definitions)}\n)")
+        field_defs = ",\n  ".join(field_definitions)
+        ddl_parts.append(f"(\n  {field_defs}\n)")
 
         # 分区定义
         partition_type = self.PARTITION_FIELD_TYPE
@@ -372,7 +373,9 @@ class DDLGenerator:
         # 只允许字母、数字、下划线和点
         import re
 
-        if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$", table_name):
+        if not re.match(
+            r"^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$", table_name
+        ):
             raise ValueError(
                 f"Invalid table_name: {table_name}. "
                 "Table name must match pattern: [database.]table_name"

@@ -191,7 +191,18 @@ def set_preferred_alias(alias_id):
     if not alias:
         return json_error_response("Parameter alias not found", status_code=404)
 
-    game_gid = alias["game_gid"]
+    # Handle both game_id and game_gid (migration support)
+    game_gid = alias.get("game_gid")
+    if not game_gid and alias.get("game_id"):
+        # Convert game_id to game_gid if needed
+        game_record = fetch_one_as_dict(
+            "SELECT gid FROM games WHERE id = ?", (alias["game_id"],)
+        )
+        game_gid = game_record["gid"] if game_record else None
+
+    if not game_gid:
+        return json_error_response("Game not found for alias", status_code=400)
+
     param_id = alias["param_id"]
 
     # Unset other preferred aliases

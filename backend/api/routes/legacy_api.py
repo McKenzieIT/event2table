@@ -173,9 +173,12 @@ def api_delete_common_param(id):
         if not param:
             return json_error_response("Parameter not found", status_code=404)
 
+        # Get param name for logging (handle both 'name' and 'param_name')
+        param_name = param.get("name") or param.get("param_name", f"ID: {id}")
+
         Repositories.COMMON_PARAMS.delete(id)
 
-        logger.info(f"Common param deleted: {param['name']} (ID: {id})")
+        logger.info(f"Common param deleted: {param_name} (ID: {id})")
         return json_success_response(message="Parameter deleted successfully")
 
     except Exception as e:

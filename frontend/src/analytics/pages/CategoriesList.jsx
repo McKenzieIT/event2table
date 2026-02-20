@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, SearchInput, useToast, EmptyState } from '@shared/ui';
+import { Button, SearchInput, useToast } from '@shared/ui';
+import EmptyState from '@shared/ui/EmptyState/EmptyState';
 import { useGameStore } from '@/stores/gameStore';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import CategoryModal from '../components/categories/CategoryModal';

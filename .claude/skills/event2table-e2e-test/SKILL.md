@@ -1,6 +1,6 @@
 ---
 name: event2table-e2e-test
-description: Enterprise-grade intelligent E2E testing system for Event2Table project using Chrome DevTools MCP. Use when Claude needs to: (1) Run comprehensive E2E tests on Event2Table web application, (2) Generate test configurations automatically using AI, (3) Predict high-risk code areas and suggest tests, (4) Monitor performance and detect regressions, (5) Generate comprehensive quality reports with multi-dimensional scoring. The skill provides intelligent test data generation, adaptive retry mechanisms, and integration with existing test infrastructure.
+description: Enterprise-grade intelligent E2E testing system for Event2Table project using Chrome DevTools MCP. Use when Claude needs to run comprehensive E2E tests on Event2Table web application, generate test configurations automatically using AI, predict high-risk code areas and suggest tests, monitor performance and detect regressions, or generate comprehensive quality reports with multi-dimensional scoring. The skill provides intelligent test data generation, adaptive retry mechanisms, and integration with existing test infrastructure.
 ---
 
 # Event2Table E2E Testing Skill

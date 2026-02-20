@@ -237,7 +237,7 @@ function EventsList() {
           )}
           <Button
             variant="outline-success"
-            onClick={() => navigate('/events/import')}
+            onClick={() => navigate('/import-events')}
           >
             导入Excel
           </Button>
@@ -324,7 +324,7 @@ function EventsList() {
           <div className="empty-actions">
             <Button
               variant="success"
-              onClick={() => navigate('/events/import')}
+              onClick={() => navigate('/import-events')}
             >
               导入Excel
             </Button>

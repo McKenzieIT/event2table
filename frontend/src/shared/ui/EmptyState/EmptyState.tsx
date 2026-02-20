@@ -14,12 +14,12 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ 
+const EmptyState: React.FC<EmptyStateProps> = ({
   icon,
-  title, 
-  description, 
+  title,
+  description,
   action,
-  className = '' 
+  className = ''
 }) => {
   return (
     <div className={`empty-state-component ${className}`}>
