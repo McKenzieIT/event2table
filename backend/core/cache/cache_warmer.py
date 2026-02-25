@@ -10,10 +10,9 @@
 """
 
 from backend.core.cache.cache_hierarchical import hierarchical_cache
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict
+from backend.core.utils import fetch_all_as_dict
 import logging
 import threading
-import time
 
 logger = logging.getLogger(__name__)
 

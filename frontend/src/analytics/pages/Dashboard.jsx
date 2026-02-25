@@ -29,9 +29,9 @@ function Dashboard() {
       if (!response.ok) throw new Error('Failed to fetch games');
       return response.json();
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 1000,  // ✅ 从5分钟缩短到5秒，确保游戏更新后能立即反映
     cacheTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,  // ✅ 启用窗口焦点刷新，确保数据及时更新
   });
 
   // Fetch flows data for HQL flow count

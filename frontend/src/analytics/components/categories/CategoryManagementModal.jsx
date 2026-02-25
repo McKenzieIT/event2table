@@ -14,7 +14,8 @@
 
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BaseModal, Button, Input, useToast } from '@shared/ui';
+import { BaseModal, Button, Input, Spinner, useToast } from '@shared/ui';
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import './CategoryManagementModal.css';
 
 const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
@@ -25,6 +26,9 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '' });
+
+  // Promise-based confirm dialog
+  const { confirm, ConfirmDialogComponent } = usePromiseConfirm();
 
   // Fetch categories list
   const { data: apiResponse, isLoading } = useQuery({
@@ -52,7 +56,8 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
     },
     onSuccess: () => {
       success('创建分类成功');
-      queryClient.invalidateQueries(['categories']);
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['categories', gameGid] });
       setIsCreating(false);
       setFormData({ name: '', description: '' });
     },
@@ -74,7 +79,8 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
     },
     onSuccess: () => {
       success('更新分类成功');
-      queryClient.invalidateQueries(['categories']);
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['categories', gameGid] });
       setSelectedCategory(null);
       setFormData({ name: '', description: '' });
     },
@@ -94,7 +100,8 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
     },
     onSuccess: () => {
       success('删除分类成功');
-      queryClient.invalidateQueries(['categories']);
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['categories', gameGid] });
       setSelectedCategory(null);
       setFormData({ name: '', description: '' });
     },
@@ -119,11 +126,11 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
 
   // Handle delete category button
   const handleDelete = useCallback(async (category) => {
-    if (!confirm(`确定要删除分类"${category.name}"吗？`)) {
+    if (!(await confirm(`确定要删除分类"${category.name}"吗？`))) {
       return;
     }
     await deleteMutation.mutateAsync(category.id);
-  }, [deleteMutation]);
+  }, [deleteMutation, confirm]);
 
   // Handle save (create or update)
   const handleSave = useCallback(async () => {
@@ -162,7 +169,9 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
 
           <div className="category-list">
             {isLoading ? (
-              <div className="loading">加载中...</div>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
+                <Spinner size="lg" label="加载中..." />
+              </div>
             ) : categories.length === 0 ? (
               <div className="empty-state">暂无分类</div>
             ) : (
@@ -173,10 +182,10 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
                     <div className="category-count">{category.event_count || 0} 个事件</div>
                   </div>
                   <div className="category-actions">
-                    <Button variant="secondary" size="xs" onClick={() => handleEdit(category)}>
+                    <Button variant="secondary" size="sm" onClick={() => handleEdit(category)}>
                       编辑
                     </Button>
-                    <Button variant="danger" size="xs" onClick={() => handleDelete(category)}>
+                    <Button variant="danger" size="sm" onClick={() => handleDelete(category)}>
                       删除
                     </Button>
                   </div>
@@ -195,25 +204,22 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
               </div>
 
               <div className="category-form">
-                <div className="form-group">
-                  <label>分类名称</label>
-                  <Input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="分类名称"
-                  />
-                </div>
+                <Input
+                  label="分类名称"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="分类名称"
+                  required
+                />
 
-                <div className="form-group">
-                  <label>描述</label>
-                  <Input
-                    type="text"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="分类描述（可选）"
-                  />
-                </div>
+                <Input
+                  label="描述"
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="分类描述（可选）"
+                />
 
                 <div className="form-actions">
                   <Button variant="secondary" onClick={handleCancel}>
@@ -236,6 +242,9 @@ const CategoryManagementModal = ({ isOpen, onClose, gameGid }) => {
           )}
         </div>
       </div>
+
+      {/* Promise-based confirm dialog */}
+      <ConfirmDialogComponent />
     </BaseModal>
   );
 };

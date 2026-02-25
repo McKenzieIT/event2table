@@ -21,7 +21,7 @@ export function DeleteConfirmModal({
       <div className="delete-confirm-modal">
         <div className="modal-header">
           <h4>{title}</h4>
-          <button className="modal-close" onClick={onCancel}>✕</button>
+          <button className="modal-close" onClick={onCancel} aria-label="关闭对话框">✕</button>
         </div>
         <div className="modal-body">
           <p>{message}</p>

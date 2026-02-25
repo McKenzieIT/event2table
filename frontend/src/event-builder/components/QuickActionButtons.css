@@ -1,0 +1,323 @@
+/**
+ * QuickActionButtons Styles
+ *
+ * Dropdown toolbar with cyberpunk theme
+ */
+
+/* ========================================
+   Container
+   ======================================== */
+
+.quick-action-buttons {
+  position: relative;
+  display: inline-block;
+}
+
+/* ========================================
+   Trigger Button
+   ======================================== */
+
+.quick-action-buttons__trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-action-buttons__trigger-icon {
+  font-size: 16px;
+}
+
+.quick-action-buttons__trigger-arrow {
+  font-size: 10px;
+  margin-left: 4px;
+  transition: transform 0.2s ease;
+}
+
+.quick-action-buttons__trigger-arrow--open {
+  transform: rotate(180deg);
+}
+
+/* ========================================
+   Dropdown Container
+   ======================================== */
+
+.quick-action-buttons__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 280px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+              0 0 20px rgba(6, 182, 212, 0.1);
+  z-index: 100;
+  overflow: hidden;
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   Dropdown Header
+   ======================================== */
+
+.quick-action-buttons__dropdown-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+  background: rgba(6, 182, 212, 0.05);
+}
+
+.quick-action-buttons__dropdown-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #F1F5F9;
+}
+
+/* ========================================
+   Dropdown Actions
+   ======================================== */
+
+.quick-action-buttons__dropdown-actions {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Scrollbar styling */
+.quick-action-buttons__dropdown-actions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quick-action-buttons__dropdown-actions::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.quick-action-buttons__dropdown-actions::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.3);
+  border-radius: 3px;
+}
+
+.quick-action-buttons__dropdown-actions::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.5);
+}
+
+/* ========================================
+   Action Item
+   ======================================== */
+
+.quick-action-buttons__action {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  grid-template-areas:
+    "icon label spinner"
+    "icon description spinner";
+  gap: 8px 12px;
+  padding: 10px 12px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-action-buttons__action::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.quick-action-buttons__action:hover:not(:disabled)::before {
+  opacity: 0.08;
+}
+
+.quick-action-buttons__action:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Action Colors */
+
+.quick-action-buttons__action--primary {
+  color: #06B6D4;
+  border-color: rgba(6, 182, 212, 0.25);
+}
+
+.quick-action-buttons__action--primary:hover:not(:disabled) {
+  border-color: rgba(6, 182, 212, 0.5);
+  background: rgba(6, 182, 212, 0.08);
+}
+
+.quick-action-buttons__action--info {
+  color: #3B82F6;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.quick-action-buttons__action--info:hover:not(:disabled) {
+  border-color: rgba(59, 130, 246, 0.5);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.quick-action-buttons__action--warning {
+  color: #F59E0B;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.quick-action-buttons__action--warning:hover:not(:disabled) {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.quick-action-buttons__action--success {
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.quick-action-buttons__action--success:hover:not(:disabled) {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.quick-action-buttons__action--secondary {
+  color: #9CA3AF;
+  border-color: rgba(156, 163, 175, 0.25);
+}
+
+.quick-action-buttons__action--secondary:hover:not(:disabled) {
+  border-color: rgba(156, 163, 175, 0.5);
+  background: rgba(156, 163, 175, 0.08);
+}
+
+.quick-action-buttons__action--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Action Icon */
+
+.quick-action-buttons__action-icon {
+  grid-area: icon;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* Action Label */
+
+.quick-action-buttons__action-label {
+  grid-area: label;
+  font-size: 14px;
+  font-weight: 600;
+  color: inherit;
+  position: relative;
+  z-index: 1;
+}
+
+/* Action Description */
+
+.quick-action-buttons__action-description {
+  grid-area: description;
+  font-size: 12px;
+  opacity: 0.8;
+  color: inherit;
+  position: relative;
+  z-index: 1;
+}
+
+/* Action Spinner */
+
+.quick-action-buttons__action-spinner {
+  grid-area: spinner;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 1s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   Dropdown Footer
+   ======================================== */
+
+.quick-action-buttons__dropdown-footer {
+  padding: 8px 16px 12px;
+  border-top: 1px solid rgba(6, 182, 212, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.text-muted {
+  color: #64748B;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 640px) {
+  .quick-action-buttons__dropdown {
+    right: -100%;
+    min-width: 260px;
+  }
+
+  .quick-action-buttons__action {
+    grid-template-columns: 28px 1fr;
+    gap: 6px 10px;
+    padding: 8px 10px;
+  }
+
+  .quick-action-buttons__action-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+  }
+
+  .quick-action-buttons__action-label {
+    font-size: 13px;
+  }
+
+  .quick-action-buttons__action-description {
+    font-size: 11px;
+  }
+}

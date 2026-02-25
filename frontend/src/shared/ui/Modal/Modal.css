@@ -13,7 +13,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
-  z-index: 9998;
+  z-index: var(--z-modal-backdrop, 1040);
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -33,7 +33,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  z-index: 9999;
+  z-index: var(--z-modal, 1050);
   overflow-y: auto;
 }
 
@@ -107,8 +107,8 @@
 
 .cyber-modal__close {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,7 +116,7 @@
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
   border-radius: 6px;
   color: var(--text-secondary, #94A3B8);
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;

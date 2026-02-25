@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Game Repository (游戏数据访问层)
+Game Repository (游戏数据访问层 - 精简架构)
 
 提供游戏相关的数据访问方法
-基于 GenericRepository 实现特定领域的查询
+- 返回统一Entity模型 (GameEntity)
+- 移除DDD抽象
+- 保持GenericRepository继承
 """
 
 from typing import Optional, List, Dict, Any
 from backend.core.data_access import GenericRepository
 from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.models.entities import GameEntity
 
 
 class GameRepository(GenericRepository):
     """
-    游戏仓储类
+    游戏仓储类 (精简架构)
 
     继承 GenericRepository 并添加游戏特定的查询方法
+    返回GameEntity而非字典,确保类型安全
     """
 
     def __init__(self):
@@ -29,7 +33,7 @@ class GameRepository(GenericRepository):
             table_name="games", primary_key="id", enable_cache=True, cache_timeout=120  # 2分钟缓存
         )
 
-    def find_by_gid(self, gid: int) -> Optional[Dict[str, Any]]:
+    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
         """
         根据业务GID查询游戏
 
@@ -37,28 +41,54 @@ class GameRepository(GenericRepository):
             gid: 游戏业务GID
 
         Returns:
-            游戏字典，不存在返回None
+            GameEntity, 不存在返回None
 
         Example:
             >>> repo = GameRepository()
             >>> game = repo.find_by_gid(1001)
-            >>> print(game['name']) if game else None
+            >>> print(game.name) if game else None
         """
         query = "SELECT * FROM games WHERE gid = ?"
-        return fetch_one_as_dict(query, (gid,))
+        row = fetch_one_as_dict(query, (gid,))
+        return GameEntity(**row) if row else None
 
-    def get_all_with_event_count(self) -> List[Dict[str, Any]]:
+    def find_all(self) -> List[GameEntity]:
+        """
+        查询所有游戏
+
+        Returns:
+            GameEntity列表
+        """
+        query = "SELECT * FROM games ORDER BY name"
+        rows = fetch_all_as_dict(query)
+        return [GameEntity(**row) for row in rows]
+
+    def find_by_id(self, game_id: int) -> Optional[GameEntity]:
+        """
+        根据数据库ID查询游戏
+
+        Args:
+            game_id: 数据库自增ID
+
+        Returns:
+            GameEntity, 不存在返回None
+        """
+        query = "SELECT * FROM games WHERE id = ?"
+        row = fetch_one_as_dict(query, (game_id,))
+        return GameEntity(**row) if row else None
+
+    def get_all_with_event_count(self) -> List[GameEntity]:
         """
         获取所有游戏及其事件数量
 
         Returns:
-            游戏列表，每个游戏包含事件数量统计
+            GameEntity列表, 包含事件数量统计
 
         Example:
             >>> repo = GameRepository()
             >>> games = repo.get_all_with_event_count()
             >>> for game in games:
-            ...     print(f"{game['name']}: {game['event_count']} events")
+            ...     print(f"{game.name}: {game.event_count} events")
         """
         query = """
             SELECT
@@ -69,20 +99,21 @@ class GameRepository(GenericRepository):
             GROUP BY g.id
             ORDER BY g.name
         """
-        return fetch_all_as_dict(query)
+        rows = fetch_all_as_dict(query)
+        return [GameEntity(**row) for row in rows]
 
-    def get_all_with_stats(self) -> List[Dict[str, Any]]:
+    def get_all_with_stats(self) -> List[GameEntity]:
         """
         获取所有游戏及其详细统计信息
 
         Returns:
-            游戏列表，包含事件数、参数数等统计信息
+            GameEntity列表, 包含事件数、参数数等统计信息
 
         Example:
             >>> repo = GameRepository()
             >>> games = repo.get_all_with_stats()
             >>> for game in games:
-            ...     print(f"{game['name']}: {game['event_count']} events, {game['param_count']} params")
+            ...     print(f"{game.name}: {game.event_count} events, {game.param_count} params")
         """
         query = """
             SELECT
@@ -96,7 +127,96 @@ class GameRepository(GenericRepository):
             GROUP BY g.id
             ORDER BY g.name
         """
-        return fetch_all_as_dict(query)
+        rows = fetch_all_as_dict(query)
+        return [GameEntity(**row) for row in rows]
+
+    def batch_delete(self, game_gids: List[int]) -> int:
+        """
+        批量删除游戏
+
+        Args:
+            game_gids: 游戏GID列表
+
+        Returns:
+            删除的游戏数量
+        """
+        if not game_gids:
+            return 0
+
+        placeholders = ",".join(["?" for _ in game_gids])
+        query = f"DELETE FROM games WHERE gid IN ({placeholders})"
+
+        from backend.core.utils.converters import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, game_gids)
+        deleted_count = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return deleted_count
+
+    def update(self, game_gid: int, data: Dict[str, Any]) -> Optional[GameEntity]:
+        """
+        根据game_gid更新游戏
+
+        Args:
+            game_gid: 游戏业务GID
+            data: 要更新的字段字典
+
+        Returns:
+            更新后的GameEntity, 不存在返回None
+
+        Example:
+            >>> repo = GameRepository()
+            >>> game = repo.update(10000147, {'name': 'Updated Name'})
+        """
+        if not data:
+            return None
+
+        # 构建UPDATE语句
+        set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
+        query = f"UPDATE games SET {set_clause} WHERE gid = ?"
+        values = list(data.values()) + [game_gid]
+
+        from backend.core.utils.converters import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, values)
+        conn.commit()
+        conn.close()
+
+        # 返回更新后的游戏
+        return self.find_by_gid(game_gid)
+
+    def delete(self, game_gid: int) -> bool:
+        """
+        根据game_gid删除游戏
+
+        Args:
+            game_gid: 游戏业务GID
+
+        Returns:
+            是否删除成功
+
+        Example:
+            >>> repo = GameRepository()
+            >>> success = repo.delete(10000147)
+        """
+        query = "DELETE FROM games WHERE gid = ?"
+
+        from backend.core.utils.converters import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, (game_gid,))
+        deleted_count = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return deleted_count > 0
+        cursor = conn.cursor()
+        cursor.execute(query, game_gids)
+        conn.commit()
+
+        return cursor.rowcount
 
     def find_by_ods_db(self, ods_db: str) -> List[Dict[str, Any]]:
         """

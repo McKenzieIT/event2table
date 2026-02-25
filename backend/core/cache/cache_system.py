@@ -708,40 +708,6 @@ def cached(pattern: str, timeout: Optional[int] = None):
     return decorator
 
 
-def cached_hierarchical(pattern: str):
-    """
-    分层缓存装饰器（使用三级缓存）
-
-    Usage:
-        @cached_hierarchical('games.detail')
-        def get_game(game_id: int):
-            return fetch_game_from_db(game_id)
-
-    Args:
-        pattern: 缓存模式 (如 'events.list')
-    """
-
-    def decorator(f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            # 尝试从缓存获取
-            result = hierarchical_cache.get(pattern, **kwargs)
-            if result is not None:
-                return result
-
-            # 执行函数
-            result = f(*args, **kwargs)
-
-            # 写入缓存
-            hierarchical_cache.set(pattern, result, **kwargs)
-
-            return result
-
-        return wrapper
-
-    return decorator
-
-
 # ============================================================================
 # 全局实例
 # ============================================================================

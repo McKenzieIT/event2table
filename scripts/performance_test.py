@@ -1,721 +1,337 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Performance Testing Script for Event2Table
+Performance Testing Script
 
-Tests:
-1. API Response Time (P95 < 200ms target)
-2. HQL Generation Time (< 1s target)
-3. Cache Hit Rate (> 80% target)
-4. Database Query Performance
+Comprehensive performance testing for GraphQL API.
+Compares GraphQL vs REST API performance and generates detailed reports.
 """
 
-import os
-import sys
 import time
 import json
 import statistics
-import sqlite3
-from pathlib import Path
+import requests
 from typing import Dict, List, Any, Tuple
+from dataclasses import dataclass
+import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import threading
 
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-# Set environment before importing Flask app
-# Use production database for performance testing
-os.environ['FLASK_DEBUG'] = 'False'
-
-from backend.core.config import get_db_path, FlaskConfig
-from backend.core.database import get_db_connection
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict
-from backend.services.hql.core.generator import HQLGenerator
-from backend.services.hql.models.event import Event, Field
-from backend.core.cache.cache_system import cache_result
-from backend.core.logging import get_logger
-
-logger = get_logger(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-class PerformanceTestResults:
-    """Store and analyze performance test results"""
-
-    def __init__(self, test_name: str):
-        self.test_name = test_name
-        self.response_times: List[float] = []
-        self.errors: List[str] = []
-        self.success_count = 0
-        self.failure_count = 0
-
-    def add_result(self, response_time: float, success: bool, error: str = None):
-        """Add a test result"""
-        self.response_times.append(response_time)
-        if success:
-            self.success_count += 1
-        else:
-            self.failure_count += 1
-            if error:
-                self.errors.append(error)
-
-    def get_statistics(self) -> Dict[str, Any]:
-        """Calculate performance statistics"""
-        if not self.response_times:
-            return {
-                'test_name': self.test_name,
-                'total_requests': 0,
-                'success_count': 0,
-                'failure_count': 0,
-                'error_rate': 0,
-                'min_time': 0,
-                'max_time': 0,
-                'avg_time': 0,
-                'median_time': 0,
-                'p50': 0,
-                'p95': 0,
-                'p99': 0,
-                'throughput': 0
-            }
-
-        sorted_times = sorted(self.response_times)
-        total_requests = len(self.response_times)
-        total_time = sum(self.response_times)
-
-        return {
-            'test_name': self.test_name,
-            'total_requests': total_requests,
-            'success_count': self.success_count,
-            'failure_count': self.failure_count,
-            'error_rate': (self.failure_count / total_requests * 100) if total_requests > 0 else 0,
-            'min_time': min(self.response_times),
-            'max_time': max(self.response_times),
-            'avg_time': statistics.mean(self.response_times),
-            'median_time': statistics.median(self.response_times),
-            'p50': sorted_times[int(len(sorted_times) * 0.50)] if len(sorted_times) > 0 else 0,
-            'p95': sorted_times[int(len(sorted_times) * 0.95)] if len(sorted_times) > 0 else 0,
-            'p99': sorted_times[int(len(sorted_times) * 0.99)] if len(sorted_times) > 0 else 0,
-            'throughput': self.success_count / total_time if total_time > 0 else 0
-        }
-
-    def print_summary(self):
-        """Print test summary"""
-        stats = self.get_statistics()
-        print(f"\n{'='*80}")
-        print(f"Test: {self.test_name}")
-        print(f"{'='*80}")
-        print(f"Total Requests: {stats['total_requests']}")
-        print(f"Success: {stats['success_count']}")
-        print(f"Failures: {stats['failure_count']}")
-        print(f"Error Rate: {stats['error_rate']:.2f}%")
-        print(f"\nResponse Times:")
-        print(f"  Min:    {stats['min_time']*1000:.2f} ms")
-        print(f"  Max:    {stats['max_time']*1000:.2f} ms")
-        print(f"  Avg:    {stats['avg_time']*1000:.2f} ms")
-        print(f"  Median: {stats['median_time']*1000:.2f} ms")
-        print(f"  P50:    {stats['p50']*1000:.2f} ms")
-        print(f"  P95:    {stats['p95']*1000:.2f} ms")
-        print(f"  P99:    {stats['p99']*1000:.2f} ms")
-        print(f"\nThroughput: {stats['throughput']:.2f} requests/second")
-
-        if self.errors:
-            print(f"\nErrors (first 10):")
-            for error in self.errors[:10]:
-                print(f"  - {error}")
+@dataclass
+class PerformanceMetric:
+    """Performance metric data structure"""
+    operation: str
+    api_type: str  # 'graphql' or 'rest'
+    duration: float  # milliseconds
+    status_code: int
+    response_size: int
+    success: bool
+    error: str = None
 
 
 class PerformanceTester:
-    """Performance testing framework"""
-
-    def __init__(self):
-        self.db_path = get_db_path()
-        self.results: Dict[str, PerformanceTestResults] = {}
-        self.cache_stats_before = {}
-        self.cache_stats_after = {}
-
-    def setup_test_data(self):
-        """Setup test data for performance testing"""
-        print("\n" + "="*80)
-        print("Setting up test data...")
-        print("="*80)
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Check if we have test data
-        games = fetch_all_as_dict("SELECT * FROM games LIMIT 1")
-        if not games:
-            print("Creating test game...")
-            cursor.execute("""
-                INSERT INTO games (gid, name, ods_db)
-                VALUES (10000147, 'Test Game', 'ieu_ods')
-            """)
-            conn.commit()
-
-        # Check if we have test events
-        events = fetch_all_as_dict("SELECT * FROM log_events LIMIT 1")
-        if not events:
-            print("Creating test events...")
-            game_gid = 10000147
-            test_events = [
-                ('login', 'user_login'),
-                ('logout', 'user_logout'),
-                ('purchase', 'item_purchase'),
-                ('level_up', 'player_level_up'),
-            ]
-
-            for event_name, event_code in test_events:
-                cursor.execute("""
-                    INSERT INTO log_events (game_gid, event_name, event_code, category_id)
-                    VALUES (?, ?, ?, 1)
-                """, (game_gid, event_name, event_code))
-
-            conn.commit()
-
-        conn.close()
-        print("Test data setup complete")
-
-    def get_cache_stats(self) -> Dict[str, Any]:
-        """Get current cache statistics"""
-        try:
-            from flask import current_app
-            cache = current_app.cache
-            # Try to get stats from Redis cache
-            if hasattr(cache, '_client'):
-                # For Redis cache
-                info = cache._client.info('stats')
-                return {
-                    'hits': info.get('keyspace_hits', 0),
-                    'misses': info.get('keyspace_misses', 0)
+    """
+    Performance Tester
+    
+    Tests GraphQL and REST API performance with various metrics.
+    """
+    
+    def __init__(self, base_url: str = "http://localhost:5000"):
+        self.base_url = base_url
+        self.metrics: List[PerformanceMetric] = []
+        
+        # Test scenarios
+        self.test_scenarios = [
+            {
+                'name': 'Get Games List',
+                'rest': {
+                    'method': 'GET',
+                    'url': f'{base_url}/api/games',
+                },
+                'graphql': {
+                    'query': '''
+                        query {
+                            games(limit: 50, offset: 0) {
+                                id
+                                gid
+                                name
+                                nameCn
+                                isActive
+                            }
+                        }
+                    ''',
                 }
-        except Exception as e:
-            logger.warning(f"Could not get cache stats: {e}")
-            return {'hits': 0, 'misses': 0}
-
-    def test_api_games_list(self, iterations: int = 100) -> PerformanceTestResults:
-        """Test GET /api/games endpoint"""
-        print(f"\n{'='*80}")
-        print(f"Testing GET /api/games ({iterations} iterations)")
-        print(f"{'='*80}")
-
-        results = PerformanceTestResults("GET /api/games")
-
-        for i in range(iterations):
-            start = time.time()
-            try:
-                games = fetch_all_as_dict("""
-                    SELECT
-                        g.id, g.gid, g.name, g.ods_db, g.icon_path,
-                        g.created_at, g.updated_at,
-                        (SELECT COUNT(*) FROM log_events le WHERE le.game_gid = g.gid) as event_count,
-                        (SELECT COUNT(*) FROM event_params ep
-                         INNER JOIN log_events le ON ep.event_id = le.id
-                         WHERE le.game_gid = g.gid AND ep.is_active = 1) as param_count
-                    FROM games g
-                    ORDER BY g.id
-                """)
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=True)
-
-                if (i + 1) % 20 == 0:
-                    print(f"  Completed {i+1}/{iterations} requests")
-
-            except Exception as e:
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=False, error=str(e))
-
-        results.print_summary()
-        self.results['api_games_list'] = results
-        return results
-
-    def test_api_single_game(self, iterations: int = 100) -> PerformanceTestResults:
-        """Test GET /api/games/<gid> endpoint"""
-        print(f"\n{'='*80}")
-        print(f"Testing GET /api/games/<gid> ({iterations} iterations)")
-        print(f"{'='*80}")
-
-        results = PerformanceTestResults("GET /api/games/<gid>")
-
-        # Get a valid game GID
-        game = fetch_one_as_dict("SELECT gid FROM games LIMIT 1")
-        if not game:
-            print("ERROR: No games found in database")
-            return results
-
-        game_gid = game['gid']
-
-        for i in range(iterations):
-            start = time.time()
-            try:
-                game_data = fetch_one_as_dict(
-                    "SELECT * FROM games WHERE gid = ?",
-                    (game_gid,)
-                )
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=True)
-
-                if (i + 1) % 20 == 0:
-                    print(f"  Completed {i+1}/{iterations} requests")
-
-            except Exception as e:
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=False, error=str(e))
-
-        results.print_summary()
-        self.results['api_single_game'] = results
-        return results
-
-    def test_api_events_list(self, iterations: int = 100) -> PerformanceTestResults:
-        """Test GET /api/events endpoint with pagination"""
-        print(f"\n{'='*80}")
-        print(f"Testing GET /api/events (paginated, {iterations} iterations)")
-        print(f"{'='*80}")
-
-        results = PerformanceTestResults("GET /api/events (paginated)")
-
-        # Get a valid game GID
-        game = fetch_one_as_dict("SELECT gid FROM games LIMIT 1")
-        if not game:
-            print("ERROR: No games found in database")
-            return results
-
-        game_gid = game['gid']
-
-        for i in range(iterations):
-            start = time.time()
-            try:
-                events = fetch_all_as_dict("""
-                    SELECT * FROM log_events
-                    WHERE game_gid = ?
-                    ORDER BY id
-                    LIMIT 10
-                """, (game_gid,))
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=True)
-
-                if (i + 1) % 20 == 0:
-                    print(f"  Completed {i+1}/{iterations} requests")
-
-            except Exception as e:
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=False, error=str(e))
-
-        results.print_summary()
-        self.results['api_events_list'] = results
-        return results
-
-    def test_hql_generation_single_event(self, iterations: int = 50) -> PerformanceTestResults:
-        """Test HQL generation for single event with varying field counts"""
-        print(f"\n{'='*80}")
-        print(f"Testing HQL Generation - Single Event ({iterations} iterations)")
-        print(f"{'='*80}")
-
-        results = PerformanceTestResults("HQL Generation - Single Event (10 fields)")
-
-        generator = HQLGenerator()
-
-        # Get a valid game and event
-        game = fetch_one_as_dict("SELECT * FROM games LIMIT 1")
-        if not game:
-            print("ERROR: No games found in database")
-            return results
-
-        event = fetch_one_as_dict("SELECT * FROM log_events WHERE game_gid = ? LIMIT 1", (game['gid'],))
-        if not event:
-            print("ERROR: No events found in database")
-            return results
-
-        # Create test event with 10 fields
-        test_event = Event(
-            name=event['event_name'],
-            table_name=f"{game['ods_db']}.ods_{game['gid']}_all_view"
-        )
-
-        # Create 10 test fields
-        fields = [
-            Field(name="ds", type="base"),
-            Field(name="role_id", type="base"),
-            Field(name="account_id", type="base"),
-            Field(name="utdid", type="base"),
-            Field(name="zone_id", type="param", json_path="$.zoneId"),
-            Field(name="level", type="param", json_path="$.level"),
-            Field(name="vip_level", type="param", json_path="$.vipLevel"),
-            Field(name="coin", type="param", json_path="$.coin"),
-            Field(name="gem", type="param", json_path="$.gem"),
-            Field(name="exp", type="param", json_path="$.exp"),
-        ]
-
-        for i in range(iterations):
-            start = time.time()
-            try:
-                hql = generator.generate(
-                    events=[test_event],
-                    fields=fields,
-                    conditions=[],
-                    mode="single"
-                )
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=True)
-
-                if (i + 1) % 10 == 0:
-                    print(f"  Completed {i+1}/{iterations} generations")
-
-            except Exception as e:
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=False, error=str(e))
-
-        results.print_summary()
-        self.results['hql_single_10_fields'] = results
-        return results
-
-    def test_hql_generation_large_event(self, iterations: int = 50) -> PerformanceTestResults:
-        """Test HQL generation for single event with 50 fields"""
-        print(f"\n{'='*80}")
-        print(f"Testing HQL Generation - Single Event 50 Fields ({iterations} iterations)")
-        print(f"{'='*80}")
-
-        results = PerformanceTestResults("HQL Generation - Single Event (50 fields)")
-
-        generator = HQLGenerator()
-
-        # Get a valid game and event
-        game = fetch_one_as_dict("SELECT * FROM games LIMIT 1")
-        if not game:
-            print("ERROR: No games found in database")
-            return results
-
-        event = fetch_one_as_dict("SELECT * FROM log_events WHERE game_gid = ? LIMIT 1", (game['gid'],))
-        if not event:
-            print("ERROR: No events found in database")
-            return results
-
-        # Create test event
-        test_event = Event(
-            name=event['event_name'],
-            table_name=f"{game['ods_db']}.ods_{game['gid']}_all_view"
-        )
-
-        # Create 50 test fields
-        fields = [
-            Field(name="ds", type="base"),
-            Field(name="role_id", type="base"),
-            Field(name="account_id", type="base"),
-            Field(name="utdid", type="base"),
-        ]
-
-        # Add 46 param fields
-        for i in range(46):
-            fields.append(Field(name=f"field_{i}", type="param", json_path=f"$.field{i}"))
-
-        for i in range(iterations):
-            start = time.time()
-            try:
-                hql = generator.generate(
-                    events=[test_event],
-                    fields=fields,
-                    conditions=[],
-                    mode="single"
-                )
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=True)
-
-                if (i + 1) % 10 == 0:
-                    print(f"  Completed {i+1}/{iterations} generations")
-
-            except Exception as e:
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=False, error=str(e))
-
-        results.print_summary()
-        self.results['hql_single_50_fields'] = results
-        return results
-
-    def test_cache_performance(self, iterations: int = 200) -> PerformanceTestResults:
-        """Test cache hit rate for repeated queries"""
-        print(f"\n{'='*80}")
-        print(f"Testing Cache Hit Rate ({iterations} iterations)")
-        print(f"{'='*80}")
-
-        results = PerformanceTestResults("Cache Performance (Repeated Queries)")
-
-        # Get cache stats before
-        self.cache_stats_before = self.get_cache_stats()
-
-        # Define a cached query function
-        @cache_result('performance_test:games', timeout=300)
-        def cached_query():
-            return fetch_all_as_dict("""
-                SELECT
-                    g.id, g.gid, g.name, g.ods_db,
-                    (SELECT COUNT(*) FROM log_events le WHERE le.game_gid = g.gid) as event_count
-                FROM games g
-            """)
-
-        # First call - cache miss
-        start = time.time()
-        try:
-            games = cached_query()
-            elapsed = time.time() - start
-            results.add_result(elapsed, success=True)
-            print(f"  First call (cache miss): {elapsed*1000:.2f} ms")
-        except Exception as e:
-            elapsed = time.time() - start
-            results.add_result(elapsed, success=False, error=str(e))
-
-        # Subsequent calls - should hit cache
-        cache_hit_times = []
-        for i in range(iterations - 1):
-            start = time.time()
-            try:
-                games = cached_query()
-                elapsed = time.time() - start
-                cache_hit_times.append(elapsed)
-                results.add_result(elapsed, success=True)
-
-                if (i + 1) % 50 == 0:
-                    print(f"  Completed {i+2}/{iterations} calls")
-
-            except Exception as e:
-                elapsed = time.time() - start
-                results.add_result(elapsed, success=False, error=str(e))
-
-        # Get cache stats after
-        self.cache_stats_after = self.get_cache_stats()
-
-        results.print_summary()
-        self.results['cache_performance'] = results
-        return results
-
-    def test_concurrent_requests(self, concurrent_users: int = 10, requests_per_user: int = 10) -> PerformanceTestResults:
-        """Test performance under concurrent load"""
-        print(f"\n{'='*80}")
-        print(f"Testing Concurrent Load ({concurrent_users} users, {requests_per_user} requests each)")
-        print(f"{'='*80}")
-
-        results = PerformanceTestResults(f"Concurrent Load ({concurrent_users} users)")
-
-        def make_request(user_id: int) -> Tuple[float, bool, str]:
-            """Make a single request"""
-            start = time.time()
-            try:
-                games = fetch_all_as_dict("""
-                    SELECT
-                        g.id, g.gid, g.name, g.ods_db,
-                        (SELECT COUNT(*) FROM log_events le WHERE le.game_gid = g.gid) as event_count
-                    FROM games g
-                """)
-                elapsed = time.time() - start
-                return (elapsed, True, None)
-            except Exception as e:
-                elapsed = time.time() - start
-                return (elapsed, False, str(e))
-
-        total_requests = concurrent_users * requests_per_user
-        completed = 0
-
-        with ThreadPoolExecutor(max_workers=concurrent_users) as executor:
-            # Submit all requests
-            futures = []
-            for user_id in range(concurrent_users):
-                for req_id in range(requests_per_user):
-                    future = executor.submit(make_request, user_id)
-                    futures.append(future)
-
-            # Collect results as they complete
-            for future in as_completed(futures):
-                elapsed, success, error = future.result()
-                results.add_result(elapsed, success, error)
-                completed += 1
-
-                if completed % 20 == 0:
-                    print(f"  Completed {completed}/{total_requests} requests")
-
-        results.print_summary()
-        self.results['concurrent_load'] = results
-        return results
-
-    def generate_report(self) -> Dict[str, Any]:
-        """Generate comprehensive performance report"""
-        print("\n" + "="*80)
-        print("PERFORMANCE TEST REPORT")
-        print("="*80)
-
-        report = {
-            'test_environment': {
-                'python_version': sys.version,
-                'platform': sys.platform,
-                'db_path': str(self.db_path),
-                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
             },
-            'results': {},
-            'summary': {
-                'total_tests': len(self.results),
-                'passed_targets': 0,
-                'failed_targets': 0,
-                'warnings': []
-            }
-        }
-
-        # Performance targets
-        targets = {
-            'api_response_p95_ms': 200,
-            'hql_generation_single_ms': 1000,
-            'cache_hit_rate_percent': 80
-        }
-
-        print("\nTest Environment:")
-        for key, value in report['test_environment'].items():
-            print(f"  {key}: {value}")
-
-        # Analyze each test result
-        for test_name, result in self.results.items():
-            stats = result.get_statistics()
-            report['results'][test_name] = stats
-
-            # Check against targets
-            if 'api' in test_name or 'concurrent' in test_name:
-                p95_ms = stats['p95'] * 1000
-                if p95_ms <= targets['api_response_p95_ms']:
-                    report['summary']['passed_targets'] += 1
-                    status = "✅ PASS"
-                else:
-                    report['summary']['failed_targets'] += 1
-                    status = "❌ FAIL"
-                    report['summary']['warnings'].append(
-                        f"{test_name}: P95 = {p95_ms:.2f}ms (target: <{targets['api_response_p95_ms']}ms)"
-                    )
-            elif 'hql' in test_name:
-                avg_ms = stats['avg_time'] * 1000
-                if avg_ms <= targets['hql_generation_single_ms']:
-                    report['summary']['passed_targets'] += 1
-                    status = "✅ PASS"
-                else:
-                    report['summary']['failed_targets'] += 1
-                    status = "❌ FAIL"
-                    report['summary']['warnings'].append(
-                        f"{test_name}: Avg = {avg_ms:.2f}ms (target: <{targets['hql_generation_single_ms']}ms)"
-                    )
-            elif 'cache' in test_name:
-                # Calculate cache hit rate
-                cache_hits = self.cache_stats_after.get('hits', 0) - self.cache_stats_before.get('hits', 0)
-                cache_misses = self.cache_stats_after.get('misses', 0) - self.cache_stats_before.get('misses', 0)
-                total_cache_ops = cache_hits + cache_misses
-                hit_rate = (cache_hits / total_cache_ops * 100) if total_cache_ops > 0 else 0
-
-                if hit_rate >= targets['cache_hit_rate_percent']:
-                    report['summary']['passed_targets'] += 1
-                    status = "✅ PASS"
-                else:
-                    report['summary']['failed_targets'] += 1
-                    status = "❌ FAIL"
-                    report['summary']['warnings'].append(
-                        f"{test_name}: Hit rate = {hit_rate:.2f}% (target: >{targets['cache_hit_rate_percent']}%)"
-                    )
+            {
+                'name': 'Get Events List',
+                'rest': {
+                    'method': 'GET',
+                    'url': f'{base_url}/api/events',
+                    'params': {'game_gid': 1}
+                },
+                'graphql': {
+                    'query': '''
+                        query {
+                            events(gameGid: 1, limit: 50, offset: 0) {
+                                id
+                                eventName
+                                eventNameCn
+                                description
+                                isActive
+                            }
+                        }
+                    ''',
+                }
+            },
+            {
+                'name': 'Get Categories',
+                'rest': {
+                    'method': 'GET',
+                    'url': f'{base_url}/api/categories',
+                },
+                'graphql': {
+                    'query': '''
+                        query {
+                            categories(limit: 50, offset: 0) {
+                                id
+                                name
+                                nameCn
+                                description
+                            }
+                        }
+                    ''',
+                }
+            },
+        ]
+    
+    def run_test(self, scenario: Dict, iterations: int = 10) -> List[PerformanceMetric]:
+        """
+        Run performance test for a scenario.
+        
+        Args:
+            scenario: Test scenario configuration
+            iterations: Number of iterations to run
+            
+        Returns:
+            List of performance metrics
+        """
+        metrics = []
+        
+        # Test REST API
+        logger.info(f"Testing REST API: {scenario['name']}")
+        for i in range(iterations):
+            metric = self._test_rest_api(scenario)
+            metrics.append(metric)
+            time.sleep(0.1)  # Small delay between requests
+        
+        # Test GraphQL API
+        logger.info(f"Testing GraphQL API: {scenario['name']}")
+        for i in range(iterations):
+            metric = self._test_graphql_api(scenario)
+            metrics.append(metric)
+            time.sleep(0.1)  # Small delay between requests
+        
+        return metrics
+    
+    def _test_rest_api(self, scenario: Dict) -> PerformanceMetric:
+        """Test REST API endpoint"""
+        rest_config = scenario['rest']
+        
+        start_time = time.time()
+        try:
+            if rest_config['method'] == 'GET':
+                response = requests.get(
+                    rest_config['url'],
+                    params=rest_config.get('params', {}),
+                    timeout=10
+                )
             else:
-                status = "⚠️  N/A"
-
-            print(f"\n{test_name}: {status}")
-
-        # Print summary
-        print("\n" + "="*80)
-        print("SUMMARY")
-        print("="*80)
-        print(f"Total Tests: {report['summary']['total_tests']}")
-        print(f"Passed Targets: {report['summary']['passed_targets']}")
-        print(f"Failed Targets: {report['summary']['failed_targets']}")
-
-        if report['summary']['warnings']:
-            print("\nWarnings/Issues:")
-            for warning in report['summary']['warnings']:
-                print(f"  ⚠️  {warning}")
-
-        # Overall assessment
-        print("\n" + "="*80)
-        print("OVERALL ASSESSMENT")
-        print("="*80)
-
-        if report['summary']['failed_targets'] == 0:
-            print("✅ ALL TESTS PASSED")
-            print("\nThe system performance is READY FOR PRODUCTION.")
-            print("\nAll performance metrics meet or exceed the defined targets.")
-            report['overall_status'] = 'PASS'
-        elif report['summary']['failed_targets'] <= report['summary']['total_tests'] / 2:
-            print("⚠️  SOME TESTS FAILED")
-            print("\nThe system has performance issues that should be addressed before deployment.")
-            print("\nRecommendations:")
-            print("1. Review the warnings above for specific areas needing optimization")
-            print("2. Consider database indexing for slow queries")
-            print("3. Optimize cache strategies for frequently accessed data")
-            print("4. Profile HQL generation code for bottlenecks")
-            report['overall_status'] = 'WARNING'
-        else:
-            print("❌ MAJOR PERFORMANCE ISSUES")
-            print("\nThe system has significant performance problems that MUST be addressed.")
-            print("\nCritical Recommendations:")
-            print("1. IMMEDIATE: Optimize slow database queries (add indexes)")
-            print("2. IMMEDIATE: Review and optimize cache implementation")
-            print("3. HIGH: Profile and optimize HQL generation logic")
-            print("4. HIGH: Consider database query optimization")
-            report['overall_status'] = 'FAIL'
-
+                response = requests.post(
+                    rest_config['url'],
+                    json=rest_config.get('data', {}),
+                    timeout=10
+                )
+            
+            duration = (time.time() - start_time) * 1000  # Convert to ms
+            
+            return PerformanceMetric(
+                operation=scenario['name'],
+                api_type='rest',
+                duration=duration,
+                status_code=response.status_code,
+                response_size=len(response.content),
+                success=response.status_code == 200
+            )
+        except Exception as e:
+            duration = (time.time() - start_time) * 1000
+            return PerformanceMetric(
+                operation=scenario['name'],
+                api_type='rest',
+                duration=duration,
+                status_code=0,
+                response_size=0,
+                success=False,
+                error=str(e)
+            )
+    
+    def _test_graphql_api(self, scenario: Dict) -> PerformanceMetric:
+        """Test GraphQL API endpoint"""
+        graphql_config = scenario['graphql']
+        
+        start_time = time.time()
+        try:
+            response = requests.post(
+                f'{self.base_url}/graphql',
+                json={'query': graphql_config['query']},
+                timeout=10
+            )
+            
+            duration = (time.time() - start_time) * 1000  # Convert to ms
+            
+            return PerformanceMetric(
+                operation=scenario['name'],
+                api_type='graphql',
+                duration=duration,
+                status_code=response.status_code,
+                response_size=len(response.content),
+                success=response.status_code == 200
+            )
+        except Exception as e:
+            duration = (time.time() - start_time) * 1000
+            return PerformanceMetric(
+                operation=scenario['name'],
+                api_type='graphql',
+                duration=duration,
+                status_code=0,
+                response_size=0,
+                success=False,
+                error=str(e)
+            )
+    
+    def run_all_tests(self, iterations: int = 10) -> List[PerformanceMetric]:
+        """Run all test scenarios"""
+        all_metrics = []
+        
+        for scenario in self.test_scenarios:
+            metrics = self.run_test(scenario, iterations)
+            all_metrics.extend(metrics)
+        
+        self.metrics = all_metrics
+        return all_metrics
+    
+    def generate_report(self) -> Dict[str, Any]:
+        """Generate performance report"""
+        if not self.metrics:
+            return {'error': 'No metrics collected'}
+        
+        report = {
+            'summary': {},
+            'by_operation': {},
+            'comparison': {},
+        }
+        
+        # Overall summary
+        rest_metrics = [m for m in self.metrics if m.api_type == 'rest']
+        graphql_metrics = [m for m in self.metrics if m.api_type == 'graphql']
+        
+        report['summary'] = {
+            'total_tests': len(self.metrics),
+            'rest_tests': len(rest_metrics),
+            'graphql_tests': len(graphql_metrics),
+            'rest_success_rate': sum(1 for m in rest_metrics if m.success) / len(rest_metrics) * 100,
+            'graphql_success_rate': sum(1 for m in graphql_metrics if m.success) / len(graphql_metrics) * 100,
+        }
+        
+        # By operation
+        operations = set(m.operation for m in self.metrics)
+        for operation in operations:
+            op_rest = [m for m in rest_metrics if m.operation == operation]
+            op_graphql = [m for m in graphql_metrics if m.operation == operation]
+            
+            report['by_operation'][operation] = {
+                'rest': {
+                    'avg_duration': statistics.mean([m.duration for m in op_rest]),
+                    'min_duration': min([m.duration for m in op_rest]),
+                    'max_duration': max([m.duration for m in op_rest]),
+                    'median_duration': statistics.median([m.duration for m in op_rest]),
+                    'avg_response_size': statistics.mean([m.response_size for m in op_rest]),
+                },
+                'graphql': {
+                    'avg_duration': statistics.mean([m.duration for m in op_graphql]),
+                    'min_duration': min([m.duration for m in op_graphql]),
+                    'max_duration': max([m.duration for m in op_graphql]),
+                    'median_duration': statistics.median([m.duration for m in op_graphql]),
+                    'avg_response_size': statistics.mean([m.response_size for m in op_graphql]),
+                }
+            }
+        
+        # Comparison
+        for operation in operations:
+            op_report = report['by_operation'][operation]
+            rest_avg = op_report['rest']['avg_duration']
+            graphql_avg = op_report['graphql']['avg_duration']
+            
+            improvement = ((rest_avg - graphql_avg) / rest_avg * 100) if rest_avg > 0 else 0
+            
+            report['comparison'][operation] = {
+                'faster_api': 'graphql' if graphql_avg < rest_avg else 'rest',
+                'improvement_percent': improvement,
+                'duration_difference': rest_avg - graphql_avg,
+            }
+        
         return report
-
-    def save_report(self, report: Dict[str, Any], filename: str = None):
-        """Save performance report to JSON file"""
-        if filename is None:
-            timestamp = time.strftime('%Y%m%d_%H%M%S')
-            filename = f"performance_report_{timestamp}.json"
-
-        output_dir = Path(__file__).parent.parent / "output"
-        output_dir.mkdir(exist_ok=True)
-        filepath = output_dir / filename
-
+    
+    def save_report(self, filepath: str):
+        """Save report to file"""
+        report = self.generate_report()
+        
         with open(filepath, 'w') as f:
             json.dump(report, f, indent=2)
-
-        print(f"\n✅ Report saved to: {filepath}")
+        
+        logger.info(f"Report saved to {filepath}")
 
 
 def main():
-    """Run all performance tests"""
-    print("="*80)
-    print("Event2Table Performance Testing")
-    print("="*80)
-
-    tester = PerformanceTester()
-
-    # Setup test data
-    tester.setup_test_data()
-
-    # Run tests
-    print("\n" + "="*80)
-    print("Starting Performance Tests...")
-    print("="*80)
-
-    # 1. API Response Time Tests
-    tester.test_api_games_list(iterations=100)
-    tester.test_api_single_game(iterations=100)
-    tester.test_api_events_list(iterations=100)
-
-    # 2. HQL Generation Time Tests
-    tester.test_hql_generation_single_event(iterations=50)
-    tester.test_hql_generation_large_event(iterations=50)
-
-    # 3. Cache Performance Tests
-    tester.test_cache_performance(iterations=200)
-
-    # 4. Concurrent Load Tests
-    tester.test_concurrent_requests(concurrent_users=10, requests_per_user=10)
-
-    # Generate and print report
+    """Main function"""
+    import sys
+    
+    base_url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:5000"
+    iterations = int(sys.argv[2]) if len(sys.argv) > 2 else 10
+    
+    print(f"🚀 Starting performance tests...")
+    print(f"Base URL: {base_url}")
+    print(f"Iterations per test: {iterations}")
+    print()
+    
+    tester = PerformanceTester(base_url)
+    metrics = tester.run_all_tests(iterations)
+    
+    print(f"\n✅ Completed {len(metrics)} tests")
+    
+    # Generate and display report
     report = tester.generate_report()
-
+    
+    print("\n" + "="*60)
+    print("PERFORMANCE TEST REPORT")
+    print("="*60)
+    
+    print(f"\n📊 Summary:")
+    print(f"  Total tests: {report['summary']['total_tests']}")
+    print(f"  REST success rate: {report['summary']['rest_success_rate']:.1f}%")
+    print(f"  GraphQL success rate: {report['summary']['graphql_success_rate']:.1f}%")
+    
+    print(f"\n📈 Performance Comparison:")
+    for operation, comparison in report['comparison'].items():
+        print(f"\n  {operation}:")
+        print(f"    Faster API: {comparison['faster_api'].upper()}")
+        print(f"    Improvement: {comparison['improvement_percent']:.1f}%")
+        print(f"    Time saved: {comparison['duration_difference']:.2f}ms")
+    
     # Save report
-    tester.save_report(report)
-
-    print("\n" + "="*80)
-    print("Performance Testing Complete")
-    print("="*80)
+    tester.save_report('performance_test_report.json')
+    print(f"\n✅ Detailed report saved to: performance_test_report.json")
 
 
 if __name__ == '__main__':

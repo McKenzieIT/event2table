@@ -1,0 +1,22 @@
+归档日期: 2026-02-21
+归档原因: 已迁移到GraphQL
+GraphQL实现: backend/gql_api/queries/node_queries.py, backend/gql_api/mutations/node_mutations.py
+测试覆盖: backend/tests/test_graphql_schema.py
+
+迁移说明:
+- Nodes模块已完全迁移到GraphQL API
+- 所有REST端点已被GraphQL Query和Mutation替代
+
+GraphQL端点:
+- POST /api/graphql
+- GraphiQL IDE: /api/graphiql
+
+GraphQL操作:
+Query:
+  - node(id: Int!): Node
+  - nodes(gameGid: Int, nodeType: String, limit: Int, offset: Int): [Node]
+
+Mutation:
+  - createNode(name: String!, ...): CreateNodePayload
+  - updateNode(id: Int!, ...): UpdateNodePayload
+  - deleteNode(id: Int!): DeleteNodePayload

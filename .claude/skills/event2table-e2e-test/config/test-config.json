@@ -1,0 +1,368 @@
+{
+  "testExecution": {
+    "autoStart": true,
+    "parallelTesting": false,
+    "maxRetries": 2,
+    "timeoutPerPage": 30000,
+    "timeoutPerAction": 5000
+  },
+  "pages": {
+    "required": [
+      {
+        "name": "Dashboard",
+        "url": "http://localhost:5173/",
+        "priority": "P0",
+        "tests": [
+          "pageLoad",
+          "consoleErrors",
+          "buttonClicks",
+          "statistics",
+          "gameManagementBtn"
+        ]
+      },
+      {
+        "name": "Games Management (Modal)",
+        "url": "modal:game-management",
+        "trigger": ".game-management-btn",
+        "priority": "P0",
+        "tests": [
+          "modalOpen",
+          "gameList",
+          "gameDetail",
+          "editGameName",
+          "saveAndVerifyCache",
+          "modalClose"
+        ]
+      },
+      {
+        "name": "Events List",
+        "url": "http://localhost:5173/#/events?game_gid=10000147",
+        "priority": "P1",
+        "tests": [
+          "pageLoad",
+          "eventsDisplay",
+          "pagination",
+          "search"
+        ]
+      },
+      {
+        "name": "Events Create",
+        "url": "modal:event-create",
+        "trigger": ".create-event-btn",
+        "priority": "P1",
+        "tests": [
+          "modalOpen",
+          "formValidation",
+          "createEvent",
+          "verifyCacheUpdate"
+        ]
+      },
+      {
+        "name": "Parameters List",
+        "url": "http://localhost:5173/#/parameters?game_gid=10000147",
+        "priority": "P1",
+        "tests": [
+          "pageLoad",
+          "parametersDisplay",
+          "search"
+        ]
+      },
+      {
+        "name": "Event Node Builder",
+        "url": "http://localhost:5173/#/event-node-builder?game_gid=10000147",
+        "priority": "P0",
+        "tests": [
+          "pageLoad",
+          "eventSelector",
+          "paramSelectorEnhanced",
+          "baseFieldsListRemoved",
+          "edgeToolbar",
+          "canvasStatsDisplay"
+        ]
+      },
+      {
+        "name": "Canvas",
+        "url": "http://localhost:5173/#/canvas?game_gid=10000147",
+        "priority": "P2",
+        "tests": [
+          "pageLoad",
+          "dragNode",
+          "connectNodes",
+          "generateHQL"
+        ]
+      },
+      {
+        "name": "Flows Management",
+        "url": "http://localhost:5173/#/flows?game_gid=10000147",
+        "priority": "P2",
+        "tests": [
+          "pageLoad",
+          "flowsList"
+        ]
+      },
+      {
+        "name": "Categories Management",
+        "url": "http://localhost:5173/#/categories?game_gid=10000147",
+        "priority": "P1",
+        "tests": [
+          "pageLoad",
+          "categoriesList",
+          "createCategory",
+          "editCategory",
+          "deleteCategory"
+        ]
+      },
+      {
+        "name": "Common Parameters",
+        "url": "http://localhost:5173/#/common-params?game_gid=10000147",
+        "priority": "P2",
+        "tests": [
+          "pageLoad",
+          "commonParamsList"
+        ]
+      },
+      {
+        "name": "Event Nodes Management",
+        "url": "http://localhost:5173/#/event-nodes?game_gid=10000147",
+        "priority": "P2",
+        "tests": [
+          "pageLoad",
+          "nodesList"
+        ]
+      }
+    ]
+  },
+  "fixes": {
+    "fix1": {
+      "id": "React Query Cache Update",
+      "description": "游戏名称修改后缓存立即更新",
+      "status": "pending",
+      "testSteps": [
+        "打开游戏管理模态框",
+        "选择STAR001游戏",
+        "点击游戏名称输入框",
+        "修改名称为'TEST-{{timestamp}}'",
+        "等待保存按钮出现",
+        "点击保存",
+        "验证左侧列表立即更新",
+        "关闭模态框",
+        "验证Dashboard显示新名称",
+        "刷新页面验证持久化"
+      ],
+      "expectedResults": [
+        "保存按钮自动出现",
+        "左侧游戏列表立即更新",
+        "Dashboard游戏卡片立即更新",
+        "刷新后数据保持更新",
+        "无控制台错误"
+      ]
+    },
+    "fix2": {
+      "id": "Search Icon Overlap Fix",
+      "description": "搜索框图标与输入文字无重叠",
+      "status": "pending",
+      "testSteps": [
+        "打开游戏管理模态框",
+        "找到搜索输入框",
+        "输入测试文字'STAR001-TEST'",
+        "验证CSS: padding-left=44px",
+        "验证图标位置: left=16px, width=20px",
+        "验证间距: 8px",
+        "截图验证无重叠"
+      ],
+      "expectedResults": [
+        "padding-left = 44px",
+        "图标位于left: 16px",
+        "输入文字与图标保持8px间距",
+        "22个组件自动受益"
+      ]
+    },
+    "fix3": {
+      "id": "Event Node Builder Optimization",
+      "description": "移除BaseFieldsList，增强ParamSelector",
+      "status": "verified",
+      "testSteps": [
+        "导航到Event Node Builder",
+        "验证BaseFieldsList不存在",
+        "验证ParamSelector高度增加",
+        "验证ParamSelector显示10+参数",
+        "验证EdgeToolbar存在",
+        "验证CanvasStatsDisplay增强效果"
+      ],
+      "expectedResults": [
+        "BaseFieldsList完全移除",
+        "ParamSelector显示10+参数",
+        "EdgeToolbar正常工作",
+        "CanvasStatsDisplay视觉效果增强"
+      ]
+    }
+  },
+  "p0Tests": [
+    {
+      "id": "P0-1",
+      "name": "游戏编辑完整流程",
+      "fix": "fix1",
+      "steps": [
+        "打开Dashboard",
+        "点击游戏管理按钮",
+        "点击STAR001游戏项",
+        "点击游戏名称输入框",
+        "清空并输入新名称",
+        "等待React状态更新",
+        "验证保存按钮出现",
+        "点击保存",
+        "等待API响应",
+        "验证左侧列表立即更新",
+        "关闭模态框",
+        "验证Dashboard更新",
+        "刷新页面验证持久化"
+      ]
+    },
+    {
+      "id": "P0-2",
+      "name": "搜索框图标验证",
+      "fix": "fix2",
+      "steps": [
+        "打开包含搜索框的页面",
+        "输入测试文字",
+        "检查CSS padding-left值",
+        "检查图标位置",
+        "截图对比"
+      ]
+    },
+    {
+      "id": "P0-3",
+      "name": "Event Node Builder验证",
+      "fix": "fix3",
+      "steps": [
+        "导航到Event Node Builder",
+        "验证DOM结构",
+        "检查组件类名",
+        "测量元素尺寸"
+      ]
+    }
+  ],
+  "p1Tests": [
+    {
+      "id": "P1-1",
+      "name": "事件创建完整流程",
+      "steps": [
+        "打开Events列表",
+        "点击创建事件",
+        "填写事件表单",
+        "提交表单",
+        "验证列表更新",
+        "验证Dashboard统计更新"
+      ]
+    },
+    {
+      "id": "P1-2",
+      "name": "分类管理完整流程",
+      "steps": [
+        "打开分类管理",
+        "创建新分类",
+        "编辑分类",
+        "验证缓存更新",
+        "删除分类",
+        "验证确认对话框"
+      ]
+    },
+    {
+      "id": "P1-3",
+      "name": "模态框关闭操作",
+      "steps": [
+        "打开各种模态框",
+        "测试取消按钮",
+        "测试ESC键",
+        "测试点击外部"
+      ]
+    },
+    {
+      "id": "P1-4",
+      "name": "删除确认对话框",
+      "steps": [
+        "选择测试数据",
+        "点击删除按钮",
+        "验证确认对话框",
+        "测试取消操作",
+        "测试确认删除",
+        "验证列表更新"
+      ]
+    },
+    {
+      "id": "P1-5",
+      "name": "统计数据实时更新",
+      "steps": [
+        "记录初始统计",
+        "创建新事件",
+        "验证统计+1",
+        "删除事件",
+        "验证统计-1"
+      ]
+    }
+  ],
+  "testData": {
+    "testGame": {
+      "gid": 90000001,
+      "name": "E2E测试游戏",
+      "ods_db": "ieu_ods"
+    },
+    "testEvent": {
+      "name": "test-event-",
+      "description": "E2E自动化测试事件",
+      "category": "测试分类"
+    },
+    "testCategory": {
+      "name": "测试分类",
+      "description": "E2E测试用"
+    },
+    "testSearchTerms": [
+      "STAR001",
+      "TEST",
+      "zmpvp",
+      "login"
+    ]
+  },
+  "assertions": {
+    "cacheUpdate": {
+      "timeout": 3000,
+      "checkInterval": 500,
+      "maxAttempts": 6
+    },
+    "modalOpen": {
+      "timeout": 2000,
+      "selector": "[role=\"dialog\"]"
+    },
+    "listUpdate": {
+      "timeout": 2000,
+      "minItems": 1
+    }
+  },
+  "output": {
+    "screenshotsDir": "docs/testing/reports/{{date}}/screenshots/",
+    "reportsDir": "docs/testing/reports/{{date}}/",
+    "reportFormat": "markdown"
+  },
+  "browser": {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "userAgent": "Event2Table-E2E-Testing-Agent/2.0"
+  },
+  "performance": {
+    "budgets": {
+      "pageLoad": 3000,
+      "domContentLoaded": 2000,
+      "lcp": 2500,
+      "apiResponse": 1000
+    }
+  },
+  "qualityGates": {
+    "p0PassRequired": true,
+    "p1PassRate": 0.8,
+    "p2PassRate": 0.6,
+    "maxConsoleErrors": 0,
+    "maxApiErrors": 0
+  }
+}

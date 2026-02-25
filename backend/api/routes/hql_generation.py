@@ -23,10 +23,16 @@ from backend.core.utils import (
     validate_json_request,
 )
 
+# Import cached HQL service
+from backend.services.hql.hql_service_cached import HQLServiceCached
+
 # Import the parent blueprint
 from .. import api_bp
 
 logger = logging.getLogger(__name__)
+
+# Initialize cached HQL service
+hql_service = HQLServiceCached()
 
 
 @api_bp.route("/api/generate", methods=["POST"])
@@ -96,7 +102,7 @@ def api_get_hql(id):
 @api_bp.route("/api/validate-hql", methods=["POST"])
 def api_validate_hql():
     """
-    API: Validate HQL syntax and structure
+    API: Validate HQL syntax and structure (with caching)
 
     Request body:
     {
@@ -123,18 +129,21 @@ def api_validate_hql():
         return json_error_response(error)
 
     hql_content = data["hql_content"]
+    use_cache = data.get("use_cache", True)  # 默认使用缓存
 
     try:
-        import re
-
-        # Initialize result
+        # 使用缓存增强版服务验证HQL
+        validation_result = hql_service.validate_hql(hql_content, use_cache=use_cache)
+        
+        # 转换为API响应格式
         result = {
-            "is_valid": True,
-            "error_count": 0,
-            "sanitized_fields": [],
-            "errors": [],
+            "is_valid": validation_result.get("valid", False),
+            "error_count": len(validation_result.get("syntax_errors", [])),
+            "sanitized_fields": [],  # TODO: 从验证结果中提取
+            "errors": validation_result.get("syntax_errors", []),
             "warnings": [],
             "recommendations": [],
+            "performance": validation_result.get("performance", {}),
         }
 
         # 1. Check for field names with dots and track sanitization

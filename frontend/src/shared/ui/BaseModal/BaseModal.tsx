@@ -52,6 +52,8 @@ export interface BaseModalProps {
   onClose: () => void;
   /** 子组件 */
   children: ReactNode;
+  /** 模态框标题 */
+  title?: string;
 
   // ESC关闭控制
   /** 是否启用ESC键关闭，默认true */
@@ -64,6 +66,8 @@ export interface BaseModalProps {
   // 样式
   /** 背景遮罩的className */
   overlayClassName?: string;
+  /** 内容区域的className (别名，与contentClassName相同) */
+  className?: string;
   /** 内容区域的className */
   contentClassName?: string;
   /** 内容区域的内联样式 */
@@ -86,6 +90,10 @@ export interface BaseModalProps {
   closeOnBackdropClick?: boolean;
   /** 模态框关闭时的回调 */
   onAfterClose?: () => void;
+  /** 是否显示header，默认true */
+  showHeader?: boolean;
+  /** 是否显示关闭按钮，默认true */
+  showCloseButton?: boolean;
 }
 
 /**
@@ -94,11 +102,13 @@ export interface BaseModalProps {
 export const BaseModal = React.memo(function BaseModal({
   isOpen,
   onClose,
+  title,
   children,
   enableEscClose = true,
   onBeforeClose,
   confirmConfig = {},
   overlayClassName = '',
+  className = '',
   contentClassName = '',
   contentStyle,
   zIndex = Z_INDICES.MODAL,
@@ -108,6 +118,8 @@ export const BaseModal = React.memo(function BaseModal({
   variant = 'default',
   closeOnBackdropClick = true,
   onAfterClose,
+  showHeader = true,
+  showCloseButton = true,
 }: BaseModalProps) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -130,7 +142,8 @@ export const BaseModal = React.memo(function BaseModal({
     glassmorphism && 'modal-content--glassmorphism',
     `modal-content--${size}`,
     `modal-content--${variant}`,
-    contentClassName,
+    className, // 支持通用的 className prop
+    contentClassName, // 支持特定的 contentClassName prop
   ].filter(Boolean).join(' ');
 
   // 确认对话框默认配置
@@ -196,6 +209,46 @@ export const BaseModal = React.memo(function BaseModal({
     enabled: enableEscClose && isOpen && !showConfirm,
   });
 
+  // 焦点陷阱 - 防止Tab键焦点跳出模态框
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      const modal = modalContentRef.current;
+      if (!modal) return;
+
+      // 获取模态框内所有可聚焦元素
+      const focusableSelectors = [
+        'button:not([disabled])',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        'a[href]',
+        '[tabindex]:not([tabindex="-1"])',
+      ].join(', ');
+
+      const focusableElements = modal.querySelectorAll<HTMLElement>(focusableSelectors);
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      // 如果焦点在最后一个元素且按Tab，则跳到第一个
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement?.focus();
+      } 
+      // 如果焦点在第一个元素且按Shift+Tab，则跳到最后一个
+      else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   // 焦点管理
   useEffect(() => {
     if (isOpen) {
@@ -242,14 +295,39 @@ export const BaseModal = React.memo(function BaseModal({
           className={contentClasses}
           style={{
             outline: 'none',
+            display: 'flex',
+            flexDirection: 'column',
             ...contentStyle,
           }}
           onClick={(e) => e.stopPropagation()}
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
+          aria-labelledby={title ? "modal-title" : undefined}
         >
-          {children}
+          {/* Header: 标题 + 关闭按钮 */}
+          {showHeader && (
+            <div className="modal-header">
+              <h2 className="modal-title" id="modal-title">
+                {title}
+              </h2>
+              {showCloseButton && (
+                <button
+                  className="modal-close"
+                  onClick={handleClose}
+                  aria-label="关闭对话框"
+                  type="button"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          )}
+          
+          {/* Body: 内容区域 */}
+          <div className="modal-body">
+            {children}
+          </div>
         </div>
       </div>
 

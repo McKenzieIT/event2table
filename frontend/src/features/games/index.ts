@@ -13,6 +13,10 @@ export * from './api';
 // Hooks
 export * from './hooks';
 
-// Components
-export { default as GameManagementModal } from './GameManagementModal';
-export { default as AddGameModal } from './AddGameModal';
+// Components - GraphQL versions
+export { default as GameManagementModal } from './GameManagementModalGraphQL';
+export { default as AddGameModal } from './AddGameModalGraphQL';
+
+// Legacy REST API versions (archived)
+// export { default as GameManagementModal } from './GameManagementModal';
+// export { default as AddGameModal } from './AddGameModal';

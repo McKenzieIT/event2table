@@ -12,12 +12,27 @@ export default function NodeDetailModal({ isOpen, node, onClose }) {
   const isEventNode = node.type === "event";
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+    >
       <div className="node-detail-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <span className="node-icon">{data.icon || "⚙️"}</span>
           <h2>{data.label}</h2>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             ×
           </button>
         </div>

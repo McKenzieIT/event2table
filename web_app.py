@@ -15,6 +15,8 @@ from backend.core.logging import get_logger
 from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict
 from backend.core.cache.cache_system import cache_result
 from backend.core.cache.cache_warmer import cache_warmer
+from backend.core.startup.app_initializer import initialize_app
+from backend.api.middleware.deprecation import init_deprecation_middleware
 
 # Initialize logger early
 logger = get_logger(__name__)
@@ -23,6 +25,11 @@ logger = get_logger(__name__)
 from backend.api import api_bp
 from backend.api.routes.hql_preview_v2 import hql_preview_v2_bp  # V2 HQL Preview API
 from backend.api.routes.v1_adapter import v1_adapter_bp  # V1-to-V2 Adapter API (2026-02-17)
+
+# GraphQL API
+from flask import request, jsonify
+from backend.gql_api.schema import schema
+from flask_graphql import GraphQLView
 
 # Service Blueprints - from backend/services (standardized package imports)
 # NOTE: games_bp routes are now in api_bp (backend.api.routes.games)
@@ -147,6 +154,12 @@ except Exception as e:
     logger.warning(f"CSRF protection initialization failed: {e}")
 
 app.after_request(add_security_headers)
+
+# Register V1 API deprecation middleware
+try:
+    init_deprecation_middleware(app)
+except Exception as e:
+    logger.warning(f"V1 API deprecation middleware initialization failed: {e}")
 
 # 缓存控制 - 开发模式禁用 HTML 缓存
 @app.after_request
@@ -275,6 +288,10 @@ app.register_blueprint(api_bp)  # API endpoints (/api/*)
 app.register_blueprint(hql_preview_v2_bp)  # HQL Preview V2 API (/hql-preview-v2/*)
 app.register_blueprint(v1_adapter_bp)  # V1-to-V2 Adapter API (/api/v1-adapter/*) (2026-02-17)
 app.register_blueprint(event_node_builder_bp)  # Event Node Builder API (/event_node_builder/*)
+
+# Register GraphQL API endpoint
+app.add_url_rule('/api/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True), methods=['GET', 'POST'])
+logger.info("✅ GraphQL API registered at /api/graphql with GraphiQL IDE")
 if bulk_bp:
     app.register_blueprint(bulk_bp)  # Bulk operations
 app.register_blueprint(cache_monitor_bp)  # Cache monitoring (/admin/cache/*)
@@ -374,12 +391,20 @@ def internal_server_error(error):
 # Use app.app_context() to ensure cache utilities can access current_app
 try:
     with app.app_context():
-        cache_warmer.warmup_on_startup(warm_all_events=False)
-        # Start periodic cache warming (every 1 hour)
-        cache_warmer.start_periodic_warmup(interval_hours=1)
+        # 使用新的应用初始化器
+        initialize_app(app)
+        logger.info("✅ 应用初始化器已启动")
 except Exception as e:
-    logger.warning(f"⚠️ 缓存预热失败: {e}")
-    logger.info("应用将在无预热缓存模式下运行")
+    logger.warning(f"⚠️ 应用初始化失败: {e}")
+    logger.info("应用将在无初始化模式下运行")
+    # 降级到旧的缓存预热方式
+    try:
+        with app.app_context():
+            cache_warmer.warmup_on_startup(warm_all_events=False)
+            cache_warmer.start_periodic_warmup(interval_hours=1)
+    except Exception as e2:
+        logger.warning(f"⚠️ 缓存预热失败: {e2}")
+        logger.info("应用将在无预热缓存模式下运行")
 
 
 # Cached functions for database queries

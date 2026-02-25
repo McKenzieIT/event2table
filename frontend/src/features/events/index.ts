@@ -16,3 +16,7 @@ export * from './hooks';
 
 // Components
 export * from './components';
+
+// GraphQL Components
+export { default as EventManagementModalGraphQL } from './EventManagementModalGraphQL';
+export { default as AddEventModalGraphQL } from './AddEventModalGraphQL';

@@ -47,36 +47,44 @@ const Input = React.forwardRef(({
   value,
   onChange,
   onBlur,
+  onFocus,
+  id: customId,
+  name,
+  readOnly = false,
+  autoFocus = false,
+  maxLength,
+  minLength,
   ...props
 }, ref) => {
-  const inputId = React.useId();
+  const generatedId = React.useId();
+  const inputId = customId || generatedId;
   const isInvalid = Boolean(error);
 
   const wrapperClass = [
-    'cyber-input-wrapper',
-    isInvalid && 'cyber-input-wrapper--invalid',
-    disabled && 'cyber-input-wrapper--disabled',
-    Icon && 'cyber-input-wrapper--with-icon'
+    'cyber-field__wrapper',
+    isInvalid && 'cyber-field__wrapper--invalid',
+    disabled && 'cyber-field__wrapper--disabled',
+    Icon && 'cyber-field__wrapper--with-icon'
   ].filter(Boolean).join(' ');
 
   const inputClass = [
-    'cyber-input',
-    isInvalid && 'cyber-input--invalid',
-    disabled && 'cyber-input--disabled'
+    'cyber-field__input',
+    isInvalid && 'cyber-field__input--invalid',
+    disabled && 'cyber-field__input--disabled'
   ].filter(Boolean).join(' ');
 
   return (
-    <div className={['cyber-input', className].filter(Boolean).join(' ')}>
+    <div className={['cyber-field', 'cyber-input', className].filter(Boolean).join(' ')}>
       {label && (
-        <label htmlFor={inputId} className="cyber-input__label">
+        <label htmlFor={inputId} className="cyber-field__label cyber-input__label">
           {label}
-          {required && <span className="cyber-input__required" aria-hidden="true"> *</span>}
+          {required && <span className="cyber-field__required cyber-input__required" aria-hidden="true"> *</span>}
         </label>
       )}
 
       <div className={wrapperClass}>
         {Icon && (
-          <span className="cyber-input__icon">
+          <span className="cyber-field__icon cyber-input__icon">
             <Icon />
           </span>
         )}
@@ -85,12 +93,18 @@ const Input = React.forwardRef(({
           ref={ref}
           id={inputId}
           type={type}
+          name={name}
           className={inputClass}
           placeholder={placeholder}
           disabled={disabled}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          maxLength={maxLength}
+          minLength={minLength}
           value={value}
           onChange={onChange}
           onBlur={onBlur}
+          onFocus={onFocus}
           aria-invalid={isInvalid}
           aria-describedby={
             isInvalid ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
@@ -100,13 +114,13 @@ const Input = React.forwardRef(({
       </div>
 
       {isInvalid && (
-        <p id={`${inputId}-error`} className="cyber-input__error" role="alert">
+        <p id={`${inputId}-error`} className="cyber-field__error cyber-input__error" role="alert">
           {error}
         </p>
       )}
 
       {helperText && !isInvalid && (
-        <p id={`${inputId}-helper`} className="cyber-input__helper">
+        <p id={`${inputId}-helper`} className="cyber-field__helper cyber-input__helper">
           {helperText}
         </p>
       )}
@@ -129,7 +143,14 @@ const MemoizedInput = React.memo(Input, (prevProps, nextProps) => {
     prevProps.helperText === nextProps.helperText &&
     prevProps.className === nextProps.className &&
     prevProps.value === nextProps.value &&
-    prevProps.onChange === nextProps.onChange
+    prevProps.onChange === nextProps.onChange &&
+    prevProps.onBlur === nextProps.onBlur &&
+    prevProps.onFocus === nextProps.onFocus &&
+    prevProps.readOnly === nextProps.readOnly &&
+    prevProps.autoFocus === nextProps.autoFocus &&
+    prevProps.name === nextProps.name &&
+    prevProps.maxLength === nextProps.maxLength &&
+    prevProps.minLength === nextProps.minLength
   );
 });
 

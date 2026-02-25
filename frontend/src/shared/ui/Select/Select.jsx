@@ -52,11 +52,34 @@ const Select = React.forwardRef(({
 }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dropdownPosition, setDropdownPosition] = useState('down');
   const dropdownRef = useRef(null);
-  const inputRef = useRef(ref);
+  const triggerRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const inputId = React.useId();
   const isInvalid = Boolean(error);
+
+  // Calculate dropdown position based on viewport
+  useEffect(() => {
+    if (!isOpen || !dropdownRef.current || !triggerRef.current) return;
+
+    const dropdown = dropdownRef.current;
+    const trigger = triggerRef.current;
+    
+    const triggerRect = trigger.getBoundingClientRect();
+    const dropdownHeight = dropdown.offsetHeight || 240;
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+    
+    // If not enough space below and more space above, flip up
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      setDropdownPosition('up');
+    } else {
+      setDropdownPosition('down');
+    }
+  }, [isOpen]);
 
   // Filter options based on search term
   const filteredOptions = React.useMemo(() => {
@@ -146,7 +169,8 @@ const Select = React.forwardRef(({
 
   const dropdownClass = [
     'cyber-select-dropdown',
-    isOpen && 'cyber-select-dropdown--open'
+    isOpen && 'cyber-select-dropdown--open',
+    dropdownPosition === 'up' && 'cyber-select-dropdown--up'
   ].filter(Boolean).join(' ');
 
   return (
@@ -160,7 +184,7 @@ const Select = React.forwardRef(({
 
       <div className={wrapperClass} ref={dropdownRef}>
         <div
-          ref={inputRef}
+          ref={triggerRef}
           id={inputId}
           className="cyber-select-trigger"
           tabIndex={disabled ? -1 : 0}
@@ -170,10 +194,13 @@ const Select = React.forwardRef(({
           aria-disabled={disabled}
           aria-invalid={isInvalid}
           aria-labelledby={label ? inputId : undefined}
+          aria-describedby={
+            isInvalid ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
+          }
           onClick={handleTriggerClick}
           onKeyDown={handleKeyDown}
         >
-          <span className="cyber-select-value">
+          <span className="cyber-select-value" data-placeholder={placeholder}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           <span className="cyber-select-arrow" aria-hidden="true">
@@ -251,7 +278,7 @@ const Select = React.forwardRef(({
       </div>
 
       {isInvalid && (
-        <p className="cyber-select__error" role="alert">
+        <p id={`${inputId}-error`} className="cyber-select__error" role="alert">
           {error}
         </p>
       )}

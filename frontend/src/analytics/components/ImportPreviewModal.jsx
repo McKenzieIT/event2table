@@ -49,11 +49,23 @@ export function ImportPreviewModal({ parameters, onConfirm, onCancel }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
+    <div
+      className="modal-overlay"
+      onClick={onCancel}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onCancel();
+        }
+      }}
+    >
       <div className="modal-content glass-card" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h4>导入预览</h4>
-          <button className="modal-close" onClick={onCancel}>✕</button>
+          <button className="modal-close" onClick={onCancel} aria-label="关闭对话框">✕</button>
         </div>
         <div className="modal-body">
           <div className="import-stats mb-3">

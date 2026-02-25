@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Button } from '@shared/ui';
+import { Button, Spinner } from '@shared/ui';
 import './CategoryForm.css';
 
 /**
@@ -93,7 +93,11 @@ function CategoryForm() {
   };
 
   if (isLoading) {
-    return <div className="loading">加载中...</div>;
+    return (
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spinner size="lg" label="加载中..." />
+      </div>
+    );
   }
 
   return (

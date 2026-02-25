@@ -1,0 +1,11 @@
+Method,Name,Error,Occurrences
+GET,Monitoring Metrics,CatchResponseError('Status code: 0'),180
+GET,L1 Capacity,CatchResponseError('Status code: 0'),174
+GET,Cache Clear Simulation,"ConnectionRefusedError(61, 'Connection refused')",424
+GET,Config Update Simulation,"ConnectionRefusedError(61, 'Connection refused')",462
+GET,Cache Stats,CatchResponseError('Status code: 0'),547
+GET,Parameters List,CatchResponseError('Status code: 0'),183
+GET,Cache Stats Burst,"ConnectionRefusedError(61, 'Connection refused')",851
+GET,High Freq Read,"ConnectionRefusedError(61, 'Connection refused')",886
+GET,Events List,CatchResponseError('Status code: 0'),319
+GET,Game Detail,CatchResponseError('Status code: 0'),336

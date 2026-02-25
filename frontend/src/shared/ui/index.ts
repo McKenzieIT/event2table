@@ -57,6 +57,7 @@ export { default as Checkbox } from './Checkbox/Checkbox';
 export { default as Radio } from './Radio/Radio';
 export { default as Switch } from './Switch/Switch';
 export { default as Spinner } from './Spinner/Spinner';
+export { default as Skeleton } from './Skeleton/Skeleton';
 export { default as PageLoader } from './PageLoader/PageLoader';
 export { default as ErrorState } from './ErrorState/ErrorState';
 export { default as EmptyState } from './EmptyState/EmptyState';

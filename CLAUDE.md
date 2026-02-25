@@ -1,9 +1,32 @@
 # Event2Table - 开发规范
 
-> **版本**: 7.4 | **最新优化**: 事件节点构建器全面修复 | **最后更新**: 2026-02-18
+> **版本**: 7.6.0 | **最新优化**: 缓存系统文档完善与使用率提升 | **最后更新**: 2026-02-25
 >
+> **🆕 最新变更**: 缓存系统文档完善 - 7份新文档 + CLAUDE.md开发规范 (2026-02-25)
+> **🆕 最新变更**: 批量删除事件修复 + Dashboard统计准确性修复 + 环境设置规范强化 (2026-02-23)
+> **🆕 最新变更**: 后端优化完成 - 安全加固、性能优化、架构重构 (2026-02-20)
+> **🆕 最新变更**: Input组件架构重构与游戏编辑UX优化 (2026-02-22)
 > **🆕 最新变更**: 事件节点构建器6大问题修复 (2026-02-18)
-> **🆕 最新变更**: React性能优化最佳实践 (2026-02-18)
+
+---
+
+⚠️ **环境设置：必须先激活虚拟环境**
+---
+**在执行任何Python命令前，必须先激活虚拟环境**：
+
+```bash
+source backend/venv/bin/activate
+```
+
+**激活后**：
+- ✅ 使用 `python3` 执行Python脚本
+- ✅ 使用 `pip3` 安装依赖
+- ❌ 不要使用 `python`（会使用系统Python，可能导致依赖问题）
+
+**检查虚拟环境是否激活**：
+```bash
+which python3  # 应该显示: /Users/mckenzie/Documents/event2table/backend/venv/bin/python3
+```
 
 ---
 
@@ -34,6 +57,226 @@
 ---
 
 ## 问题修复记录
+
+### 2026-02-25: 缓存系统文档完善与使用率提升 ⚠️ **极其重要**
+
+**修复范围**: 7份新文档 + CLAUDE.md开发规范
+
+#### 新增文档（7份）
+
+**Level 1: 快速上手文档**
+- ✅ [5分钟快速开始指南](docs/cache/quickstart/5-minute-guide.md) - 让新用户5分钟上手缓存系统
+- ✅ [常见问题FAQ](docs/cache/quickstart/faq.md) - 10个最常见问题及解决方案
+- ✅ [代码片段参考](docs/cache/quickstart/code-snippets.md) - 可直接复制使用的代码模板
+
+**Level 3: 运维手册**
+- ✅ [故障排除手册](docs/cache/operations/troubleshooting.md) - 解决80%常见问题
+- ✅ [部署运维文档](docs/cache/operations/deployment.md) - 生产环境配置指南
+
+**Level 2: 开发指南**
+- ✅ [开发者指南](docs/cache/development/developer-guide.md) - 深入了解缓存系统架构
+
+**文档导航中心**
+- ✅ [缓存系统文档中心](docs/cache/README.md) - 完整的文档导航和快速参考
+
+#### CLAUDE.md更新
+
+**新增章节**: 缓存系统开发规范
+- ✅ 核心原则（读写分离、合理TTL、避免大对象）
+- ✅ 强制检查清单（6项检查）
+- ✅ 常见反模式（3个错误示例）
+- ✅ API快速参考
+- ✅ 违反后果说明
+
+**影响文件**:
+- `docs/cache/quickstart/5-minute-guide.md` - 新增
+- `docs/cache/quickstart/faq.md` - 新增
+- `docs/cache/quickstart/code-snippets.md` - 新增
+- `docs/cache/operations/troubleshooting.md` - 新增
+- `docs/cache/operations/deployment.md` - 新增
+- `docs/cache/development/developer-guide.md` - 新增
+- `docs/cache/README.md` - 新增
+- `CLAUDE.md` - 添加"缓存系统开发规范"章节
+
+**预期成果**:
+- 📚 文档覆盖度从85%提升到95%
+- 🚀 新用户5分钟上手（从无文档）
+- 🔧 运维10分钟解决80%问题
+- ✅ 开发者有明确的缓存使用规范
+
+**详细计划**: [缓存系统文档完善与使用率提升方案](/Users/mckenzie/.claude/plans/groovy-swinging-sketch.md)
+
+---
+
+### 2026-02-23: 批量删除和Dashboard统计修复 + 环境设置规范强化 ⚠️ **极其重要**
+
+**修复范围**: 3个关键修复 + 文档改进
+
+#### 1. 批量删除事件功能修复
+- ✅ 修复CacheInvalidator导入错误（类方法改为实例方法）
+- ✅ 添加3处缓存失效调用的空值检查
+- ✅ 删除不必要的fallback代码
+- ✅ 测试通过：成功删除3个测试事件
+
+#### 2. Dashboard统计数据准确性修复
+- ✅ 修复SQL查询使用错误的列名（`le.category` → `category_id`）
+- ✅ 添加JOIN event_categories表获取类别名称
+- ✅ 使用COALESCE处理NULL类别，显示"未分类"
+- ✅ 注册dashboard模块到API路由
+- ✅ 修复数据库外键引用（1903条记录 category_id: 6→63）
+- ✅ 测试通过：正确显示 "充值/付费": 1903
+
+#### 3. 环境设置规范强化
+- ✅ 在文档开头添加虚拟环境激活警告框
+- ✅ 更新"快速开始"部分，强调使用`python3`而不是`python`
+- ✅ 添加虚拟环境激活检查命令
+
+**影响文件**:
+- `backend/api/routes/events.py` - 缓存失效器修复
+- `backend/api/routes/dashboard.py` - SQL查询修复
+- `backend/api/__init__.py` - Dashboard模块注册
+- `CLAUDE.md` - 环境设置规范强化
+
+**详细报告**: [docs/reports/2026-02-23/documentation-updates.md](docs/reports/2026-02-23/documentation-updates.md)
+
+---
+
+### 2026-02-20: 后端优化完成 - 6阶段全面优化 ⚠️ **极其重要**
+
+**优化范围**: 57+优化点，覆盖安全、性能、架构、代码质量
+
+#### Phase 0: 紧急修复
+- ✅ 修复56+处异常信息泄露（堆栈跟踪、SQL查询暴露）
+- ✅ GenericRepository添加表名/字段名验证
+- ✅ 修复缺少的导入（field_builder.py, flows.py）
+- ✅ 修复Session中game_id误用为gid
+
+#### Phase 1: 安全加固
+- ✅ 修复动态SQL构建（dashboard, templates, games, join_configs）
+- ✅ 添加XSS防护validator（schemas.py）
+- ✅ 添加批量删除验证（categories.py）
+- ✅ 创建SQLValidator使用指南
+- ✅ 标记legacy_api为废弃
+
+#### Phase 2: 性能优化
+- ✅ 修复3处N+1查询（common_params, event_importer, parameters）
+- ✅ 合并统计查询（5→2, 4→2）
+- ✅ 添加game_gid转换缓存
+- ✅ 添加分页支持（flows, event_nodes）
+
+#### Phase 3: 架构重构
+- ✅ 创建GameService, EventService（业务逻辑层）
+- ✅ 创建EventParamRepository（数据访问层）
+- ✅ 创建HQLFacade门面类（简化HQL生成）
+- ✅ 标记services/flows/routes.py废弃
+
+#### Phase 4: 代码质量
+- ✅ 创建error_handler.py中间件（统一错误处理）
+- ✅ 创建json_helpers.py工具函数（JSON序列化）
+- ✅ 添加mypy配置（类型检查）
+- ✅ 增强Service类型注解
+
+#### Phase 5: game_gid迁移（完全切换）
+- ✅ Event Nodes使用game_gid
+- ✅ Parameter Aliases使用game_gid + 数据库迁移
+- ✅ FlowRepository使用game_gid
+- ✅ API参数完全切换到game_gid
+- ✅ JOIN条件和Schema更新
+
+**详细报告**: [docs/optimization/FINAL_OPTIMIZATION_REPORT.md](docs/optimization/FINAL_OPTIMIZATION_REPORT.md)
+**优化指南**: [docs/optimization/CORE_OPTIMIZATION_GUIDE.md](docs/optimization/CORE_OPTIMIZATION_GUIDE.md)
+
+**影响文件**:
+- `backend/api/routes/` - 13个路由文件
+- `backend/core/security/sql_validator.py` - 新增SQL验证器
+- `backend/services/games/game_service.py` - 新增GameService
+- `backend/services/events/event_service.py` - 新增EventService
+- `backend/models/repositories/` - 新增Repository层
+- `backend/core/utils/json_helpers.py` - 新增JSON工具
+
+**关键改进**:
+- 🔒 **安全性**: SQL注入防护、XSS防护、异常信息脱敏
+- ⚡ **性能**: N+1查询修复、缓存优化、分页支持
+- 🏗️ **架构**: Service层、Repository层、门面模式
+- 📝 **代码质量**: 类型注解、错误处理、代码重复消除
+
+---
+
+### 2026-02-22: Input组件架构重构与游戏编辑UX优化 ⚠️ **极其重要**
+
+**问题1**: Input组件尺寸不一致（cyber-input和wrapper长度不同）
+**问题2**: 游戏编辑功能UX不直观（需要点击"编辑"按钮才能编辑）
+
+**根本原因分析**:
+1. **CSS命名混淆**: `.cyber-input`既用作Grid容器，又被当作input元素
+2. **DOM结构错误**: Label在Input外部，导致Grid布局预留的label列空置
+3. **外部CSS冲突**: Modal CSS覆盖了Input组件的Grid架构
+
+**修复方案**:
+
+**1. Input组件架构重构** (前端)
+- ✅ 重命名class消除歧义：`.cyber-input` → `.cyber-field`
+- ✅ 新的DOM结构：
+  ```jsx
+  <div class="cyber-field cyber-input">  ← Grid容器
+    <label class="cyber-field__label">Label</label>
+    <div class="cyber-field__wrapper">  ← Flex容器
+      <input class="cyber-field__input">  ← 实际input
+    </div>
+  </div>
+  ```
+- ✅ 保留旧class作为alias，确保向后兼容
+
+**2. 游戏编辑UX改进**
+- ✅ 移除`disabled={!hasChanges}`限制
+- ✅ 点击游戏后自动进入编辑模式
+- ✅ 添加编辑提示："✎ 点击任意字段开始编辑"
+- ✅ 添加未保存提示："⚠ 有未保存的更改"
+
+**3. CSS冲突修复**
+- ❌ 删除：`.form-group .cyber-input { width: 100%; padding: ... }`
+- ✅ 添加：`.edit-hint` 和 `.unsaved-changes-hint` 样式
+
+**修复文件**:
+- `frontend/src/shared/ui/Input/Input.jsx`
+- `frontend/src/shared/ui/Input/Input.css`
+- `frontend/src/features/games/GameManagementModal.jsx`
+- `frontend/src/features/games/GameManagementModal.css`
+
+**验证结果**:
+- ✅ 所有Input组件wrapper和input尺寸完全一致（差异 < 2px）
+- ✅ 游戏编辑功能正常工作
+- ✅ 7/7个Input组件测试通过（添加游戏、事件创建等）
+
+**最佳实践** (见下文"Input组件使用规范")
+
+### 2026-02-22: Redis缓存清理与数据一致性 ⚠️ **极其重要**
+
+**问题**: 用户报告"当前页面仍有99个游戏而不是只有10000147一个"
+
+**根本原因**: Redis缓存未清理
+- 数据库实际只有1个游戏（GID: 10000147）
+- Redis缓存保存旧的99个游戏数据（TTL: 1小时）
+- API优先返回缓存数据，导致数据不一致
+
+**修复过程**:
+1. 验证数据库：`sqlite3 data/dwd_generator.db "SELECT COUNT(*) FROM games;"` → 1个
+2. 清理Redis缓存：`redis-cli FLUSHALL`
+3. 验证API：`curl -s http://127.0.0.1:5001/api/games` → 1个游戏 ✅
+
+**教训**:
+- ✅ Redis缓存持久化很强，清理数据库后必须同时清理Redis缓存
+- ✅ 缓存TTL: 1小时过长，建议5-10分钟
+- ✅ 数据清理必须包含：数据库 + Redis缓存
+- ✅ 测试完成后必须清理所有缓存
+
+**预防措施**:
+1. 确保所有修改游戏数据的API都清理缓存（已实现：Lines 268-269, 410-412, 667-670）
+2. 考虑使用Cache Tags系统：`cache.set(..., tags=["games"])` + `cache.delete_many(*, tags=["games"])`
+3. 定期验证缓存一致性：`cached_count vs db_count`
+
+**影响文件**:
+- `backend/api/routes/games.py` (缓存清理逻辑已存在)
 
 ### 2026-02-18: 事件节点构建器全面修复 ⚠️ **重要**
 
@@ -633,10 +876,58 @@ python scripts/git-hooks/install_hooks.py
 
 ---
 
+## 经验文档快速查找 ⭐ **极其重要 - 2026-02-24新增**
+
+> **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
+
+### 核心经验文档（docs/lessons-learned/）
+
+| 场景 | 查看文档 | 优先级 |
+|------|----------|--------|
+| **🚨 React Hooks错误** | [React最佳实践 - Hooks规则](docs/lessons-learned/react-best-practices.md#react-hooks-规则) | P0 |
+| **🐌 页面加载超时** | [React最佳实践 - Lazy Loading](docs/lessons-learned/react-best-practices.md#lazy-loading) | P0 |
+| **🔒 SQL注入风险** | [安全要点 - SQL注入防护](docs/lessons-learned/security-essentials.md#sql注入防护) | P0 |
+| **🧪 E2E测试失败** | [测试指南 - E2E测试](docs/lessons-learned/testing-guide.md#e2e测试) | P0 |
+| **⚡ 查询性能差** | [性能模式 - N+1查询](docs/lessons-learned/performance-patterns.md#n1查询优化) | P0 |
+| **🗄️ 数据库迁移** | [数据库模式 - game_gid](docs/lessons-learned/database-patterns.md#game_gid迁移) | P0 |
+| **🔧 API错误处理** | [API设计模式 - 错误处理](docs/lessons-learned/api-design-patterns.md#错误处理) | P0 |
+| **🐛 Bug调试方法** | [调试技能](docs/lessons-learned/debugging-skills.md) | P1 |
+
+### 完整经验文档索引
+
+- **[经验文档索引](docs/lessons-learned/README.md)** - 所有经验文档的导航中心 ⭐
+- **[React最佳实践](docs/lessons-learned/react-best-practices.md)** - Hooks规则、Lazy Loading、性能优化
+- **[测试指南](docs/lessons-learned/testing-guide.md)** - E2E测试、TDD、自动化测试
+- **[安全要点](docs/lessons-learned/security-essentials.md)** - XSS防护、SQL注入、输入验证
+- **[性能模式](docs/lessons-learned/performance-patterns.md)** - 缓存、N+1查询、优化技巧
+- **[数据库模式](docs/lessons-learned/database-patterns.md)** - game_gid使用、事务、迁移
+- **[API设计模式](docs/lessons-learned/api-design-patterns.md)** - 分层架构、错误处理
+- **[调试技能](docs/lessons-learned/debugging-skills.md)** - Chrome DevTools MCP、Subagent分析
+- **[重构检查清单](docs/lessons-learned/refactoring-checklist.md)** - TDD、代码审查、技术债务
+
+### 经验文档使用说明
+
+**为什么建立经验文档系统**：
+- ✅ 整合了399个文档的精华经验，避免重复
+- ✅ 集中管理，便于查找和维护
+- ✅ 持续更新，每次问题修复后立即更新
+
+**如何使用**：
+1. **遇到问题** → 先查阅经验文档，看是否有类似问题
+2. **修复问题后** → 提取经验，更新对应经验文档
+3. **Code Review** → 检查是否违反经验文档中的规范
+
+**经验贡献**：
+- 修复问题后，请更新对应经验文档
+- 使用统一的经验模板（见经验文档索引）
+- 在CLAUDE.md中添加简短记录和链接
+
+---
+
 ## 文档组织规范 ⚠️ **极其重要**
 
 > **🚨 所有文档必须按照本规范放置在正确的位置**
-> **🆕 更新 (2026-02-12)**: 建立文档组织规则，避免根目录混乱
+> **🆕 更新 (2026-02-24)**: 建立经验文档系统，整合399个文档
 
 ### 根目录文件规范
 
@@ -954,17 +1245,17 @@ event2table/
 # 进入项目目录
 cd /Users/mckenzie/Documents/event2table
 
-# 激活虚拟环境
-source venv/bin/activate
+# ⚠️ 第一步：激活虚拟环境（必须！）
+source backend/venv/bin/activate
 
 # 安装依赖
 pip install -r requirements.txt
 
 # 初始化数据库
-python scripts/setup/init_db.py
+python3 scripts/setup/init_db.py
 
 # 启动后端应用
-python web_app.py  # http://127.0.0.1:5001
+python3 web_app.py  # http://127.0.0.1:5001
 
 # 前端开发（另开终端）
 cd frontend
@@ -973,6 +1264,11 @@ npm run dev         # http://localhost:5173 (热更新)
 npm run build       # 生产构建
 npm run test        # 运行测试
 ```
+
+**⚠️ 重要提示**：
+- **必须先激活虚拟环境**：`source backend/venv/bin/activate`
+- 激活后使用 `python3` 而不是 `python`
+- 如果忘记激活虚拟环境，Python命令会找不到或使用错误的Python版本
 
 ### 开发前的强制检查清单 ⚠️ **极其重要**
 
@@ -1453,6 +1749,210 @@ HQL输出
 
 ---
 
+## 缓存系统开发规范 ⚠️ **极其重要 - 2026-02-25新增**
+
+> **🚨 所有后端开发者必须遵守缓存使用规范**
+> **🆕 更新 (2026-02-25)**: 建立完整缓存系统文档和开发规范
+
+### 核心原则
+
+**1. 读写分离 - 读使用缓存，写清理缓存**
+```python
+from backend.core.cache.decorators import cached, cache_invalidate
+
+# ✅ 正确：读操作使用缓存
+@cached(ttl=3600)
+def get_events(game_gid: int):
+    return fetch_all_as_dict('SELECT * FROM log_events WHERE game_gid = ?', (game_gid,))
+
+# ✅ 正确：写操作清理缓存
+@cache_invalidate
+def create_event(game_gid: int, event_data: dict):
+    return execute_insert('INSERT INTO log_events ...')
+
+# ✅ 正确：更新操作清理缓存
+@cache_invalidate
+def update_event(event_id: int, event_data: dict):
+    execute_update('UPDATE log_events SET ... WHERE id = ?', (event_id,))
+
+# ✅ 正确：删除操作清理缓存
+@cache_invalidate
+def delete_event(event_id: int):
+    execute_update('DELETE FROM log_events WHERE id = ?', (event_id,))
+```
+
+**2. 合理设置TTL - 根据数据变化频率**
+```python
+# ✅ 静态数据：长TTL（1-2小时）
+@cached(ttl=7200)
+def get_system_config():
+    pass
+
+# ✅ 中等变化：中TTL（30分钟）
+@cached(ttl=1800)
+def get_events(game_gid):
+    pass
+
+# ✅ 实时数据：短TTL（1分钟）
+@cached(ttl=60)
+def get_online_users():
+    pass
+
+# ❌ 错误：实时数据使用长TTL
+@cached(ttl=3600)  # TTL太长，数据不新鲜
+def get_realtime_stats():
+    pass
+```
+
+**3. 避免缓存大对象**
+```python
+# ❌ 错误：缓存整个大表（可能百万行）
+@cached(ttl=3600)
+def get_all_logs():
+    return fetch_all_as_dict('SELECT * FROM logs')
+
+# ✅ 正确：分页缓存
+@cached(ttl=600, key_prefix="logs:page")
+def get_logs_page(page: int, size: int = 100):
+    return fetch_all_as_dict('SELECT * FROM logs LIMIT ? OFFSET ?', (size, page * size))
+```
+
+### 强制检查清单
+
+每个使用缓存的功能必须完成以下检查：
+
+- [ ] **是否使用了 `@cached` 装饰器？**
+  - 所有查询函数必须使用缓存装饰器
+  - 参数化查询自动生成不同的缓存键
+
+- [ ] **TTL是否合理？**
+  - 静态数据：3600-7200秒
+  - 中等变化：1800秒
+  - 实时数据：60秒
+
+- [ ] **数据更新时是否调用了 `@cache_invalidate`？**
+  - CREATE操作必须清理缓存
+  - UPDATE操作必须清理缓存
+  - DELETE操作必须清理缓存
+
+- [ ] **缓存键是否遵循命名规范？**
+  - 格式：`{prefix}:{module}:{function}:{args}`
+  - 使用 `key_prefix` 避免键冲突
+
+- [ ] **是否避免了缓存大对象？**
+  - 单个缓存对象 < 1MB
+  - 使用分页代替全表缓存
+
+- [ ] **是否添加了缓存验证？**
+  - 开发环境检查 `X-Cache-Status` 响应头
+  - 生产环境监控缓存命中率
+
+### 常见反模式
+
+**❌ 反模式1: 更新数据后不清理缓存**
+```python
+# 错误：更新数据库后缓存未清理
+def update_event(event_id, data):
+    execute_update('UPDATE log_events SET name = ? WHERE id = ?', (data['name'], event_id))
+    # ❌ 缓存未清理，导致数据不一致
+
+# 正确：使用@cache_invalidate
+@cache_invalidate
+def update_event(event_id, data):
+    execute_update('UPDATE log_events SET name = ? WHERE id = ?', (data['name'], event_id))
+    # ✅ 装饰器自动清理相关缓存
+```
+
+**❌ 反模式2: 缓存实时数据且TTL过长**
+```python
+# 错误：实时统计数据使用长TTL
+@cached(ttl=3600)  # ❌ 数据可能过期1小时
+def get_realtime_stats():
+    return fetch_one_as_dict('SELECT COUNT(*) as online_users FROM user_sessions')
+
+# 正确：使用短TTL
+@cached(ttl=60)  # ✅ 1分钟内相对新鲜
+def get_realtime_stats():
+    return fetch_one_as_dict('SELECT COUNT(*) as online_users FROM user_sessions')
+```
+
+**❌ 反模式3: 忘记参数化缓存键**
+```python
+# 错误：缓存键不包含参数，所有查询共享同一缓存
+@cached(ttl=3600)
+def get_events(game_gid):  # ❌ game_gid参数未包含在缓存键中
+    return fetch_all_as_dict('SELECT * FROM log_events WHERE game_gid = ?', (game_gid,))
+
+# 正确：装饰器自动将参数包含在缓存键中
+@cached(ttl=3600)
+def get_events(game_gid: int):  # ✅ 不同game_gid有不同缓存
+    return fetch_all_as_dict('SELECT * FROM log_events WHERE game_gid = ?', (game_gid,))
+```
+
+### API快速参考
+
+**装饰器**:
+```python
+from backend.core.cache.decorators import cached, cache_invalidate
+
+@cached(ttl=3600, key_prefix="custom")  # 缓存查询
+def query_function(arg1, arg2):
+    pass
+
+@cache_invalidate  # 自动清理缓存
+def update_function(arg1, arg2):
+    pass
+```
+
+**缓存API**:
+```python
+from backend.core.cache.cache_system import cache_result
+
+# 手动操作（不推荐，优先使用装饰器）
+cache_result.set(key, value, ttl=3600)
+data = cache_result.get(key)
+cache_result.delete(key)
+cache_result.delete_many(pattern="games:*")
+```
+
+**验证缓存生效**:
+```bash
+# 方法1: 查看HTTP响应头
+curl -i http://127.0.0.1:5001/api/events?game_gid=10000147
+# 响应头应包含: X-Cache-Status: HIT 或 MISS
+
+# 方法2: 查看缓存统计
+curl http://127.0.0.1:5001/api/cache/stats
+
+# 方法3: 直接查看Redis
+redis-cli GET "cache:events:10000147"
+```
+
+### 违反后果
+
+**不遵守缓存规范的后果**:
+- ⚠️ **数据不一致**：用户看到过期数据，导致业务错误
+- ⚠️ **性能问题**：缓存命中率低，查询性能下降100-1000倍
+- ⚠️ **内存浪费**：缓存大对象导致内存占用过高
+- ⚠️ **技术债务**：后期需要重构以添加缓存支持
+
+**Code Review必须拒绝**:
+- ❌ 查询函数未使用 `@cached` 装饰器
+- ❌ 更新函数未使用 `@cache_invalidate` 装饰器
+- ❌ TTL设置不合理（过长或过短）
+- ❌ 缓存大对象（>1MB）
+
+### 完整文档
+
+- **[缓存系统文档中心](docs/cache/)** - 完整的缓存系统文档 ⭐
+- **[5分钟快速开始](docs/cache/quickstart/5-minute-guide.md)** - 新用户快速上手
+- **[常见问题FAQ](docs/cache/quickstart/faq.md)** - 10个最常见问题
+- **[开发者指南](docs/cache/development/developer-guide.md)** - 深入了解架构和高级用法
+- **[故障排除手册](docs/cache/operations/troubleshooting.md)** - 解决常见问题
+- **[部署运维文档](docs/cache/operations/deployment.md)** - 生产环境配置
+
+---
+
 ## Coding Standards → 编码规范
 
 ### Python代码规范
@@ -1629,6 +2129,193 @@ get_json_object(params, '$.field') AS field
 
 ---
 
+### Input组件使用规范 ⚠️ **极其重要 - 2026-02-22新增**
+
+> **🚨 必须遵循的Input组件使用模式，避免CSS布局冲突**
+
+#### 核心原则
+
+**1. 始终使用label prop，不要在Input外部写label**
+
+```jsx
+// ✅ 正确：使用label prop
+<Input
+  label="游戏名称"
+  type="text"
+  value={gameName}
+  onChange={(e) => setGameName(e.target.value)}
+/>
+
+// ❌ 错误：label在Input外部
+<div className="form-group">
+  <label>游戏名称</label>
+  <Input ... />
+</div>
+```
+
+**为什么？**
+- Input组件使用CSS Grid布局（140px label列 + 1fr input列）
+- Label在Input外部会导致Grid预留的label列空置
+- 结果：Input右侧出现152px空白间隙
+
+**2. 保持Input组件的完整性**
+
+```jsx
+// ✅ 正确：Input组件自包含所有结构
+<Input label="游戏GID" type="text" value={gid} disabled />
+
+// ❌ 错误：拆分Input组件的结构
+<div className="some-wrapper">
+  <Input ... />
+  <small>提示信息</small>
+</div>
+```
+
+**3. 避免覆盖Input组件的内部class**
+
+```css
+/* ❌ 错误：破坏Grid架构 */
+.form-group .cyber-input {
+  width: 100%;  /* 覆盖Grid容器 */
+  padding: 0.625rem 0.75rem;
+}
+
+/* ✅ 正确：通过新的class定制 */
+.form-group .cyber-field {
+  margin-bottom: 1rem;
+}
+
+.form-group .cyber-field__input {
+  background: #1e293b;
+  border-color: #334155;
+}
+```
+
+#### 推荐的表单结构
+
+**简单表单**:
+```jsx
+<form onSubmit={handleSubmit}>
+  <Input
+    label="游戏名称"
+    type="text"
+    value={gameData.name}
+    onChange={(e) => setGameData({...gameData, name: e.target.value})}
+    required
+  />
+
+  <Input
+    label="游戏GID"
+    type="text"
+    value={gameData.gid}
+    disabled
+    helperText="GID为只读字段"
+  />
+
+  <Button type="submit">保存</Button>
+</form>
+```
+
+**带自定义样式的表单**:
+```jsx
+<div className="custom-form">
+  <Input
+    label="游戏名称"
+    type="text"
+    value={gameData.name}
+    onChange={(e) => setGameData({...gameData, name: e.target.value})}
+    className="custom-input"  // ✅ 安全：只添加到外层容器
+  />
+</div>
+
+/* CSS */
+.custom-input.cyber-field {
+  margin-bottom: 2rem;
+}
+
+.custom-input .cyber-field__input {
+  border-color: #06b6d4;
+}
+```
+
+#### 常见错误和修复
+
+**错误1: Label在外部导致空白间隙**
+```jsx
+// ❌ 问题代码
+<div className="form-group">
+  <label>游戏名称</label>
+  <Input ... />
+</div>
+
+// ✅ 修复：使用label prop
+<Input label="游戏名称" ... />
+```
+
+**错误2: 外部CSS破坏Grid布局**
+```css
+/* ❌ 错误 */
+.form-group .cyber-input {
+  width: 100%;  /* 破坏Grid */
+}
+
+/* ✅ 正确 */
+.form-group .cyber-field {
+  margin-bottom: 1rem;  /* 只调整margin */
+}
+```
+
+**错误3: 混淆Grid容器和input元素**
+```css
+/* ❌ 错误：试图给Grid容器添加input样式 */
+.cyber-input {
+  padding: 0.625rem;  /* 这会破坏Grid */
+}
+
+/* ✅ 正确：给实际input添加样式 */
+.cyber-field__input {
+  padding: 0.625rem;
+}
+```
+
+#### 组件架构说明
+
+**Input组件的DOM结构**:
+```html
+<div class="cyber-field cyber-input">              ← Grid容器（140px label列 + 1fr input列）
+  <label class="cyber-field__label cyber-input__label">
+    游戏名称 <span class="cyber-field__required">*</span>
+  </label>
+  <div class="cyber-field__wrapper cyber-input-wrapper">  ← Flex容器（占满第2列）
+    <input class="cyber-field__input cyber-input"      ← 实际input元素（占满wrapper）
+      type="text"
+      value="..."
+    />
+  </div>
+  <p class="cyber-field__helper cyber-input__helper">
+    提示信息
+  </p>
+</div>
+```
+
+**关键点**:
+- `.cyber-field` = Grid容器（整体布局）
+- `.cyber-field__label` = Label（第1列）
+- `.cyber-field__wrapper` = Flex容器（第2列）
+- `.cyber-field__input` = input元素（Flex子项）
+
+#### 向后兼容性
+
+**2026-02-22重构保留了旧class名作为alias**:
+- ✅ `.cyber-input` = `.cyber-field` (Grid容器)
+- ✅ `.cyber-input__label` = `.cyber-field__label`
+- ✅ `.cyber-input-wrapper` = `.cyber-field__wrapper`
+- ✅ `.cyber-input` (在wrapper内) = `.cyber-field__input`
+
+**旧代码无需修改**，但新代码应使用新class名。
+
+---
+
 ## Development Tips → 开发提示
 
 ### 常见问题
@@ -1663,16 +2350,26 @@ A: 参考数据库迁移脚本：`migration/migrate_game_gid.py`
 - [产品需求文档(PRD)](docs/requirements/PRD.md) - 功能需求、变更记录 ⭐
 - [架构设计文档](docs/development/architecture.md) - 分层架构设计 ⭐
 - [贡献指南](docs/development/contributing.md) - 开发规范 ⭐
+- [文档中心](docs/README.md) - 所有文档导航索引 ⭐ (2026-02-22新增)
 
 #### 开发指南
-- [快速开始](docs/development/getting-started.md) - 环境搭建
+- [快速开始](docs/development/QUICKSTART.md) ⭐ - 快速上手指南 (2026-02-22新增)
+- [环境搭建](docs/development/getting-started.md) - 环境配置
 - [API开发指南](docs/development/api-development.md) - API开发规范
 - [前端开发指南](docs/development/frontend-development.md) - 前端开发规范
+- [game_gid迁移指南](docs/development/GAME_GID_MIGRATION_GUIDE.md) - game_gid迁移 (2026-02-22新增)
 
 #### 测试文档
 - [E2E测试指南](docs/testing/e2e-testing-guide.md) - E2E测试规范
 - [快速测试指南](docs/testing/quick-test-guide.md) - PATH问题排查
+- [测试经验总结](docs/testing/TESTING_LESSONS_LEARNED.md) ⭐ - 测试最佳实践 (2026-02-22新增)
 - [TDD实践](docs/development/tdd-practices.md) (TODO) - TDD最佳实践
+
+#### 优化文档
+- [优化经验总结](docs/optimization/OPTIMIZATION_LESSONS_LEARNED.md) ⭐ - 6阶段优化总结 (2026-02-22新增)
+- [最终优化报告](docs/optimization/FINAL_OPTIMIZATION_REPORT.md) - 后端优化报告
+- [核心优化指南](docs/optimization/CORE_OPTIMIZATION_GUIDE.md) - 优化实施指南
+- [缓存优化总结](docs/optimization/CACHE_OPTIMIZATION_SUMMARY.md) - 缓存系统优化
 
 ---
 

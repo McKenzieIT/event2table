@@ -37,7 +37,7 @@ export const ToastProvider = ({ children }) => {
   }, []);
 
   const showToast = useCallback((type, message, duration) => {
-    const defaultDuration = type === 'error' ? 5000 : type === 'warning' ? 4000 : 3000;
+    const defaultDuration = type === 'error' ? 10000 : type === 'warning' ? 8000 : 5000;
     const actualDuration = duration ?? defaultDuration;
     const id = Math.random().toString(36).substring(7);
     const newToast = { id, type, message, duration: actualDuration };

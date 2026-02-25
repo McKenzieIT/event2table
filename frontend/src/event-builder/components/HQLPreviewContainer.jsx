@@ -24,18 +24,17 @@ export default function HQLPreviewContainer({
     const generateHQLInternal = async () => {
       // Enhanced validation
       if (!gameGid) {
-        console.error('[HQLPreviewContainer] Missing gameGid');
+        console.warn('[HQLPreviewContainer] Missing gameGid');
         return;
       }
 
       if (!event || !event.id) {
-        console.error('[HQLPreviewContainer] Missing or invalid event');
+        // 这是正常的初始状态，不需要显示为错误
         setHqlContent('-- 请选择事件');
         return;
       }
 
       if (!fields || fields.length === 0) {
-        console.warn('[HQLPreviewContainer] No fields selected');
         setHqlContent('-- 请添加字段');
         return;
       }

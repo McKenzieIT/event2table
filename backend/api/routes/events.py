@@ -50,25 +50,11 @@ from backend.core.utils import (
 # Import Repository pattern for data access
 from backend.core.data_access import Repositories
 
-sys.path.append("..")
+# Import cache invalidator instance (matching pattern in games.py)
 try:
-    from backend.core.cache.cache_system import clear_cache_pattern
+    from backend.core.cache.cache_system import cache_invalidator
 except ImportError:
-
-    def clear_cache_pattern(pattern):
-        """
-        Clear cache entries matching a pattern (fallback implementation).
-
-        This is a fallback function used when the cache_system module
-        is not available. It does nothing but prevents ImportError.
-
-        Args:
-            pattern (str): Cache key pattern to match (unused in fallback)
-
-        Returns:
-            None
-        """
-        pass
+    cache_invalidator = None
 
 
 # Import the parent blueprint
@@ -191,7 +177,7 @@ def api_create_event():
     """API: Create a new event"""
     try:
         is_valid, data, error = validate_json_request(
-            ["game_gid", "event_name", "event_name_cn", "category_id"]
+            ["game_gid", "event_name", "event_name_cn"]
         )
         if not is_valid:
             return json_error_response(error, status_code=400)
@@ -201,9 +187,37 @@ def api_create_event():
         if not is_valid_game:
             return json_error_response(game_error, status_code=400)
 
-        # 验证category_id
-        if not data.get("category_id"):
-            return json_error_response("category_id is required", status_code=400)
+        # 验证category_id (optional - defaults to "未分类" if not provided or empty)
+        category_id = data.get("category_id")
+        # Treat empty string as None/missing (handle both string and int types)
+        if not category_id or (isinstance(category_id, str) and category_id.strip() == ""):
+            category_id = None
+
+        if category_id:
+            # Validate category exists if provided
+            category = fetch_one_as_dict(
+                "SELECT id, name FROM event_categories WHERE id = ?", (category_id,)
+            )
+            if not category:
+                return json_error_response(
+                    f"Category with id {category_id} not found", status_code=400
+                )
+            event_category = category["name"]
+        else:
+            # Auto-create "未分类" category if it doesn't exist
+            default_category = fetch_one_as_dict(
+                "SELECT id, name FROM event_categories WHERE name = ?", ("未分类",)
+            )
+            if default_category:
+                category_id = default_category["id"]
+            else:
+                # Create "未分类" category
+                category_id = execute_write(
+                    "INSERT INTO event_categories (name) VALUES (?)",
+                    ("未分类",),
+                    return_last_id=True
+                )
+            event_category = "未分类"
 
         # Validate input lengths to prevent database errors and DoS attacks
         event_name = data.get("event_name", "").strip()
@@ -228,16 +242,8 @@ def api_create_event():
         # Update data with sanitized values
         data["event_name"] = event_name
         data["event_name_cn"] = event_name_cn
-
-        # 获取category名称
-        category = fetch_one_as_dict(
-            "SELECT name FROM event_categories WHERE id = ?", (data["category_id"],)
-        )
-        if not category:
-            return json_error_response(
-                f"Category with id {data['category_id']} not found", status_code=400
-            )
-        event_category = category["name"]
+        # category_id is already set above, handle it properly for INSERT
+        data["category_id"] = category_id if category_id else None
 
         # 验证game_gid存在
         game = fetch_one_as_dict(
@@ -265,7 +271,7 @@ def api_create_event():
                 game_gid,
                 data["event_name"],
                 data.get("event_name_cn", ""),
-                data.get("category_id", ""),
+                data["category_id"],  # Already set to valid category ID above
                 source_table,
                 target_table,
                 data.get("include_in_common_params", 1),
@@ -294,7 +300,8 @@ def api_create_event():
                     ),
                 )
 
-        clear_cache_pattern("dashboard_statistics")
+        if cache_invalidator:
+            cache_invalidator.invalidate_key("dashboard_statistics")
         logger.info(f"Event created: {data['event_name']} (ID: {event_id})")
         return json_success_response(
             data={"event_id": event_id}, message="Event created successfully"
@@ -491,7 +498,8 @@ def api_batch_delete_events():
         # Delete events using Repository batch delete
         deleted_count = Repositories.LOG_EVENTS.delete_batch(event_ids)
 
-        clear_cache_pattern("events")  # Clear cache after delete
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("events.list:*")  # Clear cache after delete
         logger.info(f"Batch deleted {deleted_count} events")
         return json_success_response(
             message=f"Deleted {deleted_count} events",
@@ -549,7 +557,8 @@ def api_batch_update_events():
         # Use Repository batch update
         updated_count = Repositories.LOG_EVENTS.update_batch(event_ids, updates)
 
-        clear_cache_pattern("events")  # Clear cache after update
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("events.list:*")  # Clear cache after update
         logger.info(f"Batch updated {updated_count} events")
         return json_success_response(
             message=f"Updated {updated_count} events",

@@ -116,6 +116,18 @@ class SecureHasher:
             >>> file_hash = SecureHasher.hash_file('/path/to/file.txt')
             >>> print(len(file_hash))  # 64 (SHA-256输出长度)
         """
+        # Validate file path to prevent path traversal
+        if PathValidator is not None:
+            try:
+                # Get project root for validation
+                project_root = Path(__file__).parent.parent.parent.resolve()
+                file_path = PathValidator.validate_path(file_path, str(project_root))
+            except ValueError as e:
+                logger.error(f"Path validation failed: {e}")
+                raise ValueError(f"Invalid file path: {e}")
+        else:
+            logger.warning("PathValidator not available, skipping path validation")
+
         hasher = cls._get_hasher(algorithm)()
 
         with open(file_path, "rb") as f:

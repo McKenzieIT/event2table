@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt, SearchInput } from '@shared/ui';
+import { SelectGamePrompt, SearchInput, Spinner } from '@shared/ui';
 import EmptyState from '@shared/ui/EmptyState/EmptyState';
 import './ParameterCompare.css';
 
@@ -106,7 +106,11 @@ function ParameterCompare() {
 
   // 提前返回优化
   if (isLoading) {
-    return <div className="loading">加载中...</div>;
+    return (
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spinner size="lg" label="加载中..." />
+      </div>
+    );
   }
 
   const canShowComparison = selectedParam1 && selectedParam2;

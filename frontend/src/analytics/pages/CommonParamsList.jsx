@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, SearchInput } from '@shared/ui';
+import { Button, SearchInput, Skeleton, ErrorState } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './CommonParamsList.css';
@@ -57,7 +57,8 @@ export default function CommonParamsList() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['common-params'] });
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['common-params', gameGid] });
     }
   });
 
@@ -74,7 +75,8 @@ export default function CommonParamsList() {
     },
     onSuccess: () => {
       setSelectedIds(new Set());
-      queryClient.invalidateQueries({ queryKey: ['common-params'] });
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['common-params', gameGid] });
     }
   });
 
@@ -204,8 +206,23 @@ export default function CommonParamsList() {
     );
   }
 
-  if (isLoading) return <div className="loading-state">加载中...</div>;
-  if (queryError) return <div className="error-state">加载失败: {queryError.message}</div>;
+  if (isLoading) {
+    return (
+      <div className="common-params-page">
+        <div className="page-header">
+          <div className="header-left">
+            <h1>公参管理</h1>
+          </div>
+        </div>
+        <div className="params-grid">
+          <Skeleton type="card" count={6} />
+        </div>
+      </div>
+    );
+  }
+  if (queryError) {
+    return <ErrorState message={queryError.message} onRetry={() => window.location.reload()} />;
+  }
 
   return (
     <div className="common-params-page">

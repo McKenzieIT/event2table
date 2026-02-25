@@ -83,6 +83,8 @@ export default function WhereBuilderModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
+      size="xl"
+      showHeader={false}
       enableEscClose={true}
       onBeforeClose={handleBeforeClose}
       confirmConfig={{
@@ -103,7 +105,7 @@ export default function WhereBuilderModal({
               WHERE条件构建器
             </h3>
           </div>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             <i className="bi bi-x"></i>
           </button>
         </div>

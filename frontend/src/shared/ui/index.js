@@ -22,14 +22,18 @@ export { default as SearchInput } from './SearchInput/SearchInput';
 export { default as Badge } from './Badge/Badge';
 export { default as Spinner } from './Spinner/Spinner';
 export { default as Table } from './Table/Table';
+export { default as Skeleton } from './Skeleton/Skeleton';
+export { default as Pagination } from './Pagination/Pagination';
 
 // Feedback Components
 export { ToastProvider, useToast } from './Toast/Toast';
+export { ConfirmDialog } from './ConfirmDialog';
 export { BaseModal } from './BaseModal/BaseModal';
 export { default as Modal } from './BaseModal/BaseModal';
 
 // Special Components
 export { SelectGamePrompt } from './SelectGamePrompt';
 export { default as Loading } from './Loading';
+export { ErrorState } from './ErrorState/ErrorState';
 export { ErrorBoundary, ErrorFallback } from './ErrorBoundary';
 export { default as CanvasErrorBoundary } from './CanvasErrorBoundary';

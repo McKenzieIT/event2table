@@ -20,6 +20,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { BaseModal } from '@shared/ui/BaseModal';
 import { formatSQL, calculateSQLStats } from '@shared/utils/sqlFormatter';
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import DataPreviewModal from './DataPreviewModal';
 import "./HQLResultModal.css";
 
@@ -40,6 +41,9 @@ export default function HQLResultModal({
   const [copied, setCopied] = useState(false);
   const [showDataPreview, setShowDataPreview] = useState(false);
   const textareaRef = useRef(null);
+
+  // Promise-based confirm dialog
+  const { confirm, ConfirmDialogComponent } = usePromiseConfirm();
 
   // 当hql prop变化时更新本地状态
   useEffect(() => {
@@ -133,9 +137,9 @@ export default function HQLResultModal({
   };
 
   // 重新生成HQL
-  const handleRegenerate = () => {
+  const handleRegenerate = async () => {
     if (hasChanges) {
-      if (window.confirm("重新生成将覆盖您的修改，是否继续？")) {
+      if (await confirm("重新生成将覆盖您的修改，是否继续？")) {
         onClose(); // 关闭当前Modal
         onRegenerate(); // 触发重新生成
       }
@@ -146,9 +150,9 @@ export default function HQLResultModal({
   };
 
   // 关闭Modal（如果有修改则确认）
-  const handleClose = () => {
+  const handleClose = async () => {
     if (hasChanges) {
-      if (window.confirm("您有未保存的修改，确定要关闭吗？")) {
+      if (await confirm("您有未保存的修改，确定要关闭吗？")) {
         onClose();
       }
     } else {
@@ -191,7 +195,7 @@ export default function HQLResultModal({
         isOpen={isOpen}
         onClose={handleClose}
         title="HQL生成结果"
-        size="modal-lg"
+        size="lg"
       >
         <div className="hql-result-modal">
           <div className="empty-state">
@@ -221,7 +225,7 @@ export default function HQLResultModal({
           )}
         </span>
       }
-      size="modal-xl"
+        size="xl"
     >
       <div className="hql-result-modal">
         {/* Toolbar */}
@@ -385,6 +389,9 @@ export default function HQLResultModal({
           gameData={gameData}
         />
       )}
+
+      {/* Promise-based confirm dialog */}
+      <ConfirmDialogComponent />
     </BaseModal>
   );
 }

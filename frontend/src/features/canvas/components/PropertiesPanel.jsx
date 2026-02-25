@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Button } from '@shared/ui';
 import './PropertiesPanel.css';
 
 /**
@@ -308,20 +309,22 @@ export default function PropertiesPanel({
                             />
                             {hasChanges && (
                                 <div className="change-actions">
-                                    <button
-                                        className="action-button save-button"
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
                                         onClick={handleSave}
                                         title="保存更改"
                                     >
                                         ✓
-                                    </button>
-                                    <button
-                                        className="action-button cancel-button"
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
                                         onClick={handleCancel}
                                         title="取消更改"
                                     >
                                         ✕
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
                         </div>
@@ -343,12 +346,13 @@ export default function PropertiesPanel({
                 {/* Configure Button (if applicable) */}
                 {(selectedNode.type === 'join' || selectedNode.type === 'event' || selectedNode.type === 'custom') && (
                     <div className="properties-section">
-                        <button
-                            className="configure-button"
+                        <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={handleOpenConfig}
                         >
                             ⚙️ 打开配置
-                        </button>
+                        </Button>
                     </div>
                 )}
             </div>

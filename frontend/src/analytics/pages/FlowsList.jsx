@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, SearchInput } from '@shared/ui';
+import { Button, SearchInput, Spinner } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './FlowsList.css';
 
@@ -61,7 +61,8 @@ export default function FlowsList() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['flows']);
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['flows', gameGid] });
     }
   });
 
@@ -139,11 +140,8 @@ export default function FlowsList() {
       </div>
 
       {isLoading ? (
-        <div className="loading-spinner">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">加载中...</span>
-          </div>
-          <p>正在加载流程列表...</p>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
+          <Spinner size="lg" label="正在加载流程列表..." />
         </div>
       ) : filteredFlows.length === 0 ? (
         <div className="empty-state">

@@ -27,7 +27,7 @@
  * />
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import './SearchInput.css';
 
 /**
@@ -39,7 +39,7 @@ interface SearchInputProps {
   placeholder?: string;
   onClear?: () => void;
   debounceMs?: number;
-  icon?: React.ComponentType<any>;
+  icon?: ReactNode;
   disabled?: boolean;
   className?: string;
 }
@@ -53,10 +53,17 @@ function SearchInput({
   placeholder = '搜索...',
   onClear,
   debounceMs = 300,
-  icon: SearchIcon,
+  icon,
   disabled = false,
   className = '',
 }: SearchInputProps) {
+  const defaultSearchIcon = (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="m21 21-4.35-4.35"></path>
+    </svg>
+  );
+  const searchIcon = icon !== undefined ? icon : defaultSearchIcon;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [showClearButton, setShowClearButton] = useState(false);
@@ -136,8 +143,9 @@ function SearchInput({
 
   return (
     <div className={wrapperClass}>
-      {/* 搜索图标 */}
-      {SearchIcon && <div className="search-icon">{<SearchIcon />}</div>}
+      <div className="search-icon">
+        {searchIcon}
+      </div>
 
       {/* 输入框 */}
       <input
@@ -152,6 +160,8 @@ function SearchInput({
         onKeyDown={handleKeyDown}
         disabled={disabled}
         autoComplete="off"
+        aria-label={placeholder}
+        aria-describedby={!disabled ? "search-shortcut-hint" : undefined}
       />
 
       {/* 清除按钮 */}
@@ -168,7 +178,7 @@ function SearchInput({
 
       {/* 快捷键提示 */}
       {!isFocused && !disabled && (
-        <div className="shortcut-hint">
+        <div className="shortcut-hint" id="search-shortcut-hint">
           <span>⌘K</span>
         </div>
       )}

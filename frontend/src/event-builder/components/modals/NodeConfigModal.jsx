@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { Input } from '@shared/ui';
 
 export default function NodeConfigModal({ config, onChange, onClose, disabled }) {
   const [localConfig, setLocalConfig] = useState({
@@ -50,50 +51,53 @@ export default function NodeConfigModal({ config, onChange, onClose, disabled })
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+    >
       <div
         className="modal-content glass-card node-config-modal"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
           <h3>节点配置</h3>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             ✕
           </button>
         </div>
 
         <div className="modal-body">
-          <div className="form-group">
-            <label>
-              <span className="required">*</span>
-                       节点英文名称
-            </label>
-            <input
-              type="text"
-              className="glass-input"
-              placeholder="例如: login_event_node"
-              value={localConfig.nameEn}
-              onChange={(e) => handleChange('nameEn', e.target.value)}
-              disabled={disabled}
-            />
-            <small className="help-text">用于标识节点的唯一英文名称</small>
-          </div>
+          <Input
+            label="节点英文名称 *"
+            type="text"
+            placeholder="例如: login_event_node"
+            value={localConfig.nameEn}
+            onChange={(e) => handleChange('nameEn', e.target.value)}
+            disabled={disabled}
+            helperText="用于标识节点的唯一英文名称"
+          />
 
-          <div className="form-group">
-            <label>
-              <span className="required">*</span>
-                       节点中文名称
-            </label>
-            <input
-              type="text"
-              className="glass-input"
-              placeholder="例如：登录事件节点"
-              value={localConfig.nameCn}
-              onChange={(e) => handleChange('nameCn', e.target.value)}
-              disabled={disabled}
-            />
-            <small className="help-text">节点的中文显示名称</small>
-          </div>
+          <Input
+            label="节点中文名称 *"
+            type="text"
+            placeholder="例如：登录事件节点"
+            value={localConfig.nameCn}
+            onChange={(e) => handleChange('nameCn', e.target.value)}
+            disabled={disabled}
+            helperText="节点的中文显示名称"
+          />
 
           <div className="form-group">
             <label>节点描述</label>

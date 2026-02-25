@@ -166,10 +166,11 @@ def api_dashboard_stats() -> Tuple[Dict[str, Any], int]:
         # 2. Event categories breakdown
         category_where = "WHERE le.game_gid = ?" if game_gid else "WHERE 1=1"
         category_stats = fetch_all_as_dict(
-            f"""SELECT le.category, COUNT(DISTINCT le.id) as count
+            f"""SELECT COALESCE(ec.name, '未分类') as category, COUNT(DISTINCT le.id) as count
                 FROM log_events le
+                LEFT JOIN event_categories ec ON le.category_id = ec.id
                 {category_where}
-                GROUP BY le.category
+                GROUP BY category
                 ORDER BY count DESC""",
             (game_gid,) if game_gid else (),
         )

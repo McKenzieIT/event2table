@@ -1,0 +1,2246 @@
+{
+  "rest_endpoints": [
+    {
+      "path": "/api/events",
+      "methods": [
+        "GET"
+      ],
+      "file": "events.py",
+      "line": 66,
+      "deprecated": false
+    },
+    {
+      "path": "/api/events",
+      "methods": [
+        "POST"
+      ],
+      "file": "events.py",
+      "line": 175,
+      "deprecated": false
+    },
+    {
+      "path": "/api/events/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "events.py",
+      "line": 319,
+      "deprecated": false
+    },
+    {
+      "path": "/api/events/<int:id>",
+      "methods": [
+        "PUT",
+        "PATCH"
+      ],
+      "file": "events.py",
+      "line": 362,
+      "deprecated": false
+    },
+    {
+      "path": "/api/events/<int:id>/parameters",
+      "methods": [
+        "GET"
+      ],
+      "file": "events.py",
+      "line": 417,
+      "deprecated": false
+    },
+    {
+      "path": "/api/events/<int:event_id>/params",
+      "methods": [
+        "GET"
+      ],
+      "file": "events.py",
+      "line": 457,
+      "deprecated": false
+    },
+    {
+      "path": "/api/events/batch",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "events.py",
+      "line": 485,
+      "deprecated": false
+    },
+    {
+      "path": "/api/events/batch-update",
+      "methods": [
+        "PUT"
+      ],
+      "file": "events.py",
+      "line": 513,
+      "deprecated": false
+    },
+    {
+      "path": "/api/categories",
+      "methods": [
+        "GET"
+      ],
+      "file": "categories.py",
+      "line": 65,
+      "deprecated": false
+    },
+    {
+      "path": "/api/categories/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "categories.py",
+      "line": 117,
+      "deprecated": false
+    },
+    {
+      "path": "/api/categories",
+      "methods": [
+        "POST"
+      ],
+      "file": "categories.py",
+      "line": 132,
+      "deprecated": false
+    },
+    {
+      "path": "/api/categories/<int:id>",
+      "methods": [
+        "PUT",
+        "PATCH"
+      ],
+      "file": "categories.py",
+      "line": 159,
+      "deprecated": false
+    },
+    {
+      "path": "/api/categories/<int:id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "categories.py",
+      "line": 190,
+      "deprecated": false
+    },
+    {
+      "path": "/api/categories/batch",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "categories.py",
+      "line": 213,
+      "deprecated": false
+    },
+    {
+      "path": "/api/categories/batch-update",
+      "methods": [
+        "PUT"
+      ],
+      "file": "categories.py",
+      "line": 253,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events",
+      "methods": [
+        "GET"
+      ],
+      "file": "events_v2.py",
+      "line": 33,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events/<int:event_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "events_v2.py",
+      "line": 88,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events",
+      "methods": [
+        "POST"
+      ],
+      "file": "events_v2.py",
+      "line": 121,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events/<int:event_id>",
+      "methods": [
+        "PUT"
+      ],
+      "file": "events_v2.py",
+      "line": 195,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events/<int:event_id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "events_v2.py",
+      "line": 248,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events/<int:event_id>/parameters",
+      "methods": [
+        "POST"
+      ],
+      "file": "events_v2.py",
+      "line": 281,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events/<int:event_id>/parameters/<param_name>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "events_v2.py",
+      "line": 353,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events/search",
+      "methods": [
+        "GET"
+      ],
+      "file": "events_v2.py",
+      "line": 390,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/events/<int:event_id>/statistics",
+      "methods": [
+        "GET"
+      ],
+      "file": "events_v2.py",
+      "line": 430,
+      "deprecated": false
+    },
+    {
+      "path": "/api/join-configs",
+      "methods": [
+        "GET"
+      ],
+      "file": "join_configs.py",
+      "line": 78,
+      "deprecated": false
+    },
+    {
+      "path": "/api/join-configs/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "join_configs.py",
+      "line": 121,
+      "deprecated": false
+    },
+    {
+      "path": "/api/join-configs",
+      "methods": [
+        "POST"
+      ],
+      "file": "join_configs.py",
+      "line": 136,
+      "deprecated": false
+    },
+    {
+      "path": "/api/join-configs/<int:id>",
+      "methods": [
+        "PUT",
+        "PATCH"
+      ],
+      "file": "join_configs.py",
+      "line": 244,
+      "deprecated": false
+    },
+    {
+      "path": "/api/join-configs/<int:id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "join_configs.py",
+      "line": 336,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games",
+      "methods": [
+        "GET"
+      ],
+      "file": "games_v2.py",
+      "line": 53,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games",
+      "methods": [
+        "POST"
+      ],
+      "file": "games_v2.py",
+      "line": 77,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games/<int:gid>",
+      "methods": [
+        "GET"
+      ],
+      "file": "games_v2.py",
+      "line": 169,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games/<int:gid>",
+      "methods": [
+        "PUT",
+        "PATCH"
+      ],
+      "file": "games_v2.py",
+      "line": 194,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games/<int:gid>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "games_v2.py",
+      "line": 279,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games/<int:gid>/impact",
+      "methods": [
+        "GET"
+      ],
+      "file": "games_v2.py",
+      "line": 337,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games/batch",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "games_v2.py",
+      "line": 358,
+      "deprecated": false
+    },
+    {
+      "path": "/api/v2/games/batch-update",
+      "methods": [
+        "PUT"
+      ],
+      "file": "games_v2.py",
+      "line": 395,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games",
+      "methods": [
+        "GET"
+      ],
+      "file": "games.py",
+      "line": 54,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/<int:game_gid>",
+      "methods": [
+        "GET"
+      ],
+      "file": "games.py",
+      "line": 80,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games",
+      "methods": [
+        "POST"
+      ],
+      "file": "games.py",
+      "line": 107,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/<int:game_gid>",
+      "methods": [
+        "PUT",
+        "PATCH"
+      ],
+      "file": "games.py",
+      "line": 144,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/<int:game_gid>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "games.py",
+      "line": 183,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/batch",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "games.py",
+      "line": 206,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games",
+      "methods": [
+        "GET"
+      ],
+      "file": "games.py",
+      "line": 242,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games",
+      "methods": [
+        "POST"
+      ],
+      "file": "games.py",
+      "line": 330,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/<int:gid>",
+      "methods": [
+        "GET"
+      ],
+      "file": "games.py",
+      "line": 429,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/by-gid/<int:gid>",
+      "methods": [
+        "GET"
+      ],
+      "file": "games.py",
+      "line": 450,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/<int:gid>",
+      "methods": [
+        "PUT",
+        "PATCH"
+      ],
+      "file": "games.py",
+      "line": 474,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/<int:gid>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "games.py",
+      "line": 716,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/batch",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "games.py",
+      "line": 771,
+      "deprecated": false
+    },
+    {
+      "path": "/api/games/batch-update",
+      "methods": [
+        "PUT"
+      ],
+      "file": "games.py",
+      "line": 826,
+      "deprecated": false
+    },
+    {
+      "path": "/api/hql",
+      "methods": [
+        "GET"
+      ],
+      "file": "legacy_api.py",
+      "line": 56,
+      "deprecated": false
+    },
+    {
+      "path": "/api/hql/results",
+      "methods": [
+        "GET"
+      ],
+      "file": "legacy_api.py",
+      "line": 85,
+      "deprecated": false
+    },
+    {
+      "path": "/api/common-params",
+      "methods": [
+        "GET"
+      ],
+      "file": "legacy_api.py",
+      "line": 116,
+      "deprecated": false
+    },
+    {
+      "path": "/api/common-params/<int:id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "legacy_api.py",
+      "line": 167,
+      "deprecated": false
+    },
+    {
+      "path": "/api/common-params/batch",
+      "methods": [
+        "GET"
+      ],
+      "file": "legacy_api.py",
+      "line": 189,
+      "deprecated": false
+    },
+    {
+      "path": "/api/common-params/batch",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "legacy_api.py",
+      "line": 238,
+      "deprecated": false
+    },
+    {
+      "path": "/api/preview-excel",
+      "methods": [
+        "POST"
+      ],
+      "file": "legacy_api.py",
+      "line": 269,
+      "deprecated": false
+    },
+    {
+      "path": "/api/logs/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "legacy_api.py",
+      "line": 382,
+      "deprecated": false
+    },
+    {
+      "path": "/api/logs/<int:id>",
+      "methods": [
+        "PUT"
+      ],
+      "file": "legacy_api.py",
+      "line": 398,
+      "deprecated": false
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "methods": [
+        "GET"
+      ],
+      "file": "dashboard.py",
+      "line": 52,
+      "deprecated": false
+    },
+    {
+      "path": "/api/dashboard/summary",
+      "methods": [
+        "GET"
+      ],
+      "file": "dashboard.py",
+      "line": 266,
+      "deprecated": false
+    },
+    {
+      "path": "/api/templates",
+      "methods": [
+        "GET"
+      ],
+      "file": "templates.py",
+      "line": 68,
+      "deprecated": false
+    },
+    {
+      "path": "/api/templates",
+      "methods": [
+        "POST"
+      ],
+      "file": "templates.py",
+      "line": 138,
+      "deprecated": false
+    },
+    {
+      "path": "/api/templates/<int:template_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "templates.py",
+      "line": 185,
+      "deprecated": false
+    },
+    {
+      "path": "/api/templates/<int:template_id>",
+      "methods": [
+        "PUT"
+      ],
+      "file": "templates.py",
+      "line": 201,
+      "deprecated": false
+    },
+    {
+      "path": "/api/templates/<int:template_id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "templates.py",
+      "line": 230,
+      "deprecated": false
+    },
+    {
+      "path": "/api/templates/<int:template_id>/apply",
+      "methods": [
+        "POST"
+      ],
+      "file": "templates.py",
+      "line": 248,
+      "deprecated": false
+    },
+    {
+      "path": "/api/field-builder/config",
+      "methods": [
+        "POST"
+      ],
+      "file": "field_builder.py",
+      "line": 63,
+      "deprecated": false
+    },
+    {
+      "path": "/api/field-builder/configs",
+      "methods": [
+        "POST"
+      ],
+      "file": "field_builder.py",
+      "line": 64,
+      "deprecated": false
+    },
+    {
+      "path": "/api/field-builder/config/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "field_builder.py",
+      "line": 166,
+      "deprecated": false
+    },
+    {
+      "path": "/api/field-builder/configs/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "field_builder.py",
+      "line": 167,
+      "deprecated": false
+    },
+    {
+      "path": "/api/field-builder/preview",
+      "methods": [
+        "POST"
+      ],
+      "file": "field_builder.py",
+      "line": 214,
+      "deprecated": false
+    },
+    {
+      "path": "/api/field-builder/configs",
+      "methods": [
+        "GET"
+      ],
+      "file": "field_builder.py",
+      "line": 269,
+      "deprecated": false
+    },
+    {
+      "path": "/api/field-builder/config/<int:id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "field_builder.py",
+      "line": 312,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/all",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 98,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/<path:param_name>/details",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 234,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/stats",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 351,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/<int:id>",
+      "methods": [
+        "PUT"
+      ],
+      "file": "parameters.py",
+      "line": 439,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/search",
+      "methods": [
+        "POST"
+      ],
+      "file": "parameters.py",
+      "line": 490,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/common",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 537,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/validate",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 593,
+      "deprecated": false
+    },
+    {
+      "path": "/api/parameters/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 643,
+      "deprecated": false
+    },
+    {
+      "path": "/api/param-library/check",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 652,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-params/<int:param_id>/link-library",
+      "methods": [
+        "POST"
+      ],
+      "file": "parameters.py",
+      "line": 676,
+      "deprecated": false
+    },
+    {
+      "path": "/api/param-library/batch-check",
+      "methods": [
+        "POST"
+      ],
+      "file": "parameters.py",
+      "line": 720,
+      "deprecated": false
+    },
+    {
+      "path": "/api/alter-table/<int:param_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "parameters.py",
+      "line": 790,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows",
+      "methods": [
+        "GET"
+      ],
+      "file": "flows.py",
+      "line": 65,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows",
+      "methods": [
+        "POST"
+      ],
+      "file": "flows.py",
+      "line": 117,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/<int:flow_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "flows.py",
+      "line": 194,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/<int:flow_id>",
+      "methods": [
+        "PUT"
+      ],
+      "file": "flows.py",
+      "line": 210,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/<int:flow_id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "flows.py",
+      "line": 279,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/<int:flow_id>/load",
+      "methods": [
+        "POST"
+      ],
+      "file": "flows.py",
+      "line": 298,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/generate",
+      "methods": [
+        "POST"
+      ],
+      "file": "flows.py",
+      "line": 319,
+      "deprecated": false
+    },
+    {
+      "path": "/canvas/api/flows/save",
+      "methods": [
+        "POST"
+      ],
+      "file": "flows.py",
+      "line": 350,
+      "deprecated": false
+    },
+    {
+      "path": "/canvas/api/flows/<int:flowId>",
+      "methods": [
+        "GET"
+      ],
+      "file": "flows.py",
+      "line": 356,
+      "deprecated": false
+    },
+    {
+      "path": "/canvas/api/execute",
+      "methods": [
+        "POST"
+      ],
+      "file": "flows.py",
+      "line": 362,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/execute",
+      "methods": [
+        "POST"
+      ],
+      "file": "flows.py",
+      "line": 368,
+      "deprecated": false
+    },
+    {
+      "path": "/canvas/api/canvas/health",
+      "methods": [
+        "GET"
+      ],
+      "file": "flows.py",
+      "line": 378,
+      "deprecated": false
+    },
+    {
+      "path": "/canvas/api/preview-results",
+      "methods": [
+        "POST"
+      ],
+      "file": "flows.py",
+      "line": 387,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/batch",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "flows.py",
+      "line": 418,
+      "deprecated": false
+    },
+    {
+      "path": "/api/flows/batch-update",
+      "methods": [
+        "PUT"
+      ],
+      "file": "flows.py",
+      "line": 445,
+      "deprecated": false
+    },
+    {
+      "path": "/api/nodes",
+      "methods": [
+        "GET"
+      ],
+      "file": "nodes.py",
+      "line": 45,
+      "deprecated": false
+    },
+    {
+      "path": "/api/nodes",
+      "methods": [
+        "POST"
+      ],
+      "file": "nodes.py",
+      "line": 76,
+      "deprecated": false
+    },
+    {
+      "path": "/api/nodes/<int:node_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "nodes.py",
+      "line": 115,
+      "deprecated": false
+    },
+    {
+      "path": "/api/nodes/<int:node_id>",
+      "methods": [
+        "PUT"
+      ],
+      "file": "nodes.py",
+      "line": 131,
+      "deprecated": false
+    },
+    {
+      "path": "/api/nodes/<int:node_id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "nodes.py",
+      "line": 159,
+      "deprecated": false
+    },
+    {
+      "path": "/api/generate",
+      "methods": [
+        "POST"
+      ],
+      "file": "hql_generation.py",
+      "line": 38,
+      "deprecated": false
+    },
+    {
+      "path": "/api/hql/<int:id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "hql_generation.py",
+      "line": 69,
+      "deprecated": false
+    },
+    {
+      "path": "/api/validate-hql",
+      "methods": [
+        "POST"
+      ],
+      "file": "hql_generation.py",
+      "line": 102,
+      "deprecated": false
+    },
+    {
+      "path": "/api/hql/<int:id>/deactivate",
+      "methods": [
+        "POST"
+      ],
+      "file": "hql_generation.py",
+      "line": 224,
+      "deprecated": false
+    },
+    {
+      "path": "/api/hql/<int:id>/activate",
+      "methods": [
+        "POST"
+      ],
+      "file": "hql_generation.py",
+      "line": 243,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>",
+      "methods": [
+        "PUT"
+      ],
+      "file": "event_parameters.py",
+      "line": 47,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>",
+      "methods": [
+        "DELETE"
+      ],
+      "file": "event_parameters.py",
+      "line": 67,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>/history",
+      "methods": [
+        "GET"
+      ],
+      "file": "event_parameters.py",
+      "line": 85,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>/config",
+      "methods": [
+        "GET"
+      ],
+      "file": "event_parameters.py",
+      "line": 99,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>/config",
+      "methods": [
+        "PUT"
+      ],
+      "file": "event_parameters.py",
+      "line": 113,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>/rollback",
+      "methods": [
+        "POST"
+      ],
+      "file": "event_parameters.py",
+      "line": 131,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>/validation-rules",
+      "methods": [
+        "GET"
+      ],
+      "file": "event_parameters.py",
+      "line": 154,
+      "deprecated": false
+    },
+    {
+      "path": "/api/event-parameters/<int:id>/validation-rules",
+      "methods": [
+        "POST"
+      ],
+      "file": "event_parameters.py",
+      "line": 168,
+      "deprecated": false
+    }
+  ],
+  "graphql_operations": {
+    "queries": "{'all_game_stats', 'search_games', 'games', 'nodes', 'category', 'template', 'flow', 'node', 'search_categories', 'categories', 'event', 'event_parameter_extended', 'search_events', 'dashboard_stats', 'param_config', 'game_stats', 'events', 'parameter', 'join_config', 'flows', 'validation_rules', 'param_history', 'search_templates', 'join_configs', 'templates', 'game', 'search_parameters', 'parameters'}",
+    "mutations": "{'BatchDeleteGamesV2'}"
+  },
+  "migration": {
+    "migrated": [
+      {
+        "rest": "/api/events",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "events",
+          "event"
+        ],
+        "file": "events.py"
+      },
+      {
+        "rest": "/api/events",
+        "methods": [
+          "POST"
+        ],
+        "graphql": [
+          "events",
+          "event"
+        ],
+        "file": "events.py"
+      },
+      {
+        "rest": "/api/categories",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "categories",
+          "category"
+        ],
+        "file": "categories.py"
+      },
+      {
+        "rest": "/api/categories",
+        "methods": [
+          "POST"
+        ],
+        "graphql": [
+          "categories",
+          "category"
+        ],
+        "file": "categories.py"
+      },
+      {
+        "rest": "/api/games",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "games",
+          "game"
+        ],
+        "file": "games.py"
+      },
+      {
+        "rest": "/api/games",
+        "methods": [
+          "POST"
+        ],
+        "graphql": [
+          "games",
+          "game"
+        ],
+        "file": "games.py"
+      },
+      {
+        "rest": "/api/games",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "games",
+          "game"
+        ],
+        "file": "games.py"
+      },
+      {
+        "rest": "/api/games",
+        "methods": [
+          "POST"
+        ],
+        "graphql": [
+          "games",
+          "game"
+        ],
+        "file": "games.py"
+      },
+      {
+        "rest": "/api/templates",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "templates",
+          "template"
+        ],
+        "file": "templates.py"
+      },
+      {
+        "rest": "/api/templates",
+        "methods": [
+          "POST"
+        ],
+        "graphql": [
+          "templates",
+          "template"
+        ],
+        "file": "templates.py"
+      },
+      {
+        "rest": "/api/templates/<int:template_id>",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "template"
+        ],
+        "file": "templates.py"
+      },
+      {
+        "rest": "/api/templates/<int:template_id>",
+        "methods": [
+          "PUT"
+        ],
+        "graphql": [
+          "template"
+        ],
+        "file": "templates.py"
+      },
+      {
+        "rest": "/api/templates/<int:template_id>",
+        "methods": [
+          "DELETE"
+        ],
+        "graphql": [
+          "template"
+        ],
+        "file": "templates.py"
+      },
+      {
+        "rest": "/api/flows",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "flows",
+          "flow"
+        ],
+        "file": "flows.py"
+      },
+      {
+        "rest": "/api/flows",
+        "methods": [
+          "POST"
+        ],
+        "graphql": [
+          "flows",
+          "flow"
+        ],
+        "file": "flows.py"
+      },
+      {
+        "rest": "/api/flows/<int:flow_id>",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "flow"
+        ],
+        "file": "flows.py"
+      },
+      {
+        "rest": "/api/flows/<int:flow_id>",
+        "methods": [
+          "PUT"
+        ],
+        "graphql": [
+          "flow"
+        ],
+        "file": "flows.py"
+      },
+      {
+        "rest": "/api/flows/<int:flow_id>",
+        "methods": [
+          "DELETE"
+        ],
+        "graphql": [
+          "flow"
+        ],
+        "file": "flows.py"
+      },
+      {
+        "rest": "/api/nodes",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "nodes",
+          "node"
+        ],
+        "file": "nodes.py"
+      },
+      {
+        "rest": "/api/nodes",
+        "methods": [
+          "POST"
+        ],
+        "graphql": [
+          "nodes",
+          "node"
+        ],
+        "file": "nodes.py"
+      },
+      {
+        "rest": "/api/nodes/<int:node_id>",
+        "methods": [
+          "GET"
+        ],
+        "graphql": [
+          "node"
+        ],
+        "file": "nodes.py"
+      },
+      {
+        "rest": "/api/nodes/<int:node_id>",
+        "methods": [
+          "PUT"
+        ],
+        "graphql": [
+          "node"
+        ],
+        "file": "nodes.py"
+      },
+      {
+        "rest": "/api/nodes/<int:node_id>",
+        "methods": [
+          "DELETE"
+        ],
+        "graphql": [
+          "node"
+        ],
+        "file": "nodes.py"
+      }
+    ],
+    "not_migrated": [
+      {
+        "rest": "/api/events/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "events.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/events/<int:id>",
+        "methods": [
+          "PUT",
+          "PATCH"
+        ],
+        "suggested_graphql": null,
+        "file": "events.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/events/<int:id>/parameters",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "events.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/events/<int:event_id>/params",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "events.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/events/batch",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "events.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/events/batch-update",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "events.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/categories/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "categories.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/categories/<int:id>",
+        "methods": [
+          "PUT",
+          "PATCH"
+        ],
+        "suggested_graphql": null,
+        "file": "categories.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/categories/<int:id>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "categories.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/categories/batch",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "categories.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/categories/batch-update",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "categories.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events/<int:event_id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events/<int:event_id>",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events/<int:event_id>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events/<int:event_id>/parameters",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events/<int:event_id>/parameters/<param_name>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events/search",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/events/<int:event_id>/statistics",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "events_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/join-configs",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": [
+          "joinConfigs",
+          "joinConfig"
+        ],
+        "file": "join_configs.py",
+        "reason": "GraphQL operation not found"
+      },
+      {
+        "rest": "/api/join-configs/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": [
+          "joinConfig"
+        ],
+        "file": "join_configs.py",
+        "reason": "GraphQL operation not found"
+      },
+      {
+        "rest": "/api/join-configs",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": [
+          "joinConfigs",
+          "joinConfig"
+        ],
+        "file": "join_configs.py",
+        "reason": "GraphQL operation not found"
+      },
+      {
+        "rest": "/api/join-configs/<int:id>",
+        "methods": [
+          "PUT",
+          "PATCH"
+        ],
+        "suggested_graphql": [
+          "joinConfig"
+        ],
+        "file": "join_configs.py",
+        "reason": "GraphQL operation not found"
+      },
+      {
+        "rest": "/api/join-configs/<int:id>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": [
+          "joinConfig"
+        ],
+        "file": "join_configs.py",
+        "reason": "GraphQL operation not found"
+      },
+      {
+        "rest": "/api/v2/games",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/games",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/games/<int:gid>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/games/<int:gid>",
+        "methods": [
+          "PUT",
+          "PATCH"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/games/<int:gid>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/games/<int:gid>/impact",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/games/batch",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/v2/games/batch-update",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "games_v2.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/<int:game_gid>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/<int:game_gid>",
+        "methods": [
+          "PUT",
+          "PATCH"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/<int:game_gid>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/batch",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/<int:gid>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/by-gid/<int:gid>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/<int:gid>",
+        "methods": [
+          "PUT",
+          "PATCH"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/<int:gid>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/batch",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/games/batch-update",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "games.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/hql",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": [
+          "generateHQL"
+        ],
+        "file": "legacy_api.py",
+        "reason": "GraphQL operation not found"
+      },
+      {
+        "rest": "/api/hql/results",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/common-params",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/common-params/<int:id>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/common-params/batch",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/common-params/batch",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/preview-excel",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/logs/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/logs/<int:id>",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "legacy_api.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/dashboard/stats",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "dashboard.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/dashboard/summary",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "dashboard.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/templates/<int:template_id>/apply",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "templates.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/field-builder/config",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "field_builder.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/field-builder/configs",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "field_builder.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/field-builder/config/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "field_builder.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/field-builder/configs/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "field_builder.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/field-builder/preview",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "field_builder.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/field-builder/configs",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "field_builder.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/field-builder/config/<int:id>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "field_builder.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/all",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/<path:param_name>/details",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/stats",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/<int:id>",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/search",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/common",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/validate",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/parameters/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/param-library/check",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-params/<int:param_id>/link-library",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/param-library/batch-check",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/alter-table/<int:param_id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/flows/<int:flow_id>/load",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/flows/generate",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/canvas/api/flows/save",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/canvas/api/flows/<int:flowId>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/canvas/api/execute",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/flows/execute",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/canvas/api/canvas/health",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/canvas/api/preview-results",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/flows/batch",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/flows/batch-update",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "flows.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/generate",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "hql_generation.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/hql/<int:id>",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "hql_generation.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/validate-hql",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "hql_generation.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/hql/<int:id>/deactivate",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "hql_generation.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/hql/<int:id>/activate",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "hql_generation.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>",
+        "methods": [
+          "DELETE"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>/history",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>/config",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>/config",
+        "methods": [
+          "PUT"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>/rollback",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>/validation-rules",
+        "methods": [
+          "GET"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      },
+      {
+        "rest": "/api/event-parameters/<int:id>/validation-rules",
+        "methods": [
+          "POST"
+        ],
+        "suggested_graphql": null,
+        "file": "event_parameters.py",
+        "reason": "No GraphQL mapping defined"
+      }
+    ]
+  },
+  "stats": {
+    "total_rest": 120,
+    "active_rest": 120,
+    "deprecated_rest": 0,
+    "migrated_count": 23,
+    "not_migrated_count": 97,
+    "graphql_queries": 28,
+    "graphql_mutations": 1
+  }
+}

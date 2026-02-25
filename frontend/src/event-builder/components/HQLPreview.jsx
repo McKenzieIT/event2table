@@ -5,6 +5,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
 import { formatSQL as formatHQL } from '@shared/utils/sqlFormatter';
+import { Spinner } from '@shared/ui';
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import './HQLPreview.css';
 
 /**
@@ -67,6 +69,9 @@ const HQLPreview = forwardRef(({
   React.useEffect(() => {
     editorContentRef.current = editorContent;
   }, [editorContent]);
+
+  // Promise-based confirm dialog
+  const { confirm, ConfirmDialogComponent } = usePromiseConfirm();
 
   // 同步外部HQL内容到编辑器
   useEffect(() => {
@@ -139,16 +144,16 @@ const HQLPreview = forwardRef(({
   }, [sqlMode]); // 移除editorContent依赖，使用ref代替
 
   // 模式切换
-  const handleModeChange = useCallback((mode) => {
+  const handleModeChange = useCallback(async (mode) => {
     if (hasModifications) {
-      if (window.confirm('切换模式将丢失当前编辑内容，确定要继续吗？')) {
+      if (await confirm('切换模式将丢失当前编辑内容，确定要继续吗？')) {
         setHasModifications(false);
         onModeChange(mode);
       }
     } else {
       onModeChange(mode);
     }
-  }, [hasModifications, onModeChange]);
+  }, [hasModifications, onModeChange, confirm]);
 
   // 格式化SQL
   const handleFormat = useCallback(() => {
@@ -283,9 +288,8 @@ const HQLPreview = forwardRef(({
       {/* Content */}
       <div className="panel-content">
         {isLoading ? (
-          <div className="loading-state">
-            <i className="bi bi-arrow-repeat spin"></i>
-            <p>正在生成HQL...</p>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
+            <Spinner size="lg" label="正在生成HQL..." />
           </div>
         ) : isEmpty ? (
           <div className="empty-state">
@@ -356,6 +360,9 @@ const HQLPreview = forwardRef(({
           </small>
         </div>
       )}
+
+      {/* Promise-based confirm dialog */}
+      <ConfirmDialogComponent />
     </div>
   );
 });

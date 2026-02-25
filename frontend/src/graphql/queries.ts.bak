@@ -1,0 +1,501 @@
+/**
+ * GraphQL Queries
+ *
+ * Query definitions for Event2Table GraphQL API
+ */
+
+import { gql } from '@apollo/client';
+
+/**
+ * Get all games with pagination
+ */
+export const GET_GAMES = gql`
+  query GetGames($limit: Int, $offset: Int) {
+    games(limit: $limit, offset: $offset) {
+      gid
+      name
+      odsDb
+      eventCount
+      parameterCount
+    }
+  }
+`;
+
+/**
+ * Get a single game by GID
+ */
+export const GET_GAME = gql`
+  query GetGame($gid: Int!) {
+    game(gid: $gid) {
+      gid
+      name
+      odsDb
+      eventCount
+      parameterCount
+    }
+  }
+`;
+
+/**
+ * Search games by name or GID
+ */
+export const SEARCH_GAMES = gql`
+  query SearchGames($query: String!) {
+    searchGames(query: $query) {
+      gid
+      name
+      odsDb
+    }
+  }
+`;
+
+/**
+ * Get events for a game
+ */
+export const GET_EVENTS = gql`
+  query GetEvents($gameGid: Int!, $category: String, $limit: Int, $offset: Int) {
+    events(gameGid: $gameGid, category: $category, limit: $limit, offset: $offset) {
+      id
+      eventName
+      eventNameCn
+      categoryName
+      paramCount
+    }
+  }
+`;
+
+/**
+ * Get a single event by ID
+ */
+export const GET_EVENT = gql`
+  query GetEvent($id: Int!) {
+    event(id: $id) {
+      id
+      gameGid
+      eventName
+      eventNameCn
+      categoryId
+      categoryName
+      sourceTable
+      targetTable
+      paramCount
+    }
+  }
+`;
+
+/**
+ * Search events
+ */
+export const SEARCH_EVENTS = gql`
+  query SearchEvents($query: String!, $gameGid: Int) {
+    searchEvents(query: $query, gameGid: $gameGid) {
+      id
+      eventName
+      eventNameCn
+      gameGid
+    }
+  }
+`;
+
+/**
+ * Get all categories with pagination
+ */
+export const GET_CATEGORIES = gql`
+  query GetCategories($limit: Int, $offset: Int) {
+    categories(limit: $limit, offset: $offset) {
+      id
+      name
+      eventCount
+    }
+  }
+`;
+
+/**
+ * Get a single category by ID
+ */
+export const GET_CATEGORY = gql`
+  query GetCategory($id: Int!) {
+    category(id: $id) {
+      id
+      name
+      eventCount
+    }
+  }
+`;
+
+/**
+ * Search categories by name
+ */
+export const SEARCH_CATEGORIES = gql`
+  query SearchCategories($query: String!) {
+    searchCategories(query: $query) {
+      id
+      name
+      eventCount
+    }
+  }
+`;
+
+/**
+ * Get parameters for an event
+ */
+export const GET_PARAMETERS = gql`
+  query GetParameters($eventId: Int!, $activeOnly: Boolean) {
+    parameters(eventId: $eventId, activeOnly: $activeOnly) {
+      id
+      eventId
+      paramName
+      paramNameCn
+      paramType
+      paramDescription
+      jsonPath
+      isActive
+      version
+    }
+  }
+`;
+
+/**
+ * Get a single parameter by ID
+ */
+export const GET_PARAMETER = gql`
+  query GetParameter($id: Int!) {
+    parameter(id: $id) {
+      id
+      eventId
+      paramName
+      paramNameCn
+      paramType
+      paramDescription
+      jsonPath
+      isActive
+      version
+    }
+  }
+`;
+
+/**
+ * Search parameters
+ */
+export const SEARCH_PARAMETERS = gql`
+  query SearchParameters($query: String!, $eventId: Int) {
+    searchParameters(query: $query, eventId: $eventId) {
+      id
+      eventId
+      paramName
+      paramNameCn
+      paramType
+    }
+  }
+`;
+
+// ============================================
+// Event Node Builder Queries
+// ============================================
+
+/**
+ * Get event fields for the event node builder
+ * Returns all available fields for an event
+ */
+export const GET_EVENT_FIELDS = gql`
+  query GetEventFields($eventId: Int!, $fieldType: FieldTypeEnum) {
+    eventFields(eventId: $eventId, fieldType: $fieldType) {
+      name
+      displayName
+      type
+      category
+      isCommon
+      dataType
+      jsonPath
+      usageCount
+    }
+  }
+`;
+
+/**
+ * Get common parameters for a game
+ */
+export const GET_COMMON_PARAMETERS = gql`
+  query GetCommonParameters($gameGid: Int!, $threshold: Float) {
+    commonParameters(gameGid: $gameGid, threshold: $threshold) {
+      paramName
+      paramType
+      paramDescription
+      occurrenceCount
+      totalEvents
+      threshold
+      eventCodes
+      isCommon
+      commonalityScore
+    }
+  }
+`;
+
+/**
+ * Get parameters management data
+ */
+export const GET_PARAMETERS_MANAGEMENT = gql`
+  query GetParametersManagement($gameGid: Int!, $mode: ParameterFilterModeEnum, $eventId: Int) {
+    parametersManagement(gameGid: $gameGid, mode: $mode, eventId: $eventId) {
+      id
+      eventId
+      paramName
+      paramNameCn
+      paramType
+      paramDescription
+      jsonPath
+      isActive
+      version
+      usageCount
+      eventsCount
+      isCommon
+      eventCode
+      eventName
+      gameGid
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get parameter changes history
+ */
+export const GET_PARAMETER_CHANGES = gql`
+  query GetParameterChanges($gameGid: Int!, $parameterId: Int, $limit: Int) {
+    parameterChanges(gameGid: $gameGid, parameterId: $parameterId, limit: $limit) {
+      id
+      parameterId
+      changeType
+      oldValue
+      newValue
+      changedBy
+      changedAt
+    }
+  }
+`;
+
+/**
+ * Get dashboard statistics
+ */
+export const GET_DASHBOARD_STATS = gql`
+  query GetDashboardStats {
+    dashboardStats {
+      totalGames
+      totalEvents
+      totalParameters
+      totalCategories
+      eventsLast7Days
+      parametersLast7Days
+    }
+  }
+`;
+
+/**
+ * Get game statistics
+ */
+export const GET_GAME_STATS = gql`
+  query GetGameStats($gameGid: Int!) {
+    gameStats(gameGid: $gameGid) {
+      gameGid
+      gameName
+      eventCount
+      parameterCount
+      categoryCount
+    }
+  }
+`;
+
+/**
+ * Get all game statistics
+ */
+export const GET_ALL_GAME_STATS = gql`
+  query GetAllGameStats($limit: Int) {
+    allGameStats(limit: $limit) {
+      gameGid
+      gameName
+      eventCount
+      parameterCount
+      categoryCount
+    }
+  }
+`;
+
+/**
+ * Get templates
+ */
+export const GET_TEMPLATES = gql`
+  query GetTemplates($gameGid: Int, $category: String, $search: String, $limit: Int, $offset: Int) {
+    templates(gameGid: $gameGid, category: $category, search: $search, limit: $limit, offset: $offset) {
+      id
+      name
+      content
+      category
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get a single template by ID
+ */
+export const GET_TEMPLATE = gql`
+  query GetTemplate($id: Int!) {
+    template(id: $id) {
+      id
+      name
+      content
+      category
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get nodes
+ */
+export const GET_NODES = gql`
+  query GetNodes($gameGid: Int, $nodeType: String, $limit: Int, $offset: Int) {
+    nodes(gameGid: $gameGid, nodeType: $nodeType, limit: $limit, offset: $offset) {
+      id
+      gameGid
+      nodeType
+      nodeName
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get flows
+ */
+export const GET_FLOWS = gql`
+  query GetFlows($gameGid: Int, $flowType: String, $limit: Int, $offset: Int) {
+    flows(gameGid: $gameGid, flowType: $flowType, limit: $limit, offset: $offset) {
+      id
+      gameGid
+      flowName
+      flowType
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get templates
+ */
+export const GET_TEMPLATES = gql`
+  query GetTemplates($gameGid: Int, $category: String, $search: String, $limit: Int, $offset: Int) {
+    templates(gameGid: $gameGid, category: $category, search: $search, limit: $limit, offset: $offset) {
+      id
+      name
+      content
+      category
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get a single template by ID
+ */
+export const GET_TEMPLATE = gql`
+  query GetTemplate($id: Int!) {
+    template(id: $id) {
+      id
+      name
+      content
+      category
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get nodes
+ */
+export const GET_NODES = gql`
+  query GetNodes($gameGid: Int, $nodeType: String, $limit: Int, $offset: Int) {
+    nodes(gameGid: $gameGid, nodeType: $nodeType, limit: $limit, offset: $offset) {
+      id
+      gameGid
+      nodeType
+      nodeName
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get flows
+ */
+export const GET_FLOWS = gql`
+  query GetFlows($gameGid: Int, $flowType: String, $limit: Int, $offset: Int) {
+    flows(gameGid: $gameGid, flowType: $flowType, limit: $limit, offset: $offset) {
+      id
+      gameGid
+      flowName
+      flowType
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get a single flow by ID
+ */
+export const GET_FLOW = gql`
+  query GetFlow($id: Int!) {
+    flow(id: $id) {
+      id
+      gameGid
+      flowName
+      flowType
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * Get all parameters for a game
+ */
+export const GET_ALL_PARAMETERS_BY_GAME = gql`
+  query GetAllParametersByGame($gameGid: Int!) {
+    parametersManagement(gameGid: $gameGid, mode: "all") {
+      id
+      paramName
+      paramNameCn
+      paramType
+      paramDescription
+      jsonPath
+      isActive
+      version
+      usageCount
+      eventsCount
+      isCommon
+      eventCode
+      eventName
+      gameGid
+      createdAt
+      updatedAt
+    }
+  }
+`;

@@ -1,0 +1,236 @@
+backend/core/cache/capacity_monitor.py:112: error: Returning Any from function
+declared to return "Optional[float]"  [no-any-return]
+                    return exhaustion_time
+                    ^~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:168: error: Incompatible types in
+assignment (expression has type "str", target has type "Optional[int]") 
+[assignment]
+                stats["l1_exhaustion_prediction"] = l1_exhaustion.isoforma...
+                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:170: error: Incompatible types in
+assignment (expression has type "float", target has type "Optional[int]") 
+[assignment]
+                stats["days_until_exhaustion_l1"] = round(days_remaining, ...
+                                                    ^~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:175: error: Incompatible types in
+assignment (expression has type "str", target has type "Optional[int]") 
+[assignment]
+                stats["l2_exhaustion_prediction"] = l2_exhaustion.isoforma...
+                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:177: error: Incompatible types in
+assignment (expression has type "float", target has type "Optional[int]") 
+[assignment]
+                stats["days_until_exhaustion_l2"] = round(days_remaining, ...
+                                                    ^~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:219: error: Need type annotation for
+"prometheus_metrics"  [var-annotated]
+            self.prometheus_metrics = {
+                                      ^
+backend/core/cache/capacity_monitor.py:257: error: Returning Any from function
+declared to return "float"  [no-any-return]
+                return len(self.cache.l1_cache) / self.cache.l1_size
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:282: error: Returning Any from function
+declared to return "float"  [no-any-return]
+                return used_memory / maxmemory if maxmemory > 0 else 0.0
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:333: error: Returning Any from function
+declared to return "float"  [no-any-return]
+            return (used_memory / maxmemory * 100) if maxmemory > 0 else 0...
+            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/capacity_monitor.py:530: error: Incompatible types in
+assignment (expression has type "Thread", variable has type "None") 
+[assignment]
+                self._monitoring_thread = threading.Thread(
+                                          ^
+backend/core/cache/capacity_monitor.py:535: error: "None" has no attribute
+"start"  [attr-defined]
+                self._monitoring_thread.start()
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/cache_system.py:301: error: Argument "key" to "min" has
+incompatible type overloaded function; expected
+"Callable[[str], Union[SupportsDunderLT[Any], SupportsDunderGT[Any]]]" 
+[arg-type]
+    ...        oldest_key = min(self.l1_timestamps, key=self.l1_timestamps.ge...
+                                                        ^~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/cache_system.py:413: error: Need type annotation for
+"pattern_constraints" (hint: "pattern_constraints: Dict[<type>, <type>] = ...") 
+[var-annotated]
+            pattern_constraints = {}
+            ^~~~~~~~~~~~~~~~~~~
+backend/core/cache/cache_system.py:450: error: Incompatible types in assignment
+(expression has type "float", variable has type "int")  [assignment]
+                    hit_rate = (self.stats["l1_hits"] + self.stats["l2_hit...
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~...
+backend/core/cache/cache_system.py:514: error: "Flask" has no attribute "cache"
+ [attr-defined]
+                return current_app.cache
+                       ^~~~~~~~~~~~~~~~~
+backend/core/cache/cache_system.py:637: error: Argument after ** must be a
+mapping, not "object"  [arg-type]
+                self.invalidate_pattern(pattern, **kwargs)
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/cache_system.py:687: error: "Flask" has no attribute "cache"
+ [attr-defined]
+                    cache = current_app.cache
+                            ^~~~~~~~~~~~~~~~~
+backend/core/cache/cache_system.py:806: error: Need type annotation for
+"patterns"  [var-annotated]
+            patterns = [
+                       ^
+backend/core/cache/cache_system.py:867: error: "Flask" has no attribute "cache"
+ [attr-defined]
+            return current_app.cache
+                   ^~~~~~~~~~~~~~~~~
+backend/core/cache/statistics.py:61: error: Need type annotation for
+"response_times"  [var-annotated]
+            self.response_times = {
+                                  ^
+backend/core/cache/statistics.py:301: error: Need type annotation for
+"trend_data"  [var-annotated]
+                trend_data = {
+                             ^
+backend/core/cache/invalidator.py:304: error: Incompatible default for argument
+"game_gid" (default has type "None", argument has type "int")  [assignment]
+    ...ory_related(self, category_id: int, game_gid: int = None) -> Set[str]:
+                                                           ^~~~
+backend/core/cache/invalidator.py:304: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+backend/core/cache/invalidator.py:304: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+backend/core/cache/invalidator.py:320: error: Incompatible default for argument
+"game_gid" (default has type "None", argument has type "int")  [assignment]
+    ...ate_related(self, template_id: int, game_gid: int = None) -> Set[str]:
+                                                           ^~~~
+backend/core/cache/invalidator.py:320: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+backend/core/cache/invalidator.py:320: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+backend/core/cache/bloom_filter_enhanced.py:178: error: Incompatible types in
+assignment (expression has type "float", variable has type "None")  [assignment]
+                self._last_persistence = time.time()
+                                         ^~~~~~~~~~~
+backend/core/cache/bloom_filter_enhanced.py:416: error: Incompatible types in
+assignment (expression has type "float", variable has type "None")  [assignment]
+                    self._last_rebuild = time.time()
+                                         ^~~~~~~~~~~
+backend/core/cache/bloom_filter_enhanced.py:433: error: Incompatible types in
+assignment (expression has type "str", target has type "Optional[int]") 
+[assignment]
+                rebuild_stats['error'] = str(e)
+                                         ^~~~~~
+backend/core/cache/bloom_filter_enhanced.py:436: error: Incompatible types in
+assignment (expression has type "float", target has type "Optional[int]") 
+[assignment]
+                rebuild_stats['duration_seconds'] = time.time() - start_ti...
+                                                    ^~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/tests/test_consistency.py:165: error: Need type annotation
+for "results"  [var-annotated]
+            results = {"key1": [], "key2": []}
+                      ^~~~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/cache_hierarchical.py:290: error: Argument "key" to "min"
+has incompatible type overloaded function; expected
+"Callable[[str], Union[SupportsDunderLT[Any], SupportsDunderGT[Any]]]" 
+[arg-type]
+    ...        oldest_key = min(self.l1_timestamps, key=self.l1_timestamps.ge...
+                                                        ^~~~~~~~~~~~~~~~~~~~~~
+backend/core/cache/cache_hierarchical.py:399: error: Need type annotation for
+"pattern_constraints" (hint: "pattern_constraints: Dict[<type>, <type>] = ...") 
+[var-annotated]
+            pattern_constraints = {}
+            ^~~~~~~~~~~~~~~~~~~
+backend/core/cache/cache_hierarchical.py:435: error: Incompatible types in
+assignment (expression has type "float", variable has type "int")  [assignment]
+                hit_rate = (self.stats["l1_hits"] + self.stats["l2_hits"])...
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~...
+backend/core/cache/degradation.py:29: error: Incompatible types in assignment
+(expression has type "None", variable has type "HierarchicalCache") 
+[assignment]
+        hierarchical_cache = None
+                             ^~~~
+backend/core/cache/degradation.py:30: error: Cannot assign to a type  [misc]
+        CacheKeyBuilder = None
+        ^
+backend/core/cache/degradation.py:30: error: Incompatible types in assignment
+(expression has type "None", variable has type "type[CacheKeyBuilder]") 
+[assignment]
+        CacheKeyBuilder = None
+                          ^~~~
+backend/core/cache/degradation.py:31: error: Incompatible types in assignment
+(expression has type "None", variable has type "Callable[[], Any]") 
+[assignment]
+        get_cache = None
+                    ^~~~
+backend/core/cache/degradation.py:32: error: Cannot assign to a type  [misc]
+        RedisError = Exception
+        ^
+backend/core/cache/degradation.py:32: error: Incompatible types in assignment
+(expression has type "type[Exception]", variable has type "type[RedisError]") 
+[assignment]
+        RedisError = Exception
+                     ^~~~~~~~~
+backend/core/cache/degradation.py:119: error: Incompatible types in assignment
+(expression has type "float", variable has type "int")  [assignment]
+            self.last_health_check = time.time()
+                                     ^~~~~~~~~~~
+backend/core/cache/degradation.py:187: error: Incompatible types in assignment
+(expression has type "float", target has type "int")  [assignment]
+                    self.stats['last_degradation_time'] = time.time()
+                                                          ^~~~~~~~~~~
+backend/core/cache/degradation.py:196: error: Incompatible types in assignment
+(expression has type "float", target has type "int")  [assignment]
+                    self.stats['last_recovery_time'] = time.time()
+                                                       ^~~~~~~~~~~
+backend/core/cache/intelligent_warmer.py:30: error: Incompatible types in
+assignment (expression has type "None", variable has type "HierarchicalCache") 
+[assignment]
+        hierarchical_cache = None
+                             ^~~~
+backend/core/cache/intelligent_warmer.py:31: error: Cannot assign to a type 
+[misc]
+        CacheKeyBuilder = None
+        ^
+backend/core/cache/intelligent_warmer.py:31: error: Incompatible types in
+assignment (expression has type "None", variable has type
+"type[CacheKeyBuilder]")  [assignment]
+        CacheKeyBuilder = None
+                          ^~~~
+backend/core/cache/intelligent_warmer.py:32: error: Incompatible types in
+assignment (expression has type "None", variable has type "Callable[[], Any]") 
+[assignment]
+        get_cache = None
+                    ^~~~
+backend/core/cache/intelligent_warmer.py:47: error: Need type annotation for
+"buffer"  [var-annotated]
+            self.buffer = deque(maxlen=size)
+                          ^~~~~~~~~~~~~~~~~~
+backend/core/cache/intelligent_warmer.py:124: error: Need type annotation for
+"key_scores"  [var-annotated]
+            key_scores = defaultdict(float)
+            ^~~~~~~~~~
+backend/core/cache/intelligent_warmer.py:240: error: Need type annotation for
+"key_frequency"  [var-annotated]
+                key_frequency = defaultdict(int)
+                ^~~~~~~~~~~~~
+backend/core/cache/intelligent_warmer.py:376: error: Unsupported operand types
+for / ("int" and "None")  [operator]
+                'buffer_usage': f"{total_access / self.access_log.buffer.m...
+                                ^
+backend/core/cache/intelligent_warmer.py:376: note: Right operand is of type "Optional[int]"
+backend/core/cache/tests/test_degradation.py:242: error: Incompatible types in
+assignment (expression has type "float", variable has type "int")  [assignment]
+            manager.last_health_check = time.time()
+                                        ^~~~~~~~~~~
+backend/core/cache/tests/test_degradation.py:246: error: Incompatible types in
+assignment (expression has type "float", variable has type "int")  [assignment]
+            manager.last_health_check = time.time() - 11
+                                        ^~~~~~~~~~~~~~~~
+backend/core/cache/tests/test_degradation.py:259: error: Incompatible types in
+assignment (expression has type "float", variable has type "int")  [assignment]
+            manager.last_health_check = time.time() - 20  # 超过健康检查间隔
+                                        ^~~~~~~~~~~~~~~~
+backend/core/cache/tests/test_degradation.py:283: error: Incompatible types in
+assignment (expression has type "float", variable has type "int")  [assignment]
+            manager.last_health_check = time.time()  # 刚检查过
+                                        ^~~~~~~~~~~
+backend/core/cache/tests/test_degradation.py:370: error: Incompatible types in
+assignment (expression has type "float", variable has type "int")  [assignment]
+            manager.last_health_check = 123456.78
+                                        ^~~~~~~~~
+Found 53 errors in 10 files (checked 24 source files)

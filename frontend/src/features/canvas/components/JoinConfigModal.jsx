@@ -105,7 +105,7 @@ export default function JoinConfigModal({
         isOpen={isOpen}
         onClose={onClose}
         title="JOIN节点配置"
-        size="modal-lg"
+        size="lg"
       >
         <div className="join-config-modal">
           <div className="empty-state">
@@ -129,7 +129,7 @@ export default function JoinConfigModal({
       isOpen={isOpen}
       onClose={onClose}
       title="JOIN节点配置"
-      size="modal-lg"
+      size="lg"
     >
       <div className="join-config-modal">
         {/* JOIN类型选择 */}

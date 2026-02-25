@@ -6,7 +6,32 @@
  * - 300ms防抖
  * - Ctrl+K / Cmd+K 快捷键
  * - 清除按钮
+ *
+ * Version: 2.0 (2026-02-22)
+ * - Fixed icon-text overlap issue
+ * - Unified spacing with CSS variables
+ * - Removed duplicate width/height definitions
  */
+
+/* ========================================
+   Search Input Spacing Variables
+   ======================================== */
+:root {
+  /* 搜索图标尺寸 */
+  --search-icon-width: 20px;
+  --search-icon-height: 20px;
+
+  /* 搜索图标间距 */
+  --search-icon-left: var(--space-4, 16px);
+  --search-icon-gap: var(--space-2, 8px);
+
+  /* 输入框左padding = 图标左偏移 + 图标宽度 + 间距 */
+  --search-input-padding-left: calc(
+    var(--search-icon-left) +
+    var(--search-icon-width) +
+    var(--search-icon-gap)
+  ); /* 16px + 20px + 8px = 44px */
+}
 
 .search-input-wrapper {
   position: relative;
@@ -26,8 +51,8 @@
   width: 100%;
   /* 统一高度为44px，与Input组件一致 */
   height: 44px;
-  /* 统一padding为var(--space-3) var(--space-4)，与Input组件一致 */
-  padding: var(--space-3) var(--space-4);
+  /* 统一垂直padding为var(--space-3)，左padding预留图标空间 */
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--search-input-padding-left);
   /* 统一字体大小为var(--text-sm)，与Input组件一致 */
   font-size: var(--text-sm);
   line-height: 1.5;
@@ -58,18 +83,16 @@
 .search-icon {
   position: absolute;
   /* 统一左偏移为var(--space-4) (16px)，与Input组件一致 */
-  left: var(--space-4);
+  left: var(--search-icon-left);
   color: var(--text-tertiary, #64748B);
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 统一图标尺寸为24px，与Input组件一致 */
-  width: 24px;
-  height: 24px;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
+  /* 统一图标尺寸为20px */
+  width: var(--search-icon-width);
+  height: var(--search-icon-height);
+  flex-shrink: 0; /* 防止图标被压缩 */
 }
 
 /* 快捷键提示 */
@@ -134,4 +157,57 @@
   border-color: var(--border-active, #06B6D4);
   box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1),
               0 0 12px rgba(6, 182, 212, 0.15);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+@media (max-width: 768px) {
+  :root {
+    /* 移动端保持相同间距 */
+    --search-icon-width: 20px;
+    --search-icon-height: 20px;
+    --search-icon-left: var(--space-3, 12px);
+    --search-icon-gap: var(--space-2, 8px);
+    --search-input-padding-left: calc(
+      var(--search-icon-left) +
+      var(--search-icon-width) +
+      var(--search-icon-gap)
+    ); /* 12px + 20px + 8px = 40px */
+  }
+
+  .search-input {
+    /* 移动端调整padding */
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--search-input-padding-left);
+  }
+
+  .shortcut-hint {
+    /* 移动端隐藏快捷键提示 */
+    display: none;
+  }
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .search-input,
+  .search-icon,
+  .clear-button,
+  .shortcut-hint {
+    transition: none !important;
+  }
+}
+
+/* 禁用状态 */
+.search-input-wrapper--disabled .search-input {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--bg-surface, rgba(31, 41, 55, 0.6));
+}
+
+.search-input--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--bg-surface, rgba(31, 41, 55, 0.6));
 }

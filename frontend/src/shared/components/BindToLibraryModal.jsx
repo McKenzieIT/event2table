@@ -78,11 +78,23 @@ export function BindToLibraryModal({ paramId, paramName, templateId, onClose, on
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+    >
       <div className="modal-content glass-card" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h4>绑定到参数库</h4>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">✕</button>
         </div>
         <div className="modal-body">
           <div className="mb-3">

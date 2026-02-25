@@ -21,6 +21,8 @@ import NodeConfigModal from '@event-builder/components/modals/NodeConfigModal';
 import EventNodeBuilderErrorBoundary from '@event-builder/components/ErrorBoundary';
 import PerformanceIndicator from '@event-builder/components/HQLPreviewV2/PerformanceIndicator';
 import DebugViewer from '@event-builder/components/HQLPreviewV2/DebugViewer';
+import FieldSelectionModal from '@event-builder/components/FieldSelectionModal';
+import QuickActionButtons from '@event-builder/components/QuickActionButtons';
 import { Button } from '@shared/ui/Button';
 import { useToast } from '@shared/ui/Toast/Toast';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
@@ -76,6 +78,7 @@ export default function EventNodeBuilder() {
   const [showWhereConfig, setShowWhereConfig] = useState(false);
   const [showHQLDetails, setShowHQLDetails] = useState(false);
   const [showNodeConfig, setShowNodeConfig] = useState(false);
+  const [showFieldSelection, setShowFieldSelection] = useState(false);
 
   // 性能分析和调试模式面板状态
   const [showPerformancePanel, setShowPerformancePanel] = useState(false);
@@ -134,6 +137,11 @@ export default function EventNodeBuilder() {
     // Clear canvas fields and WHERE conditions when switching events
     // This ensures users start fresh with each new event selection
     clearCanvas();
+
+    // Show field selection modal when event is selected
+    if (selectedEvent) {
+      setShowFieldSelection(true);
+    }
   }, [selectedEvent, clearCanvas]);
 
   // 加载配置（编辑模式）
@@ -274,7 +282,26 @@ export default function EventNodeBuilder() {
     // 更新字段
     updateField(editingField.id, updates);
     setEditingField(null);
-  }, [editingField, updateField]);
+  }, [editingField, updateField, error]);
+
+  /**
+   * Handle batch fields added from FieldSelectionModal or QuickActionButtons
+   */
+  const handleFieldsAdded = useCallback((fields) => {
+    if (!Array.isArray(fields)) return;
+
+    // Add all fields to canvas
+    fields.forEach((field, index) => {
+      addFieldToCanvas(
+        field.fieldType,
+        field.fieldName,
+        field.displayName,
+        field.paramId
+      );
+    });
+
+    success(`已添加 ${fields.length} 个字段到画布`);
+  }, [addFieldToCanvas, success]);
 
   // 处理清空画布
   const handleClearCanvas = useCallback(() => {
@@ -318,7 +345,15 @@ export default function EventNodeBuilder() {
           setShowPerformancePanel={setShowPerformancePanel}
           showDebugPanel={showDebugPanel}
           setShowDebugPanel={setShowDebugPanel}
-        />
+        >
+          {/* Quick Action Buttons in Header */}
+          {selectedEvent && (
+            <QuickActionButtons
+              eventId={selectedEvent.id}
+              onFieldsAdded={handleFieldsAdded}
+            />
+          )}
+        </PageHeader>
 
         <div className="workspace" data-testid="event-node-builder-workspace">
           <LeftSidebar
@@ -413,6 +448,16 @@ export default function EventNodeBuilder() {
             onClose={() => setShowNodeConfig(false)}
             disabled={!selectedEvent || canvasFields.length === 0}
             data-testid="node-config-modal"
+          />
+        )}
+
+        {/* Field Selection Modal */}
+        {showFieldSelection && selectedEvent && (
+          <FieldSelectionModal
+            isOpen={showFieldSelection}
+            onClose={() => setShowFieldSelection(false)}
+            eventId={selectedEvent.id}
+            onFieldsAdded={handleFieldsAdded}
           />
         )}
 

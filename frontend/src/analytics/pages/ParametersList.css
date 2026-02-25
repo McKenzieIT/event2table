@@ -249,38 +249,11 @@
   overflow-y: auto;
 }
 
-.oled-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-body);
-}
-
-.oled-table th,
-.oled-table td {
-  padding: var(--space-4);
-  text-align: left;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
+/* Page-specific table styles - generic styles moved to shared Table.css */
 .oled-table thead th {
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
-  font-family: var(--font-mono);
-  font-weight: var(--font-semibold);
-  color: var(--text-secondary);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-.oled-table tbody tr {
-  transition: background-color var(--transition-base);
-}
-
-.oled-table tbody tr:hover {
-  background: var(--bg-glass-light);
 }
 
 /* Badge Styles */

@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Button } from '@shared/ui';
+import { Button, Input } from '@shared/ui';
+import { Spinner } from '@shared/ui';
 import { useFormValidation } from '../../shared/hooks/useFormValidation';
 import './LogForm.css';
 
@@ -155,7 +156,11 @@ function LogForm() {
   }, [formData.log_type, isEdit]);
 
   if (isLoading) {
-    return <div className="loading">加载中...</div>;
+    return (
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spinner size="lg" label="加载中..." />
+      </div>
+    );
   }
 
   return (
@@ -171,62 +176,47 @@ function LogForm() {
       <form onSubmit={handleSubmit} className="form-card glass-card">
 
         <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="log_type">
-              <i className="bi bi-tag"></i>
-              日志类型 *
-            </label>
-            <input
-              type="text"
-              id="log_type"
-              className={`form-control ${touched.log_type && errors.log_type ? 'is-invalid' : ''}`}
-              value={formData.log_type}
-              onChange={(e) => setFormData({ ...formData, log_type: e.target.value })}
-              onBlur={handleBlur ? () => handleBlur('log_type') : undefined}
-              placeholder="例如: card.gacha"
-              readOnly={isEdit}
-            />
-            {touched.log_type && errors.log_type && <div className="invalid-feedback">{errors.log_type}</div>}
-            <span className="form-hint">
-              <i className="bi bi-info-circle"></i>
-              使用点号分隔的格式，如: card.gacha, user.login
-            </span>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="source_table">
-              <i className="bi bi-database"></i>
-              源表 (ODS) *
-            </label>
-            <input
-              type="text"
-              id="source_table"
-              className={`form-control ${touched.source_table && errors.source_table ? 'is-invalid' : ''}`}
-              value={formData.source_table}
-              onChange={(e) => setFormData({ ...formData, source_table: e.target.value })}
-              onBlur={handleBlur ? () => handleBlur('source_table') : undefined}
-              placeholder="例如: ods_card_gacha"
-            />
-            {touched.source_table && errors.source_table && <div className="invalid-feedback">{errors.source_table}</div>}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="target_table">
-            <i className="bi bi-table"></i>
-            目标表 (DWD) *
-          </label>
-          <input
+          <Input
+            id="log_type"
+            name="log_type"
+            label="日志类型 *"
             type="text"
-            id="target_table"
-            className={`form-control ${touched.target_table && errors.target_table ? 'is-invalid' : ''}`}
-            value={formData.target_table}
-            onChange={(e) => setFormData({ ...formData, target_table: e.target.value })}
-            onBlur={handleBlur ? () => handleBlur('target_table') : undefined}
-            placeholder="例如: dwd_card_gacha"
+            value={formData.log_type}
+            onChange={(e) => setFormData({ ...formData, log_type: e.target.value })}
+            onBlur={handleBlur ? () => handleBlur('log_type') : undefined}
+            placeholder="例如: card.gacha"
+            readOnly={isEdit}
+            error={touched.log_type && errors.log_type ? errors.log_type : undefined}
+            helperText="使用点号分隔的格式，如: card.gacha, user.login"
+            icon="bi-tag"
           />
-          {touched.target_table && errors.target_table && <div className="invalid-feedback">{errors.target_table}</div>}
+
+          <Input
+            id="source_table"
+            name="source_table"
+            label="源表 (ODS) *"
+            type="text"
+            value={formData.source_table}
+            onChange={(e) => setFormData({ ...formData, source_table: e.target.value })}
+            onBlur={handleBlur ? () => handleBlur('source_table') : undefined}
+            placeholder="例如: ods_card_gacha"
+            error={touched.source_table && errors.source_table ? errors.source_table : undefined}
+            icon="bi-database"
+          />
         </div>
+
+        <Input
+          id="target_table"
+          name="target_table"
+          label="目标表 (DWD) *"
+          type="text"
+          value={formData.target_table}
+          onChange={(e) => setFormData({ ...formData, target_table: e.target.value })}
+          onBlur={handleBlur ? () => handleBlur('target_table') : undefined}
+          placeholder="例如: dwd_card_gacha"
+          error={touched.target_table && errors.target_table ? errors.target_table : undefined}
+          icon="bi-table"
+        />
 
         <div className="form-divider"></div>
 
@@ -238,10 +228,9 @@ function LogForm() {
             <div key={index} className="field-row glass-card">
               <div className="field-grid">
                 <div className="field-item">
-                  <label>字段名</label>
-                  <input
+                  <Input
+                    label="字段名"
                     type="text"
-                    className="form-control"
                     value={field.name}
                     onChange={(e) => updateField(index, 'name', e.target.value)}
                     required
@@ -261,10 +250,9 @@ function LogForm() {
                   </select>
                 </div>
                 <div className="field-item comment">
-                  <label>说明</label>
-                  <input
+                  <Input
+                    label="说明"
                     type="text"
-                    className="form-control"
                     value={field.comment}
                     onChange={(e) => updateField(index, 'comment', e.target.value)}
                   />
@@ -302,10 +290,10 @@ function LogForm() {
         <div className="form-group">
           <div className="joinable-logs-container">
             {formData.can_join_with.map((log, index) => (
-              <input
+              <Input
                 key={index}
                 type="text"
-                className="form-control joinable-log"
+                className="joinable-log"
                 value={log}
                 onChange={(e) => updateJoinableLog(index, e.target.value)}
                 placeholder="输入日志类型，例如: item.change"

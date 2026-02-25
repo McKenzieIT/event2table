@@ -4,15 +4,63 @@
  * Two-layer slide-out animation on top of game management modal
  */
 
+/* Modal size - match GameManagementModal */
+.modal-content--full.add-game-modal {
+  max-width: 1400px;
+  width: 1400px;
+  height: 85vh;
+  max-height: 900px;
+}
+
 /* Higher z-index for two-layer modal effect */
 .add-game-modal {
   z-index: 1100 !important;
+  padding: 1.5rem;
 }
 
-.add-game-modal .cyber-modal__body {
-  padding: 1.5rem;
-  max-height: 70vh;
-  overflow-y: auto;
+/* Modal header with close button */
+.add-game-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.add-game-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+/* Close button - using BaseModal CSS */
+.add-game-modal-header .modal-close {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-game-modal-header .modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.add-game-modal-header .modal-close:active {
+  transform: scale(0.95);
 }
 
 .add-game-modal__content {
@@ -26,6 +74,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
@@ -39,8 +88,7 @@
   margin-left: 0.25rem;
 }
 
-/* Form inputs - Input component handles cyber-input styling */
-/* Note: We only style select and textarea directly, not input */
+/* Form inputs */
 .add-game-modal select.cyber-select {
   width: 100%;
   padding: 0.625rem 0.75rem;
@@ -140,14 +188,21 @@
 
 /* Responsive Design */
 @media (max-width: 640px) {
-  .add-game-modal .cyber-modal__body {
+  .modal-content--full.add-game-modal {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+  }
+  
+  .add-game-modal {
     padding: 1rem;
   }
-
+  
   .form-actions {
     flex-direction: column;
   }
-
+  
   .form-actions button {
     width: 100%;
   }

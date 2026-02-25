@@ -184,12 +184,15 @@ export default function HQLPreviewModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
+      size="xl"
+      showHeader={false}
       enableEscClose={true}
       overlayClassName="hql-preview-modal-overlay"
       contentClassName="glass-card hql-preview-modal"
       zIndex={1200}
+      contentStyle={{ maxWidth: '1200px', height: '90vh' }}
     >
-      <div className="modal-content glass-card hql-preview-modal" style={{ backgroundColor: 'transparent', width: '95vw', maxWidth: '1200px', height: '90vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="modal-content glass-card hql-preview-modal" style={{ backgroundColor: 'transparent', display: 'flex', flexDirection: 'column' }}>
         {/* Modal Header */}
         <div className="modal-header">
           <div className="header-left">
@@ -216,7 +219,7 @@ export default function HQLPreviewModal({
             </div>
           </div>
 
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             <i className="bi bi-x"></i>
           </button>
         </div>
