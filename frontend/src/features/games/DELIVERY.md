@@ -3,7 +3,7 @@
 ## ✅ 交付内容
 
 ### 核心组件
-- ✅ **GameManagementModal.jsx** (389 行)
+- ✅ **GameManagementModal.tsx** (389 行)
   - 主从视图布局
   - 完整的CRUD功能
   - 智能编辑模式

@@ -2,26 +2,52 @@
  * TextArea Component - Cyberpunk Lab Theme Styles
  *
  * Multi-line text input with focus glow
+ * 
+ * 🆕 2026-02-24: Updated to use Grid layout matching Input/Select components
  */
 
+/* ========================================
+   Grid Layout System (matching Input/Select)
+   ======================================== */
+
 .cyber-textarea {
+  font-family: var(--font-body);
   width: 100%;
+  display: grid;
+  grid-template-columns: var(--form-label-width, 140px) 1fr;
+  gap: var(--form-field-gap, var(--space-3));
+  align-items: start;
+  margin-bottom: var(--form-row-gap, var(--space-5));
 }
 
+/* ========================================
+   Label (Grid Column 1)
+   ======================================== */
+
 .cyber-textarea__label {
+  grid-column: 1;
+  grid-row: 1;
   display: block;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-secondary, #94A3B8);
-  margin-bottom: 8px;
+  padding-top: 11px;
+  text-align: right;
+  margin-bottom: 0;
 }
 
 .cyber-textarea__required {
-  color: var(--color-primary, #06B6D4);
+  color: var(--danger);
   margin-left: 2px;
 }
 
+/* ========================================
+   Wrapper (Grid Column 2)
+   ======================================== */
+
 .cyber-textarea-wrapper {
+  grid-column: 2;
+  grid-row: 1;
   position: relative;
   background: var(--bg-secondary, rgba(15, 23, 42, 0.6));
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
@@ -35,9 +61,54 @@
 
 .cyber-textarea-wrapper:focus-within {
   border-color: var(--color-primary, #06B6D4);
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+  box-shadow: 0 3px rgba(6,  0 0182, 212, 0.1);
 }
 
+/* Error state */
+.cyber-textarea-wrapper--invalid {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.cyber-textarea-wrapper--invalid:focus-within {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.cyber-textarea--invalid {
+  border-color: var(--danger);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.cyber-textarea-wrapper--invalid .cyber-textarea {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* ========================================
+   TextArea Input Element
+   ======================================== */
+
+.cyber-textarea__input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text-primary, #F1F5F9);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+  min-height: 100px;
+}
+
+/* Legacy class name for backward compatibility */
 .cyber-textarea {
   width: 100%;
   padding: 12px 16px;
@@ -53,30 +124,77 @@
   min-height: 100px;
 }
 
-.cyber-textarea::placeholder {
+.cyber-textarea::placeholder,
+.cyber-textarea__input::placeholder {
   color: var(--text-tertiary, #64748B);
 }
 
-.cyber-textarea:disabled {
+.cyber-textarea:disabled,
+.cyber-textarea__input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ========================================
+   Character Count & Helper Text
+   ======================================== */
 
 .cyber-textarea__count {
   font-size: 12px;
   color: var(--text-tertiary, #64748B);
   text-align: right;
   margin-top: 6px;
+  grid-column: 2;
 }
 
 .cyber-textarea__error {
-  font-size: 13px;
-  color: #EF4444;
-  margin-top: 6px;
+  font-size: var(--text-xs, 12px);
+  color: var(--danger);
+  margin-top: var(--space-2, 8px);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  grid-column: 2;
+}
+
+.cyber-textarea__error::before {
+  content: '⚠';
+  font-size: var(--text-sm, 14px);
 }
 
 .cyber-textarea__helper {
-  font-size: 13px;
+  font-size: var(--text-xs, 12px);
   color: var(--text-tertiary, #64748B);
-  margin-top: 6px;
+  margin-top: var(--space-2, 8px);
+  grid-column: 2;
+}
+
+/* ========================================
+   Mobile Responsive
+   ======================================== */
+
+@media (max-width: 768px) {
+  .cyber-textarea {
+    grid-template-columns: 1fr;
+    gap: var(--space-2, 8px);
+  }
+
+  .cyber-textarea__label {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: left;
+    padding-top: 0;
+    margin-bottom: var(--space-1, 4px);
+  }
+
+  .cyber-textarea-wrapper {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .cyber-textarea__error,
+  .cyber-textarea__helper,
+  .cyber-textarea__count {
+    grid-column: 1;
+  }
 }

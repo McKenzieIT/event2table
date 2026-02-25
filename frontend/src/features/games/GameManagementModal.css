@@ -20,11 +20,12 @@
 
 /* ===== Left Panel - Game List ===== */
 .game-list-panel {
-  flex: 0 0 350px;
+  flex: 0 0 450px;
   display: flex;
   flex-direction: column;
   background: #0f1419;
   border-right: 1px solid #1e293b;
+  min-width: 450px;
 }
 
 .game-list-panel .panel-header {
@@ -95,12 +96,13 @@
 .game-list-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.375rem;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  min-height: 60px;
 }
 
 .game-list-item:hover {
@@ -222,34 +224,54 @@
   color: #e2e8f0;
 }
 
-.form-group .cyber-input,
-.form-group select.cyber-select {
-  width: 100%;
-  padding: 0.625rem 0.75rem;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 0.375rem;
-  color: #e2e8f0;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
+/* ========================================
+   编辑提示样式 (新增)
+   ======================================== */
+
+.edit-hint,
+.unsaved-changes-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: 1.5;
 }
 
-.form-group select.cyber-select:disabled {
-  cursor: not-allowed;
+.edit-hint {
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: var(--cyan-400);
 }
 
-.form-group .cyber-input:focus,
-.form-group select.cyber-select:focus {
-  outline: none;
-  border-color: #06b6d4;
-  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+.unsaved-changes-hint {
+  background: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  color: var(--warning);
 }
 
-.form-group .cyber-input:disabled,
-.form-group select.cyber-select:disabled {
-  background: #0f1419;
-  color: #64748b;
+.hint-icon {
+  font-size: var(--text-base);
+  flex-shrink: 0;
+}
+
+/* ========================================
+   Select样式定制 (已移除 - 使用ODSSelector组件)
+   ======================================== */
+
+/* .form-group select.cyber-select { ... } */
+
+/* Form Label样式 (用于ODSSelector) */
+.form-label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
 }
 
 .readonly-field {

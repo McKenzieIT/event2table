@@ -5,7 +5,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEvents } from '@shared/api/events';
-import { SearchInput } from '@shared/ui';
+import { SearchInput, Skeleton, ErrorState } from '@shared/ui';
 
 export default function EventSelector({ gameGid, onSelect, selectedEvent }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,6 +14,9 @@ export default function EventSelector({ gameGid, onSelect, selectedEvent }) {
   const {
     data,
     isLoading,
+    isError,
+    error,
+    refetch,
   } = useQuery({
     queryKey: ['events', gameGid, searchQuery],
     queryFn: () => fetchEvents(gameGid, 1, searchQuery),
@@ -70,7 +73,15 @@ export default function EventSelector({ gameGid, onSelect, selectedEvent }) {
         </div>
         <div className="dropdown-list">
           {isLoading && events.length === 0 ? (
-            <div className="dropdown-loading">加载中...</div>
+            <div className="dropdown-loading">
+              <Skeleton type="inline" rows={5} height={40} />
+            </div>
+          ) : isError ? (
+            <ErrorState
+              message="无法加载事件列表"
+              error={error}
+              onRetry={refetch}
+            />
           ) : events.length === 0 ? (
             <div className="dropdown-placeholder">没有找到事件</div>
           ) : (

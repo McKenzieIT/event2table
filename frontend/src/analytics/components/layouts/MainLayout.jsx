@@ -7,6 +7,8 @@ import AddGameModal from '../../../features/games/AddGameModal';
 import { useGameStore } from '../../../stores/gameStore';
 import { useGameContext } from '@/shared/hooks/useGameContext';
 import Loading from '@shared/ui/Loading';
+import Breadcrumb from '@shared/ui/Breadcrumb/Breadcrumb';
+import { generateBreadcrumbs } from '@shared/config/breadcrumbConfig';
 import './MainLayout.css';
 
 export default function MainLayout() {
@@ -79,11 +81,20 @@ export default function MainLayout() {
 
   const outletKey = useMemo(() => location.pathname, [location.pathname]);
 
+  const breadcrumbItems = useMemo(() => {
+    return generateBreadcrumbs(location.pathname);
+  }, [location.pathname]);
+
   return (
     <div className="app-shell" data-testid="main-layout">
       <div className="app-body">
         <Sidebar currentGame={currentGame} />
         <main className="app-content" data-testid="main-content">
+          {breadcrumbItems.length > 1 && (
+            <div className="breadcrumb-container">
+              <Breadcrumb items={breadcrumbItems} />
+            </div>
+          )}
           <Suspense fallback={<Loading />}>
             <Outlet key={outletKey} context={contextValue} />
           </Suspense>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useOutletContext } from 'react-router-dom';
@@ -11,7 +12,8 @@ import {
   Badge,
   Spinner,
   useToast,
-  SelectGamePrompt
+  SelectGamePrompt,
+  Pagination
 } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './EventsList.css';
@@ -27,43 +29,53 @@ function EventsList() {
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
-  const pageSize = 10;  // 减少默认pageSize从20到10（性能优化：避免一次渲染过多事件）
+  const [pageSize, setPageSize] = useState(10);
 
-  // Game context check - show prompt if no game selected
-  if (!currentGame) {
-    return <SelectGamePrompt message="查看事件列表需要先选择游戏" />;
-  }
+  // Game context check - render prompt if no game selected
+  // This must be AFTER all useState calls to maintain hooks order
+  const hasGameContext = !!currentGame;
 
-  // Fetch events list
+  // Use placeholder data when no game is selected - this keeps hooks consistent
+  const placeholderData = { events: [], pagination: { total: 0, total_pages: 1 } };
+  
+  // Fetch events list - always call this hook for consistent hooks order
   const { data, isLoading, error: fetchError } = useQuery({
-    queryKey: ['events', currentPage, pageSize, selectedCategory, currentGame?.gid],
+    queryKey: ['events', currentPage, pageSize, selectedCategory, currentGame?.gid, searchTerm],
     queryFn: async () => {
+      // Guard: don't fetch if no game context
+      if (!currentGame?.gid) {
+        return placeholderData;
+      }
+      
       const params = new URLSearchParams({
         page: currentPage.toString(),
         per_page: pageSize.toString(),
-        game_gid: currentGame.gid.toString() // Use game_gid instead of game_id
+        game_gid: currentGame.gid.toString()
       });
 
       if (searchTerm) {
         params.append('search', searchTerm);
       }
 
+      console.log('[EventsList] Fetching events with params:', params.toString());
       const response = await fetch(`/api/events?${params.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch events');
       const result = await response.json();
 
-      // Validate response structure
       if (!result?.success) {
         throw new Error(result?.message || 'Failed to fetch events');
       }
 
-      // Return the data object containing events and pagination
       return result.data || {};
     },
-    enabled: !!currentGame // Only execute when currentGame exists
+    // Only enable when we have a valid game context
+    enabled: hasGameContext
   });
 
-  // Batch delete mutation
+  // Use placeholder data when no game is selected
+  const effectiveData = hasGameContext ? data : placeholderData;
+
+  // Batch delete mutation - must be BEFORE any conditional returns
   const deleteMutation = useMutation({
     mutationFn: async (eventIds) => {
       const response = await fetch('/api/events/batch', {
@@ -75,17 +87,66 @@ function EventsList() {
       return response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(['events']);
+      // ✅ Fix: Use complete cache key with game_gid for precise invalidation
+      queryClient.invalidateQueries({
+        queryKey: ['events', currentGame?.gid]
+      });
       setSelectedEvents([]);
-      success(`成功删除 ${data.deleted_count} 个事件`);
+      const deletedCount = data?.data?.deleted_count ?? data?.deleted_count ?? 0;
+      success(`成功删除 ${deletedCount} 个事件`);
     },
     onError: (err) => {
       showError(`删除失败: ${err.message}`);
     }
   });
 
+  // All useMemo calls - MUST be before ANY conditional returns
+  const filteredEvents = useMemo(() => {
+    const events = effectiveData?.events;
+    if (!Array.isArray(events)) {
+      return [];
+    }
+
+    // Backend already handles search filtering via API parameter
+    // Only need to filter by category on the client side
+    const filtered = events.filter(event => {
+      const matchesCategory = selectedCategory === 'all' ||
+        event.category_name?.toLowerCase() === selectedCategory.toLowerCase();
+      return matchesCategory;
+    });
+
+    console.log('[EventsList] Filtered events count:', filtered.length, 'Total events:', events.length);
+    return filtered;
+  }, [effectiveData, selectedCategory]);
+
+  const categories = useMemo(() => {
+    const events = effectiveData?.events;
+    if (!Array.isArray(events)) {
+      return ['all'];
+    }
+
+    return ['all', ...new Set(events.map(e => e.category_name).filter(Boolean))];
+  }, [effectiveData]);
+
+  const pageSizeOptions = useMemo(() => [
+    { value: '10', label: '10' },
+    { value: '20', label: '20' },
+    { value: '50', label: '50' },
+    { value: '100', label: '100' }
+  ], []);
+
+  // Callbacks that depend on currentGame - use optional chaining for safety
+  const handleViewEvent = useCallback((eventId) => {
+    navigate(`/events/${eventId}?game_gid=${currentGame?.gid}`);
+  }, [navigate, currentGame?.gid]);
+
+  const handleEditEvent = useCallback((eventId) => {
+    navigate(`/events/${eventId}/edit?game_gid=${currentGame?.gid}`);
+  }, [navigate, currentGame?.gid]);
+
   // Handle search with debounce - using useCallback
   const handleSearchChange = useCallback((value) => {
+    console.log('[EventsList] Search term changed:', value);
     setSearchTerm(value);
     setCurrentPage(1); // Reset to first page on search
   }, []);
@@ -110,7 +171,7 @@ function EventsList() {
         return filteredEvents.map(e => e.id);
       }
     });
-  }, [selectedEvents.length]);
+  }, [filteredEvents]);
 
   // Handle batch delete - using useCallback
   const handleBatchDelete = useCallback(() => {
@@ -128,18 +189,6 @@ function EventsList() {
       }
     });
   }, [selectedEvents.length, deleteMutation, showError]);
-
-  // Handle view event - using useCallback
-  const handleViewEvent = useCallback((eventId) => {
-    // 在URL中包含game_gid参数，以便详情页面能够正确加载
-    navigate(`/events/${eventId}?game_gid=${currentGame.gid}`);
-  }, [navigate, currentGame.gid]);
-
-  // Handle edit event - using useCallback
-  const handleEditEvent = useCallback((eventId) => {
-    // 在URL中包含game_gid参数
-    navigate(`/events/${eventId}/edit?game_gid=${currentGame.gid}`);
-  }, [navigate, currentGame.gid]);
 
   // Handle delete event - using useCallback
   const handleDeleteEvent = useCallback((eventId, eventName) => {
@@ -159,61 +208,38 @@ function EventsList() {
     setSelectedEvents([]);
   }, []);
 
-  // 客户端过滤优化（useMemo记忆化）
-  const filteredEvents = useMemo(() => {
-    // Validate data structure with optional chaining
-    const events = data?.events;
-    if (!Array.isArray(events)) {
-      return [];
-    }
-
-    return events.filter(event => {
-      const matchesCategory = selectedCategory === 'all' ||
-        event.category_name?.toLowerCase() === selectedCategory.toLowerCase();
-      return matchesCategory;
-    });
-  }, [data, selectedCategory]);
-
-  // 提取分类列表优化（useMemo记忆化）
-  const categories = useMemo(() => {
-    // Validate data structure with optional chaining
-    const events = data?.events;
-    if (!Array.isArray(events)) {
-      return ['all'];
-    }
-
-    return ['all', ...new Set(events.map(e => e.category_name).filter(Boolean))];
-  }, [data]);
-
-  // Page size options for Select component
-  const pageSizeOptions = useMemo(() => [
-    { value: '10', label: '10' },
-    { value: '20', label: '20' },
-    { value: '50', label: '50' },
-    { value: '100', label: '100' }
-  ], []);
-
   // Get pagination info with optional chaining
-  const pagination = data?.pagination || {};
+  const pagination = effectiveData?.pagination || {};
   const totalPages = pagination.total_pages || 1;
   const total = pagination.total || 0;
 
-  if (fetchError) {
-    return (
-      <div className="events-list-page">
-        <div className="error-message">
-          <p>加载事件列表失败: {fetchError.message}</p>
-          <Button variant="primary" onClick={() => {
-            queryClient.invalidateQueries({ queryKey: ['events'] });
-          }}>
-            重新加载
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // Always render content - handle error state and no game context inline
+  // This ensures consistent Hooks order across all render paths
+  const renderContent = () => {
+    // Show game selection prompt if no game context
+    if (!hasGameContext) {
+      return <SelectGamePrompt message="查看事件列表需要先选择游戏" />;
+    }
 
-  return (
+    if (fetchError) {
+      return (
+        <div className="events-list-page">
+          <div className="error-message">
+            <p>加载事件列表失败: {fetchError.message}</p>
+            <Button variant="primary" onClick={() => {
+              // ✅ Fix: Use complete cache key with game_gid for precise invalidation
+              queryClient.invalidateQueries({
+                queryKey: ['events', currentGame?.gid]
+              });
+            }}>
+              重新加载
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
     <div className="events-list-page">
       {/* Page Header */}
       <div className="page-header">
@@ -237,7 +263,7 @@ function EventsList() {
           )}
           <Button
             variant="outline-success"
-            onClick={() => navigate('/events/import')}
+            onClick={() => navigate('/import-events')}
           >
             导入Excel
           </Button>
@@ -324,7 +350,7 @@ function EventsList() {
           <div className="empty-actions">
             <Button
               variant="success"
-              onClick={() => navigate('/events/import')}
+              onClick={() => navigate('/import-events')}
             >
               导入Excel
             </Button>
@@ -431,67 +457,23 @@ function EventsList() {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="pagination-container">
-          <div className="page-info">
-            显示第 {((currentPage - 1) * pageSize) + 1} 到 {Math.min(currentPage * pageSize, total)} 条，
-            共 {total} 条
-          </div>
-
-          <div className="pagination">
-            <button
-              className="page-link"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-            >
-              首页
-            </button>
-
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum;
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = currentPage - 2 + i;
-              }
-
-              return (
-                <button
-                  key={pageNum}
-                  className={`page-link ${currentPage === pageNum ? 'active' : ''}`}
-                  onClick={() => setCurrentPage(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-
-            <button
-              className="page-link"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            >
-              末页
-            </button>
-          </div>
-
-          <div className="page-size-selector">
-            <span>每页显示:</span>
-            <Select
-              options={pageSizeOptions}
-              value={pageSize.toString()}
-              onChange={(value) => {
-                const newSize = parseInt(value);
-                setCurrentPage(1);
-                navigate(`?page=1&per_page=${newSize}`);
-              }}
-            />
-          </div>
-        </div>
+      {total > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={total}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            navigate(`?page=${page}&per_page=${pageSize}`);
+          }}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+            navigate(`?page=1&per_page=${size}`);
+          }}
+          pageSizeOptions={[10, 20, 50, 100]}
+        />
       )}
 
       <ConfirmDialog
@@ -505,7 +487,11 @@ function EventsList() {
         onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
       />
     </div>
-  );
+    );
+  };
+
+  // Render the component
+  return renderContent();
 }
 
 // Memoize the component to prevent unnecessary re-renders

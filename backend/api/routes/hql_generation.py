@@ -23,10 +23,16 @@ from backend.core.utils import (
     validate_json_request,
 )
 
+# Import cached HQL service
+from backend.services.hql.hql_service_cached import HQLServiceCached
+
 # Import the parent blueprint
 from .. import api_bp
 
 logger = logging.getLogger(__name__)
+
+# Initialize cached HQL service
+hql_service = HQLServiceCached()
 
 
 @api_bp.route("/api/generate", methods=["POST"])
@@ -52,10 +58,12 @@ def api_generate_hql():
             "message": "HQL generation endpoint - requires implementation with HQLManager",
         }
 
-        return json_success_response(data=results, message=f"Generated {len(results)} HQL files")
+        return json_success_response(
+            data=results, message=f"Generated {len(results)} HQL files"
+        )
     except Exception as e:
-        logger.error(f"Error generating HQL: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error generating HQL: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/hql/<int:id>", methods=["GET"])
@@ -87,14 +95,14 @@ def api_get_hql(id):
             return json_success_response(data=hql)
         return json_error_response("HQL not found", status_code=404)
     except Exception as e:
-        logger.error(f"Error getting HQL {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error getting HQL {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/validate-hql", methods=["POST"])
 def api_validate_hql():
     """
-    API: Validate HQL syntax and structure
+    API: Validate HQL syntax and structure (with caching)
 
     Request body:
     {
@@ -121,18 +129,21 @@ def api_validate_hql():
         return json_error_response(error)
 
     hql_content = data["hql_content"]
+    use_cache = data.get("use_cache", True)  # 默认使用缓存
 
     try:
-        import re
-
-        # Initialize result
+        # 使用缓存增强版服务验证HQL
+        validation_result = hql_service.validate_hql(hql_content, use_cache=use_cache)
+        
+        # 转换为API响应格式
         result = {
-            "is_valid": True,
-            "error_count": 0,
-            "sanitized_fields": [],
-            "errors": [],
+            "is_valid": validation_result.get("valid", False),
+            "error_count": len(validation_result.get("syntax_errors", [])),
+            "sanitized_fields": [],  # TODO: 从验证结果中提取
+            "errors": validation_result.get("syntax_errors", []),
             "warnings": [],
             "recommendations": [],
+            "performance": validation_result.get("performance", {}),
         }
 
         # 1. Check for field names with dots and track sanitization
@@ -151,7 +162,9 @@ def api_validate_hql():
             )
 
         # 2. Check for CREATE VIEW syntax
-        if not re.search(r"CREATE\s+(OR\s+REPLACE\s+)?VIEW", hql_content, re.IGNORECASE):
+        if not re.search(
+            r"CREATE\s+(OR\s+REPLACE\s+)?VIEW", hql_content, re.IGNORECASE
+        ):
             result["errors"].append("Missing CREATE VIEW statement")
             result["is_valid"] = False
             result["error_count"] += 1
@@ -170,9 +183,13 @@ def api_validate_hql():
 
         # 5. Check for common SQL keywords
         required_keywords = ["SELECT", "FROM"]
-        missing_keywords = [kw for kw in required_keywords if kw not in hql_content.upper()]
+        missing_keywords = [
+            kw for kw in required_keywords if kw not in hql_content.upper()
+        ]
         if missing_keywords:
-            result["errors"].append(f'Missing required keywords: {", ".join(missing_keywords)}')
+            result["errors"].append(
+                f"Missing required keywords: {', '.join(missing_keywords)}"
+            )
             result["is_valid"] = False
             result["error_count"] += len(missing_keywords)
 
@@ -200,8 +217,8 @@ def api_validate_hql():
 
         return json_success_response(data=result)
     except Exception as e:
-        logger.error(f"Error validating HQL: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error validating HQL: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/hql/<int:id>/deactivate", methods=["POST"])
@@ -219,8 +236,8 @@ def api_deactivate_hql(id):
         execute_write("UPDATE hql_statements SET is_active = 0 WHERE id = ?", (id,))
         return json_success_response(message="HQL deactivated successfully")
     except Exception as e:
-        logger.error(f"Error deactivating HQL {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error deactivating HQL {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/hql/<int:id>/activate", methods=["POST"])
@@ -252,5 +269,5 @@ def api_activate_hql(id):
 
         return json_error_response("HQL is already the latest version", status_code=400)
     except Exception as e:
-        logger.error(f"Error activating HQL {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error activating HQL {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)

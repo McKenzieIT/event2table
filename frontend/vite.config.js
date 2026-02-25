@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
   },
   // 优化依赖预构建，强制预构建ReactFlow以避免TDZ错误
   optimizeDeps: {
-    include: ['reactflow'],  // 强制预构建ReactFlow，确保模块正确加载
+    include: ['reactflow', '@apollo/client'],  // 强制预构建ReactFlow和Apollo Client，确保模块正确加载
   },
   server: {
     port: 5173,
@@ -67,9 +67,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     rollupOptions: {
-      // Remove reactflow from external so it gets bundled
-      // Only exclude canvas-react which is a separate package
-      external: [/^@canvas-react\/.*/],
+      // Externalize Apollo Client as it has complex export structure
+      external: [/^@canvas-react\/.*/, '@apollo/client'],
       output: {
         // 🔥 性能优化：更细粒度的代码分割
         manualChunks: {

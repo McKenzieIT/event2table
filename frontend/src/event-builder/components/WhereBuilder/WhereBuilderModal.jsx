@@ -7,6 +7,7 @@ import { generateWhereClause, validateWhereConditions } from '@shared/utils/wher
 import WhereBuilderCanvas from './WhereBuilderCanvas';
 import './WhereBuilderModal.css';
 import { BaseModal } from '@shared/ui/BaseModal';
+import toast from 'react-hot-toast';
 
 export default function WhereBuilderModal({
   isOpen,
@@ -59,7 +60,7 @@ export default function WhereBuilderModal({
   const handleApply = () => {
     const validation = validateWhereConditions(localConditions);
     if (!validation.valid) {
-      alert(`配置错误:\n${validation.errors.join('\n')}`);
+      toast.error(`配置错误:\n${validation.errors.join('\n')}`);
       return;
     }
     onApply(localConditions);
@@ -82,6 +83,8 @@ export default function WhereBuilderModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
+      size="xl"
+      showHeader={false}
       enableEscClose={true}
       onBeforeClose={handleBeforeClose}
       confirmConfig={{
@@ -102,7 +105,7 @@ export default function WhereBuilderModal({
               WHERE条件构建器
             </h3>
           </div>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             <i className="bi bi-x"></i>
           </button>
         </div>
@@ -115,7 +118,7 @@ export default function WhereBuilderModal({
               <h4>WHERE预览</h4>
               <button className="btn btn-sm btn-outline-secondary" onClick={() => {
                 navigator.clipboard.writeText(preview);
-                alert('已复制到剪贴板');
+                toast.success('已复制到剪贴板');
               }}>
                 <i className="bi bi-clipboard"></i> 复制
               </button>

@@ -1,0 +1,77 @@
+/* Virtual Table Styles */
+
+.virtual-table-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.virtual-table-header {
+  display: flex;
+  align-items: center;
+  background: var(--surface-elevated);
+  border-bottom: 2px solid var(--border-strong);
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.virtual-table-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-base);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.virtual-table-row:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-default);
+}
+
+.virtual-table-row.selected {
+  background: var(--cyan-50);
+  border-left: 3px solid var(--cyan-500);
+}
+
+.virtual-table-cell {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 骨架屏 */
+.virtual-table-skeleton .skeleton-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-base);
+}
+
+.virtual-table-skeleton .skeleton-cell {
+  height: 16px;
+  margin: 0 var(--space-2);
+  background: linear-gradient(
+    90deg,
+    var(--surface-hover) 25%,
+    var(--surface-active) 50%,
+    var(--surface-hover) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-sm);
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}

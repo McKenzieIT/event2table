@@ -5,12 +5,12 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchParams } from "@shared/api/eventNodeBuilder";
-import { SearchInput } from "@shared/ui";
+import { SearchInput, Skeleton, ErrorState } from "@shared/ui";
 
 export default function ParamSelector({ eventId, onAddField, disabled }) {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["params", eventId, searchQuery],
     queryFn: () => fetchParams(eventId),
     enabled: !!eventId,
@@ -105,7 +105,15 @@ export default function ParamSelector({ eventId, onAddField, disabled }) {
           {!eventId ? (
             <div className="dropdown-placeholder">请先选择事件</div>
           ) : isLoading ? (
-            <div className="dropdown-loading">加载中...</div>
+            <div className="dropdown-loading">
+              <Skeleton type="inline" rows={5} height={40} />
+            </div>
+          ) : isError ? (
+            <ErrorState
+              message="无法加载参数列表"
+              error={error}
+              onRetry={refetch}
+            />
           ) : filteredParams.length === 0 ? (
             <div className="dropdown-placeholder">没有找到参数</div>
           ) : (

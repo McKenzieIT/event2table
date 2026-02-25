@@ -7,16 +7,14 @@ import MainLayout from "@analytics/components/layouts/MainLayout";
 // Reason: React Query hooks are incompatible with React.lazy() + Suspense
 // Impact: Prevents React Error #321, #310, and removeChild errors
 // ============================================================================
-import Dashboard from "@analytics/pages/Dashboard";
+import Dashboard from "@analytics/pages/DashboardGraphQL";
 import CanvasPage from "@features/canvas/pages/CanvasPage";
 import EventNodeBuilder from "@event-builder/pages/EventNodeBuilder";
 import EventNodes from "@analytics/pages/EventNodes";
-import GamesList from "@analytics/pages/GamesList";
-import EventsList from "@analytics/pages/EventsList";
+import EventsList from "@analytics/pages/EventsListGraphQL";
 import FlowsList from "@analytics/pages/FlowsList";
-import GameForm from "@analytics/pages/GameForm";
 import EventForm from "@analytics/pages/EventForm";
-import CategoriesList from "@analytics/pages/CategoriesList";
+import CategoriesList from "@analytics/pages/CategoriesListGraphQL";
 import CommonParamsList from "@analytics/pages/CommonParamsList";
 import ParametersList from "@analytics/pages/ParametersList";
 import HqlManage from "@analytics/pages/HqlManage";
@@ -24,8 +22,8 @@ import HqlResults from "@analytics/pages/HqlResults";
 import LogForm from "@analytics/pages/LogForm";
 import ParameterAnalysis from "@analytics/pages/ParameterAnalysis";
 import ParameterCompare from "@analytics/pages/ParameterCompare";
-import ParametersEnhanced from "@analytics/pages/ParametersEnhanced";
-import EventDetail from "@analytics/pages/EventDetail";
+import ParametersEnhanced from "@analytics/pages/ParametersEnhancedGraphQL";
+import EventDetail from "@analytics/pages/EventDetailGraphQL";
 
 // ============================================================================
 // NON-REACT QUERY PAGES (Safe for Lazy Loading)
@@ -71,9 +69,6 @@ export const routes = [
       { path: "canvas", element: <CanvasPage /> },
       { path: "event-node-builder", element: <EventNodeBuilder /> },
       { path: "flows", element: <FlowsList /> },
-      { path: "games/create", element: <GameForm /> },
-      { path: "games/:gid/edit", element: <GameForm /> },
-      { path: "games", element: <GamesList /> },
       { path: "categories", element: <CategoriesList /> },
       { path: "events/create", element: <EventForm /> },
       { path: "events/:id", element: <EventDetail /> },

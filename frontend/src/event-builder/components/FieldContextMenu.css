@@ -1,0 +1,153 @@
+/**
+ * FieldContextMenu Styles
+ * 右键上下文菜单样式
+ */
+
+.field-context-menu {
+  /* Layout */
+  min-width: 220px;
+
+  /* Visual: Glass morphism */
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  padding: 8px 0;
+
+  /* Animation */
+  animation: contextMenuFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Header */
+.field-context-menu .context-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field-context-menu .context-menu-header i {
+  font-size: 12px;
+}
+
+/* Divider */
+.field-context-menu .context-menu-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}
+
+/* Menu List */
+.field-context-menu .context-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.field-context-menu .context-menu-list:last-child {
+  padding-bottom: 4px;
+}
+
+/* Menu Item */
+.field-context-menu .context-menu-item {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+
+  /* Typography */
+  font-size: 13px;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+
+  /* Cursor */
+  cursor: pointer;
+  user-select: none;
+
+  /* Transition */
+  transition: all 0.15s ease;
+
+  /* Icon */
+}
+
+.field-context-menu .context-menu-item i {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.field-context-menu .context-menu-item:hover {
+  background: rgba(6, 182, 212, 0.1);
+  color: rgba(255, 255, 255, 1);
+}
+
+.field-context-menu .context-menu-item:hover i {
+  color: #06B6D4;
+}
+
+/* Shortcut hint */
+.field-context-menu .shortcut {
+  margin-left: auto;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .field-context-menu {
+    min-width: 200px;
+  }
+
+  .field-context-menu .context-menu-item {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+
+.field-context-menu .context-menu-item:focus-visible {
+  outline: 2px solid rgba(6, 182, 212, 0.6);
+  outline-offset: -2px;
+}
+
+/* ========================================
+   Reduce Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .field-context-menu,
+  .field-context-menu .context-menu-item {
+    transition: none;
+    animation: none;
+  }
+}

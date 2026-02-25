@@ -29,6 +29,10 @@ from backend.core.utils import (
     validate_json_request,
 )
 
+# Import database connection
+from backend.core.database.database import get_db_connection
+from backend.core.data_access import Repositories
+
 sys.path.append("..")
 try:
     from backend.core.cache.cache_system import clear_cache_pattern
@@ -112,7 +116,9 @@ def api_save_field_builder_config():
                 )
 
                 if affected == 0:
-                    return json_error_response("Configuration not found", status_code=404)
+                    return json_error_response(
+                        "Configuration not found", status_code=404
+                    )
             else:
                 # Create new configuration
                 # Generate a name from view_name (remove v_dwd_ prefix and convert to slug format)
@@ -151,8 +157,10 @@ def api_save_field_builder_config():
                 time.sleep(wait_time)
                 continue
             else:
-                logger.error(f"Error saving field builder config: {e}")
-                return json_error_response(str(e), status_code=500)
+                logger.error(f"Error saving field builder config: {e}", exc_info=True)
+                return json_error_response(
+                    "An internal error occurred", status_code=500
+                )
 
 
 @api_bp.route("/api/field-builder/config/<int:id>", methods=["GET"])
@@ -184,7 +192,9 @@ def api_get_field_builder_config(id):
             return json_error_response("Configuration not found", status_code=404)
 
         field_mapping_v2 = (
-            json.loads(config["field_mapping_v2"]) if config["field_mapping_v2"] else None
+            json.loads(config["field_mapping_v2"])
+            if config["field_mapping_v2"]
+            else None
         )
 
         return json_success_response(
@@ -197,8 +207,8 @@ def api_get_field_builder_config(id):
         )
 
     except Exception as e:
-        logger.error(f"Error loading field builder config {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error loading field builder config {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/field-builder/preview", methods=["POST"])
@@ -249,11 +259,11 @@ def api_preview_field_builder_hql():
         return json_success_response(data={"hql": hql})
 
     except Exception as e:
-        logger.error(f"Error previewing HQL: {e}")
+        logger.error(f"Error previewing HQL: {e}", exc_info=True)
         import traceback
 
         traceback.print_exc()
-        return json_error_response(str(e), status_code=500)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/field-builder/configs", methods=["GET"])
@@ -295,8 +305,8 @@ def api_list_field_builder_configs():
         return json_success_response(data=configs)
 
     except Exception as e:
-        logger.error(f"Error listing field builder configs: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error listing field builder configs: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)
 
 
 @api_bp.route("/api/field-builder/config/<int:id>", methods=["DELETE"])
@@ -322,5 +332,5 @@ def api_delete_field_builder_config(id):
         return json_success_response(message="Configuration deleted successfully")
 
     except Exception as e:
-        logger.error(f"Error deleting field builder config {id}: {e}")
-        return json_error_response(str(e), status_code=500)
+        logger.error(f"Error deleting field builder config {id}: {e}", exc_info=True)
+        return json_error_response("An internal error occurred", status_code=500)

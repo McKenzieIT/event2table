@@ -5,6 +5,8 @@
  * 为JavaScript文件提供类型提示（通过JSDoc）和TypeScript文件提供类型支持
  */
 
+import { ReactNode, ButtonHTMLAttributes, ForwardRefRenderFunction } from 'react';
+
 /**
  * API响应标准格式
  */
@@ -13,6 +15,28 @@ export interface APIResponse<T> {
   success: boolean;
   message?: string;
   timestamp?: string;
+}
+
+/**
+ * Button组件属性
+ */
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children?: ReactNode;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline-primary' | 'outline-danger' | 'success' | 'warning' | 'info';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  loading?: boolean;
+  icon?: React.ComponentType;
+  className?: string;
+}
+
+/**
+ * 声明Button组件类型
+ */
+declare module 'react' {
+  function forwardRef<T extends HTMLButtonElement, P = {}>(
+    render: (props: P, ref: React.Ref<T>) => React.ReactElement | null
+  ): ForwardRefRenderFunction<T, P>;
 }
 
 /**

@@ -3,6 +3,9 @@
  * 字段配置模态框组件
  */
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { Input } from '@shared/ui';
+import { Button } from '@shared/ui';
 
 export default function FieldConfigModal({ field, onSave, onClose }) {
   const [formData, setFormData] = useState({
@@ -21,7 +24,7 @@ export default function FieldConfigModal({ field, onSave, onClose }) {
 
   const handleSubmit = () => {
     if (!formData.displayName.trim()) {
-      alert('请输入中文名称');
+      toast.error('请输入中文名称');
       return;
     }
     onSave({
@@ -39,49 +42,52 @@ export default function FieldConfigModal({ field, onSave, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+    >
       <div
-        className="modal-content glass-card"
+        className="modal-content glass-card field-config-modal"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
         <div className="modal-header">
           <h3>配置字段</h3>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             ✕
           </button>
         </div>
         <div className="modal-body">
-          <div className="form-group">
-            <label>字段名</label>
-            <input
-              type="text"
-              className="glass-input"
-              value={field?.fieldName || ''}
-              readOnly
-            />
-          </div>
-          <div className="form-group">
-            <label>中文名称</label>
-            <input
-              type="text"
-              className="glass-input"
-              placeholder="例如: 角色ID"
-              value={formData.displayName}
-              onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              autoFocus
-            />
-          </div>
-          <div className="form-group">
-            <label>Alias (别名)</label>
-            <input
-              type="text"
-              className="glass-input"
-              placeholder="例如: user_id"
-              value={formData.alias}
-              onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
-            />
-          </div>
+          <Input
+            label="字段名"
+            type="text"
+            value={field?.fieldName || ''}
+            readOnly
+          />
+          <Input
+            label="中文名称"
+            type="text"
+            placeholder="例如: 角色ID"
+            value={formData.displayName}
+            onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+            autoFocus
+          />
+          <Input
+            label="Alias (别名)"
+            type="text"
+            placeholder="例如: user_id"
+            value={formData.alias}
+            onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
+          />
           {field?.fieldType === 'param' && (
             <div className="form-info">
               <span>参数字段将自动使用HQL模板</span>

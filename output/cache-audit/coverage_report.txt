@@ -1,0 +1,58 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-7.4.3, pluggy-1.6.0
+rootdir: /Users/mckenzie/Documents/event2table
+configfile: pytest.ini
+plugins: cov-4.1.0
+collected 233 items
+
+backend/core/cache/tests/test_bloom_filter_enhanced.py ................. [  7%]
+.......................................                                  [ 24%]
+backend/core/cache/tests/test_capacity_monitor.py ...................... [ 33%]
+..........................                                               [ 44%]
+backend/core/cache/tests/test_consistency.py ...........                 [ 49%]
+backend/core/cache/tests/test_degradation.py ........................... [ 60%]
+                                                                         [ 60%]
+backend/core/cache/tests/test_intelligent_warmer.py .................... [ 69%]
+.......................                                                  [ 79%]
+backend/core/cache/tests/test_monitoring.py ............................ [ 91%]
+....................                                                     [100%]
+
+=============================== warnings summary ===============================
+backend/venv/lib/python3.9/site-packages/urllib3/__init__.py:35
+  /Users/mckenzie/Documents/event2table/backend/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+---------- coverage: platform darwin, python 3.9.6-final-0 -----------
+Name                                                              Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------
+backend/core/cache/__init__.py                                        0      0   100%
+backend/core/cache/bloom_filter_enhanced.py                         250     31    88%   152-154, 182-199, 238, 264-269, 298-300, 384-387
+backend/core/cache/cache_hierarchical.py                            243    195    20%   122-141, 153-155, 168-212, 225-236, 247-276, 289-297, 307-322, 335-351, 376-421, 430-437, 451-453, 457-458, 464-471, 475-482, 486-493, 499-500, 504-505, 509-510, 514-515, 519-520, 524-525, 536, 563-581
+backend/core/cache/cache_monitor.py                                 121    121     0%   19-360
+backend/core/cache/cache_system.py                                  342    279    18%   81-87, 105-108, 184-234, 252-287, 300-309, 319-335, 348-365, 390-435, 444-452, 470-473, 477-491, 495-496, 500-509, 513-517, 521-526, 561-562, 575-577, 589-620, 629-639, 648-656, 678-708, 724-742, 785-787, 800-812, 824-825, 839-856, 879-899, 915-921
+backend/core/cache/cache_warmer.py                                  134    134     0%   12-301
+backend/core/cache/capacity_monitor.py                              247      2    99%   114-115
+backend/core/cache/consistency.py                                    53      0   100%
+backend/core/cache/decorators.py                                     70     70     0%   7-195
+backend/core/cache/degradation.py                                   112      9    92%   28-32, 101-102, 241, 269
+backend/core/cache/intelligent_warmer.py                            137      6    96%   29-32, 421-422
+backend/core/cache/invalidator.py                                   208    208     0%   19-466
+backend/core/cache/monitoring.py                                    214      1    99%   164
+backend/core/cache/protection.py                                    142    142     0%   19-423
+backend/core/cache/statistics.py                                    138    138     0%   20-403
+backend/core/cache/tests/__init__.py                                  0      0   100%
+backend/core/cache/tests/test_bloom_filter_enhanced.py              505      7    99%   98, 208, 576-577, 956, 1060, 1077
+backend/core/cache/tests/test_capacity_monitor.py                   394      4    99%   177-179, 588, 761
+backend/core/cache/tests/test_consistency.py                        154      1    99%   266
+backend/core/cache/tests/test_degradation.py                        305      4    99%   502-503, 528-529
+backend/core/cache/tests/test_hierarchical_cache_integration.py     136    136     0%   19-334
+backend/core/cache/tests/test_intelligent_warmer.py                 393      2    99%   658, 853
+backend/core/cache/tests/test_module_imports.py                      34     34     0%   7-59
+backend/core/cache/tests/test_monitoring.py                         317      1    99%   970
+-----------------------------------------------------------------------------------------------
+TOTAL                                                              4649   1525    67%
+Coverage HTML written to dir htmlcov
+
+================== 233 passed, 1 warning in 86.92s (0:01:26) ===================

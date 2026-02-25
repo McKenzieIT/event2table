@@ -17,7 +17,8 @@ export default function PageHeader({
   showPerformancePanel,
   setShowPerformancePanel,
   showDebugPanel,
-  setShowDebugPanel
+  setShowDebugPanel,
+  children
 }) {
   return (
     <header className="page-header">
@@ -34,7 +35,7 @@ export default function PageHeader({
         )}
       </div>
       <div className="header-right">
-        {/* 性能分析面板（可折叠） */}
+        {/* Performance Analysis Panel (collapsible) */}
         <button
           className={`btn btn-sm ${showPerformancePanel ? 'btn-info' : 'btn-outline-info'}`}
           onClick={() => setShowPerformancePanel(!showPerformancePanel)}
@@ -44,7 +45,7 @@ export default function PageHeader({
           <i className="bi bi-speedometer2"></i> 性能分析
         </button>
 
-        {/* 调试模式面板（可折叠） */}
+        {/* Debug Mode Panel (collapsible) */}
         <button
           className={`btn btn-sm ${showDebugPanel ? 'btn-secondary' : 'btn-outline-secondary'}`}
           onClick={() => setShowDebugPanel(!showDebugPanel)}
@@ -53,6 +54,10 @@ export default function PageHeader({
         >
           <i className="bi bi-bug"></i> 调试模式
         </button>
+
+        {/* Children (e.g., QuickActionButtons) */}
+        {children}
+
         {onClearCanvas && (
           <Button variant="secondary" onClick={onClearCanvas}>
             清空画布

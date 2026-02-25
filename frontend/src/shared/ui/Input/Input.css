@@ -4,46 +4,161 @@
  * Design: Minimal tech aesthetic with subtle glow on focus
  * Background: Dark glass effect
  * Border: Subtle cyan glow on focus
+ *
+ * 🆕 2026-02-22: 重构为cyber-field命名，消除Grid容器和input元素的命名混淆
  */
 
-.cyber-input {
+/* ========================================
+   Precision Lab: Grid Layout System
+   ========================================
+   重构：使用cyber-field命名消除歧义
+
+   Grid优势：
+   - Label和wrapper在同一行，天然对齐
+   - 移除flex:1 + width:100%冲突
+   - 响应式友好（移动端自动切换单列）
+*/
+
+.cyber-field {
   font-family: var(--font-body);
   width: 100%;
+  display: grid;
+  grid-template-columns: var(--form-label-width, 140px) 1fr;
+  gap: var(--form-field-gap, var(--space-3));
+  align-items: start;
+  margin-bottom: var(--form-row-gap, var(--space-5));
+}
+
+/* 向后兼容：保留旧class */
+.cyber-input {
+  /* 继承cyber-field的所有样式 */
+}
+
+/* 移动端响应式：单列布局 */
+@media (max-width: 768px) {
+  .cyber-field {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}
+
+/* 向后兼容 */
+@media (max-width: 768px) {
+  .cyber-input {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
 }
 
 /* ========================================
-   Label
+   Label (Grid Column 1)
    ======================================== */
 
-.cyber-input__label {
+.cyber-field__label {
+  grid-column: 1;
+  grid-row: 1; /* 明确与wrapper在同一行 */
   display: block;
-  margin-bottom: var(--space-2);
+  margin-bottom: 0; /* Grid控制对齐，移除block margin */
+  padding-top: 11px; /* 视觉垂直居中：(44px - 22px) / 2 = 11px */
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
   color: var(--text-secondary);
   letter-spacing: 0.01em;
+  text-align: right; /* 桌面端右对齐 */
 }
 
+/* 向后兼容 */
+.cyber-input__label {
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
+  margin-bottom: 0;
+  padding-top: 11px;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .cyber-field__label {
+    text-align: left; /* 移动端左对齐 */
+    padding-top: 0;
+    margin-bottom: var(--space-1); /* 恢复小间距 */
+  }
+}
+
+@media (max-width: 768px) {
+  .cyber-input__label {
+    text-align: left;
+    padding-top: 0;
+    margin-bottom: var(--space-1);
+  }
+}
+
+.cyber-field__required {
+  color: var(--danger);
+  margin-left: 2px;
+}
+
+/* 向后兼容 */
 .cyber-input__required {
-  color: var(--warning);
+  color: var(--danger);
   margin-left: 2px;
 }
 
 /* ========================================
-   Input Wrapper
-   ======================================== */
+   Input Wrapper (Grid Column 2)
+   ========================================
 
-.cyber-input-wrapper {
+   修复：明确边界替代inset: 0，解决布局计算错误
+*/
+
+.cyber-field__wrapper {
+  grid-column: 2;
+  grid-row: 1; /* 明确与label在同一行 */
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%; /* 占满Grid Column 2的全部宽度 */
 }
 
+/* 向后兼容 */
+.cyber-input-wrapper {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.cyber-field__wrapper::before {
+  content: '';
+  position: absolute;
+  /* 明确边界，避免inset导致的尺寸计算错误 */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  pointer-events: none;
+  transition: box-shadow var(--transition-base);
+  z-index: 1;
+}
+
+/* 向后兼容 */
 .cyber-input-wrapper::before {
   content: '';
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   border-radius: var(--radius-md);
   background: transparent;
   pointer-events: none;
@@ -52,21 +167,53 @@
 }
 
 /* Focus state - cyan glow */
+.cyber-field__wrapper:not(.cyber-field__wrapper--disabled):focus-within::before {
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+/* 向后兼容 */
 .cyber-input-wrapper:not(.cyber-input-wrapper--disabled):focus-within::before {
   box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
 }
 
 /* Invalid state - red glow */
+.cyber-field__wrapper--invalid::before {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* 向后兼容 */
 .cyber-input-wrapper--invalid::before {
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
 
 /* ========================================
-   Input Field
-   ======================================== */
+   Input Field (Wrapper内部Flex子项)
+   ========================================
 
-.cyber-input {
-  /* 修复：在flex容器中使用flex: 1而非width: 100% */
+   修复：Input不参与Grid，只作为wrapper的Flex子项
+   确保wrapper和input长度完全一致（父子关系）
+*/
+
+.cyber-field__wrapper .cyber-field__input {
+  /* 移除grid-column: 2 - 不参与Grid布局 */
+  flex: 1;
+  width: 100%; /* 占满wrapper宽度 */
+  height: 44px;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-base);
+  box-sizing: border-box;
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input {
   flex: 1;
   width: 100%;
   height: 44px;
@@ -80,44 +227,93 @@
   border-radius: var(--radius-md);
   outline: none;
   transition: all var(--transition-base);
-  /* 修复：移除position: relative避免双重层叠上下文 */
-  /* position: relative; */
-  box-sizing: border-box; /* 确保box-sizing一致 */
+  box-sizing: border-box;
 }
 
-.cyber-input::placeholder {
+.cyber-field__wrapper .cyber-field__input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input::placeholder {
   color: var(--text-muted);
   opacity: 0.7;
 }
 
 /* Focus state */
-.cyber-input:not(.cyber-input--disabled):focus {
+.cyber-field__wrapper .cyber-field__input:not(.cyber-field__input--disabled):focus {
   background: var(--bg-glass);
   border-color: var(--cyan-500);
-  box-shadow: 
+  box-shadow:
+    0 0 0 3px rgba(6, 182, 212, 0.1),
+    0 0 20px rgba(6, 182, 212, 0.15);
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input:not(.cyber-input--disabled):focus {
+  background: var(--bg-glass);
+  border-color: var(--cyan-500);
+  box-shadow:
     0 0 0 3px rgba(6, 182, 212, 0.1),
     0 0 20px rgba(6, 182, 212, 0.15);
 }
 
 /* Hover state */
-.cyber-input:not(.cyber-input--disabled):hover:not(:focus) {
+.cyber-field__wrapper .cyber-field__input:not(.cyber-field__input--disabled):hover:not(:focus) {
   border-color: var(--border-medium);
 }
 
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input:not(.cyber-input--disabled):hover:not(:focus) {
+  border-color: var(--border-medium);
+}
+
+/* Active state */
+.cyber-field__wrapper .cyber-field__input:not(.cyber-field__input--disabled):active {
+  transform: scale(0.99);
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input:not(.cyber-input--disabled):active {
+  transform: scale(0.99);
+}
+
 /* Invalid state */
-.cyber-input--invalid {
+.cyber-field__wrapper .cyber-field__input--invalid {
   border-color: var(--danger);
   background: rgba(239, 68, 68, 0.05);
 }
 
-.cyber-input--invalid:focus {
-  box-shadow: 
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input--invalid {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.cyber-field__wrapper .cyber-field__input--invalid:focus {
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.1),
+    0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input--invalid:focus {
+  box-shadow:
     0 0 0 3px rgba(239, 68, 68, 0.1),
     0 0 20px rgba(239, 68, 68, 0.15);
 }
 
 /* Disabled state */
-.cyber-input--disabled {
+.cyber-field__wrapper .cyber-field__input--disabled {
+  background: rgba(3, 7, 18, 0.6);
+  border-color: var(--border-subtle);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input--disabled {
   background: rgba(3, 7, 18, 0.6);
   border-color: var(--border-subtle);
   color: var(--text-disabled);
@@ -128,6 +324,19 @@
    Icon
    ======================================== */
 
+.cyber-field__icon {
+  position: absolute;
+  left: var(--space-4);
+  color: var(--text-tertiary);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: color var(--transition-base);
+}
+
+/* 向后兼容 */
 .cyber-input__icon {
   position: absolute;
   left: var(--space-4);
@@ -140,10 +349,20 @@
   transition: color var(--transition-base);
 }
 
+.cyber-field__wrapper:focus-within .cyber-field__icon {
+  color: var(--cyan-400);
+}
+
+/* 向后兼容 */
 .cyber-input-wrapper:focus-within .cyber-input__icon {
   color: var(--cyan-400);
 }
 
+.cyber-field__wrapper--with-icon .cyber-field__input {
+  padding-left: calc(var(--space-4) + 24px);
+}
+
+/* 向后兼容 */
 .cyber-input-wrapper--with-icon .cyber-input {
   padding-left: calc(var(--space-4) + 24px);
 }
@@ -152,6 +371,15 @@
    Helper & Error Text
    ======================================== */
 
+.cyber-field__helper {
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+/* 向后兼容 */
 .cyber-input__helper {
   margin-top: var(--space-2);
   font-family: var(--font-body);
@@ -160,6 +388,18 @@
   line-height: 1.4;
 }
 
+.cyber-field__error {
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--danger);
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* 向后兼容 */
 .cyber-input__error {
   margin-top: var(--space-2);
   font-family: var(--font-body);
@@ -171,6 +411,12 @@
   gap: var(--space-1);
 }
 
+.cyber-field__error::before {
+  content: '⚠';
+  font-size: var(--text-sm);
+}
+
+/* 向后兼容 */
 .cyber-input__error::before {
   content: '⚠';
   font-size: var(--text-sm);
@@ -186,6 +432,11 @@
   75% { transform: translateX(4px); }
 }
 
+.cyber-field__wrapper--invalid .cyber-field__input {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* 向后兼容 */
 .cyber-input-wrapper--invalid .cyber-input {
   animation: shake 0.3s ease-in-out;
 }
@@ -194,7 +445,15 @@
    Textarea Variant
    ======================================== */
 
-.cyber-input--textarea {
+.cyber-field__wrapper .cyber-field__input--textarea {
+  height: auto;
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input--textarea {
   height: auto;
   min-height: 100px;
   resize: vertical;
@@ -205,10 +464,20 @@
    Search Input Variant
    ======================================== */
 
-.cyber-input--search {
+.cyber-field__wrapper .cyber-field__input--search {
   padding-left: calc(var(--space-4) + 24px);
 }
 
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input--search {
+  padding-left: calc(var(--space-4) + 24px);
+}
+
+.cyber-field__input--search + .cyber-field__icon {
+  left: var(--space-4);
+}
+
+/* 向后兼容 */
 .cyber-input--search + .cyber-input__icon {
   left: var(--space-4);
 }
@@ -217,6 +486,13 @@
    Focus Visible for Accessibility
    ======================================== */
 
-.cyber-input:focus-visible {
-  outline: none;
+.cyber-field__wrapper .cyber-field__input:focus-visible {
+  outline: 2px solid var(--cyan-500);
+  outline-offset: 2px;
+}
+
+/* 向后兼容 */
+.cyber-input-wrapper .cyber-input:focus-visible {
+  outline: 2px solid var(--cyan-500);
+  outline-offset: 2px;
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useEventConfigs } from '../hooks/useEventConfigs';
-import { Button, Input } from '@shared/ui';
+import { Button, Input, Spinner } from '@shared/ui';
 import SearchBar from "./SearchBar";
 import "./NodeSidebar.css";
 
@@ -119,7 +119,11 @@ export default function NodeSidebar({
 
           <section className="node-sidebar-section">
             <h4>已保存配置</h4>
-            {isLoading && <div className="loading-message">加载中...</div>}
+            {isLoading && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                <Spinner size="md" label="加载中..." />
+              </div>
+            )}
             {error && (
               <div className="error-message">
                 {error.message || "加载配置失败"}

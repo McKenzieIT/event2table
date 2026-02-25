@@ -121,21 +121,21 @@ def get_event_nodes():
     if not game_gid:
         return json_error_response("game_gid is required", status_code=400)
 
-    # Convert game_gid to game_id
-    game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+    # Validate game exists
+    game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
     if not game:
         return json_error_response("Game not found", status_code=404)
-    game_id = game["id"]
 
+    # Query using game_gid directly (no conversion needed)
     nodes = fetch_all_as_dict(
         """
         SELECT en.*, le.event_name, le.event_name_cn
         FROM event_nodes en
         LEFT JOIN log_events le ON en.event_id = le.id
-        WHERE en.game_id = ? AND en.is_active = 1
+        WHERE en.game_gid = ? AND en.is_active = 1
         ORDER BY en.created_at DESC
     """,
-        (game_id,),
+        (game_gid,),
     )
 
     # Parse config_json
@@ -189,10 +189,11 @@ def create_event_node():
     event_id = data["event_id"]
     config = data["config"]
 
-    # Validate game exists and get game_id
-    game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+    # Validate game exists
+    game = fetch_one_as_dict("SELECT id, gid FROM games WHERE gid = ?", (game_gid,))
     if not game:
         return json_error_response("Game not found", status_code=404)
+
     game_id = game["id"]
 
     # Validate event exists
@@ -202,30 +203,34 @@ def create_event_node():
 
     # Check if node with same name exists for this game
     existing = fetch_one_as_dict(
-        "SELECT * FROM event_nodes WHERE game_id = ? AND name = ?", (game_id, name)
+        "SELECT * FROM event_nodes WHERE game_gid = ? AND name = ?", (game_gid, name)
     )
     if existing:
-        return json_error_response("Event node with this name already exists", status_code=400)
+        return json_error_response(
+            "Event node with this name already exists", status_code=400
+        )
 
-    # Create event node
+    # Create event node (store both game_id and game_gid for migration support)
     config_json = json.dumps(config, ensure_ascii=False)
     node_id = execute_write(
         """
-        INSERT INTO event_nodes (game_id, name, event_id, config_json)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO event_nodes (game_id, game_gid, name, event_id, config_json)
+        VALUES (?, ?, ?, ?, ?)
     """,
-        (game_id, name, event_id, config_json),
+        (game_id, game_gid, name, event_id, config_json),
     )
 
     # Save parameter aliases if provided
     if "fieldList" in config:
-        save_parameter_aliases(game_id, config["fieldList"])
+        save_parameter_aliases(game_gid, config["fieldList"])
 
     # Clear cache
     clear_game_cache(game_gid)
 
     node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (node_id,))
-    return json_success_response(data={"node": node}, message="Event node created", status_code=201)
+    return json_success_response(
+        data={"node": node}, message="Event node created", status_code=201
+    )
 
 
 @event_nodes_bp.route("/api/event-nodes/<int:node_id>", methods=["PUT"])
@@ -238,9 +243,8 @@ def update_event_node(node_id):
     if not node:
         return json_error_response("Event node not found", status_code=404)
 
-    # Get game_gid from game_id for cache clearing
-    game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (node["game_id"],))
-    game_gid = game["gid"] if game else None
+    # Get game_gid from node for cache clearing
+    game_gid = node.get("game_gid")
 
     # Update fields
     update_fields = []
@@ -272,7 +276,7 @@ def update_event_node(node_id):
         execute_write(
             f"""
             UPDATE event_nodes
-            SET {', '.join(update_fields)}, updated_at = CURRENT_TIMESTAMP
+            SET {", ".join(update_fields)}, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         """,
             update_values,
@@ -282,8 +286,12 @@ def update_event_node(node_id):
         if game_gid:
             clear_game_cache(game_gid)
 
-    updated_node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (node_id,))
-    return json_success_response(data={"node": updated_node}, message="Event node updated")
+    updated_node = fetch_one_as_dict(
+        "SELECT * FROM event_nodes WHERE id = ?", (node_id,)
+    )
+    return json_success_response(
+        data={"node": updated_node}, message="Event node updated"
+    )
 
 
 @event_nodes_bp.route("/api/event-nodes/<int:node_id>", methods=["DELETE"])
@@ -293,9 +301,8 @@ def delete_event_node(node_id):
     if not node:
         return json_error_response("Event node not found", status_code=404)
 
-    # Get game_gid from game_id for cache clearing
-    game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (node["game_id"],))
-    game_gid = game["gid"] if game else None
+    # Get game_gid from node for cache clearing
+    game_gid = node.get("game_gid")
 
     # Delete node (soft delete by setting is_active = 0)
     execute_write("UPDATE event_nodes SET is_active = 0 WHERE id = ?", (node_id,))
@@ -318,7 +325,9 @@ def save_parameter_aliases(game_gid, field_list):
     # Convert game_gid to game_id for database operations
     game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
     if not game:
-        logger.warning(f"Game not found for game_gid={game_gid}, skipping parameter aliases save")
+        logger.warning(
+            f"Game not found for game_gid={game_gid}, skipping parameter aliases save"
+        )
         return
     game_id = game["id"]
 

@@ -1,0 +1,348 @@
+backend/core/cache/bloom_filter_enhanced.py:21:1: F401 'datetime.datetime' imported but unused
+backend/core/cache/bloom_filter_enhanced.py:21:1: F401 'datetime.timedelta' imported but unused
+backend/core/cache/bloom_filter_enhanced.py:412:17: F841 local variable 'old_filter' is assigned to but never used
+backend/core/cache/cache_system.py:37:1: F401 'random' imported but unused
+backend/core/cache/cache_system.py:253:9: F811 redefinition of unused 'random' from line 37
+backend/core/cache/cache_system.py:481:17: F401 'redis' imported but unused
+backend/core/cache/cache_system.py:595:17: F401 'redis' imported but unused
+backend/core/cache/cache_warmer.py:13:1: F401 'backend.core.utils.fetch_one_as_dict' imported but unused
+backend/core/cache/cache_warmer.py:16:1: F401 'time' imported but unused
+backend/core/cache/cache_warmer.py:140:32: F541 f-string is missing placeholders
+backend/core/cache/capacity_monitor.py:24:1: F401 'datetime.timedelta' imported but unused
+backend/core/cache/capacity_monitor.py:25:1: F401 'typing.Tuple' imported but unused
+backend/core/cache/capacity_monitor.py:278:17: F841 local variable 'used_memory_rss' is assigned to but never used
+backend/core/cache/capacity_monitor.py:610:101: E501 line too long (124 > 100 characters)
+backend/core/cache/capacity_monitor.py:614:101: E501 line too long (124 > 100 characters)
+backend/core/cache/decorators.py:28:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:36:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:39:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:50:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:56:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:59:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:64:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:66:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:74:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:79:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:82:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:94:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:97:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:105:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:107:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:121:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:128:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:135:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:141:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:148:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:155:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:158:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:162:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:166:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:170:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:174:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:178:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:190:1: W293 blank line contains whitespace
+backend/core/cache/decorators.py:194:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:34:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:41:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:46:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:50:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:54:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:58:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:69:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:73:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:77:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:81:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:88:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:91:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:95:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:99:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:103:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:107:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:114:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:118:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:121:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:127:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:129:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:133:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:137:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:141:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:149:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:152:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:157:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:162:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:166:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:169:13: F841 local variable 'event_count' is assigned to but never used
+backend/core/cache/invalidator.py:171:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:175:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:179:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:181:13: F841 local variable 'hql_count' is assigned to but never used
+backend/core/cache/invalidator.py:183:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:187:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:191:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:193:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:196:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:198:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:202:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:208:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:212:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:217:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:222:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:224:13: F841 local variable 'param_count' is assigned to but never used
+backend/core/cache/invalidator.py:226:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:229:13: F841 local variable 'event_count' is assigned to but never used
+backend/core/cache/invalidator.py:231:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:235:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:239:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:243:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:244:101: E501 line too long (103 > 100 characters)
+backend/core/cache/invalidator.py:245:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:248:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:250:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:254:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:260:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:265:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:270:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:275:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:279:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:283:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:286:13: F841 local variable 'event_count' is assigned to but never used
+backend/core/cache/invalidator.py:288:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:292:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:296:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:297:101: E501 line too long (124 > 100 characters)
+backend/core/cache/invalidator.py:298:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:301:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:303:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:319:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:332:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:347:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:362:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:375:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:379:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:383:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:386:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:391:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:394:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:398:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:402:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:409:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:412:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:418:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:421:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:423:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:427:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:431:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:440:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:453:1: W293 blank line contains whitespace
+backend/core/cache/invalidator.py:456:1: W293 blank line contains whitespace
+backend/core/cache/monitoring.py:21:1: F401 'collections.defaultdict' imported but unused
+backend/core/cache/monitoring.py:85:101: E501 line too long (123 > 100 characters)
+backend/core/cache/monitoring.py:86:101: E501 line too long (111 > 100 characters)
+backend/core/cache/monitoring.py:305:9: F841 local variable 'misses' is assigned to but never used
+backend/core/cache/monitoring.py:370:101: E501 line too long (126 > 100 characters)
+backend/core/cache/monitoring.py:433:9: E731 do not assign a lambda expression, use a def
+backend/core/cache/monitoring.py:467:17: E129 visually indented line with same indent as next logical line
+backend/core/cache/monitoring.py:509:25: F541 f-string is missing placeholders
+backend/core/cache/protection.py:42:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:48:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:61:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:65:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:68:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:75:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:77:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:81:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:85:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:92:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:96:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:99:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:107:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:109:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:113:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:115:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:125:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:130:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:133:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:139:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:144:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:154:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:158:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:166:101: E501 line too long (110 > 100 characters)
+backend/core/cache/protection.py:168:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:170:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:174:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:178:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:183:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:185:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:189:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:198:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:214:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:225:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:232:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:239:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:249:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:251:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:264:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:271:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:275:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:281:101: E501 line too long (114 > 100 characters)
+backend/core/cache/protection.py:282:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:284:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:288:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:292:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:303:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:305:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:319:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:322:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:324:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:328:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:341:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:343:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:352:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:363:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:365:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:369:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:376:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:382:101: E501 line too long (110 > 100 characters)
+backend/core/cache/protection.py:383:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:385:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:390:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:394:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:398:1: W293 blank line contains whitespace
+backend/core/cache/protection.py:408:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:22:1: F401 'typing.Optional' imported but unused
+backend/core/cache/statistics.py:24:1: F401 'time' imported but unused
+backend/core/cache/statistics.py:35:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:42:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:46:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:51:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:55:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:59:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:67:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:70:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:72:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:76:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:86:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:96:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:104:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:110:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:126:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:144:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:151:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:154:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:158:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:162:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:168:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:177:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:180:101: E501 line too long (103 > 100 characters)
+backend/core/cache/statistics.py:182:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:193:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:197:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:201:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:208:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:216:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:230:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:236:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:240:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:244:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:247:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:259:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:267:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:269:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:273:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:277:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:280:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:286:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:293:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:299:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:307:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:312:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:314:101: E501 line too long (103 > 100 characters)
+backend/core/cache/statistics.py:315:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:322:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:326:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:330:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:343:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:347:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:351:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:358:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:363:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:367:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:370:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:372:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:375:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:379:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:385:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:392:1: W293 blank line contains whitespace
+backend/core/cache/statistics.py:394:1: W293 blank line contains whitespace
+backend/core/cache/tests/test_bloom_filter_enhanced.py:20:1: F401 'pathlib.Path' imported but unused
+backend/core/cache/tests/test_bloom_filter_enhanced.py:31:9: F841 local variable 'result' is assigned to but never used
+backend/core/cache/tests/test_bloom_filter_enhanced.py:574:17: F841 local variable 'success' is assigned to but never used
+backend/core/cache/tests/test_bloom_filter_enhanced.py:731:13: F841 local variable 'initial_last_persistence' is assigned to but never used
+backend/core/cache/tests/test_bloom_filter_enhanced.py:855:9: F401 'unittest.mock.MagicMock' imported but unused
+backend/core/cache/tests/test_bloom_filter_enhanced.py:948:9: F401 'unittest.mock.PropertyMock' imported but unused
+backend/core/cache/tests/test_bloom_filter_enhanced.py:953:9: F841 local variable 'original_bloom' is assigned to but never used
+backend/core/cache/tests/test_capacity_monitor.py:21:1: F401 'datetime.timedelta' imported but unused
+backend/core/cache/tests/test_capacity_monitor.py:102:13: F841 local variable 'timestamp' is assigned to but never used
+backend/core/cache/tests/test_capacity_monitor.py:138:13: F841 local variable 'timestamp' is assigned to but never used
+backend/core/cache/tests/test_capacity_monitor.py:170:17: F401 'math' imported but unused
+backend/core/cache/tests/test_capacity_monitor.py:177:13: E722 do not use bare 'except'
+backend/core/cache/tests/test_capacity_monitor.py:193:13: F841 local variable 'timestamp' is assigned to but never used
+backend/core/cache/tests/test_capacity_monitor.py:208:13: F841 local variable 'timestamp' is assigned to but never used
+backend/core/cache/tests/test_capacity_monitor.py:223:13: F841 local variable 'timestamp' is assigned to but never used
+backend/core/cache/tests/test_capacity_monitor.py:481:13: F841 local variable 'alert' is assigned to but never used
+backend/core/cache/tests/test_capacity_monitor.py:498:13: F841 local variable 'timestamp' is assigned to but never used
+backend/core/cache/tests/test_degradation.py:17:1: F401 'pytest' imported but unused
+backend/core/cache/tests/test_degradation.py:19:1: F401 'unittest.mock.MagicMock' imported but unused
+backend/core/cache/tests/test_degradation.py:23:1: F401 'backend.core.cache.degradation.cache_degradation_manager' imported but unused
+backend/core/cache/tests/test_degradation.py:98:41: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:121:41: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:167:37: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:186:37: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:202:37: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:218:37: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:235:37: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:243:47: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:247:47: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:273:17: F841 local variable 'result' is assigned to but never used
+backend/core/cache/tests/test_degradation.py:276:41: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:299:41: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:344:76: F841 local variable 'mock_cache' is assigned to but never used
+backend/core/cache/tests/test_degradation.py:357:45: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:374:35: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:389:33: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:393:33: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:403:33: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:516:33: E712 comparison to True should be 'if cond is True:' or 'if cond:'
+backend/core/cache/tests/test_degradation.py:542:33: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_degradation.py:550:9: F811 redefinition of unused 'cache_degradation_manager' from line 23
+backend/core/cache/tests/test_degradation.py:559:9: F811 redefinition of unused 'cache_degradation_manager' from line 23
+backend/core/cache/tests/test_degradation.py:562:51: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+backend/core/cache/tests/test_hierarchical_cache_integration.py:20:1: F401 'time' imported but unused
+backend/core/cache/tests/test_hierarchical_cache_integration.py:28:1: E402 module level import not at top of file
+backend/core/cache/tests/test_hierarchical_cache_integration.py:305:9: F841 local variable 'result' is assigned to but never used
+backend/core/cache/tests/test_intelligent_warmer.py:19:1: F401 'collections.defaultdict' imported but unused
+backend/core/cache/tests/test_intelligent_warmer.py:20:1: F401 'unittest.mock.Mock' imported but unused
+backend/core/cache/tests/test_intelligent_warmer.py:20:1: F401 'unittest.mock.AsyncMock' imported but unused
+backend/core/cache/tests/test_intelligent_warmer.py:20:1: F401 'unittest.mock.MagicMock' imported but unused
+backend/core/cache/tests/test_intelligent_warmer.py:21:1: F401 'typing.Dict' imported but unused
+backend/core/cache/tests/test_intelligent_warmer.py:21:1: F401 'typing.List' imported but unused
+backend/core/cache/tests/test_intelligent_warmer.py:518:13: F401 'concurrent.futures' imported but unused
+backend/core/cache/tests/test_intelligent_warmer.py:524:101: E501 line too long (101 > 100 characters)
+backend/core/cache/tests/test_intelligent_warmer.py:640:101: E501 line too long (101 > 100 characters)
+backend/core/cache/tests/test_intelligent_warmer.py:803:101: E501 line too long (101 > 100 characters)
+backend/core/cache/tests/test_module_imports.py:7:1: F401 'pytest' imported but unused
+backend/core/cache/tests/test_module_imports.py:29:5: F401 'core.cache.capacity_monitor.cache_capacity_monitor' imported but unused
+backend/core/cache/tests/test_monitoring.py:21:1: F401 'unittest.mock.MagicMock' imported but unused
+backend/core/cache/tests/test_monitoring.py:301:13: F841 local variable 'active_alerts' is assigned to but never used
+backend/core/cache/tests/test_monitoring.py:790:17: F841 local variable 'alerts' is assigned to but never used
+1     E129 visually indented line with same indent as next logical line
+1     E402 module level import not at top of file
+15    E501 line too long (124 > 100 characters)
+19    E712 comparison to True should be 'if cond is True:' or 'if cond:'
+1     E722 do not use bare 'except'
+1     E731 do not assign a lambda expression, use a def
+31    F401 'datetime.datetime' imported but unused
+2     F541 f-string is missing placeholders
+3     F811 redefinition of unused 'random' from line 37
+24    F841 local variable 'old_filter' is assigned to but never used
+239   W293 blank line contains whitespace

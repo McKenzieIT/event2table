@@ -1,0 +1,293 @@
+backend/core/database/_constants.py:84:        game_id INTEGER NOT NULL,
+backend/core/database/_constants.py:93:        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/_constants.py:94:        UNIQUE(game_id, param_name)
+backend/core/database/_constants.py:158:        game_id INTEGER,
+backend/core/database/_constants.py:161:        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/_constants.py:184:        game_id INTEGER NOT NULL,
+backend/core/database/_constants.py:191:        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/_constants.py:203:    "CREATE INDEX IF NOT EXISTS idx_common_params_game_id ON common_params(game_id)",
+backend/core/database/_constants.py:207:    "CREATE INDEX IF NOT EXISTS idx_join_configs_game_id ON join_configs(game_id)",
+backend/core/database/database.py:128:            game_id INTEGER NOT NULL,
+backend/core/database/database.py:137:            FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/database.py:160:            game_id INTEGER NOT NULL,
+backend/core/database/database.py:169:            FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/database.py:213:            game_id INTEGER NOT NULL,
+backend/core/database/database.py:220:            FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/database.py:228:            game_id INTEGER NOT NULL,
+backend/core/database/database.py:237:            FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/database.py:239:            UNIQUE(game_id, param_id, alias)
+backend/core/database/database.py:867:            if "game_id" not in columns:
+backend/core/database/database.py:868:                cursor.execute("ALTER TABLE join_configs ADD COLUMN game_id INTEGER")
+backend/core/database/database.py:902:                    game_id INTEGER,
+backend/core/database/database.py:907:                    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/database.py:1033:            if "game_id" not in columns:
+backend/core/database/database.py:1034:                cursor.execute("ALTER TABLE flow_templates ADD COLUMN game_id INTEGER")
+backend/core/database/database.py:1035:                cursor.execute("UPDATE flow_templates SET game_id = 1 WHERE game_id IS NULL")
+backend/core/database/database.py:1051:                    game_id INTEGER NOT NULL,
+backend/core/database/database.py:1058:                    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/database.py:1065:                CREATE INDEX IF NOT EXISTS idx_flow_templates_game_id
+backend/core/database/database.py:1066:                ON flow_templates(game_id)
+backend/core/database/database.py:1093:                    game_id INTEGER NOT NULL,
+backend/core/database/database.py:1100:                    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/database.py:1114:                    game_id INTEGER NOT NULL,
+backend/core/database/database.py:1123:                    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/database.py:1125:                    UNIQUE(game_id, param_id, alias)
+backend/core/database/database.py:1132:                CREATE INDEX IF NOT EXISTS idx_event_nodes_game_id
+backend/core/database/database.py:1133:                ON event_nodes(game_id)
+backend/core/database/database.py:1140:                CREATE INDEX IF NOT EXISTS idx_parameter_aliases_game_id
+backend/core/database/database.py:1141:                ON parameter_aliases(game_id)
+backend/core/database/database.py:1170:                    game_id INTEGER NOT NULL,
+backend/core/database/database.py:1177:                    UNIQUE(game_id, param_name),
+backend/core/database/database.py:1178:                    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/database.py:1202:                ON field_name_mappings(game_id, param_name)
+backend/core/database/database.py:1362:                            WHERE g.id = log_events.game_id
+backend/core/database/database.py:2068:            if "game_id" not in columns:
+backend/core/database/database.py:2069:                logger.info("Migration v9: Adding game_id column to join_configs...")
+backend/core/database/database.py:2070:                cursor.execute("ALTER TABLE join_configs ADD COLUMN game_id INTEGER")
+backend/core/database/database.py:2080:                    game_id = (
+backend/core/database/database.py:2081:                        SELECT game_id FROM log_events WHERE id = CAST(
+backend/core/database/database.py:2178:                        game_id INTEGER,
+backend/core/database/database.py:2183:                        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/database.py:2194:                "CREATE INDEX IF NOT EXISTS idx_join_configs_game_id ON join_configs(game_id)"
+backend/core/database/database.py:2200:                "CREATE INDEX IF NOT EXISTS idx_field_presets_game_id ON field_selection_presets(game_id)"
+backend/core/database/database.py:2343:                if "game_id" not in columns:
+backend/core/database/database.py:2344:                    logger.info("Migration v12: Adding game_id column...")
+backend/core/database/database.py:2345:                    cursor.execute("ALTER TABLE flow_templates ADD COLUMN game_id INTEGER")
+backend/core/database/database.py:2347:                    cursor.execute("UPDATE flow_templates SET game_id = 1 WHERE game_id IS NULL")
+backend/core/database/database.py:2348:                    logger.info("Migration v12: game_id column added")
+backend/core/database/database.py:2381:                        game_id INTEGER NOT NULL,
+backend/core/database/database.py:2388:                        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/database.py:2396:                    CREATE INDEX IF NOT EXISTS idx_flow_templates_game_id
+backend/core/database/database.py:2397:                    ON flow_templates(game_id)
+backend/core/database/database.py:2399:                logger.info("Migration v12: game_id index created")
+backend/core/database/database.py:2401:                logger.warning(f"Migration v12: Could not create game_id index: {e}")
+backend/core/database/database.py:2428:                        game_id INTEGER NOT NULL,
+backend/core/database/database.py:2435:                        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/database.py:2450:                        game_id INTEGER NOT NULL,
+backend/core/database/database.py:2459:                        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+backend/core/database/database.py:2461:                        UNIQUE(game_id, param_id, alias)
+backend/core/database/database.py:2469:                    CREATE INDEX IF NOT EXISTS idx_event_nodes_game_id
+backend/core/database/database.py:2470:                    ON event_nodes(game_id)
+backend/core/database/database.py:2477:                    CREATE INDEX IF NOT EXISTS idx_parameter_aliases_game_id
+backend/core/database/database.py:2478:                    ON parameter_aliases(game_id)
+backend/core/database/database.py:2504:                        game_id INTEGER NOT NULL,
+backend/core/database/database.py:2511:                        UNIQUE(game_id, param_name),
+backend/core/database/database.py:2512:                        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+backend/core/database/database.py:2538:                    ON field_name_mappings(game_id, param_name)
+backend/core/database/database.py:2689:                            WHERE g.id = log_events.game_id
+backend/core/database/database.py:2760:        "CREATE INDEX IF NOT EXISTS idx_log_events_game_id ON log_events(game_id)",
+backend/core/database/database.py:2767:        "CREATE INDEX IF NOT EXISTS idx_common_params_game_id ON common_params(game_id)",
+backend/core/database/database.py:2795:        "CREATE INDEX IF NOT EXISTS idx_join_configs_game_id ON join_configs(game_id)",
+backend/core/database/database.py:2798:        "CREATE INDEX IF NOT EXISTS idx_field_presets_game_id ON field_selection_presets(game_id)",
+backend/core/database/database.py:2806:        "CREATE INDEX IF NOT EXISTS idx_log_events_game_id_updated_at ON log_events(game_id, updated_at)",
+backend/core/database/database.py:2809:        "CREATE INDEX IF NOT EXISTS idx_common_params_game_status ON common_params(game_id, status)",
+backend/core/cache/cache_hierarchical.py:213:        - 从pattern中提取指定的参数约束（如 game_id:*)
+backend/core/cache/cache_hierarchical.py:218:            key: 缓存键（如 'dwd_gen:v3:test.key:event_id:0:game_id:1'）
+backend/core/cache/cache_hierarchical.py:219:            pattern: 通配符模式（如 'dwd_gen:v3:test.key:game_id:*'）
+backend/core/cache/cache_hierarchical.py:225:            >>> key = 'dwd_gen:v3:test.key:event_id:0:game_id:1'
+backend/core/cache/cache_hierarchical.py:226:            >>> pattern = 'dwd_gen:v3:test.key:game_id:*'
+backend/core/cache/cache_hierarchical.py:326:        def get_events(game_id: int, page: int):
+backend/core/cache/cache_hierarchical.py:327:            return fetch_events_from_db(game_id, page)
+backend/core/cache/cache_system.py:25:    def get_events(game_id: int, page: int):
+backend/core/cache/cache_system.py:26:        return fetch_events_from_db(game_id, page)
+backend/core/cache/cache_system.py:30:    def get_game(game_id: int):
+backend/core/cache/cache_system.py:31:        return fetch_game_from_db(game_id)
+backend/core/cache/cache_system.py:76:            >>> CacheKeyBuilder.build('events.list', game_id=1, page=1)
+backend/core/cache/cache_system.py:77:            'dwd_gen:v3:events.list:game_id:1:page:1'
+backend/core/cache/cache_system.py:78:            >>> CacheKeyBuilder.build('events.list', page=1, game_id=1)
+backend/core/cache/cache_system.py:79:            'dwd_gen:v3:events.list:game_id:1:page:1'  # 参数顺序不影响
+backend/core/cache/cache_system.py:102:            >>> CacheKeyBuilder.build_pattern('events.list', game_id=1)
+backend/core/cache/cache_system.py:103:            'dwd_gen:v3:events.list:game_id:*'
+backend/core/cache/cache_system.py:372:        - 从pattern中提取指定的参数约束（如 game_id:*)
+backend/core/cache/cache_system.py:377:            key: 缓存键（如 'dwd_gen:v3:test.key:event_id:0:game_id:1'）
+backend/core/cache/cache_system.py:378:            pattern: 通配符模式（如 'dwd_gen:v3:test.key:game_id:*'）
+backend/core/cache/cache_system.py:384:            >>> key = 'dwd_gen:v3:test.key:event_id:0:game_id:1'
+backend/core/cache/cache_system.py:385:            >>> pattern = 'dwd_gen:v3:test.key:game_id:*'
+backend/core/cache/cache_system.py:622:    def invalidate_game(self, game_id: int):
+backend/core/cache/cache_system.py:627:            game_id: 游戏ID
+backend/core/cache/cache_system.py:630:            ("games.detail", {"id": game_id}),
+backend/core/cache/cache_system.py:632:            ("events.list", {"game_id": game_id}),
+backend/core/cache/cache_system.py:633:            ("events.*", {"game_id": game_id}),
+backend/core/cache/cache_system.py:639:        logger.info(f"🗑️ 游戏缓存已失效: game_id={game_id}")
+backend/core/cache/cache_system.py:670:        def get_events(game_id: int, page: int):
+backend/core/cache/cache_system.py:671:            return fetch_events_from_db(game_id, page)
+backend/core/cache/cache_system.py:717:        def get_game(game_id: int):
+backend/core/cache/cache_system.py:718:            return fetch_game_from_db(game_id)
+backend/core/cache/cache_system.py:790:def clear_game_cache(game_id=None):
+backend/core/cache/cache_system.py:798:        game_id: 游戏ID（None表示清除所有游戏缓存）
+backend/core/cache/cache_system.py:800:    if game_id is not None:
+backend/core/cache/cache_system.py:802:        cache_invalidator.invalidate_game(game_id)
+backend/core/cache/cache_system.py:803:        logger.info(f"🗑️ 游戏缓存已清除: game_id={game_id}")
+backend/core/utils/validators.py:160:def validate_game_id(game_gid: int) -> Tuple[bool, Optional[str]]:
+backend/core/utils/validators.py:408:    "validate_game_id",
+backend/core/utils/__init__.py:48:    validate_game_id,
+backend/core/utils/__init__.py:174:    "validate_game_id",
+backend/core/common.py:144:        >>> clear_entity_caches('game', game_id)
+backend/core/utils.py:765:def validate_game_id(game_gid: int) -> Tuple[bool, Optional[str]]:
+backend/core/performance.py:104:        def get_events(game_id):
+backend/core/performance.py:105:            return fetch_events_from_db(game_id)
+backend/core/performance.py:213:        def get_events_api(game_id, page):
+backend/core/performance.py:359:        def get_events(game_id):
+backend/core/performance.py:360:            return fetch_events_from_db(game_id)
+backend/models/events.py:451:        selected_game_id=game_gid,
+backend/models/events.py:1190:        selected_game_id = request.args.get("game_gid", type=int)
+backend/models/events.py:1191:        if not selected_game_id and games:
+backend/models/events.py:1192:            selected_game_id = games[0]["id"]
+backend/models/events.py:1197:            selected_game_id=selected_game_id,
+backend/models/repositories/events.py:389:            ...         'game_id': 1,
+backend/models/repositories/events.py:418:                        game_id, event_name, event_name_cn, category_id,
+backend/models/repositories/events.py:423:                        event_data["game_id"],
+backend/models/repositories/games.py:180:    def get_game_for_update(self, game_id: int) -> Optional[Dict[str, Any]]:
+backend/models/repositories/games.py:185:            game_id: 游戏ID
+backend/models/repositories/games.py:194:        return fetch_one_as_dict(query, (game_id,))
+backend/models/repositories/parameters.py:310:                le.game_id,
+backend/models/schemas.py:355:    game_id: int
+backend/api/routes/events.py:233:        db_game_id = game["id"]
+backend/api/routes/events.py:242:            """INSERT INTO log_events (game_id, game_gid, event_name, event_name_cn, category_id, source_table, target_table, include_in_common_params)
+backend/api/routes/events.py:245:                db_game_id,
+backend/api/routes/events.py:300:        - game_id: Legacy parameter for backward compatibility (deprecated)
+backend/api/routes/events.py:305:        game_id = request.args.get("game_id", type=int)
+backend/api/routes/events.py:306:        if game_id:
+backend/api/routes/events.py:308:            game = Repositories.GAMES.find_by_id(game_id)
+backend/api/routes/join_configs.py:70:    - game_id: Filter by game database ID (deprecated, for backward compatibility)
+backend/api/routes/join_configs.py:75:    game_id = request.args.get("game_id", type=int)
+backend/api/routes/join_configs.py:88:    elif game_id:
+backend/api/routes/join_configs.py:90:        game = Repositories.GAMES.find_by_id(game_id)
+backend/api/routes/join_configs.py:189:                where_conditions, field_mappings, description, game_id
+backend/api/routes/join_configs.py:267:            data["game_id"] = game["id"]
+backend/api/routes/join_configs.py:286:            "game_id",
+backend/api/routes/games.py:62:    def clear_game_cache(game_id=None):
+backend/api/routes/games.py:70:            game_id (int, optional): Game ID to clear cache for. Defaults to None.
+backend/api/routes/games.py:154:        LEFT JOIN flow_templates ft ON ft.game_id = g.id
+backend/api/routes/games.py:425:    game_id = game["id"]
+backend/api/routes/games.py:555:    game_ids = data.get("ids", [])
+backend/api/routes/games.py:557:    if not game_ids or not isinstance(game_ids, list):
+backend/api/routes/games.py:562:        games = Repositories.GAMES.find_by_ids(game_ids)
+backend/api/routes/games.py:583:        deleted_count = Repositories.GAMES.delete_batch(game_ids)
+backend/api/routes/games.py:610:    game_ids = data.get("ids", [])
+backend/api/routes/games.py:613:    if not game_ids or not updates:
+backend/api/routes/games.py:635:        updated_count = Repositories.GAMES.update_batch(game_ids, updates)
+backend/api/routes/legacy_api.py:118:        game_id = game['id']
+backend/api/routes/legacy_api.py:124:                game_id,
+backend/api/routes/legacy_api.py:133:            WHERE game_id = ?
+backend/api/routes/legacy_api.py:135:        """, (game_id,))
+backend/api/routes/_param_helpers.py:23:    Supports both game_gid (business GID, recommended) and game_id (database ID)
+backend/api/routes/_param_helpers.py:27:        Tuple of (game_id, game_gid, error_message)
+backend/api/routes/_param_helpers.py:28:        - game_id: Database ID (for common_params table queries)
+backend/api/routes/_param_helpers.py:33:        >>> game_id, game_gid, error = resolve_game_context()
+backend/api/routes/_param_helpers.py:40:    game_id = request.args.get("game_id", type=int)
+backend/api/routes/_param_helpers.py:47:        game_id = game["id"]
+backend/api/routes/_param_helpers.py:48:        return game_id, game_gid, None
+backend/api/routes/_param_helpers.py:49:    elif game_id:
+backend/api/routes/_param_helpers.py:54:            return None, None, f"Game not found: id={game_id}"
+backend/api/routes/_param_helpers.py:55:        return game_id, game["gid"], None
+backend/api/routes/_param_helpers.py:58:        session_game_id = session.get("current_game_id")
+backend/api/routes/_param_helpers.py:59:        if session_game_id:
+backend/api/routes/_param_helpers.py:62:                return session_game_id, game["gid"], None
+backend/api/routes/_param_helpers.py:64:        return None, None, "Game context required (game_gid or game_id)"
+backend/api/routes/_param_helpers.py:69:    game_id: Optional[int] = None
+backend/api/routes/_param_helpers.py:76:        game_id: Database ID (fallback)
+backend/api/routes/_param_helpers.py:84:        >>> where, value = get_where_clause_for_game(game_id=1)
+backend/api/routes/_param_helpers.py:89:    elif game_id:
+backend/api/routes/_param_helpers.py:90:        return "le.game_id = ?", game_id
+backend/api/routes/_param_helpers.py:92:        raise ValueError("Either game_gid or game_id must be provided")
+backend/api/routes/_param_helpers.py:108:        params: Base query parameters (game_id or game_gid)
+backend/api/routes/parameters.py:73:    支持game_gid参数(推荐)或game_id参数(向后兼容)
+backend/api/routes/parameters.py:82:        game_id, game_gid, error = resolve_game_context()
+backend/api/routes/parameters.py:94:            "game_id": game_id,
+backend/api/routes/parameters.py:104:            logger.debug(f"✅ Cache HIT: parameters.all for game_id={game_id}, page={page}")
+backend/api/routes/parameters.py:111:        logger.debug(f"❌ Cache MISS: parameters.all for game_id={game_id}, page={page}")
+backend/api/routes/parameters.py:184:        logger.debug(f"💾 Cache SET: parameters.all for game_id={game_id}, page={page}")
+backend/api/routes/parameters.py:205:        - game_id: Game database ID (optional, for backward compatibility)
+backend/api/routes/parameters.py:210:        game_id = request.args.get("game_id", type=int)
+backend/api/routes/parameters.py:221:        elif game_id:
+backend/api/routes/parameters.py:229:                query_value = game_id
+backend/api/routes/parameters.py:230:            common_query_value = game_id
+backend/api/routes/parameters.py:233:            game_id = session.get("current_game_id")
+backend/api/routes/parameters.py:234:            if not game_id:
+backend/api/routes/parameters.py:236:                    "Game context required (game_gid or game_id)", status_code=400
+backend/api/routes/parameters.py:245:                query_value = game_id
+backend/api/routes/parameters.py:246:            common_query_value = game_id
+backend/api/routes/parameters.py:271:            "le.game_id", "e.game_id"
+backend/api/routes/parameters.py:293:            WHERE param_name = ? AND game_id = ?
+backend/api/routes/parameters.py:315:        - game_id: Game database ID (optional, for backward compatibility)
+backend/api/routes/parameters.py:320:        game_id = request.args.get("game_id", type=int)
+backend/api/routes/parameters.py:331:        elif game_id:
+backend/api/routes/parameters.py:339:                query_value = game_id
+backend/api/routes/parameters.py:340:            common_query_value = game_id
+backend/api/routes/parameters.py:343:            game_id = session.get("current_game_id")
+backend/api/routes/parameters.py:344:            if not game_id:
+backend/api/routes/parameters.py:346:                    "Game context required (game_gid or game_id)", status_code=400
+backend/api/routes/parameters.py:355:                query_value = game_id
+backend/api/routes/parameters.py:356:            common_query_value = game_id
+backend/api/routes/parameters.py:389:            WHERE game_id = ?
+backend/api/routes/parameters.py:442:            event = fetch_one_as_dict("SELECT game_id FROM log_events WHERE id = ?", (param["event_id"],))
+backend/api/routes/parameters.py:444:                game_id = event["game_id"]
+backend/api/routes/parameters.py:447:                cache_invalidator.invalidate_pattern("parameters.all", game_id=game_id)
+backend/api/routes/parameters.py:452:                logger.info(f"✅ Cache invalidated for parameter update: id={id}, game_id={game_id}")
+backend/api/routes/parameters.py:518:        - game_id: Game database ID (optional, for backward compatibility)
+backend/api/routes/parameters.py:523:        game_id = request.args.get("game_id", type=int)
+backend/api/routes/parameters.py:534:        elif game_id:
+backend/api/routes/parameters.py:542:                query_value = game_id
+backend/api/routes/parameters.py:543:            common_query_value = game_id
+backend/api/routes/parameters.py:546:            game_id = session.get("current_game_id")
+backend/api/routes/parameters.py:547:            if not game_id:
+backend/api/routes/parameters.py:549:                    "Game context required (game_gid or game_id)", status_code=400
+backend/api/routes/parameters.py:558:                query_value = game_id
+backend/api/routes/parameters.py:559:            common_query_value = game_id
+backend/api/routes/parameters.py:577:            WHERE cp.game_id = ?
+backend/api/routes/parameters.py:597:        - game_id: Game database ID (optional, for backward compatibility)
+backend/api/routes/parameters.py:602:        game_id, game_gid, error = resolve_game_context()
+backend/api/routes/parameters.py:802:            JOIN games g ON p.game_id = g.id
+backend/services/event_node_builder/__init__.py:194:        game_id = game["id"]
+backend/services/event_node_builder/__init__.py:203:            "SELECT * FROM event_nodes WHERE game_id = ? AND name = ?",
+backend/services/event_node_builder/__init__.py:204:            (game_id, name)
+backend/services/event_node_builder/__init__.py:213:            INSERT INTO event_nodes (game_id, name, event_id, config_json)
+backend/services/event_node_builder/__init__.py:216:            (game_id, name, event_id, config_json),
+backend/services/event_node_builder/__init__.py:345:        game_id = game["id"]
+backend/services/event_node_builder/__init__.py:352:            WHERE en.game_id = ? AND en.is_active = 1
+backend/services/event_node_builder/__init__.py:355:            (game_id,),
+backend/services/event_node_builder/__init__.py:417:            INSERT INTO event_nodes (game_id, name, event_id, config_json)
+backend/services/event_node_builder/__init__.py:420:            (node["game_id"], new_name, node["event_id"], node["config_json"]),
+backend/services/parameters/parameter_aliases.py:44:    game_id = game["id"]
+backend/services/parameters/parameter_aliases.py:53:        WHERE pa.game_id = ? AND pa.param_id = ?
+backend/services/parameters/parameter_aliases.py:56:        (game_id, param_id),
+backend/services/parameters/parameter_aliases.py:83:    game_id = game["id"]
+backend/services/parameters/parameter_aliases.py:94:        WHERE game_id = ? AND param_id = ? AND alias = ?
+backend/services/parameters/parameter_aliases.py:96:        (game_id, param_id, alias),
+backend/services/parameters/parameter_aliases.py:108:            WHERE game_id = ? AND param_id = ?
+backend/services/parameters/parameter_aliases.py:110:            (game_id, param_id),
+backend/services/parameters/parameter_aliases.py:116:        INSERT INTO parameter_aliases (game_id, param_id, alias, display_name, is_preferred, usage_count, last_used_at)
+backend/services/parameters/parameter_aliases.py:119:        (game_id, param_id, alias, display_name, is_preferred),
+backend/services/parameters/parameter_aliases.py:156:                WHERE game_id = ? AND param_id = ? AND id != ?
+backend/services/parameters/parameter_aliases.py:158:                (alias["game_id"], alias["param_id"], alias_id),
+backend/services/parameters/parameter_aliases.py:187:    game_id = alias["game_id"]
+backend/services/parameters/parameter_aliases.py:195:        WHERE game_id = ? AND param_id = ?
+backend/services/parameters/parameter_aliases.py:197:        (game_id, param_id),
+backend/services/parameters/param_library_manager.py:26:        self, game_id: Optional[int] = None, category: Optional[str] = None
+backend/services/parameters/param_library_manager.py:38:        if game_id:
+backend/services/parameters/param_library_manager.py:46:                params.append(game_id)  # Will return no results
+backend/services/parameters/common_params.py:40:        game_id = game['id']
+backend/services/parameters/common_params.py:41:        logger.info(f"[DEBUG] Found game_id={game_id} for game_gid={game_gid}")
+backend/services/parameters/common_params.py:47:                game_id,
+backend/services/parameters/common_params.py:56:            WHERE game_id = ?
+backend/services/parameters/common_params.py:58:        """, (game_id,))
+backend/services/parameters/common_params.py:88:    game_gid = data.get("game_gid") or data.get("game_id")
+backend/services/parameters/common_params.py:118:        common_params_game_id = game_record["id"]
+backend/services/parameters/common_params.py:149:                    "SELECT id FROM common_params WHERE game_id = ? AND param_name = ?",
+backend/services/parameters/common_params.py:150:                    (common_params_game_id, param_name),
+backend/services/parameters/common_params.py:170:                        game_id, param_name, param_name_cn, param_type,
+backend/services/parameters/common_params.py:175:                        common_params_game_id,
+backend/services/events/event_nodes.py:128:    game_id = game["id"]
+backend/services/events/event_nodes.py:135:        WHERE en.game_id = ? AND en.is_active = 1
+backend/services/events/event_nodes.py:138:        (game_id,),
+backend/services/events/event_nodes.py:196:    game_id = game["id"]
+backend/services/events/event_nodes.py:205:        "SELECT * FROM event_nodes WHERE game_id = ? AND name = ?", (game_id, name)
+backend/services/events/event_nodes.py:214:        INSERT INTO event_nodes (game_id, name, event_id, config_json)
+backend/services/events/event_nodes.py:217:        (game_id, name, event_id, config_json),
+backend/services/events/event_nodes.py:222:        save_parameter_aliases(game_id, config["fieldList"])
+backend/services/events/event_nodes.py:323:    game_id = game["id"]
+backend/services/events/event_nodes.py:338:                WHERE game_id = ? AND param_id = ? AND alias = ?
+backend/services/events/event_nodes.py:340:                (game_id, param_id, alias),
+backend/services/events/event_nodes.py:360:                    INSERT INTO parameter_aliases (game_id, param_id, alias, display_name, usage_count, last_used_at)
+backend/services/events/event_nodes.py:363:                    (game_id, param_id, alias, display_name),

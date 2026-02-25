@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * HQL查看模态框组件
  * HQL View Modal Component

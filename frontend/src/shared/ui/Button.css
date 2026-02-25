@@ -347,21 +347,21 @@
 
 /* Icon button sizes */
 .btn-icon-xs {
-  padding: var(--space-1);
-  width: 24px;
-  height: 24px;
+  padding: var(--space-2);
+  width: 44px;
+  height: 44px;
 }
 
 .btn-icon-sm {
   padding: var(--space-2);
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
 }
 
 .btn-icon-md {
   padding: var(--space-2);
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
 }
 
 .btn-icon-lg {

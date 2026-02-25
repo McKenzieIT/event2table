@@ -1,0 +1,19 @@
+backend/core/database/_helpers.py:120:        cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+backend/core/data_access.py:86:        query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = ?"
+backend/core/data_access.py:109:        query = f"SELECT * FROM {self.table_name} WHERE {field} = ?"
+backend/core/data_access.py:130:        query = f"SELECT * FROM {self.table_name}"
+backend/core/data_access.py:166:        query = f"SELECT * FROM {self.table_name}"
+backend/core/data_access.py:318:            query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} IN ({placeholders})"
+backend/api/routes/templates.py:97:        count_sql = f"SELECT COUNT(*) FROM flow_templates WHERE {where_sql}"
+backend/services/hql/core/dml_generator.py:328:                f"source_query must be a SELECT statement, got: {stripped[:50]}..."
+backend/services/hql/core/generator.py:149:        hql = f"SELECT\n  {select_fields}\n{join_sql}\nWHERE\n  {where_clause}"
+backend/services/hql/builders/union_builder.py:76:        return f"SELECT\n  {fields_str}\nFROM {from_clause}"
+backend/services/hql/builders/union_builder.py:170:        return f"SELECT\n  {fields_str}\nFROM {from_clause}\nWHERE {where_clause}"
+backend/services/hql/builders/union_builder.py:242:            return f"SELECT\n  {fields_str}\nFROM {from_clause}\nWHERE {where_clause}"
+backend/services/hql/builders/union_builder.py:244:            return f"SELECT\n  {fields_str}\nFROM {from_clause}"
+backend/services/hql/builders/join_builder.py:162:        full_sql = f"SELECT *\n{join_sql}\nWHERE {where_clause}"
+backend/core/database/database.py:1440:                    cursor.execute(f"PRAGMA user_version = {version}")
+backend/core/database/database.py:2738:        cursor.execute(f"PRAGMA user_version = {target_version}")
+backend/core/database/_helpers.py:25:        conn.execute(f"PRAGMA {key}={value}")
+backend/core/database/_helpers.py:120:        cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+backend/core/database/_helpers.py:144:    cursor.execute(f"PRAGMA table_info({table_name})")

@@ -296,34 +296,9 @@
   overflow-x: auto;
 }
 
-.oled-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-}
-
+/* Page-specific table styles - generic styles moved to shared Table.css */
 .oled-table thead {
   background: var(--bg-elevated);
-}
-
-.oled-table th {
-  padding: var(--space-3) var(--space-4);
-  text-align: left;
-  font-family: var(--font-display);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
-  border-bottom: 2px solid var(--border-default);
-}
-
-.oled-table td {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-}
-
-.oled-table tbody tr:hover {
-  background: rgba(6, 182, 212, 0.03);
 }
 
 .oled-table code {

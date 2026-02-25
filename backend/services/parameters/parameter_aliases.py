@@ -37,12 +37,6 @@ def get_parameter_aliases():
     if not param_id:
         return json_error_response("param_id is required", status_code=400)
 
-    # Convert game_gid to game_id
-    game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
-    if not game:
-        return json_error_response("Game not found", status_code=404)
-    game_id = game["id"]
-
     # Get aliases, ordered by is_preferred (preferred first), then usage_count
     # Note: param_id references event_params table (not the old 'parameters' table)
     aliases = fetch_all_as_dict(
@@ -50,10 +44,10 @@ def get_parameter_aliases():
         SELECT pa.*, ep.param_name, ep.param_name_cn
         FROM parameter_aliases pa
         LEFT JOIN event_params ep ON pa.param_id = ep.id
-        WHERE pa.game_id = ? AND pa.param_id = ?
+        WHERE pa.game_gid = ? AND pa.param_id = ?
         ORDER BY pa.is_preferred DESC, pa.usage_count DESC, pa.last_used_at DESC
     """,
-        (game_id, param_id),
+        (game_gid, param_id),
     )
 
     return json_success_response(data=aliases, message="Parameter aliases retrieved")
@@ -76,10 +70,12 @@ def create_parameter_alias():
     display_name = data.get("display_name", "")
     is_preferred = data.get("is_preferred", 0)
 
-    # Convert game_gid to game_id
-    game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+    # Validate game exists
+    game = fetch_one_as_dict("SELECT id, gid FROM games WHERE gid = ?", (game_gid,))
     if not game:
         return json_error_response("Game not found", status_code=404)
+
+    # Get game_id for legacy support (both game_id and game_gid are stored)
     game_id = game["id"]
 
     # Validate parameter exists (param_id references event_params table)
@@ -91,13 +87,15 @@ def create_parameter_alias():
     existing = fetch_one_as_dict(
         """
         SELECT * FROM parameter_aliases
-        WHERE game_id = ? AND param_id = ? AND alias = ?
+        WHERE game_gid = ? AND param_id = ? AND alias = ?
     """,
-        (game_id, param_id, alias),
+        (game_gid, param_id, alias),
     )
 
     if existing:
-        return json_error_response("Alias already exists for this parameter", status_code=400)
+        return json_error_response(
+            "Alias already exists for this parameter", status_code=400
+        )
 
     # If setting as preferred, unset other preferred aliases
     if is_preferred:
@@ -105,23 +103,27 @@ def create_parameter_alias():
             """
             UPDATE parameter_aliases
             SET is_preferred = 0
-            WHERE game_id = ? AND param_id = ?
+            WHERE game_gid = ? AND param_id = ?
         """,
-            (game_id, param_id),
+            (game_gid, param_id),
         )
 
-    # Create alias
+    # Create alias (store both game_id and game_gid for migration support)
     alias_id = execute_write(
         """
-        INSERT INTO parameter_aliases (game_id, param_id, alias, display_name, is_preferred, usage_count, last_used_at)
-        VALUES (?, ?, ?, ?, ?, 0, NULL)
+        INSERT INTO parameter_aliases (game_id, game_gid, param_id, alias, display_name, is_preferred, usage_count, last_used_at)
+        VALUES (?, ?, ?, ?, ?, ?, 0, NULL)
     """,
-        (game_id, param_id, alias, display_name, is_preferred),
+        (game_id, game_gid, param_id, alias, display_name, is_preferred),
         return_last_id=True,
     )
 
-    alias = fetch_one_as_dict("SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,))
-    return json_success_response(data=alias, message="Parameter alias created", status_code=201)
+    alias = fetch_one_as_dict(
+        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+    )
+    return json_success_response(
+        data=alias, message="Parameter alias created", status_code=201
+    )
 
 
 @parameter_aliases_bp.route("/api/parameter-aliases/<int:alias_id>", methods=["PUT"])
@@ -130,7 +132,9 @@ def update_parameter_alias(alias_id):
     data = request.get_json()
 
     # Get existing alias
-    alias = fetch_one_as_dict("SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,))
+    alias = fetch_one_as_dict(
+        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+    )
     if not alias:
         return json_error_response("Parameter alias not found", status_code=404)
 
@@ -153,9 +157,9 @@ def update_parameter_alias(alias_id):
                 """
                 UPDATE parameter_aliases
                 SET is_preferred = 0
-                WHERE game_id = ? AND param_id = ? AND id != ?
+                WHERE game_gid = ? AND param_id = ? AND id != ?
             """,
-                (alias["game_id"], alias["param_id"], alias_id),
+                (alias["game_gid"], alias["param_id"], alias_id),
             )
 
         update_fields.append("is_preferred = ?")
@@ -166,25 +170,42 @@ def update_parameter_alias(alias_id):
         execute_write(
             f"""
             UPDATE parameter_aliases
-            SET {', '.join(update_fields)}, updated_at = CURRENT_TIMESTAMP
+            SET {", ".join(update_fields)}, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         """,
             update_values,
         )
 
-    updated_alias = fetch_one_as_dict("SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,))
+    updated_alias = fetch_one_as_dict(
+        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+    )
     return json_success_response(data=updated_alias, message="Parameter alias updated")
 
 
-@parameter_aliases_bp.route("/api/parameter-aliases/<int:alias_id>/prefer", methods=["PUT"])
+@parameter_aliases_bp.route(
+    "/api/parameter-aliases/<int:alias_id>/prefer", methods=["PUT"]
+)
 def set_preferred_alias(alias_id):
     """API: Set an alias as preferred"""
     # Get existing alias
-    alias = fetch_one_as_dict("SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,))
+    alias = fetch_one_as_dict(
+        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+    )
     if not alias:
         return json_error_response("Parameter alias not found", status_code=404)
 
-    game_id = alias["game_id"]
+    # Handle both game_id and game_gid (migration support)
+    game_gid = alias.get("game_gid")
+    if not game_gid and alias.get("game_id"):
+        # Convert game_id to game_gid if needed
+        game_record = fetch_one_as_dict(
+            "SELECT gid FROM games WHERE id = ?", (alias["game_id"],)
+        )
+        game_gid = game_record["gid"] if game_record else None
+
+    if not game_gid:
+        return json_error_response("Game not found for alias", status_code=400)
+
     param_id = alias["param_id"]
 
     # Unset other preferred aliases
@@ -192,9 +213,9 @@ def set_preferred_alias(alias_id):
         """
         UPDATE parameter_aliases
         SET is_preferred = 0
-        WHERE game_id = ? AND param_id = ?
+        WHERE game_gid = ? AND param_id = ?
     """,
-        (game_id, param_id),
+        (game_gid, param_id),
     )
 
     # Set this alias as preferred
@@ -207,11 +228,15 @@ def set_preferred_alias(alias_id):
         (alias_id,),
     )
 
-    updated_alias = fetch_one_as_dict("SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,))
+    updated_alias = fetch_one_as_dict(
+        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+    )
     return json_success_response(data=updated_alias, message="Preferred alias set")
 
 
-@parameter_aliases_bp.route("/api/parameters/<int:param_id>/display-name", methods=["PUT"])
+@parameter_aliases_bp.route(
+    "/api/parameters/<int:param_id>/display-name", methods=["PUT"]
+)
 def update_parameter_display_name(param_id):
     """API: Update parameter's display name
 
@@ -239,5 +264,9 @@ def update_parameter_display_name(param_id):
         (display_name, param_id),
     )
 
-    updated_param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (param_id,))
-    return json_success_response(data=updated_param, message="Parameter display name updated")
+    updated_param = fetch_one_as_dict(
+        "SELECT * FROM event_params WHERE id = ?", (param_id,)
+    )
+    return json_success_response(
+        data=updated_param, message="Parameter display name updated"
+    )

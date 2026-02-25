@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
-import { Button, SearchInput } from '@shared/ui';
+import { Button, SearchInput, Spinner } from '@shared/ui';
 import { BindToLibraryButton } from '@shared/components/BindToLibraryButton';
 import './ParametersEnhanced.css';
 
@@ -45,7 +45,11 @@ function ParametersEnhanced() {
   }, [parameters]);
 
   if (isLoading) {
-    return <div className="loading">加载中...</div>;
+    return (
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spinner size="lg" label="加载中..." />
+      </div>
+    );
   }
 
   return (

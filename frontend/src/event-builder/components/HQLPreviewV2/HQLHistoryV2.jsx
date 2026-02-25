@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import './HQLHistoryV2.css';
 
 export default function HQLHistoryV2({
@@ -49,7 +50,7 @@ export default function HQLHistoryV2({
       // 默认实现：将HQL复制到剪贴板
       try {
         await navigator.clipboard.writeText(item.hql);
-        alert('HQL已复制到剪贴板');
+        toast.success('HQL已复制到剪贴板');
       } catch (err) {
         console.error('Failed to copy HQL:', err);
       }
@@ -59,7 +60,7 @@ export default function HQLHistoryV2({
   // 对比选中的版本
   const handleCompare = () => {
     if (selectedVersions.length !== 2) {
-      alert('请选择2个版本进行对比');
+      toast.error('请选择2个版本进行对比');
       return;
     }
 

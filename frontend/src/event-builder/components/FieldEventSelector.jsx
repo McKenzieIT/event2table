@@ -14,7 +14,7 @@
  * @component FieldEventSelector
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import './FieldEventSelector.css';
 
@@ -75,7 +75,19 @@ function CategorySection({
 }) {
   return (
     <div className="category-section">
-      <div className="category-header" onClick={onToggle}>
+      <div
+        className="category-header"
+        onClick={onToggle}
+        tabIndex={0}
+        role="button"
+        aria-label={`切换${category || '未分类'}分类`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
+      >
         <div className="category-info">
           <i className={`bi bi-chevron-${isExpanded ? 'down' : 'right'}`}></i>
           <span className="category-name">{category || '未分类'}</span>
@@ -113,6 +125,7 @@ export default function FieldEventSelector({
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const searchDebounceRef = useRef(null);
 
   // Group events by category
   const eventsByCategory = useMemo(() => {
@@ -210,7 +223,15 @@ export default function FieldEventSelector({
             className="search-input"
             placeholder="搜索事件名称或分类..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (searchDebounceRef.current) {
+                clearTimeout(searchDebounceRef.current);
+              }
+              searchDebounceRef.current = setTimeout(() => {
+                setSearchQuery(value);
+              }, 300);
+            }}
           />
           {searchQuery && (
             <button

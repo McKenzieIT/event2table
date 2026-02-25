@@ -1,5 +1,5 @@
 """
-Games API Routes Module
+Games API Routes Module (精简架构)
 
 This module contains all game-related API endpoints:
 - GET /api/games - List all games
@@ -11,72 +11,230 @@ This module contains all game-related API endpoints:
 - DELETE /api/games/batch - Batch delete games
 - PUT /api/games/batch-update - Batch update games
 
+架构变更:
+- 使用统一Entity模型 (GameEntity) 进行请求验证和响应序列化
+- 移除手动验证,改用Pydantic自动验证
+- 返回GameEntity.model_dump()而非字典
+
 NOTE: All game queries use business GID (e.g., 10000147), not database ID.
 """
 
 import logging
-import sqlite3
-from typing import Any, Dict, Tuple
+from typing import List, Tuple, Dict, Any
+from pydantic import ValidationError
 
-# Import cache functions
-import sys
+from flask import request
 
-from flask import request, Response
+# 导入统一Entity模型
+from backend.models.entities import GameEntity
 
-# Import shared utilities and response functions
-from backend.core.utils import (
-    execute_write,
-    fetch_all_as_dict,
-    fetch_one_as_dict,
-    json_error_response,
-    json_success_response,
-    safe_int_convert,
-    sanitize_and_validate_string,
-    validate_json_request,
-)
+# 导入响应工具
+from backend.core.utils import json_error_response, json_success_response
 
-# Import Repository pattern for data access
-from backend.core.data_access import Repositories
+# 导入Service层
+from backend.services.games.game_service import GameService
 
-sys.path.append("..")
+# 导入缓存失效器 (用于兼容性)
 try:
-    from backend.core.cache.cache_system import clear_cache_pattern, clear_game_cache
+    from backend.core.cache.cache_system import CacheInvalidator
 except ImportError:
-    # Cache functions not available, use no-op placeholders
-
-    def clear_cache_pattern(pattern):
-        """
-        Clear cache entries matching a pattern (fallback implementation).
-
-        This is a fallback function used when the cache_system module
-        is not available. It does nothing but prevents ImportError.
-
-        Args:
-            pattern (str): Cache key pattern to match (unused in fallback)
-
-        Returns:
-            None
-        """
-        pass
-
-    def clear_game_cache(game_id=None):
-        """
-        Clear cache entries for a specific game (fallback implementation).
-
-        This is a fallback function used when the cache_system module
-        is not available. It does nothing but prevents ImportError.
-
-        Args:
-            game_id (int, optional): Game ID to clear cache for. Defaults to None.
-
-        Returns:
-            None
-        """
-        pass
-
+    CacheInvalidator = None
 
 # Import the parent blueprint
 from .. import api_bp
+
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# API Endpoints
+# ============================================================================
+
+
+@api_bp.route("/api/games", methods=["GET"])
+def list_games():
+    """
+    获取所有游戏列表
+
+    Query Parameters:
+        include_stats (bool): 是否包含统计信息 (事件数量、流程数量)
+
+    Returns:
+        JSON响应: {"success": true, "data": [...]}
+    """
+    try:
+        include_stats = request.args.get("include_stats", "false").lower() == "true"
+
+        service = GameService()
+        games = service.get_all_games(include_stats=include_stats)
+
+        # 序列化Entity为字典
+        data = [game.model_dump() for game in games]
+
+        return json_success_response(data=data)
+    except Exception as e:
+        logger.error(f"Error listing games: {e}")
+        return json_error_response("Failed to list games", status_code=500)
+
+
+@api_bp.route("/api/games/<int:game_gid>", methods=["GET"])
+def get_game(game_gid: int):
+    """
+    根据GID获取单个游戏
+
+    Args:
+        game_gid: 游戏业务GID (如 10000147)
+
+    Returns:
+        JSON响应: {"success": true, "data": {...}}
+    """
+    try:
+        service = GameService()
+        game = service.get_game_by_gid(game_gid)
+
+        if game is None:
+            return json_error_response(f"Game GID {game_gid} not found", status_code=404)
+
+        # 序列化Entity为字典
+        return json_success_response(data=game.model_dump())
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.error(f"Error getting game {game_gid}: {e}")
+        return json_error_response("Failed to get game", status_code=500)
+
+
+@api_bp.route("/api/games", methods=["POST"])
+def create_game():
+    """
+    创建新游戏
+
+    Request Body:
+        {
+            "gid": 10000147,
+            "name": "STAR001",
+            "ods_db": "ieu_ods",
+            "description": "测试游戏" (可选)
+        }
+
+    Returns:
+        JSON响应: {"success": true, "data": {...}}
+    """
+    try:
+        # 使用Pydantic Entity自动验证
+        game_data = GameEntity(**request.get_json())
+
+        service = GameService()
+        created_game = service.create_game(game_data)
+
+        # 序列化Entity为字典
+        return json_success_response(
+            data=created_game.model_dump(),
+            message="Game created successfully",
+        )
+    except ValidationError as e:
+        return json_error_response(f"Validation error: {e}", status_code=400)
+    except ValueError as e:
+        return json_error_response(str(e), status_code=409)
+    except Exception as e:
+        logger.error(f"Error creating game: {e}")
+        return json_error_response("Failed to create game", status_code=500)
+
+
+@api_bp.route("/api/games/<int:game_gid>", methods=["PUT", "PATCH"])
+def update_game(game_gid: int):
+    """
+    更新游戏信息
+
+    Args:
+        game_gid: 游戏业务GID
+
+    Request Body:
+        {
+            "name": "新名称" (可选),
+            "ods_db": "ieu_ods" (可选)
+        }
+
+    Returns:
+        JSON响应: {"success": true, "data": {...}}
+    """
+    try:
+        # 获取更新字段
+        updates = request.get_json()
+
+        if not updates:
+            return json_error_response("No update fields provided", status_code=400)
+
+        service = GameService()
+        updated_game = service.update_game(game_gid, updates)
+
+        # 序列化Entity为字典
+        return json_success_response(
+            data=updated_game.model_dump(),
+            message="Game updated successfully",
+        )
+    except ValueError as e:
+        return json_error_response(str(e), status_code=404)
+    except Exception as e:
+        logger.error(f"Error updating game {game_gid}: {e}")
+        return json_error_response("Failed to update game", status_code=500)
+
+
+@api_bp.route("/api/games/<int:game_gid>", methods=["DELETE"])
+def delete_game(game_gid: int):
+    """
+    删除游戏
+
+    Args:
+        game_gid: 游戏业务GID
+
+    Returns:
+        JSON响应: {"success": true, "message": "..."}
+    """
+    try:
+        service = GameService()
+        service.delete_game(game_gid)
+
+        return json_success_response(message=f"Game GID {game_gid} deleted successfully")
+    except ValueError as e:
+        return json_error_response(str(e), status_code=404)
+    except Exception as e:
+        logger.error(f"Error deleting game {game_gid}: {e}")
+        return json_error_response("Failed to delete game", status_code=500)
+
+
+@api_bp.route("/api/games/batch", methods=["DELETE"])
+def batch_delete_games():
+    """
+    批量删除游戏
+
+    Request Body:
+        {
+            "game_gids": [10000147, 10000148, ...]
+        }
+
+    Returns:
+        JSON响应: {"success": true, "data": {"deleted_count": 3}}
+    """
+    try:
+        data = request.get_json()
+        game_gids = data.get("game_gids", [])
+
+        if not game_gids:
+            return json_error_response("No game GIDs provided", status_code=400)
+
+        service = GameService()
+        deleted_count = service.batch_delete_games(game_gids)
+
+        return json_success_response(
+            data={"deleted_count": deleted_count},
+            message=f"Deleted {deleted_count} games successfully",
+        )
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.error(f"Error batch deleting games: {e}")
+        return json_error_response("Failed to batch delete games", status_code=500)
 
 logger = logging.getLogger(__name__)
 
@@ -151,7 +309,7 @@ def api_list_games() -> Tuple[Dict[str, Any], int]:
         LEFT JOIN log_events le ON le.game_gid = g.gid
         LEFT JOIN event_params ep ON ep.event_id = le.id
         LEFT JOIN event_node_configs enc ON enc.game_gid = CAST(g.gid AS INTEGER)
-        LEFT JOIN flow_templates ft ON ft.game_id = g.id
+        LEFT JOIN flow_templates ft ON ft.game_gid = g.gid
         GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
         ORDER BY g.id
     """)
@@ -190,17 +348,45 @@ def api_create_game() -> Tuple[Dict[str, Any], int]:
     """
     is_valid, data, error = validate_json_request(["gid", "name", "ods_db"])
     if not is_valid:
+        logger.warning(f"Game creation failed: {error}")
         return json_error_response(error, status_code=400)
 
-    # 验证游戏ID格式
-    if not isinstance(data["gid"], int) or data["gid"] <= 0:
-        return json_error_response("Game GID must be a positive integer", status_code=400)
+    # Log received data for debugging
+    logger.info(f"Game creation request - GID type: {type(data.get('gid'))}, GID value: {data.get('gid')}")
+    logger.info(f"Game creation request - name: {data.get('name')}, ods_db: {data.get('ods_db')}")
+
+    # Validate and convert GID (handle both int and string inputs)
+    gid_value = data.get("gid")
+    if gid_value is None:
+        logger.warning("Game creation failed: GID is missing")
+        return json_error_response("Game GID is required", status_code=400)
+
+    # Convert GID to integer (handle string inputs from frontend)
+    try:
+        if isinstance(gid_value, str):
+            gid_value = int(gid_value)
+        elif not isinstance(gid_value, int):
+            raise ValueError(f"Invalid GID type: {type(gid_value)}")
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Game creation failed: Invalid GID format - {e}")
+        return json_error_response(
+            f"Game GID must be a valid integer, received: {gid_value}",
+            status_code=400
+        )
+
+    # Validate GID is positive
+    if gid_value <= 0:
+        logger.warning(f"Game creation failed: GID must be positive, received: {gid_value}")
+        return json_error_response(
+            "Game GID must be a positive integer", status_code=400
+        )
 
     # 验证和清理游戏名称
     is_valid, result = sanitize_and_validate_string(
         data.get("name"), max_length=200, field_name="name", allow_empty=False
     )
     if not is_valid:
+        logger.warning(f"Game creation failed: Invalid name - {result}")
         return json_error_response(result, status_code=400)
     name = result
 
@@ -209,22 +395,35 @@ def api_create_game() -> Tuple[Dict[str, Any], int]:
         data.get("ods_db", ""), max_length=100, field_name="ods_db", allow_empty=False
     )
     if not is_valid:
+        logger.warning(f"Game creation failed: Invalid ods_db - {result}")
         return json_error_response(result, status_code=400)
     ods_db = result
 
+    # 简化INSERT：只包含必需字段
     try:
-        execute_write(
-            "INSERT INTO games (gid, name, ods_db) VALUES (?, ?, ?)",
-            (data["gid"], name, ods_db),
+        query = "INSERT INTO games (gid, name, ods_db) VALUES (?, ?, ?)"
+        execute_write(query, (gid_value, name, ods_db))
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("dashboard_statistics:*")  # Clear dashboard cache
+        logger.info(f"Game created successfully: {name} (GID: {gid_value})")
+        return json_success_response(
+            message="Game created successfully",
+            data={"gid": gid_value, "name": name, "ods_db": ods_db}
         )
-        clear_cache_pattern("dashboard_statistics")  # Clear dashboard cache
-        logger.info(f"Game created: {data['name']} (GID: {data['gid']})")
-        return json_success_response(message="Game created successfully")
     except sqlite3.IntegrityError:
-        return json_error_response("Game GID already exists", status_code=409)
+        logger.warning(f"Game creation failed: GID {gid_value} already exists")
+        # 使用标准化的错误消息
+        return json_error_response(
+            error_messages.ErrorMessages.duplicate_game_gid(gid_value),
+            status_code=409
+        )
     except Exception as e:
-        logger.error(f"Error creating game: {e}")
-        return json_error_response("Failed to create game", status_code=500)
+        logger.error(f"Error creating game: {e}", exc_info=True)
+        # 使用标准化的错误消息
+        return json_error_response(
+            error_messages.ErrorMessages.server_error(),
+            status_code=500
+        )
 
 
 @api_bp.route("/api/games/<int:gid>", methods=["GET"])
@@ -302,6 +501,16 @@ def api_update_game(gid):
     update_fields = []
     update_values = []
 
+    # Validate input fields against whitelist
+    provided_fields = set(data.keys())
+    invalid_fields = provided_fields - ALLOWED_UPDATE_FIELDS
+    if invalid_fields:
+        return json_error_response(
+            f"Invalid fields: {', '.join(sorted(invalid_fields))}. "
+            f"Allowed fields: {', '.join(sorted(ALLOWED_UPDATE_FIELDS))}",
+            status_code=400,
+        )
+
     # Validate and sanitize name if provided
     if "name" in data:
         is_valid, result = sanitize_and_validate_string(
@@ -325,8 +534,7 @@ def api_update_game(gid):
     # Check if at least one field is being updated
     if not update_fields:
         return json_error_response(
-            "No valid fields to update. Provide 'name' and/or 'ods_db'",
-            status_code=400
+            "No valid fields to update. Provide 'name' and/or 'ods_db'", status_code=400
         )
 
     # Add gid to the values for the WHERE clause
@@ -336,10 +544,19 @@ def api_update_game(gid):
         # Build dynamic UPDATE query
         query = f"UPDATE games SET {', '.join(update_fields)} WHERE gid = ?"
         execute_write(query, tuple(update_values))
-        clear_game_cache()  # Clear cache after update
-        clear_cache_pattern("dashboard_statistics")  # Clear dashboard cache
+
+        # ✅ Fix: Query and return updated game data
+        updated_game = fetch_one_as_dict('SELECT * FROM games WHERE gid = ?', (gid,))
+
+        # ✅ Fix: Clear Flask-Caching cache using cache_invalidator
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("games:list:*")
+            cache_invalidator.invalidate_pattern("games:list:v1")
+            cache_invalidator.invalidate_pattern("dashboard_statistics:*")
         logger.info(f"Game updated: GID {gid}, fields: {', '.join(update_fields)}")
-        return json_success_response(message="Game updated successfully")
+
+        # ✅ Fix: Return updated game data in response
+        return json_success_response(data=updated_game, message="Game updated successfully")
     except Exception as e:
         logger.error(f"Error updating game: {e}")
         return json_error_response("Failed to update game", status_code=500)
@@ -367,33 +584,37 @@ def check_deletion_impact(game_gid: int) -> Dict[str, Any]:
 
     # 检查事件数量
     event_count = fetch_one_as_dict(
-        "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
-        (game_gid,)
+        "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?", (game_gid,)
     )
     impact["event_count"] = event_count["count"]
 
     # 检查参数数量（通过事件关联）
-    param_count = fetch_one_as_dict("""
+    param_count = fetch_one_as_dict(
+        """
         SELECT COUNT(*) as count
         FROM event_params ep
         INNER JOIN log_events le ON ep.event_id = le.id
         WHERE le.game_gid = ?
-    """, (game_gid,))
+    """,
+        (game_gid,),
+    )
     impact["param_count"] = param_count["count"]
 
     # 检查Canvas节点配置
     node_count = fetch_one_as_dict(
         "SELECT COUNT(*) as count FROM event_node_configs WHERE game_gid = ?",
-        (game_gid,)
+        (game_gid,),
     )
     impact["node_config_count"] = node_count["count"]
 
     # 判断是否有关联数据
-    impact["has_associated_data"] = any([
-        impact["event_count"] > 0,
-        impact["param_count"] > 0,
-        impact["node_config_count"] > 0,
-    ])
+    impact["has_associated_data"] = any(
+        [
+            impact["event_count"] > 0,
+            impact["param_count"] > 0,
+            impact["node_config_count"] > 0,
+        ]
+    )
 
     logger.debug(
         f"Deletion impact for game_gid={game_gid}: "
@@ -406,8 +627,7 @@ def check_deletion_impact(game_gid: int) -> Dict[str, Any]:
 
 
 def execute_cascade_delete(
-    game: Dict[str, Any],
-    impact: Dict[str, Any]
+    game: Dict[str, Any], impact: Dict[str, Any]
 ) -> Tuple[Dict[str, Any], int]:
     """
     执行级联删除游戏及其所有关联数据
@@ -432,33 +652,32 @@ def execute_cascade_delete(
             cursor.execute("BEGIN IMMEDIATE")  # 立即锁，防止并发修改
 
             # 验证游戏仍然存在（防止已被其他请求删除）
-            cursor.execute(
-                "SELECT id FROM games WHERE id = ?", (game_id,)
-            )
+            cursor.execute("SELECT id FROM games WHERE id = ?", (game_id,))
             game_exists = cursor.fetchone()
 
             if not game_exists:
                 conn.rollback()
                 return json_error_response(
-                    "Game not found (may have been deleted)",
-                    status_code=404
+                    "Game not found (may have been deleted)", status_code=404
                 )
 
             # 1. 删除事件参数（通过事件ID）
-            cursor.execute("""
+            cursor.execute(
+                """
                 DELETE FROM event_params
                 WHERE event_id IN (
                     SELECT id FROM log_events WHERE game_gid = ?
                 )
-            """, (game_gid,))
+            """,
+                (game_gid,),
+            )
 
             # 2. 删除事件记录
             cursor.execute("DELETE FROM log_events WHERE game_gid = ?", (game_gid,))
 
             # 3. 删除Canvas节点配置
             cursor.execute(
-                "DELETE FROM event_node_configs WHERE game_gid = ?",
-                (game_gid,)
+                "DELETE FROM event_node_configs WHERE game_gid = ?", (game_gid,)
             )
 
             # 4. 删除游戏记录（在同一事务中完成）
@@ -478,8 +697,8 @@ def execute_cascade_delete(
                 data={
                     "deleted_event_count": impact["event_count"],
                     "deleted_param_count": impact["param_count"],
-                    "deleted_node_config_count": impact["node_config_count"]
-                }
+                    "deleted_node_config_count": impact["node_config_count"],
+                },
             )
 
         except Exception as e:
@@ -497,7 +716,9 @@ def execute_cascade_delete(
 @api_bp.route("/api/games/<int:gid>", methods=["DELETE"])
 def api_delete_game(gid):
     """API: Delete a game by business GID (with confirmation)"""
-    logger.info(f"*** api_delete_game CALLED with gid={gid}, force_delete={request.get_json() or {}.get('confirm', False)} ***")
+    logger.info(
+        f"*** api_delete_game CALLED with gid={gid}, force_delete={request.get_json() or {}.get('confirm', False)} ***"
+    )
 
     # 获取确认标志
     data = request.get_json() or {}
@@ -523,27 +744,29 @@ def api_delete_game(gid):
                 "event_count": impact["event_count"],
                 "param_count": impact["param_count"],
                 "node_config_count": impact["node_config_count"],
-            }
-)
+            },
+        )
 
     # 执行级联删除
     result, status_code = execute_cascade_delete(game, impact)
 
     # 清理缓存
     if status_code == 200:
-        clear_game_cache()
-        clear_cache_pattern("dashboard_statistics")
+        cache_invalidator.invalidate("games.list")
+        cache_invalidator.invalidate("dashboard_statistics")
 
         # ✅ 显式清除Flask-Caching的列表缓存
         try:
             from flask import current_app
-            if hasattr(current_app, 'cache'):
+
+            if hasattr(current_app, "cache"):
                 current_app.cache.delete("games:list:v1")
                 logger.info("✅ Cleared games:list:v1 Flask-Caching after deletion")
         except (AttributeError, RuntimeError) as e:
             logger.warning(f"Failed to clear Flask-Caching games:list cache: {e}")
 
     return result, status_code
+
 
 @api_bp.route("/api/games/batch", methods=["DELETE"])
 def api_batch_delete_games():
@@ -564,17 +787,21 @@ def api_batch_delete_games():
         if not games:
             return json_error_response("No games found", status_code=404)
 
+        # Batch check for associated events (single query)
+        gids = [g["gid"] for g in games]
+        placeholders = ",".join(["?"] * len(gids))
+        event_counts = fetch_all_as_dict(
+            f"SELECT game_gid, COUNT(*) as count FROM log_events WHERE game_gid IN ({placeholders}) GROUP BY game_gid",
+            tuple(gids),
+        )
+        count_map = {e["game_gid"]: e["count"] for e in event_counts}
+
         # Check if any game has associated events
         for game in games:
-            event_count = fetch_one_as_dict(
-                """SELECT COUNT(*) as count FROM log_events
-                   WHERE game_gid = ?""",
-                (game["gid"],),
-            )
-
-            if event_count["count"] > 0:
+            event_count = count_map.get(game["gid"], 0)
+            if event_count > 0:
                 return json_error_response(
-                    f"Cannot delete game '{game['name']}' with {event_count['count']} associated events. "
+                    f"Cannot delete game '{game['name']}' with {event_count} associated events. "
                     "Delete events first.",
                     status_code=409,
                 )
@@ -582,11 +809,14 @@ def api_batch_delete_games():
         # Delete games using Repository batch delete
         deleted_count = Repositories.GAMES.delete_batch(game_ids)
 
-        clear_game_cache()  # Clear cache after delete
-        clear_cache_pattern("dashboard_statistics")  # Clear dashboard cache
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("games.list:*")  # Clear cache after delete
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("dashboard_statistics:*")  # Clear dashboard cache
         logger.info(f"Batch deleted {deleted_count} games")
         return json_success_response(
-            message=f"Deleted {deleted_count} games", data={"deleted_count": deleted_count}
+            message=f"Deleted {deleted_count} games",
+            data={"deleted_count": deleted_count},
         )
     except Exception as e:
         logger.error(f"Error batch deleting games: {e}")
@@ -625,7 +855,10 @@ def api_batch_update_games():
 
         if "ods_db" in updates:
             is_valid, result = sanitize_and_validate_string(
-                updates["ods_db"], max_length=100, field_name="ods_db", allow_empty=False
+                updates["ods_db"],
+                max_length=100,
+                field_name="ods_db",
+                allow_empty=False,
             )
             if not is_valid:
                 return json_error_response(result, status_code=400)
@@ -634,11 +867,14 @@ def api_batch_update_games():
         # Use Repository batch update
         updated_count = Repositories.GAMES.update_batch(game_ids, updates)
 
-        clear_game_cache()  # Clear cache after update
-        clear_cache_pattern("dashboard_statistics")  # Clear dashboard cache
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("games.list:*")  # Clear cache after update
+        if cache_invalidator:
+            cache_invalidator.invalidate_pattern("dashboard_statistics:*")  # Clear dashboard cache
         logger.info(f"Batch updated {updated_count} games")
         return json_success_response(
-            message=f"Updated {updated_count} games", data={"updated_count": updated_count}
+            message=f"Updated {updated_count} games",
+            data={"updated_count": updated_count},
         )
     except Exception as e:
         logger.error(f"Error batch updating games: {e}")

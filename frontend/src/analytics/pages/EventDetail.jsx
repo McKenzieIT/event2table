@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Button } from '@shared/ui';
+import { Button, Spinner, ErrorState } from '@shared/ui';
 import { useGameContext } from '@shared/hooks/useGameContext';
 import './EventDetail.css';
 
@@ -26,7 +26,7 @@ function EventDetail() {
   const gameGid = gameGidFromUrl || currentGameGid || localStorage.getItem('selectedGameGid');
 
   // 并行加载事件数据和参数数据
-  const { data: eventData, isLoading: eventLoading } = useQuery({
+  const { data: eventData, isLoading: eventLoading, error: eventError } = useQuery({
     queryKey: ['event', id, gameGid],
     queryFn: async () => {
       // API需要game_gid参数或从session获取
@@ -40,7 +40,7 @@ function EventDetail() {
     enabled: !!id
   });
 
-  const { data: parametersData, isLoading: paramsLoading } = useQuery({
+  const { data: parametersData, isLoading: paramsLoading, error: paramsError } = useQuery({
     queryKey: ['event', id, 'parameters'],
     queryFn: async () => {
       const response = await fetch(`/api/events/${id}/parameters`);
@@ -50,9 +50,21 @@ function EventDetail() {
     enabled: !!id
   });
 
+  // 合并加载和错误状态
+  const isLoading = eventLoading || paramsLoading;
+  const loadingError = eventError || paramsError;
+
   // 提前返回优化
-  if (eventLoading || paramsLoading) {
-    return <div className="loading">加载中...</div>;
+  if (isLoading) {
+    return (
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spinner size="lg" label="加载中..." />
+      </div>
+    );
+  }
+
+  if (loadingError) {
+    return <ErrorState message={loadingError.message} onRetry={() => window.location.reload()} />;
   }
 
   const event = eventData?.data;

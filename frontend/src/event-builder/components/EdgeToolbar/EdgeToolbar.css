@@ -1,0 +1,311 @@
+/**
+ * EdgeToolbar Styles
+ * 底部边缘激活栏样式
+ */
+
+/* Import advanced animations */
+@import "../AdvancedAnimations.css";
+
+/* ========================================
+   Field Canvas Edge Trigger Area
+   ======================================== */
+
+.field-canvas {
+  position: relative;
+}
+
+/* 发光边缘线 - 默认状态 */
+.field-canvas::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+
+  /* 渐变发光效果 */
+  background: linear-gradient(
+    to top,
+    rgba(6, 182, 212, 0.6) 0%,
+    rgba(6, 182, 212, 0) 100%
+  );
+
+  opacity: 0.3;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* 鼠标hover时边缘线变亮 */
+.field-canvas:hover::after {
+  height: 8px;
+  opacity: 0.8;
+  box-shadow: 0 -2px 8px rgba(6, 182, 212, 0.4);
+}
+
+/* ========================================
+   Edge Toolbar - 底部工具栏
+   ======================================== */
+
+.edge-toolbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  /* Glass morphism效果 */
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(6, 182, 212, 0.3);
+
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+
+  /* 动画：从底部滑入 */
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index确保在其他元素之上，包括WHERE sidebar */
+  z-index: 1000;
+}
+
+/* 鼠标hover画布时，工具栏滑入 */
+.field-canvas:hover .edge-toolbar {
+  transform: translateY(0);
+}
+
+/* ========================================
+   Toolbar Sections
+   ======================================== */
+
+.edge-toolbar .toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edge-toolbar .toolbar-section--quick {
+  position: relative;
+}
+
+.edge-toolbar .toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   Edge Toolbar Button
+   ======================================== */
+
+.edge-toolbar-button {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  /* Visual */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 12px;
+
+  /* Typography */
+  font-size: 12px;
+  font-family: var(--font-sans), "Inter", system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+
+  /* Cursor */
+  cursor: pointer;
+  user-select: none;
+
+  /* Transition */
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.edge-toolbar-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(6, 182, 212, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2);
+  color: rgba(255, 255, 255, 1);
+}
+
+.edge-toolbar-button:active {
+  transform: translateY(0);
+}
+
+.edge-toolbar-button.active {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.5);
+  color: #06b6d4;
+}
+
+.edge-toolbar-button i {
+  font-size: 14px;
+}
+
+.edge-toolbar-button .button-label {
+  font-size: 11px;
+}
+
+/* ========================================
+   Quick Field Tools
+   ======================================== */
+
+.quick-field-tools {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  /* Animation */
+  animation: quickToolsSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes quickToolsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Batch buttons */
+.quick-tools-batch {
+  display: flex;
+  gap: 8px;
+}
+
+.quick-tool-batch-btn {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  /* Visual: Enhanced cyberpunk style */
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.15),
+    rgba(6, 182, 212, 0.05)
+  );
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  border-radius: 6px;
+  padding: 6px 12px;
+
+  /* Shadow */
+  box-shadow:
+    0 0 10px rgba(6, 182, 212, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Typography */
+  font-size: 12px;
+  font-family:
+    var(--font-sans),
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: #22d3ee;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+
+  /* Cursor */
+  cursor: pointer;
+  user-select: none;
+
+  /* Transition */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.quick-tool-batch-btn i {
+  font-size: 14px;
+  filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.6));
+}
+
+.quick-tool-batch-btn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.25),
+    rgba(6, 182, 212, 0.1)
+  );
+  border-color: rgba(6, 182, 212, 0.6);
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 16px rgba(6, 182, 212, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  color: #67e8f9;
+}
+
+.quick-tool-batch-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 0 8px rgba(6, 182, 212, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .edge-toolbar {
+    padding: 10px 12px;
+    gap: 12px;
+  }
+
+  .edge-toolbar-button {
+    padding: 5px 10px;
+  }
+
+  .edge-toolbar-button .button-label {
+    font-size: 10px;
+  }
+
+  .quick-field-tools {
+    gap: 6px;
+  }
+
+  .quick-tools-batch {
+    gap: 6px;
+  }
+
+  .quick-tool-batch-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+
+.edge-toolbar-button:focus-visible,
+.quick-tool-batch-btn:focus-visible {
+  outline: 2px solid rgba(6, 182, 212, 0.6);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Reduce Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .field-canvas::after,
+  .edge-toolbar,
+  .edge-toolbar-button,
+  .quick-tool-batch-btn,
+  .quick-field-tools {
+    transition: none;
+    animation: none;
+  }
+}

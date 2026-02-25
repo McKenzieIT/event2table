@@ -104,7 +104,22 @@ export default function ConnectionPromptModal({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+    >
       <div
         className="modal-content connection-prompt"
         onClick={(e) => e.stopPropagation()}

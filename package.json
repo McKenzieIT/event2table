@@ -31,6 +31,11 @@
   "author": "Event2Table Development Team",
   "license": "MIT",
   "devDependencies": {
+    "@graphql-codegen/cli": "^6.1.2",
+    "@graphql-codegen/introspection": "^5.0.0",
+    "@graphql-codegen/typescript": "^5.0.8",
+    "@graphql-codegen/typescript-operations": "^5.0.8",
+    "@graphql-codegen/typescript-react-apollo": "^4.4.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "terser": "^5.46.0"
   }

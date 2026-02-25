@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Event Repository (事件数据访问层)
+Event Repository (事件数据访问层 - 精简架构)
 
 提供事件相关的数据访问方法
-基于 GenericRepository 实现特定领域的查询
+- 返回统一Entity模型 (EventEntity)
+- 移除DDD抽象
+- 保持GenericRepository继承
 """
 
 from typing import Optional, List, Dict, Any
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, get_db_connection
+from backend.models.entities import EventEntity
 
 
 class EventRepository(GenericRepository):
     """
-    事件仓储类
+    事件仓储类 (精简架构)
 
     继承 GenericRepository 并添加事件特定的查询方法
+    返回EventEntity而非字典,确保类型安全
     """
 
     def __init__(self):
@@ -32,9 +36,51 @@ class EventRepository(GenericRepository):
             cache_timeout=60,  # 1分钟缓存
         )
 
+    def find_by_id(self, event_id: int) -> Optional[EventEntity]:
+        """
+        根据数据库ID查询事件
+
+        Args:
+            event_id: 数据库自增ID
+
+        Returns:
+            EventEntity, 不存在返回None
+        """
+        query = "SELECT * FROM log_events WHERE id = ?"
+        row = fetch_one_as_dict(query, (event_id,))
+        return EventEntity(**row) if row else None
+
+    def find_by_name(self, event_name: str, game_gid: int) -> Optional[EventEntity]:
+        """
+        根据事件名和游戏GID查询事件
+
+        Args:
+            event_name: 事件名
+            game_gid: 游戏GID
+
+        Returns:
+            EventEntity, 不存在返回None
+
+        Example:
+            >>> repo = EventRepository()
+            >>> event = repo.find_by_name('login', 10000147)
+        """
+        query = """
+            SELECT
+                le.*,
+                g.gid, g.name as game_name, g.ods_db,
+                ec.name as category_name
+            FROM log_events le
+            LEFT JOIN games g ON le.game_gid = g.gid
+            LEFT JOIN event_categories ec ON le.category_id = ec.id
+            WHERE le.event_name = ? AND g.gid = ?
+        """
+        row = fetch_one_as_dict(query, (event_name, game_gid))
+        return EventEntity(**row) if row else None
+
     def find_by_game_gid(
         self, game_gid: int, page: int = 1, per_page: int = 20
-    ) -> List[Dict[str, Any]]:
+    ) -> List[EventEntity]:
         """
         根据游戏GID分页查询事件
 
@@ -44,11 +90,11 @@ class EventRepository(GenericRepository):
             per_page: 每页数量
 
         Returns:
-            事件列表
+            EventEntity列表
 
         Example:
             >>> repo = EventRepository()
-            >>> events = repo.find_by_game_gid(1001, page=1, per_page=20)
+            >>> events = repo.find_by_game_gid(10000147, page=1, per_page=20)
         """
         offset = (page - 1) * per_page
         query = """
@@ -66,7 +112,41 @@ class EventRepository(GenericRepository):
             ORDER BY le.id DESC
             LIMIT ? OFFSET ?
         """
-        return fetch_all_as_dict(query, (game_gid, per_page, offset))
+        rows = fetch_all_as_dict(query, (game_gid, per_page, offset))
+        return [EventEntity(**row) for row in rows]
+
+    def find_all(self, game_gid: Optional[int] = None) -> List[EventEntity]:
+        """
+        查询所有事件（可选游戏过滤）
+
+        Args:
+            game_gid: 可选的游戏GID过滤
+
+        Returns:
+            EventEntity列表
+        """
+        if game_gid:
+            query = """
+                SELECT le.*, g.gid, g.name as game_name, g.ods_db,
+                       ec.name as category_name
+                FROM log_events le
+                LEFT JOIN games g ON le.game_gid = g.gid
+                LEFT JOIN event_categories ec ON le.category_id = ec.id
+                WHERE g.gid = ?
+                ORDER BY le.id DESC
+            """
+            rows = fetch_all_as_dict(query, (game_gid,))
+        else:
+            query = """
+                SELECT le.*, g.gid, g.name as game_name, g.ods_db,
+                       ec.name as category_name
+                FROM log_events le
+                LEFT JOIN games g ON le.game_gid = g.gid
+                LEFT JOIN event_categories ec ON le.category_id = ec.id
+                ORDER BY le.id DESC
+            """
+            rows = fetch_all_as_dict(query)
+        return [EventEntity(**row) for row in rows]
 
     def count_by_game_gid(self, game_gid: int) -> int:
         """
@@ -93,7 +173,7 @@ class EventRepository(GenericRepository):
 
     def get_with_parameters(self, event_id: int) -> Optional[Dict[str, Any]]:
         """
-        获取事件及其参数列表
+        获取事件及其参数列表（保持返回字典格式以包含参数列表）
 
         Args:
             event_id: 事件ID
@@ -138,40 +218,13 @@ class EventRepository(GenericRepository):
         """
         parameters = fetch_all_as_dict(params_query, (event_id,))
 
-        # 组合结果
+        # 组合结果（保持字典格式以便包含parameters列表）
         event["parameters"] = parameters
         return event
 
-    def find_by_name(self, event_name: str, game_gid: int) -> Optional[Dict[str, Any]]:
-        """
-        根据事件名和游戏GID查询事件
-
-        Args:
-            event_name: 事件名
-            game_gid: 游戏GID
-
-        Returns:
-            事件字典，不存在返回None
-
-        Example:
-            >>> repo = EventRepository()
-            >>> event = repo.find_by_name('login', 1001)
-        """
-        query = """
-            SELECT
-                le.*,
-                g.gid, g.name as game_name, g.ods_db,
-                ec.name as category_name
-            FROM log_events le
-            LEFT JOIN games g ON le.game_gid = g.gid
-            LEFT JOIN event_categories ec ON le.category_id = ec.id
-            WHERE le.event_name = ? AND g.gid = ?
-        """
-        return fetch_one_as_dict(query, (event_name, game_gid))
-
     def find_by_category(
         self, category_id: int, limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[EventEntity]:
         """
         根据分类ID查询事件
 
@@ -180,7 +233,7 @@ class EventRepository(GenericRepository):
             limit: 限制数量
 
         Returns:
-            事件列表
+            EventEntity列表
 
         Example:
             >>> repo = EventRepository()
@@ -202,9 +255,10 @@ class EventRepository(GenericRepository):
         """
         if limit:
             query += f" LIMIT {limit}"
-        return fetch_all_as_dict(query, (category_id,))
+        rows = fetch_all_as_dict(query, (category_id,))
+        return [EventEntity(**row) for row in rows]
 
-    def get_events_with_common_params(self, game_gid: Optional[int] = None) -> List[Dict[str, Any]]:
+    def get_events_with_common_params(self, game_gid: Optional[int] = None) -> List[EventEntity]:
         """
         获取包含公共参数的事件
 
@@ -212,11 +266,11 @@ class EventRepository(GenericRepository):
             game_gid: 可选的游戏GID过滤
 
         Returns:
-            事件列表
+            EventEntity列表
 
         Example:
             >>> repo = EventRepository()
-            >>> events = repo.get_events_with_common_params(game_gid=1001)
+            >>> events = repo.get_events_with_common_params(game_gid=10000147)
         """
         if game_gid:
             query = """
@@ -230,7 +284,7 @@ class EventRepository(GenericRepository):
                 WHERE g.gid = ? AND le.include_in_common_params = 1
                 ORDER BY le.id DESC
             """
-            return fetch_all_as_dict(query, (game_gid,))
+            rows = fetch_all_as_dict(query, (game_gid,))
         else:
             query = """
                 SELECT
@@ -243,11 +297,12 @@ class EventRepository(GenericRepository):
                 WHERE le.include_in_common_params = 1
                 ORDER BY le.id DESC
             """
-            return fetch_all_as_dict(query)
+            rows = fetch_all_as_dict(query)
+        return [EventEntity(**row) for row in rows]
 
     def search_events(
         self, keyword: str, game_gid: Optional[int] = None, category_id: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[EventEntity]:
         """
         搜索事件（支持事件名和中文名模糊搜索）
 
@@ -257,11 +312,11 @@ class EventRepository(GenericRepository):
             category_id: 可选的分类ID过滤
 
         Returns:
-            事件列表
+            EventEntity列表
 
         Example:
             >>> repo = EventRepository()
-            >>> events = repo.search_events('login', game_gid=1001)
+            >>> events = repo.search_events('login', game_gid=10000147)
         """
         keyword_pattern = f"%{keyword}%"
         conditions = []
@@ -294,11 +349,12 @@ class EventRepository(GenericRepository):
         """
 
         params.extend([keyword_pattern, keyword_pattern])
-        return fetch_all_as_dict(query, tuple(params))
+        rows = fetch_all_as_dict(query, tuple(params))
+        return [EventEntity(**row) for row in rows]
 
     def get_recent_events(
         self, game_gid: Optional[int] = None, limit: int = 10
-    ) -> List[Dict[str, Any]]:
+    ) -> List[EventEntity]:
         """
         获取最近更新的事件
 
@@ -307,11 +363,11 @@ class EventRepository(GenericRepository):
             limit: 限制数量
 
         Returns:
-            事件列表
+            EventEntity列表
 
         Example:
             >>> repo = EventRepository()
-            >>> events = repo.get_recent_events(game_gid=1001, limit=5)
+            >>> events = repo.get_recent_events(game_gid=10000147, limit=5)
         """
         if game_gid:
             query = """
@@ -326,7 +382,7 @@ class EventRepository(GenericRepository):
                 ORDER BY le.updated_at DESC
                 LIMIT ?
             """
-            return fetch_all_as_dict(query, (game_gid, limit))
+            rows = fetch_all_as_dict(query, (game_gid, limit))
         else:
             query = """
                 SELECT
@@ -339,7 +395,8 @@ class EventRepository(GenericRepository):
                 ORDER BY le.updated_at DESC
                 LIMIT ?
             """
-            return fetch_all_as_dict(query, (limit,))
+            rows = fetch_all_as_dict(query, (limit,))
+        return [EventEntity(**row) for row in rows]
 
     def get_event_statistics(self, event_id: int) -> Optional[Dict[str, Any]]:
         """
@@ -372,6 +429,157 @@ class EventRepository(GenericRepository):
         """
         return fetch_one_as_dict(query, (event_id,))
 
+    def create(self, data: Dict[str, Any]) -> Optional[EventEntity]:
+        """
+        创建事件
+
+        Args:
+            data: 事件数据字典 (使用Entity字段名或数据库列名)
+
+        Returns:
+            创建的EventEntity, 失败返回None
+
+        Example:
+            >>> repo = EventRepository()
+            >>> event = repo.create({
+            ...     'game_gid': 10000147,
+            ...     'event_name': 'test_event',
+            ...     'event_name_cn': '测试事件'
+            ... })
+        """
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            # 首先需要根据game_gid查找game_id
+            game_gid = data.get('game_gid')
+            if not game_gid:
+                raise ValueError("game_gid is required")
+
+            # 从games表获取game_id
+            # games表使用TEXT类型的gid列
+            cursor.execute("SELECT id FROM games WHERE gid = ?", (str(game_gid),))
+            game_row = cursor.fetchone()
+            if not game_row:
+                raise ValueError(f"Game not found: gid={game_gid}")
+            game_id = game_row[0]
+
+            # 字段映射: Entity字段 -> 数据库列
+            db_data = {
+                'game_id': game_id,  # 从game_gid查找game_id
+                'game_gid': game_gid,
+                'event_name': data.get('event_name') or data.get('name'),
+                'event_name_cn': data.get('event_name_cn') or data.get('name_cn'),
+                'category_id': data.get('category_id'),
+                'source_table': data.get('source_table', 'ieu_ods.unknown'),  # 必需字段
+                'target_table': data.get('target_table', 'dwd.unknown'),  # 必需字段
+                'include_in_common_params': data.get('include_in_common_params', 0),
+            }
+
+            # 移除None值
+            db_data = {k: v for k, v in db_data.items() if v is not None}
+
+            columns = ", ".join(db_data.keys())
+            placeholders = ", ".join(["?" for _ in db_data.keys()])
+
+            query = f"INSERT INTO log_events ({columns}) VALUES ({placeholders})"
+            cursor.execute(query, tuple(db_data.values()))
+            event_id = cursor.lastrowid
+            conn.commit()
+
+            return self.find_by_id(event_id)
+
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+    def update(self, event_id: int, data: Dict[str, Any]) -> Optional[EventEntity]:
+        """
+        根据event_id更新事件
+
+        Args:
+            event_id: 事件ID
+            data: 要更新的字段字典 (使用Entity字段名或数据库列名)
+
+        Returns:
+            更新后的EventEntity, 不存在返回None
+
+        Example:
+            >>> repo = EventRepository()
+            >>> event = repo.update(1, {'event_name_cn': 'Updated Event'})
+        """
+        if not data:
+            return None
+
+        # 字段映射: Entity字段 -> 数据库列
+        field_mapping = {
+            'name': 'event_name',
+            'name_cn': 'event_name_cn',
+        }
+
+        db_data = {}
+        for key, value in data.items():
+            db_key = field_mapping.get(key, key)
+            db_data[db_key] = value
+
+        # 构建UPDATE语句
+        set_clause = ", ".join([f"{key} = ?" for key in db_data.keys()])
+        query = f"UPDATE log_events SET {set_clause} WHERE id = ?"
+        values = list(db_data.values()) + [event_id]
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, values)
+        conn.commit()
+        conn.close()
+
+        # 返回更新后的事件
+        return self.find_by_id(event_id)
+
+    def delete(self, event_id: int) -> bool:
+        """
+        根据event_id删除事件
+
+        Args:
+            event_id: 事件ID
+
+        Returns:
+            是否删除成功
+
+        Example:
+            >>> repo = EventRepository()
+            >>> success = repo.delete(1)
+        """
+        query = "DELETE FROM log_events WHERE id = ?"
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, (event_id,))
+        deleted_count = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return deleted_count > 0
+
+    def exists_by_name(self, event_name: str, game_gid: int) -> bool:
+        """
+        检查指定事件名和游戏GID的事件是否存在
+
+        Args:
+            event_name: 事件名
+            game_gid: 游戏GID
+
+        Returns:
+            是否存在
+
+        Example:
+            >>> repo = EventRepository()
+            >>> if repo.exists_by_name('login', 10000147):
+            ...     print("Event exists")
+        """
+        return self.find_by_name(event_name, game_gid) is not None
+
     def bulk_create_with_parameters(self, events_data: List[Dict[str, Any]]) -> List[int]:
         """
         批量创建事件及其参数
@@ -399,8 +607,6 @@ class EventRepository(GenericRepository):
             ...     }
             ... ])
         """
-        from backend.core.database.database import get_db_connection
-
         conn = get_db_connection()
         cursor = conn.cursor()
 

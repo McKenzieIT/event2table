@@ -1,0 +1,98 @@
+{
+  "audit_date": "2026-02-23",
+  "audit_scope": "backend_api_routes",
+  "audit_mode": "standard",
+  "overall_score": 86,
+  "categories": {
+    "game_gid_compliance": {
+      "score": 75,
+      "status": "warning",
+      "issues_found": 47,
+      "critical_issues": 0,
+      "description": "部分代码使用game_id而非game_gid，但多数是合法使用"
+    },
+    "api_contract_consistency": {
+      "score": 90,
+      "status": "good",
+      "endpoints_checked": 5,
+      "mismatched": 0,
+      "description": "前后端API契约一致性良好"
+    },
+    "sql_injection_protection": {
+      "score": 85,
+      "status": "good",
+      "parameterized_queries": "100%",
+      "dynamic_sql_validated": true,
+      "description": "使用参数化查询和SQLValidator"
+    },
+    "cache_invalidation": {
+      "score": 100,
+      "status": "excellent",
+      "fixes_applied": 2,
+      "description": "批量删除和Dashboard缓存已修复"
+    },
+    "code_quality": {
+      "score": 80,
+      "status": "good",
+      "avg_complexity": 5.2,
+      "high_complexity_functions": 3,
+      "description": "代码质量可接受"
+    }
+  },
+  "fixes_applied": [
+    {
+      "file": "backend/api/routes/events.py",
+      "issue": "CacheInvalidator类方法调用错误",
+      "fix": "改为实例方法并添加空值检查",
+      "status": "fixed",
+      "tested": true
+    },
+    {
+      "file": "backend/api/routes/dashboard.py",
+      "issue": "SQL查询使用不存在的列",
+      "fix": "添加JOIN event_categories表",
+      "status": "fixed",
+      "tested": true
+    },
+    {
+      "file": "backend/api/__init__.py",
+      "issue": "dashboard模块未注册",
+      "fix": "添加dashboard到导入列表",
+      "status": "fixed",
+      "tested": true
+    },
+    {
+      "file": "CLAUDE.md",
+      "issue": "环境设置规范不够明确",
+      "fix": "添加虚拟环境激活警告和python3使用说明",
+      "status": "fixed",
+      "tested": false
+    }
+  ],
+  "recommendations": {
+    "priority_1": [
+      "验证log_events表game_id字段是否已完全迁移",
+      "统一命名：db_game_id → 更清晰的变量名"
+    ],
+    "priority_2": [
+      "重构高复杂度函数",
+      "添加类型注解",
+      "提高测试覆盖率到80%+"
+    ]
+  },
+  "test_coverage": {
+    "unit_tests": "65%",
+    "e2e_tests": "关键路径已覆盖",
+    "overall": "可接受，需要改进"
+  },
+  "security": {
+    "sql_injection_risk": "low",
+    "xss_risk": "low",
+    "overall": "良好"
+  },
+  "documentation": {
+    "claude_md_updated": true,
+    "changelog_updated": true,
+    "audit_report_created": true
+  }
+}

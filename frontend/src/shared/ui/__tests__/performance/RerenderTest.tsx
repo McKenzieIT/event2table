@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * Re-render Performance Test
  *

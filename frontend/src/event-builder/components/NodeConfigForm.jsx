@@ -3,6 +3,7 @@
  * 节点配置表单组件
  */
 import React from 'react';
+import { Input } from '@shared/ui';
 
 export default function NodeConfigForm({ config, onChange, disabled }) {
   const handleChange = (field, value) => {
@@ -18,35 +19,25 @@ export default function NodeConfigForm({ config, onChange, disabled }) {
         </h3>
       </div>
       <div className="section-content">
-        <div className="form-group">
-          <label htmlFor="configNameEn">
-            <span className="required">*</span>英文名称
-          </label>
-          <input
-            id="configNameEn"
-            type="text"
-            className="glass-input"
-            placeholder="例如: login_event_node"
-            value={config.nameEn}
-            onChange={(e) => handleChange('nameEn', e.target.value)}
-            disabled={disabled}
-          />
-        </div>
+        <Input
+          id="configNameEn"
+          label="英文名称 *"
+          type="text"
+          placeholder="例如: login_event_node"
+          value={config.nameEn}
+          onChange={(e) => handleChange('nameEn', e.target.value)}
+          disabled={disabled}
+        />
 
-        <div className="form-group">
-          <label htmlFor="configNameCn">
-            <span className="required">*</span>中文名称
-          </label>
-          <input
-            id="configNameCn"
-            type="text"
-            className="glass-input"
-            placeholder="例如: 登录事件节点"
-            value={config.nameCn}
-            onChange={(e) => handleChange('nameCn', e.target.value)}
-            disabled={disabled}
-          />
-        </div>
+        <Input
+          id="configNameCn"
+          label="中文名称 *"
+          type="text"
+          placeholder="例如: 登录事件节点"
+          value={config.nameCn}
+          onChange={(e) => handleChange('nameCn', e.target.value)}
+          disabled={disabled}
+        />
 
         <div className="form-group">
           <label htmlFor="configDescription">描述</label>

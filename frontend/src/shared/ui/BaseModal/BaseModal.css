@@ -101,6 +101,16 @@
 .modal-content--full {
   max-width: calc(100vw - 40px);
   max-height: calc(100vh - 40px);
+  width: calc(100vw - 40px);
+  height: calc(100vh - 40px);
+}
+
+/* 专为游戏管理模态框优化 */
+.modal-content--full.game-management-modal {
+  max-width: 1400px;
+  width: 1400px;
+  height: 85vh;
+  max-height: 900px;
 }
 
 /* ========================================
@@ -132,8 +142,8 @@
 
 .modal-close {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,7 +151,7 @@
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
   border-radius: 6px;
   color: var(--text-secondary, #94A3B8);
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;

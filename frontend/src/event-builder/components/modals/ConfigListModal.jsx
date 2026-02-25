@@ -5,10 +5,15 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchConfigList, deleteConfig, copyNode } from '@shared/api/eventNodeBuilder';
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+import toast from 'react-hot-toast';
 
 export default function ConfigListModal({ gameGid, onSelect, onClose }) {
   const [page, setPage] = useState(1);
   const [selectedConfigId, setSelectedConfigId] = useState(null);
+
+  // Promise-based confirm dialog
+  const { confirm, ConfirmDialogComponent } = usePromiseConfirm();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['config-list', gameGid, page],
@@ -26,15 +31,16 @@ export default function ConfigListModal({ gameGid, onSelect, onClose }) {
 
   const handleDelete = async (configId, e) => {
     e.stopPropagation();
-    if (!confirm('确定要删除这个配置吗？')) {
+    if (!(await confirm('确定要删除这个配置吗？'))) {
       return;
     }
 
     const result = await deleteConfig(configId);
     if (result.success) {
       refetch();
+      toast.success('删除成功');
     } else {
-      alert('删除失败: ' + (result.error || '未知错误'));
+      toast.error('删除失败: ' + (result.error || '未知错误'));
     }
   };
 
@@ -42,22 +48,37 @@ export default function ConfigListModal({ gameGid, onSelect, onClose }) {
     e.stopPropagation();
     const result = await copyNode(nodeId);
     if (result.success) {
-      alert('复制成功');
+      toast.success('复制成功');
       refetch();
     } else {
-      alert('复制失败: ' + (result.error || '未知错误'));
+      toast.error('复制失败: ' + (result.error || '未知错误'));
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+    >
       <div
         className="modal-content glass-card config-list-modal"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
           <h3>配置列表</h3>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             ✕
           </button>
         </div>
@@ -124,6 +145,9 @@ export default function ConfigListModal({ gameGid, onSelect, onClose }) {
           </button>
         </div>
       </div>
+
+      {/* Promise-based confirm dialog */}
+      <ConfirmDialogComponent />
     </div>
   );
 }

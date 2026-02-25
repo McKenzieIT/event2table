@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Button, SearchInput, useToast } from '@shared/ui';
+import { Button, SearchInput, Spinner, useToast } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './HqlManage.css';
 
@@ -63,7 +63,11 @@ function HqlManage() {
 
   // 4. 条件返回 - 放在所有Hooks之后
   if (isLoading) {
-    return <div className="loading" data-testid="hql-manage-loading">加载中...</div>;
+    return (
+      <div className="loading-container">
+        <Spinner size="lg" label="加载中..." />
+      </div>
+    );
   }
 
   return (

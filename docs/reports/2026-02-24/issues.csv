@@ -1,0 +1,15 @@
+优先级,文件,问题,影响,修复建议,预计修复时间,状态
+P0,tests/test_capacity_monitor.py:177,空except块隐藏所有异常,无法调试测试失败,添加具体异常类型和日志,5分钟,待修复
+P1,__init__.py,缺少模块级docstring,使用者不知道模块用途,添加完整的模块文档和示例,10分钟,待修复
+P1,cache_hierarchical.py,异常处理过于宽泛,无法区分Redis错误和其他错误,区分RedisError和通用异常,15分钟,待修复
+P1,cache_system.py,部分日志缺少上下文信息,难以定位问题,添加key、pattern等关键信息,15分钟,待修复
+P2,decorators.py,_build_cache_key文档过简,不清楚函数用途,添加完整的参数说明和示例,5分钟,待修复
+P2,cache_warmer.py,部分内部函数缺少docstring,代码可读性差,添加函数文档,15分钟,待修复
+P2,monitoring.py,部分数据类缺少示例,不知道如何使用,添加使用示例,20分钟,待修复
+P2,intelligent_warmer.py:185,预测准确率未实现,无法评估预热效果,实现预测准确率计算,2小时,待修复
+P2,monitoring.py:345,L2内存使用率为硬编码0,监控数据不准确,实现Redis内存使用率获取,1小时,待修复
+P2,monitoring.py:516,智能预热未联动,自动化不完整,集成智能预热系统,4小时,待修复
+P2,intelligent_warmer.py:295,set_raw()方法未实现,无法直接设置L2,实现set_raw()方法,3小时,待修复
+P3,cache_hierarchical.py:_match_pattern,圈复杂度12,难以维护,拆分为多个小函数,1小时,待修复
+P3,monitoring.py:_check_alert_rules,圈复杂度11,难以维护,使用策略模式简化,1小时,待修复
+P3,cache_system.py:cached,圈复杂度10,难以维护,提取辅助方法,1小时,待修复

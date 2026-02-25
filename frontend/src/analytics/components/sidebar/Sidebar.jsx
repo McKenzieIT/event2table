@@ -33,15 +33,22 @@ export function Sidebar() {
 
   // 响应式处理：小屏幕默认折叠
   useEffect(() => {
+    let timeoutId;
     const handleResize = () => {
-      const screenWidth = window.innerWidth;
-      if (screenWidth < 768 && !collapsed) {
-        toggleCollapsed();
-      }
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const screenWidth = window.innerWidth;
+        if (screenWidth < 768 && !collapsed) {
+          toggleCollapsed();
+        }
+      }, 100);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [collapsed, toggleCollapsed]);
 
   // 键盘快捷键支持

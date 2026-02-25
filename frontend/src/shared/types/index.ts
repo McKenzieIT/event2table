@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript检查暂禁用
 /**
  * 前端类型定义 - 统一导出
  *

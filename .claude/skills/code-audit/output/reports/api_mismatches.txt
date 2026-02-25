@@ -1,0 +1,4 @@
+FRONTEND CALL WITHOUT BACKEND ROUTE: fetch("/api/events/import"
+FRONTEND CALL WITHOUT BACKEND ROUTE: fetch("/api/flows"
+FRONTEND CALL WITHOUT BACKEND ROUTE: fetch("/api/generate"
+FRONTEND CALL WITHOUT BACKEND ROUTE: fetch("/api/preview-ex

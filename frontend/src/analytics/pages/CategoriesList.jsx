@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, SearchInput, useToast } from '@shared/ui';
+import { Button, SearchInput, Skeleton, ErrorState, useToast } from '@shared/ui';
+import EmptyState from '@shared/ui/EmptyState/EmptyState';
 import { useGameStore } from '@/stores/gameStore';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import CategoryModal from '../components/categories/CategoryModal';
@@ -86,7 +87,8 @@ export default function CategoriesList() {
     },
     onSuccess: () => {
       success('删除分类成功');
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['categories', gameGid] });
     },
     onError: () => {
       showError('删除分类失败');
@@ -107,7 +109,8 @@ export default function CategoriesList() {
     onSuccess: (data, ids) => {
       success(`批量删除成功：${ids.size} 个分类`);
       setSelectedIds(new Set());
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+      queryClient.invalidateQueries({ queryKey: ['categories', gameGid] });
     },
     onError: () => {
       showError('批量删除失败');
@@ -181,8 +184,23 @@ export default function CategoriesList() {
     );
   }
 
-  if (isLoading) return <div className="loading-state">加载中...</div>;
-  if (error) return <div className="error-state">加载失败: {error.message}</div>;
+  if (isLoading) {
+    return (
+      <div className="categories-page">
+        <div className="page-header">
+          <div className="header-left">
+            <h1>分类管理</h1>
+          </div>
+        </div>
+        <div className="categories-grid">
+          <Skeleton type="card" count={6} />
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return <ErrorState message={error.message} onRetry={() => window.location.reload()} />;
+  }
 
   return (
     <div className="categories-page">
@@ -238,10 +256,11 @@ export default function CategoriesList() {
       {/* Category Cards Grid */}
       <div className="categories-grid">
         {filteredCategories.length === 0 ? (
-          <div className="empty-state">
-            <span>📥</span>
-            <p>没有找到分类</p>
-          </div>
+          <EmptyState
+            icon={<span aria-hidden="true">📥</span>}
+            title="没有找到分类"
+            description="尝试调整搜索条件"
+          />
         ) : (
           filteredCategories.map(category => (
             <div key={category.id} className="category-card">
@@ -309,7 +328,8 @@ export default function CategoriesList() {
         gameGid={gameGid}
         initialData={editingCategory}
         onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: ['categories'] });
+          // ✅ Fix: Use complete cache key with gameGid for precise invalidation
+          queryClient.invalidateQueries({ queryKey: ['categories', gameGid] });
         }}
       />
     </div>

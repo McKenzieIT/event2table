@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams, useSearchParams, useOutletContext } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Input,
   Select,
@@ -23,6 +23,7 @@ function EventForm() {
   const { id } = useParams();
   const { currentGame } = useOutletContext();
   const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();  // ✅ Fix: Add useQueryClient for cache invalidation
   const { success, error: showError } = useToast();
 
   const isEdit = !!id;
@@ -127,7 +128,7 @@ function EventForm() {
     const newErrors = {};
     if (!formData.event_name.trim()) newErrors.event_name = '事件名称不能为空';
     if (!formData.event_name_cn.trim()) newErrors.event_name_cn = '事件中文名不能为空';
-    if (!formData.category_id) newErrors.category_id = '请选择分类';
+    // Category is now optional - will default to "未分类" if not selected
     if (!formData.game_gid) newErrors.game_gid = '游戏GID不能为空';
 
     if (Object.keys(newErrors).length > 0) {
@@ -158,6 +159,14 @@ function EventForm() {
       // Show success toast
       success(isEdit ? '事件更新成功' : '事件创建成功');
 
+      // ✅ Fix: Invalidate events cache to refresh the list
+      const gameGid = searchParams.get('game_gid') || currentGame?.gid;
+      if (gameGid) {
+        queryClient.invalidateQueries({
+          queryKey: ['events', parseInt(gameGid)]
+        });
+      }
+
       // Navigate back to events list
       navigate('/events', { replace: true });
     } catch (err) {
@@ -183,7 +192,7 @@ function EventForm() {
 
   // Prepare category options for Select component
   const categoryOptions = [
-    { value: '', label: '请选择分类' },
+    { value: '', label: '未分类（默认）' },
     ...categories.map(category => ({
       value: category.id,
       label: category.name
@@ -266,8 +275,8 @@ function EventForm() {
             onChange={handleCategoryChange}
             disabled={isSubmitting}
             options={categoryOptions}
-            required
             error={errors.category_id}
+            helperText="可选，未选择时将自动归类为'未分类'"
           />
 
           {/* Include in Common Params Checkbox */}

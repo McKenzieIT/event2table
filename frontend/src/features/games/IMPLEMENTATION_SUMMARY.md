@@ -4,7 +4,7 @@
 
 已成功创建 `GameManagementModal` 组件，实现了主从视图布局的游戏管理界面。
 
-**文件路径**: `/Users/mckenzie/Documents/event2table/frontend/src/features/games/GameManagementModal.jsx`
+**文件路径**: `/Users/mckenzie/Documents/event2table/frontend/src/features/games/GameManagementModal.tsx`
 
 ## 🎯 实现的功能
 

@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import CodeMirror from '@uiw/react-codemirror';
+import toast from 'react-hot-toast';
 import './HQLPreviewModal.css';
 import { BaseModal } from '@shared/ui/BaseModal';
 import PerformanceIndicator from '../HQLPreviewV2/PerformanceIndicator';
@@ -183,12 +184,15 @@ export default function HQLPreviewModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
+      size="xl"
+      showHeader={false}
       enableEscClose={true}
       overlayClassName="hql-preview-modal-overlay"
       contentClassName="glass-card hql-preview-modal"
       zIndex={1200}
+      contentStyle={{ maxWidth: '1200px', height: '90vh' }}
     >
-      <div className="modal-content glass-card hql-preview-modal" style={{ backgroundColor: 'transparent', width: '95vw', maxWidth: '1200px', height: '90vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="modal-content glass-card hql-preview-modal" style={{ backgroundColor: 'transparent', display: 'flex', flexDirection: 'column' }}>
         {/* Modal Header */}
         <div className="modal-header">
           <div className="header-left">
@@ -215,7 +219,7 @@ export default function HQLPreviewModal({
             </div>
           </div>
 
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             <i className="bi bi-x"></i>
           </button>
         </div>
@@ -226,7 +230,7 @@ export default function HQLPreviewModal({
           <div className="editor-toolbar">
             <button className="btn btn-sm btn-outline-primary" onClick={() => {
               navigator.clipboard.writeText(currentHQL);
-              alert('已复制到剪贴板');
+              toast.success('已复制到剪贴板');
             }}>
               <i className="bi bi-clipboard"></i> 复制
             </button>

@@ -59,6 +59,18 @@ from .validators import (
     SQL_INJECTION_PATTERN,
 )
 
+# Error messages
+from .error_messages import (
+    ErrorMessages,
+    format_validation_error,
+    format_api_error,
+    build_error_response,
+    validation_error,
+    not_found_error,
+    conflict_error,
+    server_error,
+)
+
 # ============================================================================
 # 从 formatters 导入
 # ============================================================================
@@ -183,6 +195,15 @@ __all__ = [
     "EVENT_NAME_PATTERN",
     "PARAM_NAME_PATTERN",
     "SQL_INJECTION_PATTERN",
+    # ========== error messages ==========
+    "ErrorMessages",
+    "format_validation_error",
+    "format_api_error",
+    "build_error_response",
+    "validation_error",
+    "not_found_error",
+    "conflict_error",
+    "server_error",
     # ========== formatters ==========
     # 表名格式化
     "format_table_name",

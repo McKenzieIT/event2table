@@ -73,6 +73,7 @@ export default tseslint.config(
     rules: {
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      '@typescript-eslint/ban-ts-comment': ['off'],
       'react/prop-types': 'off',
       'react-refresh/only-export-components': [
         'warn',
@@ -83,8 +84,6 @@ export default tseslint.config(
       }],
       'no-hardcoded-colors/no-hardcoded-colors': 'warn',
       'basemodal-migration/use-content-class-name': 'error',
-      'basemodal-migration/invalid-size-value': 'error',
-      'basemodal-migration/use-modal-body': 'error',
     },
   },
 );

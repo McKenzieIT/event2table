@@ -2,9 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { ApolloProvider } from "@apollo/client/react";
 import { Toaster } from "react-hot-toast";
 import { ToastProvider } from "@shared/ui";
 import ErrorBoundary from "@shared/components/ErrorBoundary";
+import { client } from "@shared/apollo/client";
 import App from "./App";
 
 // CSS imports - Order is critical for Vite
@@ -20,11 +22,13 @@ import { queryClient } from "@analytics/components/lib/queryClient";
 ReactDOM.createRoot(document.getElementById("app-root")).render(
   <ErrorBoundary>
     <HashRouter>
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
-      </QueryClientProvider>
+      <ApolloProvider client={client}>
+        <QueryClientProvider client={queryClient}>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </QueryClientProvider>
+      </ApolloProvider>
       <Toaster position="top-right" />
     </HashRouter>
   </ErrorBoundary>,

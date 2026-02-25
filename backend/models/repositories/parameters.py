@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Parameter Repository (参数数据访问层)
+Parameter Repository (参数数据访问层 - 精简架构)
 
 提供参数相关的数据访问方法
-基于 GenericRepository 实现特定领域的查询
+- 返回统一Entity模型 (ParameterEntity)
+- 移除DDD抽象
+- 保持GenericRepository继承
 """
 
 from typing import Optional, List, Dict, Any
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, get_db_connection
+from backend.models.entities import ParameterEntity
 
 
 class ParameterRepository(GenericRepository):
     """
-    参数仓储类
+    参数仓储类 (精简架构)
 
     继承 GenericRepository 并添加参数特定的查询方法
+    返回ParameterEntity而非字典,确保类型安全
     """
 
     def __init__(self):
@@ -32,7 +36,108 @@ class ParameterRepository(GenericRepository):
             cache_timeout=60,  # 1分钟缓存
         )
 
-    def get_active_by_event(self, event_id: int) -> List[Dict[str, Any]]:
+    @staticmethod
+    def _row_to_entity(row: Dict[str, Any]) -> ParameterEntity:
+        """
+        将数据库行映射到ParameterEntity
+
+        数据库字段名 → Entity字段名映射:
+        - param_name → name
+        - param_name_cn → name_cn (暂不使用)
+        - param_description → description
+        - 需要查询log_events获取game_gid
+
+        Args:
+            row: 数据库行字典
+
+        Returns:
+            ParameterEntity实例
+        """
+        # 从关联的log_events获取game_gid
+        game_gid = row.get('game_gid')
+        if not game_gid and 'event_id' in row:
+            # 如果没有game_gid,查询获取
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT game_gid FROM log_events WHERE id = ?", (row['event_id'],))
+            result = cursor.fetchone()
+            if result:
+                game_gid = result[0]
+            conn.close()
+
+        # 映射字段
+        entity_data = {
+            'id': row.get('id'),
+            'event_id': row.get('event_id'),
+            'game_gid': game_gid or 0,  # 提供默认值
+            'name': row.get('param_name', ''),
+            'param_type': 'base',  # 默认值,数据库中没有这个字段
+            'json_path': row.get('json_path'),
+            'hive_type': 'STRING',  # 默认值
+            'description': row.get('param_description'),
+            'is_common': False,  # 默认值
+            'created_at': row.get('created_at'),
+            'updated_at': row.get('updated_at'),
+        }
+
+        return ParameterEntity(**entity_data)
+
+    def create(self, data: Dict[str, Any]) -> Optional[ParameterEntity]:
+        """
+        创建参数
+
+        处理字段名映射:
+        - name → param_name
+        - description → param_description
+
+        Args:
+            data: 参数数据 (使用Entity字段名)
+
+        Returns:
+            创建的ParameterEntity, 失败返回None
+        """
+        from backend.core.utils.converters import get_db_connection
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            # 字段映射: Entity字段 → 数据库列
+            db_data = {
+                'event_id': data.get('event_id'),
+                'game_gid': data.get('game_gid'),
+                'param_name': data.get('name'),
+                'param_name_cn': data.get('name_cn'),  # 暂不使用
+                'param_type': data.get('param_type', 'base'),
+                'json_path': data.get('json_path'),
+                'hive_type': data.get('hive_type', 'STRING'),
+                'param_description': data.get('description'),
+                'is_common': data.get('is_common', False),
+                'template_id': 1,  # 默认模板ID (NOT NULL)
+                'is_active': 1,  # 默认激活
+                'version': 1,  # 默认版本
+            }
+
+            # 移除None值
+            db_data = {k: v for k, v in db_data.items() if v is not None}
+
+            columns = ", ".join(db_data.keys())
+            placeholders = ", ".join(["?" for _ in db_data.keys()])
+
+            query = f"INSERT INTO event_params ({columns}) VALUES ({placeholders})"
+            cursor.execute(query, tuple(db_data.values()))
+            param_id = cursor.lastrowid
+            conn.commit()
+
+            return self.find_by_id(param_id)
+
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+    def get_active_by_event(self, event_id: int) -> List[ParameterEntity]:
         """
         获取指定事件的所有活跃参数
 
@@ -40,7 +145,7 @@ class ParameterRepository(GenericRepository):
             event_id: 事件ID
 
         Returns:
-            参数列表
+            ParameterEntity列表
 
         Example:
             >>> repo = ParameterRepository()
@@ -49,16 +154,16 @@ class ParameterRepository(GenericRepository):
         query = """
             SELECT
                 ep.*,
-                pt.template_name,
-                pt.display_name as type_display_name
+                le.game_gid
             FROM event_params ep
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            JOIN log_events le ON ep.event_id = le.id
             WHERE ep.event_id = ? AND ep.is_active = 1
             ORDER BY ep.id
         """
-        return fetch_all_as_dict(query, (event_id,))
+        rows = fetch_all_as_dict(query, (event_id,))
+        return [self._row_to_entity(row) for row in rows]
 
-    def find_by_name_and_event(self, param_name: str, event_id: int) -> Optional[Dict[str, Any]]:
+    def find_by_name_and_event(self, param_name: str, event_id: int) -> Optional[ParameterEntity]:
         """
         根据参数名和事件ID查询参数
 
@@ -67,7 +172,7 @@ class ParameterRepository(GenericRepository):
             event_id: 事件ID
 
         Returns:
-            参数字典，不存在返回None
+            ParameterEntity, 不存在返回None
 
         Example:
             >>> repo = ParameterRepository()
@@ -76,17 +181,17 @@ class ParameterRepository(GenericRepository):
         query = """
             SELECT
                 ep.*,
-                pt.template_name,
-                pt.display_name as type_display_name
+                le.game_gid
             FROM event_params ep
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            JOIN log_events le ON ep.event_id = le.id
             WHERE ep.param_name = ? AND ep.event_id = ?
         """
-        return fetch_one_as_dict(query, (param_name, event_id))
+        row = fetch_one_as_dict(query, (param_name, event_id))
+        return self._row_to_entity(row) if row else None
 
     def get_all_by_event(
         self, event_id: int, include_inactive: bool = False
-    ) -> List[Dict[str, Any]]:
+    ) -> List[ParameterEntity]:
         """
         获取指定事件的所有参数（包含非活跃参数）
 
@@ -95,7 +200,7 @@ class ParameterRepository(GenericRepository):
             include_inactive: 是否包含非活跃参数
 
         Returns:
-            参数列表
+            ParameterEntity列表
 
         Example:
             >>> repo = ParameterRepository()
@@ -105,10 +210,9 @@ class ParameterRepository(GenericRepository):
             query = """
                 SELECT
                     ep.*,
-                    pt.template_name,
-                    pt.display_name as type_display_name
+                    le.game_gid
                 FROM event_params ep
-                LEFT JOIN param_templates pt ON ep.template_id = pt.id
+                JOIN log_events le ON ep.event_id = le.id
                 WHERE ep.event_id = ?
                 ORDER BY ep.id
             """
@@ -116,18 +220,39 @@ class ParameterRepository(GenericRepository):
             query = """
                 SELECT
                     ep.*,
-                    pt.template_name,
-                    pt.display_name as type_display_name
+                    le.game_gid
                 FROM event_params ep
-                LEFT JOIN param_templates pt ON ep.template_id = pt.id
+                JOIN log_events le ON ep.event_id = le.id
                 WHERE ep.event_id = ? AND ep.is_active = 1
                 ORDER BY ep.id
             """
-        return fetch_all_as_dict(query, (event_id,))
+        rows = fetch_all_as_dict(query, (event_id,))
+        return [self._row_to_entity(row) for row in rows]
+
+    def find_by_id(self, param_id: int) -> Optional[ParameterEntity]:
+        """
+        根据参数ID查询参数
+
+        Args:
+            param_id: 参数ID
+
+        Returns:
+            ParameterEntity, 不存在返回None
+        """
+        query = """
+            SELECT
+                ep.*,
+                le.game_gid
+            FROM event_params ep
+            JOIN log_events le ON ep.event_id = le.id
+            WHERE ep.id = ?
+        """
+        row = fetch_one_as_dict(query, (param_id,))
+        return self._row_to_entity(row) if row else None
 
     def find_by_template(
         self, template_id: int, limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[ParameterEntity]:
         """
         根据模板ID查询参数
 
@@ -136,7 +261,7 @@ class ParameterRepository(GenericRepository):
             limit: 限制数量
 
         Returns:
-            参数列表
+            ParameterEntity列表
 
         Example:
             >>> repo = ParameterRepository()
@@ -145,23 +270,20 @@ class ParameterRepository(GenericRepository):
         query = """
             SELECT
                 ep.*,
-                le.event_name,
-                le.event_name_cn,
-                pt.template_name,
-                pt.display_name as type_display_name
+                le.game_gid
             FROM event_params ep
-            LEFT JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            JOIN log_events le ON ep.event_id = le.id
             WHERE ep.template_id = ?
             ORDER BY ep.id DESC
         """
         if limit:
             query += f" LIMIT {limit}"
-        return fetch_all_as_dict(query, (template_id,))
+        rows = fetch_all_as_dict(query, (template_id,))
+        return [self._row_to_entity(row) for row in rows]
 
     def search_parameters(
         self, keyword: str, event_id: Optional[int] = None, template_id: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[ParameterEntity]:
         """
         搜索参数（支持参数名和中文名模糊搜索）
 
@@ -171,7 +293,7 @@ class ParameterRepository(GenericRepository):
             template_id: 可选的模板ID过滤
 
         Returns:
-            参数列表
+            ParameterEntity列表
 
         Example:
             >>> repo = ParameterRepository()
@@ -194,20 +316,17 @@ class ParameterRepository(GenericRepository):
         query = f"""
             SELECT
                 ep.*,
-                le.event_name,
-                le.event_name_cn,
-                pt.template_name,
-                pt.display_name as type_display_name
+                le.game_gid
             FROM event_params ep
-            LEFT JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            JOIN log_events le ON ep.event_id = le.id
             WHERE {where_clause}
-            AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)
+            AND (ep.param_name LIKE ?)
             ORDER BY ep.id DESC
         """
 
-        params.extend([keyword_pattern, keyword_pattern])
-        return fetch_all_as_dict(query, tuple(params))
+        params.extend([keyword_pattern])
+        rows = fetch_all_as_dict(query, tuple(params))
+        return [self._row_to_entity(row) for row in rows]
 
     def get_common_parameters(self, game_gid: Optional[int] = None) -> List[Dict[str, Any]]:
         """
@@ -340,7 +459,7 @@ class ParameterRepository(GenericRepository):
             ...     {'param_name': 'param2', 'param_name_cn': '参数2', ...}
             ... ])
         """
-        from backend.core.database.database import get_db_connection
+        from backend.core.utils.converters import get_db_connection
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -435,7 +554,7 @@ class ParameterRepository(GenericRepository):
 
     def get_parameters_by_type(
         self, template_id: int, event_id: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[ParameterEntity]:
         """
         根据参数类型获取参数列表
 
@@ -444,7 +563,7 @@ class ParameterRepository(GenericRepository):
             event_id: 可选的事件ID过滤
 
         Returns:
-            参数列表
+            ParameterEntity列表
 
         Example:
             >>> repo = ParameterRepository()
@@ -454,26 +573,94 @@ class ParameterRepository(GenericRepository):
             query = """
                 SELECT
                     ep.*,
-                    pt.template_name,
-                    pt.display_name as type_display_name
+                    le.game_gid
                 FROM event_params ep
-                LEFT JOIN param_templates pt ON ep.template_id = pt.id
+                JOIN log_events le ON ep.event_id = le.id
                 WHERE ep.template_id = ? AND ep.event_id = ? AND ep.is_active = 1
                 ORDER BY ep.id
             """
-            return fetch_all_as_dict(query, (template_id, event_id))
+            rows = fetch_all_as_dict(query, (template_id, event_id))
         else:
             query = """
                 SELECT
                     ep.*,
-                    le.event_name,
-                    le.event_name_cn,
-                    pt.template_name,
-                    pt.display_name as type_display_name
+                    le.game_gid
                 FROM event_params ep
-                LEFT JOIN log_events le ON ep.event_id = le.id
-                LEFT JOIN param_templates pt ON ep.template_id = pt.id
+                JOIN log_events le ON ep.event_id = le.id
                 WHERE ep.template_id = ? AND ep.is_active = 1
                 ORDER BY ep.id DESC
             """
-            return fetch_all_as_dict(query, (template_id,))
+            rows = fetch_all_as_dict(query, (template_id,))
+
+        return [self._row_to_entity(row) for row in rows]
+
+    def update(self, param_id: int, data: Dict[str, Any]) -> Optional[ParameterEntity]:
+        """
+        根据参数ID更新参数
+
+        Args:
+            param_id: 参数ID
+            data: 要更新的字段字典（支持Entity字段名或数据库字段名）
+
+        Returns:
+            更新后的ParameterEntity, 不存在返回None
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> param = repo.update(1, {'name': 'Updated Name'})  # Entity字段名
+            >>> param = repo.update(1, {'param_name': 'Updated Name'})  # 数据库字段名
+        """
+        if not data:
+            return None
+
+        # 映射Entity字段名到数据库字段名
+        field_mapping = {
+            'name': 'param_name',
+            'description': 'param_description',
+        }
+
+        # 转换字段名
+        db_data = {}
+        for key, value in data.items():
+            db_key = field_mapping.get(key, key)
+            db_data[db_key] = value
+
+        # 构建UPDATE语句
+        set_clause = ", ".join([f"{key} = ?" for key in db_data.keys()])
+        query = f"UPDATE event_params SET {set_clause} WHERE id = ?"
+        values = list(db_data.values()) + [param_id]
+
+        from backend.core.utils.converters import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, values)
+        conn.commit()
+        conn.close()
+
+        # 返回更新后的参数
+        return self.find_by_id(param_id)
+
+    def delete(self, param_id: int) -> bool:
+        """
+        根据参数ID删除参数
+
+        Args:
+            param_id: 参数ID
+
+        Returns:
+            是否删除成功
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> success = repo.delete(1)
+        """
+        query = "DELETE FROM event_params WHERE id = ?"
+
+        from backend.core.utils.converters import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, (param_id,))
+        deleted_count = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return deleted_count > 0

@@ -35,38 +35,24 @@ def resolve_game_context() -> Tuple[Optional[int], Optional[str], Optional[str]]
         ...     return json_error_response(error, status_code=400)
         >>> # Use game_gid for event queries, game_id for common_params queries
     """
-    # 优先使用game_gid(业务GID),回退到game_id(数据库ID)
     game_gid = request.args.get("game_gid", type=str)
-    game_id = request.args.get("game_id", type=int)
 
-    # 如果提供的是game_gid,需要先转换为game_id
-    if game_gid:
-        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
-        if not game:
-            return None, None, f"Game not found: gid={game_gid}"
-        game_id = game["id"]
-        return game_id, game_gid, None
-    elif game_id:
-        # 直接使用game_id(向后兼容)
-        # 获取game_gid以供使用
-        game = fetch_one_as_dict("SELECT * FROM games WHERE id = ?", (game_id,))
-        if not game:
-            return None, None, f"Game not found: id={game_id}"
-        return game_id, game["gid"], None
-    else:
-        # 尝试从session获取
-        session_game_id = session.get("current_game_id")
-        if session_game_id:
-            game = fetch_one_as_dict("SELECT * FROM games WHERE id = ?", (session_game_id,))
-            if game:
-                return session_game_id, game["gid"], None
+    if not game_gid:
+        game_gid = session.get("current_game_gid")
 
-        return None, None, "Game context required (game_gid or game_id)"
+    if not game_gid:
+        return None, None, "game_gid required"
+
+    # Convert game_gid to game_id for common_params table queries
+    game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+    if not game:
+        return None, None, f"Game not found: gid={game_gid}"
+    game_id = game["id"]
+    return game_id, game_gid, None
 
 
 def get_where_clause_for_game(
-    game_gid: Optional[str] = None,
-    game_id: Optional[int] = None
+    game_gid: Optional[str] = None, game_id: Optional[int] = None
 ) -> Tuple[str, Any]:
     """
     Get WHERE clause and query value for game filtering
@@ -97,7 +83,7 @@ def build_parameter_query(
     where_clause: str,
     params: list,
     search: Optional[str] = None,
-    type_filter: Optional[str] = None
+    type_filter: Optional[str] = None,
 ) -> Tuple[str, list]:
     """
     Build parameter query with optional filters

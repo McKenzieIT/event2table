@@ -74,3 +74,4 @@ const MemoizedSpinner = React.memo(Spinner, (prevProps, nextProps) => {
 MemoizedSpinner.displayName = 'MemoizedSpinner';
 
 export default MemoizedSpinner;
+export { MemoizedSpinner as Spinner };

@@ -1,0 +1,603 @@
+---
+name: event2table-e2e-test
+description: Enterprise-grade intelligent E2E testing system for Event2Table project. Focuses on REAL USER WORKFLOW testing - not just page loads, but actual user interactions like clicking buttons, filling forms, drag-and-drop, and verifying complete workflows. PHASE 3 READY: Now supports automated Playwright testing with pre-commit hooks and CI/CD integration. Use when: (1) Test actual user workflows, (2) Discover functional obstacles, (3) Verify button clicks/form submissions, (4) Generate Playwright test scripts, (5) Run automated regression tests, (6) Monitor performance, or (7) Establish continuous testing.
+---
+
+# Event2Table E2E Testing Skill
+
+## 🎯 Core Philosophy
+
+> **"测试不是验证页面能加载，而是验证用户能完成任务。"**
+
+**NOT** just page load validation.
+**YES** actual user interaction testing.
+
+**Testing Depth Levels**:
+- Page Load (20%) - Does page display?
+- User Interaction (60%) - Do buttons/forms work? ← **CORE FOCUS**
+- Workflow Completion (20%) - Does entire feature work?
+
+**Phase 3 Evolution**:
+- Phase 1: Manual Chrome DevTools MCP testing
+- Phase 2: Deep workflow testing, discovered 6 critical issues
+- Phase 3: Automated Playwright testing with CI/CD ← **YOU ARE HERE**
+
+---
+
+## Quick Start
+
+### Manual Testing (Chrome DevTools MCP)
+```
+"Run E2E tests on Event2Table"
+"Test all user workflows in the app"
+"Verify all features work end-to-end"
+```
+
+### Automated Testing (Playwright)
+```
+"Run Playwright tests"
+"Execute smoke tests"
+"Run regression test suite"
+"Create Playwright test script for [feature]"
+```
+
+---
+
+## Testing Anti-Patterns (What NOT to Do)
+
+### ❌ Anti-Pattern #1: Shallow Testing
+
+```javascript
+// DON'T DO THIS
+test('Page loads', async ({ page }) => {
+  await page.goto('/events')
+  await expect(page.locator('button')).toBeVisible()
+  // This doesn't test if button WORKS!
+})
+```
+
+**Why it's wrong**: Button exists but clicking it does nothing = bug missed!
+
+### ✅ Correct Pattern: Workflow Testing
+
+```javascript
+// DO THIS INSTEAD
+test('User can import events from Excel', async ({ page }) => {
+  await page.goto('/events')
+  await page.click('text=导入Excel')
+  await expect(page.locator('.import-dialog')).toBeVisible()
+  await page.locator('input[type="file"]').uploadFile('test.xlsx')
+  await page.click('text=导入')
+  await expect(page.locator('.toast-success')).toContainText('导入成功')
+})
+```
+
+**Why it's right**: Tests complete user workflow, discovers real issues.
+
+### ❌ Anti-Pattern #2: Generic Error Messages
+
+```javascript
+// DON'T DO THIS
+throw new Error('Creation failed')
+// Users don't know what went wrong!
+```
+
+### ✅ Correct Pattern: Actionable Errors
+
+```javascript
+// DO THIS INSTEAD
+if (response.status === 409) {
+  throw new Error(`Game GID ${data.gid} already exists. Please use another GID (suggested: 90000000+)`)
+}
+// Users know exactly what to do!
+```
+
+**Impact**: Clear errors reduce support burden by 50%+.
+
+---
+
+## Phase 2 Proven Techniques
+
+### 1. Error Enhancement Pattern
+
+```javascript
+// Enhance errors with specific guidance
+let errorMessage = result.message || 'Operation failed';
+
+if (response.status === 409) {
+  errorMessage = `Game GID ${data.gid} already exists. Please use another GID (suggested: 90000000+)`;
+} else if (response.status === 400) {
+  if (errorMessage.includes('GID')) {
+    errorMessage += ' (Hint: GID must be a positive integer, e.g., 90000001)';
+  }
+}
+
+throw new Error(errorMessage);
+```
+
+### 2. Test Data Isolation
+
+**GID Ranges**:
+- Production: 10000000-19999999 (e.g., STAR001 = 10000147)
+- Test: 90000000-99999999 (e.g., TEST001 = 90000001)
+
+**Rule**: NEVER use production GIDs for write operations in tests
+
+```javascript
+// ✅ Correct
+const testGid = 90000001;
+await createGame({ gid: testGid, name: 'Test Game' });
+
+// ❌ Wrong - PROTECTED!
+const prodGid = 10000147; // STAR001
+await createGame({ gid: prodGid, name: 'Test Game' });
+```
+
+### 3. Verification Checklist
+
+After fixing any issue:
+- [ ] Fix implemented in code
+- [ ] Build succeeds (`npm run build`)
+- [ ] E2E test passes for exact scenario
+- [ ] No regressions in related features
+- [ ] Test documentation updated
+- [ ] Screenshot evidence captured
+
+---
+
+## Phase 3: Playwright Automation
+
+### Test Script Templates
+
+**Smoke Test Example** (`test/e2e/smoke/dashboard.spec.js`):
+```javascript
+import { test, expect } from '@playwright/test';
+
+test.describe('Dashboard Smoke Tests', () => {
+  test('Dashboard loads and displays statistics', async ({ page }) => {
+    await page.goto('http://localhost:5173/');
+
+    // Wait for page to load
+    await expect(page.locator('.dashboard-container')).toBeVisible({ timeout: 5000 });
+
+    // Verify statistics cards
+    await expect(page.locator('.stat-card')).toHaveCount(4);
+
+    // Verify no console errors
+    const errors = await page.evaluate(() => window.__errors || []);
+    expect(errors).toHaveLength(0);
+  });
+
+  test('Dashboard games management button works', async ({ page }) => {
+    await page.goto('http://localhost:5173/');
+    await page.click('text=游戏管理');
+    await expect(page.locator('.modal')).toBeVisible();
+    await expect(page.locator('.game-item')).toBeVisible();
+    await page.click('button:has-text("关闭")');
+  });
+});
+```
+
+**CRUD Test Example** (`test/e2e/smoke/games-crud.spec.js`):
+```javascript
+import { test, expect } from '@playwright/test';
+
+test.describe('Games CRUD Tests', () => {
+  test('User can create a new game', async ({ page }) => {
+    await page.goto('http://localhost:5173/#/games/create');
+
+    // Generate unique test GID
+    const testGid = Math.floor(Math.random() * 10000000) + 90000000;
+
+    // Fill form
+    await page.fill('input[name="gid"]', String(testGid));
+    await page.fill('input[name="name"]', 'E2E测试游戏');
+    await page.selectOption('select[name="ods_db"]', 'ieu_ods');
+
+    // Submit
+    await page.click('button[type="submit"]');
+
+    // Verify success
+    await expect(page.locator('.toast-success')).toBeVisible();
+    await expect(page.locator('.toast-success')).toContainText(/创建成功/i);
+  });
+
+  test('User receives helpful error for duplicate GID', async ({ page }) => {
+    await page.goto('http://localhost:5173/#/games/create');
+
+    // Try existing GID
+    await page.fill('input[name="gid"]', '10000147'); // STAR001 exists
+    await page.fill('input[name="name"]', '测试重复GID');
+    await page.selectOption('select[name="ods_db"]', 'ieu_ods');
+
+    await page.click('button[type="submit"]');
+
+    // Verify helpful error message
+    await expect(page.locator('.toast-error')).toBeVisible();
+    const errorText = await page.locator('.toast-error').textContent();
+    expect(errorText).toContain(/已存在|already exists/i);
+    expect(errorText).toContain(/90000000+/i); // Should suggest test GID range
+  });
+});
+```
+
+**Event Builder Test Example** (`test/e2e/critical/event-builder.spec.js`):
+```javascript
+import { test, expect } from '@playwright/test';
+
+test.describe('Event Builder Critical Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('http://localhost:5173/#/event-node-builder?game_gid=90000001');
+  });
+
+  test('User can drag field to canvas', async ({ page }) => {
+    // Select event
+    await page.selectOption('#event-select', 'zmpvp.vis');
+    await expect(page.locator('.field-list-item')).toBeVisible();
+
+    // Get initial field count
+    const initialFields = await page.locator('.canvas-field').count();
+
+    // Drag field to canvas
+    const fieldElement = page.locator('.field-list-item[data-field="role_id"]');
+    const canvas = page.locator('.field-canvas');
+
+    await fieldElement.dragTo(canvas);
+
+    // Verify field added
+    await expect(page.locator('.canvas-field')).toHaveCount(initialFields + 1);
+    await expect(page.locator('.canvas-field[data-field="role_id"]')).toBeVisible();
+  });
+
+  test('User can add WHERE condition', async ({ page }) => {
+    // Select event
+    await page.selectOption('#event-select', 'zmpvp.vis');
+
+    // Click Add WHERE Condition
+    await page.click('text=添加WHERE条件');
+    await expect(page.locator('.where-builder-modal')).toBeVisible();
+
+    // Fill condition
+    await page.selectOption('.condition-field-select', 'zone_id');
+    await page.selectOption('.condition-operator-select', '>');
+    await page.fill('.condition-value-input', '100');
+
+    // Apply
+    await page.click('text=应用');
+
+    // Verify in HQL preview
+    await expect(page.locator('.hql-preview')).toContainText('zone_id > 100');
+  });
+});
+```
+
+---
+
+## Pre-commit Hook Implementation
+
+Create `.git/hooks/pre-commit`:
+```bash
+#!/bin/bash
+set -e
+
+echo "🧪 Running E2E tests..."
+
+# Check servers
+if ! curl -s http://127.0.0.1:5001 > /dev/null; then
+  echo "❌ Backend not running. Start with: python web_app.py"
+  exit 1
+fi
+
+if ! curl -s http://localhost:5173 > /dev/null; then
+  echo "❌ Frontend not running. Start with: cd frontend && npm run dev"
+  exit 1
+fi
+
+# Run smoke tests
+cd frontend
+npm run test:e2e:smoke
+
+TEST_RESULT=$?
+
+if [ $TEST_RESULT -ne 0 ]; then
+  echo "❌ E2E tests failed. Commit aborted."
+  echo "💡 Run tests locally with: npm run test:e2e:smoke"
+  exit 1
+fi
+
+echo "✅ E2E tests passed. Proceeding with commit."
+```
+
+Make executable:
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
+---
+
+## CI/CD Integration
+
+Create `.github/workflows/e2e-tests.yml`:
+```yaml
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python & Node.js
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          cd frontend && npm ci
+
+      - name: Install Playwright
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Start servers
+        run: |
+          python web_app.py &
+          cd frontend && npm run dev &
+
+      - name: Wait for servers
+        run: sleep 30
+
+      - name: Run E2E tests
+        working-directory: ./frontend
+        run: npm run test:e2e:smoke
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: frontend/test/e2e/playwright-report/
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: frontend/test/e2e/screenshots/
+```
+
+---
+
+## Test Documentation Template
+
+For each issue discovered:
+
+```markdown
+## Feature: [Feature Name]
+
+### Test Steps
+1. Navigate to [URL]
+2. Click [element]
+3. Fill [field] with [value]
+4. Submit form
+
+### Expected Result
+[What should happen]
+
+### Actual Result
+[What actually happened]
+
+### Result
+❌ FAIL - [Brief failure reason]
+
+### Issue
+**SEVERITY**: CRITICAL/HIGH/MEDIUM
+**IMPACT**: [User impact description]
+**Screenshot**: [screenshot-reference.png]
+
+### Recommendation
+[Specific, actionable fix suggestion]
+```
+
+---
+
+## Performance Monitoring
+
+**Performance Monitor Class**:
+```javascript
+// test/e2e/utils/performance-monitor.js
+export class PerformanceMonitor {
+  constructor(page) {
+    this.page = page;
+    this.metrics = {};
+  }
+
+  async measureCoreWebVitals() {
+    const metrics = await this.page.evaluate(() => {
+      const timing = performance.timing;
+      return {
+        pageLoadTime: timing.loadEventEnd - timing.navigationStart,
+        domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart,
+        ttfb: timing.responseStart - timing.navigationStart,
+        fcp: performance.getEntriesByType('paint')[1]?.startTime || 0
+      };
+    });
+
+    this.metrics.navigation = metrics;
+    return metrics;
+  }
+
+  generateReport() {
+    return {
+      url: this.page.url(),
+      timestamp: new Date().toISOString(),
+      metrics: this.metrics,
+      recommendation: this.getRecommendation()
+    };
+  }
+
+  getRecommendation() {
+    const { pageLoadTime } = this.metrics.navigation;
+    if (pageLoadTime < 2000) return 'Excellent';
+    if (pageLoadTime < 3000) return 'Good';
+    if (pageLoadTime < 5000) return 'Needs Improvement';
+    return 'Poor - requires optimization';
+  }
+}
+```
+
+---
+
+## Phase 3 Goals & Metrics
+
+| Metric | Phase 2 | Phase 3 Target | Improvement |
+|--------|----------|----------------|-------------|
+| Test Pass Rate | 85% | 95%+ | +10% |
+| Automation Coverage | 0% | 80%+ | +80% |
+| Feedback Time | Manual (45min) | <5 min | -89% |
+| Regression Detection | Manual | Auto | ✅ |
+| Test Count | 16 | 50 | +213% |
+
+---
+
+## Module Coverage
+
+### Analytics Module (30 tests)
+- Dashboard: Load, stats, game management modal
+- Games: Create, read, update, delete, search, filter
+- Events: List, create, edit, delete, import Excel, pagination
+- Parameters: List, export Excel, filter, compare
+
+### Event Builder Module (20 tests)
+- Event selection: Load events, switch events
+- Field canvas: Drag field, remove field, reorder fields
+- WHERE conditions: Add, edit, delete, apply, preview
+- HQL generation: Single, join, union modes
+- Configuration: Save, load, export
+
+### Canvas Module (15 tests)
+- Node operations: Add, drag, delete, select
+- Connections: Create, delete, verify
+- HQL generation: Generate, preview, copy
+- Save/Load: Save canvas, load canvas, list saved
+
+---
+
+## Important Notes
+
+### Data Safety
+- **STAR001 Protection**: Never use GID 10000147 for write operations
+- **Test GID Range**: Use 90000000+ for safe testing
+- **Database Isolation**: Tests use `data/test_database.db` or test GID range
+- **Game Context**: Always pass `game_gid` parameter in API calls
+
+### Best Practices (Proven)
+
+1. **Always Test User Workflows**
+   - ❌ Check if button exists
+   - ✅ Click button, verify response
+
+2. **Provide Actionable Error Messages**
+   - ❌ "Creation failed"
+   - ✅ "Game GID 10000147 exists, use 90000000+ range"
+
+3. **Check Code Before Implementing**
+   - Many "new issues" already fixed
+   - Read code first, avoid duplicate work
+
+4. **Document Issues Thoroughly**
+   - Steps to reproduce
+   - Expected vs Actual
+   - Screenshot evidence
+   - Actionable recommendations
+
+5. **Verify Fixes with E2E**
+   - Test exact scenario that failed
+   - Check for regressions
+   - Update documentation
+
+---
+
+## Testing Workflow
+
+### Pre-Testing
+- [ ] Read relevant code (backend + frontend)
+- [ ] Check if issue already fixed
+- [ ] Define test scenarios
+- [ ] Prepare test data (GID 90000000+)
+
+### Testing
+- [ ] Navigate to page
+- [ ] Identify user interaction points
+- [ ] Execute each interaction
+- [ ] Verify response (UI + Network + Console)
+- [ ] Document results
+
+### Post-Testing
+- [ ] Document issues with reproduction steps
+- [ ] Prioritize (Critical/High/Medium)
+- [ ] Suggest actionable fixes
+- [ ] Verify fixes don't break other features
+
+---
+
+## Quick Reference
+
+### Run Tests
+
+```bash
+# Manual testing (Chrome DevTools MCP)
+# Use this skill to guide manual testing
+
+# Automated testing (Playwright)
+cd frontend
+npm run test:e2e              # All tests
+npm run test:e2e:smoke        # Smoke tests only
+npm run test:e2e:debug        # Debug mode
+npm run test:e2e:ui           # UI mode
+```
+
+### Create New Test
+
+```bash
+# Create test file
+touch frontend/test/e2e/smoke/new-feature.spec.js
+
+# Use template from this skill
+# Copy relevant template section
+# Adapt to your feature
+```
+
+### Debug Failed Test
+
+```bash
+# Run in debug mode
+npm run test:e2e:debug -- new-feature.spec.js
+
+# Or run with UI
+npm run test:e2e:ui
+
+# Check screenshots
+ls frontend/test/e2e/screenshots/
+```
+
+---
+
+**Skill Version**: 3.0 (Phase 3 Ready)
+**Last Updated**: 2026-02-21
+**Status**: Production Ready
+**Next Phase**: Continuous Performance Monitoring

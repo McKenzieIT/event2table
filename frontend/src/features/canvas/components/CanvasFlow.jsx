@@ -28,6 +28,7 @@ import { useFlowLoad } from '../hooks/useFlowLoad';
 import { useFlowSave } from '../hooks/useFlowSave';
 import { useFlowExecute } from '../hooks/useFlowExecute';
 import { useToast } from '@shared/ui';
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import './CanvasFlow.css';
 
 // 初始空数据
@@ -49,6 +50,9 @@ export default function CanvasFlow({ gameData, flowId }) {
     const nodeTypes = CANVAS_NODE_TYPES;
 
     const { warning: toastWarning, success: toastSuccess, info: toastInfo, error: toastError } = useToast();
+
+    // Promise-based confirm dialog
+    const { confirm, ConfirmDialogComponent } = usePromiseConfirm();
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -238,7 +242,7 @@ export default function CanvasFlow({ gameData, flowId }) {
     }, [selectedNode, setNodes]);
 
     // 删除选中节点（带级联删除）
-    const deleteSelected = useCallback(() => {
+    const deleteSelected = useCallback(async () => {
         const selectedNodes = nodes.filter((n) => n.selected);
         if (selectedNodes.length === 0) {
             toastWarning('请先选择要删除的节点');
@@ -260,7 +264,7 @@ export default function CanvasFlow({ gameData, flowId }) {
 
 ⚠️ 此操作不可撤销！`;
 
-        if (confirm(message)) {
+        if (await confirm(message)) {
             // Perform cascade delete
             const result = deleteMultipleNodesCascade(selectedIds, nodes, edges);
             setNodes(result.nodes);
@@ -268,16 +272,16 @@ export default function CanvasFlow({ gameData, flowId }) {
 
             toastSuccess(`已删除 ${result.summary.deletedNodes} 个节点和 ${result.summary.deletedEdges} 条连接`);
         }
-    }, [nodes, edges, setNodes, setEdges, toastWarning, toastSuccess]);
+    }, [nodes, edges, setNodes, setEdges, toastWarning, toastSuccess, confirm]);
 
     // 清空画布
-    const clearCanvas = useCallback(() => {
-        if (confirm('确定要清空画布吗？此操作不可撤销。')) {
+    const clearCanvas = useCallback(async () => {
+        if (await confirm('确定要清空画布吗？此操作不可撤销。')) {
             pushHistory({ nodes, edges });
             setNodes([]);
             setEdges([]);
         }
-    }, [setNodes, setEdges, nodes, edges, pushHistory]);
+    }, [setNodes, setEdges, nodes, edges, pushHistory, confirm]);
 
     // 撤销操作
     const handleUndo = useCallback(() => {
@@ -496,6 +500,9 @@ export default function CanvasFlow({ gameData, flowId }) {
                     data-testid="properties-panel"
                 />
             )}
+
+            {/* Promise-based confirm dialog */}
+            <ConfirmDialogComponent />
         </div>
     );
 }

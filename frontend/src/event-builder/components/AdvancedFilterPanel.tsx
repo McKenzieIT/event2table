@@ -9,6 +9,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { eventNodesApi } from "@shared/api/eventNodes";
 import type { EventNodeFilters } from "@shared/types/eventNodes";
+import { Button, Checkbox } from "@shared/ui";
 
 /**
  * Props接口
@@ -136,8 +137,9 @@ export function AdvancedFilterPanel({
 
           {/* 清空按钮 */}
           <div className="col-auto ms-auto">
-            <button
-              className="btn btn-outline-secondary"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() =>
                 updateFilters({
                   todayModified: false,
@@ -147,9 +149,8 @@ export function AdvancedFilterPanel({
                 })
               }
             >
-              <i className="bi bi-x-circle me-2"></i>
               清空筛选
-            </button>
+            </Button>
           </div>
         </div>
 

@@ -14,7 +14,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { BaseModal } from '@shared/ui/BaseModal';
+import { BaseModal, Pagination, Button, Spinner } from '@shared/ui';
 import './DataPreviewModal.css';
 
 export default function DataPreviewModal({
@@ -138,6 +138,7 @@ export default function DataPreviewModal({
       isOpen={isOpen}
       onClose={onClose}
       title="数据预览"
+      size="xl"
       className="data-preview-modal"
     >
       <div className="data-preview-content">
@@ -154,23 +155,25 @@ export default function DataPreviewModal({
             )}
           </div>
           <div className="preview-actions">
-            <button
-              className="action-button refresh-button"
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={loadPreviewData}
-              disabled={loading}
+              loading={loading}
               title="刷新数据"
             >
-              {loading ? '加载中...' : '🔄 刷新'}
-            </button>
+              {loading ? '加载中...' : '刷新'}
+            </Button>
             {data && data.rows.length > 0 && (
-              <button
-                className="action-button export-button"
+              <Button
+                variant="success"
+                size="sm"
                 onClick={handleExportCSV}
-                disabled={exporting}
+                loading={exporting}
                 title="导出CSV"
               >
-                {exporting ? '导出中...' : '📥 导出CSV'}
-              </button>
+                {exporting ? '导出中...' : '导出CSV'}
+              </Button>
             )}
           </div>
         </div>
@@ -178,7 +181,7 @@ export default function DataPreviewModal({
         {/* Loading State */}
         {loading && !data && (
           <div className="preview-loading">
-            <div className="spinner"></div>
+            <Spinner size="lg" />
             <p>正在加载预览数据...</p>
           </div>
         )}
@@ -188,12 +191,13 @@ export default function DataPreviewModal({
           <div className="preview-error">
             <div className="error-icon">⚠️</div>
             <div className="error-message">{error}</div>
-            <button
-              className="retry-button"
+            <Button
+              variant="danger"
+              size="sm"
               onClick={loadPreviewData}
             >
               重试
-            </button>
+            </Button>
           </div>
         )}
 
@@ -233,25 +237,15 @@ export default function DataPreviewModal({
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  className="pagination-button"
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                >
-                  ← 上一页
-                </button>
-                <span className="pagination-info">
-                  第 {page} / {totalPages} 页
-                </span>
-                <button
-                  className="pagination-button"
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                >
-                  下一页 →
-                </button>
-              </div>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                pageSize={pageSize}
+                totalItems={data.row_count}
+                onPageChange={setPage}
+                showPageSize={false}
+                className="preview-pagination"
+              />
             )}
           </div>
         )}

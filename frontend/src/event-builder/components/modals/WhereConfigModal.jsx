@@ -3,6 +3,7 @@
  * WHERE条件配置模态框组件
  */
 import { useState } from 'react';
+import { Input } from '@shared/ui';
 
 export default function WhereConfigModal({ conditions, onChange, onClose }) {
   const [localConditions, setLocalConditions] = useState([...conditions]);
@@ -46,14 +47,29 @@ export default function WhereConfigModal({ conditions, onChange, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      tabIndex={0}
+      role="button"
+      aria-label="关闭"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          onClose();
+        }
+      }}
+    >
       <div
         className="modal-content glass-card where-config-modal"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
           <h3>配置WHERE条件</h3>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
             ✕
           </button>
         </div>
@@ -83,7 +99,7 @@ export default function WhereConfigModal({ conditions, onChange, onClose }) {
                   )}
 
                   <div className="condition-fields">
-                    <input
+                    <Input
                       type="text"
                       placeholder="字段名"
                       value={condition.field}
@@ -108,7 +124,7 @@ export default function WhereConfigModal({ conditions, onChange, onClose }) {
                       <option value="IS NULL">IS NULL</option>
                       <option value="IS NOT NULL">IS NOT NULL</option>
                     </select>
-                    <input
+                    <Input
                       type="text"
                       placeholder="值"
                       value={condition.value}

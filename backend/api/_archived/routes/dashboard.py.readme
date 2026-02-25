@@ -1,0 +1,34 @@
+归档日期: 2026-02-21
+归档原因: 已迁移到GraphQL
+GraphQL实现: backend/gql_api/queries/dashboard_queries.py, backend/gql_api/types/dashboard_type.py
+测试覆盖: backend/tests/test_graphql_schema.py
+
+迁移说明:
+- Dashboard模块已完全迁移到GraphQL API
+- 所有REST端点已被GraphQL Query替代
+- 统计数据查询已优化
+
+GraphQL端点:
+- POST /api/graphql
+- GraphiQL IDE: /api/graphiql
+
+GraphQL操作:
+Query:
+  - dashboardStats: DashboardStats
+  - gameStats(gameGid: Int!): GameStats
+  - allGameStats(limit: Int): [GameStats]
+
+DashboardStats字段:
+  - totalGames: Int
+  - totalEvents: Int
+  - totalParameters: Int
+  - totalCategories: Int
+  - eventsLast7Days: Int
+  - parametersLast7Days: Int
+
+GameStats字段:
+  - gameGid: Int
+  - gameName: String
+  - eventCount: Int
+  - parameterCount: Int
+  - categoryCount: Int

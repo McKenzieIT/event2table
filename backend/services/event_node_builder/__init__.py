@@ -18,7 +18,9 @@ from backend.core.utils import (
 
 logger = get_logger(__name__)
 
-event_node_builder_bp = Blueprint("event_node_builder", __name__, url_prefix='/event_node_builder')
+event_node_builder_bp = Blueprint(
+    "event_node_builder", __name__, url_prefix="/event_node_builder"
+)
 
 
 def validate_game_exists(game_gid: int) -> bool:
@@ -47,12 +49,18 @@ def preview_hql():
         sql_mode = data.get("sql_mode", "view")
 
         if not game_gid or not event_id:
-            logger.error(f"Missing required params: game_gid={game_gid}, event_id={event_id}")
-            return json_error_response("game_gid and event_id are required", status_code=400)
+            logger.error(
+                f"Missing required params: game_gid={game_gid}, event_id={event_id}"
+            )
+            return json_error_response(
+                "game_gid and event_id are required", status_code=400
+            )
 
         # 添加详细日志用于调试
         logger.info(f"Generating HQL for game_gid={game_gid}, event_id={event_id}")
-        logger.info(f"Fields count: {len(fields)}, Filter conditions: {filter_conditions}")
+        logger.info(
+            f"Fields count: {len(fields)}, Filter conditions: {filter_conditions}"
+        )
 
         # 导入 HQL V2 生成器
         from backend.services.hql.core.generator import HQLGenerator
@@ -80,8 +88,7 @@ def preview_hql():
             except ValueError as e:
                 logger.error(f"Invalid field at index {idx}: {field}, error: {str(e)}")
                 return json_error_response(
-                    f"Invalid field at index {idx}: {str(e)}",
-                    status_code=400
+                    f"Invalid field at index {idx}: {str(e)}", status_code=400
                 )
 
         # 转换 WHERE 条件格式（使用 adapter）
@@ -93,23 +100,27 @@ def preview_hql():
                     condition_obj = adapter.condition_from_project(cond)
                     where_conditions_v2.append(condition_obj)
                 except (KeyError, ValueError) as e:
-                    return json_error_response(f"Invalid condition: {str(e)}", status_code=400)
+                    return json_error_response(
+                        f"Invalid condition: {str(e)}", status_code=400
+                    )
 
         # 生成 HQL
         hql_result = generator.generate(
-            events_data,              # 位置参数1: events
-            fields_v2,                # 位置参数2: fields
-            where_conditions_v2,      # 位置参数3: conditions
-            mode="single",            # 关键字参数
+            events_data,  # 位置参数1: events
+            fields_v2,  # 位置参数2: fields
+            where_conditions_v2,  # 位置参数3: conditions
+            mode="single",  # 关键字参数
             sql_mode=sql_mode.upper(),
-            include_comments=True
+            include_comments=True,
         )
 
         return json_success_response(data=hql_result, message="HQL preview generated")
 
     except Exception as e:
         logger.error(f"Error generating HQL preview: {e}", exc_info=True)
-        return json_error_response(f"Failed to generate HQL preview: {str(e)}", status_code=500)
+        return json_error_response(
+            f"Failed to generate HQL preview: {str(e)}", status_code=500
+        )
 
 
 @event_node_builder_bp.route("/api/params", methods=["GET"])
@@ -147,7 +158,9 @@ def get_event_params():
 
     except Exception as e:
         logger.error(f"Error fetching event params: {e}")
-        return json_error_response(f"Failed to fetch event params: {str(e)}", status_code=500)
+        return json_error_response(
+            f"Failed to fetch event params: {str(e)}", status_code=500
+        )
 
 
 @event_node_builder_bp.route("/api/save", methods=["POST"])
@@ -177,7 +190,9 @@ def save_config():
         config = data.get("config")
 
         if not all([game_gid, name, event_id, config is not None]):
-            return json_error_response("game_gid, name, event_id, and config are required", status_code=400)
+            return json_error_response(
+                "game_gid, name, event_id, and config are required", status_code=400
+            )
 
         # 导入必要的函数
         from backend.core.utils import execute_write
@@ -196,11 +211,12 @@ def save_config():
 
         # 检查是否已存在同名配置
         existing = fetch_one_as_dict(
-            "SELECT * FROM event_nodes WHERE game_id = ? AND name = ?",
-            (game_id, name)
+            "SELECT * FROM event_nodes WHERE game_id = ? AND name = ?", (game_id, name)
         )
         if existing:
-            return json_error_response("Event node with this name already exists", status_code=400)
+            return json_error_response(
+                "Event node with this name already exists", status_code=400
+            )
 
         # 创建事件节点
         config_json = json.dumps(config, ensure_ascii=False)
@@ -215,7 +231,9 @@ def save_config():
         # 返回新创建的节点
         node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (node_id,))
 
-        return json_success_response(data={"node": node}, message="Event node created", status_code=201)
+        return json_success_response(
+            data={"node": node}, message="Event node created", status_code=201
+        )
 
     except Exception as e:
         logger.error(f"Error saving config: {e}", exc_info=True)
@@ -275,20 +293,26 @@ def update_config():
             execute_write(
                 f"""
                 UPDATE event_nodes
-                SET {', '.join(update_fields)}, updated_at = CURRENT_TIMESTAMP
+                SET {", ".join(update_fields)}, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
             """,
                 update_values,
             )
 
         # 返回更新后的节点
-        updated_node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (node_id,))
+        updated_node = fetch_one_as_dict(
+            "SELECT * FROM event_nodes WHERE id = ?", (node_id,)
+        )
 
-        return json_success_response(data={"node": updated_node}, message="Event node updated")
+        return json_success_response(
+            data={"node": updated_node}, message="Event node updated"
+        )
 
     except Exception as e:
         logger.error(f"Error updating config: {e}", exc_info=True)
-        return json_error_response(f"Failed to update config: {str(e)}", status_code=500)
+        return json_error_response(
+            f"Failed to update config: {str(e)}", status_code=500
+        )
 
 
 @event_node_builder_bp.route("/api/load/<int:config_id>", methods=["GET"])
@@ -312,6 +336,7 @@ def load_config(config_id):
 
         # 解析 config_json
         import json
+
         try:
             node["config"] = json.loads(node["config_json"])
         except (json.JSONDecodeError, TypeError, ValueError):
@@ -353,6 +378,7 @@ def list_configs():
 
         # 解析 config_json
         import json
+
         for node in nodes:
             try:
                 node["config"] = json.loads(node["config_json"])
@@ -363,7 +389,9 @@ def list_configs():
 
     except Exception as e:
         logger.error(f"Error fetching config list: {e}", exc_info=True)
-        return json_error_response(f"Failed to fetch config list: {str(e)}", status_code=500)
+        return json_error_response(
+            f"Failed to fetch config list: {str(e)}", status_code=500
+        )
 
 
 @event_node_builder_bp.route("/api/delete/<int:config_id>", methods=["DELETE"])
@@ -385,7 +413,9 @@ def delete_config(config_id):
 
     except Exception as e:
         logger.error(f"Error deleting config: {e}", exc_info=True)
-        return json_error_response(f"Failed to delete config: {str(e)}", status_code=500)
+        return json_error_response(
+            f"Failed to delete config: {str(e)}", status_code=500
+        )
 
 
 @event_node_builder_bp.route("/api/copy/<int:node_id>", methods=["POST"])
@@ -417,9 +447,13 @@ def copy_node(node_id):
         )
 
         # 返回新节点
-        new_node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (new_node_id,))
+        new_node = fetch_one_as_dict(
+            "SELECT * FROM event_nodes WHERE id = ?", (new_node_id,)
+        )
 
-        return json_success_response(data={"node": new_node}, message="Event node copied", status_code=201)
+        return json_success_response(
+            data={"node": new_node}, message="Event node copied", status_code=201
+        )
 
     except Exception as e:
         logger.error(f"Error copying node: {e}", exc_info=True)
@@ -431,7 +465,8 @@ def copy_node(node_id):
 # Added 2026-02-15 to support EventNodes.tsx frontend
 # ============================================
 
-@event_node_builder_bp.route('/api/search', methods=['GET'])
+
+@event_node_builder_bp.route("/api/search", methods=["GET"])
 def search_event_nodes():
     """
     Search event nodes with filters
@@ -446,19 +481,21 @@ def search_event_nodes():
     """
     try:
         # Validate game exists
-        game_gid = request.args.get('game_gid', type=int)
+        game_gid = request.args.get("game_gid", type=int)
         if not game_gid:
-            return json_error_response('game_gid parameter is required', status_code=400)
+            return json_error_response(
+                "game_gid parameter is required", status_code=400
+            )
 
         if not validate_game_exists(game_gid):
-            return json_error_response('Game not found', status_code=404)
+            return json_error_response("Game not found", status_code=404)
 
         # Get filters
-        keyword = request.args.get('keyword', '')
-        event_id = request.args.get('event_id', type=int)
-        field_count_min = request.args.get('field_count_min', type=int)
-        field_count_max = request.args.get('field_count_max', type=int)
-        today_modified = request.args.get('today_modified', type=bool)
+        keyword = request.args.get("keyword", "")
+        event_id = request.args.get("event_id", type=int)
+        field_count_min = request.args.get("field_count_min", type=int)
+        field_count_max = request.args.get("field_count_max", type=int)
+        today_modified = request.args.get("today_modified", type=bool)
 
         # Build query
         query = """SELECT
@@ -490,7 +527,12 @@ def search_event_nodes():
             query += " HAVING COUNT(DISTINCT ep.id) <= ?"
             params.append(field_count_max)
 
-        query += " ORDER BY en.updated_at DESC LIMIT 100"
+        limit = request.args.get("limit", 100, type=int)
+        limit = min(max(limit, 1), 100)
+        offset = request.args.get("offset", 0, type=int)
+        offset = max(offset, 0)
+
+        query += f" ORDER BY en.updated_at DESC LIMIT {limit} OFFSET {offset}"
 
         nodes = fetch_all_as_dict(query, tuple(params))
 
@@ -501,17 +543,17 @@ def search_event_nodes():
                 "total": len(nodes),
                 "page": 1,
                 "per_page": 100,
-                "total_pages": 1
+                "total_pages": 1,
             },
-            message="Event nodes retrieved successfully"
+            message="Event nodes retrieved successfully",
         )
 
     except Exception as e:
         logger.error(f"Error searching event nodes: {e}")
-        return json_error_response('Failed to search event nodes', status_code=500)
+        return json_error_response("Failed to search event nodes", status_code=500)
 
 
-@event_node_builder_bp.route('/api/stats', methods=['GET'])
+@event_node_builder_bp.route("/api/stats", methods=["GET"])
 def get_event_nodes_stats():
     """
     Get event nodes statistics for a game
@@ -520,14 +562,18 @@ def get_event_nodes_stats():
         game_gid (int, required): Game GID
     """
     try:
-        logger.info(f"get_event_nodes_stats called with game_gid={request.args.get('game_gid')}")
+        logger.info(
+            f"get_event_nodes_stats called with game_gid={request.args.get('game_gid')}"
+        )
         # Validate game exists
-        game_gid = request.args.get('game_gid', type=int)
+        game_gid = request.args.get("game_gid", type=int)
         if not game_gid:
-            return json_error_response('game_gid parameter is required', status_code=400)
+            return json_error_response(
+                "game_gid parameter is required", status_code=400
+            )
 
         if not validate_game_exists(game_gid):
-            return json_error_response('Game not found', status_code=404)
+            return json_error_response("Game not found", status_code=404)
 
         # Get statistics
         query = """SELECT
@@ -544,26 +590,24 @@ def get_event_nodes_stats():
 
         if not stats:
             # Return zero stats if no nodes found
-            stats = {
-                'total_nodes': 0,
-                'unique_events': 0,
-                'total_fields': 0
-            }
+            stats = {"total_nodes": 0, "unique_events": 0, "total_fields": 0}
 
         # 计算平均字段数（avg_fields）
-        total_nodes = stats.get('total_nodes', 0)
-        total_fields = stats.get('total_fields', 0)
+        total_nodes = stats.get("total_nodes", 0)
+        total_fields = stats.get("total_fields", 0)
         avg_fields = round(total_fields / total_nodes, 2) if total_nodes > 0 else 0
 
         return json_success_response(
             data={
-                'total_nodes': stats['total_nodes'],
-                'unique_events': stats['unique_events'],
-                'avg_fields': avg_fields
+                "total_nodes": stats["total_nodes"],
+                "unique_events": stats["unique_events"],
+                "avg_fields": avg_fields,
             },
-            message="Event nodes statistics retrieved successfully"
+            message="Event nodes statistics retrieved successfully",
         )
 
     except Exception as e:
         logger.error(f"Error getting event nodes stats: {e}")
-        return json_error_response('Failed to get event nodes statistics', status_code=500)
+        return json_error_response(
+            "Failed to get event nodes statistics", status_code=500
+        )

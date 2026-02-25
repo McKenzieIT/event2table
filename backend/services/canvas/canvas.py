@@ -56,7 +56,7 @@ def node_canvas():
     session["current_game_gid"] = game.get("gid")
 
     logger.info(
-        f'Accessed node_canvas: game_gid={game_gid}, gid={game.get("gid")}, react={use_react}'
+        f"Accessed node_canvas: game_gid={game_gid}, gid={game.get('gid')}, react={use_react}"
     )
 
     # 根据react参数选择模板
@@ -95,7 +95,9 @@ def node_canvas_react():
     session["current_game_gid"] = game_gid
     session["current_game_gid"] = game.get("gid")
 
-    logger.info(f'Accessed node_canvas_react: game_gid={game_gid}, gid={game.get("gid")}')
+    logger.info(
+        f"Accessed node_canvas_react: game_gid={game_gid}, gid={game.get('gid')}"
+    )
 
     return render_template("node_canvas_react.html", game=game)
 
@@ -108,7 +110,9 @@ def health_check():
     Returns:
         JSON: 健康状态
     """
-    return json_success_response(data={"status": "healthy"}, message="Canvas module is working")
+    return json_success_response(
+        data={"status": "healthy"}, message="Canvas module is working"
+    )
 
 
 @canvas_bp.route("/api/canvas/validate", methods=["POST"])
@@ -146,11 +150,15 @@ def validate_flow():
                 )[0]
             )
         else:
-            return jsonify(error_response("; ".join(validation["errors"]), status_code=400)[0]), 400
+            return jsonify(
+                error_response("; ".join(validation["errors"]), status_code=400)[0]
+            ), 400
 
     except Exception as e:
         logger.exception(f"Error validating flow: {e}")
-        return jsonify(error_response(str(e), status_code=500)[0]), 500
+        return jsonify(
+            error_response("An internal error occurred", status_code=500)[0]
+        ), 500
 
 
 @canvas_bp.route("/api/canvas/prepare", methods=["POST"])
@@ -177,13 +185,17 @@ def prepare_generation():
         result = node_canvas_flows.prepare_flow_for_generation(graph_data)
 
         if result["success"]:
-            return json_success_response(data=result, message="Flow prepared successfully")
+            return json_success_response(
+                data=result, message="Flow prepared successfully"
+            )
         else:
             return json_error_response(result["error"], status_code=400)
 
     except Exception as e:
         logger.exception(f"Error preparing flow: {e}")
-        return jsonify(error_response(str(e), status_code=500)[0]), 500
+        return jsonify(
+            error_response("An internal error occurred", status_code=500)[0]
+        ), 500
 
 
 @canvas_bp.route("/api/canvas/preview-results", methods=["POST"])
@@ -235,7 +247,9 @@ def preview_sql_results():
 
     except Exception as e:
         logger.exception(f"Error generating preview results: {e}")
-        return jsonify(error_response(str(e), status_code=500)[0]), 500
+        return jsonify(
+            error_response("An internal error occurred", status_code=500)[0]
+        ), 500
 
 
 def generate_mock_results(output_fields, limit=5):
@@ -300,7 +314,11 @@ def generate_mock_results(output_fields, limit=5):
 
             elif "ts" in field_name.lower():
                 # Timestamp
-                ts = int((base_date - timedelta(seconds=random.randint(0, 86400))).timestamp())
+                ts = int(
+                    (
+                        base_date - timedelta(seconds=random.randint(0, 86400))
+                    ).timestamp()
+                )
                 row.append(str(ts))
 
             elif data_type == "int":
@@ -314,7 +332,7 @@ def generate_mock_results(output_fields, limit=5):
 
             else:
                 # Default: string
-                row.append(f"sample_{i+1}")
+                row.append(f"sample_{i + 1}")
 
         rows.append(row)
 

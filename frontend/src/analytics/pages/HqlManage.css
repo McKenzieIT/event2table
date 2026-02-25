@@ -116,31 +116,11 @@
   opacity: 0.6;
 }
 
-.oled-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-body);
-}
-
-.oled-table th,
-.oled-table td {
-  padding: var(--space-3) var(--space-4);
-  text-align: left;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
+/* Page-specific table styles - generic styles moved to shared Table.css */
 .oled-table thead th {
-  background: var(--bg-elevated);
-  font-family: var(--font-display);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-.oled-table tbody tr:hover {
-  background: rgba(6, 182, 212, 0.03);
 }
 
 .oled-table tbody tr.user-edited-row {

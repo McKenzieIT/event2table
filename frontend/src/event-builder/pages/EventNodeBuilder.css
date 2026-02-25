@@ -118,6 +118,34 @@
   overflow-x: hidden;
 }
 
+/* 优化的侧边栏布局 - 移除BaseFieldsList后的新布局 */
+.sidebar-left.optimized {
+  display: flex;
+  flex-direction: column;
+  gap: var(--en-space-md);
+  overflow: hidden;
+}
+
+.sidebar-section--event {
+  flex-shrink: 0;
+  max-height: 280px;
+  overflow: hidden;
+}
+
+.sidebar-section--params {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-section--params .section-content {
+  flex: 1;
+  max-height: none;
+  overflow-y: auto;
+}
+
 .sidebar-right {
   overflow-y: auto;
 }

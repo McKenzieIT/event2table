@@ -27,7 +27,9 @@ api_bp = Blueprint("api", __name__)
 # Import all route modules to register their routes
 # These imports must come after creating the blueprint to avoid circular imports
 from .routes import (
+      graphql,  # GraphQL API
     categories,
+    dashboard,
     event_parameters,
     events,
     field_builder,

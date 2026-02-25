@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
+import { ErrorState } from '@shared/ui';
 import { NavLinkWithGameContext } from '@shared/components';
 import './ParameterAnalysis.css';
 
@@ -18,7 +19,7 @@ function ParameterAnalysis() {
     return <SelectGamePrompt message="查看参数分析需要先选择游戏" />;
   }
 
-  const { data: stats = {}, isLoading } = useQuery({
+  const { data: stats = {}, isLoading, error } = useQuery({
     queryKey: ['parameter-stats', currentGame.gid],
     queryFn: async () => {
       const response = await fetch(`/api/parameters/stats?game_gid=${currentGame.gid}`);
@@ -27,6 +28,33 @@ function ParameterAnalysis() {
     },
     enabled: !!currentGame // Only execute when currentGame exists
   });
+
+  if (isLoading) {
+    return (
+      <div className="parameter-analysis-container">
+        <div className="page-header">
+          <h1>参数分析</h1>
+        </div>
+        <div className="stats-grid">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="stat-card glass-card" style={{ opacity: 0.5 }}>
+              <div className="stat-icon">
+                <i className="bi bi-list-check"></i>
+              </div>
+              <div className="stat-content">
+                <h3>--</h3>
+                <p>加载中...</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <ErrorState message={error.message} onRetry={() => window.location.reload()} />;
+  }
 
   return (
     <div className="parameter-analysis-container">

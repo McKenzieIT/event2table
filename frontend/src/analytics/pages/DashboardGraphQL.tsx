@@ -1,0 +1,259 @@
+/**
+ * DashboardGraphQL - 仪表板页面(GraphQL版本)
+ *
+ * 完整迁移自Dashboard.jsx,保留所有功能:
+ * - 统计数据展示(游戏、事件、参数、HQL流程)
+ * - 快速操作
+ * - 最近游戏列表
+ *
+ * 使用GraphQL API替代REST API
+ * 使用TypeScript提供类型安全
+ */
+
+import React, { useMemo, Suspense } from 'react';
+import { Link } from 'react-router-dom';
+import { Card, Spinner } from '@shared/ui';
+import { useGameStore } from '@/stores/gameStore';
+import { useGames, useFlows } from '@/graphql/hooks';
+import './Dashboard.css';
+
+interface Game {
+  gid: number;
+  name: string;
+  odsDb?: string;
+  eventCount: number;
+  parameterCount: number;
+}
+
+interface Flow {
+  id: number;
+  gameGid: number;
+  flowName: string;
+  flowType: string;
+  config?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface Stats {
+  gameCount: number;
+  totalEvents: number;
+  totalParams: number;
+  hqlFlowCount: number;
+}
+
+/**
+ * Dashboard Page (GraphQL Version)
+ *
+ * Main landing page showing:
+ * - Statistics (games, events, parameters count)
+ * - Quick actions
+ * - Recent activity
+ *
+ * 使用GraphQL替代REST API
+ * 性能优化：
+ * - useMemo优化统计计算
+ * - GraphQL查询优化
+ */
+function DashboardGraphQL() {
+  // 游戏管理模态框
+  const { openGameManagementModal } = useGameStore();
+
+  // Fetch games data using GraphQL
+  const { data: gamesData, loading: gamesLoading } = useGames(100, 0);
+
+  // Fetch flows data using GraphQL
+  const { data: flowsData } = useFlows(undefined, undefined, 100, 0);
+
+  const games: Game[] = gamesData?.games || [];
+  const flows: Flow[] = flowsData?.flows || [];
+
+  // Calculate stats
+  const stats: Stats = useMemo(() => {
+    let totalEvents = 0;
+    let totalParams = 0;
+
+    for (const game of games) {
+      totalEvents += game.eventCount || 0;
+      totalParams += game.parameterCount || 0;
+    }
+
+    return {
+      gameCount: games.length,
+      totalEvents,
+      totalParams,
+      hqlFlowCount: flows.length,
+    };
+  }, [games, flows]);
+
+  // 优化：延迟加载最近游戏列表，优先渲染关键内容
+  const [showRecentGames, setShowRecentGames] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    // 延迟500ms再显示最近游戏，优先渲染关键内容
+    const timer = setTimeout(() => {
+      setShowRecentGames(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const recentGames = useMemo(() => {
+    return games.slice(0, 5);
+  }, [games]);
+
+  return (
+    <Suspense fallback={<Spinner size="lg" label="正在加载仪表板..." />}>
+      <div className="dashboard-container" data-testid="dashboard-container">
+        <div className="dashboard-header">
+          <h1>Event2Table</h1>
+          <p className="text-secondary">欢迎使用Event2Table (GraphQL)</p>
+        </div>
+
+        {/* Statistics Cards - 使用新的 metric-card 组件 */}
+        <div className="stats-grid">
+          {gamesLoading ? (
+            // 骨架屏状态
+            <>
+              <Card variant="glass" padding="reset" className="metric-card skeleton-card">
+                <div className="skeleton-icon"></div>
+                <div className="skeleton-content">
+                  <div className="skeleton-number"></div>
+                  <div className="skeleton-text"></div>
+                </div>
+              </Card>
+              <Card variant="glass" padding="reset" className="metric-card skeleton-card">
+                <div className="skeleton-icon"></div>
+                <div className="skeleton-content">
+                  <div className="skeleton-number"></div>
+                  <div className="skeleton-text"></div>
+                </div>
+              </Card>
+              <Card variant="glass" padding="reset" className="metric-card skeleton-card">
+                <div className="skeleton-icon"></div>
+                <div className="skeleton-content">
+                  <div className="skeleton-number"></div>
+                  <div className="skeleton-text"></div>
+                </div>
+              </Card>
+              <Card variant="glass" padding="reset" className="metric-card skeleton-card">
+                <div className="skeleton-icon"></div>
+                <div className="skeleton-content">
+                  <div className="skeleton-number"></div>
+                  <div className="skeleton-text"></div>
+                </div>
+              </Card>
+            </>
+          ) : (
+            // 实际内容 - 使用新的 metric-card 样式
+            <>
+              <div className="metric-card metric-card--cyan">
+                <div className="metric-card__icon metric-card__icon--cyan">
+                  <i className="bi bi-controller"></i>
+                </div>
+                <div className="metric-card__value">{stats.gameCount}</div>
+                <div className="metric-card__label">游戏总数</div>
+              </div>
+
+              <div className="metric-card metric-card--violet">
+                <div className="metric-card__icon metric-card__icon--violet">
+                  <i className="bi bi-gear"></i>
+                </div>
+                <div className="metric-card__value">{stats.totalEvents}</div>
+                <div className="metric-card__label">事件总数</div>
+              </div>
+
+              <div className="metric-card metric-card--success">
+                <div className="metric-card__icon metric-card__icon--success">
+                  <i className="bi bi-sliders"></i>
+                </div>
+                <div className="metric-card__value">{stats.totalParams}</div>
+                <div className="metric-card__label">参数总数</div>
+              </div>
+
+              <div className="metric-card metric-card--warning">
+                <div className="metric-card__icon metric-card__icon--warning">
+                  <i className="bi bi-diagram-3"></i>
+                </div>
+                <div className="metric-card__value">{stats.hqlFlowCount}</div>
+                <div className="metric-card__label">HQL流程</div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="quick-actions">
+          <h2>快速操作</h2>
+          <div className="actions-grid">
+            <Card
+              as="div"
+              onClick={openGameManagementModal}
+              padding="reset"
+              className="action-card"
+              hover
+              style={{ cursor: 'pointer' }}
+            >
+              <i className="bi bi-plus-circle"></i>
+              <h3>管理游戏</h3>
+              <p>创建和管理游戏项目</p>
+            </Card>
+
+            <Card as={Link} to="/events" padding="reset" className="action-card" hover>
+              <i className="bi bi-list-task"></i>
+              <h3>管理事件</h3>
+              <p>配置日志事件</p>
+            </Card>
+
+            <Card as={Link} to="/canvas" padding="reset" className="action-card" hover>
+              <i className="bi bi-diagram-3-fill"></i>
+              <h3>HQL画布</h3>
+              <p>可视化构建HQL</p>
+            </Card>
+
+            <Card as={Link} to="/flows" padding="reset" className="action-card" hover>
+              <i className="bi bi-flowchart"></i>
+              <h3>流程管理</h3>
+              <p>管理HQL流程</p>
+            </Card>
+          </div>
+        </div>
+
+        {/* Recent Games - 优化：延迟渲染，优先加载关键内容 */}
+        {showRecentGames && stats.gameCount > 0 && (
+          <div className="recent-section">
+            <h2>最近游戏</h2>
+            <div className="games-list">
+              {recentGames.map(game => (
+                <Card
+                  key={game.gid}
+                  as={Link}
+                  to={`/events?game_gid=${game.gid}`}
+                  padding="reset"
+                  className="game-item"
+                  hover
+                >
+                  <div className="game-info">
+                    <h3>{game.name}</h3>
+                    <p className="text-secondary">GID: {game.gid}</p>
+                  </div>
+                  <div className="game-stats">
+                    <span className="badge-cyber badge-events">
+                      <i className="bi bi-diagram-3"></i>
+                      {game.eventCount || 0} 事件
+                    </span>
+                    <span className="badge-cyber badge-params">
+                      <i className="bi bi-sliders"></i>
+                      {game.parameterCount || 0} 参数
+                    </span>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      </Suspense>
+  );
+}
+
+export default DashboardGraphQL;

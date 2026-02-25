@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt, SearchInput } from '@shared/ui';
+import { SelectGamePrompt, SearchInput, Spinner } from '@shared/ui';
+import EmptyState from '@shared/ui/EmptyState/EmptyState';
 import './ParameterCompare.css';
 
 /**
@@ -77,7 +78,13 @@ function ParameterCompare() {
   // 渲染参数列表
   const renderParamList = useCallback((params, selectedParam, onSelect) => {
     if (params.length === 0) {
-      return <div className="empty-state">未找到匹配的参数</div>;
+      return (
+        <EmptyState
+          icon={<i className="bi bi-inbox" aria-hidden="true"></i>}
+          title="未找到匹配的参数"
+          description="尝试调整搜索条件"
+        />
+      );
     }
 
     return params.map(param => (
@@ -99,7 +106,11 @@ function ParameterCompare() {
 
   // 提前返回优化
   if (isLoading) {
-    return <div className="loading">加载中...</div>;
+    return (
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spinner size="lg" label="加载中..." />
+      </div>
+    );
   }
 
   const canShowComparison = selectedParam1 && selectedParam2;

@@ -10,6 +10,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { search } from '@icons/bootstrap-icons';
 import { fetchTemplates } from '@shared/api/templateApi';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { Input } from '@shared/ui';
 
 import './TemplateSelector.css';
 
@@ -162,7 +163,7 @@ export default function TemplateSelector({
         {/* Search Bar */}
         <div className="search-bar">
           <i className="bi bi-search"></i>
-          <input
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
@@ -295,18 +296,15 @@ export default function TemplateSelector({
               <div className="modal-body">
                 <form onSubmit={(e) => handleCreateTemplate(e)}>
                   {/* Template Name */}
-                  <div className="form-group">
-                    <label htmlFor="templateName">模板名称</label>
-                    <input
-                      id="templateName"
-                      name="name"
-                      type="text"
-                      required
-                      placeholder="例如：登录事件过滤模板"
-                      className="form-control"
-                      value={templateName || ''}
-                    />
-                  </div>
+                  <Input
+                    id="templateName"
+                    name="name"
+                    label="模板名称"
+                    type="text"
+                    required
+                    placeholder="例如：登录事件过滤模板"
+                    value={templateName || ''}
+                  />
 
                   {/* Description */}
                   <div className="form-group">
@@ -337,17 +335,13 @@ export default function TemplateSelector({
                   </div>
 
                   {/* Tags */}
-                  <div className="form-group">
-                    <label htmlFor="templateTags">标签（用逗号分隔）</label>
-                    <input
-                      id="templateTags"
-                      name="tags"
-                      type="text"
-                      value=""
-                      placeholder="例如：login,register, payment"
-                      className="form-control"
-                    />
-                  </div>
+                  <Input
+                    id="templateTags"
+                    name="tags"
+                    label="标签（用逗号分隔）"
+                    type="text"
+                    placeholder="例如：login,register, payment"
+                  />
 
                   {/* Buttons */}
                   <div className="form-actions">

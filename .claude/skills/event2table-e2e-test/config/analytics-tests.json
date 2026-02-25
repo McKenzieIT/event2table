@@ -1,0 +1,160 @@
+{
+  "module": "analytics",
+  "name": "Analytics Module Tests",
+  "version": "2.0.0",
+  "baseUrl": "http://localhost:5173",
+
+  "tests": [
+    {
+      "id": "AN-001",
+      "name": "Dashboard Load and Display",
+      "priority": "critical",
+      "url": "/",
+      "steps": [
+        {
+          "action": "navigate",
+          "url": "/"
+        },
+        {
+          "action": "wait_for",
+          "selector": ".dashboard-container",
+          "timeout": 5000
+        },
+        {
+          "action": "validate_state",
+          "checks": [
+            { "type": "console_errors", "expected": "none" },
+            { "type": "element_exists", "selector": ".stat-card" },
+            { "type": "element_exists", "selector": ".action-card" }
+          ]
+        },
+        {
+          "action": "take_screenshot",
+          "name": "dashboard-initial-load"
+        }
+      ]
+    },
+    {
+      "id": "AN-002",
+      "name": "Games List Display",
+      "priority": "critical",
+      "url": "/games",
+      "steps": [
+        {
+          "action": "navigate",
+          "url": "/games"
+        },
+        {
+          "action": "wait_for",
+          "selector": ".games-grid",
+          "timeout": 5000
+        },
+        {
+          "action": "validate_state",
+          "checks": [
+            { "type": "console_errors", "expected": "none" },
+            { "type": "element_exists", "selector": "input[placeholder*='搜索']" },
+            { "type": "element_exists", "selector": ".game-card" }
+          ]
+        },
+        {
+          "action": "take_screenshot",
+          "name": "games-list-display"
+        }
+      ]
+    },
+    {
+      "id": "AN-003",
+      "name": "Games Search Functionality",
+      "priority": "high",
+      "url": "/games",
+      "steps": [
+        {
+          "action": "navigate",
+          "url": "/games"
+        },
+        {
+          "action": "wait_for",
+          "selector": "input[placeholder*='搜索']",
+          "timeout": 3000
+        },
+        {
+          "action": "fill",
+          "selector": "input[placeholder*='搜索']",
+          "value": "STAR"
+        },
+        {
+          "action": "wait_for",
+          "timeout": 1000
+        },
+        {
+          "action": "validate_state",
+          "checks": [
+            { "type": "text_contains", "selector": ".games-grid", "text": "STAR" }
+          ]
+        },
+        {
+          "action": "take_screenshot",
+          "name": "games-search-results"
+        }
+      ]
+    },
+    {
+      "id": "AN-004",
+      "name": "Events List with Game Context",
+      "priority": "critical",
+      "url": "/events?game_gid=10000147",
+      "steps": [
+        {
+          "action": "navigate",
+          "url": "/events?game_gid=10000147"
+        },
+        {
+          "action": "wait_for",
+          "selector": ".events-table",
+          "timeout": 5000
+        },
+        {
+          "action": "validate_state",
+          "checks": [
+            { "type": "console_errors", "expected": "none" },
+            { "type": "element_exists", "selector": ".events-table" },
+            { "type": "element_exists", "selector": ".pagination" }
+          ]
+        },
+        {
+          "action": "take_screenshot",
+          "name": "events-list-display"
+        }
+      ]
+    },
+    {
+      "id": "AN-005",
+      "name": "Parameters List Display",
+      "priority": "high",
+      "url": "/parameters?game_gid=10000147",
+      "steps": [
+        {
+          "action": "navigate",
+          "url": "/parameters?game_gid=10000147"
+        },
+        {
+          "action": "wait_for",
+          "selector": ".parameters-table",
+          "timeout": 5000
+        },
+        {
+          "action": "validate_state",
+          "checks": [
+            { "type": "console_errors", "expected": "none" },
+            { "type": "element_exists", "selector": ".parameter-row" }
+          ]
+        },
+        {
+          "action": "take_screenshot",
+          "name": "parameters-list-display"
+        }
+      ]
+    }
+  ]
+}

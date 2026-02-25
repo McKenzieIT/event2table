@@ -61,7 +61,9 @@ class WhereBuilder:
 
         return where_clause
 
-    def _build_single_condition(self, condition: Condition, context: Optional[dict]) -> str:
+    def _build_single_condition(
+        self, condition: Condition, context: Optional[dict]
+    ) -> str:
         """构建单个条件SQL"""
         # 处理IS NULL和IS NOT NULL（不需要值）
         if condition.is_null_operator():
@@ -86,7 +88,9 @@ class WhereBuilder:
 
         # 检查空列表
         if len(condition.value) == 0:
-            raise ValueError("IN operator requires at least one value. " "Empty list provided.")
+            raise ValueError(
+                "IN operator requires at least one value. Empty list provided."
+            )
 
         values = ", ".join([self._format_value(v) for v in condition.value])
         return f"{condition.field} {condition.operator} ({values})"
@@ -154,17 +158,22 @@ class WhereBuilder:
         if value is None:
             return "NULL"
         elif isinstance(value, str):
-            # 转义特殊字符（先转义反斜杠，再转义单引号）
-            escaped = value.replace("\\", "\\\\").replace("'", "''")
-            return f"'{escaped}'"
+            return self._escape_sql_string(value)
         elif isinstance(value, bool):
             return "TRUE" if value else "FALSE"
         elif isinstance(value, (int, float)):
             return str(value)
         else:
-            # 其他类型转为字符串并转义
-            escaped = str(value).replace("\\", "\\\\").replace("'", "''")
-            return f"'{escaped}'"
+            return self._escape_sql_string(str(value))
+
+    def _escape_sql_string(self, value: str) -> str:
+        """
+        转义SQL特殊字符
+
+        使用双单引号转义，这是SQL标准的转义方式
+        """
+        escaped = value.replace("\\", "\\\\").replace("'", "''")
+        return f"'{escaped}'"
 
     def build_complex_conditions(
         self, conditions: List[Condition], context: Optional[dict] = None
@@ -210,12 +219,16 @@ class WhereBuilder:
         # 构建SQL
         and_parts = []
         for group in and_groups:
-            group_sql = " AND ".join([self._build_single_condition(c, context) for c in group])
+            group_sql = " AND ".join(
+                [self._build_single_condition(c, context) for c in group]
+            )
             and_parts.append(f"({group_sql})" if len(group) > 1 else group_sql)
 
         or_parts = []
         for group in or_groups:
-            group_sql = " OR ".join([self._build_single_condition(c, context) for c in group])
+            group_sql = " OR ".join(
+                [self._build_single_condition(c, context) for c in group]
+            )
             or_parts.append(f"({group_sql})" if len(group) > 1 else group_sql)
 
         # 组合
