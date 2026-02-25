@@ -16,6 +16,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { useDraggable } from '@dnd-kit/core';
+import { Input } from '@shared/ui';
 import './FieldEventSelector.css';
 
 /**
@@ -218,7 +219,7 @@ export default function FieldEventSelector({
       <div className="event-selector-search">
         <div className="search-input-wrapper">
           <i className="bi bi-search search-icon"></i>
-          <input
+          <Input
             type="text"
             className="search-input"
             placeholder="搜索事件名称或分类..."

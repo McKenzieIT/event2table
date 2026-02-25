@@ -1,29 +1,44 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Flow Repository (流程/Canvas模板数据访问层)
+Flow Repository (流程/Canvas模板数据访问层 - 精简架构)
 
 提供流程模板相关的数据访问方法
+- 返回统一Entity模型 (FlowEntity)
+- 移除DDD抽象
+- 保持GenericRepository继承
 """
 
 from typing import List, Dict, Optional, Any
+from backend.core.data_access import GenericRepository
 from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
-from backend.core.database.database import get_db
-import json
+from backend.core.utils import execute_write
+from backend.models.entities import FlowEntity
+from backend.core.utils.json_helpers import serialize_json_field, deserialize_json_field
 
 
-class FlowRepository:
+class FlowRepository(GenericRepository):
     """
-    流程模板仓储类
+    流程模板仓储类 (精简架构)
 
-    提供流程模板的CRUD操作
+    继承 GenericRepository 并添加流程特定的查询方法
+    返回FlowEntity而非字典,确保类型安全
     """
 
     def __init__(self):
-        """初始化流程仓储"""
-        self.table_name = "flow_templates"
+        """
+        初始化流程仓储
 
-    def find_by_id(self, flow_id: int) -> Optional[Dict[str, Any]]:
+        启用缓存以提高查询性能
+        """
+        super().__init__(
+            table_name="flow_templates",
+            primary_key="id",
+            enable_cache=True,
+            cache_timeout=120  # 2分钟缓存
+        )
+
+    def find_by_id(self, flow_id: int) -> Optional[FlowEntity]:
         """
         根据ID查找流程
 
@@ -31,31 +46,24 @@ class FlowRepository:
             flow_id: 流程ID
 
         Returns:
-            流程字典，不存在返回None
+            FlowEntity, 不存在返回None
 
         Example:
             >>> repo = FlowRepository()
             >>> flow = repo.find_by_id(1)
-            >>> print(flow['flow_name']) if flow else None
+            >>> print(flow.flow_name) if flow else None
         """
         query = f'SELECT * FROM "{self.table_name}" WHERE id = ?'
-        flow = fetch_one_as_dict(query, (flow_id,))
+        row = fetch_one_as_dict(query, (flow_id,))
 
-        if flow and flow.get("flow_graph"):
-            try:
-                flow["flow_graph"] = json.loads(flow["flow_graph"])
-            except (json.JSONDecodeError, TypeError):
-                flow["flow_graph"] = {}
+        if row:
+            # 反序列化JSON字段
+            row["flow_graph"] = deserialize_json_field(row.get("flow_graph"))
+            row["variables"] = deserialize_json_field(row.get("variables"))
 
-        if flow and flow.get("variables"):
-            try:
-                flow["variables"] = json.loads(flow["variables"])
-            except (json.JSONDecodeError, TypeError):
-                flow["variables"] = {}
+        return FlowEntity(**row) if row else None
 
-        return flow
-
-    def find_by_game_gid(self, game_gid: int) -> List[Dict[str, Any]]:
+    def find_by_game_gid(self, game_gid: int) -> List[FlowEntity]:
         """
         根据游戏GID查找所有流程
 
@@ -63,142 +71,139 @@ class FlowRepository:
             game_gid: 游戏GID
 
         Returns:
-            流程列表
+            FlowEntity列表
 
         Example:
             >>> repo = FlowRepository()
             >>> flows = repo.find_by_game_gid(10000147)
             >>> for flow in flows:
-            ...     print(flow['flow_name'])
+            ...     print(flow.flow_name)
         """
         query = f'''
             SELECT * FROM "{self.table_name}"
             WHERE game_gid = ? AND is_active = 1
             ORDER BY updated_at DESC
         '''
-        flows = fetch_all_as_dict(query, (game_gid,))
+        rows = fetch_all_as_dict(query, (game_gid,))
 
-        # 解析JSON字段
-        for flow in flows:
-            if flow.get("flow_graph"):
-                try:
-                    flow["flow_graph"] = json.loads(flow["flow_graph"])
-                except (json.JSONDecodeError, TypeError):
-                    flow["flow_graph"] = {}
+        # 反序列化JSON字段并转换为Entity
+        entities = []
+        for row in rows:
+            row["flow_graph"] = deserialize_json_field(row.get("flow_graph"))
+            row["variables"] = deserialize_json_field(row.get("variables"))
+            entities.append(FlowEntity(**row))
 
-            if flow.get("variables"):
-                try:
-                    flow["variables"] = json.loads(flow["variables"])
-                except (json.JSONDecodeError, TypeError):
-                    flow["variables"] = {}
+        return entities
 
-        return flows
+    def find_all_active(self) -> List[FlowEntity]:
+        """
+        查询所有激活的流程
 
-    def create(self, data: Dict[str, Any]) -> int:
+        Returns:
+            FlowEntity列表
+        """
+        query = f'''
+            SELECT * FROM "{self.table_name}"
+            WHERE is_active = 1
+            ORDER BY updated_at DESC
+        '''
+        rows = fetch_all_as_dict(query)
+
+        entities = []
+        for row in rows:
+            row["flow_graph"] = deserialize_json_field(row.get("flow_graph"))
+            row["variables"] = deserialize_json_field(row.get("variables"))
+            entities.append(FlowEntity(**row))
+
+        return entities
+
+    def create(self, flow: FlowEntity) -> int:
         """
         创建新流程
 
         Args:
-            data: 流程数据字典
+            flow: FlowEntity实例
 
         Returns:
             新创建的流程ID
 
         Example:
+            >>> from backend.models.entities import FlowEntity
             >>> repo = FlowRepository()
-            >>> flow_id = repo.create({
-            ...     'game_gid': 10000147,
-            ...     'flow_name': 'Test Flow',
-            ...     'flow_graph': {'nodes': [], 'edges': []},
-            ...     'description': 'Test description'
-            ... })
+            >>> flow = FlowEntity(
+            ...     game_gid=10000147,
+            ...     flow_name="Test Flow",
+            ...     flow_graph={"nodes": [], "edges": []},
+            ...     description="Test description"
+            ... )
+            >>> flow_id = repo.create(flow)
         """
-        with get_db() as db:
-            cursor = db.cursor()
+        insert_sql = f'''
+            INSERT INTO "{self.table_name}" (
+                game_gid, flow_name, flow_graph, variables,
+                description, created_by, is_active,
+                created_at, updated_at, version
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 1)
+        '''
 
-            insert_sql = f'''
-                INSERT INTO "{self.table_name}" (
-                    game_gid, flow_name, flow_graph, variables,
-                    description, created_by, is_active,
-                    created_at, updated_at, version
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 1)
-            '''
+        params = (
+            flow.game_gid,
+            flow.flow_name,
+            serialize_json_field(flow.flow_graph),
+            serialize_json_field(flow.variables),
+            flow.description or "",
+            flow.created_by or "",
+            1 if flow.is_active else 0,
+        )
 
-            cursor.execute(
-                insert_sql,
-                (
-                    data["game_gid"],
-                    data["flow_name"],
-                    json.dumps(data.get("flow_graph", {})),
-                    json.dumps(data.get("variables", {})),
-                    data.get("description", ""),
-                    data.get("created_by", ""),
-                    data.get("is_active", 1),
-                ),
-            )
+        return execute_write(insert_sql, params)
 
-            db.commit()
-            return cursor.lastrowid
-
-    def update(self, flow_id: int, data: Dict[str, Any]) -> bool:
+    def update(self, flow_id: int, flow: FlowEntity) -> bool:
         """
         更新流程
 
         Args:
             flow_id: 流程ID
-            data: 更新数据字典
+            flow: FlowEntity实例
 
         Returns:
             是否更新成功
 
         Example:
+            >>> from backend.models.entities import FlowEntity
             >>> repo = FlowRepository()
-            >>> success = repo.update(1, {
-            ...     'flow_name': 'Updated Flow Name',
-            ...     'description': 'Updated description'
-            ... })
+            >>> flow = FlowEntity(
+            ...     flow_name="Updated Flow Name",
+            ...     description="Updated description"
+            ... )
+            >>> success = repo.update(1, flow)
         """
-        with get_db() as db:
-            cursor = db.cursor()
+        update_parts = [
+            "flow_name = ?",
+            "flow_graph = ?",
+            "variables = ?",
+            "description = ?",
+            "is_active = ?",
+            "updated_at = datetime('now')",
+        ]
 
-            update_parts = []
-            params = []
+        params = (
+            flow.flow_name,
+            serialize_json_field(flow.flow_graph),
+            serialize_json_field(flow.variables),
+            flow.description or "",
+            1 if flow.is_active else 0,
+            flow_id,
+        )
 
-            if "flow_name" in data:
-                update_parts.append("flow_name = ?")
-                params.append(data["flow_name"])
+        update_sql = f'''
+            UPDATE "{self.table_name}" SET
+            {", ".join(update_parts)}
+            WHERE id = ?
+        '''
 
-            if "description" in data:
-                update_parts.append("description = ?")
-                params.append(data["description"])
-
-            if "flow_graph" in data:
-                update_parts.append("flow_graph = ?")
-                params.append(json.dumps(data["flow_graph"]))
-
-            if "variables" in data:
-                update_parts.append("variables = ?")
-                params.append(json.dumps(data["variables"]))
-
-            if "is_active" in data:
-                update_parts.append("is_active = ?")
-                params.append(data["is_active"])
-
-            if update_parts:
-                update_parts.append('updated_at = datetime("now")')
-                params.append(flow_id)
-
-                update_sql = f'''
-                    UPDATE "{self.table_name}" SET
-                    {", ".join(update_parts)}
-                    WHERE id = ?
-                '''
-
-                cursor.execute(update_sql, params)
-                db.commit()
-                return cursor.rowcount > 0
-
-            return False
+        result = execute_write(update_sql, params)
+        return result > 0
 
     def delete(self, flow_id: int) -> bool:
         """
@@ -214,19 +219,14 @@ class FlowRepository:
             >>> repo = FlowRepository()
             >>> success = repo.delete(1)
         """
-        with get_db() as db:
-            cursor = db.cursor()
+        update_sql = f'''
+            UPDATE "{self.table_name}"
+            SET is_active = 0, updated_at = datetime('now')
+            WHERE id = ?
+        '''
 
-            # 软删除：设置is_active=0
-            delete_sql = f'''
-                UPDATE "{self.table_name}"
-                SET is_active = 0, updated_at = datetime('now')
-                WHERE id = ?
-            '''
-            cursor.execute(delete_sql, (flow_id,))
-            db.commit()
-
-            return cursor.rowcount > 0
+        result = execute_write(update_sql, (flow_id,))
+        return result > 0
 
     def hard_delete(self, flow_id: int) -> bool:
         """
@@ -241,14 +241,9 @@ class FlowRepository:
         Warning:
             此操作不可恢复，请谨慎使用
         """
-        with get_db() as db:
-            cursor = db.cursor()
-
-            delete_sql = f'DELETE FROM "{self.table_name}" WHERE id = ?'
-            cursor.execute(delete_sql, (flow_id,))
-            db.commit()
-
-            return cursor.rowcount > 0
+        delete_sql = f'DELETE FROM "{self.table_name}" WHERE id = ?'
+        result = execute_write(delete_sql, (flow_id,))
+        return result > 0
 
     def count_by_game_gid(self, game_gid: int) -> int:
         """

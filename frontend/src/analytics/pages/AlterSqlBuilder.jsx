@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Input } from '@shared/ui';
 import './AlterSql.css';
 
 /**
@@ -46,16 +47,13 @@ function AlterSql() {
       <div className="content-layout">
         <div className="config-panel glass-card">
           <h3>配置</h3>
-          <div className="form-group">
-            <label>表名</label>
-            <input
-              type="text"
-              className="form-control"
-              value={tableName}
-              onChange={(e) => setTableName(e.target.value)}
-              placeholder="表名 (例如: dwd_event_login)"
-            />
-          </div>
+          <Input
+            label="表名"
+            type="text"
+            value={tableName}
+            onChange={(e) => setTableName(e.target.value)}
+            placeholder="表名 (例如: dwd_event_login)"
+          />
 
           <div className="alterations-list">
             {alterations.map((alt, index) => (
@@ -69,9 +67,8 @@ function AlterSql() {
                   <option value="DROP">DROP</option>
                   <option value="MODIFY">MODIFY</option>
                 </select>
-                <input
+                <Input
                   type="text"
-                  className="form-control"
                   value={alt.column}
                   onChange={(e) => updateAlteration(index, 'column', e.target.value)}
                   placeholder="列名 (例如: zone_id)"

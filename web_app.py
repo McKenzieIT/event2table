@@ -482,6 +482,21 @@ if __name__ == '__main__':
     logger.info(f"Access the application at: http://{FlaskConfig.HOST}:{FlaskConfig.PORT}")
     logger.info("=" * 80)
 
+    # 🆕 缓存预热 (2026-02-25)
+    logger.info("🔥 Warming up cache...")
+    try:
+        from backend.services.cache.cache_warmup import warmup_cache_on_startup
+        warmup_stats = warmup_cache_on_startup()
+        logger.info(f"✅ Cache warmup completed:")
+        logger.info(f"   - Games: {warmup_stats['games_warmed']}")
+        logger.info(f"   - Events: {warmup_stats['events_warmed']}")
+        logger.info(f"   - Params: {warmup_stats['params_warmed']}")
+        logger.info(f"   - Total keys: {warmup_stats['total_keys']}")
+    except Exception as e:
+        logger.warning(f"⚠️  Cache warmup failed (non-critical): {e}")
+
+    logger.info("=" * 80)
+
     app.run(debug=FlaskConfig.DEBUG,
             host=FlaskConfig.HOST,
             port=FlaskConfig.PORT,

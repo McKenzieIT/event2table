@@ -7,6 +7,7 @@ Event Service - 业务逻辑层 (精简架构)
 - 使用统一Entity模型 (EventEntity)
 - 移除DDD抽象,简化业务逻辑
 - 集成缓存防护和失效机制
+- 集成Bloom Filter防止缓存穿透 (2026-02-25)
 """
 
 from typing import List, Optional, Dict, Any
@@ -15,12 +16,13 @@ from backend.models.entities import EventEntity
 from backend.models.repositories.events import EventRepository
 from backend.models.repositories.games import GameRepository
 from backend.core.cache.cache_system import CacheInvalidator, cached
+from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 
 logger = logging.getLogger(__name__)
 
 
 class EventService:
-    """事件业务服务 (精简架构)"""
+    """事件业务服务 (精简架构 + Bloom Filter防护)"""
 
     def __init__(self):
         self.event_repo = EventRepository()
@@ -28,6 +30,14 @@ class EventService:
         from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
+
+        # 初始化Bloom Filter防止缓存穿透
+        self.bloom_filter = EnhancedBloomFilter(
+            capacity=500000,  # 50万容量（事件数量通常比游戏多）
+            error_rate=0.001,  # 0.1%误判率
+            persistence_path="data/events_bloom_filter.pkl"
+        )
+        logger.info("✅ EventService initialized with Bloom Filter protection")
 
     @cached("events.list", timeout=120)
     def get_events_by_game(
@@ -65,7 +75,9 @@ class EventService:
     @cached("events.detail", timeout=300)
     def get_event_by_id(self, event_id: int) -> Optional[EventEntity]:
         """
-        根据ID获取事件 (带缓存)
+        根据ID获取事件 (带Bloom Filter防护)
+
+        使用Bloom Filter防止查询不存在的事件ID导致数据库压力
 
         Args:
             event_id: 事件ID
@@ -73,7 +85,25 @@ class EventService:
         Returns:
             EventEntity, 不存在返回None
         """
-        return self.event_repo.find_by_id(event_id)
+        # 检查Bloom Filter
+        cache_key = f"events:{event_id}"
+        if not self.bloom_filter.contains(cache_key):
+            logger.debug(f"⚡ Bloom Filter: event {event_id} does not exist (fast reject)")
+            return None
+
+        # Bloom Filter说可能存在，查询数据库
+        event = self.event_repo.find_by_id(event_id)
+
+        # 如果存在，添加到Bloom Filter
+        if event:
+            self.bloom_filter.add(cache_key)
+            logger.debug(f"✅ Bloom Filter: event {event_id} exists, added to filter")
+        else:
+            # 不存在（Bloom Filter误判），也添加到Filter防止重复查询
+            self.bloom_filter.add(cache_key)
+            logger.debug(f"⚠️ Bloom Filter: event {event_id} false positive, added to filter")
+
+        return event
 
     @cached("events.with_params", timeout=300)
     def get_event_with_params(self, event_id: int) -> Optional[Dict[str, Any]]:
@@ -90,7 +120,7 @@ class EventService:
 
     def create_event(self, event_data: EventEntity) -> EventEntity:
         """
-        创建事件 (自动失效缓存)
+        创建事件 (自动失效缓存 + 更新Bloom Filter)
 
         Args:
             event_data: 事件Entity (已通过Pydantic验证)
@@ -121,8 +151,13 @@ class EventService:
 
         # 失效事件列表缓存
         self.invalidator.invalidate_pattern("events.list")
+
+        # 添加到Bloom Filter
+        cache_key = f"events:{result.id}"
+        self.bloom_filter.add(cache_key)
+
         logger.info(
-            f"事件创建成功,已失效缓存: event_id={result.id}, game_gid={event_data.game_gid}"
+            f"事件创建成功,已失效缓存并更新Bloom Filter: event_id={result.id}, game_gid={event_data.game_gid}"
         )
 
         return result
@@ -225,3 +260,35 @@ class EventService:
             事件统计信息字典, 不存在返回None
         """
         return self.event_repo.get_event_statistics(event_id)
+
+    def get_bloom_filter_stats(self) -> dict:
+        """
+        获取Bloom Filter统计信息
+
+        Returns:
+            Bloom Filter统计字典
+        """
+        return self.bloom_filter.get_stats()
+
+    def rebuild_bloom_filter(self) -> dict:
+        """
+        重建Bloom Filter (从数据库)
+
+        Returns:
+            重建统计信息
+        """
+        logger.info("🔄 Rebuilding Events Bloom Filter from database...")
+
+        # 获取所有现有事件
+        events = self.event_repo.find_all()
+
+        # 清空并重建Bloom Filter
+        self.bloom_filter.clear()
+        for event in events:
+            cache_key = f"events:{event.id}"
+            self.bloom_filter.add(cache_key)
+
+        stats = self.bloom_filter.get_stats()
+        logger.info(f"✅ Events Bloom Filter rebuilt: {stats['total_items']} items")
+
+        return stats

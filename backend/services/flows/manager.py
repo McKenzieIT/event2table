@@ -13,23 +13,22 @@ Flow Manager
 
 import logging
 from typing import Dict, Any, Optional
-from backend.models.repositories.flow_repository import FlowRepository
-from backend.models.repositories.games import GameRepository
+from backend.services.flows.flow_service import FlowService
+from backend.models.entities import FlowEntity
 
 logger = logging.getLogger(__name__)
 
 
 class FlowManager:
     """
-    流程管理器
+    流程管理器 (精简架构)
 
-    提供流程的高级操作功能
+    提供流程的高级操作功能，使用FlowService处理业务逻辑
     """
 
     def __init__(self):
         """初始化流程管理器"""
-        self.flow_repo = FlowRepository()
-        self.game_repo = GameRepository()
+        self.flow_service = FlowService()
 
     def load_flow(self, flow_id: int) -> Dict[str, Any]:
         """
@@ -44,22 +43,25 @@ class FlowManager:
         Raises:
             ValueError: 当流程不存在时
         """
-        flow = self.flow_repo.find_by_id(flow_id)
+        flow = self.flow_service.get_flow_by_id(flow_id)
 
         if not flow:
             raise ValueError(f"Flow {flow_id} not found")
 
-        # 验证游戏是否存在
-        if flow.get("game_gid"):
-            game = self.game_repo.find_by_gid(flow["game_gid"])
-            if not game:
-                logger.warning(
-                    f"Flow {flow_id} references non-existent game_gid {flow['game_gid']}"
-                )
-            else:
-                flow["game_name"] = game.get("name", "")
+        # 转换为字典（兼容旧代码）
+        flow_dict = flow.model_dump()
 
-        return flow
+        # 添加游戏名称（如果有）
+        if flow.game_gid:
+            game = self.flow_service.game_repo.find_by_gid(flow.game_gid)
+            if game:
+                flow_dict["game_name"] = game.name
+            else:
+                logger.warning(
+                    f"Flow {flow_id} references non-existent game_gid {flow.game_gid}"
+                )
+
+        return flow_dict
 
     def validate_flow(self, flow_data: Dict[str, Any]) -> tuple[bool, str]:
         """
@@ -132,24 +134,26 @@ class FlowManager:
         """
         try:
             # 加载原流程
-            original_flow = self.load_flow(flow_id)
+            original_flow = self.flow_service.get_flow_by_id(flow_id)
+            if not original_flow:
+                raise ValueError(f"Flow {flow_id} not found")
 
             # 创建新流程
-            new_flow_data = {
-                "game_gid": original_flow["game_gid"],
-                "flow_name": new_name,
-                "flow_graph": original_flow.get("flow_graph", {}),
-                "variables": original_flow.get("variables", {}),
-                "description": f"Cloned from {original_flow.get('flow_name', 'Unknown')}",
-                "created_by": original_flow.get("created_by", ""),
-                "is_active": True,
-            }
+            new_flow = FlowEntity(
+                game_gid=original_flow.game_gid,
+                flow_name=new_name,
+                flow_graph=original_flow.flow_graph,
+                variables=original_flow.variables,
+                description=f"Cloned from {original_flow.flow_name}",
+                created_by=original_flow.created_by,
+                is_active=True
+            )
 
-            new_flow_id = self.flow_repo.create(new_flow_data)
+            created_flow = self.flow_service.create_flow(new_flow)
 
-            logger.info(f"Flow cloned: {flow_id} -> {new_flow_id} ({new_name})")
+            logger.info(f"Flow cloned: {flow_id} -> {created_flow.id} ({new_name})")
 
-            return new_flow_id
+            return created_flow.id
 
         except Exception as e:
             logger.error(f"Failed to clone flow {flow_id}: {e}")
@@ -191,16 +195,15 @@ class FlowManager:
         Returns:
             统计信息字典
         """
-        flows = self.flow_repo.find_by_game_gid(game_gid)
+        flows = self.flow_service.get_flows_by_game_gid(game_gid)
 
         total_count = len(flows)
-        active_count = sum(1 for f in flows if f.get("is_active", 0) == 1)
+        active_count = sum(1 for f in flows if f.is_active)
 
         # 统计节点类型
         node_types = {}
         for flow in flows:
-            flow_graph = flow.get("flow_graph", {})
-            nodes = flow_graph.get("nodes", [])
+            nodes = flow.flow_graph.get("nodes", [])
             for node in nodes:
                 node_type = node.get("type", "unknown")
                 node_types[node_type] = node_types.get(node_type, 0) + 1

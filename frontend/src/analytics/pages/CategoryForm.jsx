@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Button, Spinner } from '@shared/ui';
+import { Button, Spinner, Input } from '@shared/ui';
 import './CategoryForm.css';
 
 /**
@@ -115,18 +115,16 @@ function CategoryForm() {
           <div className="alert alert-danger">{errors.submit}</div>
         )}
 
-        <div className="form-group">
-          <label htmlFor="name">分类名称 *</label>
-          <input
-            type="text"
-            id="name"
-            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="例如: 战斗"
-          />
-          {errors.name && <div className="invalid-feedback">{errors.name}</div>}
-        </div>
+        <Input
+          id="name"
+          name="name"
+          label="分类名称 *"
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="例如: 战斗"
+          error={errors.name}
+        />
 
         <div className="form-group">
           <label htmlFor="description">描述</label>

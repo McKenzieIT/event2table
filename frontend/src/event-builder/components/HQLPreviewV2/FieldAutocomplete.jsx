@@ -8,6 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Input } from '@shared/ui';
 import './FieldAutocomplete.css';
 
 export default function FieldAutocomplete({ eventName, onFieldSelect, apiBaseUrl = '/hql-preview-v2' }) {
@@ -80,7 +81,7 @@ export default function FieldAutocomplete({ eventName, onFieldSelect, apiBaseUrl
   return (
     <div className="field-autocomplete">
       <div className="search-input-wrapper">
-        <input
+        <Input
           type="text"
           className="search-input"
           placeholder="搜索字段..."

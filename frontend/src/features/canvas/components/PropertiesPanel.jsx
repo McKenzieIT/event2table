@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Button } from '@shared/ui';
+import { Button, Input } from '@shared/ui';
 import './PropertiesPanel.css';
 
 /**
@@ -298,16 +298,14 @@ export default function PropertiesPanel({
                 <div className="properties-section">
                     <h4 className="section-title">基本信息</h4>
                     <div className="property-row">
-                        <label className="property-label">节点标签:</label>
-                        <div className="label-editor">
-                            <input
-                                type="text"
-                                value={editedLabel}
-                                onChange={(e) => handleLabelChange(e.target.value)}
-                                className="label-input"
-                                placeholder="输入节点标签"
-                            />
-                            {hasChanges && (
+                        <Input
+                            type="text"
+                            value={editedLabel}
+                            onChange={(e) => handleLabelChange(e.target.value)}
+                            className="label-input"
+                            placeholder="输入节点标签"
+                        />
+                        {hasChanges && (
                                 <div className="change-actions">
                                     <Button
                                         variant="primary"

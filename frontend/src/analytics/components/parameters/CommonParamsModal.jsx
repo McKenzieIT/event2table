@@ -19,7 +19,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { BaseModal, Button, Badge, Spinner } from '@shared/ui';
+import { BaseModal, Button, Badge, Spinner, Input } from '@shared/ui';
 import { GET_COMMON_PARAMETERS } from '@/graphql/queries';
 
 const CommonParamsModal = ({ isOpen, onClose, gameGid }) => {
@@ -94,12 +94,11 @@ const CommonParamsModal = ({ isOpen, onClose, gameGid }) => {
 
         {/* Search box */}
         <div className="mb-4">
-          <input
+          <Input
             type="text"
             placeholder="搜索参数名称..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
           />
         </div>
 

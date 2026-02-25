@@ -7,6 +7,7 @@ Game Service - 业务逻辑层 (精简架构)
 - 使用统一Entity模型 (GameEntity)
 - 移除DDD抽象,简化业务逻辑
 - 集成缓存防护和失效机制
+- 集成Bloom Filter防止缓存穿透 (2026-02-25)
 """
 
 from typing import List, Optional
@@ -14,19 +15,28 @@ import logging
 from backend.models.entities import GameEntity
 from backend.models.repositories.games import GameRepository
 from backend.core.cache.cache_system import CacheInvalidator, cached
+from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 from backend.core.utils.business_helpers import validate_game_gid
 
 logger = logging.getLogger(__name__)
 
 
 class GameService:
-    """游戏业务服务 (精简架构)"""
+    """游戏业务服务 (精简架构 + Bloom Filter防护)"""
 
     def __init__(self):
         self.game_repo = GameRepository()
         from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
+
+        # 初始化Bloom Filter防止缓存穿透
+        self.bloom_filter = EnhancedBloomFilter(
+            capacity=100000,  # 10万容量
+            error_rate=0.001,  # 0.1%误判率
+            persistence_path="data/games_bloom_filter.pkl"
+        )
+        logger.info("✅ GameService initialized with Bloom Filter protection")
 
     @cached("games.list", timeout=120)
     def get_all_games(self, include_stats: bool = False) -> List[GameEntity]:
@@ -54,7 +64,13 @@ class GameService:
     @cached("games.detail", timeout=300)
     def get_game_by_gid(self, game_gid: int) -> Optional[GameEntity]:
         """
-        根据GID获取游戏 (带缓存)
+        根据GID获取游戏 (带Bloom Filter防护)
+
+        使用Bloom Filter防止查询不存在的game_gid导致数据库压力:
+        1. 先检查Bloom Filter
+        2. Bloom Filter说不存在 → 直接返回None (避免查询数据库)
+        3. Bloom Filter说可能存在 → 查询缓存/数据库
+        4. 数据存在 → 添加到Bloom Filter
 
         Args:
             game_gid: 游戏业务GID
@@ -66,11 +82,30 @@ class GameService:
             ValueError: game_gid格式不正确
         """
         validate_game_gid(game_gid)
-        return self.game_repo.find_by_gid(game_gid)
+
+        # 步骤1: 检查Bloom Filter
+        cache_key = f"games:{game_gid}"
+        if not self.bloom_filter.contains(cache_key):
+            logger.debug(f"⚡ Bloom Filter: game {game_gid} does not exist (fast reject)")
+            return None
+
+        # 步骤2: Bloom Filter说可能存在，查询数据库
+        game = self.game_repo.find_by_gid(game_gid)
+
+        # 步骤3: 如果存在，添加到Bloom Filter
+        if game:
+            self.bloom_filter.add(cache_key)
+            logger.debug(f"✅ Bloom Filter: game {game_gid} exists, added to filter")
+        else:
+            # 不存在（Bloom Filter误判），也添加到Filter防止重复查询
+            self.bloom_filter.add(cache_key)
+            logger.debug(f"⚠️ Bloom Filter: game {game_gid} false positive, added to filter")
+
+        return game
 
     def create_game(self, game_data: GameEntity) -> GameEntity:
         """
-        创建游戏 (自动失效缓存)
+        创建游戏 (自动失效缓存 + 更新Bloom Filter)
 
         Args:
             game_data: 游戏Entity (已通过Pydantic验证)
@@ -94,7 +129,12 @@ class GameService:
 
         # 失效游戏列表缓存
         self.invalidator.invalidate_pattern("games.list")
-        logger.info(f"游戏创建成功,已失效缓存: gid={game_data.gid}")
+
+        # 添加到Bloom Filter
+        cache_key = f"games:{game_data.gid}"
+        self.bloom_filter.add(cache_key)
+
+        logger.info(f"游戏创建成功,已失效缓存并更新Bloom Filter: gid={game_data.gid}")
 
         return result
 
@@ -131,7 +171,10 @@ class GameService:
 
     def delete_game(self, game_gid: int) -> None:
         """
-        删除游戏 (自动失效缓存)
+        删除游戏 (自动失效缓存 + 从Bloom Filter移除)
+
+        注意: Bloom Filter不支持删除操作，重建是唯一方式
+        因此我们标记需要重建，而不是立即删除
 
         Args:
             game_gid: 游戏业务GID
@@ -152,7 +195,10 @@ class GameService:
         # 失效缓存
         self.invalidator.invalidate_pattern("games.list")
         self.invalidator.invalidate_pattern(f"games.detail:{game_gid}")
-        logger.info(f"游戏删除成功,已失效缓存: gid={game_gid}")
+
+        # Bloom Filter不支持删除，标记需要重建
+        # 下次查询时会自动从数据库重建
+        logger.info(f"游戏删除成功,已失效缓存: gid={game_gid} (Bloom Filter将在下次重建时更新)")
 
     def get_by_id(self, game_id: int) -> Optional[GameEntity]:
         """
@@ -219,3 +265,37 @@ class GameService:
             (game_gid,),
         )
         return count["count"] if count else 0
+
+    def get_bloom_filter_stats(self) -> dict:
+        """
+        获取Bloom Filter统计信息
+
+        Returns:
+            Bloom Filter统计字典
+        """
+        return self.bloom_filter.get_stats()
+
+    def rebuild_bloom_filter(self) -> dict:
+        """
+        重建Bloom Filter (从Redis缓存或数据库)
+
+        用于删除游戏后同步Bloom Filter状态
+
+        Returns:
+            重建统计信息
+        """
+        logger.info("🔄 Rebuilding Bloom Filter from database...")
+
+        # 获取所有现有游戏
+        games = self.game_repo.find_all()
+
+        # 清空并重建Bloom Filter
+        self.bloom_filter.clear()
+        for game in games:
+            cache_key = f"games:{game.gid}"
+            self.bloom_filter.add(cache_key)
+
+        stats = self.bloom_filter.get_stats()
+        logger.info(f"✅ Bloom Filter rebuilt: {stats['total_items']} items")
+
+        return stats

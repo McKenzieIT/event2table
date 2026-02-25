@@ -419,3 +419,81 @@ def dict_to_entity(entity_class: type, data: Dict[str, Any]) -> BaseModel:
         Entity实例
     """
     return entity_class(**data)
+
+
+# ============================================================================
+# Flow Entity
+# ============================================================================
+
+
+class FlowEntity(BaseModel):
+    """
+    流程模板实体 - 全局唯一的流程模型定义
+
+    用途:
+    - API层: Flow模板CRUD请求验证
+    - Service层: Flow业务逻辑处理
+    - Repository层: Flow数据访问
+
+    验证规则:
+    - flow_name: 必填, 1-200字符
+    - flow_graph: JSON对象,存储流程图结构
+    - variables: JSON对象,存储流程变量
+    - game_gid: 可选,关联到游戏
+
+    JSON字段自动序列化/反序列化:
+    - flow_graph: Dict[str, Any] <-> JSON字符串
+    - variables: Dict[str, Any] <-> JSON字符串
+    """
+
+    # 主键
+    id: Optional[int] = Field(None, description="数据库自增ID")
+
+    # 业务字段
+    flow_name: str = Field(..., min_length=1, max_length=200, description="流程名称")
+    name: Optional[str] = Field(None, max_length=200, description="流程名称别名")
+
+    # JSON字段 - 自动序列化/反序列化
+    flow_graph: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="流程图结构（节点和边）"
+    )
+    variables: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="流程变量"
+    )
+
+    # 关联
+    game_gid: Optional[int] = Field(None, description="关联游戏GID")
+
+    # 元数据
+    description: Optional[str] = Field(None, description="流程描述")
+    created_by: Optional[str] = Field(None, description="创建者")
+    is_active: bool = Field(True, description="是否激活")
+    version: int = Field(1, description="版本号")
+
+    # 时间戳
+    created_at: Optional[datetime] = Field(None, description="创建时间")
+    updated_at: Optional[datetime] = Field(None, description="更新时间")
+
+    @field_validator('flow_name')
+    @classmethod
+    def sanitize_flow_name(cls, v: str) -> str:
+        """防止XSS攻击"""
+        if v:
+            return html.escape(v.strip())
+        return v
+
+    @field_validator('flow_graph', 'variables', mode='before')
+    @classmethod
+    def deserialize_json_fields(cls, v):
+        """从数据库读取时反序列化JSON字段"""
+        from backend.core.utils.json_helpers import deserialize_json_field
+        return deserialize_json_field(v)
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+        # exclude为None的字段
+        exclude_none=False
+    )
