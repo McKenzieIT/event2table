@@ -8,7 +8,9 @@ import logging
 from flask import Flask
 from backend.core.cache.cache_warmer import CacheWarmer
 from backend.core.cache.statistics import CacheStatistics
-from backend.infrastructure.events.event_handlers import register_event_handlers, unregister_event_handlers
+# NOTE: DDD event system removed in architecture migration (2026-02-25)
+# Event handlers are now managed directly in Service layer with CacheInvalidator
+# from backend.infrastructure.events.event_handlers import register_event_handlers, unregister_event_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +54,10 @@ class AppInitializer:
         
         try:
             # 1. 注册事件处理器
-            self._register_event_handlers()
-            
+            # NOTE: DDD event system removed (2026-02-25)
+            # Event handlers are now managed directly in Service layer
+            # self._register_event_handlers()
+
             # 2. 启动缓存预热
             self._start_cache_warming()
             
@@ -77,17 +81,13 @@ class AppInitializer:
     
     def _register_event_handlers(self):
         """注册领域事件处理器"""
-        logger.info("步骤1: 注册领域事件处理器...")
-        try:
-            register_event_handlers()
-            logger.info("✓ 领域事件处理器注册成功")
-        except Exception as e:
-            logger.error(f"✗ 领域事件处理器注册失败: {e}")
-            raise
-    
+        # NOTE: DDD event system removed (2026-02-25)
+        # Event handlers are now managed directly in Service layer
+        logger.info("步骤1: 跳过DDD事件处理器注册(已迁移到Service层)...")
+
     def _start_cache_warming(self):
         """启动缓存预热"""
-        logger.info("步骤2: 启动缓存预热...")
+        logger.info("步骤1: 启动缓存预热...")
         try:
             # 预热游戏数据
             logger.info("  - 预热游戏数据...")
@@ -108,7 +108,7 @@ class AppInitializer:
     
     def _start_performance_monitoring(self):
         """启动性能监控"""
-        logger.info("步骤3: 启动性能监控...")
+        logger.info("步骤2: 启动性能监控...")
         try:
             # 启动缓存统计
             self.cache_stats.start_monitoring()
@@ -120,7 +120,7 @@ class AppInitializer:
     
     def _register_shutdown_hooks(self):
         """注册关闭钩子"""
-        logger.info("步骤4: 注册关闭钩子...")
+        logger.info("步骤3: 注册关闭钩子...")
         try:
             import atexit
             atexit.register(self._shutdown)
@@ -131,7 +131,7 @@ class AppInitializer:
     
     def _health_check(self):
         """健康检查"""
-        logger.info("步骤5: 执行健康检查...")
+        logger.info("步骤4: 执行健康检查...")
         try:
             # 检查缓存系统
             cache_health = self._check_cache_health()
@@ -201,10 +201,9 @@ class AppInitializer:
         
         try:
             # 1. 注销事件处理器
-            logger.info("步骤1: 注销领域事件处理器...")
-            unregister_event_handlers()
-            logger.info("✓ 领域事件处理器已注销")
-            
+            # NOTE: DDD event system removed (2026-02-25)
+            logger.info("步骤1: 跳过DDD事件处理器注销(已迁移到Service层)...")
+
             # 2. 停止性能监控
             logger.info("步骤2: 停止性能监控...")
             self.cache_stats.stop_monitoring()
