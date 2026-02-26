@@ -14,7 +14,7 @@ import { generateId, validateField } from '@shared/utils/fieldBuilder';
 import FieldEventSelector from '@event-builder/components/FieldEventSelector';
 import FieldCanvas from '@event-builder/components/FieldCanvas';
 import HQLPreview from '@event-builder/components/HQLPreview';
-import { Button } from '@shared/ui/Button';
+import { Button, EmptyState } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './FieldBuilder.css';
@@ -465,10 +465,10 @@ function FieldBuilder() {
         <div className="field-canvas-panel glass-card" data-testid="field-canvas-panel">
           {!selectedEventId ? (
             <div className="panel-content">
-              <div className="empty-state">
-                <i className="bi bi-arrow-left"></i>
-                <p>请从左侧选择一个事件</p>
-              </div>
+              <EmptyState
+                icon={<i className="bi bi-arrow-left" style={{ fontSize: '48px' }} />}
+                title="请从左侧选择一个事件"
+              />
             </div>
           ) : (
             <FieldCanvas

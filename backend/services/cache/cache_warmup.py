@@ -27,8 +27,8 @@ logger = logging.getLogger(__name__)
 class CacheWarmer:
     """缓存预热器"""
 
-    def __init__(self):
-        self.cache = get_cache()
+    def __init__(self, cache=None):
+        self.cache = cache if cache is not None else get_cache()
         self.stats = {
             "games_warmed": 0,
             "events_warmed": 0,

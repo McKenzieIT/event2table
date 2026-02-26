@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Button, Spinner, ErrorState } from '@shared/ui';
+import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
 import { useGameContext } from '@shared/hooks/useGameContext';
 import './EventDetail.css';
 
@@ -261,9 +261,10 @@ function EventDetail() {
                   </table>
                 </div>
               ) : (
-                <div className="empty-state-card">
-                  <p className="text-secondary">此事件暂无参数字段</p>
-                </div>
+                <EmptyState
+                  icon={<i className="bi bi-inbox" style={{ fontSize: '48px' }} />}
+                  title="此事件暂无参数字段"
+                />
               )}
             </div>
           </div>

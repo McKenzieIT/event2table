@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Button, SearchInput, Spinner, useToast } from '@shared/ui';
+import { Button, SearchInput, Spinner, useToast, EmptyState } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './HqlManage.css';
 
@@ -136,11 +136,11 @@ function HqlManage() {
           <tbody>
             {filteredHql.length === 0 ? (
               <tr>
-                <td colSpan="8" className="text-center">
-                  <div className="empty-state">
-                    <span>📥</span>
-                    <p>未找到HQL记录</p>
-                  </div>
+                <td colSpan={8}>
+                  <EmptyState
+                    icon={<span style={{ fontSize: '48px' }}>📥</span>}
+                    title="未找到HQL记录"
+                  />
                 </td>
               </tr>
             ) : (

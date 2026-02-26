@@ -16,7 +16,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { Input } from '@shared/ui';
+import { Input, EmptyState } from '@shared/ui';
 import './FieldEventSelector.css';
 
 /**
@@ -269,15 +269,15 @@ export default function FieldEventSelector({
       {/* Event List */}
       <div className="event-selector-content">
         {totalEventCount === 0 ? (
-          <div className="empty-state">
-            <i className="bi bi-inbox"></i>
-            <p>暂无事件</p>
-          </div>
+          <EmptyState
+            icon={<i className="bi bi-inbox" style={{ fontSize: '48px' }} />}
+            title="暂无事件"
+          />
         ) : categoryCount === 0 ? (
-          <div className="empty-state">
-            <i className="bi bi-search"></i>
-            <p>未找到匹配的事件</p>
-          </div>
+          <EmptyState
+            icon={<i className="bi bi-search" style={{ fontSize: '48px' }} />}
+            title="未找到匹配的事件"
+          />
         ) : (
           <div className="event-list">
             {Object.entries(filteredCategories)

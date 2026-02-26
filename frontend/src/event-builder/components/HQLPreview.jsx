@@ -5,7 +5,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
 import { formatSQL as formatHQL } from '@shared/utils/sqlFormatter';
-import { Spinner } from '@shared/ui';
+import { Spinner, EmptyState } from '@shared/ui';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import './HQLPreview.css';
 
@@ -292,10 +292,10 @@ const HQLPreview = forwardRef(({
             <Spinner size="lg" label="正在生成HQL..." />
           </div>
         ) : isEmpty ? (
-          <div className="empty-state">
-            <i className="bi bi-code-slash"></i>
-            <p>添加字段后将在此处生成HQL</p>
-          </div>
+          <EmptyState
+            icon={<i className="bi bi-code-slash" style={{ fontSize: '48px' }} />}
+            title="添加字段后将在此处生成HQL"
+          />
         ) : isEditing && !readOnly ? (
           // 编辑模式：CodeMirror
           <div className="hql-editor-wrapper">

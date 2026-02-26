@@ -497,3 +497,75 @@ class FlowEntity(BaseModel):
         # exclude为None的字段
         exclude_none=False
     )
+
+
+# ============================================================================
+# Join Config Entity
+# ============================================================================
+
+
+class JoinConfigEntity(BaseModel):
+    """
+    Join配置实体 - 全局唯一的Join配置模型定义
+
+    支持JSON字段自动序列化:
+    - source_events: List[int] → JSON字符串 (存储到source_events列)
+    - join_config: Dict → JSON字符串 (存储到join_conditions列)
+
+    字段映射说明:
+    - Entity字段名 join_config → 数据库列名 join_conditions
+    - Repository会自动处理字段映射
+    """
+
+    # 主键
+    id: Optional[int] = Field(None, description="数据库自增ID")
+
+    # 业务字段
+    game_gid: int = Field(..., ge=0, description="游戏业务GID")
+    name: str = Field(..., min_length=1, max_length=100, description="配置名称")
+    display_name: str = Field(..., min_length=1, max_length=100, description="显示名称")
+
+    # Join配置
+    join_type: Literal["join", "union_all"] = Field("join", description="Join类型: join, union_all")
+    source_events: List[int] = Field(default_factory=list, description="源事件ID列表")
+    join_config: Dict[str, Any] = Field(default_factory=dict, description="JOIN条件配置")
+    output_fields: List[str] = Field(default_factory=list, description="输出字段列表")
+    output_table: str = Field(..., description="输出表名")
+
+    # 可选配置
+    where_conditions: Optional[Dict[str, Any]] = Field(None, description="WHERE条件")
+    field_mappings: Optional[Dict[str, Any]] = Field(None, description="字段映射")
+    description: Optional[str] = Field(None, description="配置描述")
+
+    # 元数据
+    created_at: Optional[datetime] = Field(None, description="创建时间")
+    updated_at: Optional[datetime] = Field(None, description="更新时间")
+
+    @field_validator('name', 'display_name')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        """防止XSS攻击"""
+        import html
+        if v:
+            return html.escape(v.strip())
+        return v
+
+    @field_validator('source_events', 'output_fields', mode='before')
+    @classmethod
+    def deserialize_list_fields(cls, v):
+        """从数据库读取时反序列化list字段"""
+        from backend.core.utils.json_helpers import deserialize_json_field
+        return deserialize_json_field(v)
+
+    @field_validator('join_config', 'where_conditions', 'field_mappings', mode='before')
+    @classmethod
+    def deserialize_dict_fields(cls, v):
+        """从数据库读取时反序列化dict字段"""
+        from backend.core.utils.json_helpers import deserialize_json_field
+        return deserialize_json_field(v)
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+        exclude_none=False
+    )

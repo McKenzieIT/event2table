@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, SearchInput, Skeleton, ErrorState } from '@shared/ui';
+import { Button, SearchInput, Skeleton, ErrorState, EmptyState } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './CommonParamsList.css';
@@ -289,10 +289,10 @@ export default function CommonParamsList() {
       {/* Parameter Cards Grid */}
       <div className="params-grid">
         {filteredParams.length === 0 ? (
-          <div className="empty-state">
-            <span>📥</span>
-            <p>没有找到公参</p>
-          </div>
+          <EmptyState
+            icon={<span style={{ fontSize: '48px' }}>📥</span>}
+            title="没有找到公参"
+          />
         ) : (
           filteredParams.map(param => (
             <div key={param.id} className="param-card">

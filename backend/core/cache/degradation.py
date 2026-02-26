@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from .cache_hierarchical import HierarchicalCache
 
 try:
-    from .cache_hierarchical import hierarchical_cache
+    from .cache_system import hierarchical_cache
     from .cache_system import CacheKeyBuilder, get_cache
     from redis.exceptions import RedisError
 except ImportError:

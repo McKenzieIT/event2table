@@ -13,7 +13,9 @@ import {
   Spinner,
   useToast,
   SelectGamePrompt,
-  Pagination
+  Pagination,
+  Skeleton,
+  EmptyState
 } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './EventsList.css';
@@ -344,24 +346,15 @@ function EventsList() {
           <Spinner size="lg" label="正在加载事件列表..." />
         </div>
       ) : filteredEvents.length === 0 ? (
-        <div className="empty-state">
-          <h3>暂无日志事件</h3>
-          <p>暂无事件，请先创建事件。</p>
-          <div className="empty-actions">
-            <Button
-              variant="success"
-              onClick={() => navigate('/import-events')}
-            >
-              导入Excel
-            </Button>
-            <Button
-              variant="outline-primary"
-              onClick={() => navigate('/events/create')}
-            >
-              创建事件
-            </Button>
-          </div>
-        </div>
+        <EmptyState
+          icon={<i className="bi bi-inbox" style={{ fontSize: '48px' }} />}
+          title="暂无日志事件"
+          description="暂无事件，请先创建事件。"
+          action={{
+            label: '创建事件',
+            onClick: () => navigate('/events/create')
+          }}
+        />
       ) : (
         <div className="events-table-container">
           <table className="oled-table">

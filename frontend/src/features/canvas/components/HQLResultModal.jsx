@@ -19,6 +19,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { BaseModal } from '@shared/ui/BaseModal';
+import { EmptyState } from '@shared/ui/EmptyState/EmptyState';
 import { formatSQL, calculateSQLStats } from '@shared/utils/sqlFormatter';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import DataPreviewModal from './DataPreviewModal';
@@ -198,11 +199,11 @@ export default function HQLResultModal({
         size="lg"
       >
         <div className="hql-result-modal">
-          <div className="empty-state">
-            <i className="bi bi-code-slash" style={{ fontSize: '3rem', marginBottom: '1rem' }}></i>
-            <h3>没有HQL内容</h3>
-            <p>生成HQL时出错或画布为空</p>
-          </div>
+          <EmptyState
+            icon={<i className="bi bi-code-slash" style={{ fontSize: '48px' }} />}
+            title="没有HQL内容"
+            description="生成HQL时出错或画布为空"
+          />
           <div className="modal-footer">
             <button className="btn btn-secondary" onClick={handleClose}>
               关闭

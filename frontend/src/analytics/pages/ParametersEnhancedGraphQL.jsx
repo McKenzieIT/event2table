@@ -14,7 +14,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
-import { Button, SearchInput, Spinner } from '@shared/ui';
+import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
 import { BindToLibraryButton } from '@shared/components/BindToLibraryButton';
 import { useAllParametersByGame } from '@/graphql/hooks';
 import './ParametersEnhanced.css';
@@ -104,9 +104,10 @@ function ParametersEnhancedGraphQL() {
 
       <div className="parameters-grid">
         {filteredParameters.length === 0 ? (
-          <div className="empty-state">
-            <p>没有找到匹配的参数</p>
-          </div>
+          <EmptyState
+            icon={<i className="bi bi-inbox" style={{ fontSize: '48px' }} />}
+            title="没有找到匹配的参数"
+          />
         ) : (
           filteredParameters.map(param => (
             <div key={param.id} className="param-card glass-card">

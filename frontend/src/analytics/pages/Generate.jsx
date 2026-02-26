@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Card, Spinner, useToast } from "@shared/ui";
+import { Button, Card, Spinner, useToast, EmptyState } from "@shared/ui";
 import { useGameContext } from "@shared/hooks/useGameContext";
 import "./Generate.css";
 
@@ -133,7 +133,10 @@ function Generate() {
             ) : (
               <div className="event-list">
                 {events.length === 0 ? (
-                  <p className="text-secondary">暂无事件</p>
+                  <EmptyState
+                    icon={<i className="bi bi-inbox" style={{ fontSize: '32px' }} />}
+                    title="暂无事件"
+                  />
                 ) : (
                   events.map((event) => (
                     <div

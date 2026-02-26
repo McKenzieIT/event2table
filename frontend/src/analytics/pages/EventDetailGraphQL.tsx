@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Button, Spinner, ErrorState } from '@shared/ui';
+import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
 import { useGameContext } from '@shared/hooks/useGameContext';
 import { GET_EVENT, GET_PARAMETERS } from '@/graphql/queries';
 import './EventDetail.css';
@@ -156,15 +156,14 @@ function EventDetailGraphQL() {
           </div>
 
           {parameters.length === 0 ? (
-            <div className="empty-state">
-              <p>暂无参数</p>
-              <Button
-                variant="primary"
-                onClick={() => navigate(`/events/${id}/parameters/create`)}
-              >
-                添加参数
-              </Button>
-            </div>
+            <EmptyState
+              icon={<i className="bi bi-inbox" style={{ fontSize: '48px' }} />}
+              title="暂无参数"
+              action={{
+                label: '添加参数',
+                onClick: () => navigate(`/events/${id}/parameters/create`)
+              }}
+            />
           ) : (
             <div className="parameters-table-container">
               <table className="parameters-table">

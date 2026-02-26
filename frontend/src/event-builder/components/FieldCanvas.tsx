@@ -37,7 +37,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Field, FieldType, DataType, Parameter } from '@shared/types/fieldBuilder';
 import { generateId } from '@shared/utils/fieldBuilder';
-import { Button } from '@shared/ui/Button';
+import { Button, EmptyState } from '@shared/ui';
 import { DeleteConfirmModal } from '@shared/components/DeleteConfirmModal';
 import CanvasStatsDisplay from './CanvasStatsDisplay';
 import EdgeToolbar from './EdgeToolbar';
@@ -628,10 +628,10 @@ export default function FieldCanvas({
             onNativeDragLeave={handleNativeDragLeave}
             isActive={true}
           >
-            <div className="empty-state">
-              <i className="bi bi-hand-index" aria-hidden="true"></i>
-              <p>从左侧拖拽参数到此处添加字段</p>
-            </div>
+            <EmptyState
+              icon={<i className="bi bi-hand-index" style={{ fontSize: '48px' }} />}
+              title="从左侧拖拽参数到此处添加字段"
+            />
           </DropZone>
         ) : (
           <DndContext

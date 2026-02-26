@@ -213,7 +213,9 @@ class TestCacheSystemEndToEnd:
     def test_complete_cache_workflow(self):
         """测试完整的缓存工作流程"""
         # 1. 预热缓存
-        warmer = CacheWarmer()
+        from backend.core.cache.cache_system import hierarchical_cache
+
+        warmer = CacheWarmer(cache=hierarchical_cache)
         warmup_stats = warmer.warmup_all(games_limit=10)
 
         # 2. 查询游戏（应该从缓存读取）

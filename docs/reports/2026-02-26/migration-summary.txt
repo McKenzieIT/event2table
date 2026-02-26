@@ -1,0 +1,204 @@
+================================================================================
+                    Event2Table API架构迁移状态总结
+================================================================================
+
+生成时间: 2026-02-26
+分析范围: backend/api/routes/ 目录所有API路由文件
+目标架构: Entity-Repository-Service (ERS) 三层架构
+
+================================================================================
+                              迁移进度概览
+================================================================================
+
+  已完成        部分迁移        未开始
+    ■■■■■■□□□□□□□□□□□□□□□■■■■■■■■■■■■■□□□□□□□□□□□□□□□□□□
+    Games (1)        Events, Parameters,         Categories,
+                        Flows, HQL              Dashboard, Join Configs
+                      (4)                       (3)
+
+  总体进度: 12.5% (1/8 完全迁移) | 50% (4/8 部分迁移) | 37.5% (3/8 未开始)
+
+================================================================================
+                         详细迁移状态
+================================================================================
+
+✅ 已迁移 (1/8) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  🟢 Games API (/api/games/*)
+     - Service: ✅ GameService
+     - Repository: ✅ GameRepository (返回 GameEntity)
+     - Entity: ✅ GameEntity
+     - API层: ✅ 使用 Service + Entity 验证
+     - 状态: 100% 完成
+
+⚠️ 部分迁移 (4/8) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  🟡 Events API (/api/events/*)
+     - Service: ✅ EventService (含 Bloom Filter)
+     - Repository: ✅ EventRepository (返回 EventEntity)
+     - Entity: ✅ EventEntity
+     - API层: ❌ 直接使用 Repository,未使用 Service
+     - 状态: 40% 完成 | 迁移复杂度: 🟡 中等 (2-3h)
+
+  🟡 Parameters API (/api/parameters/*)
+     - Service: ✅ ParameterService
+     - Repository: ✅ ParameterRepository (返回 ParameterEntity)
+     - Entity: ✅ ParameterEntity
+     - API层: ❌ 直接使用 fetch 函数
+     - 状态: 30% 完成 | 迁移复杂度: 🟡 中等 (3-4h)
+
+  🟡 Flows API (/api/flows/*)
+     - Service: ✅ FlowService
+     - Repository: ✅ FlowRepository (返回字典)
+     - Entity: ❌ 缺少 FlowEntity
+     - API层: ❌ 直接使用 fetch 函数
+     - 状态: 20% 完成 | 迁移复杂度: 🟠 较高 (4-5h)
+
+  🟡 HQL Generation API (/api/hql/*)
+     - Service: ✅ HqlService (多个)
+     - Repository: ✅ HqlRepository, HqlHistoryRepository
+     - Entity: ❌ 缺少 HqlEntity
+     - API层: ❌ 直接调用 HQLGenerator
+     - 状态: 25% 完成 | 迁移复杂度: 🔴 高 (6-8h)
+
+❌ 未开始 (3/8) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  🔴 Categories API (/api/categories/*)
+     - Service: ❌ 无 CategoryService
+     - Repository: ⚠️ 使用 GenericRepository
+     - Entity: ❌ 无 CategoryEntity
+     - 状态: 0% 完成 | 迁移复杂度: 🟢 低 (1-2h)
+
+  🔴 Dashboard API (/api/dashboard/*)
+     - Service: ❌ 无 DashboardService
+     - Repository: ❌ 直接使用 fetch 函数
+     - Entity: ❌ 无 DashboardStatsEntity
+     - 状态: 0% 完成 | 迁移复杂度: 🟠 较高 (4-5h)
+
+  🔴 Join Configs API (/api/join-configs/*)
+     - Service: ❌ 无 JoinConfigService
+     - Repository: ⚠️ 使用 GenericRepository
+     - Entity: ❌ 无 JoinConfigEntity
+     - 状态: 0% 完成 | 迁移复杂度: 🟡 中等 (3-4h)
+
+================================================================================
+                        迁移优先级与时间表
+================================================================================
+
+P0 - 立即迁移 (本周完成) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Events API        预计: 2-3h    理由: 高频使用,已有完整依赖
+  2. Categories API    预计: 1-2h    理由: 结构简单,快速完成
+
+P1 - 尽快迁移 (下周完成) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  3. Parameters API    预计: 3-4h    理由: 中频使用,需统一缓存
+  4. Join Configs API  预计: 3-4h    理由: Canvas核心功能
+
+P2 - 计划迁移 (两周内) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  5. Flows API         预计: 4-5h    理由: 需创建Entity
+  6. Dashboard API     预计: 4-5h    理由: 聚合查询复杂
+
+P3 - 延后迁移 (按需完成) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  7. HQL Generation    预计: 6-8h    理由: 业务逻辑复杂,需重构
+
+总计工时: 23-31 小时 (约 3-4 周)
+
+================================================================================
+                          标准迁移步骤
+================================================================================
+
+阶段1: 检查依赖 (5分钟)
+  ├─ 检查 Entity 是否存在 (backend/models/entities.py)
+  ├─ 检查 Service 是否存在 (backend/services/*/)
+  └─ 检查 Repository 是否存在 (backend/models/repositories/)
+
+阶段2: 创建缺失组件 (30-60分钟)
+  ├─ 创建 Entity (继承 BaseModel,添加验证器)
+  ├─ 创建 Service (继承 BaseService,实现业务逻辑)
+  └─ 创建/修改 Repository (返回 Entity 而非字典)
+
+阶段3: 迁移API层 (1-3小时)
+  ├─ 替换 fetch 函数为 Service 调用
+  ├─ 替换手动验证为 Entity 验证
+  ├─ 替换字典返回为 Entity.model_dump()
+  └─ 更新异常处理 (捕获 ValidationError)
+
+阶段4: 测试验证 (30分钟)
+  ├─ 运行单元测试 (pytest)
+  ├─ 运行API契约测试
+  └─ 手动测试API端点
+
+================================================================================
+                          迁移检查清单
+================================================================================
+
+API层检查:
+  □ 所有端点使用 Service (而非 Repository/fetch)
+  □ 所有输入使用 Entity 验证 (而非 validate_json_request)
+  □ 所有输出使用 model_dump() 序列化
+  □ 所有异常使用 ValidationError 捕获
+
+Service层检查:
+  □ 继承 BaseService (统一缓存管理)
+  □ 返回 Entity 对象 (而非字典)
+  □ 使用 @cached 装饰器 (而非 lru_cache)
+  □ 调用 self.invalidate_*() 清理缓存
+
+Repository层检查:
+  □ 继承 GenericRepository
+  □ 返回 Entity 对象 (而非字典)
+  □ 使用 fetch_one/fetch_all_as_dict
+  □ 启用缓存 (enable_cache=True)
+
+Entity层检查:
+  □ 继承 BaseModel (Pydantic)
+  □ 使用 Field 定义字段
+  □ 使用 field_validator 验证
+  □ 实现 XSS 防护 (html.escape)
+
+================================================================================
+                          关键风险提示
+================================================================================
+
+🔴 高风险:
+
+  1. 缓存不一致 - 迁移后需 FLUSHALL
+  2. API兼容性 - 使用 Field(alias=...) 保持兼容
+  3. 性能回退 - 使用 model_dump(mode='json') 优化
+
+🟡 中风险:
+
+  4. 测试覆盖不足 - 迁移前补充测试
+  5. 业务逻辑遗漏 - 仔细对比代码
+
+🟢 低风险:
+
+  6. 类型注解不完整 - 使用 mypy 检查
+
+================================================================================
+                          下一步行动
+================================================================================
+
+立即开始:
+  ✅ Events API 迁移 (P0, 已有完整依赖)
+
+本周完成:
+  ✅ Categories API 迁移 (P0, 最简单)
+
+下周计划:
+  □ Parameters API 迁移 (P1)
+  □ Join Configs API 迁移 (P1)
+
+持续优化:
+  □ 统一 Service 继承 BaseService
+  □ 统一缓存策略 (@cached 装饰器)
+  □ 优化 Entity 序列化
+
+================================================================================
+详细报告: docs/reports/2026-02-26/api-architecture-migration-status.md
+生成时间: 2026-02-26
+分析工具: Claude Code
+================================================================================

@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from .cache_hierarchical import HierarchicalCache
 
 try:
-    from .cache_hierarchical import hierarchical_cache
+    from .cache_system import hierarchical_cache
     from .cache_system import CacheKeyBuilder, get_cache
 except ImportError:
     hierarchical_cache = None  # type: ignore

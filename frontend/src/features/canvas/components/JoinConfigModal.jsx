@@ -15,7 +15,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { BaseModal } from '@shared/ui/BaseModal';
-import { Button, Select, useToast } from '@shared/ui';
+import { Button, Select, useToast, EmptyState } from '@shared/ui';
 import './JoinConfigModal.css';
 
 export default function JoinConfigModal({
@@ -108,12 +108,11 @@ export default function JoinConfigModal({
         size="lg"
       >
         <div className="join-config-modal">
-          <div className="empty-state">
-            <i className="bi bi-exclamation-triangle" style={{ fontSize: '3rem', marginBottom: '1rem' }}></i>
-            <h3>无法配置JOIN节点</h3>
-            <p>JOIN节点需要连接两个事件节点才能配置</p>
-            <p>请先连接事件节点，然后双击JOIN节点进行配置</p>
-          </div>
+          <EmptyState
+            icon={<i className="bi bi-exclamation-triangle" style={{ fontSize: '48px' }} />}
+            title="无法配置JOIN节点"
+            description="JOIN节点需要连接两个事件节点才能配置。请先连接事件节点，然后双击JOIN节点进行配置"
+          />
           <div className="modal-footer">
             <Button variant="secondary" onClick={onClose}>
               关闭

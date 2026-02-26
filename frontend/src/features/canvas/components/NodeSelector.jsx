@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { SearchInput } from '@shared/ui/SearchInput';
+import { SearchInput, EmptyState } from '@shared/ui';
 import "./NodeSelector.css";
 
 /**
@@ -109,9 +109,10 @@ export default function NodeSelector({
 
       <div className="node-list">
         {filteredNodes.length === 0 ? (
-          <div className="empty-state">
-            {searchTerm ? "没有找到匹配的节点" : "没有可选择的节点"}
-          </div>
+          <EmptyState
+            icon={<i className="bi bi-diagram-3" style={{ fontSize: '32px' }} />}
+            title={searchTerm ? "没有找到匹配的节点" : "没有可选择的节点"}
+          />
         ) : (
           filteredNodes.map((node) => (
             <div

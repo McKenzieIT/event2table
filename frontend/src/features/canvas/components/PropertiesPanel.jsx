@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Button, Input } from '@shared/ui';
+import { Button, Input, EmptyState } from '@shared/ui';
 import './PropertiesPanel.css';
 
 /**
@@ -245,13 +245,11 @@ export default function PropertiesPanel({
     if (!selectedNode) {
         return (
             <div className="properties-panel empty">
-                <div className="empty-state">
-                    <div className="empty-icon">📋</div>
-                    <div className="empty-title">未选择节点</div>
-                    <div className="empty-description">
-                        点击画布上的节点查看属性
-                    </div>
-                </div>
+                <EmptyState
+                    icon={<span style={{ fontSize: '48px' }}>📋</span>}
+                    title="未选择节点"
+                    description="点击画布上的节点查看属性"
+                />
             </div>
         );
     }
