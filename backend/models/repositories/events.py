@@ -456,17 +456,16 @@ class EventRepository(GenericRepository):
             if not game_gid:
                 raise ValueError("game_gid is required")
 
-            # 从games表获取game_id
+            # 从games表获取数据库ID（如果需要）
             # games表使用TEXT类型的gid列
+            # 注意：log_events表使用game_gid作为外键
             cursor.execute("SELECT id FROM games WHERE gid = ?", (str(game_gid),))
             game_row = cursor.fetchone()
             if not game_row:
                 raise ValueError(f"Game not found: gid={game_gid}")
-            game_id = game_row[0]
 
             # 字段映射: Entity字段 -> 数据库列
             db_data = {
-                'game_id': game_id,  # 从game_gid查找game_id
                 'game_gid': game_gid,
                 'event_name': data.get('event_name') or data.get('name'),
                 'event_name_cn': data.get('event_name_cn') or data.get('name_cn'),
@@ -594,7 +593,7 @@ class EventRepository(GenericRepository):
             >>> repo = EventRepository()
             >>> event_ids = repo.bulk_create_with_parameters([
             ...     {
-            ...         'game_id': 1,
+            ...         'game_gid': 10000147,
             ...         'event_name': 'test_event',
             ...         'event_name_cn': '测试事件',
             ...         'category_id': 1,
@@ -621,12 +620,12 @@ class EventRepository(GenericRepository):
                 cursor.execute(
                     """
                     INSERT INTO log_events (
-                        game_id, event_name, event_name_cn, category_id,
+                        game_gid, event_name, event_name_cn, category_id,
                         source_table, target_table, include_in_common_params
                     ) VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
-                        event_data["game_id"],
+                        event_data["game_gid"],
                         event_data["event_name"],
                         event_data["event_name_cn"],
                         event_data["category_id"],
