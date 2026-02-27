@@ -569,3 +569,164 @@ class JoinConfigEntity(BaseModel):
         populate_by_name=True,
         exclude_none=False
     )
+
+
+# ============================================================================
+# HQL History Entity
+# ============================================================================
+
+
+class HQLHistoryEntity(BaseModel):
+    """
+    HQL历史记录实体 - 全局唯一的HQL历史模型定义
+
+    支持JSON字段自动序列化:
+    - events_json: List[Dict] → JSON字符串
+    - fields_json: List[Dict] → JSON字符串
+    - conditions_json: Dict → JSON字符串
+    - metadata_json: Dict → JSON字符串
+    """
+
+    # 主键
+    id: Optional[int] = Field(None, description="数据库自增ID")
+
+    # 业务字段
+    user_id: int = Field(0, description="用户ID")
+    session_id: Optional[str] = Field(None, description="会话ID")
+    game_gid: Optional[int] = Field(None, description="游戏GID")
+
+    # HQL内容
+    name_cn: Optional[str] = Field(None, description="中文名称")
+    name_en: Optional[str] = Field(None, description="英文名称")
+    hql_type: str = Field("select", description="HQL类型: select, insert, create")
+    hql: str = Field(..., description="生成的HQL语句")
+    mode: str = Field("single", description="生成模式: single, join, union")
+
+    # JSON字段 (存储为JSON字符串)
+    events_json: List[Dict[str, Any]] = Field(default_factory=list, description="事件配置")
+    fields_json: List[Dict[str, Any]] = Field(default_factory=list, description="字段配置")
+    conditions_json: Optional[Dict[str, Any]] = Field(None, description="条件配置")
+    metadata_json: Optional[Dict[str, Any]] = Field(None, description="元数据")
+
+    # 性能指标
+    performance_score: Optional[int] = Field(None, ge=0, le=100, description="性能评分")
+
+    # 元数据
+    created_at: Optional[datetime] = Field(None, description="创建时间")
+
+    @field_validator('name_cn', 'name_en', mode='before')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        """防止XSS攻击"""
+        import html
+        if v:
+            return html.escape(v.strip())
+        return v
+
+    @field_validator('events_json', 'fields_json', mode='before')
+    @classmethod
+    def deserialize_json_list(cls, v):
+        """从数据库读取时反序列化JSON列表"""
+        from backend.core.utils.json_helpers import deserialize_json_field
+        return deserialize_json_field(v)
+
+    @field_validator('conditions_json', 'metadata_json', mode='before')
+    @classmethod
+    def deserialize_json_dict(cls, v):
+        """从数据库读取时反序列化JSON字典"""
+        from backend.core.utils.json_helpers import deserialize_json_field
+        return deserialize_json_field(v)
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True
+    )
+
+
+# ============================================================================
+# Event Category Entity
+# ============================================================================
+
+
+class EventCategoryEntity(BaseModel):
+    """
+    事件类别实体 - 全局唯一的事件类别模型定义
+
+    用于事件的分类管理，如"充值/付费"、"任务系统"等
+    """
+
+    # 主键
+    id: Optional[int] = Field(None, description="数据库自增ID")
+
+    # 业务字段
+    name: str = Field(..., min_length=1, max_length=50, description="类别名称(唯一)")
+    name_cn: Optional[str] = Field(None, max_length=100, description="中文名称")
+    description: Optional[str] = Field(None, description="类别描述")
+    color: Optional[str] = Field(None, max_length=20, description="显示颜色")
+    icon: Optional[str] = Field(None, max_length=50, description="图标名称")
+
+    # 元数据
+    created_at: Optional[datetime] = Field(None, description="创建时间")
+    updated_at: Optional[datetime] = Field(None, description="更新时间")
+
+    @field_validator('name', 'name_cn', mode='before')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        """防止XSS攻击"""
+        import html
+        if v:
+            return html.escape(v.strip())
+        return v
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True
+    )
+
+
+# ============================================================================
+# Event Node Entity
+# ============================================================================
+
+
+class EventNodeEntity(BaseModel):
+    """
+    事件节点实体 - 全局唯一的事件节点模型定义
+
+    用于Canvas系统中的事件节点配置
+    """
+
+    # 主键
+    id: Optional[int] = Field(None, description="数据库自增ID")
+
+    # 业务字段
+    game_gid: int = Field(..., ge=0, description="游戏业务GID")
+    name: str = Field(..., min_length=1, max_length=100, description="节点名称")
+    event_id: int = Field(..., ge=0, description="关联的事件ID")
+
+    # 配置
+    config_json: Dict[str, Any] = Field(default_factory=dict, description="节点配置JSON")
+    is_active: bool = Field(True, description="是否激活")
+
+    # 元数据
+    created_at: Optional[datetime] = Field(None, description="创建时间")
+    updated_at: Optional[datetime] = Field(None, description="更新时间")
+
+    @field_validator('name', mode='before')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        """防止XSS攻击"""
+        import html
+        return html.escape(v.strip())
+
+    @field_validator('config_json', mode='before')
+    @classmethod
+    def deserialize_config(cls, v):
+        """从数据库读取时反序列化配置"""
+        from backend.core.utils.json_helpers import deserialize_json_field
+        return deserialize_json_field(v)
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True
+    )

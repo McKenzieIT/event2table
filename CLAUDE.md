@@ -1526,16 +1526,17 @@ npx playwright test --config=playwright.config.ts --dry-run  # 验证配置
 
 ## Architecture Details → 架构详情
 
-### 分层架构设计（V7.0）
+### 分层架构设计（V7.8 - Entity架构）
 
-项目采用严格的四层架构，实现关注点分离和高内聚低耦合：
+项目采用**精简四层架构** + **统一Entity模型**，实现关注点分离和类型安全：
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│              API Layer (HTTP端点)                    │
-│  backend/api/routes/                                 │
+│         API Layer (HTTP + GraphQL端点)               │
+│  - RESTful API: backend/api/routes/                  │
+│  - GraphQL API: backend/gql_api/ (V2)               │
 │  - 处理HTTP请求/响应                                  │
-│  - 参数解析和验证                                     │
+│  - 参数解析和验证 (Pydantic Entity)                   │
 │  - 调用Service层                                      │
 └─────────────────────────────────────────────────────┘
                          │
@@ -1545,44 +1546,71 @@ npx playwright test --config=playwright.config.ts --dry-run  # 验证配置
 │  backend/services/                                   │
 │  - 实现业务逻辑                                       │
 │  - 协调多个Repository                                │
-│  - 事务管理                                           │
+│  - 缓存管理 (@cached, @cache_invalidate)             │
+│  - Bloom Filter集成                                  │
 └─────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────┐
 │        Repository Layer (数据访问)                   │
 │  backend/models/repositories/                        │
+│  - GenericRepository基类                             │
 │  - 封装数据访问逻辑                                   │
 │  - CRUD操作                                          │
-│  - 复杂查询                                           │
+│  - 返回Entity对象 (而非字典) ⭐                       │
 └─────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────┐
-│           Schema Layer (数据验证)                    │
-│  backend/models/schemas.py                           │
-│  - Pydantic模型定义                                   │
-│  - 输入验证                                           │
+│      Entity Layer (统一数据模型) ⭐                    │
+│  - Pydantic Entity: backend/models/entities.py       │
+│  - 单一真相来源 (Schema + Domain Model)              │
+│  - 自动输入验证                                       │
 │  - 序列化/反序列化                                    │
 └─────────────────────────────────────────────────────┘
 ```
 
+**架构迁移状态**: 6/8核心模块已迁移到Entity架构 (75%)
+**详细信息**: [Entity迁移状态报告](docs/reports/2026-02-26/ENTITY-MIGRATION-STATUS.md)
+
 #### 各层职责
 
-**1. Schema层（数据验证）**
+**1. Entity层（统一数据模型）⭐**
 ```python
-# backend/models/schemas.py
+# backend/models/entities.py
 from pydantic import BaseModel, Field
+from typing import Optional, List
+from datetime import datetime
 
-class GameCreate(BaseModel):
-    """游戏创建Schema"""
-    gid: str = Field(..., min_length=1, max_length=50)
-    name: str = Field(..., min_length=1, max_length=100)
-    ods_db: Literal["ieu_ods", "overseas_ods"]
+class GameEntity(BaseModel):
+    """
+    游戏实体 - 全局唯一的模型定义
+    所有模块(GameService/GameRepository/API)都使用这个模型
+    """
+    # 主键
+    id: Optional[int] = None  # 数据库自增ID
 
-    @validator("name")
-    def sanitize_name(cls, v):
+    # 业务字段
+    gid: str = Field(..., min_length=1, max_length=50, description="游戏业务GID")
+    name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
+    ods_db: str = Field(..., pattern=r'^(ieu_ods|overseas_ods)$', description="ODS数据库")
+    description: Optional[str] = Field(None, description="游戏描述")
+    dwd_prefix: str = Field("dwd", description="DWD表前缀")
+
+    # 元数据
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    # 关联数据
+    event_count: Optional[int] = Field(0, description="事件数量统计")
+
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_validator('name')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
         """防止XSS攻击"""
+        import html
         return html.escape(v.strip())
 ```
 
@@ -1592,12 +1620,13 @@ class GameCreate(BaseModel):
 class GameRepository(GenericRepository):
     """游戏仓储类"""
 
-    def find_by_gid(self, gid: int) -> Optional[Dict[str, Any]]:
+    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
         """根据业务GID查询游戏"""
         query = "SELECT * FROM games WHERE gid = ?"
-        return fetch_one_as_dict(query, (gid,))
+        row = fetch_one_as_dict(query, (gid,))
+        return GameEntity(**row) if row else None  # ⭐ 返回Entity
 
-    def get_all_with_event_count(self) -> List[Dict[str, Any]]:
+    def get_all_with_event_count(self) -> List[GameEntity]:
         """获取所有游戏及其事件数量"""
         query = """
             SELECT g.*, COUNT(DISTINCT le.id) as event_count
@@ -1605,12 +1634,15 @@ class GameRepository(GenericRepository):
             LEFT JOIN log_events le ON g.id = le.game_id
             GROUP BY g.id
         """
-        return fetch_all_as_dict(query)
+        rows = fetch_all_as_dict(query)
+        return [GameEntity(**row) for row in rows]  # ⭐ 返回Entity列表
 ```
 
 **3. Service层（业务逻辑）**
 ```python
 # backend/services/games/game_service.py
+from backend.core.cache.decorators import cached, cache_invalidate
+
 class GameService:
     """游戏业务服务"""
 
@@ -1618,14 +1650,20 @@ class GameService:
         self.game_repo = GameRepository()
         self.event_repo = EventRepository()
 
-    def create_game(self, game_data: GameCreate) -> Dict[str, Any]:
+    @cached(ttl=1800)  # ⭐ 缓存装饰器
+    def get_games(self) -> List[GameEntity]:
+        """获取所有游戏（带缓存）"""
+        return self.game_repo.get_all()
+
+    @cache_invalidate  # ⭐ 自动清理缓存
+    def create_game(self, game_data: GameEntity) -> GameEntity:
         """
         创建游戏
 
         业务逻辑：
         1. 验证gid唯一性
         2. 创建游戏
-        3. 初始化默认配置
+        3. 清理缓存
         """
         # 检查gid是否已存在
         existing = self.game_repo.find_by_gid(game_data.gid)
@@ -1633,7 +1671,7 @@ class GameService:
             raise ValueError(f"Game gid {game_data.gid} already exists")
 
         # 创建游戏
-        game_id = self.game_repo.create(game_data.dict())
+        game_id = self.game_repo.create(game_data.model_dump())  # ⭐ Entity.model_dump()
 
         return self.game_repo.find_by_id(game_id)
 ```
@@ -1647,7 +1685,7 @@ def create_game():
     try:
         # 1. 解析和验证请求参数
         data = request.get_json()
-        game_data = GameCreate(**data)  # Pydantic验证
+        game_data = GameEntity(**data)  # ⭐ 使用Entity验证
 
         # 2. 调用Service层
         service = GameService()
@@ -1655,7 +1693,7 @@ def create_game():
 
         # 3. 返回响应
         return json_success_response(
-            data=GameResponse(**game).dict(),
+            data=game.model_dump(),  # ⭐ Entity.model_dump()
             message="Game created successfully"
         )
 
@@ -1667,6 +1705,17 @@ def create_game():
         logger.error(f"Error creating game: {e}")
         return json_error_response("Failed to create game", status_code=500)
 ```
+
+### Entity架构关键优势
+
+| 方面 | 旧DDD架构 | 新Entity架构 |
+|------|-----------|-------------|
+| **模型数量** | 3套 (Domain/Schema/Dict) | 1套统一Entity ✅ |
+| **Repository返回** | Dict[str, Any] | Entity对象 ✅ |
+| **类型安全** | 部分 | 完全 (Pydantic) ✅ |
+| **输入验证** | Schema单独验证 | Entity自动验证 ✅ |
+| **代码量** | 216行 | 130行 (-40%) ✅ |
+| **学习曲线** | 陡峭 (DDD概念) | 平缓 ✅ |
 
 ### HQL V2架构设计
 
