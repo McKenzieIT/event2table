@@ -1,6 +1,36 @@
 """
 HQL Preview V2 API Blueprint
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ ACTIVE API - NOT DEPRECATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This is an ACTIVE API module, used by the frontend HQL Preview components.
+
+Status: ✅ ACTIVE (as of 2026-03-01)
+Registered: backend/api/routes/__init__.py (line 33)
+Used by: frontend/src/shared/api/hqlApiV2.ts
+
+Endpoints:
+- POST /hql-preview-v2/api/generate - Generate HQL
+- POST /hql-preview-v2/api/generate-debug - Generate HQL with debug info
+- POST /hql-preview-v2/api/validate - Validate fields
+- GET  /hql-preview-v2/api/recommend-fields - Get field recommendations
+- POST /hql-preview-v2/api/generate-incremental - Generate incremental HQL
+- GET  /hql-preview-v2/api/status - Get service status
+- GET  /hql-preview-v2/api/cache-stats - Get cache statistics
+- POST /hql-preview-v2/api/cache-clear - Clear cache
+- POST /hql-preview-v2/api/analyze - Analyze events
+- POST /hql-preview-v2/api/preview - Preview HQL
+- POST /hql-preview-v2/api/history/save - Save to history
+- GET  /hql-preview-v2/api/history/list - List history
+- DELETE /hql-preview-v2/api/history/<id> - Delete history item
+- GET  /hql-preview-v2/api/history/search - Search history
+- GET  /hql-preview-v2/api/history/global - Get global history
+
+Note: This module is NOT deprecated. It's part of the HQL V2 architecture.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 新的HQL预览API，与现有API并行运行
 """
 

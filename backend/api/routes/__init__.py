@@ -11,7 +11,7 @@ Each module is responsible for a specific domain:
 - nodes: Canvas node management
 - flows: Flow management
 - hql_generation: HQL generation and validation
-- hql_preview_v2: New HQL preview V2 API (2026-02-06)
+- hql_preview_v2: ✅ ACTIVE HQL Preview V2 API (used by frontend, NOT deprecated)
 - field_builder: Field builder configurations
 - join_configs: Join configuration management
 """
