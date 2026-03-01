@@ -312,6 +312,77 @@ class HierarchicalCache:
         self.stats = {"l1_hits": 0, "l2_hits": 0, "misses": 0, "l1_evictions": 0}
         logger.info("📊 缓存统计已重置")
 
+    def set_raw(
+        self,
+        key: str,
+        value: Any,
+        ttl: Optional[int] = None,
+        level: str = "both"
+    ):
+        """
+        直接设置缓存值（不经过序列化）
+
+        用于预热系统批量写入已序列化的数据，避免重复序列化开销
+
+        Args:
+            key: 缓存键（完整键，包含前缀）
+            value: 缓存值（可以是bytes、str或已序列化的数据）
+            ttl: TTL（秒），None表示使用默认TTL
+            level: 缓存层级 ('l1', 'l2', 'both')
+
+        Raises:
+            ValueError: 如果level参数无效
+
+        Example:
+            >>> # 预热场景：批量写入已序列化的数据
+            >>> hierarchical_cache.set_raw('dwd_gen:v3:events:game_id:1', serialized_data, ttl=3600, level='both')
+        """
+        # 验证level参数
+        valid_levels = ['l1', 'l2', 'both']
+        if level not in valid_levels:
+            raise ValueError(f"Invalid level: {level}. Must be one of {valid_levels}")
+
+        # 设置TTL
+        l1_ttl = ttl if ttl is not None else self.l1_ttl
+        l2_ttl = ttl if ttl is not None else self.l2_ttl
+
+        # 写入L1缓存
+        if level in ['l1', 'both']:
+            self._set_l1_with_ttl(key, value, l1_ttl)
+            logger.debug(f"💾 L1 SET RAW: {key}")
+
+        # 写入L2缓存
+        if level in ['l2', 'both']:
+            cache = get_cache()
+            if cache is not None:
+                try:
+                    # 直接写入，不进行额外的序列化
+                    cache.set(key, value, timeout=l2_ttl)
+                    logger.debug(f"💾 L2 SET RAW: {key}")
+                except Exception as e:
+                    logger.warning(f"⚠️ L2缓存写入失败: {e}")
+
+    def _set_l1_with_ttl(self, key: str, data: Any, ttl: int):
+        """
+        写入L1缓存（带指定TTL和LRU淘汰）
+
+        Args:
+            key: 缓存键
+            data: 缓存数据
+            ttl: TTL（秒）
+        """
+        # 如果L1已满，删除最旧的条目
+        if len(self.l1_cache) >= self.l1_size:
+            oldest_key = min(self.l1_timestamps, key=self.l1_timestamps.get)
+            del self.l1_cache[oldest_key]
+            del self.l1_timestamps[oldest_key]
+            self.stats["l1_evictions"] += 1
+            logger.debug(f"🗑️ L1淘汰: {oldest_key}")
+
+        # 写入缓存
+        self.l1_cache[key] = data
+        self.l1_timestamps[key] = time.time()
+
 
 # 全局分层缓存实例
 hierarchical_cache = HierarchicalCache()

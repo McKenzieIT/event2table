@@ -11,6 +11,7 @@ Core endpoints:
 """
 
 import logging
+import re
 
 from flask import request
 
@@ -26,6 +27,9 @@ from backend.core.utils import (
 # Import cached HQL service
 from backend.services.hql.hql_service_cached import HQLServiceCached
 
+# Import HQL Facade for HQL generation
+from backend.services.hql.hql_facade import HQLFacade
+
 # Import the parent blueprint
 from .. import api_bp
 
@@ -37,50 +41,103 @@ hql_service = HQLServiceCached()
 
 @api_bp.route("/api/generate", methods=["POST"])
 def api_generate_hql():
-    """API: Generate HQL scripts for selected events and joins"""
+    """API: Generate HQL scripts for selected events and joins
+
+    Request body:
+    {
+        "selected_events": [{"event_name": "login", "table_name": "ods_10000147_all_view"}],
+        "selected_fields": [{"param_name": "zone_id", "param_type": "param", "json_path": "$.zoneId"}],
+        "selected_conditions": [{"field": "zone_id", "operator": "=", "value": "1"}],
+        "date_str": "${bizdate}",
+        "mode": "single"  # or "join", "union"
+    }
+
+    Response:
+    {
+        "success": true,
+        "data": {
+            "hql": "CREATE OR REPLACE VIEW ...",
+            "tables": ["dwd.v_dwd_10000147_login_di"]
+        }
+    }
+    """
     is_valid, data, error = validate_json_request()
     if not is_valid:
         return json_error_response(error)
 
     selected_events = data.get("selected_events", [])
-    selected_joins = data.get("selected_joins", [])
+    selected_fields = data.get("selected_fields", [])
+    selected_conditions = data.get("selected_conditions", [])
     date_str = data.get("date_str", "${bizdate}")
+    mode = data.get("mode", "single")
 
-    if not selected_events and not selected_joins:
-        return json_error_response("No events or joins selected", status_code=400)
+    if not selected_events:
+        return json_error_response("No events selected", status_code=400)
 
     try:
-        # Simplified implementation: Return event and join configuration info
-        results = {
-            "selected_events": selected_events,
-            "selected_joins": selected_joins,
-            "date": date_str,
-            "message": "HQL generation endpoint - requires implementation with HQLManager",
-        }
+        # Use HQLFacade for HQL generation
+        hql_facade = HQLFacade()
+
+        # Convert input to HQL models
+        from backend.services.hql.models.event import Event, Field, Condition
+
+        events = [
+            Event(
+                name=e.get("event_name"),
+                table_name=e.get("table_name")
+            )
+            for e in selected_events
+        ]
+
+        fields = []
+        if selected_fields:
+            for f in selected_fields:
+                field_kwargs = {
+                    "name": f.get("param_name"),
+                    "type": f.get("param_type", "param")
+                }
+                if f.get("json_path"):
+                    field_kwargs["json_path"] = f.get("json_path")
+                fields.append(Field(**field_kwargs))
+
+        conditions = []
+        if selected_conditions:
+            for c in selected_conditions:
+                conditions.append(
+                    Condition(
+                        field=c.get("field"),
+                        operator=c.get("operator", "="),
+                        value=c.get("value")
+                    )
+                )
+
+        # Generate HQL using HQLFacade
+        result = hql_facade.generate_hql(
+            events=events,
+            fields=fields,
+            conditions=conditions,
+            mode=mode,
+            date_str=date_str
+        )
 
         return json_success_response(
-            data=results, message=f"Generated {len(results)} HQL files"
+            data={"hql": result["hql"], "tables": result.get("tables", [])},
+            message="Generated HQL successfully"
         )
     except Exception as e:
         logger.error(f"Error generating HQL: {e}", exc_info=True)
-        return json_error_response("An internal error occurred", status_code=500)
+        return json_error_response("Failed to generate HQL", status_code=500)
 
 
 @api_bp.route("/api/hql/<int:id>", methods=["GET"])
 def api_get_hql(id):
-    """API: Get HQL content by ID"""
+    """API: Get HQL content by ID
+
+    Note: This endpoint uses direct database access as a simple fallback.
+    In the future, this should be migrated to use HQLRepository or HQLService.
+    """
     try:
-        from backend.services.hql.manager import hql_manager
-
-        hql_content = hql_manager.get_hql_content(id)
-
-        if hql_content:
-            return json_success_response(data=hql_content)
-        else:
-            return json_error_response("HQL not found", status_code=404)
-    except ImportError:
-        logger.warning("hql_manager not available, using fallback")
-        # Fallback: query from hql_statements table
+        # Query from hql_statements table
         hql = fetch_one_as_dict(
             """
             SELECT * FROM hql_statements
@@ -223,14 +280,12 @@ def api_validate_hql():
 
 @api_bp.route("/api/hql/<int:id>/deactivate", methods=["POST"])
 def api_deactivate_hql(id):
-    """API: Deactivate an HQL statement"""
-    try:
-        from backend.services.hql.manager import hql_manager
+    """API: Deactivate an HQL statement
 
-        hql_manager.deactivate_hql(id)
-        return json_success_response(message="HQL deactivated successfully")
-    except ImportError:
-        logger.warning("hql_manager not available, using fallback")
+    Note: This endpoint uses direct database access as a simple fallback.
+    In the future, this should be migrated to use HQLRepository or HQLService.
+    """
+    try:
         from backend.core.utils import execute_write
 
         execute_write("UPDATE hql_statements SET is_active = 0 WHERE id = ?", (id,))
@@ -242,7 +297,11 @@ def api_deactivate_hql(id):
 
 @api_bp.route("/api/hql/<int:id>/activate", methods=["POST"])
 def api_activate_hql(id):
-    """API: Activate an HQL statement"""
+    """API: Activate an HQL statement
+
+    Note: This endpoint uses direct database access as a simple fallback.
+    In the future, this should be migrated to use HQLRepository or HQLService.
+    """
     try:
         current = fetch_one_as_dict(
             """

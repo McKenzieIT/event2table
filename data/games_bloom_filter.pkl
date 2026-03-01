@@ -1,1 +1,0 @@
-{"size": 100000, "item_count": 0, "last_rebuild": null, "rebuild_count": 0, "version": "3.0"}

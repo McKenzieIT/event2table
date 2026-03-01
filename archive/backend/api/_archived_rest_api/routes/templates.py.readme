@@ -1,0 +1,24 @@
+归档日期: 2026-02-21
+归档原因: 已迁移到GraphQL
+GraphQL实现: backend/gql_api/queries/template_queries.py, backend/gql_api/mutations/template_mutations.py
+测试覆盖: backend/tests/test_graphql_schema.py
+
+迁移说明:
+- Templates模块已完全迁移到GraphQL API
+- 所有REST端点已被GraphQL Query和Mutation替代
+- 缓存集成已完成
+
+GraphQL端点:
+- POST /api/graphql
+- GraphiQL IDE: /api/graphiql
+
+GraphQL操作:
+Query:
+  - template(id: Int!): Template
+  - templates(gameGid: Int, category: String, search: String, limit: Int, offset: Int): [Template]
+  - searchTemplates(query: String!, gameGid: Int): [Template]
+
+Mutation:
+  - createTemplate(name: String!, description: String, category: String, gameGid: Int, config: String): CreateTemplatePayload
+  - updateTemplate(id: Int!, ...): UpdateTemplatePayload
+  - deleteTemplate(id: Int!): DeleteTemplatePayload

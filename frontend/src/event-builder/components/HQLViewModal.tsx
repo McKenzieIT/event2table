@@ -11,7 +11,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import toast from "react-hot-toast";
 import { eventNodesApi } from "@shared/api/eventNodes";
-import { Button } from "@shared/ui/Button";
+import { Button } from "@shared/ui";
 import { COPY_NOTIFICATION_DURATION } from "@shared/constants/timeouts";
 
 /**

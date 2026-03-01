@@ -583,7 +583,7 @@ class HQLHistoryEntity(BaseModel):
     支持JSON字段自动序列化:
     - events_json: List[Dict] → JSON字符串
     - fields_json: List[Dict] → JSON字符串
-    - conditions_json: Dict → JSON字符串
+    - conditions_json: List[Dict] → JSON字符串 (条件配置列表)
     - metadata_json: Dict → JSON字符串
     """
 
@@ -605,7 +605,7 @@ class HQLHistoryEntity(BaseModel):
     # JSON字段 (存储为JSON字符串)
     events_json: List[Dict[str, Any]] = Field(default_factory=list, description="事件配置")
     fields_json: List[Dict[str, Any]] = Field(default_factory=list, description="字段配置")
-    conditions_json: Optional[Dict[str, Any]] = Field(None, description="条件配置")
+    conditions_json: List[Dict[str, Any]] = Field(default_factory=list, description="条件配置列表")
     metadata_json: Optional[Dict[str, Any]] = Field(None, description="元数据")
 
     # 性能指标
@@ -623,14 +623,14 @@ class HQLHistoryEntity(BaseModel):
             return html.escape(v.strip())
         return v
 
-    @field_validator('events_json', 'fields_json', mode='before')
+    @field_validator('events_json', 'fields_json', 'conditions_json', mode='before')
     @classmethod
     def deserialize_json_list(cls, v):
         """从数据库读取时反序列化JSON列表"""
         from backend.core.utils.json_helpers import deserialize_json_field
         return deserialize_json_field(v)
 
-    @field_validator('conditions_json', 'metadata_json', mode='before')
+    @field_validator('metadata_json', mode='before')
     @classmethod
     def deserialize_json_dict(cls, v):
         """从数据库读取时反序列化JSON字典"""
@@ -653,6 +653,7 @@ class EventCategoryEntity(BaseModel):
     事件类别实体 - 全局唯一的事件类别模型定义
 
     用于事件的分类管理，如"充值/付费"、"任务系统"等
+    支持全局分类和游戏级别分类
     """
 
     # 主键
@@ -660,14 +661,20 @@ class EventCategoryEntity(BaseModel):
 
     # 业务字段
     name: str = Field(..., min_length=1, max_length=50, description="类别名称(唯一)")
+    game_gid: Optional[int] = Field(None, description="游戏GID，用于游戏级别的分类")
     name_cn: Optional[str] = Field(None, max_length=100, description="中文名称")
     description: Optional[str] = Field(None, description="类别描述")
     color: Optional[str] = Field(None, max_length=20, description="显示颜色")
     icon: Optional[str] = Field(None, max_length=50, description="图标名称")
+    is_active: bool = Field(True, description="是否活跃")
+    display_order: int = Field(0, description="显示顺序")
 
     # 元数据
     created_at: Optional[datetime] = Field(None, description="创建时间")
     updated_at: Optional[datetime] = Field(None, description="更新时间")
+
+    # 统计信息（仅在查询时填充，不写入数据库）
+    event_count: Optional[int] = Field(default=0, description="该类别下的事件数量", exclude=True)
 
     @field_validator('name', 'name_cn', mode='before')
     @classmethod

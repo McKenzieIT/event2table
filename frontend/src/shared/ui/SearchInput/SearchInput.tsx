@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript检查暂禁用
 /**
  * SearchInput Component - 全功能搜索输入组件
  *
@@ -27,21 +26,31 @@
  * />
  */
 
-import React, { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import React, { useState, useEffect, useCallback, useRef, ReactNode, KeyboardEvent, ChangeEvent } from 'react';
 import './SearchInput.css';
 
 /**
  * SearchInput Props Interface
  */
 interface SearchInputProps {
+  /** 当前输入值 */
   value?: string;
+  /** 值变化回调（防抖后触发） */
   onChange?: (value: string) => void;
+  /** 占位符文本 */
   placeholder?: string;
+  /** 清除按钮回调 */
   onClear?: () => void;
+  /** 防抖延迟时间（毫秒），默认300ms */
   debounceMs?: number;
+  /** 自定义搜索图标 */
   icon?: ReactNode;
+  /** 是否禁用 */
   disabled?: boolean;
+  /** 自定义类名 */
   className?: string;
+  /** HTML input属性 */
+  [key: string]: any;
 }
 
 /**
@@ -68,21 +77,21 @@ function SearchInput({
   const [isFocused, setIsFocused] = useState(false);
   const [showClearButton, setShowClearButton] = useState(false);
   const [internalValue, setInternalValue] = useState(value);
-  
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 使用useEffect处理防抖
   useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     if (onChange && internalValue !== value) {
       timeoutRef.current = setTimeout(() => {
         onChange(internalValue);
       }, debounceMs);
     }
-    
+
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -115,7 +124,7 @@ function SearchInput({
   }, []);
 
   // 处理快捷键
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       inputRef.current?.focus();
@@ -154,7 +163,7 @@ function SearchInput({
         className={inputClass}
         placeholder={placeholder}
         value={internalValue}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
         onFocus={handleFocus}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}

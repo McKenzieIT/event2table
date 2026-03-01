@@ -12,6 +12,11 @@ Core endpoints:
 - POST /api/event-parameters/<int:id>/rollback - Rollback parameter version
 - GET /api/event-parameters/<int:id>/validation-rules - Get validation rules
 - POST /api/event-parameters/<int:id>/validation-rules - Create validation rule
+
+Architecture Update (2026-02-28):
+- Migrated to use ParameterService instead of EventParamManager
+- Uses unified Entity model (ParameterEntity)
+- Service layer handles business logic and caching
 """
 
 import logging
@@ -28,6 +33,9 @@ from backend.core.utils import (
     json_error_response,
     json_success_response,
 )
+
+# Import ParameterService for business logic
+from backend.services.parameters.parameter_service import ParameterService
 
 sys.path.append("..")
 try:
@@ -46,19 +54,37 @@ logger = logging.getLogger(__name__)
 
 @api_bp.route("/api/event-parameters/<int:id>", methods=["PUT"])
 def api_update_event_parameter(id):
-    """API: 更新事件参数"""
+    """
+    API: 更新事件参数
+
+    Uses ParameterService for business logic and cache management.
+    """
     try:
-        from backend.services.parameters import event_param_manager
-
+        service = ParameterService()
         data = request.get_json()
-        change_reason = data.get("change_reason", "更新参数")
 
-        success = event_param_manager.update_parameter(id, data, change_reason)
+        # Extract update data
+        update_data = {}
+        if "param_name" in data:
+            update_data["name"] = data["param_name"]
+        if "param_name_cn" in data:
+            update_data["param_name_cn"] = data["param_name_cn"]
+        if "param_type" in data:
+            update_data["param_type"] = data["param_type"]
+        if "json_path" in data:
+            update_data["json_path"] = data["json_path"]
 
-        if success:
-            return json_success_response(message="参数更新成功")
-        else:
-            return json_error_response("参数不存在", status_code=404)
+        # Update parameter via service
+        updated_param = service.update_parameter(id, update_data)
+
+        return json_success_response(
+            data=updated_param.model_dump(),
+            message="参数更新成功"
+        )
+
+    except ValueError as e:
+        logger.error(f"Validation error updating event parameter {id}: {e}")
+        return json_error_response(str(e), status_code=404)
     except Exception as e:
         logger.error(f"Error updating event parameter {id}: {e}", exc_info=True)
         return json_error_response("An internal error occurred", status_code=500)
@@ -66,17 +92,26 @@ def api_update_event_parameter(id):
 
 @api_bp.route("/api/event-parameters/<int:id>", methods=["DELETE"])
 def api_delete_event_parameter(id):
-    """API: 删除事件参数"""
-    try:
-        from backend.services.parameters import event_param_manager
+    """
+    API: 删除事件参数
 
-        success = event_param_manager.delete_parameter(id)
+    Uses ParameterService for business logic and cache management.
+    """
+    try:
+        service = ParameterService()
+
+        # Delete parameter via service
+        success = service.delete_parameter(id)
 
         if success:
             clear_cache_pattern("dashboard_statistics")
             return json_success_response(message="参数删除成功")
         else:
             return json_error_response("参数不存在", status_code=404)
+
+    except ValueError as e:
+        logger.error(f"Validation error deleting event parameter {id}: {e}")
+        return json_error_response(str(e), status_code=404)
     except Exception as e:
         logger.error(f"Error deleting event parameter {id}: {e}", exc_info=True)
         return json_error_response("An internal error occurred", status_code=500)
@@ -84,7 +119,12 @@ def api_delete_event_parameter(id):
 
 @api_bp.route("/api/event-parameters/<int:id>/history", methods=["GET"])
 def api_get_parameter_history(id):
-    """API: 获取参数变更历史"""
+    """
+    API: 获取参数变更历史
+
+    NOTE: Still using EventParamManager for history tracking.
+    TODO: Migrate to ParameterService when history tracking is implemented.
+    """
     try:
         from backend.services.parameters import event_param_manager
 
@@ -98,7 +138,12 @@ def api_get_parameter_history(id):
 
 @api_bp.route("/api/event-parameters/<int:id>/config", methods=["GET"])
 def api_get_parameter_config(id):
-    """API: 获取参数配置"""
+    """
+    API: 获取参数配置
+
+    NOTE: Still using EventParamManager for config management.
+    TODO: Migrate to ParameterService when config management is implemented.
+    """
     try:
         from backend.services.parameters import event_param_manager
 
@@ -112,7 +157,12 @@ def api_get_parameter_config(id):
 
 @api_bp.route("/api/event-parameters/<int:id>/config", methods=["PUT"])
 def api_set_parameter_config(id):
-    """API: 设置参数配置"""
+    """
+    API: 设置参数配置
+
+    NOTE: Still using EventParamManager for config management.
+    TODO: Migrate to ParameterService when config management is implemented.
+    """
     try:
         from backend.services.parameters import event_param_manager
 
@@ -130,7 +180,12 @@ def api_set_parameter_config(id):
 
 @api_bp.route("/api/event-parameters/<int:id>/rollback", methods=["POST"])
 def api_rollback_parameter(id):
-    """API: 回滚参数到指定版本"""
+    """
+    API: 回滚参数到指定版本
+
+    NOTE: Still using EventParamManager for rollback functionality.
+    TODO: Migrate to ParameterService when rollback is implemented.
+    """
     try:
         from backend.services.parameters import event_param_manager
 

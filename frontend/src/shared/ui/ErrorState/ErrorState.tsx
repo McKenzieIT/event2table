@@ -1,6 +1,6 @@
 // @ts-nocheck - TypeScript检查暂禁用
 import React from 'react';
-import { Button } from '../Button/Button';
+import { Button } from '@shared/ui';
 import './ErrorState.css';
 
 interface ErrorStateProps {

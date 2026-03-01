@@ -14,7 +14,7 @@
 
 import React, { useState, useMemo, useCallback, ReactElement } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BaseModal, Button, Input, Checkbox, useToast, SearchInput, Skeleton } from '@shared/ui';
+import { BaseModal, Button, Input, Checkbox, useToast, SearchInput, Skeleton, EmptyState } from '@shared/ui';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import { useGameStore } from '../../stores/gameStore';
 import { AddGameModal } from './AddGameModal';
@@ -420,7 +420,10 @@ const GameManagementModal: React.FC<GameManagementModalProps> = ({ isOpen, onClo
                 <Skeleton type="card" count={3} />
               </div>
             ) : filteredGames.length === 0 ? (
-              <div className="empty-state">暂无游戏</div>
+              <EmptyState
+                icon={<i className="bi bi-inbox" style={{ fontSize: '48px' }} />}
+                title="暂无游戏"
+              />
             ) : (
               filteredGames.map(game => (
                 <div

@@ -58,16 +58,17 @@ from backend.core.cache.invalidator import cache_invalidator_enhanced
 from backend.core.cache.statistics import cache_statistics
 from backend.core.config.config import CacheConfig
 
-logger = logging.getLogger(__name__)
+# Import the api_bp to register routes directly
+from .. import api_bp
 
-cache_bp = Blueprint('cache', __name__)
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
 # 缓存统计API
 # ============================================================================
 
-@cache_bp.route('/api/cache/stats', methods=['GET'])
+@api_bp.route('/api/cache/stats', methods=['GET'])
 def get_cache_stats():
     """
     获取缓存统计信息
@@ -146,7 +147,7 @@ def get_cache_stats():
         }), 500
 
 
-@cache_bp.route('/api/cache/stats/detailed', methods=['GET'])
+@api_bp.route('/api/cache/stats/detailed', methods=['GET'])
 def get_detailed_stats():
     """
     获取详细统计信息
@@ -195,7 +196,7 @@ def get_detailed_stats():
 # 缓存键管理API
 # ============================================================================
 
-@cache_bp.route('/api/cache/keys', methods=['GET'])
+@api_bp.route('/api/cache/keys', methods=['GET'])
 def list_cache_keys():
     """
     列出所有缓存键
@@ -253,7 +254,7 @@ def list_cache_keys():
         }), 500
 
 
-@cache_bp.route('/api/cache/keys/search', methods=['GET'])
+@api_bp.route('/api/cache/keys/search', methods=['GET'])
 def search_cache_keys():
     """
     搜索缓存键
@@ -322,7 +323,7 @@ def search_cache_keys():
         }), 500
 
 
-@cache_bp.route('/api/cache/keys/<path:key>', methods=['GET'])
+@api_bp.route('/api/cache/keys/<path:key>', methods=['GET'])
 def get_cache_key_detail(key: str):
     """
     获取单个缓存键详情
@@ -392,7 +393,7 @@ def get_cache_key_detail(key: str):
         }), 500
 
 
-@cache_bp.route('/api/cache/keys/<path:key>', methods=['DELETE'])
+@api_bp.route('/api/cache/keys/<path:key>', methods=['DELETE'])
 def delete_cache_key(key: str):
     """
     删除单个缓存键
@@ -443,7 +444,7 @@ def delete_cache_key(key: str):
 # 缓存清理API
 # ============================================================================
 
-@cache_bp.route('/api/cache/clear', methods=['POST'])
+@api_bp.route('/api/cache/clear', methods=['POST'])
 def clear_all_cache():
     """
     清空所有缓存
@@ -487,7 +488,7 @@ def clear_all_cache():
 # 缓存失效API
 # ============================================================================
 
-@cache_bp.route('/api/cache/invalidate/game/<int:game_gid>', methods=['POST'])
+@api_bp.route('/api/cache/invalidate/game/<int:game_gid>', methods=['POST'])
 def invalidate_game_cache(game_gid: int):
     """
     失效游戏相关的所有缓存
@@ -525,7 +526,7 @@ def invalidate_game_cache(game_gid: int):
         }), 500
 
 
-@cache_bp.route('/api/cache/invalidate/event/<int:event_id>', methods=['POST'])
+@api_bp.route('/api/cache/invalidate/event/<int:event_id>', methods=['POST'])
 def invalidate_event_cache(event_id: int):
     """
     失效事件相关的所有缓存
@@ -583,7 +584,7 @@ def invalidate_event_cache(event_id: int):
 # 监控和告警API
 # ============================================================================
 
-@cache_bp.route('/api/cache/monitoring/alerts', methods=['GET'])
+@api_bp.route('/api/cache/monitoring/alerts', methods=['GET'])
 def get_alerts():
     """
     获取当前告警列表
@@ -598,7 +599,7 @@ def get_alerts():
     try:
         from backend.core.cache.monitoring import get_cache_alert_manager
 
-        alert_manager = get_cache_alert_manager()
+        alert_manager = get_cache_alert_manager(hierarchical_cache)
         alerts = alert_manager.get_active_alerts()
 
         return jsonify({
@@ -617,7 +618,7 @@ def get_alerts():
         }), 500
 
 
-@cache_bp.route('/api/cache/monitoring/metrics', methods=['GET'])
+@api_bp.route('/api/cache/monitoring/metrics', methods=['GET'])
 def get_metrics():
     """
     获取Prometheus格式的指标
@@ -628,7 +629,7 @@ def get_metrics():
     try:
         from backend.core.cache.monitoring import get_cache_alert_manager, export_prometheus_metrics
 
-        alert_manager = get_cache_alert_manager()
+        alert_manager = get_cache_alert_manager(hierarchical_cache)
         metrics = export_prometheus_metrics(alert_manager)
 
         return metrics, 200, {'Content-Type': 'text/plain'}
@@ -642,7 +643,7 @@ def get_metrics():
         }), 500
 
 
-@cache_bp.route('/api/cache/monitoring/trends', methods=['GET'])
+@api_bp.route('/api/cache/monitoring/trends', methods=['GET'])
 def get_trends():
     """
     获取性能趋势数据
@@ -661,7 +662,7 @@ def get_trends():
 
         hours = int(request.args.get('hours', 24))
 
-        alert_manager = get_cache_alert_manager()
+        alert_manager = get_cache_alert_manager(hierarchical_cache)
         summary = alert_manager.get_metrics_summary()
 
         return jsonify({
@@ -684,7 +685,7 @@ def get_trends():
 # 容量监控API
 # ============================================================================
 
-@cache_bp.route('/api/cache/capacity/l1', methods=['GET'])
+@api_bp.route('/api/cache/capacity/l1', methods=['GET'])
 def get_l1_capacity():
     """
     获取L1容量详情
@@ -699,6 +700,20 @@ def get_l1_capacity():
         from backend.core.cache.capacity_monitor import get_capacity_monitor
 
         monitor = get_capacity_monitor()
+        if monitor is None:
+            # Capacity monitor not initialized (e.g., in test environment)
+            return jsonify({
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "capacity": {
+                    "current_size": 0,
+                    "max_size": 1000,
+                    "usage_percent": 0.0,
+                    "status": "not_initialized"
+                },
+                "message": "Capacity monitor not initialized"
+            })
+
         stats = monitor.get_capacity_stats()
 
         return jsonify({
@@ -716,7 +731,7 @@ def get_l1_capacity():
         }), 500
 
 
-@cache_bp.route('/api/cache/capacity/l2', methods=['GET'])
+@api_bp.route('/api/cache/capacity/l2', methods=['GET'])
 def get_l2_capacity():
     """
     获取L2容量详情
@@ -731,6 +746,20 @@ def get_l2_capacity():
         from backend.core.cache.capacity_monitor import get_capacity_monitor
 
         monitor = get_capacity_monitor()
+        if monitor is None:
+            # Capacity monitor not initialized (e.g., in test environment)
+            return jsonify({
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "capacity": {
+                    "current_size": 0,
+                    "max_size": 1000000,
+                    "usage_percent": 0.0,
+                    "status": "not_initialized"
+                },
+                "message": "Capacity monitor not initialized"
+            })
+
         stats = monitor.get_capacity_stats()
 
         return jsonify({
@@ -748,7 +777,7 @@ def get_l2_capacity():
         }), 500
 
 
-@cache_bp.route('/api/cache/capacity/prediction', methods=['GET'])
+@api_bp.route('/api/cache/capacity/prediction', methods=['GET'])
 def get_capacity_prediction():
     """
     获取容量预测
@@ -768,6 +797,20 @@ def get_capacity_prediction():
         days = int(request.args.get('days', 7))
 
         monitor = get_capacity_monitor()
+        if monitor is None:
+            # Capacity monitor not initialized (e.g., in test environment)
+            return jsonify({
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "prediction_days": days,
+                "prediction": {
+                    "days_until_exhaustion_l1": -1,
+                    "days_until_exhaustion_l2": -1,
+                    "status": "not_initialized"
+                },
+                "message": "Capacity monitor not initialized"
+            })
+
         prediction = monitor.predict_capacity_limit(days=days)
 
         return jsonify({
@@ -790,7 +833,7 @@ def get_capacity_prediction():
 # 布隆过滤器API
 # ============================================================================
 
-@cache_bp.route('/api/cache/bloom-filter/rebuild', methods=['POST'])
+@api_bp.route('/api/cache/bloom-filter/rebuild', methods=['POST'])
 def rebuild_bloom_filter():
     """
     手动重建布隆过滤器
@@ -826,7 +869,7 @@ def rebuild_bloom_filter():
         }), 500
 
 
-@cache_bp.route('/api/cache/bloom-filter/stats', methods=['GET'])
+@api_bp.route('/api/cache/bloom-filter/stats', methods=['GET'])
 def get_bloom_filter_stats():
     """
     获取布隆过滤器统计
@@ -862,7 +905,7 @@ def get_bloom_filter_stats():
 # 智能预热API
 # ============================================================================
 
-@cache_bp.route('/api/cache/warm-up/predict', methods=['POST'])
+@api_bp.route('/api/cache/warm-up/predict', methods=['POST'])
 def predict_hot_keys():
     """
     预测热点键
@@ -913,7 +956,7 @@ def predict_hot_keys():
         }), 500
 
 
-@cache_bp.route('/api/cache/warm-up/execute', methods=['POST'])
+@api_bp.route('/api/cache/warm-up/execute', methods=['POST'])
 def execute_warm_up():
     """
     执行预热任务
@@ -980,7 +1023,7 @@ def execute_warm_up():
 # 降级管理API
 # ============================================================================
 
-@cache_bp.route('/api/cache/degradation/status', methods=['GET'])
+@api_bp.route('/api/cache/degradation/status', methods=['GET'])
 def get_degradation_status():
     """
     获取降级状态
@@ -1012,7 +1055,7 @@ def get_degradation_status():
         }), 500
 
 
-@cache_bp.route('/api/cache/degradation/switch', methods=['POST'])
+@api_bp.route('/api/cache/degradation/switch', methods=['POST'])
 def switch_degradation():
     """
     手动切换降级模式
@@ -1067,4 +1110,4 @@ def switch_degradation():
         }), 500
 
 
-logger.info("✅ 缓存管理API路由已加载 (2.0.0)")
+logger.info("✅ 缓存管理API路由已加载 (2.0.0) - registered to api_bp")

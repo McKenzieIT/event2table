@@ -1,16 +1,23 @@
-// @ts-nocheck - TypeScript检查暂禁用
 import React, { useEffect, useRef } from 'react';
-import { Button } from '../Button/Button';
+import { Button } from '@shared/ui';
 import './ConfirmDialog.css';
 
 interface ConfirmDialogProps {
+  /** 对话框是否打开 */
   open: boolean;
+  /** 对话框标题 */
   title: string;
+  /** 对话框消息内容 */
   message: string;
+  /** 确认按钮文本，默认为"确认" */
   confirmText?: string;
+  /** 取消按钮文本，默认为"取消" */
   cancelText?: string;
+  /** 对话框变体类型，默认为"primary" */
   variant?: 'danger' | 'warning' | 'info' | 'primary';
+  /** 确认按钮回调函数 */
   onConfirm: () => void;
+  /** 取消按钮回调函数 */
   onCancel: () => void;
 }
 
@@ -24,17 +31,10 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  const dialogRef = useRef(null);
-  const confirmButtonRef = useRef(null);
-  const cancelButtonRef = useRef(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
-      // 聚焦到确认按钮
-      setTimeout(() => {
-        confirmButtonRef.current?.focus();
-      }, 50);
-      
       // 锁定body滚动
       document.body.style.overflow = 'hidden';
     } else {
@@ -49,9 +49,9 @@ export function ConfirmDialog({
 
   // 处理ESC键
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return;
-      
+
       if (e.key === 'Escape') {
         onCancel();
       }
@@ -63,16 +63,24 @@ export function ConfirmDialog({
 
   if (!open) return null;
 
+  const handleOverlayClick = () => {
+    onCancel();
+  };
+
+  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div 
-      className="modal-overlay" 
-      onClick={onCancel}
+    <div
+      className="modal-overlay"
+      onClick={handleOverlayClick}
       role="presentation"
     >
-      <div 
+      <div
         ref={dialogRef}
-        className="modal-content" 
-        onClick={e => e.stopPropagation()}
+        className="modal-content"
+        onClick={handleContentClick}
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
@@ -85,16 +93,14 @@ export function ConfirmDialog({
           <p id="confirm-dialog-message">{message}</p>
         </div>
         <div className="modal-footer">
-          <Button 
-            ref={cancelButtonRef}
-            variant="secondary" 
+          <Button
+            variant="secondary"
             onClick={onCancel}
           >
             {cancelText}
           </Button>
-          <Button 
-            ref={confirmButtonRef}
-            variant={variant === 'danger' ? 'danger' : variant} 
+          <Button
+            variant={variant === 'danger' ? 'danger' : variant}
             onClick={onConfirm}
           >
             {confirmText}

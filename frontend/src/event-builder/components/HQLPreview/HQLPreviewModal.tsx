@@ -1,0 +1,552 @@
+/**
+ * HQLPreviewModal Component
+ * HQL预览全屏模态框（支持编辑和多模式切换）
+ */
+import React, { useState, useEffect } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import CodeMirror from '@uiw/react-codemirror';
+import toast from 'react-hot-toast';
+import './HQLPreviewModal.css';
+import { BaseModal } from '@shared/ui/BaseModal';
+import PerformanceIndicator from '../HQLPreviewV2/PerformanceIndicator';
+import DebugViewer from '../HQLPreviewV2/DebugViewer';
+import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
+
+// ========== 类型定义 ==========
+
+/** 字段配置 */
+export interface CanvasField {
+  id?: number;
+  fieldName?: string;
+  name?: string;
+  dataType?: string;
+  fieldType?: string;
+  type?: string;
+  jsonPath?: string;
+  json_path?: string;
+  customExpression?: string;
+  custom_expression?: string;
+  alias?: string;
+}
+
+/** WHERE条件 */
+export interface WhereCondition {
+  field: string;
+  operator: string;
+  value: any;
+  logicalOp?: string;
+}
+
+/** 游戏数据 */
+export interface GameData {
+  gid: number;
+  ods_db?: string;
+}
+
+/** 事件对象 */
+export interface SelectedEvent {
+  id: number;
+  event_name?: string;
+}
+
+/** 性能报告 */
+export interface PerformanceReport {
+  score: number;
+  issues?: PerformanceIssue[];
+  [key: string]: any;
+}
+
+/** 性能问题 */
+export interface PerformanceIssue {
+  type?: string;
+  message: string;
+  suggestion?: string;
+}
+
+/** 调试跟踪步骤 */
+export interface DebugStep {
+  step: string;
+  result?: any;
+  count?: number;
+  duration?: number;
+  [key: string]: any;
+}
+
+/** 调试跟踪 */
+export interface DebugTrace {
+  steps?: DebugStep[];
+  events?: any[];
+  fields?: any[];
+  [key: string]: any;
+}
+
+/** 组件Props */
+export interface HQLPreviewModalProps {
+  /** 是否打开模态框 */
+  isOpen: boolean;
+  /** 关闭回调 */
+  onClose: () => void;
+  /** 画布字段 */
+  canvasFields?: CanvasField[];
+  /** WHERE条件 */
+  whereConditions?: WhereCondition[];
+  /** 游戏数据 */
+  gameData?: GameData;
+  /** 选中事件 */
+  selectedEvent?: SelectedEvent | null;
+  /** 是否使用V2 API */
+  useV2API?: boolean;
+}
+
+/** Tab类型 */
+type TabType = 'SELECT' | 'CREATE_TABLE' | 'CREATE_VIEW' | 'INSERT';
+
+/** HQL输出映射 */
+interface HQLOutputs {
+  [key: string]: string;
+}
+
+// ========== 组件 ==========
+
+export default function HQLPreviewModal({
+  isOpen,
+  onClose,
+  canvasFields = [],
+  whereConditions = [],
+  gameData,
+  selectedEvent,
+  useV2API = false
+}: HQLPreviewModalProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('SELECT');
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [hqlOutputs, setHqlOutputs] = useState<HQLOutputs>({});
+  const [currentHQL, setCurrentHQL] = useState<string>('');
+  const [showConflict, setShowConflict] = useState<boolean>(false);
+
+  // V2 API 特有状态
+  const [performanceReport, setPerformanceReport] = useState<PerformanceReport | null>(null);
+  const [debugTrace, setDebugTrace] = useState<DebugTrace | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // 生成所有模式的HQL（带防抖优化 - 500ms）
+  useEffect(() => {
+    if (!isOpen || !canvasFields.length) return;
+
+    const timeoutId = setTimeout(async () => {
+      if (useV2API) {
+        // 使用 V2 API 生成 HQL
+        await generateHQLWithV2API();
+      } else {
+        // 使用 V1 前端生成（原有逻辑）
+        const mockHQL: HQLOutputs = {
+          SELECT: generateSELECTHQL(canvasFields, whereConditions, gameData, selectedEvent),
+          CREATE_TABLE: generateCREATEHQL(canvasFields, whereConditions, gameData, selectedEvent, 'table'),
+          CREATE_VIEW: generateCREATEHQL(canvasFields, whereConditions, gameData, selectedEvent, 'view'),
+          INSERT: generateINSERTHQL(canvasFields, whereConditions, gameData, selectedEvent)
+        };
+
+        setHqlOutputs(mockHQL);
+        if (!isEditing) {
+          setCurrentHQL(mockHQL[activeTab]);
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [isOpen, canvasFields, whereConditions, activeTab, isEditing, gameData, selectedEvent, useV2API]);
+
+  // V2 API 调用函数
+  const generateHQLWithV2API = async () => {
+    // Validate selectedEvent before making API call
+    if (!selectedEvent || !selectedEvent.id) {
+      setApiError('请先选择事件');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!canvasFields || canvasFields.length === 0) {
+      setApiError('请至少添加一个字段');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setApiError(null);
+
+    try {
+      // 转换字段格式为V2 API期望的格式
+      // 字段类型映射：basic -> base (V2 API期望base而不是basic)
+      const normalizeFieldType = (type: string | undefined): string => {
+        if (!type) return 'base';
+        if (type === 'basic') return 'base';  // V2 API使用base
+        return type;
+      };
+
+      const v2Fields = canvasFields.map(field => ({
+        fieldName: field.fieldName || field.name,
+        fieldType: normalizeFieldType(field.fieldType || field.type),
+        jsonPath: field.jsonPath,
+        customExpression: field.customExpression,
+        alias: field.alias
+      }));
+
+      const requestData = {
+        events: [{
+          game_gid: gameData?.gid,
+          event_id: selectedEvent.id
+        }],
+        fields: v2Fields,
+        where_conditions: whereConditions.map(cond => ({
+          field: cond.field,
+          operator: cond.operator,
+          value: cond.value,
+          logicalOp: cond.logicalOp || 'AND'
+        })),
+        options: {
+          mode: 'single',
+          include_performance: true,
+          debug: true
+        }
+      };
+
+      // 调用 V2 API
+      const response = await fetch('/hql-preview-v2/api/generate-debug', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to generate HQL');
+      }
+
+      // 提取数据
+      const hql = result.data.hql;
+      const performance = result.data.performance;
+      const steps = result.data.steps;
+
+      // 更新状态
+      setHqlOutputs({ SELECT: hql });
+      setCurrentHQL(hql);
+      setPerformanceReport(performance);
+      setDebugTrace(steps);
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('V2 API Error:', error);
+      setApiError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 切换Tab
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    if (!isEditing) {
+      setCurrentHQL(hqlOutputs[tab]);
+    }
+  };
+
+  // 启用编辑
+  const handleEnableEdit = () => {
+    setIsEditing(true);
+  };
+
+  // 重新生成
+  const handleRegenerate = () => {
+    setIsEditing(false);
+    setShowConflict(false);
+  };
+
+  // 保留编辑
+  const handleKeepEdit = () => {
+    setShowConflict(false);
+    // 更新原始哈希
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="xl"
+      showHeader={false}
+      enableEscClose={true}
+      overlayClassName="hql-preview-modal-overlay"
+      contentClassName="glass-card hql-preview-modal"
+      zIndex={1200}
+      contentStyle={{ maxWidth: '1200px', height: '90vh' }}
+    >
+      <div className="modal-content glass-card hql-preview-modal" style={{ backgroundColor: 'transparent', display: 'flex', flexDirection: 'column' }}>
+        {/* Modal Header */}
+        <div className="modal-header">
+          <div className="header-left">
+            <h3>
+              <i className="bi bi-code-square"></i>
+              HQL预览 - {activeTab.replace('_', ' ')}
+            </h3>
+            {isEditing && (
+              <span className="badge badge-warning">编辑模式</span>
+            )}
+          </div>
+
+          <div className="header-center">
+            <div className="tab-switcher">
+              {(['SELECT', 'CREATE_TABLE', 'CREATE_VIEW', 'INSERT'] as TabType[]).map(tab => (
+                <button
+                  key={tab}
+                  className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                  onClick={() => handleTabChange(tab)}
+                >
+                  {tab.replace('_', ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
+            <i className="bi bi-x"></i>
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="modal-body">
+          {/* 工具栏 */}
+          <div className="editor-toolbar">
+            <button className="btn btn-sm btn-outline-primary" onClick={() => {
+              navigator.clipboard.writeText(currentHQL);
+              toast.success('已复制到剪贴板');
+            }}>
+              <i className="bi bi-clipboard"></i> 复制
+            </button>
+            <button className="btn btn-sm btn-outline-secondary" onClick={() => {
+              // 格式化HQL（简化实现）
+            }}>
+              <i className="bi bi-code-square"></i> 格式化
+            </button>
+            <button
+              className={`btn btn-sm ${isEditing ? 'btn-warning' : 'btn-outline-primary'}`}
+              onClick={isEditing ? handleRegenerate : handleEnableEdit}
+            >
+              <i className={isEditing ? 'bi bi-arrow-clockwise' : 'bi bi-pencil'}></i>
+              {isEditing ? '重新生成' : '编辑'}
+            </button>
+          </div>
+
+          {/* 冲突提示 */}
+          {showConflict && (
+            <div className="conflict-alert">
+              <div className="alert alert-warning">
+                <i className="bi bi-exclamation-triangle"></i>
+                <div>
+                  <strong>字段已变化</strong>
+                  <p>HQL基于旧的字段配置生成，但画布字段已修改。是否重新生成HQL？</p>
+                  <div className="conflict-actions">
+                    <button className="btn btn-sm btn-danger" onClick={handleRegenerate}>
+                      <i className="bi bi-arrow-clockwise"></i> 重新生成
+                    </button>
+                    <button className="btn btn-sm btn-primary" onClick={handleKeepEdit}>
+                      <i className="bi bi-check"></i> 保留编辑
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 编辑器 */}
+          <div className="editor-container">
+            {isEditing ? (
+              // ✅ 编辑模式：使用CodeMirror组件，带语法高亮和深色主题
+              <div className="code-editor code-editor-editing">
+                <CodeMirror
+                  value={currentHQL}
+                  height="100%"
+                  extensions={getBasicExtensions(false)}
+                  onChange={(value) => setCurrentHQL(value)}
+                  basicSetup={{
+                    lineNumbers: true,
+                    highlightSpecialChars: true,
+                    foldGutter: true,
+                    dropCursor: true,
+                    allowMultipleSelections: true,
+                    indentOnInput: true
+                  }}
+                />
+              </div>
+            ) : (
+              // ✅ 预览模式：使用SyntaxHighlighter
+              <>
+                <div className="line-numbers">
+                  {currentHQL.split('\n').map((_, i) => (
+                    <div key={i}>{i + 1}</div>
+                  ))}
+                </div>
+                <div className="code-editor">
+                  <div className="code-display">
+                    <SyntaxHighlighter
+                      language="sql"
+                      style={vscDarkPlus}
+                      showLineNumbers={false}
+                      customStyle={{
+                        background: 'transparent',
+                        padding: 0,
+                        margin: 0,
+                        fontSize: '0.875rem',
+                        fontFamily: "'JetBrains Mono', 'Courier New', monospace"
+                      }}
+                    >
+                      {currentHQL}
+                    </SyntaxHighlighter>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* 字段映射表 */}
+          <div className="field-mapping">
+            <h4>字段映射</h4>
+            <table className="mapping-table">
+              <thead>
+                <tr>
+                  <th>字段</th>
+                  <th>类型</th>
+                  <th>来源</th>
+                </tr>
+              </thead>
+              <tbody>
+                {canvasFields.map(field => (
+                  <tr key={field.id}>
+                    <td>{field.fieldName}</td>
+                    <td>{field.dataType || 'string'}</td>
+                    <td>{field.fieldType === 'base' ? '基础字段' : '参数字段'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* V2 API 特性展示 */}
+          {useV2API && (
+            <div className="v2-features-section">
+              {/* 加载状态 */}
+              {isLoading && (
+                <div className="v2-loading">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">加载中...</span>
+                  </div>
+                  <p>正在生成HQL并分析性能...</p>
+                </div>
+              )}
+
+              {/* API错误 */}
+              {apiError && (
+                <div className="v2-error alert alert-danger">
+                  <i className="bi bi-exclamation-triangle"></i>
+                  <div>
+                    <strong>API调用失败</strong>
+                    <p>{apiError}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* 性能分析 */}
+              {!isLoading && !apiError && performanceReport && (
+                <PerformanceIndicator performance={performanceReport} />
+              )}
+
+              {/* 调试模式 */}
+              {!isLoading && !apiError && debugTrace && (
+                <DebugViewer debugTrace={debugTrace} />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="modal-footer">
+          <div className="footer-left">
+            <span>{canvasFields.length} 个字段</span>
+            <span>•</span>
+            <span>{whereConditions.length} 个条件</span>
+          </div>
+          <div className="footer-right">
+            <button className="btn btn-secondary" onClick={onClose}>
+              关闭
+            </button>
+            <button className="btn btn-primary" onClick={() => {
+              // 应用HQL
+              onClose();
+            }}>
+              <i className="bi bi-check"></i> 应用
+            </button>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
+  );
+}
+
+// ============================================
+// HQL生成器（临时实现，后续替换为实际API调用）
+// ============================================
+
+function generateSELECTHQL(
+  fields: CanvasField[],
+  whereConditions: WhereCondition[],
+  gameData?: GameData,
+  event?: SelectedEvent | null
+): string {
+  const fieldList = fields.map(f => `  ${f.fieldName}`).join(',\n');
+  const whereClause = whereConditions.length > 0
+    ? `WHERE\n  ${generateWhereClause(whereConditions)}`
+    : '';
+
+  return `SELECT\n${fieldList}\nFROM ${gameData?.ods_db || 'ieu_ods'}.ods_${gameData?.gid || '10000147'}_all_view\n${whereClause};`;
+}
+
+function generateCREATEHQL(
+  fields: CanvasField[],
+  whereConditions: WhereCondition[],
+  gameData?: GameData,
+  event?: SelectedEvent | null,
+  type: 'table' | 'view' = 'table'
+): string {
+  const fieldList = fields.map(f => `  ${f.fieldName}`).join(',\n');
+  const tableName = `dwd_${event?.event_name || 'event'}_di`;
+
+  return `CREATE ${type} IF NOT EXISTS ${tableName} AS\nSELECT\n${fieldList}\nFROM ${gameData?.ods_db || 'ieu_ods'}.ods_${gameData?.gid || '10000147'}_all_view;`;
+}
+
+function generateINSERTHQL(
+  fields: CanvasField[],
+  whereConditions: WhereCondition[],
+  gameData?: GameData,
+  event?: SelectedEvent | null
+): string {
+  const fieldList = fields.map(f => f.fieldName).join(', ');
+  const tableName = `dwd_${event?.event_name || 'event'}_di`;
+  const whereClause = whereConditions.length > 0
+    ? `WHERE ${generateWhereClause(whereConditions)}`
+    : '';
+
+  return `INSERT OVERWRITE TABLE ${tableName}\nSELECT ${fieldList}\nFROM ${gameData?.ods_db || 'ieu_ods'}.ods_${gameData?.gid || '10000147'}_all_view\n${whereClause};`;
+}
+
+function generateWhereClause(conditions: WhereCondition[]): string {
+  // 简化实现，实际应使用whereGenerator
+  return conditions.map(c => `${c.field} ${c.operator} '${c.value}'`).join(' AND ');
+}

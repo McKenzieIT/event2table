@@ -1,45 +1,92 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Event Parameter Manager
-Manages parameters for specific events with version control
+Event Parameter Manager - DEPRECATED
+=====================================
+
+⚠️ DEPRECATED: Use ParameterService instead
+
+This class is kept for backward compatibility only.
+All methods delegate to ParameterService.
+
+Migration Guide:
+- OLD: from backend.services.parameters.event_param_manager import event_param_manager
+- NEW: from backend.services.parameters.parameter_service import ParameterService
+
+For new code, use ParameterService directly.
 """
 
 import json
 from typing import Dict, List, Optional, Any
-from datetime import datetime
 from functools import lru_cache
-from backend.core.database import get_db, get_db_connection
-from backend.core.logging import get_logger
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict, execute_write
+import logging
+
+from backend.services.parameters.parameter_service import ParameterService
 from backend.services.parameters.param_type_manager import param_type_manager
 from backend.services.parameters.param_library_manager import param_library_manager
-from backend.core.cache.cache_system import parse_json_cached
+from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict, execute_write
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class EventParamManager:
-    """Event parameter management with version control"""
+    """
+    DEPRECATED: Event parameter management wrapper
+
+    ⚠️ This class is deprecated. Use ParameterService instead.
+
+    This class provides backward compatibility by delegating all calls
+    to ParameterService. Some methods with unique business logic
+    (version control, parameter config, hierarchy) are kept but will
+    be migrated to ParameterService in future updates.
+    """
 
     def __init__(self):
-        """Initialize event param manager"""
-        pass
+        """Initialize event param manager (deprecated)"""
+        logger.warning(
+            "EventParamManager is deprecated. Use ParameterService instead. "
+            "See: backend/services/parameters/event_param_manager.py"
+        )
+        self.service = ParameterService()
+
+    # ========== Delegated Methods (use ParameterService) ==========
 
     def get_event_parameters(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:
-        """获取事件的所有参数（带缓存）"""
-        return _get_event_parameters_cached(event_id, include_inactive)
+        """
+        获取事件的所有参数（带缓存）
+
+        DEPRECATED: Use ParameterService.get_parameters_by_event() instead
+        """
+        logger.warning(f"get_event_parameters() is deprecated, use ParameterService")
+        params = self.service.get_parameters_by_event(event_id, include_inactive)
+        # Convert ParameterEntity to dict for backward compatibility
+        return [p.model_dump() for p in params]
 
     def get_parameter_by_id(self, param_id: int) -> Optional[Dict[str, Any]]:
-        """根据ID获取参数（带缓存）"""
-        return _get_parameter_by_id_cached(param_id)
+        """
+        根据ID获取参数（带缓存）
+
+        DEPRECATED: Use ParameterService.get_parameter_by_id() instead
+        """
+        logger.warning(f"get_parameter_by_id() is deprecated, use ParameterService")
+        param = self.service.get_parameter_by_id(param_id)
+        return param.model_dump() if param else None
+
+    # ========== Unique Methods (to be migrated to ParameterService) ==========
 
     def add_parameter(
         self, event_id: int, param_data: Dict[str, Any], change_reason: str = "新增参数"
     ) -> int:
-        """为事件添加参数"""
+        """
+        为事件添加参数（带版本控制）
+
+        Note: This method has unique business logic (version control, library integration).
+        It will be migrated to ParameterService in a future update.
+        """
+        from backend.core.database import get_db_connection
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
@@ -91,6 +138,7 @@ class EventParamManager:
 
         if existing:
             # 创建新版本（停用旧版本）
+            from backend.core.utils import execute_write
             execute_write("UPDATE event_params SET is_active = 0 WHERE id = ?", (existing["id"],))
             new_version = existing["version"] + 1
         else:
@@ -159,16 +207,14 @@ class EventParamManager:
     def update_parameter(
         self, event_param_id: int, param_data: Dict[str, Any], change_reason: str = "更新参数"
     ) -> bool:
-        """更新参数（创建新版本）
-
-        Args:
-            event_param_id: 参数ID
-            param_data: 更新的参数数据
-            change_reason: 变更原因
-
-        Returns:
-            是否更新成功
         """
+        更新参数（创建新版本）
+
+        Note: This method has unique version control logic.
+        Consider using ParameterService.update_parameter() for simple updates.
+        """
+        from backend.core.database import get_db
+
         with get_db() as conn:
             cursor = conn.cursor()
 
@@ -223,14 +269,13 @@ class EventParamManager:
             return True
 
     def get_parameter_history(self, event_param_id: int) -> List[Dict[str, Any]]:
-        """获取参数变更历史
-
-        Args:
-            event_param_id: 参数ID
-
-        Returns:
-            历史版本列表
         """
+        获取参数变更历史
+
+        Note: This is unique functionality not yet in ParameterService.
+        """
+        from backend.core.database import get_db
+
         with get_db() as conn:
             history = conn.execute(
                 """
@@ -246,38 +291,26 @@ class EventParamManager:
             return [dict(h) for h in history]
 
     def delete_parameter(self, event_param_id: int) -> bool:
-        """删除参数（软删除）
-
-        Args:
-            event_param_id: 参数ID
-
-        Returns:
-            是否删除成功
         """
-        with get_db() as conn:
-            cursor = conn.cursor()
+        删除参数（软删除）
 
-            # 软删除：设置is_active=0
-            cursor.execute("UPDATE event_params SET is_active = 0 WHERE id = ?", (event_param_id,))
-
-            affected = cursor.rowcount
-            conn.commit()
-
-            if affected > 0:
-                logger.info(f"Deleted parameter {event_param_id}")
-                return True
+        DEPRECATED: Use ParameterService.delete_parameter() instead
+        """
+        logger.warning(f"delete_parameter() is deprecated, use ParameterService")
+        try:
+            self.service.delete_parameter(event_param_id)
+            return True
+        except Exception:
             return False
 
     def set_parameter_config(self, event_param_id: int, config: Dict[str, Any]) -> bool:
-        """设置参数配置（用于array展开等）
-
-        Args:
-            event_param_id: 参数ID
-            config: 配置字典
-
-        Returns:
-            是否设置成功
         """
+        设置参数配置（用于array展开等）
+
+        Note: This is unique functionality not yet in ParameterService.
+        """
+        from backend.core.database import get_db
+
         with get_db() as conn:
             cursor = conn.cursor()
 
@@ -337,14 +370,14 @@ class EventParamManager:
             return True
 
     def get_parameter_config(self, event_param_id: int) -> Optional[Dict[str, Any]]:
-        """获取参数配置
-
-        Args:
-            event_param_id: 参数ID
-
-        Returns:
-            配置字典
         """
+        获取参数配置
+
+        Note: This is unique functionality not yet in ParameterService.
+        """
+        from backend.core.database import get_db
+        from backend.core.cache.cache_system import parse_json_cached
+
         with get_db() as conn:
             config = conn.execute(
                 "SELECT * FROM param_configs WHERE event_param_id = ?", (event_param_id,)
@@ -367,15 +400,13 @@ class EventParamManager:
             return result
 
     def rollback_to_version(self, event_param_id: int, target_version: int) -> bool:
-        """回滚参数到指定版本
-
-        Args:
-            event_param_id: 参数ID
-            target_version: 目标版本号
-
-        Returns:
-            是否回滚成功
         """
+        回滚参数到指定版本
+
+        Note: This is unique functionality not yet in ParameterService.
+        """
+        from backend.core.database import get_db
+
         with get_db() as conn:
             cursor = conn.cursor()
 
@@ -436,13 +467,10 @@ class EventParamManager:
             return True
 
     def get_parameter_with_children(self, param_id: int) -> Optional[Dict[str, Any]]:
-        """获取参数及其子参数（用于array类型）
+        """
+        获取参数及其子参数（用于array类型）
 
-        Args:
-            param_id: 参数ID
-
-        Returns:
-            包含子参数的完整参数信息，如果没有子参数则返回None
+        Note: This is unique functionality not yet in ParameterService.
         """
         # 获取基础参数信息
         param = self.get_parameter_by_id(param_id)
@@ -470,14 +498,10 @@ class EventParamManager:
     def get_event_parameters_hierarchy(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:
-        """获取事件的所有参数（带层级结构）
+        """
+        获取事件的所有参数（带层级结构）
 
-        Args:
-            event_id: 事件ID
-            include_inactive: 是否包含非激活参数
-
-        Returns:
-            带层级结构的参数列表
+        Note: This is unique functionality not yet in ParameterService.
         """
         # 获取所有基础参数
         params = self.get_event_parameters(event_id, include_inactive)
@@ -497,14 +521,13 @@ class EventParamManager:
         return result
 
     def _generate_child_params_for_array(self, param: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """为array类型参数生成虚拟子参数定义
-
-        Args:
-            param: 参数信息
-
-        Returns:
-            子参数列表
         """
+        为array类型参数生成虚拟子参数定义
+
+        Note: This is unique functionality not yet in ParameterService.
+        """
+        from backend.core.cache.cache_system import parse_json_cached
+
         # 尝试从配置中获取已保存的子参数定义
         config = self.get_parameter_config(param["id"])
 
@@ -579,15 +602,13 @@ class EventParamManager:
     def save_child_params_config(
         self, event_param_id: int, child_params: List[Dict[str, Any]]
     ) -> bool:
-        """保存子参数配置
-
-        Args:
-            event_param_id: 参数ID
-            child_params: 子参数列表
-
-        Returns:
-            是否保存成功
         """
+        保存子参数配置
+
+        Note: This is unique functionality not yet in ParameterService.
+        """
+        from backend.core.database import get_db
+
         with get_db() as conn:
             cursor = conn.cursor()
 
@@ -624,60 +645,44 @@ class EventParamManager:
             return True
 
 
-# Module-level cached functions (to work with singleton pattern)
+# ========== Module-level cached functions (deprecated, kept for compatibility) ==========
+
 @lru_cache(maxsize=128)
 def _get_event_parameters_cached(
     event_id: int, include_inactive: bool = False
 ) -> List[Dict[str, Any]]:
-    """获取事件的所有参数（缓存层）"""
-    query = """
-        SELECT
-            ep.*,
-            pt.template_name,
-            pt.display_name as type_display_name,
-            pt.base_type,
-            pt.element_type,
-            pt.nesting_level,
-            pt.hql_parse_template,
-            pl.param_name as library_param_name,
-            pl.is_standard
-        FROM event_params ep
-        JOIN param_templates pt ON ep.template_id = pt.id
-        LEFT JOIN param_library pl ON ep.library_id = pl.id
-        WHERE ep.event_id = ?
     """
+    获取事件的所有参数（缓存层）
 
-    if not include_inactive:
-        query += " AND ep.is_active = 1"
-
-    query += " ORDER BY ep.param_name"
-
-    return fetch_all_as_dict(query, (event_id,))
+    DEPRECATED: This is kept for backward compatibility only.
+    Use ParameterService.get_parameters_by_event() instead.
+    """
+    logger.warning(f"_get_event_parameters_cached() is deprecated, use ParameterService")
+    service = ParameterService()
+    params = service.get_parameters_by_event(event_id, include_inactive)
+    return [p.model_dump() for p in params]
 
 
 @lru_cache(maxsize=256)
 def _get_parameter_by_id_cached(param_id: int) -> Optional[Dict[str, Any]]:
-    """根据ID获取参数（缓存层）"""
-    return fetch_one_as_dict(
-        """
-        SELECT
-            ep.*,
-            pt.template_name,
-            pt.display_name as type_display_name,
-            pt.base_type,
-            pt.element_type,
-            pt.nesting_level,
-            pt.hql_parse_template,
-            pl.param_name as library_param_name,
-            pl.is_standard
-        FROM event_params ep
-        JOIN param_templates pt ON ep.template_id = pt.id
-        LEFT JOIN param_library pl ON ep.library_id = pl.id
-        WHERE ep.id = ?
-    """,
-        (param_id,),
-    )
+    """
+    根据ID获取参数（缓存层）
+
+    DEPRECATED: This is kept for backward compatibility only.
+    Use ParameterService.get_parameter_by_id() instead.
+    """
+    logger.warning(f"_get_parameter_by_id_cached() is deprecated, use ParameterService")
+    service = ParameterService()
+    param = service.get_parameter_by_id(param_id)
+    return param.model_dump() if param else None
 
 
-# Singleton instance
+# ========== Singleton instance (deprecated) ==========
+
 event_param_manager = EventParamManager()
+
+logger.warning(
+    "EventParamManager module is deprecated. "
+    "Use ParameterService instead: "
+    "from backend.services.parameters.parameter_service import ParameterService"
+)

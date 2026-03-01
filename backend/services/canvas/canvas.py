@@ -4,6 +4,12 @@
 节点画布模块 - Node Canvas Module
 
 提供可视化的节点式查询构建器功能
+
+架构:
+- API路由层 (本文件)
+- Service层 (CanvasService)
+- Repository层 (FlowRepository, EventNodeRepository)
+- Entity层 (FlowEntity, EventNodeEntity)
 """
 
 from flask import Blueprint, render_template, request, jsonify, session
@@ -16,10 +22,14 @@ from backend.core.utils import (
     json_error_response,
 )
 from . import node_canvas_flows
+from .canvas_service import get_canvas_service
 
 logger = get_logger(__name__)
 
 canvas_bp = Blueprint("canvas", __name__)
+
+# 获取CanvasService单例
+canvas_service = get_canvas_service()
 
 
 @canvas_bp.route("/canvas/node_canvas")
@@ -342,6 +352,226 @@ def generate_mock_results(output_fields, limit=5):
         "row_count": len(rows),
         "execution_time_ms": random.randint(50, 200),  # Mock execution time
     }
+
+
+@canvas_bp.route("/api/canvas/flows", methods=["GET"])
+def list_flows():
+    """
+    获取Flow模板列表
+
+    Query Params:
+        game_gid (int): 游戏GID (可选, 不提供则返回所有Flow)
+
+    Returns:
+        JSON: Flow模板列表
+    """
+    try:
+        game_gid = request.args.get("game_gid", type=int)
+
+        if game_gid:
+            flows = canvas_service.get_flows_by_game(game_gid)
+        else:
+            flows = canvas_service.get_all_flows()
+
+        return json_success_response(
+            data={"flows": [flow.model_dump() for flow in flows]},
+            message=f"Retrieved {len(flows)} flows"
+        )
+
+    except Exception as e:
+        logger.exception(f"Error listing flows: {e}")
+        return json_error_response("Failed to list flows", status_code=500)
+
+
+@canvas_bp.route("/api/canvas/flows/<int:flow_id>", methods=["GET"])
+def get_flow(flow_id: int):
+    """
+    获取单个Flow模板
+
+    Args:
+        flow_id: Flow ID
+
+    Returns:
+        JSON: Flow模板详情
+    """
+    try:
+        flow = canvas_service.get_flow(flow_id)
+
+        if not flow:
+            return json_error_response("Flow not found", status_code=404)
+
+        return json_success_response(
+            data=flow.model_dump(),
+            message="Flow retrieved successfully"
+        )
+
+    except Exception as e:
+        logger.exception(f"Error getting flow: {e}")
+        return json_error_response("Failed to get flow", status_code=500)
+
+
+@canvas_bp.route("/api/canvas/flows", methods=["POST"])
+def create_flow():
+    """
+    创建Flow模板
+
+    Request Body:
+        {
+            "game_gid": int,
+            "flow_name": str,
+            "flow_graph": dict,
+            "variables": dict (可选),
+            "description": str (可选),
+            "created_by": str (可选)
+        }
+
+    Returns:
+        JSON: 创建的Flow模板
+    """
+    try:
+        data = request.get_json()
+
+        if not data:
+            return json_error_response("Missing request body", status_code=400)
+
+        # 创建Flow
+        flow = canvas_service.create_flow(
+            game_gid=data.get("game_gid"),
+            flow_name=data.get("flow_name"),
+            flow_graph=data.get("flow_graph", {}),
+            variables=data.get("variables"),
+            description=data.get("description"),
+            created_by=data.get("created_by")
+        )
+
+        return json_success_response(
+            data=flow.model_dump(),
+            message="Flow created successfully"
+        )
+
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.exception(f"Error creating flow: {e}")
+        return json_error_response("Failed to create flow", status_code=500)
+
+
+@canvas_bp.route("/api/canvas/flows/<int:flow_id>", methods=["PUT", "PATCH"])
+def update_flow(flow_id: int):
+    """
+    更新Flow模板
+
+    Request Body:
+        {
+            "flow_name": str (可选),
+            "flow_graph": dict (可选),
+            "variables": dict (可选),
+            "description": str (可选),
+            "is_active": bool (可选)
+        }
+
+    Returns:
+        JSON: 更新结果
+    """
+    try:
+        data = request.get_json()
+
+        if not data:
+            return json_error_response("Missing request body", status_code=400)
+
+        # 获取现有Flow用于获取game_gid
+        existing_flow = canvas_service.get_flow(flow_id)
+        if not existing_flow:
+            return json_error_response("Flow not found", status_code=404)
+
+        # 更新Flow
+        success = canvas_service.update_flow(
+            flow_id=flow_id,
+            flow_name=data.get("flow_name"),
+            flow_graph=data.get("flow_graph"),
+            variables=data.get("variables"),
+            description=data.get("description"),
+            is_active=data.get("is_active")
+        )
+
+        if success:
+            return json_success_response(message="Flow updated successfully")
+        else:
+            return json_error_response("Failed to update flow", status_code=500)
+
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.exception(f"Error updating flow: {e}")
+        return json_error_response("Failed to update flow", status_code=500)
+
+
+@canvas_bp.route("/api/canvas/flows/<int:flow_id>", methods=["DELETE"])
+def delete_flow(flow_id: int):
+    """
+    删除Flow模板 (软删除)
+
+    Args:
+        flow_id: Flow ID
+
+    Query Params:
+        game_gid (int): 游戏GID (必需, 用于缓存失效)
+
+    Returns:
+        JSON: 删除结果
+    """
+    try:
+        game_gid = request.args.get("game_gid", type=int)
+
+        if not game_gid:
+            return json_error_response("Missing game_gid parameter", status_code=400)
+
+        # 删除Flow
+        success = canvas_service.delete_flow(flow_id, game_gid)
+
+        if success:
+            return json_success_response(message="Flow deleted successfully")
+        else:
+            return json_error_response("Failed to delete flow", status_code=500)
+
+    except Exception as e:
+        logger.exception(f"Error deleting flow: {e}")
+        return json_error_response("Failed to delete flow", status_code=500)
+
+
+@canvas_bp.route("/api/canvas/flows/<int:flow_id>/export", methods=["GET"])
+def export_flow(flow_id: int):
+    """
+    导出Flow配置
+
+    Args:
+        flow_id: Flow ID
+
+    Query Params:
+        format (str): 导出格式 (config/hql, 默认config)
+
+    Returns:
+        JSON: Flow导出结果
+    """
+    try:
+        export_format = request.args.get("format", "config")
+
+        if export_format == "hql":
+            result = canvas_service.export_flow_hql(flow_id)
+        else:
+            result = canvas_service.export_flow_config(flow_id)
+
+        if not result:
+            return json_error_response("Flow not found", status_code=404)
+
+        return json_success_response(
+            data=result,
+            message=f"Flow exported successfully ({export_format})"
+        )
+
+    except Exception as e:
+        logger.exception(f"Error exporting flow: {e}")
+        return json_error_response("Failed to export flow", status_code=500)
 
 
 logger.info("Canvas blueprint loaded")

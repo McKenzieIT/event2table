@@ -24,6 +24,7 @@ import {
   GET_FLOWS,
   GET_FLOW,
   GET_ALL_PARAMETERS_BY_GAME,
+  GET_PARAMETERS_MANAGEMENT,
 } from './queries';
 import {
   CREATE_GAME,
@@ -365,5 +366,17 @@ export function useAllParametersByGame(gameGid: number) {
   return useQuery(GET_ALL_PARAMETERS_BY_GAME, {
     variables: { gameGid },
     skip: !gameGid,
+  });
+}
+
+/**
+ * Hook to fetch parameters management data
+ * Used by ParametersEnhancedGraphQL component
+ */
+export function useParametersManagement(gameGid: number, mode: string = 'all', eventId?: number) {
+  return useQuery(GET_PARAMETERS_MANAGEMENT, {
+    variables: { gameGid, mode, eventId },
+    skip: !gameGid,
+    fetchPolicy: 'cache-and-network',
   });
 }

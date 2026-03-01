@@ -34,6 +34,7 @@ export { default as Modal } from './BaseModal/BaseModal';
 // Special Components
 export { SelectGamePrompt } from './SelectGamePrompt';
 export { default as Loading } from './Loading';
+export { default as EmptyState } from './EmptyState/EmptyState';
 export { ErrorState } from './ErrorState/ErrorState';
 export { ErrorBoundary, ErrorFallback } from './ErrorBoundary';
 export { default as CanvasErrorBoundary } from './CanvasErrorBoundary';

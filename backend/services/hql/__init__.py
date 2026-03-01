@@ -44,8 +44,11 @@ Models:
 
 __version__ = "2.0.0"
 
-# 导出服务接口
-from .service_interface import IHQLGenerationService, HQLGenerationServiceV2, HQLServiceFactory
+# 导出核心Facade
+from .hql_facade import HQLFacade
+
+# 导出带缓存的服务
+from .hql_service_cached import HQLServiceCached
 
 # 导出核心模型
 from .models.event import (
@@ -91,10 +94,9 @@ except ImportError:
 __all__ = [
     # 版本
     "__version__",
-    # 服务接口
-    "IHQLGenerationService",
-    "HQLGenerationServiceV2",
-    "HQLServiceFactory",
+    # 服务
+    "HQLFacade",
+    "HQLServiceCached",
     # 核心模型
     "Event",
     "Field",

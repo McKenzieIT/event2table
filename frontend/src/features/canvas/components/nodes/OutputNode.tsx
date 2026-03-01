@@ -1,0 +1,67 @@
+import React from 'react';
+import { Handle, Position } from 'reactflow';
+import './OutputNode.css';
+
+/**
+ * Output configuration structure
+ */
+interface OutputConfig {
+  view_name?: string;
+}
+
+/**
+ * OutputNode data structure
+ */
+interface OutputNodeData {
+  label?: string;
+  config?: OutputConfig;
+  [key: string]: unknown;
+}
+
+/**
+ * OutputNode component props
+ */
+interface OutputNodeProps {
+  data: OutputNodeData;
+}
+
+/**
+ * OutputNode component
+ *
+ * Displays the final output node in the canvas flow.
+ * Represents the generated HQL view output.
+ *
+ * Features:
+ * - Single input port
+ * - Displays the target view name
+ * - No output ports (terminal node)
+ */
+export default function OutputNode({ data }: OutputNodeProps): React.ReactElement {
+  const viewName = data.config?.view_name || '未命名';
+
+  return (
+    <div className="custom-node output-node">
+      {/* 输入端口 */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="node-port input-port"
+      />
+
+      {/* 节点头部 */}
+      <div className="node-header">
+        <span className="node-icon">📤</span>
+        <span className="node-title">输出</span>
+      </div>
+
+      {/* 节点内容 */}
+      <div className="node-body">
+        <div className="view-name">
+          {viewName}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export type { OutputNodeData, OutputNodeProps };

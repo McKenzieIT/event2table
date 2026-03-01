@@ -1,0 +1,30 @@
+归档日期: 2026-02-21
+归档原因: 已迁移到GraphQL
+GraphQL实现: backend/gql_api/queries/event_queries.py, backend/gql_api/mutations/event_mutations.py
+前端实现: frontend/src/features/events/EventManagementModalGraphQL.jsx, frontend/src/features/events/AddEventModalGraphQL.jsx
+测试覆盖: backend/tests/test_events_graphql.py
+
+迁移说明:
+- Events模块已完全迁移到GraphQL API
+- 所有REST端点已被GraphQL Query和Mutation替代
+- 前端组件已切换到GraphQL版本
+- 缓存集成已完成
+
+GraphQL端点:
+- POST /api/graphql
+- GraphiQL IDE: /api/graphiql
+
+GraphQL操作:
+Query:
+  - event(id: Int!): Event
+  - events(gameGid: Int!, category: String, limit: Int, offset: Int): [Event]
+  - searchEvents(query: String!, gameGid: Int): [Event]
+
+Mutation:
+  - createEvent(gameGid: Int!, eventName: String!, eventNameCn: String!, categoryId: Int!, includeInCommonParams: Boolean): CreateEventPayload
+  - updateEvent(id: Int!, eventNameCn: String, categoryId: Int, includeInCommonParams: Boolean): UpdateEventPayload
+  - deleteEvent(id: Int!): DeleteEventPayload
+
+性能测试结果:
+- Events列表查询: 6ms
+- Event搜索: 5ms

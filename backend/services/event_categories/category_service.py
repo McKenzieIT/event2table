@@ -9,7 +9,7 @@ Category Service - 业务逻辑层 (精简架构)
 - 集成缓存防护和失效机制
 """
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import logging
 from backend.models.entities import EventCategoryEntity
 from backend.models.repositories.category_repository import CategoryRepository
@@ -183,21 +183,30 @@ class CategoryService:
 
         logger.info(f"类别删除成功,已失效缓存: id={category_id}")
 
-    def batch_delete_categories(self, category_ids: List[int]) -> int:
+    def batch_delete_categories(self, category_ids: List[int]) -> Dict[str, Any]:
         """
-        批量删除类别 (自动失效缓存)
+        批量删除类别 (自动失效缓存 + 详细结果)
 
         Args:
             category_ids: 类别ID列表
 
         Returns:
-            删除的类别数量
+            包含删除结果的字典：
+            - deleted_count: 成功删除的数量
+            - failed_ids: 删除失败的ID列表
+            - failed_reasons: 失败原因字典 {id: reason}
+            - message: 操作结果消息
 
         Raises:
             ValueError: category_id包含无效值
         """
         if not category_ids:
-            return 0
+            return {
+                "deleted_count": 0,
+                "failed_ids": [],
+                "failed_reasons": {},
+                "message": "No category IDs provided"
+            }
 
         # 验证所有ID
         for category_id in category_ids:
@@ -205,16 +214,33 @@ class CategoryService:
                 raise ValueError(f"Invalid category_id: {category_id}")
 
         # 批量删除
-        deleted_count = self.category_repo.batch_delete(category_ids)
+        result = self.category_repo.batch_delete(category_ids)
 
-        # 失效缓存
-        if deleted_count > 0:
+        # 失效缓存（只针对成功删除的）
+        if result["deleted_count"] > 0:
             self.invalidator.invalidate_pattern("categories.list")
+            # 失效所有相关缓存（包括失败的ID，以防有缓存）
             for category_id in category_ids:
                 self.invalidator.invalidate_pattern(f"categories.detail:{category_id}")
-            logger.info(f"批量删除类别成功,已失效缓存: count={deleted_count}")
 
-        return deleted_count
+            logger.info(
+                f"批量删除类别完成: 成功={result['deleted_count']}, "
+                f"失败={len(result['failed_ids'])}"
+            )
+
+        # 生成消息
+        total = len(category_ids)
+        deleted = result["deleted_count"]
+        failed = len(result["failed_ids"])
+
+        if failed == 0:
+            result["message"] = f"Successfully deleted all {deleted} categories"
+        elif deleted == 0:
+            result["message"] = f"Failed to delete any categories ({failed} errors)"
+        else:
+            result["message"] = f"Successfully deleted {deleted} out of {total} categories ({failed} failed)"
+
+        return result
 
     def batch_update_categories(self, category_ids: List[int], updates: dict) -> int:
         """
@@ -261,3 +287,124 @@ class CategoryService:
             匹配的类别列表
         """
         return self.category_repo.search_by_name(name_pattern)
+
+    @cached("categories.stats", timeout=600)
+    def get_statistics(self, game_gid: Optional[int] = None) -> Dict[str, Any]:
+        """
+        获取类别统计信息
+
+        Args:
+            game_gid: 可选的游戏GID，用于获取游戏级别的统计
+
+        Returns:
+            包含统计信息的字典:
+            - total_categories: 总分类数量
+            - active_categories: 活跃分类数量 (is_active=True)
+            - categories_with_events: 有事件的分类数量
+            - category_breakdown: 各分类的详细统计列表
+
+        Raises:
+            ValueError: game_gid无效
+        """
+        from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+
+        # 验证game_gid（如果提供）
+        if game_gid is not None and game_gid <= 0:
+            raise ValueError(f"Invalid game_gid: {game_gid}")
+
+        # 构建SQL查询（根据是否提供game_gid）
+        if game_gid:
+            # 游戏级别统计
+            stats_query = """
+                SELECT
+                    COUNT(DISTINCT ec.id) as total_categories,
+                    COUNT(DISTINCT CASE WHEN ec.is_active = 1 THEN ec.id END) as active_categories,
+                    COUNT(DISTINCT CASE WHEN le.id IS NOT NULL THEN ec.id END) as categories_with_events
+                FROM event_categories ec
+                LEFT JOIN log_events le ON ec.id = le.category_id AND le.game_gid = ?
+                WHERE ec.game_gid IS NULL OR ec.game_gid = ?
+            """
+
+            breakdown_query = """
+                SELECT
+                    ec.id,
+                    ec.name,
+                    ec.name_cn,
+                    ec.description,
+                    ec.color,
+                    ec.icon,
+                    ec.is_active,
+                    ec.display_order,
+                    ec.created_at,
+                    ec.updated_at,
+                    COUNT(DISTINCT le.id) as event_count
+                FROM event_categories ec
+                LEFT JOIN log_events le ON ec.id = le.category_id AND le.game_gid = ?
+                WHERE ec.game_gid IS NULL OR ec.game_gid = ?
+                GROUP BY ec.id
+                ORDER BY ec.display_order, ec.name
+            """
+
+            stats = fetch_one_as_dict(stats_query, (game_gid, game_gid))
+            breakdown = fetch_all_as_dict(breakdown_query, (game_gid, game_gid))
+        else:
+            # 全局统计
+            stats_query = """
+                SELECT
+                    COUNT(DISTINCT ec.id) as total_categories,
+                    COUNT(DISTINCT CASE WHEN ec.is_active = 1 THEN ec.id END) as active_categories,
+                    COUNT(DISTINCT CASE WHEN le.id IS NOT NULL THEN ec.id END) as categories_with_events
+                FROM event_categories ec
+                LEFT JOIN log_events le ON ec.id = le.category_id
+            """
+
+            breakdown_query = """
+                SELECT
+                    ec.id,
+                    ec.name,
+                    ec.name_cn,
+                    ec.description,
+                    ec.color,
+                    ec.icon,
+                    ec.is_active,
+                    ec.display_order,
+                    ec.created_at,
+                    ec.updated_at,
+                    COUNT(DISTINCT le.id) as event_count
+                FROM event_categories ec
+                LEFT JOIN log_events le ON ec.id = le.category_id
+                GROUP BY ec.id
+                ORDER BY ec.display_order, ec.name
+            """
+
+            stats = fetch_one_as_dict(stats_query)
+            breakdown = fetch_all_as_dict(breakdown_query)
+
+        # 确保统计字段不为NULL
+        stats = {
+            "total_categories": stats.get("total_categories") or 0,
+            "active_categories": stats.get("active_categories") or 0,
+            "categories_with_events": stats.get("categories_with_events") or 0,
+        }
+
+        # 构建详细分类统计列表
+        category_breakdown = []
+        for row in breakdown:
+            category_breakdown.append({
+                "id": row["id"],
+                "name": row["name"],
+                "name_cn": row.get("name_cn"),
+                "description": row.get("description"),
+                "color": row.get("color"),
+                "icon": row.get("icon"),
+                "is_active": bool(row.get("is_active", 1)),
+                "display_order": row.get("display_order", 0),
+                "created_at": row.get("created_at"),
+                "updated_at": row.get("updated_at"),
+                "event_count": row.get("event_count") or 0,
+            })
+
+        return {
+            **stats,
+            "category_breakdown": category_breakdown,
+        }

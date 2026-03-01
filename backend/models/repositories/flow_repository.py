@@ -156,7 +156,7 @@ class FlowRepository(GenericRepository):
             1 if flow.is_active else 0,
         )
 
-        return execute_write(insert_sql, params)
+        return execute_write(insert_sql, params, return_last_id=True)
 
     def update(self, flow_id: int, flow: FlowEntity) -> bool:
         """

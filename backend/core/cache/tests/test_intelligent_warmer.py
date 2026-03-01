@@ -483,6 +483,172 @@ class TestIntelligentCacheWarmer:
         assert stats['buffer_capacity'] == 1000
         assert 'buffer_usage' in stats
 
+    def test_calculate_prediction_accuracy_perfect(self):
+        """测试完美预测准确率（100%）"""
+        warmer = IntelligentCacheWarmer()
+
+        # 记录一些访问
+        for _ in range(10):
+            warmer.record_access("key_1")
+        for _ in range(5):
+            warmer.record_access("key_2")
+
+        # 预测的键完全匹配实际访问
+        predicted_keys = ["key_1", "key_2"]
+
+        # 计算准确率
+        accuracy_stats = warmer.calculate_prediction_accuracy(predicted_keys)
+
+        assert accuracy_stats['accuracy'] == 100.0
+        assert accuracy_stats['predicted_count'] == 2.0
+        assert accuracy_stats['actual_hits'] == 2.0
+        assert accuracy_stats['hit_rate'] == 1.0
+
+        # 验证统计信息已更新
+        stats = warmer.get_stats()
+        assert stats['prediction_accuracy'] == 100.0
+        assert stats['predicted_count'] == 2.0
+        assert stats['actual_hits'] == 2.0
+
+    def test_calculate_prediction_accuracy_partial(self):
+        """测试部分准确率（50%）"""
+        warmer = IntelligentCacheWarmer()
+
+        # 记录访问
+        for _ in range(10):
+            warmer.record_access("key_1")
+        for _ in range(5):
+            warmer.record_access("key_2")
+
+        # 预测的键只有部分被访问
+        predicted_keys = ["key_1", "key_2", "key_3"]  # key_3没有被访问
+
+        # 计算准确率
+        accuracy_stats = warmer.calculate_prediction_accuracy(predicted_keys)
+
+        assert abs(accuracy_stats['accuracy'] - 66.67) < 0.01  # 2/3 * 100
+        assert accuracy_stats['predicted_count'] == 3.0
+        assert accuracy_stats['actual_hits'] == 2.0
+
+    def test_calculate_prediction_accuracy_zero(self):
+        """测试零准确率（0%）"""
+        warmer = IntelligentCacheWarmer()
+
+        # 记录访问
+        for _ in range(10):
+            warmer.record_access("key_1")
+
+        # 预测的键都没有被访问
+        predicted_keys = ["key_2", "key_3", "key_4"]
+
+        # 计算准确率
+        accuracy_stats = warmer.calculate_prediction_accuracy(predicted_keys)
+
+        assert accuracy_stats['accuracy'] == 0.0
+        assert accuracy_stats['predicted_count'] == 3.0
+        assert accuracy_stats['actual_hits'] == 0.0
+
+    def test_calculate_prediction_accuracy_empty_predictions(self):
+        """测试空预测列表（避免除零）"""
+        warmer = IntelligentCacheWarmer()
+
+        # 记录访问
+        for _ in range(10):
+            warmer.record_access("key_1")
+
+        # 空预测列表
+        predicted_keys = []
+
+        # 计算准确率
+        accuracy_stats = warmer.calculate_prediction_accuracy(predicted_keys)
+
+        assert accuracy_stats['accuracy'] == 0.0
+        assert accuracy_stats['predicted_count'] == 0.0
+        assert accuracy_stats['actual_hits'] == 0.0
+
+    def test_calculate_prediction_accuracy_time_window(self):
+        """测试时间窗口过滤"""
+        warmer = IntelligentCacheWarmer()
+
+        current_time = time.time()
+
+        # 添加旧访问（在时间窗口外）
+        warmer.access_log.append({
+            'key': 'old_key',
+            'timestamp': current_time - 400  # 超过默认的5分钟窗口
+        })
+
+        # 添加新访问（在时间窗口内）
+        warmer.access_log.append({
+            'key': 'new_key',
+            'timestamp': current_time - 100  # 在5分钟窗口内
+        })
+
+        # 预测的键
+        predicted_keys = ["old_key", "new_key"]
+
+        # 计算准确率（只有new_key应该算命中）
+        accuracy_stats = warmer.calculate_prediction_accuracy(
+            predicted_keys,
+            actual_access_window_seconds=300  # 5分钟窗口
+        )
+
+        # old_key在窗口外，不应该算命中
+        assert accuracy_stats['predicted_count'] == 2.0
+        assert accuracy_stats['actual_hits'] == 1.0
+        assert accuracy_stats['accuracy'] == 50.0
+
+    def test_warm_up_cache_includes_accuracy(self):
+        """测试预热包含准确率计算"""
+        warmer = IntelligentCacheWarmer()
+
+        # 记录一些访问
+        for _ in range(10):
+            warmer.record_access("hot_key_1")
+        for _ in range(5):
+            warmer.record_access("hot_key_2")
+
+        async def test_accuracy():
+            async def mock_fetch(key):
+                return f"data_{key}"
+
+            with patch('backend.core.cache.intelligent_warmer.hierarchical_cache') as mock_cache:
+                mock_cache.l1_cache = {}
+
+                # 执行预热
+                result = await warmer.warm_up_cache(
+                    keys=["hot_key_1", "hot_key_2", "cold_key"],
+                    fetch_callback=mock_fetch
+                )
+
+                # 验证返回包含准确率
+                assert 'accuracy' in result
+                assert result['accuracy'] > 50.0  # 至少2/3准确
+
+                # 验证统计信息已更新
+                stats = warmer.get_stats()
+                assert stats['prediction_accuracy'] > 0
+                assert stats['predicted_count'] == 3.0
+
+        asyncio.run(test_accuracy())
+
+    def test_prediction_stats_persistence(self):
+        """测试预测统计持久性"""
+        warmer = IntelligentCacheWarmer()
+
+        # 第一次计算
+        accuracy_stats1 = warmer.calculate_prediction_accuracy(["key_1"])
+        assert accuracy_stats1['predicted_count'] == 1.0
+
+        # 第二次计算（应该覆盖之前的值）
+        accuracy_stats2 = warmer.calculate_prediction_accuracy(["key_1", "key_2"])
+        assert accuracy_stats2['predicted_count'] == 2.0
+
+        # 验证最终的统计信息
+        stats = warmer.get_stats()
+        assert stats['predicted_count'] == 2.0
+        assert stats['actual_hits'] >= 0
+
     def test_concurrent_access_recording(self):
         """测试并发访问记录"""
         import threading

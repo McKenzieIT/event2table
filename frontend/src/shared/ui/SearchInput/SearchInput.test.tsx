@@ -1,10 +1,9 @@
-// @ts-nocheck - TypeScript检查暂禁用
 /**
  * SearchInput Component Tests
  * 测试搜索输入组件的所有功能
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SearchInput from './SearchInput';

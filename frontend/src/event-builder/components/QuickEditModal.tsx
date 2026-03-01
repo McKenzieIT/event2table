@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { eventNodesApi } from "@shared/api/eventNodes";
 import type { EventNode } from "@shared/types/eventNodes";
 import { BaseModal } from "@shared/ui/BaseModal";
-import { Button } from "@shared/ui/Button";
+import { Button } from "@shared/ui";
 
 /**
  * Zod验证schema

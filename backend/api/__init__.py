@@ -28,6 +28,7 @@ api_bp = Blueprint("api", __name__)
 # These imports must come after creating the blueprint to avoid circular imports
 from .routes import (
       graphql,  # GraphQL API
+    cache,  # Cache management endpoints
     categories,
     dashboard,
     event_parameters,

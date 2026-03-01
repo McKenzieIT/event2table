@@ -10,64 +10,24 @@ Core endpoints:
 - GET /api/join-configs/<int:id> - Get a single join configuration
 - PUT /api/join-configs/<int:id> - Update a join configuration
 - DELETE /api/join-configs/<int:id> - Delete a join configuration
+
+Architecture: API Layer → Service Layer → Repository Layer
 """
 
 import logging
-import sqlite3
-
-# Import cache functions
-import sys
-
-from flask import request
+import json
+from flask import request, session
 
 # Import shared utilities
 from backend.core.utils import (
-    execute_write,
-    fetch_all_as_dict,
-    fetch_one_as_dict,
     json_error_response,
     json_success_response,
     validate_json_request,
 )
 
-# Allowed fields for dynamic UPDATE
-ALLOWED_UPDATE_FIELDS = {
-    "name",
-    "display_name",
-    "source_events",
-    "join_condition",
-    "output_fields",
-    "output_table",
-    "join_type",
-    "where_conditions",
-    "field_mappings",
-    "description",
-    "game_id",
-}
-
-sys.path.append("..")
-try:
-    from backend.core.cache.cache_system import clear_cache_pattern
-except ImportError:
-
-    def clear_cache_pattern(pattern):
-        """
-        Clear cache entries matching a pattern (fallback implementation).
-
-        This is a fallback function used when the cache_system module
-        is not available. It does nothing but prevents ImportError.
-
-        Args:
-            pattern (str): Cache key pattern to match (unused in fallback)
-
-        Returns:
-            None
-        """
-        pass
-
-
-# Import Repository pattern for data access
-from backend.core.data_access import Repositories
+# Import Service Layer
+from backend.services.join_configs.join_config_service import JoinConfigService
+from backend.models.entities import JoinConfigEntity
 
 # Import the parent blueprint
 from .. import api_bp
@@ -94,25 +54,17 @@ def api_list_join_configs():
 
     join_type = request.args.get("join_type")
 
-    query = "SELECT * FROM join_configs WHERE 1=1"
-    params = []
-
-    # Use game_gid for filtering
-    filter_value = game_gid
-
-    if filter_value:
-        query += f" AND {filter_column} = ?"
-        params.append(filter_value)
-
-    if join_type:
-        query += " AND join_type = ?"
-        params.append(join_type)
-
-    query += " ORDER BY created_at DESC"
-
     try:
-        configs = fetch_all_as_dict(query, tuple(params))
-        return json_success_response(data=configs)
+        service = JoinConfigService()
+        configs = service.list_join_configs(game_gid, join_type)
+
+        # Convert Entity objects to dict
+        configs_data = [config.model_dump() for config in configs]
+        return json_success_response(data=configs_data)
+
+    except ValueError as e:
+        logger.error(f"Validation error listing join configs: {e}")
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error listing join configs: {e}")
         return json_error_response("Failed to fetch join configs", status_code=500)
@@ -122,12 +74,17 @@ def api_list_join_configs():
 def api_get_join_config(id):
     """API: Get a single join configuration by ID"""
     try:
-        config = Repositories.JOIN_CONFIGS.find_by_id(id)
+        service = JoinConfigService()
+        config = service.get_join_config_by_id(id)
 
         if not config:
             return json_error_response("Join config not found", status_code=404)
 
-        return json_success_response(data=config)
+        return json_success_response(data=config.model_dump())
+
+    except ValueError as e:
+        logger.error(f"Validation error fetching join config {id}: {e}")
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error fetching join config {id}: {e}")
         return json_error_response("Failed to fetch join config", status_code=500)
@@ -142,13 +99,13 @@ def api_create_join_config():
     {
         "name": "config_name",
         "display_name": "Display Name",
-        "source_events": "[1,2,3]",  # JSON array
-        "join_conditions": "{}",  # JSON for JOIN type
-        "output_fields": "[]",  # JSON array
+        "source_events": [1,2,3],  # JSON array (or string)
+        "join_config": {},  # JSON for JOIN type (or join_condition)
+        "output_fields": [],  # JSON array (or string)
         "output_table": "dwd_output_view",
         "join_type": "union_all|join|where_in",
-        "where_conditions": "{}",  # optional
-        "field_mappings": "{}",  # optional
+        "where_conditions": {},  # optional
+        "field_mappings": {},  # optional
         "description": "Description",
         "game_gid": 10000147
     }
@@ -167,17 +124,29 @@ def api_create_join_config():
         return json_error_response(error, status_code=400)
 
     try:
-        # Validate JSON fields
-        import json
+        service = JoinConfigService()
 
-        try:
-            source_events_list = json.loads(data["source_events"])
-            output_fields_list = json.loads(data["output_fields"])
-        except json.JSONDecodeError as e:
-            return json_error_response(
-                f"Invalid JSON in source_events or output_fields: {str(e)}",
-                status_code=400,
-            )
+        # Parse JSON fields if they are strings
+        def parse_json_field(value, field_name):
+            """Parse JSON field if it's a string, otherwise return as-is"""
+            if isinstance(value, str):
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError as e:
+                    raise ValueError(f"Invalid JSON in {field_name}: {str(e)}")
+            return value
+
+        # Parse JSON fields
+        source_events = parse_json_field(data["source_events"], "source_events")
+        output_fields = parse_json_field(data["output_fields"], "output_fields")
+
+        # Handle join_config (API may send join_condition)
+        join_config = data.get("join_config") or data.get("join_condition", {})
+        join_config = parse_json_field(join_config, "join_config")
+
+        # Parse optional JSON fields
+        where_conditions = data.get("where_conditions", {})
+        field_mappings = data.get("field_mappings", {})
 
         # Validate join_type
         join_type = data.get("join_type", "join")
@@ -186,56 +155,33 @@ def api_create_join_config():
                 f"Invalid join_type: {join_type}", status_code=400
             )
 
-        # Prepare join_condition based on type
-        join_condition = data.get("join_condition", "{}")
-        if join_type == "join" and not join_condition:
-            return json_error_response(
-                "join_condition required for JOIN type", status_code=400
-            )
-
-        # Convert game_gid to game_id for database storage (if needed)
-        game_gid = data["game_gid"]
-        game = Repositories.GAMES.find_by_field("gid", game_gid)
-        if not game:
-            return json_error_response(
-                f"Game with GID {game_gid} not found", status_code=404
-            )
-
-        # Insert join config (store game_id internally for foreign key)
-        config_id = execute_write(
-            """
-            INSERT INTO join_configs (
-                name, display_name, source_events, join_condition,
-                output_fields, output_table, join_type,
-                where_conditions, field_mappings, description, game_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            (
-                data["name"],
-                data["display_name"],
-                data["source_events"],
-                join_condition,
-                data["output_fields"],
-                data["output_table"],
-                join_type,
-                data.get("where_conditions", "{}"),
-                data.get("field_mappings", "{}"),
-                data.get("description", data["display_name"]),
-                game["id"],  # Store database ID for foreign key
-            ),
-            return_last_id=True,
+        # Create JoinConfigEntity (Pydantic will validate)
+        config_data = JoinConfigEntity(
+            name=data["name"],
+            display_name=data["display_name"],
+            source_events=source_events,
+            join_config=join_config,
+            output_fields=output_fields,
+            output_table=data["output_table"],
+            join_type=join_type,
+            where_conditions=where_conditions,
+            field_mappings=field_mappings,
+            description=data.get("description", data["display_name"]),
+            game_gid=data["game_gid"],
         )
 
-        clear_cache_pattern("join_configs")
-        logger.info(f"Created join config {config_id}: {data['name']}")
+        # Create config via service
+        created_config = service.create_join_config(config_data)
 
         return json_success_response(
-            data={"config_id": config_id},
+            data={"config_id": created_config.id},
             message="Join configuration created successfully",
         )
 
-    except sqlite3.IntegrityError:
-        return json_error_response("Join config name already exists", status_code=400)
+    except ValueError as e:
+        # Validation errors from service or Pydantic
+        logger.error(f"Validation error creating join config: {e}")
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error creating join config: {e}")
         return json_error_response("Failed to create join config", status_code=500)
@@ -246,35 +192,17 @@ def api_update_join_config(id):
     """
     API: Update an existing join configuration
 
-    Request body: Same as create
+    Request body: Same as create (all fields optional)
     """
-    join_config = Repositories.JOIN_CONFIGS.find_by_id(id)
-    if not join_config:
-        return json_error_response("Join config not found", status_code=404)
-
     is_valid, data, error = validate_json_request()
     if not is_valid:
         return json_error_response(error, status_code=400)
 
+    if not data:
+        return json_error_response("No fields to update", status_code=400)
+
     try:
-        import json
-
-        # Validate JSON fields if provided
-        if "source_events" in data:
-            try:
-                json.loads(data["source_events"])
-            except json.JSONDecodeError:
-                return json_error_response(
-                    "Invalid JSON in source_events", status_code=400
-                )
-
-        if "output_fields" in data:
-            try:
-                json.loads(data["output_fields"])
-            except json.JSONDecodeError:
-                return json_error_response(
-                    "Invalid JSON in output_fields", status_code=400
-                )
+        service = JoinConfigService()
 
         # Validate join_type if provided
         if "join_type" in data:
@@ -283,51 +211,33 @@ def api_update_join_config(id):
                     f"Invalid join_type: {data['join_type']}", status_code=400
                 )
 
-        # Handle game_gid conversion to game_id for database storage
-        if "game_gid" in data:
-            game_gid = data["game_gid"]
-            game = Repositories.GAMES.find_by_field("gid", game_gid)
-            if not game:
-                return json_error_response(
-                    f"Game with GID {game_gid} not found", status_code=404
-                )
-            # Store game_id internally for foreign key
-            data["game_id"] = game["id"]
-            # Remove game_gid from data as it's not a database column
-            del data["game_gid"]
+        # Parse JSON fields if they are strings (service handles dict objects)
+        json_fields = ["source_events", "join_config", "join_condition", "output_fields", "where_conditions", "field_mappings"]
+        for field in json_fields:
+            if field in data and isinstance(data[field], str):
+                try:
+                    data[field] = json.loads(data[field])
+                except json.JSONDecodeError:
+                    return json_error_response(
+                        f"Invalid JSON in {field}", status_code=400
+                    )
 
-        # Build UPDATE query dynamically
-        update_fields = []
-        update_values = []
+        # Handle alias: join_condition → join_config
+        if "join_condition" in data and "join_config" not in data:
+            data["join_config"] = data.pop("join_condition")
 
-        # Validate input fields against whitelist
-        provided_fields = set(data.keys())
-        invalid_fields = provided_fields - ALLOWED_UPDATE_FIELDS
-        if invalid_fields:
-            return json_error_response(
-                f"Invalid fields: {', '.join(sorted(invalid_fields))}. "
-                f"Allowed fields: {', '.join(sorted(ALLOWED_UPDATE_FIELDS))}",
-                status_code=400,
-            )
+        # Update config via service
+        updated_config = service.update_join_config(id, data)
 
-        for field in ALLOWED_UPDATE_FIELDS:
-            if field in data:
-                update_fields.append(f"{field} = ?")
-                update_values.append(data[field])
+        return json_success_response(
+            data=updated_config.model_dump(),
+            message="Join configuration updated successfully"
+        )
 
-        if not update_fields:
-            return json_error_response("No fields to update", status_code=400)
-
-        update_values.append(id)
-        update_query = f"UPDATE join_configs SET {', '.join(update_fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-
-        execute_write(update_query, tuple(update_values))
-
-        clear_cache_pattern("join_configs")
-        logger.info(f"Updated join config {id}")
-
-        return json_success_response(message="Join configuration updated successfully")
-
+    except ValueError as e:
+        # Validation errors from service
+        logger.error(f"Validation error updating join config {id}: {e}")
+        return json_error_response(str(e), status_code=404 if "not found" in str(e).lower() else 400)
     except Exception as e:
         logger.error(f"Error updating join config {id}: {e}")
         return json_error_response("Failed to update join config", status_code=500)
@@ -336,17 +246,16 @@ def api_update_join_config(id):
 @api_bp.route("/api/join-configs/<int:id>", methods=["DELETE"])
 def api_delete_join_config(id):
     """API: Delete a join configuration"""
-    join_config = Repositories.JOIN_CONFIGS.find_by_id(id)
-    if not join_config:
-        return json_error_response("Join config not found", status_code=404)
-
     try:
-        Repositories.JOIN_CONFIGS.delete(id)
-
-        clear_cache_pattern("join_configs")
-        logger.info(f"Deleted join config {id}: {join_config['name']}")
+        service = JoinConfigService()
+        service.delete_join_config(id)
 
         return json_success_response(message="Join configuration deleted successfully")
+
+    except ValueError as e:
+        # Config not found
+        logger.error(f"Validation error deleting join config {id}: {e}")
+        return json_error_response(str(e), status_code=404)
     except Exception as e:
         logger.error(f"Error deleting join config {id}: {e}")
         return json_error_response("Failed to delete join config", status_code=500)

@@ -203,30 +203,72 @@ class CategoryRepository(GenericRepository):
         conn.close()
         return deleted_count > 0
 
-    def batch_delete(self, category_ids: List[int]) -> int:
+    def batch_delete(self, category_ids: List[int]) -> Dict[str, Any]:
         """
-        批量删除类别
+        批量删除类别（带外键约束检查）
 
         Args:
             category_ids: 类别ID列表
 
         Returns:
-            删除的类别数量
+            包含删除结果的字典：
+            - deleted_count: 成功删除的数量
+            - failed_ids: 删除失败的ID列表
+            - failed_reasons: 失败原因字典 {id: reason}
         """
-        if not category_ids:
-            return 0
-
-        placeholders = ",".join(["?" for _ in category_ids])
-        query = f"DELETE FROM event_categories WHERE id IN ({placeholders})"
-
         from backend.core.utils.converters import get_db_connection
+
+        if not category_ids:
+            return {
+                "deleted_count": 0,
+                "failed_ids": [],
+                "failed_reasons": {}
+            }
+
+        result = {
+            "deleted_count": 0,
+            "failed_ids": [],
+            "failed_reasons": {}
+        }
+
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(query, category_ids)
-        deleted_count = cursor.rowcount
-        conn.commit()
-        conn.close()
-        return deleted_count
+
+        try:
+            # 检查每个类别的外键约束
+            for category_id in category_ids:
+                # 检查类别是否存在
+                cursor.execute("SELECT id FROM event_categories WHERE id = ?", (category_id,))
+                if not cursor.fetchone():
+                    result["failed_ids"].append(category_id)
+                    result["failed_reasons"][category_id] = "Category not found"
+                    continue
+
+                # 检查是否有事件引用此类别
+                cursor.execute(
+                    "SELECT COUNT(*) FROM log_events WHERE category_id = ?",
+                    (category_id,)
+                )
+                event_count = cursor.fetchone()[0]
+
+                if event_count > 0:
+                    result["failed_ids"].append(category_id)
+                    result["failed_reasons"][category_id] = f"Category has {event_count} associated events"
+                    continue
+
+                # 可以删除
+                cursor.execute("DELETE FROM event_categories WHERE id = ?", (category_id,))
+                if cursor.rowcount > 0:
+                    result["deleted_count"] += 1
+
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+        return result
 
     def batch_update(self, category_ids: List[int], updates: Dict[str, Any]) -> int:
         """

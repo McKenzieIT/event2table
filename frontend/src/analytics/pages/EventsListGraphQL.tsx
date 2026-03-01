@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import React from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import {
   Button,
   Input,

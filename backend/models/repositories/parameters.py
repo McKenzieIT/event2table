@@ -12,7 +12,7 @@ Parameter Repository (参数数据访问层 - 精简架构)
 from typing import Optional, List, Dict, Any
 from backend.core.data_access import GenericRepository
 from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, get_db_connection
-from backend.models.entities import ParameterEntity
+from backend.models.entities import ParameterEntity, CommonParameterEntity
 
 
 class ParameterRepository(GenericRepository):
@@ -664,3 +664,175 @@ class ParameterRepository(GenericRepository):
         conn.commit()
         conn.close()
         return deleted_count > 0
+
+    # ========== Common Params Methods ==========
+
+    def get_common_params_by_game(self, game_gid: int) -> List[Dict[str, Any]]:
+        """
+        获取指定游戏的公共参数列表
+
+        Args:
+            game_gid: 游戏GID
+
+        Returns:
+            公共参数字典列表
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> params = repo.get_common_params_by_game(10000147)
+        """
+        # First get game_id from game_gid
+        game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+        if not game:
+            return []
+
+        game_id = game["id"]
+
+        query = """
+            SELECT
+                id,
+                game_gid,
+                param_name,
+                param_name_cn,
+                param_type,
+                table_name,
+                status,
+                created_at,
+                updated_at
+            FROM common_params
+            WHERE game_gid = ?
+            ORDER BY created_at DESC
+        """
+        return fetch_all_as_dict(query, (game_gid,))
+
+    def find_common_param_by_name(self, game_gid: int, param_name: str) -> Optional[Dict[str, Any]]:
+        """
+        根据游戏GID和参数名查找公共参数
+
+        Args:
+            game_gid: 游戏GID
+            param_name: 参数名称
+
+        Returns:
+            公共参数字典，不存在返回None
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> param = repo.find_common_param_by_name(10000147, 'zone_id')
+        """
+        query = """
+            SELECT * FROM common_params
+            WHERE game_gid = ? AND param_name = ?
+        """
+        return fetch_one_as_dict(query, (game_gid, param_name))
+
+    def create_common_param(self, param_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        创建公共参数
+
+        Args:
+            param_data: 公共参数数据
+
+        Returns:
+            创建的公共参数字典，失败返回None
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> param = repo.create_common_param({
+            ...     'game_id': 1,
+            ...     'game_gid': 10000147,
+            ...     'param_name': 'zone_id',
+            ...     'param_name_cn': '区域ID',
+            ...     'param_type': 'string',
+            ...     'table_name': 'common'
+            ... })
+        """
+        from backend.core.utils.converters import get_db_connection
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            query = """
+                INSERT INTO common_params (
+                    game_id, game_gid, param_name, param_name_cn, param_type,
+                    table_name, status, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, 'synced', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            """
+            cursor.execute(query, (
+                param_data.get('game_id'),
+                param_data.get('game_gid'),
+                param_data.get('param_name'),
+                param_data.get('param_name_cn'),
+                param_data.get('param_type', 'string'),
+                param_data.get('table_name', 'common')
+            ))
+            param_id = cursor.lastrowid
+            conn.commit()
+
+            return fetch_one_as_dict("SELECT * FROM common_params WHERE id = ?", (param_id,))
+
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+    def delete_common_param(self, param_id: int) -> bool:
+        """
+        删除公共参数
+
+        Args:
+            param_id: 公共参数ID
+
+        Returns:
+            是否删除成功
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> success = repo.delete_common_param(1)
+        """
+        from backend.core.utils.converters import get_db_connection
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("DELETE FROM common_params WHERE id = ?", (param_id,))
+            deleted_count = cursor.rowcount
+            conn.commit()
+            return deleted_count > 0
+        finally:
+            conn.close()
+
+    def delete_common_params_batch(self, param_ids: List[int]) -> int:
+        """
+        批量删除公共参数
+
+        Args:
+            param_ids: 公共参数ID列表
+
+        Returns:
+            删除的参数数量
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> count = repo.delete_common_params_batch([1, 2, 3])
+        """
+        if not param_ids:
+            return 0
+
+        from backend.core.utils.converters import get_db_connection
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            placeholders = ",".join(["?" for _ in param_ids])
+            query = f"DELETE FROM common_params WHERE id IN ({placeholders})"
+            cursor.execute(query, tuple(param_ids))
+            deleted_count = cursor.rowcount
+            conn.commit()
+            return deleted_count
+        finally:
+            conn.close()

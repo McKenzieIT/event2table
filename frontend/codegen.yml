@@ -24,6 +24,8 @@ generates:
       addDocBlocks: true
       avoidOptionals: false
       maybeValue: T | null | undefined
+      # Fix for Apollo Client 4.x - ensure hooks are properly imported
+      useExactImportTypes: true
 
   ./graphql.schema.json:
     plugins:

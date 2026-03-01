@@ -14,22 +14,20 @@ Core endpoints:
 - GET /api/parameters/common - Get common parameters
 - GET /api/parameters/validate - Validate parameter
 
-Performance Optimization (2026-02-11):
-- Composite indexes on event_params table
-- Hierarchical caching (L1: 60s, L2: 300s)
-- Cache invalidation on mutations
-- Query optimization for 70% performance improvement
+Architecture Update (2026-02-28):
+- Migrated to use ParameterService instead of direct database access
+- Uses unified Entity model (ParameterEntity)
+- Service layer handles business logic and caching
+- Repository layer handles data access
 
 ================================================================================
-SCHEMA USAGE RECOMMENDATION (Phase 3)
+PARAMETER SERVICE USAGE
 ================================================================================
-This module currently uses manual validation via validate_json_request().
-For better type safety and automatic validation, consider using Pydantic Schemas.
-
-Available Schemas in backend/models/schemas.py:
-- ParameterCreate: For creating new parameters
-- ParameterUpdate: For updating existing parameters
-- ParameterResponse: For API responses
+All parameter operations now go through ParameterService:
+- Query operations: Use ParameterService.get_*() methods
+- Mutation operations: Use ParameterService.create/update/delete()
+- Caching: Automatic cache management via service decorators
+- Validation: Automatic validation via Pydantic Entity models
 ================================================================================
 """
 
@@ -49,21 +47,14 @@ from backend.core.utils import (
     validate_json_request,
 )
 
+# Import ParameterService for business logic
+from backend.services.parameters.parameter_service import ParameterService
+
 # Import parameter route helpers (code complexity reduction)
 from backend.api.routes._param_helpers import (
     resolve_game_context,
     get_where_clause_for_game,
     validate_parameter_name,
-)
-
-# Import Repository pattern for data access
-from backend.core.data_access import Repositories
-
-# Import hierarchical caching system
-from backend.core.cache.cache_system import (
-    hierarchical_cache,
-    CacheInvalidator,
-    CacheKeyBuilder,
 )
 
 # Import the parent blueprint
@@ -84,15 +75,6 @@ def _get_game_gid_from_id(game_id: int) -> Optional[int]:
     """Cached game_id to game_gid conversion"""
     game = fetch_one_as_dict("SELECT gid FROM games WHERE id = ?", (game_id,))
     return game["gid"] if game else None
-
-
-# Cache invalidator for parameter-related cache
-cache_invalidator = CacheInvalidator(hierarchical_cache)
-
-# Cache TTL configuration
-PARAMETERS_ALL_CACHE_TTL = 300  # 5 minutes for parameters list
-PARAMETERS_DETAILS_CACHE_TTL = 600  # 10 minutes for parameter details
-PARAMETERS_STATS_CACHE_TTL = 300  # 5 minutes for stats
 
 
 @api_bp.route("/api/parameters/all", methods=["GET"])
@@ -438,50 +420,41 @@ def api_get_parameter_stats():
 
 @api_bp.route("/api/parameters/<int:id>", methods=["PUT"])
 def api_update_parameter(id):
-    """API: Update parameter information"""
+    """
+    API: Update parameter information
+
+    Uses ParameterService for business logic and cache management.
+    """
     is_valid, data, error = validate_json_request(["param_name"])
     if not is_valid:
         return json_error_response(error, status_code=400)
 
     try:
-        param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
-        if not param:
-            return json_error_response("Parameter not found", status_code=404)
+        service = ParameterService()
 
-        from backend.core.utils import execute_write
+        # Map API field name to Entity field name
+        update_data = {"name": data["param_name"]}
 
-        execute_write(
-            "UPDATE event_params SET param_name = ? WHERE id = ?",
-            (data["param_name"], id),
+        # Add additional fields if provided
+        if "param_name_cn" in data:
+            update_data["param_name_cn"] = data["param_name_cn"]
+        if "param_type" in data:
+            update_data["param_type"] = data["param_type"]
+        if "json_path" in data:
+            update_data["json_path"] = data["json_path"]
+
+        # Update parameter via service
+        updated_param = service.update_parameter(id, update_data)
+
+        logger.info(f"Parameter updated via service: {id} -> {data['param_name']}")
+        return json_success_response(
+            data=updated_param.model_dump(),
+            message="Parameter updated successfully"
         )
 
-        # Invalidate parameter-related caches
-        # Invalidate all pages for this parameter
-        try:
-            # Get event_id to determine game_id
-            event = fetch_one_as_dict(
-                "SELECT game_id FROM log_events WHERE id = ?", (param["event_id"],)
-            )
-            if event:
-                game_id = event["game_id"]
-
-                # Invalidate all pages of parameters.all for this game
-                cache_invalidator.invalidate_pattern("parameters.all", game_id=game_id)
-
-                # Invalidate parameter details cache
-                cache_invalidator.invalidate(
-                    "parameters.details", param_name=param["param_name"]
-                )
-
-                logger.info(
-                    f"✅ Cache invalidated for parameter update: id={id}, game_id={game_id}"
-                )
-        except Exception as cache_error:
-            logger.warning(f"⚠️ Cache invalidation failed: {cache_error}")
-
-        logger.info(f"Parameter updated: {id} -> {data['param_name']}")
-        return json_success_response(message="Parameter updated successfully")
-
+    except ValueError as e:
+        logger.error(f"Validation error updating parameter {id}: {e}")
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error updating parameter {id}: {e}", exc_info=True)
         return json_error_response("Failed to update parameter", status_code=500)
@@ -642,11 +615,25 @@ def api_validate_parameter():
 
 @api_bp.route("/api/parameters/<int:id>", methods=["GET"])
 def api_get_parameter(id):
-    """API: Get parameter by ID"""
-    param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
-    if not param:
-        return json_error_response("Parameter not found", status_code=404)
-    return json_success_response(data=param)
+    """
+    API: Get parameter by ID
+
+    Uses ParameterService for data access.
+    """
+    try:
+        service = ParameterService()
+        param = service.get_parameter_by_id(id)
+
+        if not param:
+            return json_error_response("Parameter not found", status_code=404)
+
+        return json_success_response(data=param.model_dump())
+
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.error(f"Error getting parameter {id}: {e}", exc_info=True)
+        return json_error_response("Failed to get parameter", status_code=500)
 
 
 @api_bp.route("/api/param-library/check", methods=["GET"])

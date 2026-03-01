@@ -191,15 +191,24 @@ class CacheAlertManager:
     - L1使用率 >95% → CRITICAL (自动扩容)
     """
 
-    def __init__(self, hierarchical_cache):
+    def __init__(self, hierarchical_cache, warmup_callback=None):
         """
         初始化告警管理器
 
         Args:
             hierarchical_cache: 三级缓存实例
+            warmup_callback: 预热回调函数 (避免循环依赖)
         """
         self.cache = hierarchical_cache
         self.metrics_history = MetricsHistory(max_size=3600)
+        self._warmup_callback = warmup_callback
+
+        # 预热统计
+        self._warmup_stats = {
+            "triggered_count": 0,
+            "last_triggered_time": 0,
+            "last_trigger_result": None
+        }
 
         # 告警规则定义
         self.alert_rules: List[AlertRule] = [
@@ -340,6 +349,9 @@ class CacheAlertManager:
 
         self._last_check_time = current_time
 
+        # 获取Redis内存使用情况
+        l2_memory_usage = self._get_redis_memory_usage()
+
         # 创建快照
         snapshot = MetricSnapshot(
             timestamp=current_time,
@@ -347,7 +359,7 @@ class CacheAlertManager:
             l2_hit_rate=l2_hit_rate,
             overall_hit_rate=overall_hit_rate,
             l1_usage=l1_usage,
-            l2_memory_usage=0.0,  # TODO: 从Redis获取
+            l2_memory_usage=l2_memory_usage,
             qps=qps,
             avg_response_time_ms=avg_response_time
         )
@@ -516,11 +528,135 @@ class CacheAlertManager:
             logger.error(f"❌ L1缓存扩容失败: {e}")
 
     def _trigger_warm_up(self):
-        """触发缓存预热"""
-        logger.warning("🔥 触发缓存预热")
-        # TODO: 调用智能预热系统
-        # from .intelligent_warmer import cache_warmer
-        # cache_warmer.warm_up_cache()
+        """
+        触发缓存预热
+
+        使用回调函数机制避免循环依赖:
+        - monitoring.py (core层) 不直接依赖 services/cache
+        - 由上层应用 (web_app.py) 注入预热回调
+        - 支持同步和异步预热
+        """
+        try:
+            logger.warning("🔥 检测到缓存命中率过低，触发自动预热")
+
+            # 记录触发时间
+            self._warmup_stats["triggered_count"] += 1
+            self._warmup_stats["last_triggered_time"] = time.time()
+
+            # 调用预热回调
+            if self._warmup_callback is not None:
+                logger.info("✅ 执行预热回调函数")
+
+                # 支持同步和异步回调
+                import asyncio
+                result = self._warmup_callback()
+
+                # 检查是否是协程函数
+                if asyncio.iscoroutine(result):
+                    # 在新的事件循环中运行异步函数
+                    try:
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        result = loop.run_until_complete(result)
+                        loop.close()
+                    except Exception as e:
+                        logger.error(f"❌ 异步预热执行失败: {e}")
+                        result = {"error": str(e)}
+
+                # 记录结果
+                self._warmup_stats["last_trigger_result"] = result
+
+                # 记录预热日志
+                if isinstance(result, dict):
+                    warmed = result.get("warmed", result.get("games_warmed", 0))
+                    total = warmed + result.get("failed", 0) + result.get("skipped", 0)
+                    logger.info(
+                        f"✅ 缓存预热完成: "
+                        f"预热 {warmed}/{total} 个键"
+                    )
+
+                    # 如果有详细的统计信息
+                    if "games_warmed" in result:
+                        logger.info(
+                            f"  - 游戏: {result.get('games_warmed', 0)}, "
+                            f"事件: {result.get('events_warmed', 0)}, "
+                            f"参数: {result.get('params_warmed', 0)}"
+                        )
+                else:
+                    logger.info(f"✅ 缓存预热完成: {result}")
+
+            else:
+                logger.warning(
+                    "⚠️ 未配置预热回调函数，跳过自动预热。"
+                    "请在初始化时传入 warmup_callback 参数。"
+                )
+                logger.info(
+                    "💡 提示: 在 web_app.py 中配置回调示例:\n"
+                    "   from backend.services.cache.cache_warmup import CacheWarmer\n"
+                    "   warmer = CacheWarmer()\n"
+                    "   alert_manager = get_cache_alert_manager(\n"
+                    "       hierarchical_cache,\n"
+                    "       warmup_callback=warmer.warmup_all\n"
+                    "   )"
+                )
+
+        except Exception as e:
+            logger.error(f"❌ 缓存预热触发失败: {e}", exc_info=True)
+            self._warmup_stats["last_trigger_result"] = {"error": str(e)}
+
+    def _get_redis_memory_usage(self) -> float:
+        """
+        获取Redis内存使用情况
+
+        使用Redis INFO命令获取memory信息，返回内存使用率（百分比）
+
+        Returns:
+            内存使用率（0.0-1.0），如果获取失败则返回0.0
+
+        Example:
+            >>> usage = self._get_redis_memory_usage()
+            >>> print(f"Redis内存使用率: {usage:.2%}")
+            Redis内存使用率: 45.23%
+        """
+        try:
+            # 获取Redis客户端
+            redis_client = self.cache._get_redis_client()
+
+            if redis_client is None:
+                logger.debug("⚠️ Redis客户端不可用，无法获取内存信息")
+                return 0.0
+
+            # 执行INFO memory命令
+            memory_info = redis_client.info("memory")
+
+            # 提取内存信息
+            used_memory = memory_info.get("used_memory", 0)  # bytes
+            max_memory = memory_info.get("maxmemory", 0)  # bytes
+
+            # 如果没有设置maxmemory，则使用系统内存作为参考
+            if max_memory == 0:
+                # 获取系统总内存（可选，这里简化为0表示无限制）
+                # 返回已使用内存（MB）而非百分比
+                used_memory_mb = used_memory / (1024 * 1024)
+                logger.debug(
+                    f"📊 Redis内存使用: {used_memory_mb:.2f}MB (无maxmemory限制)"
+                )
+                # 返回0.0表示未设置限制（无法计算使用率）
+                return 0.0
+
+            # 计算内存使用率
+            memory_usage_rate = used_memory / max_memory if max_memory > 0 else 0.0
+
+            logger.debug(
+                f"📊 Redis内存使用: {used_memory / (1024 * 1024):.2f}MB / "
+                f"{max_memory / (1024 * 1024):.2f}MB ({memory_usage_rate:.2%})"
+            )
+
+            return memory_usage_rate
+
+        except Exception as e:
+            logger.warning(f"⚠️ 获取Redis内存信息失败: {e}")
+            return 0.0
 
     def get_active_alerts(self) -> List[Dict[str, Any]]:
         """
@@ -565,13 +701,15 @@ class CacheAlertManager:
             "l2_hit_rate": f"{latest.l2_hit_rate:.2%}",
             "overall_hit_rate": f"{latest.overall_hit_rate:.2%}",
             "l1_usage": f"{latest.l1_usage:.1f}%",
+            "l2_memory_usage": f"{latest.l2_memory_usage:.2%}",
             "qps": f"{latest.qps:.2f}",
             "avg_response_time_ms": f"{latest.avg_response_time_ms:.2f}",
             "trends": {
                 "l1_hit_rate_5min": self.metrics_history.get_trend("l1_hit_rate", 300),
                 "l2_hit_rate_5min": self.metrics_history.get_trend("l2_hit_rate", 300),
                 "overall_hit_rate_5min": self.metrics_history.get_trend("overall_hit_rate", 300),
-            }
+            },
+            "warmup_stats": self._warmup_stats
         }
 
     def reset(self):
@@ -630,15 +768,24 @@ _global_alert_manager: Optional[CacheAlertManager] = None
 _alert_manager_lock = Lock()
 
 
-def get_cache_alert_manager(hierarchical_cache=None):
+def get_cache_alert_manager(hierarchical_cache=None, warmup_callback=None):
     """
     Get or create the global CacheAlertManager instance.
 
     Args:
         hierarchical_cache: 三级缓存实例（仅首次调用时需要）
+        warmup_callback: 预热回调函数，可选（用于自动预热触发）
 
     Returns:
         CacheAlertManager instance
+
+    Example:
+        >>> from backend.services.cache.cache_warmup import CacheWarmer
+        >>> warmer = CacheWarmer()
+        >>> alert_manager = get_cache_alert_manager(
+        ...     hierarchical_cache,
+        ...     warmup_callback=warmer.warmup_all
+        ... )
     """
     global _global_alert_manager
 
@@ -649,7 +796,14 @@ def get_cache_alert_manager(hierarchical_cache=None):
                     "hierarchical_cache is required on first call to get_cache_alert_manager"
                 )
             logger.info("Creating global CacheAlertManager instance")
-            _global_alert_manager = CacheAlertManager(hierarchical_cache)
+            _global_alert_manager = CacheAlertManager(
+                hierarchical_cache,
+                warmup_callback=warmup_callback
+            )
+        elif warmup_callback is not None:
+            # 更新已有实例的回调
+            logger.info("Updating warmup callback for existing CacheAlertManager")
+            _global_alert_manager._warmup_callback = warmup_callback
 
         return _global_alert_manager
 

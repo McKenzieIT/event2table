@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
 import { useGameContext } from '@shared/hooks/useGameContext';

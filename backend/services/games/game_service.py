@@ -12,6 +12,8 @@ Game Service - 业务逻辑层 (精简架构)
 
 from typing import List, Optional
 import logging
+import threading
+import os
 from backend.models.entities import GameEntity
 from backend.models.repositories.games import GameRepository
 from backend.core.cache.cache_system import CacheInvalidator, cached
@@ -30,13 +32,33 @@ class GameService:
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
 
-        # 初始化Bloom Filter防止缓存穿透
-        self.bloom_filter = EnhancedBloomFilter(
-            capacity=100000,  # 10万容量
-            error_rate=0.001,  # 0.1%误判率
-            persistence_path="data/games_bloom_filter.pkl"
+        # Bloom Filter延迟初始化（lazy loading）
+        self._bloom_filter = None
+        self._bloom_filter_lock = threading.Lock()
+        logger.info("✅ GameService initialized (Bloom Filter lazy)")
+
+    @property
+    def bloom_filter(self):
+        """延迟加载Bloom Filter（线程安全）"""
+        if self._bloom_filter is None:
+            with self._bloom_filter_lock:
+                if self._bloom_filter is None:
+                    logger.info("Lazy initializing GameService Bloom Filter...")
+                    self._bloom_filter = EnhancedBloomFilter(
+                        capacity=100000,  # 10万容量
+                        error_rate=0.001,  # 0.1%误判率
+                        persistence_path="data/games_bloom_filter.pkl",
+                        strict_validation=self._is_test_mode()
+                    )
+                    logger.info("✅ GameService Bloom Filter initialized")
+        return self._bloom_filter
+
+    def _is_test_mode(self) -> bool:
+        """检测是否在测试环境"""
+        return (
+            os.environ.get("TESTING") == "true" or
+            os.environ.get("PYTEST_CURRENT_TEST") is not None
         )
-        logger.info("✅ GameService initialized with Bloom Filter protection")
 
     @cached("games.list", timeout=120)
     def get_all_games(self, include_stats: bool = False) -> List[GameEntity]:
@@ -299,3 +321,242 @@ class GameService:
         logger.info(f"✅ Bloom Filter rebuilt: {stats['total_items']} items")
 
         return stats
+
+    def get_games_with_detailed_stats(self) -> List[dict]:
+        """
+        获取所有游戏及其详细统计信息（带缓存）
+
+        使用LEFT JOIN获取统计信息，避免N+1查询问题
+
+        Returns:
+            游戏字典列表（包含详细统计）
+        """
+        from backend.core.utils.converters import fetch_all_as_dict
+
+        games = fetch_all_as_dict("""
+            SELECT
+                g.id,
+                g.gid,
+                g.name,
+                g.ods_db,
+                g.icon_path,
+                g.created_at,
+                g.updated_at,
+                COUNT(DISTINCT le.id) as event_count,
+                COUNT(DISTINCT CASE WHEN ep.is_active = 1 THEN ep.id END) as param_count,
+                COUNT(DISTINCT enc.id) as event_node_count,
+                COUNT(DISTINCT CASE WHEN ft.is_active = 1 THEN ft.id END) as flow_template_count
+            FROM games g
+            LEFT JOIN log_events le ON le.game_gid = g.gid
+            LEFT JOIN event_params ep ON ep.event_id = le.id
+            LEFT JOIN event_node_configs enc ON enc.game_gid = CAST(g.gid AS INTEGER)
+            LEFT JOIN flow_templates ft ON ft.game_gid = g.gid
+            GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
+            ORDER BY g.id
+        """)
+
+        return games
+
+    def check_deletion_impact(self, game_gid: int) -> dict:
+        """
+        检查删除游戏的影响范围
+
+        Args:
+            game_gid: 游戏业务GID
+
+        Returns:
+            影响统计字典
+        """
+        from backend.core.utils.converters import fetch_one_as_dict
+
+        impact = {
+            "game_gid": game_gid,
+            "has_associated_data": False,
+            "event_count": 0,
+            "param_count": 0,
+            "node_config_count": 0,
+        }
+
+        # 检查事件数量
+        event_count = fetch_one_as_dict(
+            "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
+            (game_gid,)
+        )
+        impact["event_count"] = event_count["count"] if event_count else 0
+
+        # 检查参数数量（通过事件关联）
+        param_count = fetch_one_as_dict(
+            """
+            SELECT COUNT(*) as count
+            FROM event_params ep
+            INNER JOIN log_events le ON ep.event_id = le.id
+            WHERE le.game_gid = ?
+        """,
+            (game_gid,)
+        )
+        impact["param_count"] = param_count["count"] if param_count else 0
+
+        # 检查Canvas节点配置
+        node_count = fetch_one_as_dict(
+            "SELECT COUNT(*) as count FROM event_node_configs WHERE game_gid = ?",
+            (game_gid,)
+        )
+        impact["node_config_count"] = node_count["count"] if node_count else 0
+
+        # 判断是否有关联数据
+        impact["has_associated_data"] = any([
+            impact["event_count"] > 0,
+            impact["param_count"] > 0,
+            impact["node_config_count"] > 0,
+        ])
+
+        logger.debug(
+            f"Deletion impact for game_gid={game_gid}: "
+            f"events={impact['event_count']}, "
+            f"params={impact['param_count']}, "
+            f"nodes={impact['node_config_count']}"
+        )
+
+        return impact
+
+    def cascade_delete_game(self, game_gid: int, force: bool = False) -> dict:
+        """
+        级联删除游戏及其所有关联数据
+
+        Args:
+            game_gid: 游戏业务GID
+            force: 是否强制删除（跳过关联数据检查）
+
+        Returns:
+            删除结果字典
+
+        Raises:
+            ValueError: 游戏不存在或未确认删除有关联数据的游戏
+        """
+        validate_game_gid(game_gid)
+
+        # 验证游戏存在
+        game = self.game_repo.find_by_gid(game_gid)
+        if not game:
+            raise ValueError(f"Game GID {game_gid} not found")
+
+        # 检查删除影响
+        impact = self.check_deletion_impact(game_gid)
+
+        # 如果有关联数据且未强制删除，返回影响统计
+        if not force and impact["has_associated_data"]:
+            raise ValueError(
+                f"Game has {impact['event_count']} events, "
+                f"{impact['param_count']} parameters, "
+                f"{impact['node_config_count']} node configs. "
+                f"Set force=True to delete."
+            )
+
+        # 执行级联删除
+        from backend.core.database import get_db_connection
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            try:
+                cursor.execute("BEGIN IMMEDIATE")  # 立即锁，防止并发修改
+
+                # 验证游戏仍然存在（防止已被其他请求删除）
+                cursor.execute("SELECT id FROM games WHERE gid = ?", (game_gid,))
+                game_exists = cursor.fetchone()
+
+                if not game_exists:
+                    conn.rollback()
+                    raise ValueError(f"Game GID {game_gid} not found (may have been deleted)")
+
+                # 1. 删除事件参数（通过事件ID）
+                cursor.execute(
+                    """
+                    DELETE FROM event_params
+                    WHERE event_id IN (
+                        SELECT id FROM log_events WHERE game_gid = ?
+                    )
+                """,
+                    (game_gid,),
+                )
+
+                # 2. 删除事件记录
+                cursor.execute("DELETE FROM log_events WHERE game_gid = ?", (game_gid,))
+
+                # 3. 删除Canvas节点配置
+                cursor.execute(
+                    "DELETE FROM event_node_configs WHERE game_gid = ?",
+                    (game_gid,)
+                )
+
+                # 4. 删除游戏记录
+                cursor.execute("DELETE FROM games WHERE gid = ?", (game_gid,))
+
+                conn.commit()
+
+                logger.info(
+                    f"Cascade deleted game {game.name} (GID: {game_gid}): "
+                    f"{impact['event_count']} events, "
+                    f"{impact['param_count']} params, "
+                    f"{impact['node_config_count']} node configs"
+                )
+
+                # 失效缓存
+                self.invalidator.invalidate_pattern("games.list")
+                self.invalidator.invalidate_pattern(f"games.detail:{game_gid}")
+                self.invalidator.invalidate_pattern("dashboard_statistics")
+
+                return {
+                    "success": True,
+                    "deleted_event_count": impact["event_count"],
+                    "deleted_param_count": impact["param_count"],
+                    "deleted_node_config_count": impact["node_config_count"],
+                }
+
+            except Exception as e:
+                conn.rollback()
+                raise e
+
+            finally:
+                conn.close()
+
+        except Exception as e:
+            logger.error(f"Error cascade deleting game: {e}")
+            raise
+
+    def batch_update_games(self, game_gids: List[int], updates: dict) -> int:
+        """
+        批量更新游戏
+
+        Args:
+            game_gids: 游戏GID列表
+            updates: 更新字段字典
+
+        Returns:
+            更新的游戏数量
+
+        Raises:
+            ValueError: 更新字段无效
+        """
+        if not game_gids:
+            return 0
+
+        if not updates:
+            raise ValueError("No update fields provided")
+
+        # 验证所有gid
+        for gid in game_gids:
+            validate_game_gid(gid)
+
+        # 批量更新
+        updated_count = self.game_repo.batch_update_by_gid(game_gids, updates)
+
+        # 失效缓存
+        if updated_count > 0:
+            self.invalidator.invalidate_pattern("games.list")
+            for gid in game_gids:
+                self.invalidator.invalidate_pattern(f"games.detail:{gid}")
+            logger.info(f"批量更新游戏成功,已失效缓存: count={updated_count}")
+
+        return updated_count

@@ -58,7 +58,7 @@ class BaseService:
             >>> service = BaseService()
             >>> service.invalidate_game_cache(10000147)
         """
-        self.invalidator.invalidate_game(game_gid)
+        self.invalidator.invalidate_game_related(game_gid)
 
     def invalidate_pattern(self, pattern: str):
         """

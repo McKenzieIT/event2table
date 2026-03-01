@@ -1,0 +1,24 @@
+归档日期: 2026-02-21
+归档原因: 已迁移到GraphQL
+GraphQL实现: backend/gql_api/queries/category_queries.py, backend/gql_api/mutations/category_mutations.py
+测试覆盖: backend/tests/test_graphql_schema.py
+
+迁移说明:
+- Categories模块已完全迁移到GraphQL API
+- 所有REST端点已被GraphQL Query和Mutation替代
+- 缓存集成已完成
+
+GraphQL端点:
+- POST /api/graphql
+- GraphiQL IDE: /api/graphiql
+
+GraphQL操作:
+Query:
+  - category(id: Int!): Category
+  - categories(limit: Int, offset: Int): [Category]
+  - searchCategories(query: String!): [Category]
+
+Mutation:
+  - createCategory(name: String!): CreateCategoryPayload
+  - updateCategory(id: Int!, name: String!): UpdateCategoryPayload
+  - deleteCategory(id: Int!): DeleteCategoryPayload

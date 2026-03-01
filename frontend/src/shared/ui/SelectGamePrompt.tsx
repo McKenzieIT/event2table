@@ -1,0 +1,39 @@
+import './SelectGamePrompt.css';
+
+/**
+ * Props for SelectGamePrompt component
+ */
+export interface SelectGamePromptProps {
+  /** Custom message to display */
+  message?: string;
+}
+
+/**
+ * SelectGamePrompt Component
+ *
+ * Displays a prompt when no game is selected
+ *
+ * @example
+ * <SelectGamePrompt message="请选择游戏以继续" />
+ */
+export function SelectGamePrompt({ message }: SelectGamePromptProps): React.JSX.Element {
+  const handleSelectGame = (): void => {
+    window.dispatchEvent(new CustomEvent('toggleGameSheet'));
+  };
+
+  return (
+    <div className="select-game-prompt">
+      <div className="prompt-container">
+        <h2 className="prompt-title">请先选择游戏</h2>
+        <p className="prompt-message">
+          {message || '选择游戏后才能查看相关数据'}
+        </p>
+        <button className="btn btn-primary" onClick={handleSelectGame}>
+          选择游戏
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default SelectGamePrompt;

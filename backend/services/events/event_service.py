@@ -12,6 +12,8 @@ Event Service - 业务逻辑层 (精简架构)
 
 from typing import List, Optional, Dict, Any
 import logging
+import threading
+import os
 from backend.models.entities import EventEntity
 from backend.models.repositories.events import EventRepository
 from backend.models.repositories.games import GameRepository
@@ -31,13 +33,33 @@ class EventService:
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
 
-        # 初始化Bloom Filter防止缓存穿透
-        self.bloom_filter = EnhancedBloomFilter(
-            capacity=500000,  # 50万容量（事件数量通常比游戏多）
-            error_rate=0.001,  # 0.1%误判率
-            persistence_path="data/events_bloom_filter.pkl"
+        # Bloom Filter延迟初始化（lazy loading）
+        self._bloom_filter = None
+        self._bloom_filter_lock = threading.Lock()
+        logger.info("✅ EventService initialized (Bloom Filter lazy)")
+
+    @property
+    def bloom_filter(self):
+        """延迟加载Bloom Filter（线程安全）"""
+        if self._bloom_filter is None:
+            with self._bloom_filter_lock:
+                if self._bloom_filter is None:
+                    logger.info("Lazy initializing EventService Bloom Filter...")
+                    self._bloom_filter = EnhancedBloomFilter(
+                        capacity=500000,  # 50万容量（事件数量通常比游戏多）
+                        error_rate=0.001,  # 0.1%误判率
+                        persistence_path="data/events_bloom_filter.pkl",
+                        strict_validation=self._is_test_mode()
+                    )
+                    logger.info("✅ EventService Bloom Filter initialized")
+        return self._bloom_filter
+
+    def _is_test_mode(self) -> bool:
+        """检测是否在测试环境"""
+        return (
+            os.environ.get("TESTING") == "true" or
+            os.environ.get("PYTEST_CURRENT_TEST") is not None
         )
-        logger.info("✅ EventService initialized with Bloom Filter protection")
 
     @cached("events.list", timeout=120)
     def get_events_by_game(

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { useGameStore } from '@/stores/gameStore';
 import {
   SelectGamePrompt,
@@ -9,7 +9,9 @@ import {
   Badge,
   Spinner,
   SearchInput,
-  useToast
+  useToast,
+  Skeleton,
+  EmptyState
 } from '@shared/ui';
 import { GET_PARAMETERS_MANAGEMENT } from '@/graphql/queries';
 import ParameterDetailDrawer from '@analytics/components/parameters/ParameterDetailDrawer';
@@ -299,44 +301,55 @@ function ParametersListGraphQL() {
             </tr>
           </thead>
           <tbody>
-            {filteredParameters.map((param) => (
-              <tr key={param.id}>
-                <td>
-                  <span
-                    className="param-name-link"
-                    onClick={() => handleParameterClick(param)}
-                  >
-                    {param.paramName}
-                  </span>
-                </td>
-                <td>{param.paramNameCn || '-'}</td>
-                <td>
-                  <Badge variant={getTypeBadgeVariant(param.paramType)}>
-                    {param.paramType || 'unknown'}
-                  </Badge>
-                </td>
-                <td>
-                  <span className="event-name">{param.eventName || '-'}</span>
-                </td>
-                <td>
-                  {param.isCommon ? (
-                    <Badge variant="success">是</Badge>
-                  ) : (
-                    <Badge variant="secondary">否</Badge>
-                  )}
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn btn-sm btn-outline-primary"
-                      onClick={() => handleParameterClick(param)}
-                    >
-                      详情
-                    </button>
-                  </div>
+            {filteredParameters.length === 0 ? (
+              <tr>
+                <td colSpan={6}>
+                  <EmptyState
+                    icon={<i className="bi bi-inbox" style={{ fontSize: '48px' }} />}
+                    title="暂无参数数据"
+                  />
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredParameters.map((param) => (
+                <tr key={param.id}>
+                  <td>
+                    <span
+                      className="param-name-link"
+                      onClick={() => handleParameterClick(param)}
+                    >
+                      {param.paramName}
+                    </span>
+                  </td>
+                  <td>{param.paramNameCn || '-'}</td>
+                  <td>
+                    <Badge variant={getTypeBadgeVariant(param.paramType)}>
+                      {param.paramType || 'unknown'}
+                    </Badge>
+                  </td>
+                  <td>
+                    <span className="event-name">{param.eventName || '-'}</span>
+                  </td>
+                  <td>
+                    {param.isCommon ? (
+                      <Badge variant="success">是</Badge>
+                    ) : (
+                      <Badge variant="secondary">否</Badge>
+                    )}
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={() => handleParameterClick(param)}
+                      >
+                        详情
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

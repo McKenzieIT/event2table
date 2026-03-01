@@ -18,6 +18,7 @@ Each module is responsible for a specific domain:
 
 # Import all route modules to register their routes with the blueprint
 from . import (
+    cache,  # Cache management endpoints
     categories,
     event_parameters,
     events,
@@ -35,6 +36,7 @@ from . import (
 )
 
 __all__ = [
+    "cache",
     "games",
     "parameters",
     "events",

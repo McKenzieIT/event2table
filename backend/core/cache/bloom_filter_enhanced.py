@@ -110,12 +110,18 @@ class EnhancedBloomFilter:
             CacheKeyValidator.set_strict_mode(False)
             logger.info("CacheKeyValidator set to test mode (strict=False)")
 
-        # Start background threads
-        self._start_background_threads()
+        # Start background threads (skip in test mode)
+        if strict_validation:
+            self._start_background_threads()
+        else:
+            logger.info("Test mode: skipping background threads")
+            self._persistence_thread = None
+            self._rebuild_thread = None
 
         logger.info(
             f"EnhancedBloomFilter initialized: capacity={capacity}, "
-            f"error_rate={error_rate}, path={self.persistence_path}"
+            f"error_rate={error_rate}, path={self.persistence_path}, "
+            f"test_mode={not strict_validation}"
         )
 
     def _validate_persistence_path(self, path: str) -> str:
@@ -365,6 +371,11 @@ class EnhancedBloomFilter:
 
     def _start_background_threads(self):
         """Start background threads for persistence and rebuild."""
+        # Check if threads should be skipped (test mode)
+        if not hasattr(self, '_persistence_thread') or self._persistence_thread is None:
+            logger.debug("Skipping background thread start (test mode)")
+            return
+
         # Persistence thread
         self._persistence_thread = threading.Thread(
             target=self._persistence_worker,

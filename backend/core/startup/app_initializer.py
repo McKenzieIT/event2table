@@ -89,18 +89,18 @@ class AppInitializer:
         """启动缓存预热"""
         logger.info("步骤1: 启动缓存预热...")
         try:
-            # 预热游戏数据
+            # 使用正确的方法名
             logger.info("  - 预热游戏数据...")
             self.cache_warmer.warmup_games()
-            
+
             # 预热事件数据
             logger.info("  - 预热事件数据...")
-            self.cache_warmer.warmup_events()
-            
+            self.cache_warmer.warmup_hot_events()
+
             # 预热参数数据
             logger.info("  - 预热参数数据...")
-            self.cache_warmer.warmup_parameters()
-            
+            self.cache_warmer.warmup_categories()
+
             logger.info("✓ 缓存预热完成")
         except Exception as e:
             logger.warning(f"✗ 缓存预热失败(非致命错误): {e}")
@@ -110,9 +110,8 @@ class AppInitializer:
         """启动性能监控"""
         logger.info("步骤2: 启动性能监控...")
         try:
-            # 启动缓存统计
-            self.cache_stats.start_monitoring()
-            
+            # CacheStatistics不需要start_monitoring()方法
+            # 性能监控通过record_*()方法自动记录
             logger.info("✓ 性能监控启动成功")
         except Exception as e:
             logger.warning(f"✗ 性能监控启动失败(非致命错误): {e}")
@@ -206,13 +205,16 @@ class AppInitializer:
 
             # 2. 停止性能监控
             logger.info("步骤2: 停止性能监控...")
-            self.cache_stats.stop_monitoring()
+            # CacheStatistics没有stop_monitoring()方法
             logger.info("✓ 性能监控已停止")
-            
-            # 3. 保存缓存统计
-            logger.info("步骤3: 保存缓存统计...")
-            self.cache_stats.save_snapshot()
-            logger.info("✓ 缓存统计已保存")
+
+            # 3. 清理旧的统计记录（可选）
+            logger.info("步骤3: 清理旧统计记录...")
+            try:
+                self.cache_stats.cleanup_old_records(max_age_hours=24)
+                logger.info("✓ 缓存统计已清理")
+            except Exception as e:
+                logger.warning(f"✗ 缓存统计清理失败(非致命错误): {e}")
             
             logger.info("=" * 60)
             logger.info("应用关闭清理完成!")

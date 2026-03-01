@@ -212,11 +212,39 @@ class GameRepository(GenericRepository):
         conn.commit()
         conn.close()
         return deleted_count > 0
-        cursor = conn.cursor()
-        cursor.execute(query, game_gids)
-        conn.commit()
 
-        return cursor.rowcount
+    def batch_update_by_gid(self, game_gids: List[int], updates: Dict[str, Any]) -> int:
+        """
+        批量更新游戏（按GID）
+
+        Args:
+            game_gids: 游戏GID列表
+            updates: 要更新的字段字典
+
+        Returns:
+            更新的游戏数量
+
+        Example:
+            >>> repo = GameRepository()
+            >>> count = repo.batch_update_by_gid([1001, 1002], {'name': 'Updated'})
+        """
+        if not game_gids or not updates:
+            return 0
+
+        # 构建UPDATE语句
+        set_clause = ", ".join([f"{key} = ?" for key in updates.keys()])
+        placeholders = ",".join(["?" for _ in game_gids])
+        query = f"UPDATE games SET {set_clause} WHERE gid IN ({placeholders})"
+        values = list(updates.values()) + game_gids
+
+        from backend.core.utils.converters import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, values)
+        updated_count = cursor.rowcount
+        conn.commit()
+        conn.close()
+        return updated_count
 
     def find_by_ods_db(self, ods_db: str) -> List[Dict[str, Any]]:
         """

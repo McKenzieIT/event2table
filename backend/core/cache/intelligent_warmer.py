@@ -185,7 +185,9 @@ class IntelligentCacheWarmer:
             'warm_up_count': 0.0,
             'keys_warmed': 0.0,
             'last_warm_up_time': 0.0,
-            'prediction_accuracy': 0.0,  # TODO: 计算预测准确率
+            'prediction_accuracy': 0.0,  # 预测准确率（百分比）
+            'predicted_count': 0.0,      # 预测的总键数
+            'actual_hits': 0.0,          # 实际命中的键数
         }
 
         self._lock = threading.Lock()
@@ -294,9 +296,9 @@ class IntelligentCacheWarmer:
                     data = None
 
                 if data is not None:
-                    # 写入缓存
-                    # TODO: 需要实现hierarchical_cache.set_raw()
-                    # hierarchical_cache.set_raw(key, data)
+                    # 写入缓存（如果hierarchical_cache可用）
+                    if hierarchical_cache is not None:
+                        hierarchical_cache.set_raw(key, data, ttl=3600, level='both')
                     warmed += 1
                 else:
                     failed += 1
@@ -311,15 +313,20 @@ class IntelligentCacheWarmer:
             self.stats['keys_warmed'] += warmed
             self.stats['last_warm_up_time'] = time.time()
 
+        # 计算预测准确率（对比预测键和实际访问）
+        accuracy_stats = self.calculate_prediction_accuracy(keys)
+
         logger.info(
             f"🔥 缓存预热完成: "
-            f"预热{warmed}个, 跳过{skipped}个, 失败{failed}个"
+            f"预热{warmed}个, 跳过{skipped}个, 失败{failed}个 | "
+            f"准确率: {accuracy_stats['accuracy']:.1f}%"
         )
 
         return {
             'warmed': warmed,
             'failed': failed,
             'skipped': skipped,
+            'accuracy': accuracy_stats['accuracy']
         }
 
     async def auto_warm_up(self, fetch_callback: Optional[Callable] = None):
@@ -379,6 +386,77 @@ class IntelligentCacheWarmer:
             'unique_keys': len(unique_keys),
             'buffer_capacity': buffer_maxlen,
             'buffer_usage': f"{total_access / buffer_maxlen:.1%}"
+        }
+
+    def calculate_prediction_accuracy(
+        self,
+        predicted_keys: List[str],
+        actual_access_window_seconds: int = 300
+    ) -> Dict[str, float]:
+        """
+        计算预测准确率
+
+        对比预测的热点键和实际访问的键，计算预测命中率
+
+        Args:
+            predicted_keys: 预测的热点键列表
+            actual_access_window_seconds: 实际访问时间窗口（秒，默认5分钟）
+
+        Returns:
+            准确率统计字典:
+            {
+                'accuracy': 准确率百分比 (0-100),
+                'predicted_count': 预测键数,
+                'actual_hits': 实际命中数,
+                'hit_rate': 命中率
+            }
+        """
+        if not predicted_keys:
+            return {
+                'accuracy': 0.0,
+                'predicted_count': 0.0,
+                'actual_hits': 0.0,
+                'hit_rate': 0.0
+            }
+
+        # 获取时间窗口内的实际访问
+        cutoff_time = time.time() - actual_access_window_seconds
+        recent_access = [
+            access for access in self.access_log.get_items()
+            if access['timestamp'] >= cutoff_time
+        ]
+
+        # 统计实际访问的键
+        actual_keys = set(access['key'] for access in recent_access)
+
+        # 计算命中数：预测的键中有多少被实际访问
+        predicted_set = set(predicted_keys)
+        hits = predicted_set.intersection(actual_keys)
+
+        # 计算准确率
+        predicted_count = len(predicted_keys)
+        actual_hits = len(hits)
+
+        # 避免除零
+        accuracy = (actual_hits / predicted_count * 100) if predicted_count > 0 else 0.0
+        hit_rate = (actual_hits / predicted_count) if predicted_count > 0 else 0.0
+
+        # 更新统计信息
+        with self._lock:
+            self.stats['predicted_count'] = predicted_count
+            self.stats['actual_hits'] = actual_hits
+            self.stats['prediction_accuracy'] = accuracy
+
+        logger.debug(
+            f"📊 预测准确率: {accuracy:.2f}% "
+            f"(预测{predicted_count}个, 命中{actual_hits}个)"
+        )
+
+        return {
+            'accuracy': accuracy,
+            'predicted_count': float(predicted_count),
+            'actual_hits': float(actual_hits),
+            'hit_rate': hit_rate
         }
 
 

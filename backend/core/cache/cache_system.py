@@ -22,17 +22,18 @@
     from backend.core.cache.cache_system import cached, hierarchical_cache, CacheKeyBuilder
 
     @cached('events.list', timeout=300)
-    def get_events(game_id: int, page: int):
-        return fetch_events_from_db(game_id, page)
+    def get_events(game_gid: int, page: int):
+        return fetch_events_from_db(game_gid, page)
 
     # 或使用分层缓存
     @cached_hierarchical('games.detail')
-    def get_game(game_id: int):
-        return fetch_game_from_db(game_id)
+    def get_game(game_gid: int):
+        return fetch_game_from_db(game_gid)
 """
 
 from functools import wraps
 from flask import current_app
+import hashlib
 import logging
 import random
 import threading
@@ -40,6 +41,23 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
+
+
+def _hash_key(key: str) -> str:
+    """
+    哈希缓存键用于日志输出（防止信息泄露）
+
+    Args:
+        key: 完整的缓存键
+
+    Returns:
+        哈希后的缓存键（前8个字符）
+
+    Example:
+        >>> _hash_key("dwd_gen:v3:events.list:game_gid:10000147")
+        'a3f5b8c2'
+    """
+    return hashlib.sha256(key.encode()).hexdigest()[:8]
 
 
 # ============================================================================
@@ -73,10 +91,10 @@ class CacheKeyBuilder:
             标准化的缓存键
 
         Example:
-            >>> CacheKeyBuilder.build('events.list', game_id=1, page=1)
-            'dwd_gen:v3:events.list:game_id:1:page:1'
-            >>> CacheKeyBuilder.build('events.list', page=1, game_id=1)
-            'dwd_gen:v3:events.list:game_id:1:page:1'  # 参数顺序不影响
+            >>> CacheKeyBuilder.build('events.list', game_gid=1, page=1)
+            'dwd_gen:v3:events.list:game_gid:1:page:1'
+            >>> CacheKeyBuilder.build('events.list', page=1, game_gid=1)
+            'dwd_gen:v3:events.list:game_gid:1:page:1'  # 参数顺序不影响
         """
         if not kwargs:
             return f"{cls.PREFIX}{pattern}"
@@ -99,8 +117,8 @@ class CacheKeyBuilder:
             通配符模式字符串
 
         Example:
-            >>> CacheKeyBuilder.build_pattern('events.list', game_id=1)
-            'dwd_gen:v3:events.list:game_id:*'
+            >>> CacheKeyBuilder.build_pattern('events.list', game_gid=1)
+            'dwd_gen:v3:events.list:game_gid:*'
         """
         if kwargs:
             param_str = ":".join(f"{k}:*" for k in sorted(kwargs.keys()))
@@ -194,17 +212,17 @@ class HierarchicalCache:
                     if cached_data == self._EMPTY_MARKER:
                         self.stats["empty_hits"] = self.stats.get("empty_hits", 0) + 1
                         self.stats["l1_hits"] += 1
-                        logger.debug(f"✅ L1 HIT (空值): {key}")
+                        logger.debug(f"✅ L1 HIT (空值): {_hash_key(key)}")
                         return None
 
                     self.stats["l1_hits"] += 1
-                    logger.debug(f"✅ L1 HIT: {key}")
+                    logger.debug(f"✅ L1 HIT: {_hash_key(key)}")
                     return cached_data
                 else:
                     # L1过期，删除
                     del self.l1_cache[key]
                     del self.l1_timestamps[key]
-                    logger.debug(f"⏰ L1过期: {key}")
+                    logger.debug(f"⏰ L1过期: {_hash_key(key)}")
 
         # L2: Redis缓存
         cache = self._get_cache()
@@ -218,19 +236,19 @@ class HierarchicalCache:
                         if cached == self._EMPTY_MARKER:
                             self.stats["empty_hits"] = self.stats.get("empty_hits", 0) + 1
                             self.stats["l2_hits"] += 1
-                            logger.debug(f"✅ L2 HIT (空值) → L1回填: {key}")
+                            logger.debug(f"✅ L2 HIT (空值) → L1回填: {_hash_key(key)}")
                             return None
 
                         self._set_l1(key, cached)
                     self.stats["l2_hits"] += 1
-                    logger.debug(f"✅ L2 HIT → L1回填: {key}")
+                    logger.debug(f"✅ L2 HIT → L1回填: {_hash_key(key)}")
                     return cached
             except Exception as e:
                 logger.warning(f"⚠️ L2缓存读取失败: {e}")
 
         # L3: 缓存未命中，返回None
         self.stats["misses"] += 1
-        logger.debug(f"❌ CACHE MISS: {key}")
+        logger.debug(f"❌ CACHE MISS: {_hash_key(key)}")
         return None
 
     def set(self, pattern: str, data: Any, ttl: Optional[int] = None, **kwargs):
@@ -267,7 +285,7 @@ class HierarchicalCache:
 
         # 处理空值缓存
         if data is None:
-            logger.debug(f"💾 空值缓存: {key}")
+            logger.debug(f"💾 空值缓存: {_hash_key(key)}")
             data = self._EMPTY_MARKER
             # 使用空值专用TTL
             ttl = CacheConfig.CACHE_EMPTY_TTL
@@ -282,7 +300,7 @@ class HierarchicalCache:
             try:
                 cache.set(key, data, timeout=ttl)
                 self.stats["l2_sets"] += 1
-                logger.debug(f"💾 L2 SET: {key} (TTL={ttl}s)")
+                logger.debug(f"💾 L2 SET: {_hash_key(key)} (TTL={ttl}s)")
             except Exception as e:
                 logger.warning(f"⚠️ L2缓存写入失败: {e}")
 
@@ -302,7 +320,7 @@ class HierarchicalCache:
             del self.l1_cache[oldest_key]
             del self.l1_timestamps[oldest_key]
             self.stats["l1_evictions"] += 1
-            logger.debug(f"🗑️ L1淘汰: {oldest_key}")
+            logger.debug(f"🗑️ L1淘汰: {_hash_key(oldest_key)}")
 
         self.l1_cache[key] = data
         self.l1_timestamps[key] = time.time()
@@ -323,14 +341,14 @@ class HierarchicalCache:
             if key in self.l1_cache:
                 del self.l1_cache[key]
                 del self.l1_timestamps[key]
-                logger.debug(f"🗑️ L1删除: {key}")
+                logger.debug(f"🗑️ L1删除: {_hash_key(key)}")
 
         # 删除L2
         cache = self._get_cache()
         if cache is not None:
             try:
                 cache.delete(key)
-                logger.debug(f"🗑️ L2删除: {key}")
+                logger.debug(f"🗑️ L2删除: {_hash_key(key)}")
             except Exception as e:
                 logger.warning(f"⚠️ L2缓存删除失败: {e}")
 
@@ -360,7 +378,7 @@ class HierarchicalCache:
                 del self.l1_cache[key]
                 del self.l1_timestamps[key]
                 count += 1
-                logger.debug(f"🗑️ L1模式失效: {key}")
+                logger.debug(f"🗑️ L1模式失效: {_hash_key(key)}")
 
         return count
 
