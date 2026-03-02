@@ -11,7 +11,7 @@ Core endpoints:
 
 Architecture (V9.0.0):
 - Uses HQLFacade for HQL generation
-- Uses HQLHistoryService for HQL retrieval
+- Uses HQLStatementRepository for HQL retrieval
 - No direct database access (100% ERS architecture)
 """
 
@@ -30,7 +30,9 @@ from backend.core.utils import (
 # Import HQL services
 from backend.services.hql.hql_service_cached import HQLServiceCached
 from backend.services.hql.hql_facade import HQLFacade
-from backend.services.hql.hql_history_service import HQLHistoryService
+
+# Import HQLStatementRepository
+from backend.models.repositories.hql_statement_repository import HQLStatementRepository
 
 # Import the parent blueprint
 from .. import api_bp
@@ -134,25 +136,11 @@ def api_generate_hql():
 @api_bp.route("/api/hql/<int:id>", methods=["GET"])
 def api_get_hql(id):
     """
-    API: Get HQL content by ID
-
-    Note: This endpoint queries the hql_statements table directly.
-    TODO: Create HQLStatementRepository and migrate to use Service layer.
+    API: Get HQL content by ID (uses HQLStatementRepository)
     """
     try:
-        from backend.core.utils import fetch_one_as_dict
-
-        # Query from hql_statements table
-        # TODO: Migrate to HQLStatementRepository when available
-        hql = fetch_one_as_dict(
-            """
-            SELECT * FROM hql_statements
-            WHERE id = ?
-            ORDER BY hql_version DESC
-            LIMIT 1
-        """,
-            (id,),
-        )
+        repo = HQLStatementRepository()
+        hql = repo.find_by_id(id)
 
         if hql:
             return json_success_response(data=hql)
@@ -303,35 +291,17 @@ def api_deactivate_hql(id):
 
 @api_bp.route("/api/hql/<int:id>/activate", methods=["POST"])
 def api_activate_hql(id):
-    """API: Activate an HQL statement
+    """
+    API: Activate an HQL statement
 
-    Note: This endpoint uses direct database access as a simple fallback.
-    In the future, this should be migrated to use HQLRepository or HQLService.
+    Uses HQLStatementRepository for data access.
     """
     try:
-        current = fetch_one_as_dict(
-            """
-            SELECT id, hql_version FROM hql_statements
-            WHERE id = ?
-            ORDER BY hql_version DESC
-            LIMIT 1
-        """,
-            (id,),
-        )
+        repo = HQLStatementRepository()
+        success = repo.activate(id)
 
-        if current and current["hql_version"] > 1:
-            from backend.core.utils import execute_write
-
-            execute_write(
-                """
-                UPDATE hql_statements
-                SET is_active = 1, updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
-            """,
-                (id,),
-            )
+        if success:
             return json_success_response(message="HQL activated successfully")
-
         return json_error_response("HQL is already the latest version", status_code=400)
     except Exception as e:
         logger.error(f"Error activating HQL {id}: {e}", exc_info=True)

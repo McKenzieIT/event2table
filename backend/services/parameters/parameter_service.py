@@ -43,6 +43,122 @@ class ParameterService:
         # ParameterRepository现在直接返回ParameterEntity
         return self.param_repo.find_all()
 
+    @cached("parameters.paginated", timeout=120)
+    def get_parameters_paginated(
+        self,
+        game_gid: Optional[int] = None,
+        search: Optional[str] = None,
+        type_filter: Optional[str] = None,
+        page: int = 1,
+        page_size: int = 50
+    ) -> Dict[str, Any]:
+        """
+        获取分页参数列表 (带缓存)
+
+        Args:
+            game_gid: 游戏GID (可选)
+            search: 搜索关键字 (可选)
+            type_filter: 类型过滤 (可选)
+            page: 页码
+            page_size: 每页大小
+
+        Returns:
+            Dict:
+                parameters: 参数列表
+                total: 总数
+                page: 当前页
+                has_more: 是否有更多
+
+        Raises:
+            ValueError: game_id转换失败
+        """
+        # Convert game_gid to game_id if provided
+        game_id = None
+        if game_gid:
+            from backend.services.games.game_service import GameService
+            game_service = GameService()
+            game = game_service.get_game_by_gid(game_gid)
+            if not game:
+                raise ValueError(f"Game {game_gid} not found")
+            game_id = game.id
+
+        # Build WHERE clause
+        where_clauses = ["ep.is_active = 1"]
+        params = []
+
+        if game_id:
+            where_clauses.append("le.game_id = ?")
+            params.append(game_id)
+
+        where_clause = " AND ".join(where_clauses)
+
+        # Build base query
+        query = f"""
+            SELECT
+                ep.id,
+                ep.param_name,
+                ep.param_name_cn,
+                ep.param_type,
+                ep.json_path,
+                ep.event_id,
+                ep.template_id,
+                pt.base_type,
+                COUNT(DISTINCT le.id) as usage_count
+            FROM event_params ep
+            JOIN log_events le ON ep.event_id = le.id
+            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            WHERE {where_clause}
+        """
+
+        # Add filters
+        if search:
+            query += " AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)"
+            params.extend([f"%{search}%", f"%{search}%"])
+
+        if type_filter:
+            query += " AND pt.base_type = ?"
+            params.append(type_filter)
+
+        # Add grouping, ordering, and pagination
+        query += " GROUP BY ep.param_name, pt.base_type"
+        query += " ORDER BY usage_count DESC, ep.param_name ASC"
+        query += " LIMIT ? OFFSET ?"
+
+        # Save base params (before pagination)
+        base_params = params.copy()
+        params.extend([page_size, (page - 1) * page_size])
+
+        # Fetch paginated data
+        parameters = fetch_all_as_dict(query, tuple(params))
+
+        # Get total count (without pagination)
+        count_query = f"""
+            SELECT COUNT(DISTINCT ep.param_name) as total
+            FROM event_params ep
+            JOIN log_events le ON ep.event_id = le.id
+            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            WHERE {where_clause} AND ep.is_active = 1
+        """
+        count_params = base_params.copy()
+
+        if search:
+            count_query += " AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)"
+            count_params.extend([f"%{search}%", f"%{search}%"])
+
+        if type_filter:
+            count_query += " AND pt.base_type = ?"
+            count_params.append(type_filter)
+
+        total_result = fetch_one_as_dict(count_query, tuple(count_params))
+        total = total_result["total"] if total_result else 0
+
+        return {
+            "parameters": parameters,
+            "total": total,
+            "page": page,
+            "has_more": page * page_size < total,
+        }
+
     @cached("parameters.by_event", timeout=180)
     def get_parameters_by_event(
         self, event_id: int, include_inactive: bool = False

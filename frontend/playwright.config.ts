@@ -1,4 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Playwright Configuration for event2table Frontend
@@ -16,24 +22,24 @@ import { defineConfig, devices } from '@playwright/test';
  * - Responsive tests: Separate project for viewport testing
  *
  * Test Data Setup:
+ * - Global setup: test/e2e/global.setup.ts (runs before all tests)
  * - Test data seeding utilities: test/e2e/helpers/setup-test-data.ts
  * - Test fixtures: test/e2e/fixtures/test-games.json
- * - Use beforeAll() hooks in test files to seed test data
- * - Use afterAll() hooks in test files to clean up test data
+ * - Backend setup script: scripts/test/setup_e2e_test_data.py
  *
- * Example:
- *   import { seedTestGamesFromFixture, cleanupTestGamesFromFixture } from '../helpers/setup-test-data';
- *
- *   test.beforeAll(async () => {
- *     await seedTestGamesFromFixture();
- *   });
- *
- *   test.afterAll(async () => {
- *     await cleanupTestGamesFromFixture();
- *   });
+ * The global setup automatically seeds test data before running any tests.
+ * For manual setup: python3 scripts/test/setup_e2e_test_data.py
  */
 export default defineConfig({
   testDir: './test',
+
+  // Global setup - runs before all tests
+  // Seeds test data (games, events, parameters)
+  globalSetup: path.resolve(__dirname, './test/e2e/global.setup.ts'),
+
+  // Global teardown - runs after all tests
+  // Cleans up test data (set SKIP_TEST_CLEANUP=true to skip)
+  globalTeardown: path.resolve(__dirname, './test/e2e/global.teardown.ts'),
 
   // Run tests in parallel
   fullyParallel: true,

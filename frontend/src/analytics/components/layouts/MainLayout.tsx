@@ -108,9 +108,10 @@ export default function MainLayout(): React.JSX.Element {
               <Breadcrumb items={breadcrumbItems} />
             </div>
           )}
-          <Suspense fallback={<Loading />}>
-            <Outlet key={outletKey} context={contextValue} />
-          </Suspense>
+          {/* NOTE: Suspense removed to fix double-nesting issue with App.tsx global Suspense boundary.
+           * The outer Suspense in App.tsx handles lazy-loaded route components.
+           * This prevents Playwright test timeout issues caused by nested Suspense boundaries. */}
+          <Outlet key={outletKey} context={contextValue} />
         </main>
       </div>
 

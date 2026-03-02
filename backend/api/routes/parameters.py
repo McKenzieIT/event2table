@@ -94,6 +94,10 @@ def api_get_all_parameters():
     API: Get all unique parameters for a game (deduplicated by param_name)
     支持game_gid参数(推荐)或game_id参数(向后兼容)
 
+    Architecture (V9.0.0):
+    - Uses ParameterService.get_parameters_paginated() for data access
+    - No direct database access (100% ERS architecture)
+
     Performance: Uses hierarchical caching with 5-minute TTL
     - L1 cache: 60s (hot data)
     - L2 cache: 300s (shared cache)
@@ -111,114 +115,24 @@ def api_get_all_parameters():
         page = request.args.get("page", 1, type=int)
         limit = min(request.args.get("limit", 50, type=int), 100)
 
-        # 构建缓存键
-        cache_key_params = {
-            "game_id": game_id,
-            "search": search or "",
-            "type": type_filter or "",
-            "page": page,
-            "limit": limit,
-        }
-
-        # 尝试从缓存获取
-        cached_result = hierarchical_cache.get("parameters.all", **cache_key_params)
-        if cached_result is not None:
-            logger.debug(
-                f"✅ Cache HIT: parameters.all for game_id={game_id}, page={page}"
-            )
-            return json_success_response(
-                data=cached_result,
-                message="Parameters retrieved successfully (cached)",
-            )
-
-        # 缓存未命中，执行查询
-        logger.debug(
-            f"❌ Cache MISS: parameters.all for game_id={game_id}, page={page}"
+        # Use ParameterService for paginated results
+        service = ParameterService()
+        result = service.get_parameters_paginated(
+            game_gid=int(game_gid) if game_gid else None,
+            search=search or None,
+            type_filter=type_filter or None,
+            page=page,
+            page_size=limit
         )
-
-        # 使用helper函数获取WHERE子句(统一game_gid关联)
-        where_clause, query_value = get_where_clause_for_game(game_gid=game_gid)
-        params = [query_value]
-
-        # 基础查询 - 按参数名分组去重
-        query = f"""
-            SELECT
-                ep.param_name,
-                MIN(ep.param_name_cn) as param_name_cn,
-                pt.base_type,
-                COUNT(DISTINCT ep.event_id) as events_count,
-                COUNT(*) as usage_count,
-                CASE WHEN COUNT(DISTINCT ep.event_id) >= 3 THEN 1 ELSE 0 END as is_common
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE {where_clause} AND ep.is_active = 1
-        """
-
-        # params已在上面的if/else中设置
-
-        # 动态添加筛选条件
-        if search:
-            query += " AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)"
-            params.extend([f"%{search}%", f"%{search}%"])
-
-        if type_filter:
-            query += " AND pt.base_type = ?"
-            params.append(type_filter)
-
-        # 分组和分页
-        query += " GROUP BY ep.param_name, pt.base_type"
-        query += " ORDER BY usage_count DESC, ep.param_name ASC"
-        query += " LIMIT ? OFFSET ?"
-
-        # 保存WHERE条件的参数（在添加分页参数之前）
-        base_params = params.copy()
-        params.extend([limit, (page - 1) * limit])
-
-        parameters = fetch_all_as_dict(query, params)
-
-        # 获取总数(不带分页)
-        count_query = f"""
-            SELECT COUNT(DISTINCT ep.param_name) as total
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE {where_clause} AND ep.is_active = 1
-        """
-        count_params = base_params.copy()  # 使用不含分页参数的params
-
-        if search:
-            count_query += " AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)"
-            count_params.extend([f"%{search}%", f"%{search}%"])
-
-        if type_filter:
-            count_query += " AND pt.base_type = ?"
-            count_params.append(type_filter)
-
-        total_result = fetch_one_as_dict(count_query, count_params)
-        total = total_result["total"] if total_result else 0
-
-        result_data = {
-            "parameters": parameters,
-            "total": total,
-            "page": page,
-            "has_more": page * limit < total,
-        }
-
-        # 写入缓存
-        hierarchical_cache.set(
-            "parameters.all",
-            result_data,
-            ttl=PARAMETERS_ALL_CACHE_TTL,
-            **cache_key_params,
-        )
-        logger.debug(f"💾 Cache SET: parameters.all for game_id={game_id}, page={page}")
 
         return json_success_response(
-            data=result_data,
+            data=result,
             message="Parameters retrieved successfully",
         )
 
+    except ValueError as e:
+        logger.error(f"Validation error fetching parameters: {e}")
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error fetching parameters: {e}", exc_info=True)
         return json_error_response("Failed to fetch parameters", status_code=500)
