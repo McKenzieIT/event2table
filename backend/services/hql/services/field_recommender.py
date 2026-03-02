@@ -14,6 +14,10 @@ import json
 from typing import List, Dict, Any, Optional
 from collections import Counter
 
+from backend.models.repositories.field_recommendation_repository import (
+    FieldRecommendationRepository,
+)
+
 
 class FieldRecommender:
     """
@@ -21,6 +25,16 @@ class FieldRecommender:
 
     基于多种策略推荐常用字段
     """
+
+    def __init__(self, db_path: Optional[str] = None):
+        """
+        初始化推荐器
+
+        Args:
+            db_path: 数据库路径（保留以兼容旧API,但不再使用）
+        """
+        self.db_path = db_path  # 保留以兼容旧API
+        self.repository = FieldRecommendationRepository()
 
     # 常用字段库（按类型分类）
     COMMON_FIELDS = {
@@ -198,68 +212,14 @@ class FieldRecommender:
         从历史数据获取推荐（基于hql_history表）
 
         Args:
-            event_name: 事件名称（可选）
+            event_name: 事件名称（可选，当前未使用）
 
         Returns:
             List[Dict]: 推荐字段列表
         """
-        if not self.db_path:
-            return []
-
         try:
-            from backend.core.database import fetch_all_as_dict
-
-            # 查询最近30天的历史记录
-            sql = """
-                SELECT fields_json, events_json, mode
-                FROM hql_history
-                WHERE created_at >= datetime('now', '-30 days')
-                ORDER BY created_at DESC
-                LIMIT 1000
-            """
-
-            history_records = fetch_all_as_dict(sql, db_path=self.db_path)
-
-            if not history_records:
-                return []
-
-            # 统计字段使用频率
-            field_counter = Counter()
-            field_type_map = {}
-
-            for record in history_records:
-                # 解析字段
-                try:
-                    fields = json.loads(record["fields_json"])
-                    for field in fields:
-                        field_name = field.get("fieldName") or field.get("name")
-                        if field_name:
-                            field_counter[field_name] += 1
-                            # 保存字段类型
-                            if field_name not in field_type_map:
-                                field_type_map[field_name] = (
-                                    field.get("fieldType") or field.get("type") or "base"
-                                )
-                except (json.JSONDecodeError, KeyError):
-                    continue
-
-            # 获取最常用字段
-            top_fields = field_counter.most_common(20)
-
-            recommendations = []
-            for field_name, count in top_fields:
-                field_type = field_type_map.get(field_name, "base")
-                recommendations.append(
-                    {
-                        "name": field_name,
-                        "type": field_type,
-                        "description": f"使用频率: {count}次",
-                        "frequency": count,
-                    }
-                )
-
-            return recommendations
-
+            # 使用Repository查询历史数据
+            return self.repository.get_history_recommendations(days=30, limit=1000)
         except Exception as e:
             # 数据库查询失败，返回空列表
             print(f"Warning: Failed to fetch history data: {e}")
@@ -275,59 +235,9 @@ class FieldRecommender:
         Returns:
             List[Dict]: 推荐字段列表
         """
-        if not self.db_path:
-            return []
-
         try:
-            from backend.core.database import fetch_all_as_dict
-
-            # 查询包含类似事件的历史记录
-            sql = """
-                SELECT fields_json, events_json
-                FROM hql_history
-                WHERE events_json LIKE ?
-                ORDER BY created_at DESC
-                LIMIT 100
-            """
-
-            history_records = fetch_all_as_dict(sql, (f"%{event_name}%",), db_path=self.db_path)
-
-            if not history_records:
-                return []
-
-            # 统计字段使用频率
-            field_counter = Counter()
-
-            for record in history_records:
-                try:
-                    fields = json.loads(record["fields_json"])
-                    for field in fields:
-                        field_name = field.get("fieldName") or field.get("name")
-                        if field_name:
-                            field_counter[field_name] += 1
-                except (json.JSONDecodeError, KeyError):
-                    continue
-
-            # 获取最常用字段（排除已知的常用字段）
-            top_fields = field_counter.most_common(10)
-
-            recommendations = []
-            for field_name, count in top_fields:
-                # 跳过已在常用字段库中的字段
-                if field_name in ["ds", "role_id", "account_id", "utdid"]:
-                    continue
-
-                recommendations.append(
-                    {
-                        "name": field_name,
-                        "type": "base",
-                        "description": f"相似事件常用 ({count}次)",
-                        "frequency": count,
-                    }
-                )
-
-            return recommendations
-
+            # 使用Repository查询协同过滤数据
+            return self.repository.get_collaborative_recommendations(event_name, limit=100)
         except Exception as e:
             print(f"Warning: Failed to fetch collaborative data: {e}")
             return []
@@ -397,43 +307,13 @@ class FieldRecommender:
         Returns:
             Dict: 字段使用频率统计
         """
-        if not self.db_path:
-            # 返回默认统计
-            return Counter(["role_id", "account_id", "zone_id", "level", "ds"])
-
         try:
-            from backend.core.database import fetch_all_as_dict
-
-            sql = """
-                SELECT fields_json
-                FROM hql_history
-                WHERE created_at >= datetime('now', '-' || ? || ' days')
-                ORDER BY created_at DESC
-            """
-
-            history_records = fetch_all_as_dict(sql, (days,), db_path=self.db_path)
-
-            if not history_records:
-                return {}
-
-            # 统计字段使用频率
-            field_counter = Counter()
-
-            for record in history_records:
-                try:
-                    fields = json.loads(record["fields_json"])
-                    for field in fields:
-                        field_name = field.get("fieldName") or field.get("name")
-                        if field_name:
-                            field_counter[field_name] += 1
-                except (json.JSONDecodeError, KeyError):
-                    continue
-
-            return dict(field_counter.most_common(20))
-
+            # 使用Repository查询字段使用统计
+            return self.repository.get_field_usage_statistics(days=days)
         except Exception as e:
             print(f"Warning: Failed to calculate field statistics: {e}")
-            return {}
+            # 返回默认统计
+            return dict(Counter(["role_id", "account_id", "zone_id", "level", "ds"]))
 
 
 # 便捷函数
