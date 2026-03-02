@@ -11,7 +11,6 @@
 所有Service类应继承此基类以保持一致的缓存管理行为
 """
 
-from typing import Optional
 from backend.core.cache.invalidator import CacheInvalidatorEnhanced
 
 # 别名以保持向后兼容

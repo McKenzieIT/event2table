@@ -836,3 +836,45 @@ class ParameterRepository(GenericRepository):
             return deleted_count
         finally:
             conn.close()
+
+    def batch_find_by_event_ids(self, event_ids: List[int]) -> Dict[int, List[ParameterEntity]]:
+        """
+        批量查询事件参数（解决N+1查询问题）
+
+        Args:
+            event_ids: 事件ID列表
+
+        Returns:
+            {event_id: [ParameterEntity]} 字典,按event_id分组
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> params_map = repo.batch_find_by_event_ids([1, 2, 3])
+            >>> # params_map = {1: [ParameterEntity, ...], 2: [...], 3: [...]}
+        """
+        if not event_ids:
+            return {}
+
+        placeholders = ','.join(['?' for _ in event_ids])
+        query = f"""
+            SELECT
+                ep.*,
+                le.game_gid
+            FROM event_params ep
+            JOIN log_events le ON ep.event_id = le.id
+            WHERE ep.event_id IN ({placeholders})
+            ORDER BY ep.event_id, ep.id
+        """
+
+        rows = fetch_all_as_dict(query, event_ids)
+
+        # 按event_id分组
+        result = {}
+        for row in rows:
+            entity = self._row_to_entity(row)
+            event_id = row['event_id']
+            if event_id not in result:
+                result[event_id] = []
+            result[event_id].append(entity)
+
+        return result

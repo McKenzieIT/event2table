@@ -89,9 +89,6 @@ class ParameterServiceExtended:
         )
 
         # 检查是否为公共参数
-        from functools import lru_cache
-
-        @lru_cache(maxsize=128)
         is_common = fetch_one_as_dict(
             """
             SELECT id FROM common_params

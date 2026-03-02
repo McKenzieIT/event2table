@@ -84,7 +84,7 @@ from .validators.syntax_validator import (
 
 # 导出适配器（可选，因为依赖项目业务逻辑）
 try:
-    from .adapters.project_adapter import ProjectAdapter
+    pass
 
     _project_adapter_available = True
 except ImportError:

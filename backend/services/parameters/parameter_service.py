@@ -824,7 +824,7 @@ class ParameterService:
 
     # ========== Common Params Service Methods ==========
 
-    @cached("common_params.list", timeout=180)
+    @cached("params.commonByGame", timeout=180)
     def get_common_params(self, game_gid: int) -> List[Dict[str, Any]]:
         """
         获取指定游戏的公共参数列表 (带缓存)
@@ -910,36 +910,21 @@ class ParameterService:
             f"Analyzing {total_events} events for game_gid={game_gid}, threshold={min_occurrences}"
         )
 
-        # Count parameter occurrences across all events
+        # Count parameter occurrences across all events (using batch query to fix N+1)
         param_counts = {}
         event_ids = [e["id"] for e in events]
 
         if event_ids:
-            placeholders = ",".join(["?"] * len(event_ids))
-            all_params = fetch_all_as_dict(
-                f"""SELECT ep.event_id, ep.param_name, ep.param_name_cn
-                    FROM event_params ep
-                    WHERE ep.event_id IN ({placeholders}) AND ep.is_active = 1""",
-                tuple(event_ids),
-            )
+            # Use batch query instead of N individual queries (N+1 fix)
+            params_map = self.param_repo.batch_find_by_event_ids(event_ids)
 
-            params_by_event = {}
-            for param in all_params:
-                eid = param["event_id"]
-                if eid not in params_by_event:
-                    params_by_event[eid] = []
-                params_by_event[eid].append(param)
-
-            for event in events:
-                event_id = event["id"]
-                params = params_by_event.get(event_id, [])
-
+            for event_id, params in params_map.items():
                 for param in params:
-                    param_key = param["param_name"]
+                    param_key = param.name
                     if param_key not in param_counts:
                         param_counts[param_key] = {
                             "count": 0,
-                            "param_name_cn": param.get("param_name_cn", ""),
+                            "param_name_cn": param.description if param.description else "",
                         }
                     param_counts[param_key]["count"] += 1
 
@@ -1034,12 +1019,9 @@ class ParameterService:
         if not param_ids:
             return 0
 
-        # Get affected games for cache invalidation
-        affected_games = set()
-        for pid in param_ids:
-            param = fetch_one_as_dict("SELECT game_gid FROM common_params WHERE id = ?", (pid,))
-            if param:
-                affected_games.add(param["game_gid"])
+        # Get affected games for cache invalidation (using batch query to fix N+1)
+        param_id_to_game_gid_map = self.param_repo.batch_get_game_gids_by_param_ids(param_ids)
+        affected_games = set(param_id_to_game_gid_map.values())
 
         # Batch delete
         deleted_count = self.param_repo.delete_common_params_batch(param_ids)

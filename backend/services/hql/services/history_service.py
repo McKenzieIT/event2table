@@ -10,8 +10,7 @@ HQL历史版本服务
 """
 
 import json
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from backend.core.database import get_db_connection
 from backend.core.config import DB_PATH
 

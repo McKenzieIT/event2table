@@ -11,7 +11,7 @@ from pathlib import Path
 # 添加hql_v2到路径
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from backend.services.hql.models.event import Event, Field, Condition, FieldType, Operator
+from backend.services.hql.models.event import Event, Field, Condition
 from backend.services.hql.core.generator import HQLGenerator
 from backend.services.hql.builders.field_builder import FieldBuilder
 from backend.services.hql.builders.where_builder import WhereBuilder

@@ -6,7 +6,7 @@ DML生成器 - Data Manipulation Language Generator
 """
 
 import re
-from typing import Optional, List, Dict, Any
+from typing import List
 from datetime import datetime
 
 
@@ -52,7 +52,6 @@ class DMLGenerator:
 
     def __init__(self):
         """初始化DML生成器"""
-        pass
 
     def generate_insert_overwrite(
         self,

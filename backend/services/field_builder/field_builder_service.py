@@ -13,10 +13,8 @@ Field Builder Service - 业务逻辑层 (精简架构)
 from typing import List, Optional, Dict, Any
 import logging
 import json
-from backend.models.entities import FieldBuilderConfigEntity
 from backend.models.repositories.join_config_repository import JoinConfigRepository
 from backend.core.cache.cache_system import CacheInvalidator, cached
-from backend.core.utils.business_helpers import validate_game_gid
 
 logger = logging.getLogger(__name__)
 

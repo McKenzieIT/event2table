@@ -13,7 +13,7 @@ from typing import List, Optional, Dict, Any
 import logging
 from backend.models.entities import EventCategoryEntity
 from backend.models.repositories.category_repository import CategoryRepository
-from backend.core.cache.cache_system import CacheInvalidator, cached
+from backend.core.cache.cache_system import cached
 
 logger = logging.getLogger(__name__)
 

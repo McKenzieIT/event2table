@@ -10,7 +10,6 @@ Event Importer Service (Refactored to use EventService)
 """
 
 from typing import List, Dict, Any
-import html
 
 from backend.core.logging import get_logger
 from backend.models.entities import EventEntity

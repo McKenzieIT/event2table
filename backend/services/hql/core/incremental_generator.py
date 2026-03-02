@@ -6,8 +6,7 @@
 """
 
 import re
-import hashlib
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
 
 from .generator import HQLGenerator

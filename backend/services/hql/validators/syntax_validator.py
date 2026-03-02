@@ -6,14 +6,12 @@ HQL语法校验器
 """
 
 import re
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Any, Optional, Tuple
 from dataclasses import dataclass, field
 
 # 尝试导入sqlparse，如果没有安装则提供基本功能
 try:
     import sqlparse
-    from sqlparse.sql import Identifier, IdentifierList, Comparison
-    from sqlparse.tokens import Token, Error
 
     SQLPARSE_AVAILABLE = True
 except ImportError:

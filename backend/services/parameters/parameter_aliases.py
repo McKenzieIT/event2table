@@ -5,20 +5,15 @@ Parameter Aliases Management Module
 Handles parameter alias CRUD operations
 """
 
-import sqlite3
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from backend.core.logging import get_logger
 from backend.core.utils import (
     fetch_all_as_dict,
     fetch_one_as_dict,
     execute_write,
-    success_response,
-    error_response,
-    validate_game_exists,
     json_success_response,
     json_error_response,
 )
-from backend.core.database import get_db_connection
 
 logger = get_logger(__name__)
 

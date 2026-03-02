@@ -6,7 +6,7 @@
 负责将当前项目的数据模型转换为抽象的Event/Field/Condition模型
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from ..models.event import Event, Field, Condition
 from backend.core.utils import fetch_one_as_dict
 

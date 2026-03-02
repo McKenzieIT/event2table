@@ -5,7 +5,6 @@ HQL生成缓存模块
 """
 
 import json
-from functools import lru_cache
 from typing import List, Dict, Any, Optional
 
 

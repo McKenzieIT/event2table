@@ -5,7 +5,6 @@ PerformanceAnalyzer 扩展单元测试
 遵循TDD原则
 """
 
-import pytest
 from backend.services.hql.validators.performance_analyzer import HQLPerformanceAnalyzer
 
 

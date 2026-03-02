@@ -19,7 +19,7 @@
 import logging
 from typing import Dict, Any
 from backend.core.cache.cache_system import get_cache
-from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
+from backend.core.utils.converters import fetch_all_as_dict
 
 logger = logging.getLogger(__name__)
 

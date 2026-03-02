@@ -4,7 +4,7 @@ HQL服务缓存增强版
 为HQLService添加多级缓存支持,提升性能
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 import json
 import hashlib
 from backend.services.hql.hql_facade import HQLFacade

@@ -6,7 +6,7 @@ WhereBuilder完整覆盖测试套件
 
 import pytest
 from backend.services.hql.builders.where_builder import WhereBuilder
-from backend.services.hql.models.event import Condition, Operator, LogicalOperator
+from backend.services.hql.models.event import Condition, Operator
 
 
 class TestWhereBuilderFullCoverage:

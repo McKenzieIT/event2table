@@ -4,8 +4,8 @@
 完全无框架依赖的HQL生成器
 """
 
-from typing import List, Optional, Union
-from ..models.event import Event, Field, Condition, HQLContext
+from typing import List, Union
+from ..models.event import Event, Field, Condition
 from ..builders.field_builder import FieldBuilder
 from ..builders.where_builder import WhereBuilder
 from ..builders.join_builder import JoinBuilder

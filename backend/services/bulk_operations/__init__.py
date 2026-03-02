@@ -18,6 +18,5 @@ from flask import Blueprint
 bulk_bp = Blueprint('bulk_operations', __name__)
 
 # Import routes to register them with the blueprint
-from . import bulk_routes
 
 __all__ = ['bulk_bp']

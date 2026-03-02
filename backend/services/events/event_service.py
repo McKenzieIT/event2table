@@ -17,7 +17,7 @@ import os
 from backend.models.entities import EventEntity
 from backend.models.repositories.events import EventRepository
 from backend.models.repositories.games import GameRepository
-from backend.core.cache.cache_system import CacheInvalidator, cached
+from backend.core.cache.cache_system import cached
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 
 logger = logging.getLogger(__name__)

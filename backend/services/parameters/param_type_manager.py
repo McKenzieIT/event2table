@@ -6,12 +6,10 @@ Handles parameter type templates and type-related operations
 """
 
 import json
-import re
 from typing import Dict, List, Optional, Any
 from functools import lru_cache
-from backend.core.database import get_db
 from backend.core.logging import get_logger
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict, execute_write
+from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict
 
 logger = get_logger(__name__)
 
@@ -27,7 +25,6 @@ class ParamTypeManager:
 
     def __init__(self):
         """Initialize type manager"""
-        pass
 
     def get_all_templates(self, include_system: bool = True) -> List[Dict[str, Any]]:
         """获取所有类型模板（带缓存）"""

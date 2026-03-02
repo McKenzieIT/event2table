@@ -23,17 +23,14 @@ Created: 2026-01-25
 Updated: 2026-02-20
 """
 
-import sqlite3
 
 from flask import Blueprint, jsonify, request, session
 
 from backend.core.cache.cache_system import clear_game_cache
-from backend.core.database import get_db_connection
 from backend.core.logging import get_logger
 from backend.core.utils import (
     error_response,
     execute_write,
-    fetch_all_as_dict,
     fetch_one_as_dict,
     success_response,
     validate_json_request,

@@ -16,11 +16,11 @@ Canvas Service - Canvas业务逻辑层
 - 缓存装饰器集成 (@cached_service, @invalidate_cache)
 """
 
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from datetime import datetime
 from backend.core.logging import get_logger
 from backend.core.cache.decorators import cached_service, invalidate_cache
-from backend.models.entities import FlowEntity, EventNodeEntity, GameEntity, EventEntity
+from backend.models.entities import FlowEntity, EventNodeEntity
 from backend.models.repositories.flow_repository import FlowRepository
 from backend.models.repositories.event_node_repository import EventNodeRepository
 from backend.models.repositories.games import GameRepository

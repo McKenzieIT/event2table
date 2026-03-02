@@ -5,7 +5,7 @@ HQL服务门面类
 简化API层对HQL服务的使用
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from backend.services.hql.core.generator import HQLGenerator
 from backend.services.hql.validators.performance_analyzer import (
     HQLPerformanceAnalyzer,
@@ -45,7 +45,6 @@ class HQLFacade:
         Returns:
             str: 生成的HQL语句
         """
-        from backend.services.hql.models.event import Event, Field, Condition
 
         validated_events = [self._dict_to_event(e) for e in events]
         validated_fields = [self._dict_to_field(f) for f in fields]

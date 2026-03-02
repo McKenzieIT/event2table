@@ -5,8 +5,6 @@ HQL历史版本数据库迁移脚本
 """
 
 import sqlite3
-from datetime import datetime
-from pathlib import Path
 
 
 def migrate_hql_history(db_path: str):

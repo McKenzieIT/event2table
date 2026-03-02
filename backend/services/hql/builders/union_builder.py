@@ -4,7 +4,7 @@ UnionBuilder - 多事件UNION HQL构建器
 支持UNION ALL操作，合并多个事件的相同字段
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from ..models.event import Event, Field, FieldType
 
 
@@ -21,7 +21,6 @@ class UnionBuilder:
 
     def __init__(self):
         """初始化UnionBuilder"""
-        pass
 
     def build_union_all(
         self, events: List[Event], fields: List[Field], use_aliases: bool = False

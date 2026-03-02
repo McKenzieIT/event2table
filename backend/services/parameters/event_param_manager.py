@@ -24,7 +24,7 @@ import logging
 from backend.services.parameters.parameter_service import ParameterService
 from backend.services.parameters.param_type_manager import param_type_manager
 from backend.services.parameters.param_library_manager import param_library_manager
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict, execute_write
+from backend.core.utils import fetch_one_as_dict
 
 logger = logging.getLogger(__name__)
 

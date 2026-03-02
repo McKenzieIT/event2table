@@ -7,7 +7,7 @@ Event Node Builder Module
 这些路由作为现有 API 的包装器，将 /event_node_builder/* 请求转发到相应的后端服务
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from backend.core.logging import get_logger
 from backend.core.utils import (
     json_success_response,
@@ -177,7 +177,6 @@ def save_config():
             return json_error_response("Request body is required", status_code=400)
 
         # 导入 event_nodes 模块的创建逻辑
-        from backend.services.events.event_nodes import create_event_node
 
         # 模拟 request 对象，因为 create_event_node 从 request.get_json() 读取数据
         # 我们需要将当前请求数据注入到 Flask 的 request context 中
@@ -453,7 +452,6 @@ def copy_node(node_id):
     """
     try:
         from backend.core.utils import execute_write
-        import json
 
         # 获取原节点
         node = fetch_one_as_dict(

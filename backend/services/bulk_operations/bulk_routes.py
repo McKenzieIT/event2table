@@ -6,10 +6,7 @@ All endpoints use the GenericRepository pattern for batch operations.
 """
 
 import logging
-import json
-from typing import Any, Dict, List
 
-from flask import request
 from backend.core.utils import (
     execute_write,
     fetch_all_as_dict,
