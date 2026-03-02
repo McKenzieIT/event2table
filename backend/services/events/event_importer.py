@@ -139,7 +139,7 @@ class EventImporter:
         self, game_gid: int, events_data: List[Dict[str, Any]]
     ) -> set:
         """
-        批量获取已存在的事件名 (优化性能)
+        批量获取已存在的事件名 (优化性能 - 使用批量查询)
 
         Args:
             game_gid: 游戏GID
@@ -153,9 +153,9 @@ class EventImporter:
         if not event_names:
             return set()
 
-        # 使用EventRepository批量查询
-        existing_events = self.event_repo.find_all(game_gid)
-        return {event.name for event in existing_events if event.name in event_names}
+        # 使用EventRepository批量查询 (优化N+1查询)
+        existing_events = self.event_repo.batch_find_by_names(event_names, game_gid)
+        return {event.event_name for event in existing_events}
 
     def _convert_to_event_entity(
         self, game_gid: int, event_data: Dict[str, Any]

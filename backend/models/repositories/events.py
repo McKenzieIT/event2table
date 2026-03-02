@@ -664,3 +664,44 @@ class EventRepository(GenericRepository):
             raise e
         finally:
             conn.close()
+
+    def batch_find_by_names(
+        self, event_names: List[str], game_gid: int
+    ) -> List[EventEntity]:
+        """
+        批量查询指定名称列表中的事件 (优化N+1查询)
+
+        Args:
+            event_names: 事件名称列表
+            game_gid: 游戏GID
+
+        Returns:
+            匹配的EventEntity列表
+
+        Example:
+            >>> repo = EventRepository()
+            >>> events = repo.batch_find_by_names(['login', 'logout'], 10000147)
+            >>> # Returns only events that match the names in the list
+            >>> [e.event_name for e in events]
+            ['login', 'logout']
+        """
+        if not event_names:
+            return []
+
+        # Build IN clause with parameterized query
+        placeholders = ", ".join(["?" for _ in event_names])
+        query = f"""
+            SELECT
+                le.*,
+                g.gid, g.name as game_name, g.ods_db,
+                ec.name as category_name
+            FROM log_events le
+            LEFT JOIN games g ON le.game_gid = g.gid
+            LEFT JOIN event_categories ec ON le.category_id = ec.id
+            WHERE le.event_name IN ({placeholders})
+            AND g.gid = ?
+        """
+
+        params = event_names + [game_gid]
+        rows = fetch_all_as_dict(query, tuple(params))
+        return [EventEntity(**row) for row in rows]

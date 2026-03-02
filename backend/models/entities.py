@@ -208,6 +208,17 @@ class EventEntity(BaseModel):
     event_name: str = Field(..., alias="name", min_length=1, max_length=100, description="事件名称")
     event_name_cn: Optional[str] = Field(None, alias="name_cn", max_length=100, description="事件中文名")
 
+    # 数据库字段 (从log_events表)
+    category_id: Optional[int] = Field(None, description="分类ID")
+    source_table: str = Field(..., description="ODS源表")
+    target_table: str = Field(..., description="DWD目标表")
+    include_in_common_params: int = Field(1, description="是否包含在公共参数中")
+
+    # 关联数据 (从JOIN查询获取)
+    game_name: Optional[str] = Field(None, description="游戏名称 (JOIN games)")
+    ods_db: Optional[str] = Field(None, description="ODS数据库 (JOIN games)")
+    category_name: Optional[str] = Field(None, description="分类名称 (JOIN event_categories)")
+
     # 计算字段 (不持久化)
     table_name: Optional[str] = Field(None, description="ODS表名", exclude=True)
     description: Optional[str] = Field(None, description="事件描述", exclude=True)
