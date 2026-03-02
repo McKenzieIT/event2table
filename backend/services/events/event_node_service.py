@@ -15,6 +15,7 @@ from backend.models.entities import EventNodeEntity
 from backend.models.repositories.event_node_repository import EventNodeRepository
 from backend.models.repositories.games import GameRepository
 from backend.models.repositories.events import EventRepository
+from backend.core.cache.decorators import cached
 
 
 class EventNodeService(BaseService):
@@ -34,9 +35,10 @@ class EventNodeService(BaseService):
         self.game_repo = GameRepository()
         self.event_repo = EventRepository()
 
+    @cached("event_nodes.byId", timeout=120)
     def get_node_by_id(self, node_id: int) -> Optional[EventNodeEntity]:
         """
-        根据ID获取事件节点
+        根据ID获取事件节点 (带缓存)
 
         Args:
             node_id: 节点ID
@@ -46,9 +48,10 @@ class EventNodeService(BaseService):
         """
         return self.node_repo.find_by_id(node_id)
 
+    @cached("event_nodes.byGame", timeout=120)
     def get_nodes_by_game_gid(self, game_gid: int) -> List[EventNodeEntity]:
         """
-        获取指定游戏的所有事件节点
+        获取指定游戏的所有事件节点 (带缓存)
 
         Args:
             game_gid: 游戏GID
@@ -58,9 +61,10 @@ class EventNodeService(BaseService):
         """
         return self.node_repo.find_by_game_gid(game_gid)
 
+    @cached("event_nodes.byEvent", timeout=120)
     def get_nodes_by_event_id(self, event_id: int) -> List[EventNodeEntity]:
         """
-        获取指定事件的所有节点
+        获取指定事件的所有节点 (带缓存)
 
         Args:
             event_id: 事件ID
@@ -221,9 +225,10 @@ class EventNodeService(BaseService):
 
         return success
 
+    @cached("event_nodes.countByGame", timeout=300)
     def count_nodes_by_game_gid(self, game_gid: int) -> int:
         """
-        统计指定游戏的事件节点数量
+        统计指定游戏的事件节点数量 (带缓存)
 
         Args:
             game_gid: 游戏GID
@@ -233,9 +238,10 @@ class EventNodeService(BaseService):
         """
         return self.node_repo.count_by_game_gid(game_gid)
 
+    @cached("event_nodes.withDetails", timeout=180)
     def get_node_with_details(self, node_id: int) -> Optional[Dict[str, Any]]:
         """
-        获取事件节点及其关联的游戏和事件信息
+        获取事件节点及其关联的游戏和事件信息 (带缓存)
 
         Args:
             node_id: 节点ID

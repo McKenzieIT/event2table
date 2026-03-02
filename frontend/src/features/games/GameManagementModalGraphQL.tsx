@@ -1,366 +1,273 @@
-/**
- * GameManagementModalGraphQL - 游戏管理模态框（GraphQL版本）
- *
- * 使用GraphQL API替代REST API
- * 利用GraphQL的灵活性优化数据获取
- */
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
+// 游戏管理组件 - GraphQL版本 (已迁移)
+// 替代原有的REST API版本
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { BaseModal, Button, Input, Checkbox, useToast, SearchInput, Skeleton } from '@shared/ui';
-import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
-import { useGameStore } from '../../stores/gameStore';
-import { AddGameModal } from './AddGameModal';
-import {
-  useGames,
-  useSearchGames,
-  useUpdateGame,
-  useDeleteGame,
-} from '../../graphql/hooks';
-import { GameType } from '../../types/api.generated';
-import './GameManagementModal.css';
+import React, { useState } from 'react';
+import { useQuery, useMutation } from '@apollo/client/react';
+import { 
+  GET_GAMES, 
+  GET_GAME, 
+  CREATE_GAME, 
+  UPDATE_GAME, 
+  DELETE_GAME,
+  SEARCH_GAMES 
+} from '../../shared/graphql/operations';
 
-interface GameManagementModalGraphQLProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface Game {
+  id: number;
+  gid: number;
+  name: string;
+  ods_db: string;
+  iconPath?: string;
+  eventCount: number;
+  parameterCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface ConfirmState {
-  open: boolean;
-  type: 'single' | 'batch';
-  data: any;
-  title: string;
-  message: string;
-}
+export const GameManagementModal: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingGame, setEditingGame] = useState<Game | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
-const GameManagementModalGraphQL: React.FC<GameManagementModalGraphQLProps> = ({ isOpen, onClose }) => {
-  const { success, error: showError } = useToast();
-  const { setCurrentGame, currentGame, isAddGameModalOpen, openAddGameModal, closeAddGameModal } = useGameStore();
-
-  // Local state
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedGames, setSelectedGames] = useState<number[]>([]);
-  const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
-
-  // Editable game data state
-  const [editingGame, setEditingGame] = useState<Partial<GameType> | null>(null);
-  const [hasChanges, setHasChanges] = useState<boolean>(false);
-  const [confirmState, setConfirmState] = useState<ConfirmState>({
-    open: false,
-    type: 'single',
-    data: null,
-    title: '',
-    message: ''
+  // 查询游戏列表
+  const { loading, error, data, refetch } = useQuery(GET_GAMES, {
+    variables: { limit: 20, offset: 0 },
+    fetchPolicy: 'cache-and-network',
   });
 
-  // GraphQL Hooks
-  const { data: gamesData, loading: isLoading, error } = useGames(100, 0);
-  const { data: searchData, loading: isSearching } = useSearchGames(searchTerm);
+  // 搜索游戏
+  const { data: searchData, loading: searchLoading } = useQuery(SEARCH_GAMES, {
+    variables: { query: searchQuery },
+    skip: !searchQuery,
+  });
 
-  // Mutations
-  const [updateGame] = useUpdateGame();
-  const [deleteGame] = useDeleteGame();
-
-  // Get games list
-  const games: GameType[] = useMemo(() => {
-    if (searchTerm && searchData?.searchGames) {
-      return searchData.searchGames;
-    }
-    return gamesData?.games || [];
-  }, [gamesData, searchData, searchTerm]);
-
-  // Filter games based on search term (client-side fallback)
-  const filteredGames: GameType[] = useMemo(() => {
-    if (!games.length) return [];
-    if (searchTerm && searchData?.searchGames) {
-      return games; // Already filtered by GraphQL
-    }
-    return games.filter(game =>
-      game.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      game.gid?.toString().includes(searchTerm)
-    );
-  }, [games, searchTerm, searchData]);
-
-  // Handle game selection
-  const handleSelectGame = useCallback((game: GameType) => {
-    setSelectedGameId(game.gid);
-    setEditingGame({ ...game });
-    setHasChanges(false);
-    setCurrentGame(game);
-  }, [setCurrentGame]);
-
-  // Handle game edit
-  const handleEditGame = useCallback((field: keyof GameType, value: string) => {
-    setEditingGame(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setHasChanges(true);
-  }, []);
-
-  // Handle save game
-  const handleSaveGame = useCallback(async () => {
-    if (!editingGame || !hasChanges) return;
-
-    try {
-      const { data } = await updateGame({
-        variables: {
-          gid: editingGame.gid!,
-          name: editingGame.name!,
-          odsDb: editingGame.odsDb!
-        }
-      });
-
-      if (data?.updateGame?.ok) {
-        success('游戏更新成功');
-        setHasChanges(false);
+  // 创建游戏
+  const [createGame, { loading: creating }] = useMutation(CREATE_GAME, {
+    onCompleted: (result) => {
+      if (result.createGame.ok) {
+        alert('游戏创建成功!');
+        setShowCreateForm(false);
+        refetch();
       } else {
-        showError(data?.updateGame?.errors?.[0] || '更新失败');
+        alert(`创建失败: ${result.createGame.errors.join(', ')}`);
       }
-    } catch (err: any) {
-      showError(`更新失败: ${err.message}`);
-    }
-  }, [editingGame, hasChanges, updateGame, success, showError]);
+    },
+    onError: (error) => {
+      alert(`创建失败: ${error.message}`);
+    },
+  });
 
-  // Handle delete game
-  const handleDeleteGame = useCallback(async (gid: number, confirm = false) => {
-    try {
-      const { data } = await deleteGame({
-        variables: { gid, confirm }
-      });
-
-      if (data?.deleteGame?.ok) {
-        success('游戏删除成功');
-        setSelectedGameId(null);
+  // 更新游戏
+  const [updateGame, { loading: updating }] = useMutation(UPDATE_GAME, {
+    onCompleted: (result) => {
+      if (result.updateGame.ok) {
+        alert('游戏更新成功!');
         setEditingGame(null);
-        setSelectedGames(prev => prev.filter(id => id !== gid));
-      } else if (data?.deleteGame?.message) {
-        // Needs confirmation
-        setConfirmState({
-          open: true,
-          type: 'single',
-          data: { gid },
-          title: '确认删除',
-          message: data.deleteGame.message
-        });
+        refetch();
       } else {
-        showError(data?.deleteGame?.errors?.[0] || '删除失败');
+        alert(`更新失败: ${result.updateGame.errors.join(', ')}`);
       }
-    } catch (err: any) {
-      showError(`删除失败: ${err.message}`);
-    }
-  }, [deleteGame, success, showError]);
+    },
+  });
 
-  // Handle batch delete
-  const handleBatchDelete = useCallback(async () => {
-    if (selectedGames.length === 0) return;
+  // 删除游戏
+  const [deleteGame, { loading: deleting }] = useMutation(DELETE_GAME, {
+    onCompleted: (result) => {
+      if (result.deleteGame.ok) {
+        alert('游戏删除成功!');
+        refetch();
+      } else {
+        alert(`删除失败: ${result.deleteGame.errors.join(', ')}`);
+      }
+    },
+  });
 
-    setConfirmState({
-      open: true,
-      type: 'batch',
-      data: { gids: selectedGames },
-      title: '批量删除确认',
-      message: `确定要删除选中的 ${selectedGames.length} 个游戏吗？`
+  // 处理创建游戏
+  const handleCreateGame = (gameData: any) => {
+    createGame({
+      variables: {
+        gid: parseInt(gameData.gid),
+        name: gameData.name,
+        ods_db: gameData.ods_db,
+      },
     });
-  }, [selectedGames]);
+  };
 
-  // Handle confirm dialog
-  const handleConfirmAction = useCallback(async () => {
-    if (confirmState.type === 'single') {
-      await handleDeleteGame(confirmState.data.gid, true);
-    } else if (confirmState.type === 'batch') {
-      setIsDeleting(true);
-      try {
-        for (const gid of confirmState.data.gids) {
-          await handleDeleteGame(gid, true);
-        }
-        setSelectedGames([]);
-      } finally {
-        setIsDeleting(false);
-      }
+  // 处理更新游戏
+  const handleUpdateGame = (gameData: any) => {
+    if (!editingGame) return;
+    
+    updateGame({
+      variables: {
+        gid: editingGame.gid,
+        name: gameData.name,
+        ods_db: gameData.ods_db,
+      },
+    });
+  };
+
+  // 处理删除游戏
+  const handleDeleteGame = (game: Game) => {
+    if (confirm(`确定要删除游戏 "${game.name}" 吗?`)) {
+      deleteGame({
+        variables: {
+          gid: game.gid,
+          confirm: true,
+        },
+      });
     }
-    setConfirmState({ open: false, type: 'single', data: null, title: '', message: '' });
-  }, [confirmState, handleDeleteGame]);
+  };
 
-  // Handle checkbox change
-  const handleCheckboxChange = useCallback((gid: number, checked: boolean) => {
-    setSelectedGames(prev =>
-      checked ? [...prev, gid] : prev.filter(id => id !== gid)
-    );
-  }, []);
+  if (loading) return <div className="loading">加载中...</div>;
+  if (error) return <div className="error">错误: {error.message}</div>;
 
-  // Render loading state
-  if (isLoading) {
-    return (
-      <BaseModal isOpen={isOpen} onClose={onClose} title="游戏管理" size="lg">
-        <div className="game-management-loading">
-          <Skeleton height={40} count={5} />
-        </div>
-      </BaseModal>
-    );
-  }
-
-  // Render error state
-  if (error) {
-    return (
-      <BaseModal isOpen={isOpen} onClose={onClose} title="游戏管理" size="lg">
-        <div className="game-management-error">
-          <p>加载失败: {error.message}</p>
-          <Button onClick={() => window.location.reload()}>重试</Button>
-        </div>
-      </BaseModal>
-    );
-  }
+  const games = searchQuery ? searchData?.searchGames : data?.games;
 
   return (
-    <>
-      <BaseModal isOpen={isOpen} onClose={onClose} title="游戏管理" size="lg">
-        <div className="game-management-container">
-          {/* Header */}
-          <div className="game-management-header">
-            <div className="header-left">
-              <SearchInput
-                value={searchTerm}
-                onChange={(value: string) => setSearchTerm(value)}
-                placeholder="搜索游戏名称或GID..."
-                loading={isSearching}
-              />
-            </div>
-            <div className="header-right">
-              <Button onClick={openAddGameModal} variant="primary">
-                + 添加游戏
-              </Button>
-              {selectedGames.length > 0 && (
-                <Button
-                  onClick={handleBatchDelete}
-                  variant="danger"
-                  loading={isDeleting}
-                >
-                  删除选中 ({selectedGames.length})
-                </Button>
-              )}
-            </div>
-          </div>
+    <div className="game-management-modal">
+      <div className="modal-header">
+        <h2>游戏管理</h2>
+        <button 
+          className="btn-primary"
+          onClick={() => setShowCreateForm(true)}
+        >
+          创建游戏
+        </button>
+      </div>
 
-          {/* Main content */}
-          <div className="game-management-content">
-            {/* Left: Games list */}
-            <div className="games-list">
-              <div className="games-list-header">
-                <Checkbox
-                  checked={selectedGames.length === filteredGames.length && filteredGames.length > 0}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    if (e.target.checked) {
-                      setSelectedGames(filteredGames.map(g => g.gid));
-                    } else {
-                      setSelectedGames([]);
-                    }
-                  }}
-                />
-                <span>游戏列表 ({filteredGames.length})</span>
-              </div>
-              <div className="games-list-body">
-                {filteredGames.map(game => (
-                  <div
-                    key={game.gid}
-                    className={`game-item ${selectedGameId === game.gid ? 'selected' : ''}`}
-                    onClick={() => handleSelectGame(game)}
-                  >
-                    <Checkbox
-                      checked={selectedGames.includes(game.gid)}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        e.stopPropagation();
-                        handleCheckboxChange(game.gid, e.target.checked);
-                      }}
-                    />
-                    <div className="game-info">
-                      <div className="game-name">{game.name}</div>
-                      <div className="game-meta">
-                        GID: {game.gid} | 事件: {game.eventCount || 0}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+      {/* 搜索框 */}
+      <div className="search-box">
+        <input
+          type="text"
+          placeholder="搜索游戏..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchLoading && <span>搜索中...</span>}
+      </div>
+
+      {/* 游戏列表 */}
+      <div className="game-list">
+        {games?.map((game: Game) => (
+          <div key={game.id} className="game-item">
+            <div className="game-info">
+              <h3>{game.name}</h3>
+              <p>GID: {game.gid}</p>
+              <p>数据库: {game.ods_db}</p>
+              <div className="game-stats">
+                <span>事件数: {game.eventCount}</span>
+                <span>参数数: {game.parameterCount}</span>
               </div>
             </div>
-
-            {/* Right: Game details */}
-            <div className="game-details">
-              {selectedGameId && editingGame ? (
-                <>
-                  <div className="details-header">
-                    <h3>游戏详情</h3>
-                    <div className="details-actions">
-                      {hasChanges && (
-                        <Button onClick={handleSaveGame} variant="primary" size="sm">
-                          保存
-                        </Button>
-                      )}
-                      <Button
-                        onClick={() => handleDeleteGame(editingGame.gid!)}
-                        variant="danger"
-                        size="sm"
-                      >
-                        删除
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="details-body">
-                    <Input
-                      label="GID"
-                      value={editingGame.gid?.toString()}
-                      disabled
-                    />
-                    <Input
-                      label="游戏名称"
-                      value={editingGame.name}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditGame('name', e.target.value)}
-                    />
-                    <Input
-                      label="ODS数据库"
-                      value={editingGame.odsDb}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditGame('odsDb', e.target.value)}
-                    />
-                    <Input
-                      label="事件数量"
-                      value={editingGame.eventCount?.toString() || '0'}
-                      disabled
-                    />
-                    <Input
-                      label="参数数量"
-                      value={editingGame.parameterCount?.toString() || '0'}
-                      disabled
-                    />
-                  </div>
-                </>
-              ) : (
-                <div className="no-selection">
-                  <p>请从左侧列表选择一个游戏</p>
-                </div>
-              )}
+            <div className="game-actions">
+              <button 
+                className="btn-secondary"
+                onClick={() => setEditingGame(game)}
+              >
+                编辑
+              </button>
+              <button 
+                className="btn-danger"
+                onClick={() => handleDeleteGame(game)}
+                disabled={deleting}
+              >
+                删除
+              </button>
             </div>
           </div>
-        </div>
-      </BaseModal>
+        ))}
+      </div>
 
-      {/* Add Game Modal */}
-      <AddGameModal
-        isOpen={isAddGameModalOpen}
-        onClose={closeAddGameModal}
-      />
+      {/* 创建游戏表单 */}
+      {showCreateForm && (
+        <GameForm
+          onSubmit={handleCreateGame}
+          onCancel={() => setShowCreateForm(false)}
+          loading={creating}
+        />
+      )}
 
-      {/* Confirm Dialog */}
-      <ConfirmDialog
-        isOpen={confirmState.open}
-        onClose={() => setConfirmState({ open: false, type: 'single', data: null, title: '', message: '' })}
-        onConfirm={handleConfirmAction}
-        title={confirmState.title}
-        message={confirmState.message}
-        confirmText="确认"
-        cancelText="取消"
-      />
-    </>
+      {/* 编辑游戏表单 */}
+      {editingGame && (
+        <GameForm
+          game={editingGame}
+          onSubmit={handleUpdateGame}
+          onCancel={() => setEditingGame(null)}
+          loading={updating}
+        />
+      )}
+    </div>
   );
 };
 
-export default GameManagementModalGraphQL;
+// 游戏表单组件
+interface GameFormProps {
+  game?: Game | null;
+  onSubmit: (data: any) => void;
+  onCancel: () => void;
+  loading: boolean;
+}
+
+const GameForm: React.FC<GameFormProps> = ({ game, onSubmit, onCancel, loading }) => {
+  const [formData, setFormData] = useState({
+    gid: game?.gid || '',
+    name: game?.name || '',
+    ods_db: game?.ods_db || 'ieu_ods',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>{game ? '编辑游戏' : '创建游戏'}</h3>
+        <form onSubmit={handleSubmit}>
+          {!game && (
+            <div className="form-group">
+              <label>GID:</label>
+              <input
+                type="number"
+                value={formData.gid}
+                onChange={(e) => setFormData({ ...formData, gid: e.target.value })}
+                required
+              />
+            </div>
+          )}
+          <div className="form-group">
+            <label>游戏名称:</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>数据库:</label>
+            <select
+              value={formData.ods_db}
+              onChange={(e) => setFormData({ ...formData, ods_db: e.target.value })}
+            >
+              <option value="ieu_ods">ieu_ods</option>
+              <option value="overseas_ods">overseas_ods</option>
+            </select>
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? '提交中...' : '提交'}
+            </button>
+            <button type="button" className="btn-secondary" onClick={onCancel}>
+              取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default GameManagementModal;

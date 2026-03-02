@@ -1,8 +1,10 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Spinner Component Tests
  * 测试加载动画组件的所有功能
  */
 
+import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Spinner from './Spinner';

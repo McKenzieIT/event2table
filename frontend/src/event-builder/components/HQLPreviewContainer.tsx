@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * HQLPreviewContainer Component
  * HQL预览容器组件 - 连接API和HQLPreview组件

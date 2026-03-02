@@ -78,6 +78,24 @@ def list_games():
         return json_error_response("Failed to list games", status_code=500)
 
 
+@api_bp.route("/api/games/by-gid/<int:game_gid>", methods=["GET"])
+def get_game_by_gid_alias(game_gid: int):
+    """
+    根据GID获取单个游戏 (前端兼容路由)
+
+    这是一个别名路由，指向与 /api/games/<game_gid> 相同的处理函数。
+    前端代码使用 /api/games/by-gid/<game_gid> 格式。
+
+    Args:
+        game_gid: 游戏业务GID (如 10000147)
+
+    Returns:
+        JSON响应: {"success": true, "data": {...}}
+    """
+    # 直接调用主路由处理函数
+    return get_game(game_gid)
+
+
 @api_bp.route("/api/games/<int:game_gid>", methods=["GET"])
 def get_game(game_gid: int):
     """

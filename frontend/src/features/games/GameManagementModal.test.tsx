@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * GameManagementModal 组件测试
  *

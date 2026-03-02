@@ -6,6 +6,7 @@ log events and their configurations.
 
 Core endpoints:
 - GET /api/events - List all events with pagination
+- GET /api/events/count - Get events count
 - POST /api/events - Create a new event
 - GET /api/events/<int:id> - Get event details
 - PUT/PATCH /api/events/<int:id> - Update an event
@@ -27,19 +28,12 @@ Available Schemas in backend/models/schemas.py:
 
 import html
 import logging
-import sqlite3
 from typing import Any, Dict, Tuple
 
-# Import cache functions
-import sys
-
-from flask import request, session, Response
+from flask import request, session
 
 # Import shared utilities
 from backend.core.utils import (
-    execute_write,
-    fetch_all_as_dict,
-    fetch_one_as_dict,
     json_error_response,
     json_success_response,
     safe_int_convert,
@@ -47,20 +41,16 @@ from backend.core.utils import (
     validate_json_request,
 )
 
-# Import Repository pattern for data access
-from backend.core.data_access import Repositories
-
-# Import cache invalidator instance (matching pattern in games.py)
-try:
-    from backend.core.cache.cache_system import cache_invalidator
-except ImportError:
-    cache_invalidator = None
-
+# Import EventService for business logic (ERS Architecture)
+from backend.services.events.event_service import EventService
 
 # Import the parent blueprint
 from .. import api_bp
 
 logger = logging.getLogger(__name__)
+
+# Initialize EventService
+event_service = EventService()
 
 
 @api_bp.route("/api/events", methods=["GET"])
@@ -109,67 +99,23 @@ def api_list_events() -> Tuple[Dict[str, Any], int]:
         per_page = 20
     if per_page > 100:
         per_page = 100
-    offset = (page - 1) * per_page
 
-    # Build base query
-    query = """
-        SELECT
-            le.*,
-            g.gid, g.name as game_name, g.ods_db,
-            ec.name as category_name,
-            (SELECT COUNT(*) FROM event_params ep
-             WHERE ep.event_id = le.id AND ep.is_active = 1) as param_count
-        FROM log_events le
-        LEFT JOIN games g ON le.game_gid = g.gid
-        LEFT JOIN event_categories ec ON le.category_id = ec.id
-    """
-
-    # Build WHERE clauses and parameters
-    where_clauses = []
-    params = []
-
-    # Game filter
-    if game_gid:
-        where_clauses.append("le.game_gid = ?")
-        params.append(game_gid)
-
-    # Search filter
-    if search:
-        where_clauses.append(
-            "(le.event_name LIKE ? OR le.event_name_cn LIKE ? OR ec.name LIKE ?)"
+    try:
+        # Use EventService for paginated list with caching
+        result = event_service.get_events_paginated(
+            game_gid=game_gid,
+            page=page,
+            per_page=per_page,
+            search=search if search else None
         )
-        search_pattern = f"%{search}%"
-        params.extend([search_pattern, search_pattern, search_pattern])
 
-    # Construct WHERE clause
-    if where_clauses:
-        where_sql = " WHERE " + " AND ".join(where_clauses)
-        query += where_sql
+        return json_success_response(data=result)
 
-    # Get total count with filters
-    count_query = "SELECT COUNT(*) as total FROM log_events le LEFT JOIN event_categories ec ON le.category_id = ec.id"
-    if where_clauses:
-        count_query += where_sql
-    total_result = fetch_one_as_dict(count_query, tuple(params))
-
-    # Add ORDER BY and pagination
-    query += " ORDER BY le.id DESC LIMIT ? OFFSET ?"
-    events = fetch_all_as_dict(query, tuple(params + [per_page, offset]))
-
-    total_events = total_result["total"] if total_result else 0
-    total_pages = max(1, (total_events + per_page - 1) // per_page)
-
-    return json_success_response(
-        data={
-            "events": events,
-            "pagination": {
-                "page": page,
-                "per_page": per_page,
-                "total": total_events,
-                "total_pages": total_pages,
-            },
-        }
-    )
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.error(f"Error listing events: {e}")
+        return json_error_response("Failed to list events", status_code=500)
 
 
 @api_bp.route("/api/events", methods=["POST"])
@@ -186,38 +132,6 @@ def api_create_event():
         is_valid_game, game_error = validate_game_gid(data["game_gid"])
         if not is_valid_game:
             return json_error_response(game_error, status_code=400)
-
-        # 验证category_id (optional - defaults to "未分类" if not provided or empty)
-        category_id = data.get("category_id")
-        # Treat empty string as None/missing (handle both string and int types)
-        if not category_id or (isinstance(category_id, str) and category_id.strip() == ""):
-            category_id = None
-
-        if category_id:
-            # Validate category exists if provided
-            category = fetch_one_as_dict(
-                "SELECT id, name FROM event_categories WHERE id = ?", (category_id,)
-            )
-            if not category:
-                return json_error_response(
-                    f"Category with id {category_id} not found", status_code=400
-                )
-            event_category = category["name"]
-        else:
-            # Auto-create "未分类" category if it doesn't exist
-            default_category = fetch_one_as_dict(
-                "SELECT id, name FROM event_categories WHERE name = ?", ("未分类",)
-            )
-            if default_category:
-                category_id = default_category["id"]
-            else:
-                # Create "未分类" category
-                category_id = execute_write(
-                    "INSERT INTO event_categories (name) VALUES (?)",
-                    ("未分类",),
-                    return_last_id=True
-                )
-            event_category = "未分类"
 
         # Validate input lengths to prevent database errors and DoS attacks
         event_name = data.get("event_name", "").strip()
@@ -239,76 +153,56 @@ def api_create_event():
         event_name = html.escape(event_name)
         event_name_cn = html.escape(event_name_cn)
 
-        # Update data with sanitized values
-        data["event_name"] = event_name
-        data["event_name_cn"] = event_name_cn
-        # category_id is already set above, handle it properly for INSERT
-        data["category_id"] = category_id if category_id else None
+        # Handle category_id
+        category_id = data.get("category_id")
+        if not category_id or (isinstance(category_id, str) and category_id.strip() == ""):
+            category_id = None
 
-        # 验证game_gid存在
-        game = fetch_one_as_dict(
-            "SELECT id, gid, ods_db FROM games WHERE gid = ?", (data["game_gid"],)
-        )
-        if not game:
-            return json_error_response(
-                f"Game with gid {data['game_gid']} not found", status_code=400
-            )
+        # Validate or create default category
+        if category_id:
+            if not event_service.validate_category_exists(category_id):
+                return json_error_response(
+                    f"Category with id {category_id} not found", status_code=400
+                )
+        else:
+            category_id = event_service.get_or_create_default_category()
 
-        # Get database game_id and game_gid
-        db_game_id = game["id"]
-        game_gid = data["game_gid"]
-        ods_db = game["ods_db"]
-
-        # Generate source_table and target_table names
-        source_table = f"{ods_db}.ods_{game_gid}_all_view"
-        target_table = f"dwd.v_dwd_{game_gid}_{data['event_name']}_di"
-
-        event_id = execute_write(
-            """INSERT INTO log_events (game_id, game_gid, event_name, event_name_cn, category_id, source_table, target_table, include_in_common_params)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                db_game_id,
-                game_gid,
-                data["event_name"],
-                data.get("event_name_cn", ""),
-                data["category_id"],  # Already set to valid category ID above
-                source_table,
-                target_table,
-                data.get("include_in_common_params", 1),
-            ),
-            return_last_id=True,
-        )
-
-        # Parse parameters
+        # Prepare parameters list
         param_names = data.get("param_names", [])
         param_names_cn = data.get("param_names_cn", [])
         param_types = data.get("param_types", [])
         param_descriptions = data.get("param_descriptions", [])
 
+        parameters = []
         for i, name in enumerate(param_names):
             if name:
-                execute_write(
-                    """INSERT INTO event_params
-                           (event_id, param_name, param_name_cn, template_id, param_description, is_active, version)
-                           VALUES (?, ?, ?, ?, ?, 1, 1)""",
-                    (
-                        event_id,
-                        name,
-                        param_names_cn[i] if i < len(param_names_cn) else "",
-                        param_types[i] if i < len(param_types) else 1,
-                        param_descriptions[i] if i < len(param_descriptions) else "",
-                    ),
-                )
+                parameters.append({
+                    "param_name": name,
+                    "param_name_cn": param_names_cn[i] if i < len(param_names_cn) else "",
+                    "template_id": param_types[i] if i < len(param_types) else 1,
+                    "param_description": param_descriptions[i] if i < len(param_descriptions) else "",
+                })
 
-        if cache_invalidator:
-            cache_invalidator.invalidate_key("dashboard_statistics")
-        logger.info(f"Event created: {data['event_name']} (ID: {event_id})")
-        return json_success_response(
-            data={"event_id": event_id}, message="Event created successfully"
+        # Create EventEntity
+        from backend.models.entities import EventEntity
+        event_data = EventEntity(
+            game_gid=data["game_gid"],
+            name=event_name,
+            name_cn=event_name_cn,
+            category_id=category_id,
+            include_in_common_params=data.get("include_in_common_params", 1)
         )
 
-    except sqlite3.IntegrityError as e:
-        return json_error_response("Integrity constraint violation", status_code=400)
+        # Use EventService to create event with parameters
+        event = event_service.create_event_with_parameters(event_data, parameters)
+
+        logger.info(f"Event created: {event_name} (ID: {event.id})")
+        return json_success_response(
+            data={"event_id": event.id}, message="Event created successfully"
+        )
+
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         if "Bad Request" in str(e) or type(e).__name__ == "BadRequest":
             return json_error_response("Invalid request format", status_code=400)
@@ -333,27 +227,16 @@ def api_get_event_detail(id):
         return json_error_response("game_gid required", status_code=400)
 
     try:
-        event = fetch_one_as_dict(
-            """
-            SELECT
-                le.*,
-                g.gid,
-                g.name as game_name,
-                g.ods_db,
-                ec.name as category_name
-            FROM log_events le
-            LEFT JOIN games g ON le.game_gid = g.gid
-            LEFT JOIN event_categories ec ON le.category_id = ec.id
-            WHERE le.id = ? AND le.game_gid = ?
-        """,
-            (id, game_gid),
-        )
+        # Use EventService to get event detail with caching
+        event = event_service.get_event_detail_with_game(id, game_gid)
 
         if not event:
             return json_error_response("Event not found", status_code=404)
 
         return json_success_response(data=event)
 
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error getting event detail for {id}: {e}", exc_info=True)
         return json_error_response("An internal error occurred", status_code=500)
@@ -362,11 +245,6 @@ def api_get_event_detail(id):
 @api_bp.route("/api/events/<int:id>", methods=["PUT", "PATCH"])
 def api_update_event(id):
     """API: Update an existing event"""
-    # 使用Repository模式替代重复的SQL查询
-    event = Repositories.LOG_EVENTS.find_by_id(id)
-    if not event:
-        return json_error_response("Event not found", status_code=404)
-
     is_valid, data, error = validate_json_request(
         ["event_name", "event_name_cn", "category_id"]
     )
@@ -392,23 +270,24 @@ def api_update_event(id):
     event_name = html.escape(event_name)
     event_name_cn = html.escape(event_name_cn)
 
-    # Update data with sanitized values
-    data["event_name"] = event_name
-    data["event_name_cn"] = event_name_cn
-
     try:
-        execute_write(
-            "UPDATE log_events SET event_name = ?, event_name_cn = ?, category_id = ?, include_in_common_params = ? WHERE id = ?",
-            (
-                data["event_name"],
-                data["event_name_cn"],
-                data["category_id"],
-                data.get("include_in_common_params", 1),
-                id,
-            ),
+        # Use EventService to update event with cache invalidation
+        event = event_service.update_event_with_invalidation(
+            event_id=id,
+            event_name=event_name,
+            event_name_cn=event_name_cn,
+            category_id=data.get("category_id"),
+            include_in_common_params=data.get("include_in_common_params", 1)
         )
-        logger.info(f"Event updated: {data['event_name']} (ID: {id})")
+
+        if not event:
+            return json_error_response("Event not found", status_code=404)
+
+        logger.info(f"Event updated: {event_name} (ID: {id})")
         return json_success_response(message="Event updated successfully")
+
+    except ValueError as e:
+        return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error updating event: {e}")
         return json_error_response("Failed to update event", status_code=500)
@@ -422,30 +301,9 @@ def api_get_event_parameters(id):
     Returns list of parameters with id, param_name, param_name_cn,
     param_type, description, etc.
     """
-    # 使用Repository模式替代重复的SQL查询
-    event = Repositories.LOG_EVENTS.find_by_id(id)
-    if not event:
-        return json_error_response("Event not found", status_code=404)
-
     try:
-        parameters = fetch_all_as_dict(
-            """
-            SELECT
-                ep.id,
-                ep.param_name,
-                ep.param_name_cn,
-                pt.template_name as param_type,
-                ep.param_description as description,
-                ep.is_active,
-                ep.created_at,
-                ep.updated_at
-            FROM event_params ep
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE ep.event_id = ? AND ep.is_active = 1
-            ORDER BY ep.id
-        """,
-            (id,),
-        )
+        # Use EventService to get event parameters with caching
+        parameters = event_service.get_event_parameters(id)
 
         return json_success_response(data=parameters)
 
@@ -495,11 +353,9 @@ def api_batch_delete_events():
         return json_error_response("Invalid event IDs", status_code=400)
 
     try:
-        # Delete events using Repository batch delete
-        deleted_count = Repositories.LOG_EVENTS.delete_batch(event_ids)
+        # Use EventService for batch delete with cache invalidation
+        deleted_count = event_service.batch_delete_events(event_ids)
 
-        if cache_invalidator:
-            cache_invalidator.invalidate_pattern("events.list:*")  # Clear cache after delete
         logger.info(f"Batch deleted {deleted_count} events")
         return json_success_response(
             message=f"Deleted {deleted_count} events",
@@ -508,6 +364,45 @@ def api_batch_delete_events():
     except Exception as e:
         logger.error(f"Error batch deleting events: {e}")
         return json_error_response("Failed to delete events", status_code=500)
+
+
+@api_bp.route("/api/events/count", methods=["GET"])
+def api_get_events_count():
+    """
+    API: Get events count
+
+    Query Parameters:
+        - game_gid: Filter by game GID (optional)
+        - search: Search keyword for event names (optional)
+
+    Returns:
+        Tuple containing response dictionary and HTTP status code
+
+    Response Format:
+        {
+            "success": true,
+            "data": {
+                "total": 123
+            }
+        }
+    """
+    try:
+        # Get query parameters
+        game_gid_str = request.args.get("game_gid")
+        game_gid = safe_int_convert(game_gid_str) if game_gid_str else None
+        search = request.args.get("search", "").strip()
+
+        # Get events count from service
+        total = event_service.get_events_count(
+            game_gid=game_gid,
+            search=search if search else None
+        )
+
+        return json_success_response(data={"total": total})
+
+    except Exception as e:
+        logger.error(f"Error getting events count: {e}")
+        return json_error_response("Failed to get events count", status_code=500)
 
 
 @api_bp.route("/api/events/batch-update", methods=["PUT"])
@@ -554,11 +449,9 @@ def api_batch_update_events():
                 )
             updates["event_name_cn"] = html.escape(event_name_cn)
 
-        # Use Repository batch update
-        updated_count = Repositories.LOG_EVENTS.update_batch(event_ids, updates)
+        # Use EventService for batch update with cache invalidation
+        updated_count = event_service.batch_update_events(event_ids, updates)
 
-        if cache_invalidator:
-            cache_invalidator.invalidate_pattern("events.list:*")  # Clear cache after update
         logger.info(f"Batch updated {updated_count} events")
         return json_success_response(
             message=f"Updated {updated_count} events",

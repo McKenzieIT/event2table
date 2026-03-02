@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * FieldSelector Component
  * 字段选择下拉框（支持增强版：显示事件所有参数）

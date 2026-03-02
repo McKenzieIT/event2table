@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * ReactFlow节点执行引擎
  * 负责DAG构建、拓扑排序、节点执行

@@ -49,7 +49,7 @@ class CacheWarmer:
         logger.info(f"🔥 Warming up top {limit} popular games...")
 
         games = fetch_all_as_dict(
-            'SELECT * FROM games ORDER BY gid LIMIT ?',
+            'SELECT id, gid, name, ods_db FROM games ORDER BY gid LIMIT ?',
             (limit,)
         )
 
@@ -74,7 +74,7 @@ class CacheWarmer:
         logger.info(f"🔥 Warming up {limit} recent events...")
 
         events = fetch_all_as_dict(
-            'SELECT * FROM log_events ORDER BY created_at DESC LIMIT ?',
+            'SELECT id, event_name, game_gid, created_at FROM log_events ORDER BY created_at DESC LIMIT ?',
             (limit,)
         )
 
@@ -108,7 +108,7 @@ class CacheWarmer:
             )
         else:
             params = fetch_all_as_dict(
-                'SELECT * FROM event_params WHERE is_common = 1 LIMIT 100'
+                'SELECT id, param_name, event_id, game_gid, is_common FROM event_params WHERE is_common = 1 LIMIT 100'
             )
 
         for param in params:

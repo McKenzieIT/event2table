@@ -16,29 +16,33 @@ logger = logging.getLogger(__name__)
 DEPRECATION_WARNING = """
 ⚠️  API废弃警告
 
-您正在使用V1 API,该API已被标记为废弃,将在未来版本中移除。
+您正在使用REST API,该API已被标记为废弃,将在未来版本中移除。
 
-请迁移到V2 API:
-- V1: /api/games → V2: /api/v2/games
-- V1: /api/events → V2: /api/v2/events
-- V1: /api/parameters → V2: /api/v2/parameters
+请迁移到GraphQL API:
+- REST: /api/games → GraphQL: games query
+- REST: /api/events → GraphQL: events query
+- REST: /api/parameters → GraphQL: parameters query
+- REST: /api/categories → GraphQL: categories query
 
-V2 API优势:
-✅ 更好的性能(DDD架构)
-✅ 更清晰的接口设计
-✅ 更完善的错误处理
-✅ 更好的缓存支持
+GraphQL API优势:
+✅ 更好的性能(DataLoader批量加载)
+✅ 灵活的查询(按需获取字段)
+✅ 类型安全(强类型Schema)
+✅ 实时订阅(Subscriptions)
+✅ 更好的开发体验(GraphiQL IDE)
 
-迁移指南: docs/api/MIGRATION_GUIDE.md
+迁移指南: docs/api/REST_TO_GRAPHQL_MIGRATION.md
+GraphQL端点: /api/graphql
+GraphiQL IDE: http://localhost:5001/api/graphql
 """
 
-# V1 API路由映射到V2 API
-V1_TO_V2_MAPPING = {
-    '/api/games': '/api/v2/games',
-    '/api/events': '/api/v2/events',
-    '/api/parameters': '/api/v2/parameters',
-    '/api/categories': '/api/v2/categories',
-    '/api/hql': '/api/v2/hql',
+# REST API到GraphQL映射
+REST_TO_GRAPHQL_MAPPING = {
+    '/api/games': 'games query',
+    '/api/events': 'events query',
+    '/api/parameters': 'parameters query',
+    '/api/categories': 'categories query',
+    '/api/hql': 'generateHQL mutation',
 }
 
 
@@ -63,8 +67,8 @@ def add_deprecation_header(response):
     if path.startswith('/api/'):
         # 添加废弃警告头
         response.headers['X-API-Deprecated'] = 'true'
-        response.headers['X-API-Deprecation-Date'] = '2026-03-31'
-        response.headers['X-API-Sunset'] = '2026-06-30'
+        response.headers['X-API-Deprecation-Date'] = '2026-04-30'
+        response.headers['X-API-Sunset'] = '2026-07-31'
         
         # 添加替代API头
         v2_path = _get_v2_path(path)
@@ -130,11 +134,11 @@ def _get_v2_path(v1_path: str) -> str:
         V2 API路径,如果没有对应的V2路径则返回空字符串
     """
     # 精确匹配
-    if v1_path in V1_TO_V2_MAPPING:
-        return V1_TO_V2_MAPPING[v1_path]
-    
+    if v1_path in REST_TO_GRAPHQL_MAPPING:
+        return REST_TO_GRAPHQL_MAPPING[v1_path]
+
     # 前缀匹配
-    for v1_prefix, v2_prefix in V1_TO_V2_MAPPING.items():
+    for v1_prefix, v2_prefix in REST_TO_GRAPHQL_MAPPING.items():
         if v1_path.startswith(v1_prefix):
             return v1_path.replace(v1_prefix, v2_prefix, 1)
     

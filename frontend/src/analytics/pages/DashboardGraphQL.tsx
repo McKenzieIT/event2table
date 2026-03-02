@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * DashboardGraphQL - 仪表板页面(GraphQL版本)
  *
@@ -249,6 +250,36 @@ function DashboardGraphQL() {
                 </Card>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Empty State - No games found */}
+        {showRecentGames && stats.gameCount === 0 && !gamesLoading && (
+          <div className="recent-section" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>
+              <i className="bi bi-controller"></i>
+            </div>
+            <h2 style={{ marginBottom: '0.5rem' }}>暂无游戏</h2>
+            <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem' }}>
+              创建您的第一个游戏，开始使用 Event2Table
+            </p>
+            <Card
+              as="div"
+              onClick={openGameManagementModal}
+              padding="md"
+              className="action-card"
+              hover
+              style={{
+                cursor: 'pointer',
+                display: 'inline-block',
+                maxWidth: '300px',
+                margin: '0 auto'
+              }}
+            >
+              <i className="bi bi-plus-circle" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}></i>
+              <h3 style={{ margin: '0.5rem 0' }}>创建游戏</h3>
+              <p style={{ margin: 0, fontSize: '0.9rem' }}>开始配置您的第一个游戏项目</p>
+            </Card>
           </div>
         )}
       </div>

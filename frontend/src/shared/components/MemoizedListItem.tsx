@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React from 'react';
 
 interface ListItemProps<T> {

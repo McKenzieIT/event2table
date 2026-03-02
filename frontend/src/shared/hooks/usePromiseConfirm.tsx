@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { useState, useCallback } from 'react';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 

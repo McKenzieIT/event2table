@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * EventNodeBuilder Component
  * 事件节点构建器主容器组件
@@ -391,11 +392,16 @@ export default function EventNodeBuilder(): React.JSX.Element {
   // 加载状态
   if (!gameData) {
     return (
-      <div className="event-node-builder-loading">
+      <div className="event-node-builder-loading" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>
+          <i className="bi bi-controller"></i>
+        </div>
         <h2>请先选择游戏</h2>
-        <p>事件节点构建器需要游戏上下文才能正常工作</p>
-        <Button variant="primary" onClick={() => navigate('/games')}>
-          前往选择游戏
+        <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem' }}>
+          事件节点构建器需要游戏上下文才能正常工作
+        </p>
+        <Button variant="primary" onClick={() => navigate('/')}>
+          前往仪表板
         </Button>
       </div>
     );

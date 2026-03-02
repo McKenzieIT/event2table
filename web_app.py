@@ -25,6 +25,7 @@ logger = get_logger(__name__)
 from backend.api import api_bp
 from backend.api.routes.hql_preview_v2 import hql_preview_v2_bp  # V2 HQL Preview API
 from backend.api.routes.v1_adapter import v1_adapter_bp  # V1-to-V2 Adapter API (2026-02-17)
+from backend.api.routes.health import health_bp  # Health check endpoint (2026-03-01)
 
 # GraphQL API
 from flask import request, jsonify
@@ -34,7 +35,7 @@ from flask_graphql import GraphQLView
 # Service Blueprints - from backend/services (standardized package imports)
 # NOTE: games_bp routes are now in api_bp (backend.api.routes.games)
 # Old games_bp from backend.services.games has conflicting routes - DO NOT USE
-from backend.services.events import events_bp, event_nodes_bp
+from backend.services.events import events_bp  # event_nodes_bp removed 2026-03-01 (replaced by GraphQL + event_node_builder_bp)
 from backend.services.parameters import common_params_bp, parameter_aliases_bp
 from backend.services.canvas import canvas_bp
 from backend.services.cache_monitor import cache_monitor_bp
@@ -284,6 +285,7 @@ except Exception as e:
 
 # Register all blueprints
 # Note: Register API blueprints first, then React shell as catch-all
+app.register_blueprint(health_bp)  # Health check endpoint (/api/health) - 2026-03-01
 app.register_blueprint(api_bp)  # API endpoints (/api/*)
 app.register_blueprint(hql_preview_v2_bp)  # HQL Preview V2 API (/hql-preview-v2/*)
 app.register_blueprint(v1_adapter_bp)  # V1-to-V2 Adapter API (/api/v1-adapter/*) (2026-02-17)
@@ -296,7 +298,7 @@ if bulk_bp:
     app.register_blueprint(bulk_bp)  # Bulk operations
 app.register_blueprint(cache_monitor_bp)  # Cache monitoring (/admin/cache/*)
 app.register_blueprint(canvas_bp)  # Canvas pages and API (/canvas/*, /api/canvas/*)
-app.register_blueprint(event_nodes_bp)  # Event nodes management
+# event_nodes_bp removed 2026-03-01 (replaced by GraphQL + event_node_builder_bp)
 app.register_blueprint(parameter_aliases_bp)  # Parameter aliases
 if async_task_bp:
     app.register_blueprint(async_task_bp)  # Async tasks

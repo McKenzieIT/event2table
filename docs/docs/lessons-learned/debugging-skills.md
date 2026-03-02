@@ -176,6 +176,72 @@ npx playwright test --ui
 - **Console**: 查看控制台输出
 - **Snapshots**: 查看页面快照
 
+---
+
+## 并行开发策略 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 多次 | **来源**: 多个Phase报告
+
+### 核心概念
+
+**使用多个subagents并行处理，效率提升3-4倍**
+
+### 并行模式
+
+**任务分解**:
+```
+Phase 1: 紧急修复 (subagent A)
+Phase 2: Service重构 (subagent B)
+Phase 3: 模块迁移 (subagent C)
+Phase 4: 全面清理 (subagent D)
+
+同时进行 → 总体时间减少3-4倍
+```
+
+### 实施策略
+
+**1. 任务分解原则**:
+- 每个任务必须独立（无共享状态）
+- 每个任务有明确的输入和输出
+- 每个任务可独立验证
+
+**2. 并行执行示例**:
+```python
+# 启动2个并行subagent
+Task(subagent_type="general-purpose", prompt="分析React Hooks错误根因")
+Task(subagent_type="general-purpose", prompt="分析加载超时模式")
+
+# 同时进行，效率提升
+```
+
+**3. 集成测试**:
+```bash
+# 每个Phase完成后立即测试
+pytest backend/test/unit/  # 单元测试
+pytest backend/test/integration/  # 集成测试
+npm run test:e2e  # E2E测试
+```
+
+### 性能数据
+
+**Event2Table项目实际数据**:
+- Phase 1-4并行开发：~4小时
+- 如果串行开发：~12-16小时
+- **效率提升：3-4倍**
+
+### 代码审查清单
+
+- [ ] 任务是否可独立执行？
+- [ ] 是否有明确的输入和输出？
+- [ ] 是否避免了共享状态？
+- [ ] 每个任务完成后是否立即测试？
+
+### 案例文档
+
+- [后端架构优化报告](../../reports/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
+
+---
+
 ### 相关经验
 
 - [性能模式 - 数据库索引](./performance-patterns.md#数据库索引) - 性能分析工具

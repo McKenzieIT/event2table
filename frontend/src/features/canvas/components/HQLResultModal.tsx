@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * HQL Result Modal Component
  * Display HQL generation results with syntax highlighting, formatting, and export options

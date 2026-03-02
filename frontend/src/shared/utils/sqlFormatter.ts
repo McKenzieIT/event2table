@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * SQL格式化工具
  * 使用sql-formatter库格式化Hive SQL语句

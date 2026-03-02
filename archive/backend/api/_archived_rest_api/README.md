@@ -1,10 +1,15 @@
 # REST API归档说明
 
 ## 归档日期
-2026-02-21
+- 初始归档: 2026-02-21
+- 移动到archive目录: 2026-03-01
 
 ## 归档原因
 已完全迁移到GraphQL API
+
+## 归档位置
+- 原位置: `backend/api/_archived/`
+- 新位置: `archive/backend/api/_archived_rest_api/`
 
 ## GraphQL API
 - Schema: backend/gql_api/schema.py

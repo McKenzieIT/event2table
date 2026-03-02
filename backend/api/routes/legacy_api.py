@@ -1,16 +1,20 @@
 """
-⚠️ DEPRECATED: 此API已废弃，不建议使用
-⚠️ DEPRECATED: This API is deprecated, do not use
+================================================================================
+⚠️ DEPRECATED API MODULE - DO NOT USE ⚠️
+================================================================================
 
-废弃原因:
-- 安全风险：多处未验证的用户输入
-- 维护困难：代码结构混乱
-- 功能重复：新API已替代
+This module is marked as DEPRECATED and will be removed in V10.0.0 (estimated 2026-04-01).
 
-建议迁移到:
-- events.py
-- games.py
-- parameters.py
+Migration Guide:
+- /api/games/by-gid/<gid> → /api/games?game_gid=<gid>
+- /api/common-params → /api/parameters/all
+- /api/hql → See hql_generation.py for HQL endpoints
+- /api/logs → See dashboard.py for statistics endpoints
+
+Deprecated: 2026-03-02 (Phase 2 Architecture Migration)
+Removal: V10.0.0 (estimated 2026-04-01)
+Reason: Security vulnerabilities, code duplication, superseded by new architecture
+================================================================================
 
 Legacy API Routes Module
 
@@ -24,11 +28,13 @@ Endpoints:
 - Logs APIs: /api/logs
 - Games APIs: /api/games/by-gid/<gid>
 - Event Node Builder: /event_node_builder/api/update-param-name
+
+All endpoints in this module return the X-Deprecated: true header.
 """
 
 import logging
 
-from flask import request
+from flask import request, make_response
 
 # Import shared utilities
 from backend.core.utils import (
@@ -46,6 +52,14 @@ from backend.core.data_access import Repositories
 from .. import api_bp
 
 logger = logging.getLogger(__name__)
+
+
+def _add_deprecation_header(response):
+    """Add deprecation header to API responses"""
+    response = make_response(response)
+    response.headers['X-Deprecated'] = 'true'
+    response.headers['X-Deprecation-Notice'] = 'This API is deprecated and will be removed in V10.0.0. See docs for migration guide.'
+    return response
 
 
 # ============================================================================
@@ -84,7 +98,7 @@ def api_hql_query():
 
 @api_bp.route("/api/hql/results", methods=["GET"])
 def api_hql_results():
-    """API: Get HQL generation results"""
+    """API: Get HQL generation results (uses hql_history table)"""
     try:
         job_id = request.args.get("job_id")
         limit = request.args.get("limit", 50, type=int)
@@ -92,13 +106,13 @@ def api_hql_results():
         if job_id:
             # Get specific job results
             result = fetch_one_as_dict(
-                "SELECT * FROM hql_results WHERE job_id = ? ORDER BY created_at DESC LIMIT 1",
+                "SELECT * FROM hql_history WHERE id = ? ORDER BY created_at DESC LIMIT 1",
                 (job_id,),
             )
         else:
             # Get recent results
             result = fetch_all_as_dict(
-                "SELECT * FROM hql_results ORDER BY created_at DESC LIMIT ?", (limit,)
+                "SELECT * FROM hql_history ORDER BY created_at DESC LIMIT ?", (limit,)
             )
 
         return json_success_response(data=result or [])
@@ -123,19 +137,17 @@ def api_list_common_params():
         if not game_gid:
             return json_error_response("game_gid is required", status_code=400)
 
-        # Get game_id from game_gid
-        game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+        # Verify game exists
+        game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
         if not game:
             return json_error_response(f"Game {game_gid} not found", status_code=404)
-
-        game_id = game["id"]
 
         # Fetch common params for this game only
         common_params = fetch_all_as_dict(
             """
             SELECT
                 id,
-                game_id,
+                game_gid,
                 param_name,
                 param_name_cn,
                 param_type,
@@ -144,10 +156,10 @@ def api_list_common_params():
                 created_at,
                 updated_at
             FROM common_params
-            WHERE game_id = ?
+            WHERE game_gid = ?
             ORDER BY created_at DESC
         """,
-            (game_id,),
+            (game_gid,),
         )
 
         # Map param_type to data_type for frontend compatibility

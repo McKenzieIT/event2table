@@ -806,6 +806,80 @@ FROM {table_names}
 
 ---
 
+## API契约测试的重要性 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [api-architecture-migration-status.md](../../api/api-architecture-migration-status.md)
+
+### 核心原则
+
+**前端调用的每个API必须后端实现**
+
+### API契约一致性测试
+
+**运行API契约测试**:
+```bash
+# 运行API契约测试
+python scripts/test/api_contract_test.py
+
+# 自动修复API契约问题
+python scripts/test/api_contract_test.py --fix
+
+# 验证修复后的代码
+python scripts/test/api_contract_test.py --verify
+```
+
+### 必填检查项
+
+- ✅ 前端调用的API端点必须后端存在
+- ✅ HTTP方法必须匹配（GET/POST/PUT/DELETE等）
+- ✅ 参数格式必须一致（game_gid vs game_id）
+- ✅ 错误状态码必须定义（404/409/500）
+
+### 开发工作流
+
+**新增API时**:
+```python
+# 1. 先在前端实现API调用
+fetch('/api/games/${gameGid}', { method: 'DELETE' })
+
+# 2. 运行契约测试
+python scripts/test/api_contract_test.py
+
+# 3. 测试会报告缺失的路由
+❌ DELETE /api/games/<int:id>
+   前端: GamesList.jsx:44
+   后端: 路由未定义
+
+# 4. 运行自动修复
+python scripts/test/api_contract_test.py --fix
+
+# 5. 验证修复
+python scripts/test/api_contract_test.py
+```
+
+### Pre-commit Hook
+
+```bash
+# 每次提交前自动运行API契约测试
+git commit  # 会自动运行契约测试
+
+# 如果测试失败，提交被阻止
+❌ API契约测试失败，提交被阻止
+
+# 修复后重新提交
+python scripts/test/api_contract_test.py --fix
+git commit
+```
+
+### 代码审查清单
+
+- [ ] 前端调用的API是否后端存在？
+- [ ] HTTP方法是否匹配？
+- [ ] 参数格式是否一致？
+- [ ] 错误状态码是否定义？
+
+---
+
 ## 相关经验文档
 
 - [安全要点 - SQL注入防护](./security-essentials.md#sql注入防护) - API安全

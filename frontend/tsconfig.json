@@ -19,13 +19,18 @@
     "checkJs": false,  // 不检查JS文件语法（仅使用JSDoc）
     "incremental": true,  // 增量编译，加速构建
 
-    /* Linting - 渐进式启用 */
-    "strict": false,  // 从宽松开始，逐步收紧
-    "noUnusedLocals": false,  // 先禁用，后续启用
-    "noUnusedParameters": false,  // 先禁用，后续启用
+    /* Linting - Strict Mode Enabled */
+    "strict": true,  // ✅ 启用完整严格模式
+    "noUnusedLocals": false,  // 保持禁用以避免过度严格
+    "noUnusedParameters": false,  // 保持禁用以避免过度严格
     "noFallthroughCasesInSwitch": true,  // 保持启用
-    "noImplicitAny": false,  // 先禁用，逐步启用
-    "strictNullChecks": false,  // 先禁用，逐步启用
+    "noImplicitAny": true,  // 已包含在strict中
+    "strictNullChecks": true,  // 已包含在strict中
+    "strictFunctionTypes": true,  // 已包含在strict中
+    "strictBindCallApply": true,  // 已包含在strict中
+    "strictPropertyInitialization": true,  // 已包含在strict中
+    "noImplicitThis": true,  // 已包含在strict中
+    "alwaysStrict": true,  // 已包含在strict中
 
     /* Path aliases */
     "baseUrl": ".",
@@ -49,7 +54,8 @@
   "exclude": [
     "node_modules",
     "dist",
-    "build"
+    "build",
+    "src/migration"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -89,6 +89,14 @@ export const SIDEBAR_GROUPS: SidebarGroup[] = [
     defaultExpanded: false,
     items: [
       {
+        id: 'games',
+        label: '游戏管理',
+        shortLabel: '游戏',
+        icon: 'bi-controller',
+        path: '/games',
+        tooltip: '游戏管理'
+      },
+      {
         id: 'categories',
         label: '分类管理',
         shortLabel: '分类',

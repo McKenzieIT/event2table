@@ -276,9 +276,10 @@ class CategoryService:
 
         return updated_count
 
+    @cached("categories.search", timeout=120)
     def search_categories(self, name_pattern: str) -> List[EventCategoryEntity]:
         """
-        搜索类别
+        搜索类别 (带缓存)
 
         Args:
             name_pattern: 名称匹配模式（支持SQL LIKE语法）

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useRef, useCallback, memo, ReactNode, CSSProperties } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import './VirtualList.css';

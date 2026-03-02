@@ -14,6 +14,7 @@ import EventNodeBuilder from "@event-builder/pages/EventNodeBuilder";
 import EventNodes from "@analytics/pages/EventNodes";
 import EventsList from "@analytics/pages/EventsListGraphQL";
 import FlowsList from "@analytics/pages/FlowsList";
+import GamesList from "@analytics/pages/GamesListGraphQL";
 import EventForm from "@analytics/pages/EventForm";
 import CategoriesList from "@analytics/pages/CategoriesListGraphQL";
 import CommonParamsList from "@analytics/pages/CommonParamsList";
@@ -70,6 +71,7 @@ export const routes: RouteObject[] = [
       { path: "canvas", element: <CanvasPage /> },
       { path: "event-node-builder", element: <EventNodeBuilder /> },
       { path: "flows", element: <FlowsList /> },
+      { path: "games", element: <GamesList /> },
       { path: "categories", element: <CategoriesList /> },
       { path: "events/create", element: <EventForm /> },
       { path: "events/:id", element: <EventDetail /> },

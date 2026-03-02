@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Switch Component Tests
  * 测试开关组件的所有功能

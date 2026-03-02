@@ -286,7 +286,7 @@ def resolve_event_fields(
                 'is_common': field.get('is_common', False),
                 'data_type': _infer_data_type(field),
                 'json_path': field.get('json_path'),
-                'usage_count': 0  # TODO: Implement usage tracking
+                'usage_count: _calculate_field_usage(field.get("name"), event_id)
             }
             graphql_fields.append(graphql_field)
 
@@ -549,3 +549,52 @@ def _infer_data_type(field: Dict[str, Any]) -> str:
 
     # Default to string
     return 'string'
+
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+def _calculate_field_usage(field_name: str, event_id: int) -> int:
+    """
+    Calculate field usage count from HQL history and flow templates.
+    
+    Args:
+        field_name: Field name to track
+        event_id: Event ID
+        
+    Returns:
+        Usage count (number of times this field is used in HQL/flows)
+    """
+    try:
+        from backend.core.utils import fetch_one_as_dict
+        
+        # Count usage in HQL history
+        hql_count = fetch_one_as_dict(
+            """
+            SELECT COUNT(*) as count 
+            FROM hql_history 
+            WHERE hql LIKE ?
+            """,
+            (f'%{field_name}%',)
+        )
+        
+        # Count usage in flow templates
+        flow_count = fetch_one_as_dict(
+            """
+            SELECT COUNT(*) as count 
+            FROM flow_templates 
+            WHERE config LIKE ?
+            """,
+            (f'%{field_name}%',)
+        )
+        
+        total_count = (hql_count.get('count', 0) if hql_count else 0) + \
+                     (flow_count.get('count', 0) if flow_count else 0)
+        
+        logger.debug(f"Field usage: {field_name} used {total_count} times")
+        return total_count
+        
+    except Exception as e:
+        logger.warning(f"Failed to calculate field usage for {field_name}: {e}")
+        return 0

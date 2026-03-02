@@ -12,6 +12,10 @@ Core endpoints:
 - DELETE /api/flows/<int:flow_id> - Delete a flow
 - POST /api/flows/<int:flow_id>/load - Load flow data
 - POST /api/flows/generate - Generate flow
+
+Architecture (V9.0.0):
+- Uses FlowService for business logic and data access
+- No direct database access (100% ERS architecture)
 """
 
 import logging
@@ -24,16 +28,14 @@ from flask import request
 # Import shared utilities
 from backend.core.utils import (
     execute_write,
-    fetch_all_as_dict,
-    fetch_one_as_dict,
     json_error_response,
     json_success_response,
     sanitize_and_validate_string,
     validate_json_request,
 )
 
-# Import Repository pattern for data access
-from backend.core.data_access import Repositories
+# Import Service layer
+from backend.services.flows.flow_service import FlowService
 
 sys.path.append("..")
 try:
@@ -64,48 +66,31 @@ logger = logging.getLogger(__name__)
 
 @api_bp.route("/api/flows", methods=["GET"])
 def api_list_flows():
-    """API: List all flows with pagination"""
+    """API: List all flows with pagination (uses FlowService)"""
     try:
-        game_gid = request.args.get("game_gid", type=int)
+        service = FlowService()
 
+        game_gid = request.args.get("game_gid", type=int)
         page = request.args.get("page", 1, type=int)
         page_size = request.args.get("page_size", 50, type=int)
-        page_size = min(max(page_size, 1), 100)
 
-        offset = (page - 1) * page_size
-
-        where_clauses = ["1=1"]
-        params = []
-
-        if game_gid:
-            where_clauses.append("game_gid = ?")
-            params.append(game_gid)
-
-        where_sql = " AND ".join(where_clauses)
-
-        total_result = fetch_one_as_dict(
-            f"SELECT COUNT(*) as count FROM flow_templates WHERE {where_sql}",
-            tuple(params),
+        # Use FlowService for paginated results
+        result = service.get_flows_paginated(
+            game_gid=game_gid,
+            page=page,
+            page_size=page_size
         )
-        total = total_result["count"] if total_result else 0
 
-        flows = fetch_all_as_dict(
-            f"""
-            SELECT * FROM flow_templates
-            WHERE {where_sql}
-            ORDER BY updated_at DESC
-            LIMIT ? OFFSET ?
-        """,
-            tuple(params) + (page_size, offset),
-        )
+        # Convert FlowEntity objects to dicts
+        flows_data = [flow.model_dump() for flow in result["flows"]]
 
         return json_success_response(
             data={
-                "flows": flows,
-                "page": page,
-                "page_size": page_size,
-                "total": total,
-                "total_pages": (total + page_size - 1) // page_size if total > 0 else 0,
+                "flows": flows_data,
+                "page": result["page"],
+                "page_size": result["page_size"],
+                "total": result["total"],
+                "total_pages": result["total_pages"],
             }
         )
 

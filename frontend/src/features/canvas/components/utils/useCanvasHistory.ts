@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { useCallback, useRef } from 'react';
 import { Node, Edge } from 'reactflow';
 

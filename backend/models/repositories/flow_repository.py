@@ -262,3 +262,18 @@ class FlowRepository(GenericRepository):
         '''
         result = fetch_one_as_dict(query, (game_gid,))
         return result["count"] if result else 0
+
+    def count_all(self) -> int:
+        """
+        统计所有流程数量
+
+        Returns:
+            流程数量
+        """
+        query = f'''
+            SELECT COUNT(*) as count
+            FROM "{self.table_name}"
+            WHERE is_active = 1
+        '''
+        result = fetch_one_as_dict(query)
+        return result["count"] if result else 0

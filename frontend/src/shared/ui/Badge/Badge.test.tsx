@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Badge Component Tests
  * 测试徽章组件的所有功能

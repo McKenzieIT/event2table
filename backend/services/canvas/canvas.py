@@ -56,7 +56,7 @@ def node_canvas():
         return redirect(url_for("games.list_games"))
 
     # 验证游戏是否存在
-    game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+    game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (game_gid,))
     if not game:
         logger.warning(f"Game not found: game_gid={game_gid}")
         return json_error_response("游戏不存在", status_code=404)
@@ -96,7 +96,7 @@ def node_canvas_react():
         return redirect(url_for("games.list_games"))
 
     # 验证游戏是否存在
-    game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+    game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (game_gid,))
     if not game:
         logger.warning(f"Game not found: game_gid={game_gid}")
         return json_error_response("游戏不存在", status_code=404)

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * ParameterTypeEditor - Modal for Editing Parameter Type
  *

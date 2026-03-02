@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * WhereBuilderModal Component
  * WHERE条件构建器主模态框

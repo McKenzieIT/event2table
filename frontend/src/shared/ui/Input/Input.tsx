@@ -34,30 +34,48 @@
 import React, {
   forwardRef,
   useId,
-  ComponentType
 } from 'react';
+import type {
+  IconComponent,
+  LabeledComponentProps,
+  ChangeEventHandler,
+  FocusEventHandler,
+} from '@/types/common';
 import './Input.css';
 
 /**
  * Input HTML element types
  */
-type InputType = ReactHTML['input'] extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
-  ? React.InputHTMLAttributes<HTMLInputElement>['type']
-  : 'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' | 'datetime-local' | 'month' | 'week' | 'file' | 'color' | 'range';
+type InputType =
+  | 'text'
+  | 'password'
+  | 'email'
+  | 'number'
+  | 'tel'
+  | 'url'
+  | 'search'
+  | 'date'
+  | 'time'
+  | 'datetime-local'
+  | 'month'
+  | 'week'
+  | 'file'
+  | 'color'
+  | 'range';
 
 /**
- * Props for the Input component
+ * Props for the Input component - extends common labeled component props
  *
  * Migration Notes from PropTypes:
  * - type: PropTypes.string (default: 'text') → type: InputType
- * - label: PropTypes.string → label?: string
+ * - label: PropTypes.string → label?: string (from LabeledComponentProps)
  * - placeholder: PropTypes.string → placeholder?: string
- * - error: PropTypes.string → error?: string
- * - disabled: PropTypes.bool (default: false) → disabled?: boolean
- * - required: PropTypes.bool (default: false) → required?: boolean
- * - icon: PropTypes.elementType → icon?: ComponentType<any>
- * - helperText: PropTypes.string → helperText?: string
- * - className: PropTypes.string (default: '') → className?: string
+ * - error: PropTypes.string → error?: string (from LabeledComponentProps)
+ * - disabled: PropTypes.bool (default: false) → disabled?: boolean (from BaseComponentProps)
+ * - required: PropTypes.bool (default: false) → required?: boolean (from LabeledComponentProps)
+ * - icon: PropTypes.elementType → icon?: IconComponent
+ * - helperText: PropTypes.string → helperText?: string (from LabeledComponentProps)
+ * - className: PropTypes.string (default: '') → className?: string (from BaseComponentProps)
  * - value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]) → value?: string | number
  * - onChange: PropTypes.func → onChange?: ChangeEventHandler<HTMLInputElement>
  * - onBlur: PropTypes.func → onBlur?: FocusEventHandler<HTMLInputElement>
@@ -69,7 +87,7 @@ type InputType = ReactHTML['input'] extends React.DetailedHTMLProps<React.InputH
  * - maxLength: PropTypes.number → maxLength?: number
  * - minLength: PropTypes.number → minLength?: number
  */
-export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'onBlur' | 'onFocus' | 'value'> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'onBlur' | 'onFocus' | 'value'>, LabeledComponentProps {
   /**
    * Input type (text, password, email, number, etc.)
    * @default 'text'
@@ -77,46 +95,14 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   type?: InputType;
 
   /**
-   * Label text displayed above the input
-   */
-  label?: string;
-
-  /**
    * Placeholder text shown when input is empty
    */
   placeholder?: string;
 
   /**
-   * Error message to display (triggers invalid state)
-   */
-  error?: string;
-
-  /**
-   * Whether the input is disabled
-   * @default false
-   */
-  disabled?: boolean;
-
-  /**
-   * Whether the input is required (shows asterisk)
-   * @default false
-   */
-  required?: boolean;
-
-  /**
    * Icon component to display inside the input
    */
-  icon?: ComponentType<any>;
-
-  /**
-   * Helper text displayed below the input
-   */
-  helperText?: string;
-
-  /**
-   * Additional CSS class names
-   */
-  className?: string;
+  icon?: IconComponent;
 
   /**
    * Input value (controlled component)
@@ -126,17 +112,17 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   /**
    * Change event handler
    */
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
 
   /**
    * Blur event handler
    */
-  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  onBlur?: FocusEventHandler;
 
   /**
    * Focus event handler
    */
-  onFocus?: React.FocusEventHandler<HTMLInputElement>;
+  onFocus?: FocusEventHandler;
 
   /**
    * Custom ID for the input (auto-generated if not provided)
@@ -260,11 +246,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
           autoFocus={autoFocus}
           maxLength={maxLength}
           minLength={minLength}
+          required={required}
           value={value}
           onChange={onChange}
           onBlur={onBlur}
           onFocus={onFocus}
           aria-invalid={isInvalid}
+          aria-required={required}
           aria-describedby={
             isInvalid
               ? `${inputId}-error`
@@ -324,4 +312,3 @@ const MemoizedInput = React.memo(Input, (prevProps, nextProps) => {
 MemoizedInput.displayName = 'MemoizedInput';
 
 export default MemoizedInput;
-export type { InputProps };

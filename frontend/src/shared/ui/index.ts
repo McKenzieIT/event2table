@@ -76,8 +76,7 @@ export type { PaginationProps } from './Pagination/Pagination';
 export { default as SelectGamePrompt } from './SelectGamePrompt';
 export type { SelectGamePromptProps } from './SelectGamePrompt';
 export { ConfirmDialog } from './BaseModal/ConfirmDialog';
-export { SearchInput } from './SearchInput/SearchInput';
+export { default as SearchInput } from './SearchInput/SearchInput';
 export { default as Loading } from './Loading';
 export { default as CanvasErrorBoundary } from './CanvasErrorBoundary';
-export { ToastProvider, useToast } from './Toast/Toast';
-export type { ToastType, Toast, ToastContextValue } from './Toast/Toast';
+// Note: ToastProvider and useToast already exported above (line 55)

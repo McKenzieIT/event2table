@@ -275,6 +275,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
           onFocus={handleFocus}
           style={{ resize }}
           aria-invalid={isInvalid}
+          aria-required={required}
           aria-describedby={
             isInvalid
               ? `${inputId}-error`

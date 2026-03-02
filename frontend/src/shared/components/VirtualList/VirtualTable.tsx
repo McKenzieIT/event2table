@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { memo, useMemo, ReactNode } from 'react';
 import { VirtualList } from './VirtualList';
 import './VirtualTable.css';

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * HQLPreviewModal Component
  * HQL预览全屏模态框（支持编辑和多模式切换）

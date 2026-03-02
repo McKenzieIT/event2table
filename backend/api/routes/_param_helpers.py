@@ -5,13 +5,15 @@ Helper functions for parameter API routes
 
 This module provides reusable functions for handling game context
 resolution in parameter-related endpoints, reducing code duplication.
+
+Architecture (V9.0.0):
+- Uses GameService for game validation
+- No direct database access
 """
 
 from typing import Tuple, Optional, Dict, Any
 from flask import request, session
 import logging
-
-from backend.core.utils import fetch_one_as_dict, json_error_response
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +37,8 @@ def resolve_game_context() -> Tuple[Optional[int], Optional[str], Optional[str]]
         ...     return json_error_response(error, status_code=400)
         >>> # Use game_gid for event queries, game_id for common_params queries
     """
+    from backend.services.games.game_service import GameService
+
     game_gid = request.args.get("game_gid", type=str)
 
     if not game_gid:
@@ -43,11 +47,12 @@ def resolve_game_context() -> Tuple[Optional[int], Optional[str], Optional[str]]
     if not game_gid:
         return None, None, "game_gid required"
 
-    # Convert game_gid to game_id for common_params table queries
-    game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+    # Convert game_gid to game_id for common_params table queries using GameService
+    game_service = GameService()
+    game = game_service.get_game_by_gid(int(game_gid))
     if not game:
         return None, None, f"Game not found: gid={game_gid}"
-    game_id = game["id"]
+    game_id = game.id
     return game_id, game_gid, None
 
 

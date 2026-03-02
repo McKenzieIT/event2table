@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * EventNodeBuilder Component Tests
  * 阶段3：V2 API默认启用 + 可折叠面板

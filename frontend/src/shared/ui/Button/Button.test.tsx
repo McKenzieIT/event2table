@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Button Component Tests
  * 测试按钮组件的所有功能

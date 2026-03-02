@@ -1,0 +1,108 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - link " Event2Table" [ref=e7] [cursor=pointer]:
+        - /url: /react-app-shell#/
+        - generic [ref=e8]: 
+        - generic [ref=e9]: Event2Table
+      - button "折叠侧边栏" [ref=e10] [cursor=pointer]:
+        - img [ref=e11]
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - button "切换 仪表板 分组" [expanded] [ref=e15] [cursor=pointer]:
+          - generic [ref=e16]: 仪表板
+          - generic [ref=e17]: ▼
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - link " 概览" [ref=e22] [cursor=pointer]:
+              - /url: "#/"
+              - generic [ref=e23]: 
+              - generic [ref=e24]: 概览
+      - generic [ref=e25]:
+        - button "切换 事件节点 分组" [expanded] [ref=e26] [cursor=pointer]:
+          - generic [ref=e27]: 事件节点
+          - generic [ref=e28]: ▼
+        - list [ref=e31]:
+          - listitem [ref=e32]:
+            - link " 事件节点构建器" [ref=e33] [cursor=pointer]:
+              - /url: "#/event-node-builder"
+              - generic [ref=e34]: 
+              - generic [ref=e35]: 事件节点构建器
+          - listitem [ref=e36]:
+            - link " 事件节点管理" [ref=e37] [cursor=pointer]:
+              - /url: "#/event-nodes"
+              - generic [ref=e38]: 
+              - generic [ref=e39]: 事件节点管理
+      - generic [ref=e40]:
+        - button "切换 HQL生成 分组" [expanded] [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: HQL生成
+          - generic [ref=e43]: ▼
+        - list [ref=e46]:
+          - listitem [ref=e47]:
+            - link " HQL构建画布" [ref=e48] [cursor=pointer]:
+              - /url: "#/canvas"
+              - generic [ref=e49]: 
+              - generic [ref=e50]: HQL构建画布
+          - listitem [ref=e51]:
+            - link " HQL流程管理" [ref=e52] [cursor=pointer]:
+              - /url: "#/flows"
+              - generic [ref=e53]: 
+              - generic [ref=e54]: HQL流程管理
+      - generic [ref=e55]:
+        - button "切换 数据管理 分组" [ref=e56] [cursor=pointer]:
+          - generic [ref=e57]: 数据管理
+          - generic [ref=e58]: ▼
+        - list [ref=e61]:
+          - listitem [ref=e62]:
+            - link " 分类管理" [ref=e63] [cursor=pointer]:
+              - /url: "#/categories"
+              - generic [ref=e64]: 
+              - generic [ref=e65]: 分类管理
+          - listitem [ref=e66]:
+            - link " 日志事件" [ref=e67] [cursor=pointer]:
+              - /url: "#/events"
+              - generic [ref=e68]: 
+              - generic [ref=e69]: 日志事件
+          - listitem [ref=e70]:
+            - link " 参数管理" [ref=e71] [cursor=pointer]:
+              - /url: "#/parameters"
+              - generic [ref=e72]: 
+              - generic [ref=e73]: 参数管理
+          - listitem [ref=e74]:
+            - link " 公参管理" [ref=e75] [cursor=pointer]:
+              - /url: "#/common-params"
+              - generic [ref=e76]: 
+              - generic [ref=e77]: 公参管理
+    - generic [ref=e78]:
+      - button "切换游戏" [ref=e79] [cursor=pointer]:
+        - generic [ref=e80]:
+          - generic [ref=e81]: 
+          - generic [ref=e82]: 选择游戏
+        - generic [ref=e83]: 
+      - button "游戏管理" [ref=e84] [cursor=pointer]:
+        - generic [ref=e85]:
+          - generic [ref=e86]: 
+          - generic [ref=e87]: 游戏管理
+  - main [ref=e88]:
+    - navigation "面包屑导航" [ref=e90]:
+      - list [ref=e91]:
+        - listitem [ref=e92]:
+          - link "首页" [ref=e93] [cursor=pointer]:
+            - /url: "#/"
+          - generic [ref=e94]: ">"
+          - text: /
+        - listitem [ref=e95]:
+          - link "日志事件" [ref=e96] [cursor=pointer]:
+            - /url: "#/events"
+          - generic [ref=e97]: ">"
+          - text: /
+        - listitem [ref=e98]:
+          - generic [ref=e99]: 新建事件
+    - generic [ref=e101]:
+      - heading "请先选择游戏" [level=2] [ref=e102]
+      - paragraph [ref=e103]: 创建事件需要先选择游戏
+      - button "选择游戏" [ref=e104] [cursor=pointer]
+```

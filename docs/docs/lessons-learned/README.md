@@ -87,6 +87,20 @@
 - [Brainstorming系统化设计](./refactoring-checklist.md#brainstorming系统化设计) - 系统化设计流程
 - [技术债务管理](./refactoring-checklist.md#技术债务管理) - 技术债务识别和偿还
 
+### 部署与运维
+- [部署流程规范](./deployment-operations.md#部署流程规范) - 生产环境部署检查清单
+- [环境配置管理](./deployment-operations.md#环境配置管理) - 开发/测试/生产环境隔离
+- [监控与告警](./deployment-operations.md#监控与告警) - 性能监控、错误追踪
+- [日志管理](./deployment-operations.md#日志管理) - 日志收集、存储、分析
+- [备份与恢复](./deployment-operations.md#备份与恢复) - 数据备份策略、灾难恢复
+
+### 项目管理
+- [需求管理流程](./project-management.md#需求管理流程) - 需求收集、分析、优先级排序
+- [迭代规划](./project-management.md#迭代规划) - Sprint规划、任务分解
+- [代码审查规范](./project-management.md#代码审查规范) - PR审查流程、检查清单
+- [技术债务管理](./project-management.md#技术债务管理) - 债务识别、优先级、偿还计划
+- [团队协作](./project-management.md#团队协作) - 沟通流程、文档规范
+
 ---
 
 ## 快速查找场景
@@ -101,6 +115,8 @@
 | 🗄️ 数据库迁移 | [数据库模式](./database-patterns.md) | game_gid迁移 |
 | 🔧 API错误处理 | [API设计模式](./api-design-patterns.md) | 错误处理模式 |
 | 🐛 Bug调试方法 | [调试技能](./debugging-skills.md) | Chrome DevTools MCP |
+| 🚀 生产部署 | [部署与运维](./deployment-operations.md) | 部署流程规范 |
+| 📋 项目管理 | [项目管理](./project-management.md) | 需求管理流程 |
 
 ---
 
@@ -142,9 +158,9 @@
 
 ## 统计信息
 
-- **经验文档总数**: 9个
+- **经验文档总数**: 11个
 - **P0核心经验**: 7个主题（22个经验点）
-- **P1重要经验**: 8个主题（32个经验点）
+- **P1重要经验**: 10个主题（42个经验点）
 - **P0完成度**: 100% ✅
 - **P1完成度**: 100% ✅
 - **整合文档数**: 399个

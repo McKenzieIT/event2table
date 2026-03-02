@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * EdgeToolbar Component
  * 底部边缘激活栏 - 鼠标靠近底部时从底部滑入

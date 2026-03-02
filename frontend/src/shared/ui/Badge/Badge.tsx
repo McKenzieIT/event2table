@@ -11,7 +11,7 @@ import './Badge.css';
 /**
  * Badge variant types
  */
-type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
+type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'secondary';
 
 /**
  * Badge size types

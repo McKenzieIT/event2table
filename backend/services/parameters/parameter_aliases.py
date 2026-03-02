@@ -79,14 +79,14 @@ def create_parameter_alias():
     game_id = game["id"]
 
     # Validate parameter exists (param_id references event_params table)
-    param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (param_id,))
+    param = fetch_one_as_dict("SELECT id, param_name, event_id, game_gid FROM event_params WHERE id = ?", (param_id,))
     if not param:
         return json_error_response("Parameter not found", status_code=404)
 
     # Check if alias already exists
     existing = fetch_one_as_dict(
         """
-        SELECT * FROM parameter_aliases
+        SELECT id FROM parameter_aliases
         WHERE game_gid = ? AND param_id = ? AND alias = ?
     """,
         (game_gid, param_id, alias),
@@ -119,7 +119,10 @@ def create_parameter_alias():
     )
 
     alias = fetch_one_as_dict(
-        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+        """SELECT id, param_id, alias, display_name, usage_count, last_used_at,
+                  is_preferred, game_gid, created_at, updated_at
+           FROM parameter_aliases WHERE id = ?""",
+        (alias_id,)
     )
     return json_success_response(
         data=alias, message="Parameter alias created", status_code=201
@@ -133,7 +136,10 @@ def update_parameter_alias(alias_id):
 
     # Get existing alias
     alias = fetch_one_as_dict(
-        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+        """SELECT id, param_id, alias, display_name, usage_count, last_used_at,
+                  is_preferred, game_gid, created_at, updated_at
+           FROM parameter_aliases WHERE id = ?""",
+        (alias_id,)
     )
     if not alias:
         return json_error_response("Parameter alias not found", status_code=404)
@@ -189,7 +195,10 @@ def set_preferred_alias(alias_id):
     """API: Set an alias as preferred"""
     # Get existing alias
     alias = fetch_one_as_dict(
-        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+        """SELECT id, param_id, alias, display_name, usage_count, last_used_at,
+                  is_preferred, game_gid, created_at, updated_at
+           FROM parameter_aliases WHERE id = ?""",
+        (alias_id,)
     )
     if not alias:
         return json_error_response("Parameter alias not found", status_code=404)
@@ -250,7 +259,7 @@ def update_parameter_display_name(param_id):
     display_name = data["display_name"]
 
     # Get existing parameter (param_id references event_params table)
-    param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (param_id,))
+    param = fetch_one_as_dict("SELECT id, param_name, event_id, game_gid FROM event_params WHERE id = ?", (param_id,))
     if not param:
         return json_error_response("Parameter not found", status_code=404)
 
@@ -265,7 +274,9 @@ def update_parameter_display_name(param_id):
     )
 
     updated_param = fetch_one_as_dict(
-        "SELECT * FROM event_params WHERE id = ?", (param_id,)
+        """SELECT id, param_name, event_id, game_gid, is_common, param_type, hive_type
+           FROM event_params WHERE id = ?""",
+        (param_id,)
     )
     return json_success_response(
         data=updated_param, message="Parameter display name updated"

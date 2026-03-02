@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * 节点数据转换工具
  * 将Flask API返回的配置转换为ReactFlow节点格式

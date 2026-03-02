@@ -104,7 +104,7 @@ def get_game(id):
         JSON: 游戏信息
     """
     try:
-        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (id,))
+        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?", (id,))
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404
@@ -130,7 +130,7 @@ def get_game_by_gid(gid):
         JSON: 游戏信息
     """
     try:
-        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (gid,))
+        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?", (gid,))
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404
@@ -252,7 +252,7 @@ def update_game(id):
             return jsonify(response), 400
 
         # 检查游戏是否存在
-        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (id,))
+        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (id,))
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404
@@ -276,7 +276,7 @@ def update_game(id):
         clear_game_cache()
 
         # 获取更新后的游戏
-        updated_game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (id,))
+        updated_game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?", (id,))
 
         logger.info(f"[UpdateGame] Game updated: {name} (ID: {id}, ODS: {ods_db})")
         response, _ = success_response(
@@ -303,7 +303,7 @@ def delete_game(id):
     """
     try:
         # 检查游戏是否存在
-        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (id,))
+        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (id,))
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404

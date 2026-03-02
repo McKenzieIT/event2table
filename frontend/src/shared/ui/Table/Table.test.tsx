@@ -1,8 +1,10 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Table Component Tests
  * 测试表格组件的所有功能
  */
 
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

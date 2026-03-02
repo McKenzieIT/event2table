@@ -18,7 +18,7 @@ generates:
         enumValues: keep
       skipTypename: false
       enumsAsTypes: true
-      reactApolloVersion: 3
+      reactApolloVersion: 4
       documentMode: documentNode
       pureMagicComment: true
       addDocBlocks: true

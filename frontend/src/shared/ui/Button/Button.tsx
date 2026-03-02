@@ -19,38 +19,44 @@
  */
 
 import React from 'react';
+import type {
+  Variant,
+  Size,
+  IconComponent,
+  BaseComponentProps,
+  MouseEventHandler,
+} from '@/types/common';
 import './Button.css';
 
 /**
- * Button variant types
+ * Button variant types (extended to support all used variants)
  */
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline-primary' | 'outline-danger';
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'danger'
+  | 'outline-primary'
+  | 'outline-danger'
+  | 'outline-secondary'
+  | 'success'
+  | 'warning'
+  | 'info'
+  | 'outline-success'
+  | 'text';
 
 /**
- * Button size types
+ * Button component props - extends common base props
  */
-type ButtonSize = 'sm' | 'md' | 'lg';
-
-/**
- * Button component props
- */
-export interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
-  /** Button text or content */
-  children?: React.ReactNode;
+export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'size' | 'onClick'>, BaseComponentProps {
   /** Button variant */
   variant?: ButtonVariant;
   /** Button size */
-  size?: ButtonSize;
-  /** Disabled state */
-  disabled?: boolean;
-  /** Loading state */
-  loading?: boolean;
+  size?: Size;
   /** Icon component */
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: IconComponent;
   /** Click handler */
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  /** Additional CSS classes */
-  className?: string;
+  onClick?: MouseEventHandler;
 }
 
 /**

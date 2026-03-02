@@ -5,6 +5,34 @@
  */
 
 import { useQuery, useMutation } from '@apollo/client/react';
+import { TypedDocumentNode } from '@apollo/client/core';
+
+// Type definitions for GraphQL responses
+interface Game {
+  gid: number;
+  name: string;
+  odsDb: string;
+  eventCount?: number;
+  parameterCount?: number;
+  description?: string;
+  dwdPrefix?: string;
+}
+
+interface GamesResponse {
+  games?: Game[];
+}
+
+interface DeleteGameResponse {
+  deleteGame?: {
+    ok: boolean;
+    errors?: string[];
+  };
+}
+
+interface DeleteGameVariables {
+  gid: number;
+  confirm?: boolean;
+}
 import {
   GET_GAMES,
   GET_GAME,
@@ -48,7 +76,7 @@ import {
  * Hook to fetch games list
  */
 export function useGames(limit: number = 20, offset: number = 0) {
-  return useQuery(GET_GAMES, {
+  return useQuery<GamesResponse>(GET_GAMES as any, {
     variables: { limit, offset },
   });
 }
@@ -184,7 +212,7 @@ export function useUpdateGame() {
  * Hook to delete a game
  */
 export function useDeleteGame() {
-  return useMutation(DELETE_GAME, {
+  return useMutation<DeleteGameResponse, DeleteGameVariables>(DELETE_GAME as any, {
     refetchQueries: [
       { query: GET_GAMES, variables: { limit: 20, offset: 0 } },
     ],

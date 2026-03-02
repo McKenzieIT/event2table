@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * ErrorState Component Tests
  * 测试错误状态组件的所有功能

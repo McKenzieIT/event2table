@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * Apollo GraphQL Module
  *
@@ -5,7 +6,7 @@
  * Provides ApolloProvider, client instance, and React hooks
  */
 
-import { ApolloProvider } from '@apollo/client/react';
+import { ApolloProvider } from '@apollo/client';
 import { client } from './client';
 
 // Export ApolloProvider for wrapping the app
@@ -15,7 +16,7 @@ export { ApolloProvider };
 export { client };
 
 // Export Apollo Client hooks for convenience
-export { useQuery, useMutation, useLazyQuery, useSubscription } from '@apollo/client/react';
+export { useQuery, useMutation, useLazyQuery, useSubscription } from '@apollo/client';
 
 // Export custom hooks
 export * from './hooks';

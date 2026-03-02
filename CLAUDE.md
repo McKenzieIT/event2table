@@ -1,7 +1,9 @@
 # Event2Table - 开发规范
 
-> **版本**: 7.6.0 | **最新优化**: 缓存系统文档完善与使用率提升 | **最后更新**: 2026-02-25
+> **版本**: 7.9.0 | **最新优化**: 项目管理最佳实践 | **最后更新**: 2026-03-02
 >
+> **🆕 最新变更**: 后端架构全面优化完成 - Phase 1-4 (2026-03-01)
+> **🆕 最新变更**: Entity架构迁移 + DDD清理完成 (2026-02-26)
 > **🆕 最新变更**: 缓存系统文档完善 - 7份新文档 + CLAUDE.md开发规范 (2026-02-25)
 > **🆕 最新变更**: 批量删除事件修复 + Dashboard统计准确性修复 + 环境设置规范强化 (2026-02-23)
 > **🆕 最新变更**: 后端优化完成 - 安全加固、性能优化、架构重构 (2026-02-20)
@@ -57,6 +59,63 @@ which python3  # 应该显示: /Users/mckenzie/Documents/event2table/backend/ven
 ---
 
 ## 问题修复记录
+
+### 2026-03-01: 后端架构全面优化完成 ⚠️ **极其重要**
+
+**修复范围**: Phase 1-4 全面优化
+
+#### Phase 1: 紧急修复（双规制代码）
+- ✅ 修复 games.py 双规制（625行代码移除）
+- ✅ 修复 hql_generation.py 双规制
+- ✅ 标记删除 EventParamRepository
+
+#### Phase 2: Service 层重构
+- ✅ 重构参数管理模块（删除 parameter_service_cached.py）
+- ✅ 统一 HQL 服务层
+- ✅ 修复 Event Importer
+- ✅ 创建 CanvasService（680行，21个方法）
+- ✅ 扩展 GameService（4个新方法）
+- ✅ 扩展 ParameterService（8个新方法）
+
+#### Phase 3: 核心模块迁移
+- ✅ Join Configs 模块迁移（JoinConfigService + API 重构）
+- ✅ Event Categories 模块迁移（EventCategoryService + API 重构）
+- ✅ 新增 stats 和 batch-delete 端点
+
+#### Phase 4: 全面清理
+- ✅ 清理 11 个 V2 废弃文件（~7,082 行代码）
+- ✅ Repository 层更新（4→8 个 Repository）
+- ✅ 删除 EventParamRepository
+- ✅ 完善缓存策略（100% 覆盖率）
+- ✅ 更新项目文档
+
+**影响文件**: 57个文件
+**删除代码**: ~7,807 行
+**新增代码**: ~3,500 行
+**净减少**: ~4,307 行代码
+
+**详细报告**: [docs/reports/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md](docs/reports/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
+
+---
+
+### 2026-02-26: Entity架构迁移完成 ⚠️ **极其重要**
+
+**修复范围**: DDD清理 + Entity架构统一
+
+#### DDD Legacy代码清理
+- ✅ 删除 `backend/domain/` 目录（2个文件）
+- ✅ 删除 `backend/infrastructure/` 目录（15个文件）
+- ✅ 总计移除 4,132 行废弃代码
+
+#### Entity架构统一
+- ✅ 6个核心模块完成Entity架构迁移
+- ✅ Repository层返回Entity对象（而非Dict）
+- ✅ Service层使用Entity进行业务逻辑
+- ✅ API层使用Entity进行自动验证
+
+**详细报告**: [docs/reports/2026-02-26/ENTITY-MIGRATION-FINAL-REPORT.md](docs/reports/2026-02-26/ENTITY-MIGRATION-FINAL-REPORT.md)
+
+---
 
 ### 2026-02-25: 缓存系统文档完善与使用率提升 ⚠️ **极其重要**
 
@@ -892,6 +951,9 @@ python scripts/git-hooks/install_hooks.py
 | **🗄️ 数据库迁移** | [数据库模式 - game_gid](docs/lessons-learned/database-patterns.md#game_gid迁移) | P0 |
 | **🔧 API错误处理** | [API设计模式 - 错误处理](docs/lessons-learned/api-design-patterns.md#错误处理) | P0 |
 | **🐛 Bug调试方法** | [调试技能](docs/lessons-learned/debugging-skills.md) | P1 |
+| **🚀 并行开发任务** | [项目管理 - 并行开发策略](docs/docs/lessons-learned/project-management.md#并行开发策略) | P0 |
+| **🏗️ 大规模重构** | [项目管理 - 分阶段重构](docs/docs/lessons-learned/project-management.md#分阶段重构策略) | P0 |
+| **🚢 部署与运维** | [部署与运维](docs/docs/lessons-learned/deployment-operations.md) | P1 |
 
 ### 完整经验文档索引
 
@@ -904,6 +966,8 @@ python scripts/git-hooks/install_hooks.py
 - **[API设计模式](docs/lessons-learned/api-design-patterns.md)** - 分层架构、错误处理
 - **[调试技能](docs/lessons-learned/debugging-skills.md)** - Chrome DevTools MCP、Subagent分析
 - **[重构检查清单](docs/lessons-learned/refactoring-checklist.md)** - TDD、代码审查、技术债务
+- **[项目管理](docs/docs/lessons-learned/project-management.md)** - 并行开发、分阶段重构、零破坏性变更 🆕
+- **[部署与运维](docs/docs/lessons-learned/deployment-operations.md)** - 部署流程、运维监控、故障排查 🆕
 
 ### 经验文档使用说明
 
@@ -1130,6 +1194,238 @@ ls frontend/test/e2e/smoke/
 ls backend/test/unit/api/
 ls backend/test/integration/
 ```
+
+---
+
+## 文档生命周期管理规范 ⭐ **2026-03-02新增**
+
+> **🚨 所有文档必须按照生命周期进行管理，避免文档膨胀和过时**
+> **🆕 更新 (2026-03-02)**: 建立文档生命周期管理系统，确保文档质量和可维护性
+
+### 三阶段文档生命周期
+
+**1. 活跃文档** (`docs/`)
+- 经常更新
+- 反映当前最佳实践
+- 包括：开发指南、测试文档、API文档、经验文档
+
+**2. 归档文档** (`docs/archive/`)
+- 按主题分类
+- 历史参考价值
+- 组织结构：`archive/{主题}/{日期}/`
+
+**3. 临时文档**
+- 短期使用
+- 完成后删除或归档
+
+### 文档更新流程
+
+**每次代码变更后**:
+1. 更新API文档（如果修改了API）
+2. 更新架构文档（如果修改了架构）
+3. 更新经验文档（如果学到了新经验）
+4. 提交文档和代码
+
+**完成阶段时**:
+1. 整理重复文档
+2. 归档过时文档
+3. 更新文档索引
+4. 更新CLAUDE.md
+
+### 经验贡献
+
+**如何贡献经验**:
+1. 修复问题后，提取经验
+2. 使用统一的经验模板
+3. 在CLAUDE.md中添加简短记录
+4. 更新对应经验文档
+
+### 归档策略
+
+**6个月自动归档**:
+- 报告文档：6个月后归档
+- 测试文档：完成后归档
+- 临时文档：完成后删除
+
+**归档目录结构**:
+```
+docs/archive/
+├── 2026/
+│   ├── 02-february/     # 2月文档
+│   ├── 03-march/        # 3月文档
+│   └── ...
+├── reports/             # 归档报告
+├── testing/             # 归档测试文档
+└── development/         # 归档开发文档
+```
+
+### 文档质量检查清单
+
+**创建新文档前**:
+- [ ] 确认文档类型（指南/报告/需求）
+- [ ] 确认目标目录
+- [ ] 使用标准命名格式（小写+连字符）
+- [ ] 检查是否已有类似文档（避免重复）
+
+**归档文档前**:
+- [ ] 确认文档已过时或不再活跃
+- [ ] 更新相关引用
+- [ ] 添加归档日期说明
+- [ ] 移动到正确归档目录
+
+**删除文档前**:
+- [ ] 确认无参考价值
+- [ ] 检查是否有其他文档引用
+- [ ] 确认可以安全删除
+
+### 文档维护职责
+
+**开发者职责**:
+- 修改代码时同步更新文档
+- 修复问题后贡献经验
+- 定期检查文档准确性
+- 归档过时文档
+
+**文档审查**:
+- Code Review时检查文档更新
+- 每月文档质量审查
+- 每季度文档整理归档
+
+---
+
+## 项目管理最佳实践 ⭐ **2026-03-02新增**
+
+> **🚨 基于大规模重构和并行开发的经验总结**
+
+### 并行开发策略 ⚠️ **P0极其重要**
+
+**核心原则**: 独立任务并行执行，依赖任务串行执行
+
+**并行开发模式**:
+```python
+# ✅ 正确：并行执行独立任务
+# Phase 1-4 并行执行（4个独立subagents）
+# - Phase 1: 紧急修复（games.py, hql_generation.py）
+# - Phase 2: Service层重构（参数管理、HQL服务、Canvas服务）
+# - Phase 3: 核心模块迁移（Join Configs、Event Categories）
+# - Phase 4: 全面清理（V2文件、Repository层）
+
+# 执行时间：4个Phase并行 → 总时间 = max(Phase时间) 而非 sum(Phase时间)
+# 性能提升：~70%（串行需要12小时 → 并行需要3.5小时）
+```
+
+**识别独立任务**:
+- ✅ 修改不同的文件（games.py vs events.py）
+- ✅ 修改不同的模块（Service层 vs Repository层）
+- ✅ 修改不同的功能域（缓存系统 vs 验证器）
+
+**识别依赖任务**:
+- ❌ Service层依赖Repository层 → 必须串行
+- ❌ 前端依赖后端API → 必须串行
+- ❌ 测试依赖实现 → 必须串行
+
+### 大规模重构管理 ⚠️ **P0极其重要**
+
+**分阶段执行策略**:
+
+**Phase 0: 紧急修复** - 修复阻塞性问题（56+处异常信息泄露）
+**Phase 1: 安全加固** - SQL注入、XSS防护
+**Phase 2: 性能优化** - N+1查询、缓存优化
+**Phase 3: 架构重构** - Service层、Repository层
+**Phase 4: 代码质量** - 类型注解、错误处理
+**Phase 5: 数据迁移** - game_gid迁移
+
+**每个Phase都包含**:
+1. 明确的目标和验收标准
+2. 详细的实施清单
+3. 测试验证步骤
+4. 文档更新要求
+
+### 零破坏性变更保证 ⚠️ **P0极其重要**
+
+**核心原则**: 所有重构必须保持向后兼容
+
+**实现策略**:
+```python
+# ✅ 正确：保留旧API作为废弃
+def get_game_by_id(game_id):  # 旧API（保留但废弃）
+    warnings.warn("Use get_game_by_gid instead", DeprecationWarning)
+    game = fetch_one_as_dict("SELECT * FROM games WHERE id = ?", (game_id,))
+    return get_game_by_gid(game['gid'])
+
+def get_game_by_gid(game_gid):  # 新API
+    return fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+
+# ✅ 正确：渐进式迁移
+# 1. 添加新API（不删除旧API）
+# 2. 更新调用方逐步使用新API
+# 3. 标记旧API为废弃
+# 4. 确认所有调用方已迁移
+# 5. 删除旧API（至少6个月后）
+```
+
+**验证步骤**:
+1. 运行所有单元测试（pytest）
+2. 运行E2E测试（Playwright）
+3. 检查API契约一致性
+4. 验证前端功能正常
+5. 检查日志中的废弃警告
+
+### 文档驱动开发 ⭐ **P1重要**
+
+**核心原则**: 文档与代码同步更新
+
+**开发流程**:
+```bash
+# 1. 编写实施计划（先写文档）
+# 创建计划文件：.claude/plans/feature-name.md
+
+# 2. 按计划执行开发
+# 每完成一个步骤，更新计划状态
+
+# 3. 完成后更新文档
+# - 更新API文档（如果修改了API）
+# - 更新架构文档（如果修改了架构）
+# - 提取经验到经验文档系统
+# - 更新CLAUDE.md
+
+# 4. 归档临时文档
+# 将实施报告、测试报告移至 archive/
+```
+
+**经验贡献流程**:
+1. 修复问题后，提取经验
+2. 使用统一的经验模板更新经验文档
+3. 在CLAUDE.md中添加简短记录和链接
+4. 更新经验文档索引
+
+### 代码审查清单
+
+**并行开发检查**:
+- [ ] 任务是否真正独立（无共享状态）？
+- [ ] 是否有明确的依赖关系？
+- [ ] 并行任务是否有冲突的文件修改？
+
+**大规模重构检查**:
+- [ ] 是否有详细的实施计划？
+- [ ] 每个Phase是否有验收标准？
+- [ ] 是否有回滚计划？
+
+**零破坏性变更检查**:
+- [ ] 是否保留了旧API？
+- [ ] 是否标记了废弃警告？
+- [ ] 是否运行了所有测试？
+
+**文档更新检查**:
+- [ ] 是否更新了相关文档？
+- [ ] 是否提取了经验？
+- [ ] 是否归档了临时文档？
+
+### 相关经验文档
+
+- **[经验文档 - 项目管理](docs/docs/lessons-learned/project-management.md)** - 详细的项目管理经验
+- **[经验文档 - 重构检查清单](docs/docs/lessons-learned/refactoring-checklist.md)** - 重构最佳实践
+- **[经验文档 - 调试技能](docs/docs/lessons-learned/debugging-skills.md)** - 并行开发调试技巧
 
 ---
 
@@ -1937,6 +2233,38 @@ def get_events(game_gid):  # ❌ game_gid参数未包含在缓存键中
 def get_events(game_gid: int):  # ✅ 不同game_gid有不同缓存
     return fetch_all_as_dict('SELECT * FROM log_events WHERE game_gid = ?', (game_gid,))
 ```
+
+### 缓存预热策略
+
+**生产环境缓存预热可以避免冷启动性能问题**
+
+```python
+@app.before_first_request
+def warm_up_cache():
+    """服务启动时预热缓存"""
+    from backend.services.games.game_service import GameService
+    game_service = GameService()
+    games = game_service.get_all()
+    logger.info(f"Warmed up {len(games)} games")
+```
+
+**预热时机**:
+- 服务启动时
+- 低峰期（定时任务）
+- 数据更新后
+
+**预热策略**:
+- 静态数据：完整预热
+- 热点数据：分批次预热
+- 大数据集：分页预热
+
+### 缓存监控指标
+
+**关键指标**:
+- 缓存命中率：目标 >85%
+- API响应时间：目标 95% <500ms
+- 慢查询率：目标 <5%
+- 错误率：目标 <1%
 
 ### API快速参考
 
@@ -2924,8 +3252,8 @@ module.exports = {
 
 ---
 
-**文档版本**: 7.4
-**最后更新**: 2026-02-18
+**文档版本**: 7.9.0
+**最后更新**: 2026-03-02
 **维护者**: Event2Table Development Team
 
 ---
@@ -2934,6 +3262,11 @@ module.exports = {
 
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
+| 7.9 | 2026-03-02 | 新增项目管理最佳实践章节：并行开发、大规模重构、零破坏性变更 |
+| 7.8 | 2026-03-01 | 后端架构全面优化（Phase 1-4 完成）：100% ERS 架构迁移 |
+| 7.8 | 2026-02-26 | Entity架构迁移 + DDD清理完成：6/8核心模块迁移 |
+| 7.7.1 | 2026-02-26 | 缓存系统架构统一：双实例合并为单实例 |
+| 7.6.1 | 2026-02-25 | 缓存系统文档完善：7份新文档，使用率从7.5%提升到60% |
 | 7.4 | 2026-02-18 | 事件节点构建器全面修复：6大问题解决，React性能优化，API适配器迁移 |
 | 7.3 | 2026-02-12 | 新增文档组织规范章节，重组文档结构，修复路径引用 |
 | 7.2 | 2026-02-12 | 新增环境问题排查章节，记录 PATH 问题及解决方案 |

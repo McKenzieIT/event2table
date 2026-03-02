@@ -27,6 +27,115 @@ description: Interactive E2E testing system for Event2Table using Chrome DevTool
 
 ---
 
+## ⚠️ 配置要求 (CRITICAL)
+
+### Chrome DevTools MCP 必须可用
+
+**本 skill 严格要求 Chrome DevTools MCP 可用才能执行测试。**
+
+#### 验证 MCP 可用性
+
+**方法1: 检查全局安装**
+```bash
+ls -la ~/.nvm/versions/node/v25.2.1/lib/node_modules/chrome-devtools-mcp/
+```
+
+**方法2: 检查项目配置**
+```bash
+cat .claude/config.json | grep chrome-devtools
+```
+
+**方法3: 在 Claude Code 中测试工具**
+```
+尝试调用: mcp__chrome-devtools__list_pages
+如果返回页面列表，MCP 已正确加载
+如果报错 "No such tool available"，需要配置
+```
+
+#### 如果 MCP 不可用 - 配置步骤
+
+**步骤1: 确认 Node.js 版本**
+```bash
+node --version  # 应显示 v25.2.1 或更高
+which node      # 应显示 NVM 路径
+```
+
+**步骤2: 安装 chrome-devtools-mcp（如果未安装）**
+```bash
+npm install -g chrome-devtools-mcp
+```
+
+**步骤3: 创建项目配置文件 `.claude/config.json`**
+
+项目配置文件应已存在。如果不存在，创建它：
+
+```json
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "/Users/mckenzie/.nvm/versions/node/v25.2.1/bin/node",
+      "args": [
+        "/Users/mckenzie/.nvm/versions/node/v25.2.1/lib/node_modules/chrome-devtools-mcp/build/src/index.js"
+      ],
+      "env": {
+        "NODE_PATH": "/Users/mckenzie/.nvm/versions/node/v25.2.1/lib/node_modules"
+      }
+    }
+  }
+}
+```
+
+**步骤4: 重启 VSCode**
+
+⚠️ **重要**: 必须完全关闭 VSCode 后重新打开，才能加载新的 MCP 配置
+
+**步骤5: 验证 MCP 可用**
+
+在 Claude Code 中尝试调用：
+```
+mcp__chrome-devtools__list_pages
+```
+
+#### 故障排除
+
+**问题**: `Error: No such tool available: mcp__chrome-devtools__list_pages`
+
+**原因**: VSCode 会话未加载 chrome-devtools MCP 服务器
+
+**解决方案**:
+1. ✅ 检查 `.claude/config.json` 是否存在
+2. ✅ 验证 Node.js 路径正确: `which node`
+3. ✅ 验证包已安装: `npm list -g chrome-devtools-mcp`
+4. ✅ **完全关闭 VSCode**（不是重新加载窗口）
+5. ✅ 重新打开 VSCode 和项目
+6. ✅ 在新会话中测试 MCP 工具
+
+**替代方案**: 如果 MCP 仍不可用，使用 Playwright 测试
+```bash
+cd frontend
+npm run test:e2e
+```
+
+#### 测试方法选择
+
+**方法1: Chrome DevTools MCP（推荐）** - 交互式诊断
+- 实时页面分析
+- 智能问题发现
+- 深度 DOM + Console + Network 分析
+- 适用于: 问题诊断、UX 测试、功能验证
+
+**方法2: Playwright 自动化（回退）** - 回归测试
+- 完整自动化测试套件
+- 11页面全面测试
+- 适用于: 回归测试、CI/CD
+
+**如何选择**:
+- 发现新问题 → 使用 Chrome DevTools MCP
+- 验证修复 → 使用 Chrome DevTools MCP
+- 完整回归 → 使用 Playwright
+
+---
+
 ## Quick Start
 
 ### ⚠️ MANDATORY: 全面测试要求

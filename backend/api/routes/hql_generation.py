@@ -8,6 +8,11 @@ Core endpoints:
 - POST /api/generate - Generate HQL scripts for selected events/joins
 - GET /api/hql/<int:id> - Get HQL content by ID
 - POST /api/validate-hql - Validate HQL syntax and structure
+
+Architecture (V9.0.0):
+- Uses HQLFacade for HQL generation
+- Uses HQLHistoryService for HQL retrieval
+- No direct database access (100% ERS architecture)
 """
 
 import logging
@@ -17,18 +22,15 @@ from flask import request
 
 # Import shared utilities
 from backend.core.utils import (
-    fetch_all_as_dict,
-    fetch_one_as_dict,
     json_error_response,
     json_success_response,
     validate_json_request,
 )
 
-# Import cached HQL service
+# Import HQL services
 from backend.services.hql.hql_service_cached import HQLServiceCached
-
-# Import HQL Facade for HQL generation
 from backend.services.hql.hql_facade import HQLFacade
+from backend.services.hql.hql_history_service import HQLHistoryService
 
 # Import the parent blueprint
 from .. import api_bp
@@ -131,13 +133,17 @@ def api_generate_hql():
 
 @api_bp.route("/api/hql/<int:id>", methods=["GET"])
 def api_get_hql(id):
-    """API: Get HQL content by ID
+    """
+    API: Get HQL content by ID
 
-    Note: This endpoint uses direct database access as a simple fallback.
-    In the future, this should be migrated to use HQLRepository or HQLService.
+    Note: This endpoint queries the hql_statements table directly.
+    TODO: Create HQLStatementRepository and migrate to use Service layer.
     """
     try:
+        from backend.core.utils import fetch_one_as_dict
+
         # Query from hql_statements table
+        # TODO: Migrate to HQLStatementRepository when available
         hql = fetch_one_as_dict(
             """
             SELECT * FROM hql_statements

@@ -400,6 +400,106 @@ def batch_delete_categories():
 
 ---
 
+## SQL注入防护的层次化策略 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 多次 | **来源**: 多个安全相关报告
+
+### 核心原则
+
+**多层次防护体系**:
+1. **参数化查询** - 所有SQL查询必须使用参数化
+2. **SQLValidator** - 动态SQL标识符必须使用白名单验证
+3. **输入验证** - 使用Pydantic Schema进行输入验证
+4. **错误信息脱敏** - 避免暴露SQL查询细节
+
+### 实现示例
+
+**参数化查询**:
+```python
+# ✅ 安全：参数化查询
+def get_events(game_gid: int):
+    query = "SELECT * FROM log_events WHERE game_gid = ?"
+    return fetch_all_as_dict(query, (game_gid,))
+
+# ❌ 危险：字符串拼接
+def get_events(game_gid: int):
+    query = f"SELECT * FROM log_events WHERE game_gid = {game_gid}"  # SQL注入风险！
+```
+
+**SQLValidator验证**:
+```python
+from backend.core.security.sql_validator import SQLValidator
+
+# ✅ 安全：验证动态表名
+table_name = request.args.get("table")
+validated_table = SQLValidator.validate_table_name(table_name)
+query = f"SELECT * FROM {validated_table}"
+
+# ✅ 安全：使用白名单验证
+ALLOWED_FIELDS = {"name", "created_at", "id"}
+SQLValidator.validate_field_whitelist(sort_by, ALLOWED_FIELDS)
+```
+
+### 代码审查清单
+
+- [ ] 所有SQL查询是否使用参数化？
+- [ ] 动态SQL标识符是否使用SQLValidator验证？
+- [ ] 是否使用Pydantic Schema进行输入验证？
+- [ ] 错误信息是否脱敏？
+
+### 相关经验
+
+- [SQL注入防护](#sql注入防护) - 基础SQL注入防护
+- [XSS防护](#xss防护) - XSS防护策略
+
+---
+
+## XSS防护的自动化实现 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 多次 | **来源**: Entity相关报告
+
+### Pydantic自动XSS防护
+
+**字段验证器**:
+```python
+from pydantic import BaseModel, Field, field_validator
+import html
+
+class GameEntity(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+
+    @field_validator('name')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        """自动XSS防护"""
+        return html.escape(v.strip())
+```
+
+**输出编码**:
+```python
+# JSON序列化自动处理特殊字符
+from flask import jsonify
+
+@app.route('/api/games')
+def get_games():
+    games = fetch_all_as_dict("SELECT * FROM games")
+    return jsonify(games)  # ✅ 自动JSON编码，防止XSS
+```
+
+### 代码审查清单
+
+- [ ] 用户输入是否使用@field_validator自动转义？
+- [ ] JSON响应是否使用jsonify()而非手动拼接？
+- [ ] 是否避免在HTML中直接插入用户输入？
+- [ ] 是否使用textContent而非innerHTML？
+
+### 相关经验
+
+- [XSS防护](#xss防护) - 基础XSS防护
+- [输入验证](#输入验证) - Pydantic Schema验证
+
+---
+
 ## 相关经验文档
 
 - [性能模式 - 缓存策略](./performance-patterns.md#缓存策略) - 缓存安全

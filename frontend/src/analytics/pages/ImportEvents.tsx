@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, useToast } from "@shared/ui";

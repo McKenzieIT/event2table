@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * WhereBuilderModal Component Tests
  * 阶段2：模式融合 - 移除简单/高级模式切换

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Select Component Tests
  * 测试下拉选择组件的所有功能

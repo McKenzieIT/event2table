@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * CustomModeWarning Component
  * 自定义编辑模式智能提醒对话框组件

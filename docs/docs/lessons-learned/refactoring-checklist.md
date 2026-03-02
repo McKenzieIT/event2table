@@ -260,6 +260,107 @@ def create_event(config: EventConfig):
 4. **分步偿还** - 每次迭代偿还一部分
 5. **验证清理** - 确保债务已完全偿还
 
+---
+
+## 技术债务管理流程 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [cache-cleanup-report.md](../../reports/2026-03-01/cache-cleanup-report.md)
+
+### 核心原则
+
+**系统化技术债务清理策略**
+
+### 定期审计
+
+**审计频率**: 每月
+
+**审计内容**:
+```bash
+# 1. 检测未使用代码
+vulture backend/ --min-confidence 70
+
+# 2. 检测重复代码
+jscpd backend/
+
+# 3. 检测代码复杂度
+radon cc backend/ -a
+
+# 4. 检测类型问题
+mypy backend/
+```
+
+### 债务分类
+
+**按严重程度分类**:
+- **P0** - 影响功能的债务（立即处理）
+- **P1** - 影响性能的债务（本周处理）
+- **P2** - 代码质量问题（本月处理）
+- **P3** - 优化建议（有空处理）
+
+### 清理优先级
+
+**1. 先清理影响功能的债务**:
+```python
+# ❌ 错误：导入错误导致崩溃
+from backend.services.events import EventService  # 文件不存在
+
+# ✅ 正确：修复导入
+from backend.services.events.event_service import EventService
+```
+
+**2. 再清理影响性能的债务**:
+```python
+# ❌ N+1查询
+events = fetch_all_as_dict("SELECT * FROM log_events")
+for event in events:
+    game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (event['game_gid'],))
+
+# ✅ 使用JOIN
+events = fetch_all_as_dict('''
+    SELECT le.*, g.name as game_name
+    FROM log_events le
+    INNER JOIN games g ON le.game_gid = g.gid
+''')
+```
+
+**3. 最后清理代码质量问题**:
+```python
+# ❌ 未使用的导入
+import os
+import sys
+from datetime import datetime  # 未使用
+
+# ✅ 删除未使用的导入
+from datetime import datetime
+```
+
+### 自动化清理
+
+**使用工具自动清理**:
+```bash
+# 1. 自动删除未使用的导入
+autoflake --remove-all-unused-imports --recursive backend/
+
+# 2. 自动排序导入
+isort backend/
+
+# 3. 自动格式化代码
+black backend/
+```
+
+### 代码审查清单
+
+- [ ] 是否定期进行代码审计？
+- [ ] 技术债务是否按优先级分类？
+- [ ] 是否优先清理影响功能的债务？
+- [ ] 是否使用自动化工具辅助清理？
+
+### 案例文档
+
+- [缓存清理报告](../../reports/2026-03-01/cache-cleanup-report.md)
+
+---
+
 ### 相关经验
 
 - [测试指南 - TDD实践](./testing-guide.md#tdd实践) - 避免测试债务

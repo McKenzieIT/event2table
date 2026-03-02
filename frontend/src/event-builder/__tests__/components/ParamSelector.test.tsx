@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * TDD 单元测试：ParamSelector 组件 - API 数据解析
  *

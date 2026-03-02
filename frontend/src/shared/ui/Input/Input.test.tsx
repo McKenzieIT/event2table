@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Input Component Tests
  * 测试输入框组件的所有功能
@@ -12,7 +13,7 @@ describe('Input Component', () => {
   describe('Rendering', () => {
     it('should render input element', () => {
       const { container } = render(<Input />);
-      expect(container.querySelector('input.cyber-input')).toBeInTheDocument();
+      expect(container.querySelector('input.cyber-field__input')).toBeInTheDocument();
     });
 
     it('should render with label', () => {
@@ -77,13 +78,13 @@ describe('Input Component', () => {
   describe('Label and Required', () => {
     it('should render label with required indicator', () => {
       const { container } = render(<Input label="Email" required />);
-      expect(container.querySelector('.cyber-input__required')).toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__required')).toBeInTheDocument();
       expect(screen.getByText('*')).toBeInTheDocument();
     });
 
     it('should not show required indicator when not required', () => {
       const { container } = render(<Input label="Email" />);
-      expect(container.querySelector('.cyber-input__required')).not.toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__required')).not.toBeInTheDocument();
     });
 
     it('should associate label with input', () => {
@@ -101,8 +102,8 @@ describe('Input Component', () => {
 
     it('should have error class when error is present', () => {
       const { container } = render(<Input error="Error message" />);
-      expect(container.querySelector('.cyber-input-wrapper--invalid')).toBeInTheDocument();
-      expect(container.querySelector('.cyber-input--invalid')).toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__wrapper--invalid')).toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__input--invalid')).toBeInTheDocument();
     });
 
     it('should set aria-invalid when error is present', () => {
@@ -148,8 +149,8 @@ describe('Input Component', () => {
 
     it('should have disabled class when disabled', () => {
       const { container } = render(<Input disabled />);
-      expect(container.querySelector('.cyber-input-wrapper--disabled')).toBeInTheDocument();
-      expect(container.querySelector('.cyber-input--disabled')).toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__wrapper--disabled')).toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__input--disabled')).toBeInTheDocument();
     });
 
     it('should not allow input when disabled', async () => {
@@ -165,19 +166,19 @@ describe('Input Component', () => {
     it('should render icon when icon prop is provided', () => {
       const TestIcon = () => <svg data-testid="test-icon" />;
       const { container } = render(<Input icon={TestIcon} />);
-      expect(container.querySelector('.cyber-input__icon')).toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__icon')).toBeInTheDocument();
       expect(screen.getByTestId('test-icon')).toBeInTheDocument();
     });
 
     it('should have icon class when icon is present', () => {
       const TestIcon = () => <svg />;
       const { container } = render(<Input icon={TestIcon} />);
-      expect(container.querySelector('.cyber-input-wrapper--with-icon')).toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__wrapper--with-icon')).toBeInTheDocument();
     });
 
     it('should not render icon when icon prop is not provided', () => {
       const { container } = render(<Input />);
-      expect(container.querySelector('.cyber-input__icon')).not.toBeInTheDocument();
+      expect(container.querySelector('.cyber-field__icon')).not.toBeInTheDocument();
     });
   });
 

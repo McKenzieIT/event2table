@@ -86,13 +86,7 @@ class GameService:
     @cached("games.detail", timeout=300)
     def get_game_by_gid(self, game_gid: int) -> Optional[GameEntity]:
         """
-        根据GID获取游戏 (带Bloom Filter防护)
-
-        使用Bloom Filter防止查询不存在的game_gid导致数据库压力:
-        1. 先检查Bloom Filter
-        2. Bloom Filter说不存在 → 直接返回None (避免查询数据库)
-        3. Bloom Filter说可能存在 → 查询缓存/数据库
-        4. 数据存在 → 添加到Bloom Filter
+        根据GID获取游戏
 
         Args:
             game_gid: 游戏业务GID
@@ -105,23 +99,8 @@ class GameService:
         """
         validate_game_gid(game_gid)
 
-        # 步骤1: 检查Bloom Filter
-        cache_key = f"games:{game_gid}"
-        if not self.bloom_filter.contains(cache_key):
-            logger.debug(f"⚡ Bloom Filter: game {game_gid} does not exist (fast reject)")
-            return None
-
-        # 步骤2: Bloom Filter说可能存在，查询数据库
+        # 查询数据库
         game = self.game_repo.find_by_gid(game_gid)
-
-        # 步骤3: 如果存在，添加到Bloom Filter
-        if game:
-            self.bloom_filter.add(cache_key)
-            logger.debug(f"✅ Bloom Filter: game {game_gid} exists, added to filter")
-        else:
-            # 不存在（Bloom Filter误判），也添加到Filter防止重复查询
-            self.bloom_filter.add(cache_key)
-            logger.debug(f"⚠️ Bloom Filter: game {game_gid} false positive, added to filter")
 
         return game
 
@@ -322,6 +301,7 @@ class GameService:
 
         return stats
 
+    @cached("games.detailed_stats", timeout=300)
     def get_games_with_detailed_stats(self) -> List[dict]:
         """
         获取所有游戏及其详细统计信息（带缓存）
@@ -357,9 +337,10 @@ class GameService:
 
         return games
 
+    @cached("games.deletion_impact", timeout=60)
     def check_deletion_impact(self, game_gid: int) -> dict:
         """
-        检查删除游戏的影响范围
+        检查删除游戏的影响范围 (带缓存 - 短TTL用于实时数据)
 
         Args:
             game_gid: 游戏业务GID

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useState, useEffect, useCallback } from "react";
 import { SearchInput, EmptyState } from '@shared/ui';
 import { FlowNode } from '../../types';

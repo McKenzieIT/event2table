@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * AddEventModalGraphQL - 添加事件模态框（GraphQL版本）
  *

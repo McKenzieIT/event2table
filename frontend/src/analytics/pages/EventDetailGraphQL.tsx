@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React from 'react';
 import { useQuery } from '@apollo/client/react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';

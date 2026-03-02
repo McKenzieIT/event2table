@@ -14,6 +14,7 @@ from backend.models.entities import FlowEntity
 from backend.models.repositories.flow_repository import FlowRepository
 from backend.models.repositories.games import GameRepository
 from backend.services.base_service import BaseService
+from backend.core.cache.decorators import cached
 
 
 class FlowService(BaseService):
@@ -75,9 +76,10 @@ class FlowService(BaseService):
 
         return self.flow_repo.find_by_id(flow_id)
 
+    @cached("flows.byId", timeout=120)
     def get_flow_by_id(self, flow_id: int) -> Optional[FlowEntity]:
         """
-        根据ID获取流程
+        根据ID获取流程 (带缓存)
 
         Args:
             flow_id: 流程ID
@@ -87,9 +89,10 @@ class FlowService(BaseService):
         """
         return self.flow_repo.find_by_id(flow_id)
 
+    @cached("flows.byGame", timeout=120)
     def get_flows_by_game_gid(self, game_gid: int) -> List[FlowEntity]:
         """
-        获取游戏的所有流程
+        获取游戏的所有流程 (带缓存)
 
         Args:
             game_gid: 游戏GID
@@ -214,9 +217,10 @@ class FlowService(BaseService):
 
         return success
 
+    @cached("flows.countByGame", timeout=300)
     def count_flows_by_game_gid(self, game_gid: int) -> int:
         """
-        统计游戏的流程数量
+        统计游戏的流程数量 (带缓存)
 
         Args:
             game_gid: 游戏GID
@@ -226,9 +230,85 @@ class FlowService(BaseService):
         """
         return self.flow_repo.count_by_game_gid(game_gid)
 
+    @cached("flows.countAll", timeout=300)
+    def count_all_flows(self) -> int:
+        """
+        统计所有流程数量 (带缓存)
+
+        Returns:
+            流程数量
+        """
+        return self.flow_repo.count_all()
+
+    @cached("flows.paginated", timeout=120)
+    def get_flows_paginated(self, game_gid: Optional[int] = None, page: int = 1, page_size: int = 50) -> dict:
+        """
+        获取分页流程列表 (带缓存)
+
+        Args:
+            game_gid: 游戏GID (可选，None表示获取所有)
+            page: 页码
+            page_size: 每页大小
+
+        Returns:
+            dict:
+                flows: FlowEntity列表
+                total: 总数量
+                page: 当前页码
+                page_size: 每页大小
+                total_pages: 总页数
+        """
+        from backend.core.utils import fetch_one_as_dict, fetch_all_as_dict
+
+        # 验证page_size
+        page_size = min(max(page_size, 1), 100)
+
+        # 计算offset
+        offset = (page - 1) * page_size
+
+        # 构建WHERE子句
+        where_clauses = ["1=1"]
+        params = []
+
+        if game_gid:
+            where_clauses.append("game_gid = ?")
+            params.append(game_gid)
+
+        where_sql = " AND ".join(where_clauses)
+
+        # 获取总数
+        total_result = fetch_one_as_dict(
+            f"SELECT COUNT(*) as count FROM flow_templates WHERE {where_sql}",
+            tuple(params),
+        )
+        total = total_result["count"] if total_result else 0
+
+        # 获取分页数据
+        flows = fetch_all_as_dict(
+            f"""
+            SELECT * FROM flow_templates
+            WHERE {where_sql}
+            ORDER BY updated_at DESC
+            LIMIT ? OFFSET ?
+        """,
+            tuple(params) + (page_size, offset),
+        )
+
+        # 转换为FlowEntity
+        flow_entities = [FlowEntity(**flow) for flow in flows]
+
+        return {
+            "flows": flow_entities,
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "total_pages": (total + page_size - 1) // page_size if total > 0 else 0,
+        }
+
+    @cached("flows.allActive", timeout=60)
     def get_all_active_flows(self) -> List[FlowEntity]:
         """
-        获取所有激活的流程
+        获取所有激活的流程 (带缓存)
 
         Returns:
             FlowEntity列表

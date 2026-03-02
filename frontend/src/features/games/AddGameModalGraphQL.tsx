@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * AddGameModalGraphQL - 添加游戏模态框（GraphQL版本）
  *

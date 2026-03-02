@@ -553,6 +553,87 @@ const parameters = result.data?.parameters || [];
 
 ---
 
+## TypeScript严格模式迁移 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL-COMPREHENSIVE-REPORT.md](../../reports/2026-03-01/FINAL-COMPREHENSIVE-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- 项目中存在大量`any`类型
+- 类型错误难以在开发时发现
+- 运行时错误频发
+
+### 根本原因
+
+**技术原因**:
+- TypeScript配置未启用严格模式
+- 缺少类型检查规则
+- 没有强制类型注解
+
+### 解决方案
+
+**分阶段启用严格模式**:
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    // 阶段1: noImplicitAny（已启用）
+    "noImplicitAny": true,
+
+    // 阶段2: strictNullChecks（计划中）
+    "strictNullChecks": true,
+
+    // 阶段3: 完整严格模式（最终目标）
+    "strict": true
+  }
+}
+```
+
+**自动化类型检查**:
+```bash
+# ESLint强制检查
+npm install --save-dev @typescript-eslint/parser @typescript-eslint/eslint-plugin
+```
+
+```javascript
+// .eslintrc.js
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/explicit-function-return-type': 'warn'
+  }
+};
+```
+
+**类型系统设计**:
+```typescript
+// 共享类型定义
+export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type Variant = 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost';
+
+// 组合模式
+export interface LabeledComponentProps extends BaseComponentProps {
+  label?: string;
+  error?: string;
+}
+```
+
+### 代码审查清单
+
+- [ ] 是否启用了noImplicitAny？
+- [ ] 是否避免使用any类型？
+- [ ] 是否为函数添加返回类型注解？
+- [ ] 是否使用共享类型定义？
+
+### 案例文档
+
+- [TypeScript完整迁移报告](../../reports/2026-03-01/FINAL-COMPREHENSIVE-REPORT.md)
+
+---
+
 ## 相关经验文档
 
 - [测试指南 - E2E测试](./testing-guide.md#e2e测试) - React组件E2E测试方法

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "/Users/mckenzie/.nvm/versions/node/v25.2.1/bin/node",
+      "args": [
+        "/Users/mckenzie/.nvm/versions/node/v25.2.1/lib/node_modules/chrome-devtools-mcp/build/src/index.js"
+      ],
+      "env": {
+        "NODE_PATH": "/Users/mckenzie/.nvm/versions/node/v25.2.1/lib/node_modules"
+      }
+    }
+  }
+}

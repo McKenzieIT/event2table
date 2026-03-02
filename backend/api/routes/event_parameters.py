@@ -13,10 +13,12 @@ Core endpoints:
 - GET /api/event-parameters/<int:id>/validation-rules - Get validation rules
 - POST /api/event-parameters/<int:id>/validation-rules - Create validation rule
 
-Architecture Update (2026-02-28):
-- Migrated to use ParameterService instead of EventParamManager
+Architecture Update (V9.0.0):
+- Uses ParameterService for business logic and caching
 - Uses unified Entity model (ParameterEntity)
 - Service layer handles business logic and caching
+- Repository layer handles data access
+- Note: History and config endpoints still use deprecated event_param_manager
 """
 
 import logging
@@ -28,8 +30,6 @@ from flask import request
 
 # Import shared utilities
 from backend.core.utils import (
-    fetch_all_as_dict,
-    fetch_one_as_dict,
     json_error_response,
     json_success_response,
 )

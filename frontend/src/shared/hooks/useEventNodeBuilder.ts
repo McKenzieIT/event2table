@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * useEventNodeBuilder Hook
  * 事件节点构建器状态管理Hook

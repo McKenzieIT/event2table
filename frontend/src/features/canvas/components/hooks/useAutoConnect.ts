@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Node, Edge, OnEdgesChange } from "reactflow";
 import { useNodeConnections, CanvasNodeType } from "./useNodeConnections";

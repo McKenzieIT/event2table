@@ -348,6 +348,97 @@ throw new Error(errorMessage);
 
 ---
 
+## E2E健康检查机制 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [TRACK-5-API-CONNECTIVITY-HEALTH-CHECK.md](../../reports/2026-03-01/TRACK-5-API-CONNECTIVITY-HEALTH-CHECK.md)
+
+### 问题现象
+
+**症状描述**:
+- E2E测试执行失败，超时60+秒
+- 错误信息不明确：`connect ECONNREFUSED 127.0.0.1:5001`
+- 测试失败后难以诊断问题
+
+### 根本原因
+
+**技术原因**:
+- E2E测试前未验证后端可用性
+- 后端服务未启动导致测试失败
+- 缺少快速失败机制
+
+### 解决方案
+
+**前置健康检查**:
+```typescript
+// tests/e2e/helpers/backend-health.ts
+export async function ensureBackendReady(
+  maxRetries = 30,
+  retryInterval = 1000
+): Promise<boolean> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch('http://127.0.0.1:5001/api/health');
+      if (response.ok) {
+        console.log('✅ Backend is ready');
+        return true;
+      }
+    } catch (error) {
+      if (i < maxRetries - 1) {
+        console.log(`⏳ Backend not ready, retry ${i + 1}/${maxRetries}...`);
+        await new Promise(resolve => setTimeout(resolve, retryInterval));
+      }
+    }
+  }
+
+  console.error('❌ Backend failed to start after retries');
+  console.error('🔧 Please start backend: python3 web_app.py');
+  return false;
+}
+```
+
+**E2E测试中使用**:
+```typescript
+// tests/e2e/dashboard.spec.ts
+import { test, beforeAll } from '@playwright/test';
+import { ensureBackendReady } from './helpers/backend-health';
+
+beforeAll(async () => {
+  // ✅ 前置健康检查
+  const backendReady = await ensureBackendReady();
+  if (!backendReady) {
+    throw new Error('Backend is not available');
+  }
+});
+
+test('Dashboard loads correctly', async ({ page }) => {
+  // ... 测试逻辑
+});
+```
+
+**实现架构**:
+```
+E2E测试
+    ↓ (beforeAll)
+ensureBackendReady()
+    ↓ (polling)
+/api/health 端点
+    ↓ (success)
+实际API测试
+```
+
+### 代码审查清单
+
+- [ ] E2E测试是否添加了前置健康检查？
+- [ ] 是否使用polling而非单次检查？
+- [ ] 是否提供了清晰的启动后端的指令？
+- [ ] 是否有重试机制（建议30次）？
+
+### 案例文档
+
+- [API连接健康检查报告](../../reports/2026-03-01/TRACK-5-API-CONNECTIVITY-HEALTH-CHECK.md)
+
+---
+
 ## 相关经验文档
 
 - [React最佳实践 - Hooks规则](./react-best-practices.md#react-hooks-规则) - React组件测试常见问题

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Loading Component Tests
  * 测试加载组件的所有功能

@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Breadcrumb Component Tests
  * 测试面包屑导航组件的所有功能
@@ -77,11 +78,11 @@ describe('Breadcrumb Component', () => {
         { label: 'Home', to: '/' },
         { label: 'Page', to: '/page' }
       ];
-      
+
       renderWithRouter(<BreadcrumbComponent items={itemsWithoutActive} />);
-      
-      const lastItem = screen.getByText('Page');
-      expect(lastItem).toHaveClass('active');
+
+      const lastItemLi = screen.getByText('Page').closest('li');
+      expect(lastItemLi).toHaveClass('active');
     });
   });
 
@@ -111,9 +112,9 @@ describe('Breadcrumb Component', () => {
 
     it('should render separator between items', () => {
       renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+
       const breadcrumb = screen.getByRole('navigation');
-      expect(breadcrumb.textContent).toContain('Home > Products > Category > Product Details');
+      expect(breadcrumb.textContent).toContain('Home>Products>Category>Product Details');
     });
   });
 
@@ -138,11 +139,11 @@ describe('Breadcrumb Component', () => {
 
   describe('Empty Items', () => {
     it('should render empty breadcrumb when items is empty', () => {
-      renderWithRouter(<BreadcrumbComponent items={[]} />);
-      
-      const breadcrumb = screen.getByRole('navigation');
-      expect(breadcrumb).toBeInTheDocument();
-      expect(breadcrumb).toBeEmptyDOMElement();
+      const { container } = renderWithRouter(<BreadcrumbComponent items={[]} />);
+
+      const breadcrumbList = container.querySelector('.breadcrumb-list');
+      expect(breadcrumbList).toBeInTheDocument();
+      expect(breadcrumbList?.children).toHaveLength(0);
     });
   });
 

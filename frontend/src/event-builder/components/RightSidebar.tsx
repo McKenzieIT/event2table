@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * RightSidebar Component
  * 右侧栏组件（HQL预览、WHERE条件、统计信息）

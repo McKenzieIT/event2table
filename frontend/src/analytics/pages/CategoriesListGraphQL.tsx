@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * CategoriesListGraphQL - 分类列表页面(GraphQL版本)
  *

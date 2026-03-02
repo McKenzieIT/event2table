@@ -38,5 +38,8 @@
     "@graphql-codegen/typescript-react-apollo": "^4.4.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "terser": "^5.46.0"
+  },
+  "dependencies": {
+    "@apollo/client": "^4.1.6"
   }
 }

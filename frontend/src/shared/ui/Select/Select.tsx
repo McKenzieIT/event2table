@@ -33,17 +33,17 @@
  * />
  *
  * Migration Notes from PropTypes:
- * - label: PropTypes.string → label?: string
+ * - label: PropTypes.string → label?: string (from LabeledComponentProps)
  * - options: PropTypes.arrayOf(PropTypes.shape({ value, label, disabled })) → options?: SelectOption[]
  * - value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]) → value?: string | number
- * - onChange: PropTypes.func → onChange?: (value: string | number) => void
+ * - onChange: PropTypes.func → onChange?: ValueChangeCallback<string | number>
  * - placeholder: PropTypes.string (default: 'Select...') → placeholder?: string
  * - searchable: PropTypes.bool (default: false) → searchable?: boolean
- * - disabled: PropTypes.bool (default: false) → disabled?: boolean
- * - required: PropTypes.bool (default: false) → required?: boolean
- * - error: PropTypes.string → error?: string
- * - helperText: PropTypes.string → helperText?: string
- * - className: PropTypes.string (default: '') → className?: string
+ * - disabled: PropTypes.bool (default: false) → disabled?: boolean (from BaseComponentProps)
+ * - required: PropTypes.bool (default: false) → required?: boolean (from LabeledComponentProps)
+ * - error: PropTypes.string → error?: string (from LabeledComponentProps)
+ * - helperText: PropTypes.string → helperText?: string (from LabeledComponentProps)
+ * - className: PropTypes.string (default: '') → className?: string (from BaseComponentProps)
  */
 
 import React, {
@@ -57,28 +57,12 @@ import React, {
   MouseEvent,
   ChangeEvent
 } from 'react';
+import type {
+  SelectOption,
+  LabeledComponentProps,
+  ValueChangeCallback,
+} from '@/types/common';
 import './Select.css';
-
-/**
- * Select option type
- */
-export interface SelectOption {
-  /**
-   * Option value (can be string or number)
-   */
-  value: string | number;
-
-  /**
-   * Option display label
-   */
-  label: string;
-
-  /**
-   * Whether the option is disabled
-   * @default false
-   */
-  disabled?: boolean;
-}
 
 /**
  * Dropdown position type
@@ -86,14 +70,9 @@ export interface SelectOption {
 type DropdownPosition = 'down' | 'up';
 
 /**
- * Props for the Select component
+ * Props for the Select component - extends common labeled component props
  */
-export interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'value'> {
-  /**
-   * Label text displayed above the select
-   */
-  label?: string;
-
+export interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'value'>, LabeledComponentProps {
   /**
    * Array of options to display
    */
@@ -107,7 +86,7 @@ export interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   /**
    * Change handler called when an option is selected
    */
-  onChange?: (value: string | number) => void;
+  onChange?: ValueChangeCallback<string | number>;
 
   /**
    * Placeholder text shown when no option is selected
@@ -120,33 +99,6 @@ export interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
    * @default false
    */
   searchable?: boolean;
-
-  /**
-   * Whether the select is disabled
-   * @default false
-   */
-  disabled?: boolean;
-
-  /**
-   * Whether the select is required (shows asterisk)
-   * @default false
-   */
-  required?: boolean;
-
-  /**
-   * Error message to display (triggers invalid state)
-   */
-  error?: string;
-
-  /**
-   * Helper text displayed below the select
-   */
-  helperText?: string;
-
-  /**
-   * Additional CSS class names
-   */
-  className?: string;
 }
 
 /**
@@ -183,7 +135,8 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
   const triggerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const inputId = React.useId();
+  const labelId = React.useId();
+  const triggerId = React.useId();
   const isInvalid = Boolean(error);
 
   // Calculate dropdown position based on viewport
@@ -302,7 +255,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
   return (
     <div className={['cyber-select', className].filter(Boolean).join(' ')} ref={ref} {...props}>
       {label && (
-        <label htmlFor={inputId} className="cyber-select__label">
+        <label id={labelId} className="cyber-select__label">
           {label}
           {required && <span className="cyber-select__required" aria-hidden="true"> *</span>}
         </label>
@@ -311,7 +264,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
       <div className={wrapperClass} ref={dropdownRef}>
         <div
           ref={triggerRef}
-          id={inputId}
+          id={triggerId}
           className="cyber-select-trigger"
           tabIndex={disabled ? -1 : 0}
           role="combobox"
@@ -319,9 +272,9 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
           aria-haspopup="listbox"
           aria-disabled={disabled}
           aria-invalid={isInvalid}
-          aria-labelledby={label ? inputId : undefined}
+          aria-labelledby={label ? labelId : undefined}
           aria-describedby={
-            isInvalid ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
+            isInvalid ? `${triggerId}-error` : helperText ? `${triggerId}-helper` : undefined
           }
           onClick={handleTriggerClick}
           onKeyDown={handleKeyDown}
@@ -405,13 +358,13 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
       </div>
 
       {isInvalid && (
-        <p id={`${inputId}-error`} className="cyber-select__error" role="alert">
+        <p id={`${triggerId}-error`} className="cyber-select__error" role="alert">
           {error}
         </p>
       )}
 
       {helperText && !isInvalid && (
-        <p id={`${inputId}-helper`} className="cyber-select__helper">
+        <p id={`${triggerId}-helper`} className="cyber-select__helper">
           {helperText}
         </p>
       )}

@@ -198,20 +198,19 @@ def save_config():
         from backend.core.utils import execute_write
         import json
 
-        # 验证游戏存在并获取 game_id
-        game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+        # 验证游戏存在并获取 game_gid
+        game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
         if not game:
             return json_error_response("Game not found", status_code=404)
-        game_id = game["id"]
 
         # 验证事件存在
-        event = fetch_one_as_dict("SELECT * FROM log_events WHERE id = ?", (event_id,))
+        event = fetch_one_as_dict("SELECT id, event_name, game_gid FROM log_events WHERE id = ?", (event_id,))
         if not event:
             return json_error_response("Event not found", status_code=404)
 
         # 检查是否已存在同名配置
         existing = fetch_one_as_dict(
-            "SELECT * FROM event_nodes WHERE game_id = ? AND name = ?", (game_id, name)
+            "SELECT id FROM event_nodes WHERE game_gid = ? AND name = ?", (game_gid, name)
         )
         if existing:
             return json_error_response(
@@ -222,14 +221,22 @@ def save_config():
         config_json = json.dumps(config, ensure_ascii=False)
         node_id = execute_write(
             """
-            INSERT INTO event_nodes (game_id, name, event_id, config_json)
+            INSERT INTO event_nodes (game_gid, name, event_id, config_json)
             VALUES (?, ?, ?, ?)
         """,
-            (game_id, name, event_id, config_json),
+            (game_gid, name, event_id, config_json),
         )
 
         # 返回新创建的节点
-        node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (node_id,))
+        node = fetch_one_as_dict(
+            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
+                      en.is_active, en.created_at, en.updated_at,
+                      le.event_name, le.event_name_cn
+               FROM event_nodes en
+               LEFT JOIN log_events le ON en.event_id = le.id
+               WHERE en.id = ?""",
+            (node_id,)
+        )
 
         return json_success_response(
             data={"node": node}, message="Event node created", status_code=201
@@ -259,7 +266,15 @@ def update_config():
             return json_error_response("node_id is required", status_code=400)
 
         # 获取现有节点
-        node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (node_id,))
+        node = fetch_one_as_dict(
+            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
+                      en.is_active, en.created_at, en.updated_at,
+                      le.event_name, le.event_name_cn
+               FROM event_nodes en
+               LEFT JOIN log_events le ON en.event_id = le.id
+               WHERE en.id = ?""",
+            (node_id,)
+        )
         if not node:
             return json_error_response("Event node not found", status_code=404)
 
@@ -301,7 +316,13 @@ def update_config():
 
         # 返回更新后的节点
         updated_node = fetch_one_as_dict(
-            "SELECT * FROM event_nodes WHERE id = ?", (node_id,)
+            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
+                      en.is_active, en.created_at, en.updated_at,
+                      le.event_name, le.event_name_cn
+               FROM event_nodes en
+               LEFT JOIN log_events le ON en.event_id = le.id
+               WHERE en.id = ?""",
+            (node_id,)
         )
 
         return json_success_response(
@@ -359,21 +380,20 @@ def list_configs():
         if not game_gid:
             return json_error_response("game_gid is required", status_code=400)
 
-        # 转换 game_gid 为 game_id
-        game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+        # 验证游戏存在
+        game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
         if not game:
             return json_error_response("Game not found", status_code=404)
-        game_id = game["id"]
 
         nodes = fetch_all_as_dict(
             """
             SELECT en.*, le.event_name, le.event_name_cn
             FROM event_nodes en
             LEFT JOIN log_events le ON en.event_id = le.id
-            WHERE en.game_id = ? AND en.is_active = 1
+            WHERE en.game_gid = ? AND en.is_active = 1
             ORDER BY en.created_at DESC
         """,
-            (game_id,),
+            (game_gid,),
         )
 
         # 解析 config_json
@@ -402,7 +422,15 @@ def delete_config(config_id):
     try:
         from backend.core.utils import execute_write
 
-        node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (config_id,))
+        node = fetch_one_as_dict(
+            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
+                      en.is_active, en.created_at, en.updated_at,
+                      le.event_name, le.event_name_cn
+               FROM event_nodes en
+               LEFT JOIN log_events le ON en.event_id = le.id
+               WHERE en.id = ?""",
+            (config_id,)
+        )
         if not node:
             return json_error_response("Event node not found", status_code=404)
 
@@ -428,7 +456,15 @@ def copy_node(node_id):
         import json
 
         # 获取原节点
-        node = fetch_one_as_dict("SELECT * FROM event_nodes WHERE id = ?", (node_id,))
+        node = fetch_one_as_dict(
+            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
+                      en.is_active, en.created_at, en.updated_at,
+                      le.event_name, le.event_name_cn
+               FROM event_nodes en
+               LEFT JOIN log_events le ON en.event_id = le.id
+               WHERE en.id = ?""",
+            (node_id,)
+        )
 
         if not node:
             return json_error_response("Event node not found", status_code=404)
@@ -440,15 +476,21 @@ def copy_node(node_id):
         # 创建新节点
         new_node_id = execute_write(
             """
-            INSERT INTO event_nodes (game_id, name, event_id, config_json)
+            INSERT INTO event_nodes (game_gid, name, event_id, config_json)
             VALUES (?, ?, ?, ?)
         """,
-            (node["game_id"], new_name, node["event_id"], node["config_json"]),
+            (node["game_gid"], new_name, node["event_id"], node["config_json"]),
         )
 
         # 返回新节点
         new_node = fetch_one_as_dict(
-            "SELECT * FROM event_nodes WHERE id = ?", (new_node_id,)
+            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
+                      en.is_active, en.created_at, en.updated_at,
+                      le.event_name, le.event_name_cn
+               FROM event_nodes en
+               LEFT JOIN log_events le ON en.event_id = le.id
+               WHERE en.id = ?""",
+            (new_node_id,)
         )
 
         return json_success_response(

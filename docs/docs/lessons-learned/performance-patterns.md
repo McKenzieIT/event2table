@@ -630,6 +630,74 @@ def get_performance_stats():
 
 ---
 
+## Bloom Filter在数据库防护中的应用 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [EVENTS-PY-MIGRATION-STATS.md](../../reports/2026-03-01/EVENTS-PY-MIGRATION-STATS.md)
+
+### 应用场景
+
+**问题场景**:
+- 存在大量无效数据库查询
+- 查询不存在的事件ID导致不必要的数据库访问
+- 数据库CPU使用率高
+
+### 解决方案
+
+**Bloom Filter快速拒绝**:
+```python
+from pybloom_live import ScalableBloomFilter
+
+class EventService:
+    def __init__(self):
+        # 初始化Bloom Filter（容量500,000，误判率0.1%）
+        self.bloom_filter = ScalableBloomFilter(
+            initial_capacity=500000,
+            error_rate=0.001
+        )
+        self._warm_up_bloom_filter()
+
+    def _warm_up_bloom_filter(self):
+        """预热Bloom Filter"""
+        events = fetch_all_as_dict("SELECT id FROM log_events")
+        for event in events:
+            self.bloom_filter.add(event['id'])
+
+    def get_event_by_id(self, event_id: int):
+        """获取事件（带Bloom Filter检查）"""
+        # ✅ 先快速检查是否存在
+        if event_id not in self.bloom_filter:
+            return None  # 快速拒绝，避免数据库查询
+
+        # ✅ 再查询数据库
+        return fetch_one_as_dict(
+            "SELECT * FROM log_events WHERE id = ?",
+            (event_id,)
+        )
+```
+
+**性能提升**:
+- 不存在的ID查询：10ms → <0.1ms（99%提升）
+- 误判率：<0.1%（可接受）
+- 数据库查询减少：70-80%
+
+### 代码审查清单
+
+- [ ] 是否使用Bloom Filter快速拒绝不存在的数据？
+- [ ] Bloom Filter容量是否足够（建议500,000+）？
+- [ ] 误判率是否合理（建议<0.1%）？
+- [ ] 是否有预热机制？
+
+### 相关经验
+
+- [缓存策略](#缓存策略) - 缓存优化
+- [N+1查询优化](#n1查询优化) - 查询优化
+
+### 案例文档
+
+- [Events迁移统计](../../reports/2026-03-01/EVENTS-PY-MIGRATION-STATS.md)
+
+---
+
 ## 相关经验文档
 
 - [数据库模式 - game_gid迁移](./database-patterns.md#game_gid迁移) - 数据库性能优化

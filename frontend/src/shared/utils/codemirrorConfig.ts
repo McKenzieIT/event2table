@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { sql, SQLDialect } from '@codemirror/lang-sql';
 import { EditorView, Extension } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';

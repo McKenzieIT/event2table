@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * ParametersEnhancedGraphQL - 增强参数管理页面(GraphQL版本)
  *

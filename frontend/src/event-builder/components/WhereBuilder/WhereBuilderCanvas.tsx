@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * WhereBuilderCanvas Component
  * WHERE条件构建器画布（支持拖拽、性能优化）

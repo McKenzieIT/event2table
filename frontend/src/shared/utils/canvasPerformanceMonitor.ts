@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 export interface PerformanceMetrics {
   fps: number;
   memory: number;

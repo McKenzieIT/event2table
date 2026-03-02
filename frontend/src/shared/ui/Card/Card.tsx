@@ -41,7 +41,7 @@ export type CardVariant = 'default' | 'glass' | 'solid' | 'bordered';
 /**
  * Card padding sizes
  */
-export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
+export type CardPadding = 'none' | 'sm' | 'md' | 'lg' | 'reset';
 
 /**
  * Props for Card component
@@ -158,21 +158,24 @@ const CardTitle = memo<CardSubComponentProps>(function CardTitle({ children, cla
   );
 });
 
-// Attach sub-components to Card first
-(ForwardedCard as any).Header = CardHeader;
-(ForwardedCard as any).Body = CardBody;
-(ForwardedCard as any).Footer = CardFooter;
-(ForwardedCard as any).Title = CardTitle;
-(ForwardedCard as any).Content = CardBody; // Alias
+// Define CardWithSubComponents type
+interface CardWithSubComponents extends React.MemoExoticComponent<React.ForwardRefExoticComponent<CardProps & React.RefAttributes<HTMLElement>>> {
+  Header: typeof CardHeader;
+  Body: typeof CardBody;
+  Footer: typeof CardFooter;
+  Title: typeof CardTitle;
+  Content: typeof CardBody;
+}
 
-// Then attach to MemoizedCard
-(MemoizedCard as any).Header = CardHeader;
-(MemoizedCard as any).Body = CardBody;
-(MemoizedCard as any).Footer = CardFooter;
-(MemoizedCard as any).Title = CardTitle;
-(MemoizedCard as any).Content = CardBody;
+// Attach sub-components to MemoizedCard with proper typing
+const CardComponent = MemoizedCard as CardWithSubComponents;
+CardComponent.Header = CardHeader;
+CardComponent.Body = CardBody;
+CardComponent.Footer = CardFooter;
+CardComponent.Title = CardTitle;
+CardComponent.Content = CardBody;
 
 // Export sub-components as named exports
-export { Card, CardHeader, CardBody, CardFooter, CardTitle };
+export { CardHeader, CardBody, CardFooter, CardTitle };
 
-export default MemoizedCard;
+export default CardComponent;

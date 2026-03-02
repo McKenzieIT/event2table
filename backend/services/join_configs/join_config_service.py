@@ -214,9 +214,10 @@ class JoinConfigService:
 
         return deleted_count
 
+    @cached("join_configs.by_name", timeout=300)
     def get_join_config_by_name(self, name: str) -> Optional[JoinConfigEntity]:
         """
-        根据名称获取Join配置
+        根据名称获取Join配置 (带缓存)
 
         Args:
             name: 配置名称
@@ -226,9 +227,10 @@ class JoinConfigService:
         """
         return self.config_repo.find_by_name(name)
 
+    @cached("join_configs.validation", timeout=180)
     def validate_join_config(self, config_data: JoinConfigEntity) -> List[str]:
         """
-        验证Join配置数据
+        验证Join配置数据 (带缓存 - 验证逻辑很少变化)
 
         Args:
             config_data: Join配置Entity

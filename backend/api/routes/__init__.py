@@ -14,6 +14,7 @@ Each module is responsible for a specific domain:
 - hql_preview_v2: ✅ ACTIVE HQL Preview V2 API (used by frontend, NOT deprecated)
 - field_builder: Field builder configurations
 - join_configs: Join configuration management
+- health: Health check endpoint for E2E testing and monitoring
 """
 
 # Import all route modules to register their routes with the blueprint
@@ -25,13 +26,14 @@ from . import (
     field_builder,
     flows,
     games,
+    graphql,  # GraphQL API
     hql_generation,
+    health,  # Health check endpoint (2026-03-01)
     hql_preview_v2,
     join_configs,
     legacy_api,  # Legacy/compatibility API endpoints
-    nodes,
+    monitoring,  # Monitoring endpoints
     parameters,
-    templates,
     v1_adapter,  # V1-to-V2 adapter endpoints (2026-02-17)
 )
 
@@ -42,13 +44,14 @@ __all__ = [
     "events",
     "categories",
     "event_parameters",
-    "templates",
-    "nodes",
     "flows",
+    "graphql",
     "hql_generation",
     "hql_preview_v2",
     "field_builder",
+    "health",
     "join_configs",
     "legacy_api",
+    "monitoring",
     "v1_adapter",
 ]

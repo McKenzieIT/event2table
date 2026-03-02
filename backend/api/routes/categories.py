@@ -12,10 +12,12 @@ Core endpoints:
 - DELETE /api/categories/<int:id> - Delete a category
 - POST /api/categories/batch-delete - Batch delete categories
 
-Architecture:
+Architecture (V9.0.0):
 - Uses CategoryService for business logic
+- Uses GameService for game validation
 - Uses EventCategoryEntity for data validation
 - Automatic cache invalidation via service layer
+- No direct database access (100% ERS architecture)
 """
 
 import logging
@@ -24,7 +26,6 @@ from flask import request
 
 # Import shared utilities
 from backend.core.utils import (
-    fetch_one_as_dict,
     json_error_response,
     json_success_response,
     sanitize_and_validate_string,
@@ -33,6 +34,7 @@ from backend.core.utils import (
 
 # Import Service layer
 from backend.services.event_categories.category_service import CategoryService
+from backend.services.games.game_service import GameService
 
 # Import Entity for validation
 from backend.models.entities import EventCategoryEntity
@@ -68,8 +70,9 @@ def api_list_categories():
         if not game_gid:
             return json_error_response("game_gid is required", status_code=400)
 
-        # Verify game exists
-        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+        # Verify game exists using GameService
+        game_service = GameService()
+        game = game_service.get_game_by_gid(game_gid)
         if not game:
             return json_error_response(f"Game {game_gid} not found", status_code=404)
 
@@ -353,9 +356,10 @@ def api_get_category_stats():
         # Get optional game_gid parameter
         game_gid = request.args.get("game_gid", type=int)
 
-        # If game_gid is provided, verify game exists
+        # If game_gid is provided, verify game exists using GameService
         if game_gid is not None:
-            game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+            game_service = GameService()
+            game = game_service.get_game_by_gid(game_gid)
             if not game:
                 return json_error_response(f"Game {game_gid} not found", status_code=404)
 

@@ -24,6 +24,7 @@ from typing import Optional, List, Dict, Any, Literal, Union
 from datetime import datetime
 from pydantic import BaseModel, Field, field_validator, ConfigDict, field_serializer
 import html
+import os
 
 # ============================================================================
 # Game Entity
@@ -42,7 +43,11 @@ class GameEntity(BaseModel):
     验证规则:
     - gid: 必须是正整数
     - name: 1-100字符,自动XSS防护
-    - ods_db: 只能是ieu_ods或overseas_ods
+    - ods_db: 生产环境只能是ieu_ods或overseas_ods,测试环境允许任意值
+
+    测试模式:
+    - 设置 FLASK_ENV=testing 或 ENVIRONMENT=test 允许任意 ods_db 值
+    - 用于E2E测试和单元测试的测试数据创建
     """
 
     # 主键
@@ -51,9 +56,7 @@ class GameEntity(BaseModel):
     # 业务字段
     gid: int = Field(..., ge=0, description="游戏业务GID")
     name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
-    ods_db: Literal["ieu_ods", "overseas_ods"] = Field(
-        ..., description="ODS数据库名称"
-    )
+    ods_db: str = Field(..., description="ODS数据库名称 (生产: ieu_ods/overseas_ods, 测试: 任意值)")
     description: Optional[str] = Field(None, description="游戏描述")
     dwd_prefix: str = Field("dwd", description="DWD表前缀")
     icon_path: Optional[str] = Field(None, description="图标路径")
@@ -64,6 +67,46 @@ class GameEntity(BaseModel):
 
     # 关联数据 (统计信息,不持久化到数据库)
     event_count: Optional[int] = Field(default=0, description="事件数量统计", exclude=True)
+
+    @field_validator("ods_db")
+    @classmethod
+    def validate_ods_db(cls, v: str) -> str:
+        """
+        验证ODS数据库名称
+
+        生产环境: 只允许 ieu_ods 或 overseas_ods
+    测试环境: 允许任意值 (用于测试数据创建)
+
+        Args:
+            v: ODS数据库名称
+
+        Returns:
+            验证后的数据库名称
+
+        Raises:
+            ValueError: 生产环境下使用无效的数据库名称
+        """
+        # 检查是否在测试环境 (仅当明确设置FLASK_ENV=testing时)
+        # 注意: 不自动检测PYTEST_CURRENT_TEST,以允许测试验证功能
+        is_testing = (
+            os.environ.get("FLASK_ENV", "").lower() == "testing" or
+            os.environ.get("ENVIRONMENT", "").lower() == "test"
+        )
+
+        # 测试环境: 允许任意值
+        if is_testing:
+            return v
+
+        # 生产环境: 严格验证
+        allowed_values = ["ieu_ods", "overseas_ods"]
+        if v not in allowed_values:
+            raise ValueError(
+                f"ods_db必须是以下值之一: {', '.join(allowed_values)}. "
+                f"当前值: '{v}'. "
+                f"提示: 如需在测试中使用其他值,请设置 FLASK_ENV=testing 环境变量."
+            )
+
+        return v
 
     @field_validator("name")
     @classmethod
@@ -382,6 +425,113 @@ class CommonParameterEntity(BaseModel):
                 "json_path": None,
                 "hive_type": "BIGINT",
                 "description": "角色ID",
+                "created_at": "2024-01-01T00:00:00",
+                "updated_at": "2024-01-01T00:00:00",
+            }
+        },
+    )
+
+
+# ============================================================================
+# Field Builder Config Entity
+# ============================================================================
+
+
+class FieldBuilderConfigEntity(BaseModel):
+    """
+    Field Builder配置实体 - 全局唯一的Field Builder配置模型定义
+
+    用途:
+    - API层: Field Builder配置CRUD请求验证
+    - Service层: Field Builder业务逻辑处理
+    - Repository层: Field Builder配置数据访问
+
+    验证规则:
+    - name: 必填, 1-200字符
+    - output_table: 必填, 1-200字符 (视图/表名)
+    - field_mapping_v2: JSON格式的字段映射配置
+
+    字段说明:
+    - field_mapping_v2: 包含view_config, base_fields, param_fields等
+    - source_events: JSON数组,源事件ID列表
+    """
+
+    # 主键
+    id: Optional[int] = Field(None, description="数据库自增ID")
+
+    # 业务字段
+    name: str = Field(..., min_length=1, max_length=200, description="配置名称")
+    display_name: str = Field(..., min_length=1, max_length=200, description="显示名称")
+    output_table: str = Field(..., alias="view_name", min_length=1, max_length=200, description="输出表/视图名称")
+
+    # 配置数据 (JSON格式)
+    source_events: Optional[str] = Field(None, description="源事件列表(JSON)")
+    field_mapping_v2: Optional[Dict[str, Any]] = Field(None, description="字段映射配置v2(JSON)")
+
+    # 旧字段 (兼容性)
+    join_conditions: Optional[str] = Field(None, description="JOIN条件(JSON)")
+    output_fields: Optional[str] = Field(None, description="输出字段(JSON)")
+    join_type: Optional[str] = Field("join", description="连接类型")
+    where_conditions: Optional[str] = Field(None, description="WHERE条件(JSON)")
+    field_mappings: Optional[str] = Field(None, description="字段映射(JSON)")
+    description: Optional[str] = Field(None, description="描述")
+
+    # 游戏关联
+    game_id: Optional[int] = Field(None, description="游戏ID(旧)")
+    game_gid: Optional[int] = Field(None, description="游戏GID(新)")
+
+    # 元数据
+    created_at: Optional[datetime] = Field(None, description="创建时间")
+    updated_at: Optional[datetime] = Field(None, description="更新时间")
+
+    @field_validator("name", "display_name", "output_table")
+    @classmethod
+    def sanitize_string(cls, v: str) -> str:
+        """防止XSS攻击"""
+        if v:
+            return html.escape(v.strip())
+        return v
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_datetime(self, dt: Optional[datetime]) -> Optional[str]:
+        """序列化datetime为ISO格式字符串"""
+        return dt.isoformat() if dt else None
+
+    @property
+    def view_name(self) -> str:
+        """兼容旧代码: view_name属性映射到output_table"""
+        return self.output_table
+
+    @view_name.setter
+    def view_name(self, value: str):
+        """兼容旧代码: 设置view_name属性时映射到output_table"""
+        self.output_table = value
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,  # 允许使用alias或field name
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "name": "Custom View",
+                "display_name": "自定义视图",
+                "view_name": "v_dwd_custom_view",
+                "output_table": "v_dwd_custom_view",
+                "field_mapping_v2": {
+                    "view_config": {
+                        "game_gid": 10000147,
+                        "date_var": "${bizdate}"
+                    },
+                    "base_fields": [
+                        {
+                            "event_id": 1,
+                            "event_name": "login",
+                            "field_name": "role_id",
+                            "alias": "role_id"
+                        }
+                    ]
+                },
+                "source_events": "[1, 2, 3]",
                 "created_at": "2024-01-01T00:00:00",
                 "updated_at": "2024-01-01T00:00:00",
             }

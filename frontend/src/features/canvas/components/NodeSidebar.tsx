@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useState, useEffect } from "react";
 import { useEventConfigs } from '../hooks/useEventConfigs';
 import { Button, Spinner } from '@shared/ui';

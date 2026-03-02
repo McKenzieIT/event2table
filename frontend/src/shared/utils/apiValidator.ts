@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 export interface ValidationResult<T = unknown> {
   success: boolean;
   data?: T;

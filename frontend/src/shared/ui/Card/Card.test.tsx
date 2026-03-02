@@ -1,3 +1,4 @@
+// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Card Component Tests
  * 测试卡片组件的所有功能

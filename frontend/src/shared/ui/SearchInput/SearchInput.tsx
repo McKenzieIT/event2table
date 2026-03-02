@@ -72,7 +72,10 @@ function SearchInput({
       <path d="m21 21-4.35-4.35"></path>
     </svg>
   );
+
+  // Handle both function components and JSX elements
   const searchIcon = icon !== undefined ? icon : defaultSearchIcon;
+  const renderedIcon = typeof searchIcon === 'function' ? React.createElement(searchIcon) : searchIcon;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [showClearButton, setShowClearButton] = useState(false);
@@ -152,8 +155,8 @@ function SearchInput({
 
   return (
     <div className={wrapperClass}>
-      <div className="search-icon">
-        {searchIcon}
+      <div className="search-icon" data-testid="search-icon-wrapper">
+        {renderedIcon}
       </div>
 
       {/* 输入框 */}
