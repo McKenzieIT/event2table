@@ -178,7 +178,9 @@ class CacheConfig:
     CACHE_REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
 
     # Cache key prefix (updated to v3)
-    CACHE_KEY_PREFIX = os.getenv("CACHE_KEY_PREFIX", "dwd_gen:v3:")
+    # Note: Prefix is managed by CacheKeyBuilder, not Flask-Cache
+    # Setting to None to avoid duplicate prefix
+    CACHE_KEY_PREFIX = os.getenv("CACHE_KEY_PREFIX", None)
 
     # Default cache timeout (in seconds)
     CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT", 300))  # 5 minutes
