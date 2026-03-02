@@ -61,7 +61,7 @@ class GameService:
             os.environ.get("PYTEST_CURRENT_TEST") is not None
         )
 
-    @cached("games.list", timeout=120)
+    @cached("games.list", timeout=CacheConfig.CACHE_TIMEOUT_STATIC)
     def get_all_games(self, include_stats: bool = False) -> List[GameEntity]:
         """
         获取所有游戏 (带缓存)
@@ -84,7 +84,7 @@ class GameService:
 
         return games
 
-    @cached("games.detail", timeout=300)
+    @cached("games.detail", timeout=CacheConfig.CACHE_TIMEOUT_STATIC)
     def get_game_by_gid(self, game_gid: int) -> Optional[GameEntity]:
         """
         根据GID获取游戏

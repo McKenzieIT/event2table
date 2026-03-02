@@ -186,32 +186,32 @@ class CacheConfig:
     CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT", 300))  # 5 minutes
 
     # ============================================================================
-    # TTL配置 v3.0 (基于数据更新频率优化)
+    # TTL配置 v4.0 (优化策略 - 85%+ 命中率目标)
     # ============================================================================
-    # 静态数据 (1小时) - 游戏列表、分类列表
-    CACHE_TIMEOUT_STATIC = 3600
+    # 静态数据 (2小时) - 游戏列表、分类列表
+    CACHE_TIMEOUT_STATIC = 7200
 
-    # 半静态数据 (30分钟) - 参数、模板
-    CACHE_TIMEOUT_SEMI_STATIC = 1800
+    # 半静态数据 (10分钟) - 参数、模板
+    CACHE_TIMEOUT_SEMI_STATIC = 600
 
-    # 动态数据 (5分钟) - 事件列表
-    CACHE_TIMEOUT_DYNAMIC = 300
+    # 动态数据 (2分钟) - 事件列表
+    CACHE_TIMEOUT_DYNAMIC = 120
 
-    # 实时数据 (1分钟) - 搜索结果
-    CACHE_TIMEOUT_REALTIME = 60
+    # 实时数据 (30秒) - 搜索结果
+    CACHE_TIMEOUT_REALTIME = 30
 
-    # 统计数据 (10分钟)
-    CACHE_TIMEOUT_STATS = 600
+    # 统计数据 (5分钟)
+    CACHE_TIMEOUT_STATS = 300
 
-    # HQL模板 (1小时)
-    CACHE_TIMEOUT_HQL = 3600
+    # HQL模板 (2小时)
+    CACHE_TIMEOUT_HQL = 7200
 
     # Legacy timeout names (for backward compatibility)
-    CACHE_TIMEOUT_GAMES = CACHE_TIMEOUT_STATIC  # 1 hour
-    CACHE_TIMEOUT_CATEGORIES = CACHE_TIMEOUT_SEMI_STATIC  # 30 minutes
-    CACHE_TIMEOUT_EVENTS = CACHE_TIMEOUT_DYNAMIC  # 5 minutes
-    CACHE_TIMEOUT_PARAMS = CACHE_TIMEOUT_SEMI_STATIC  # 30 minutes
-    CACHE_TIMEOUT_SEARCH = CACHE_TIMEOUT_REALTIME  # 1 minute
+    CACHE_TIMEOUT_GAMES = CACHE_TIMEOUT_STATIC  # 2 hours
+    CACHE_TIMEOUT_CATEGORIES = CACHE_TIMEOUT_SEMI_STATIC  # 10 minutes
+    CACHE_TIMEOUT_EVENTS = CACHE_TIMEOUT_DYNAMIC  # 2 minutes
+    CACHE_TIMEOUT_PARAMS = CACHE_TIMEOUT_SEMI_STATIC  # 10 minutes
+    CACHE_TIMEOUT_SEARCH = CACHE_TIMEOUT_REALTIME  # 30 seconds
 
     # ============================================================================
     # TTL抖动配置（防止雪崩）

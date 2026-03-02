@@ -15,6 +15,7 @@ import sqlite3
 from backend.models.entities import ParameterEntity, CommonParameterEntity
 from backend.models.repositories.parameters import ParameterRepository
 from backend.core.cache.cache_system import CacheInvalidator, cached
+from backend.core.config.config import CacheConfig
 from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class ParameterService:
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
 
-    @cached("parameters.list", timeout=120)
+    @cached("parameters.list", timeout=CacheConfig.CACHE_TIMEOUT_PARAMS)
     def get_all_parameters(self) -> List[ParameterEntity]:
         """
         获取所有参数 (带缓存)
@@ -43,7 +44,7 @@ class ParameterService:
         # ParameterRepository现在直接返回ParameterEntity
         return self.param_repo.find_all()
 
-    @cached("parameters.paginated", timeout=120)
+    @cached("parameters.paginated", timeout=CacheConfig.CACHE_TIMEOUT_PARAMS)
     def get_parameters_paginated(
         self,
         game_gid: Optional[int] = None,
