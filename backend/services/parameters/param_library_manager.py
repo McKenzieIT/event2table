@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Parameter Library Manager - DEPRECATED
-========================================
+Parameter Library Manager - REFACTORED
+=======================================
 
-This module is DEPRECATED. All parameter library functionality has been moved to:
-- backend/services/parameters/parameter_service.py
+Refactored to use Repository pattern instead of direct database access.
 
-This class is kept for backward compatibility only.
-All methods delegate to the appropriate service.
+Migration Status: Repository Pattern Implementation (2026-03-02)
+- Added ParameterRepository integration
+- Added get_param_library() with caching
+- Refactored methods to use Repository layer
+- Maintained backward compatibility
 
-Migration Guide:
-- Replace ParamLibraryManager with ParameterService
-- Library parameters are now handled through ParameterService with library_id field
-- For backward compatibility, this wrapper converts between old and new interfaces
-
-Last Updated: 2026-02-28
-Status: DEPRECATED - Will be removed in v8.0.0
+Note: This module is still marked as DEPRECATED for future migration to ParameterService.
 """
 
 import json
 import logging
 from typing import Dict, List, Optional, Any
+from collections import Counter
+
+from backend.core.cache.cache_system import cached
+from backend.models.repositories.parameters import ParameterRepository
 from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 from backend.core.utils import execute_write
 from backend.services.parameters.param_type_manager import param_type_manager
@@ -31,23 +31,94 @@ logger = logging.getLogger(__name__)
 
 class ParamLibraryManager:
     """
-    DEPRECATED: Parameter Library Manager Wrapper
+    Parameter Library Manager (Repository Pattern Implementation)
 
-    This class is a thin wrapper for backward compatibility.
-    All functionality should use ParameterService directly.
+    This class provides parameter library functionality using the Repository pattern.
 
-    Deprecated: 2026-02-28
-    Removal: v8.0.0
-    Reason: Consolidated into ParameterService for unified parameter management
+    Migration Status (2026-03-02):
+    - Refactored to use ParameterRepository
+    - Added caching support for get_param_library()
+    - Deprecated methods still use direct DB access (to be migrated)
+
+    Future: Migrate to ParameterService for unified parameter management.
     """
 
     def __init__(self):
-        """Initialize library manager (deprecated)"""
-        logger.warning(
-            "ParamLibraryManager is DEPRECATED. "
-            "Use ParameterService for all new code. "
-            "This wrapper will be removed in v8.0.0"
+        """Initialize library manager with Repository"""
+        self.param_repo = ParameterRepository()
+        logger.debug(
+            "ParamLibraryManager initialized with ParameterRepository. "
+            "This module is DEPRECATED - migrate to ParameterService when possible."
         )
+
+    @cached("params.library", timeout=300)
+    def get_param_library(self, game_gid: int) -> Dict[str, Any]:
+        """
+        获取参数库（带缓存）
+
+        Args:
+            game_gid: 游戏GID
+
+        Returns:
+            参数库字典，包含:
+            - parameters: 参数列表
+            - stats: 统计信息
+              - total: 总数
+              - by_type: 按类型统计
+              - by_category: 按类别统计
+
+        Example:
+            >>> manager = ParamLibraryManager()
+            >>> library = manager.get_param_library(90000001)
+            >>> print(library['stats']['total'])
+        """
+        # Get common parameters for the game
+        parameters = self.param_repo.get_common_params_by_game(game_gid)
+
+        # Calculate statistics
+        stats = {
+            'total': len(parameters),
+            'by_type': self._count_by_type(parameters),
+            'by_category': self._count_by_category(parameters)
+        }
+
+        return {
+            'parameters': parameters,
+            'stats': stats
+        }
+
+    def _count_by_type(self, parameters: List[Dict[str, Any]]) -> Dict[str, int]:
+        """
+        按类型统计参数数量
+
+        Args:
+            parameters: 参数列表
+
+        Returns:
+            类型统计字典
+        """
+        if not parameters:
+            return {}
+
+        types = [p.get('param_type', 'unknown') for p in parameters]
+        return dict(Counter(types))
+
+    def _count_by_category(self, parameters: List[Dict[str, Any]]) -> Dict[str, int]:
+        """
+        按类别统计参数数量
+
+        Args:
+            parameters: 参数列表
+
+        Returns:
+            类别统计字典
+        """
+        if not parameters:
+            return {}
+
+        # For common_params, use table_name as category
+        categories = [p.get('table_name', 'unknown') for p in parameters]
+        return dict(Counter(categories))
 
     def get_all_parameters(
         self, game_id: Optional[int] = None, category: Optional[str] = None
