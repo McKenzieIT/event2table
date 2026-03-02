@@ -15,12 +15,12 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from backend.core.logging import get_logger
 from backend.core.utils import (
-    fetch_one_as_dict,
     success_response,
     error_response,
     json_success_response,
     json_error_response,
 )
+from backend.services.games.game_service import GameService
 from . import node_canvas_flows
 from .canvas_service import get_canvas_service
 
@@ -30,6 +30,8 @@ canvas_bp = Blueprint("canvas", __name__)
 
 # 获取CanvasService单例
 canvas_service = get_canvas_service()
+# 获取GameService单例
+game_service = GameService()
 
 
 @canvas_bp.route("/canvas/node_canvas")
@@ -56,17 +58,17 @@ def node_canvas():
         return redirect(url_for("games.list_games"))
 
     # 验证游戏是否存在
-    game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (game_gid,))
+    game = game_service.get_game_by_gid(game_gid)
     if not game:
         logger.warning(f"Game not found: game_gid={game_gid}")
         return json_error_response("游戏不存在", status_code=404)
 
     # 设置当前游戏上下文
     session["current_game_gid"] = game_gid
-    session["current_game_gid"] = game.get("gid")
+    session["current_game_gid"] = game.gid
 
     logger.info(
-        f"Accessed node_canvas: game_gid={game_gid}, gid={game.get('gid')}, react={use_react}"
+        f"Accessed node_canvas: game_gid={game_gid}, gid={game.gid}, react={use_react}"
     )
 
     # 根据react参数选择模板
@@ -96,17 +98,17 @@ def node_canvas_react():
         return redirect(url_for("games.list_games"))
 
     # 验证游戏是否存在
-    game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (game_gid,))
+    game = game_service.get_game_by_gid(game_gid)
     if not game:
         logger.warning(f"Game not found: game_gid={game_gid}")
         return json_error_response("游戏不存在", status_code=404)
 
     # 设置当前游戏上下文
     session["current_game_gid"] = game_gid
-    session["current_game_gid"] = game.get("gid")
+    session["current_game_gid"] = game.gid
 
     logger.info(
-        f"Accessed node_canvas_react: game_gid={game_gid}, gid={game.get('gid')}"
+        f"Accessed node_canvas_react: game_gid={game_gid}, gid={game.gid}"
     )
 
     return render_template("node_canvas_react.html", game=game)
