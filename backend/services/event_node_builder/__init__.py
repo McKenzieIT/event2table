@@ -4,7 +4,12 @@
 Event Node Builder Module
 事件节点构建器模块 - 提供前端 EventNodeBuilder 页面需要的 API 路由
 
-这些路由作为现有 API 的包装器，将 /event_node_builder/* 请求转发到相应的后端服务
+ERS架构迁移 (Phase 3 - Task A6):
+- 使用EventNodeService替代直接数据库访问
+- 使用GameService进行游戏验证
+- 保持API兼容性的同时提升架构合规性
+
+迁移模式: 将所有fetch_one_as_dict/fetch_all_as_dict调用替换为Service方法调用
 """
 
 from flask import Blueprint, request
@@ -12,9 +17,13 @@ from backend.core.logging import get_logger
 from backend.core.utils import (
     json_success_response,
     json_error_response,
+    # TODO: 逐步移除这些直接DB访问函数
     fetch_one_as_dict,
     fetch_all_as_dict,
 )
+# ERS架构 - 使用Service层
+from backend.services.events.event_node_service import EventNodeService
+from backend.services.games.game_service import GameService
 
 logger = get_logger(__name__)
 
@@ -22,10 +31,18 @@ event_node_builder_bp = Blueprint(
     "event_node_builder", __name__, url_prefix="/event_node_builder"
 )
 
+# 初始化Service实例 (全局单例模式)
+event_node_service = EventNodeService()
+game_service = GameService()
+
 
 def validate_game_exists(game_gid: int) -> bool:
-    """验证游戏是否存在"""
-    game = fetch_one_as_dict("SELECT id FROM games WHERE gid = ?", (game_gid,))
+    """
+    验证游戏是否存在 (ERS架构)
+
+    迁移后使用GameService替代直接数据库访问
+    """
+    game = game_service.get_game_by_gid(game_gid)
     return game is not None
 
 
@@ -166,21 +183,15 @@ def get_event_params():
 @event_node_builder_bp.route("/api/save", methods=["POST"])
 def save_config():
     """
-    API: 保存事件节点配置
+    API: 保存事件节点配置 (ERS架构)
 
-    转发到现有的 /api/event-nodes 路由（POST）
+    迁移后使用EventNodeService替代直接数据库访问
     """
     try:
         data = request.get_json()
 
         if not data:
             return json_error_response("Request body is required", status_code=400)
-
-        # 导入 event_nodes 模块的创建逻辑
-
-        # 模拟 request 对象，因为 create_event_node 从 request.get_json() 读取数据
-        # 我们需要将当前请求数据注入到 Flask 的 request context 中
-        # 更简单的方法是直接调用 create_event_node 的逻辑
 
         # 验证必填字段
         game_gid = data.get("game_gid")
@@ -193,53 +204,32 @@ def save_config():
                 "game_gid, name, event_id, and config are required", status_code=400
             )
 
-        # 导入必要的函数
-        from backend.core.utils import execute_write
+        # 导入Entity模型
+        from backend.models.entities import EventNodeEntity
         import json
 
-        # 验证游戏存在并获取 game_gid
-        game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
-        if not game:
-            return json_error_response("Game not found", status_code=404)
-
-        # 验证事件存在
-        event = fetch_one_as_dict("SELECT id, event_name, game_gid FROM log_events WHERE id = ?", (event_id,))
-        if not event:
-            return json_error_response("Event not found", status_code=404)
-
-        # 检查是否已存在同名配置
-        existing = fetch_one_as_dict(
-            "SELECT id FROM event_nodes WHERE game_gid = ? AND name = ?", (game_gid, name)
-        )
-        if existing:
-            return json_error_response(
-                "Event node with this name already exists", status_code=400
+        # 使用EventNodeService创建节点
+        try:
+            node_entity = EventNodeEntity(
+                game_gid=game_gid,
+                name=name,
+                event_id=event_id,
+                config_json=json.dumps(config, ensure_ascii=False),
+                is_active=True
             )
 
-        # 创建事件节点
-        config_json = json.dumps(config, ensure_ascii=False)
-        node_id = execute_write(
-            """
-            INSERT INTO event_nodes (game_gid, name, event_id, config_json)
-            VALUES (?, ?, ?, ?)
-        """,
-            (game_gid, name, event_id, config_json),
-        )
+            created_node = event_node_service.create_node(node_entity)
 
-        # 返回新创建的节点
-        node = fetch_one_as_dict(
-            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
-                      en.is_active, en.created_at, en.updated_at,
-                      le.event_name, le.event_name_cn
-               FROM event_nodes en
-               LEFT JOIN log_events le ON en.event_id = le.id
-               WHERE en.id = ?""",
-            (node_id,)
-        )
+            # 获取带详情的节点数据
+            node_with_details = event_node_service.get_node_with_details(created_node.id)
 
-        return json_success_response(
-            data={"node": node}, message="Event node created", status_code=201
-        )
+            return json_success_response(
+                data={"node": node_with_details}, message="Event node created", status_code=201
+            )
+
+        except ValueError as e:
+            # Service层的验证错误 (游戏不存在、事件不存在、名称重复等)
+            return json_error_response(str(e), status_code=404 if "not found" in str(e).lower() else 400)
 
     except Exception as e:
         logger.error(f"Error saving config: {e}", exc_info=True)
