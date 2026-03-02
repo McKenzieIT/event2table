@@ -1,0 +1,55 @@
+{
+  "version": "V8.0.0",
+  "timestamp": "2026-03-02 10:46:06",
+  "tests": {
+    "api__api_games": {
+      "description": "Get all games",
+      "endpoint": "/api/games",
+      "requests": 10,
+      "errors": 0,
+      "avg_ms": 4.13,
+      "min_ms": 3.1,
+      "max_ms": 10.32
+    },
+    "api__api_events_game_gid_10000147": {
+      "description": "Get events for game",
+      "endpoint": "/api/events?game_gid=10000147",
+      "requests": 10,
+      "errors": 0,
+      "avg_ms": 5.59,
+      "min_ms": 3.17,
+      "max_ms": 22.01
+    },
+    "api__api_parameters_all_game_gid_10000147": {
+      "description": "Get parameters for game",
+      "endpoint": "/api/parameters/all?game_gid=10000147",
+      "requests": 10,
+      "errors": 0,
+      "avg_ms": 37.24,
+      "min_ms": 5.09,
+      "max_ms": 320.07
+    },
+    "cache": {
+      "hits": 22,
+      "misses": 6,
+      "total_requests": 28,
+      "hit_rate_percent": 78.57
+    },
+    "db_n1_query_simulation": {
+      "query_name": "N+1 query simulation",
+      "time_ms": 0.45
+    },
+    "db_count_query": {
+      "query_name": "Count query",
+      "time_ms": 0.23
+    },
+    "db_join_query": {
+      "query_name": "Join query",
+      "time_ms": 0.25
+    },
+    "memory": {
+      "rss_mb": 38.4,
+      "vms_mb": 32990.43
+    }
+  }
+}
