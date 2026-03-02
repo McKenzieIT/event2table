@@ -136,9 +136,10 @@ def generate_hql_v2():
                     event["game_gid"] = data["game_gid"]
 
         # 1. 通过适配层转换数据
-        events = ProjectAdapter.events_from_api_request(events_data)
-        fields = ProjectAdapter.fields_from_api_request(data["fields"])
-        conditions = ProjectAdapter.conditions_from_api_request(
+        adapter = ProjectAdapter()
+        events = adapter.events_from_api_request(events_data)
+        fields = adapter.fields_from_api_request(data["fields"])
+        conditions = adapter.conditions_from_api_request(
             data.get("where_conditions", [])
         )
 
@@ -270,9 +271,10 @@ def generate_hql_debug():
             ), 400
 
         # 1. 通过适配层转换数据
-        events = ProjectAdapter.events_from_api_request(data["events"])
-        fields = ProjectAdapter.fields_from_api_request(data["fields"])
-        conditions = ProjectAdapter.conditions_from_api_request(
+        adapter = ProjectAdapter()
+        events = adapter.events_from_api_request(data["events"])
+        fields = adapter.fields_from_api_request(data["fields"])
+        conditions = adapter.conditions_from_api_request(
             data.get("where_conditions", [])
         )
 
@@ -582,9 +584,10 @@ def generate_hql_incremental():
             ), 400
 
         # 1. 通过适配层转换数据
-        events = ProjectAdapter.events_from_api_request(data["events"])
-        fields = ProjectAdapter.fields_from_api_request(data["fields"])
-        conditions = ProjectAdapter.conditions_from_api_request(
+        adapter = ProjectAdapter()
+        events = adapter.events_from_api_request(data["events"])
+        fields = adapter.fields_from_api_request(data["fields"])
+        conditions = adapter.conditions_from_api_request(
             data.get("where_conditions", [])
         )
 

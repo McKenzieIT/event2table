@@ -326,9 +326,10 @@ def preview_hql_v1():
         # 3. Call V2 HQL generation service
         logger.info(f"V1 Adapter: Calling V2 generator with {len(v2_data['events'])} events, {len(v2_data['fields'])} fields")
 
-        events = ProjectAdapter.events_from_api_request(v2_data["events"])
-        fields = ProjectAdapter.fields_from_api_request(v2_data["fields"])
-        conditions = ProjectAdapter.conditions_from_api_request(v2_data.get("where_conditions", []))
+        adapter = ProjectAdapter()
+        events = adapter.events_from_api_request(v2_data["events"])
+        fields = adapter.fields_from_api_request(v2_data["fields"])
+        conditions = adapter.conditions_from_api_request(v2_data.get("where_conditions", []))
 
         options = v2_data.get("options", {})
 
@@ -428,9 +429,10 @@ def generate_with_debug_v1():
         v2_data = transform_v1_request_to_v2(data)
 
         # 3. Call V2 HQL generation service (with debug mode)
-        events = ProjectAdapter.events_from_api_request(v2_data["events"])
-        fields = ProjectAdapter.fields_from_api_request(v2_data["fields"])
-        conditions = ProjectAdapter.conditions_from_api_request(v2_data.get("where_conditions", []))
+        adapter = ProjectAdapter()
+        events = adapter.events_from_api_request(v2_data["events"])
+        fields = adapter.fields_from_api_request(v2_data["fields"])
+        conditions = adapter.conditions_from_api_request(v2_data.get("where_conditions", []))
 
         options = v2_data.get("options", {})
 

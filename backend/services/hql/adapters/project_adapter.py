@@ -8,7 +8,8 @@
 
 from typing import Dict, Any, List
 from ..models.event import Event, Field, Condition
-from backend.core.utils import fetch_one_as_dict
+from backend.models.repositories.events import EventRepository
+from backend.models.repositories.games import GameRepository
 
 
 class ProjectAdapter:
@@ -20,8 +21,12 @@ class ProjectAdapter:
     这是唯一的业务依赖点！
     """
 
-    @staticmethod
-    def event_from_project(game_gid: int, event_id: int) -> Event:
+    def __init__(self):
+        """初始化适配器，注入Repository依赖"""
+        self.event_repo = EventRepository()
+        self.game_repo = GameRepository()
+
+    def event_from_project(self, game_gid: int, event_id: int) -> Event:
         """
         从项目数据构建抽象Event
 
@@ -48,25 +53,24 @@ class ProjectAdapter:
             raise ValueError(f"Invalid game_gid or event_id: must be integers, got game_gid={game_gid}, event_id={event_id}")
 
         # 查询事件
-        event = fetch_one_as_dict("SELECT * FROM log_events WHERE id = ?", (event_id,))
+        event = self.event_repo.find_by_id(event_id)
 
         if not event:
             raise ValueError(f"Event not found: id={event_id}")
 
         # 查询游戏
-        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+        game = self.game_repo.find_by_gid(game_gid)
 
         if not game:
             raise ValueError(f"Game not found: gid={game_gid}")
 
         # 构建抽象Event
         # 表名格式: {ods_db}.ods_{game_gid}_all_view
-        table_name = f"{game['ods_db']}.ods_{game['gid']}_all_view"
+        table_name = f"{game.ods_db}.ods_{game.gid}_all_view"
 
-        return Event(name=event["event_name"], table_name=table_name, partition_field="ds")
+        return Event(name=event.event_name, table_name=table_name, partition_field="ds")
 
-    @staticmethod
-    def event_from_request_data(data: Dict[str, Any]) -> Event:
+    def event_from_request_data(self, data: Dict[str, Any]) -> Event:
         """
         从请求数据构建Event（简化版）
 
@@ -90,8 +94,7 @@ class ProjectAdapter:
             partition_field=data.get("partition_field", "ds"),
         )
 
-    @staticmethod
-    def field_from_project(field_data: Dict[str, Any]) -> Field:
+    def field_from_project(self, field_data: Dict[str, Any]) -> Field:
         """
         从前端字段数据构建抽象Field
 
@@ -136,8 +139,7 @@ class ProjectAdapter:
             fixed_value=field_data.get("fixedValue") or field_data.get("fixed_value"),
         )
 
-    @staticmethod
-    def condition_from_project(condition_data: Dict[str, Any]) -> Condition:
+    def condition_from_project(self, condition_data: Dict[str, Any]) -> Condition:
         """
         从前端条件数据构建抽象Condition
 
@@ -170,8 +172,7 @@ class ProjectAdapter:
             logical_op=condition_data.get("logicalOp") or condition_data.get("logical_op", "AND"),
         )
 
-    @staticmethod
-    def events_from_api_request(events_data: List[Dict[str, Any]]) -> List[Event]:
+    def events_from_api_request(self, events_data: List[Dict[str, Any]]) -> List[Event]:
         """
         从API请求数据批量构建Event列表
 
@@ -185,19 +186,18 @@ class ProjectAdapter:
         for event_data in events_data:
             if "game_gid" in event_data and "event_id" in event_data:
                 # 需要查询数据库
-                event = ProjectAdapter.event_from_project(
+                event = self.event_from_project(
                     event_data["game_gid"], event_data["event_id"]
                 )
             else:
                 # 直接使用请求数据
-                event = ProjectAdapter.event_from_request_data(event_data)
+                event = self.event_from_request_data(event_data)
 
             events.append(event)
 
         return events
 
-    @staticmethod
-    def fields_from_api_request(fields_data: List[Dict[str, Any]]) -> List[Field]:
+    def fields_from_api_request(self, fields_data: List[Dict[str, Any]]) -> List[Field]:
         """
         从API请求数据批量构建Field列表
 
@@ -207,10 +207,9 @@ class ProjectAdapter:
         Returns:
             List[Field]: 字段列表
         """
-        return [ProjectAdapter.field_from_project(f) for f in fields_data]
+        return [self.field_from_project(f) for f in fields_data]
 
-    @staticmethod
-    def conditions_from_api_request(conditions_data: List[Dict[str, Any]]) -> List[Condition]:
+    def conditions_from_api_request(self, conditions_data: List[Dict[str, Any]]) -> List[Condition]:
         """
         从API请求数据批量构建Condition列表
 
@@ -220,4 +219,4 @@ class ProjectAdapter:
         Returns:
             List[Condition]: 条件列表
         """
-        return [ProjectAdapter.condition_from_project(c) for c in conditions_data]
+        return [self.condition_from_project(c) for c in conditions_data]
