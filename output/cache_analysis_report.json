@@ -1,0 +1,59 @@
+{
+  "cache_stats": {
+    "hits": 29,
+    "misses": 8,
+    "total": 37,
+    "hit_rate_percent": 78.38
+  },
+  "memory_stats": {
+    "used_memory_bytes": 1059488,
+    "used_memory_human": "1.01M"
+  },
+  "total_keys": 1,
+  "key_patterns": {
+    "dwd_gen:v3": 1
+  },
+  "ttl_distribution": {
+    "<1min": 1
+  },
+  "sample_keys": [
+    {
+      "key": "dwd_gen:v3:dwd_gen:v3:games.list:include_stats:False",
+      "ttl": 45,
+      "type": "string",
+      "size_bytes": 705
+    }
+  ],
+  "optimization_suggestions": [
+    {
+      "priority": "HIGH",
+      "issue": "Cache hit rate (78.38%) below 85% (current target)",
+      "suggestion": "Implement cache warming strategy: pre-load frequently accessed data on startup",
+      "action": "Add @app.before_first_request cache warming for games.list, events.list, parameters.list"
+    },
+    {
+      "priority": "HIGH",
+      "issue": "Only 1 cached keys (low cache utilization)",
+      "suggestion": "Cache is not being utilized effectively. Check if @cached decorators are applied to query functions.",
+      "action": "Review Service layer methods to ensure @cached decorators are used"
+    },
+    {
+      "priority": "MEDIUM",
+      "issue": "1 keys (100.0%) have TTL < 1 minute",
+      "suggestion": "Increase TTL for keys that change infrequently to reduce cache churn",
+      "action": "Adjust TTL values: static data (3600s), semi-static (1800s), dynamic (300s)"
+    },
+    {
+      "priority": "MEDIUM",
+      "issue": "8 cache misses (21.62% miss rate)",
+      "suggestion": "Analyze which queries are missing cache and add @cached decorators",
+      "action": "Check logs for cache.miss patterns or add X-Cache-Status header monitoring"
+    },
+    {
+      "priority": "INFO",
+      "issue": "Most common pattern: dwd_gen:v3 (1 keys)",
+      "suggestion": "Consider pre-warming this pattern to improve hit rate",
+      "action": "Add cache warming for dwd_gen:v3 in startup sequence"
+    }
+  ]
+}

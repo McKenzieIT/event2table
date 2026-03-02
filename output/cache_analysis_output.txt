@@ -1,0 +1,21 @@
+============================================================
+Cache Analysis Report
+============================================================
+Hit Rate: 78.38% (29 hits, 8 misses)
+Total Keys: 1
+Memory Used: 1.01M
+
+Top Key Patterns:
+  dwd_gen:v3: 1
+
+TTL Distribution:
+  <1min: 1
+
+Optimization Suggestions: 5
+  - [HIGH] Cache hit rate (78.38%) below 85% (current target)
+  - [HIGH] Only 1 cached keys (low cache utilization)
+  - [MEDIUM] 1 keys (100.0%) have TTL < 1 minute
+  - [MEDIUM] 8 cache misses (21.62% miss rate)
+  - [INFO] Most common pattern: dwd_gen:v3 (1 keys)
+
+Report saved to: output/cache_analysis_report.json
