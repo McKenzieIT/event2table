@@ -50,7 +50,7 @@ class HQLHistoryService(BaseService):
         offset: int = 0,
     ) -> List[HQLHistoryEntity]:
         """
-        获取历史记录列表
+        获取历史记录列表 (ERS架构)
 
         Args:
             user_id: 用户ID
@@ -61,28 +61,9 @@ class HQLHistoryService(BaseService):
         Returns:
             HQLHistoryEntity列表
         """
-        # 如果按session_id查询，需要自定义SQL（Repository没有此方法）
+        # 优先按session_id查询 (使用Repository)
         if session_id:
-            from backend.core.utils.converters import fetch_all_as_dict
-            from backend.core.utils.json_helpers import deserialize_json_field
-
-            query = '''
-                SELECT * FROM hql_history
-                WHERE session_id = ?
-                ORDER BY created_at DESC
-                LIMIT ? OFFSET ?
-            '''
-            rows = fetch_all_as_dict(query, (session_id, limit, offset))
-
-            # 转换为Entity
-            entities = []
-            for row in rows:
-                row["events_json"] = deserialize_json_field(row.get("events_json"))
-                row["fields_json"] = deserialize_json_field(row.get("fields_json"))
-                row["conditions_json"] = deserialize_json_field(row.get("conditions_json"))
-                row["metadata_json"] = deserialize_json_field(row.get("metadata_json"))
-                entities.append(HQLHistoryEntity(**row))
-            return entities
+            return self.history_repo.find_by_session_id(session_id, limit, offset)
 
         # 否则按user_id查询
         return self.history_repo.find_by_user_id(user_id, limit, offset)

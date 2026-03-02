@@ -97,6 +97,36 @@ class HQLHistoryRepository(GenericRepository):
 
         return entities
 
+    def find_by_session_id(
+        self, session_id: str, limit: int = 50, offset: int = 0
+    ) -> List[HQLHistoryEntity]:
+        """
+        根据会话ID查找HQL历史记录
+
+        Args:
+            session_id: 会话ID
+            limit: 返回数量限制
+            offset: 偏移量
+
+        Returns:
+            HQLHistoryEntity列表
+        """
+        query = f'''
+            SELECT * FROM "{self.table_name}"
+            WHERE session_id = ?
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+        '''
+        rows = fetch_all_as_dict(query, (session_id, limit, offset))
+
+        # 反序列化JSON字段并转换为Entity
+        entities = []
+        for row in rows:
+            row = self._deserialize_json_fields(row)
+            entities.append(HQLHistoryEntity(**row))
+
+        return entities
+
     def find_by_game_gid(
         self, game_gid: int, limit: int = 50, offset: int = 0
     ) -> List[HQLHistoryEntity]:
