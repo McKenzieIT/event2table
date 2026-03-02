@@ -13,6 +13,7 @@ from typing import Optional, List, Dict, Any
 from backend.core.data_access import GenericRepository
 from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, get_db_connection
 from backend.models.entities import EventEntity
+from backend.core.cache.cache_system import cached
 
 
 class EventRepository(GenericRepository):
@@ -665,6 +666,7 @@ class EventRepository(GenericRepository):
         finally:
             conn.close()
 
+    @cached("events.batchByName", timeout=120)
     def batch_find_by_names(
         self, event_names: List[str], game_gid: int
     ) -> List[EventEntity]:
