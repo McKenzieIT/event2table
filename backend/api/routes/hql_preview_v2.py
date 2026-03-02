@@ -1059,7 +1059,7 @@ def save_history():
                     error_response(f"{field} is required", status_code=400)[0]
                 ), 400
 
-        from backend.services.hql.services.history_service import HQLHistoryService
+        from backend.services.hql.hql_history_service import HQLHistoryService
         from datetime import datetime
 
         service = HQLHistoryService()
@@ -1128,7 +1128,7 @@ def get_history_list():
     }
     """
     try:
-        from backend.services.hql.services.history_service import HQLHistoryService
+        from backend.services.hql.hql_history_service import HQLHistoryService
 
         service = HQLHistoryService()
 
@@ -1180,7 +1180,7 @@ def get_history_by_id(history_id: int):
     }
     """
     try:
-        from backend.services.hql.services.history_service import HQLHistoryService
+        from backend.services.hql.hql_history_service import HQLHistoryService
 
         service = HQLHistoryService()
         history = service.get_history_by_id(history_id)
@@ -1253,7 +1253,7 @@ def restore_history(history_id: int):
     }
     """
     try:
-        from backend.services.hql.services.history_service import HQLHistoryService
+        from backend.services.hql.hql_history_service import HQLHistoryService
 
         service = HQLHistoryService()
         restored = service.restore_history(history_id)
@@ -1301,7 +1301,7 @@ def delete_history(history_id: int):
     }
     """
     try:
-        from backend.services.hql.services.history_service import HQLHistoryService
+        from backend.services.hql.hql_history_service import HQLHistoryService
 
         service = HQLHistoryService()
         deleted = service.delete_history(history_id)
@@ -1390,7 +1390,7 @@ def search_history():
                 error_response("Invalid JSON format", status_code=400)[0]
             ), 400
 
-        from backend.services.hql.services.history_service import HQLHistoryService
+        from backend.services.hql.hql_history_service import HQLHistoryService
 
         service = HQLHistoryService()
 
@@ -1502,7 +1502,7 @@ def global_search_history():
     }
     """
     try:
-        from backend.services.hql.services.history_service import HQLHistoryService
+        from backend.services.hql.hql_history_service import HQLHistoryService
 
         service = HQLHistoryService()
 
