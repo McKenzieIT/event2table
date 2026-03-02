@@ -325,3 +325,156 @@ class CategoryRepository(GenericRepository):
         query = "SELECT * FROM event_categories WHERE name LIKE ? ORDER BY name"
         rows = fetch_all_as_dict(query, (name_pattern,))
         return [EventCategoryEntity(**row) for row in rows]
+
+    def get_game_statistics(self, game_gid: int) -> Dict[str, Any]:
+        """
+        获取特定游戏的类别统计信息
+
+        Args:
+            game_gid: 游戏业务GID
+
+        Returns:
+            包含统计信息和详细分类的字典:
+            - total_categories: 总分类数量
+            - active_categories: 活跃分类数量 (is_active=True)
+            - categories_with_events: 有事件的分类数量
+            - category_breakdown: 各分类的详细统计列表
+
+        Raises:
+            ValueError: game_gid无效
+        """
+        if game_gid <= 0:
+            raise ValueError(f"Invalid game_gid: {game_gid}")
+
+        # 统计查询
+        stats_query = """
+            SELECT
+                COUNT(DISTINCT ec.id) as total_categories,
+                COUNT(DISTINCT CASE WHEN ec.is_active = 1 THEN ec.id END) as active_categories,
+                COUNT(DISTINCT CASE WHEN le.id IS NOT NULL THEN ec.id END) as categories_with_events
+            FROM event_categories ec
+            LEFT JOIN log_events le ON ec.id = le.category_id AND le.game_gid = ?
+            WHERE ec.game_gid IS NULL OR ec.game_gid = ?
+        """
+
+        # 详细分类查询
+        breakdown_query = """
+            SELECT
+                ec.id,
+                ec.name,
+                ec.name_cn,
+                ec.description,
+                ec.color,
+                ec.icon,
+                ec.is_active,
+                ec.display_order,
+                ec.created_at,
+                ec.updated_at,
+                COUNT(DISTINCT le.id) as event_count
+            FROM event_categories ec
+            LEFT JOIN log_events le ON ec.id = le.category_id AND le.game_gid = ?
+            WHERE ec.game_gid IS NULL OR ec.game_gid = ?
+            GROUP BY ec.id
+            ORDER BY ec.display_order, ec.name
+        """
+
+        stats = fetch_one_as_dict(stats_query, (game_gid, game_gid))
+        breakdown = fetch_all_as_dict(breakdown_query, (game_gid, game_gid))
+
+        # 确保统计字段不为NULL
+        stats = {
+            "total_categories": stats.get("total_categories") or 0,
+            "active_categories": stats.get("active_categories") or 0,
+            "categories_with_events": stats.get("categories_with_events") or 0,
+        }
+
+        # 构建详细分类统计列表
+        category_breakdown = []
+        for row in breakdown:
+            category_breakdown.append({
+                "id": row["id"],
+                "name": row["name"],
+                "name_cn": row.get("name_cn"),
+                "description": row.get("description"),
+                "color": row.get("color"),
+                "icon": row.get("icon"),
+                "is_active": bool(row.get("is_active")),
+                "display_order": row.get("display_order"),
+                "event_count": row.get("event_count") or 0,
+                "created_at": row.get("created_at"),
+                "updated_at": row.get("updated_at"),
+            })
+
+        stats["category_breakdown"] = category_breakdown
+        return stats
+
+    def get_global_statistics(self) -> Dict[str, Any]:
+        """
+        获取全局类别统计信息（跨所有游戏）
+
+        Returns:
+            包含统计信息和详细分类的字典:
+            - total_categories: 总分类数量
+            - active_categories: 活跃分类数量 (is_active=True)
+            - categories_with_events: 有事件的分类数量
+            - category_breakdown: 各分类的详细统计列表
+        """
+        # 统计查询
+        stats_query = """
+            SELECT
+                COUNT(DISTINCT ec.id) as total_categories,
+                COUNT(DISTINCT CASE WHEN ec.is_active = 1 THEN ec.id END) as active_categories,
+                COUNT(DISTINCT CASE WHEN le.id IS NOT NULL THEN ec.id END) as categories_with_events
+            FROM event_categories ec
+            LEFT JOIN log_events le ON ec.id = le.category_id
+        """
+
+        # 详细分类查询
+        breakdown_query = """
+            SELECT
+                ec.id,
+                ec.name,
+                ec.name_cn,
+                ec.description,
+                ec.color,
+                ec.icon,
+                ec.is_active,
+                ec.display_order,
+                ec.created_at,
+                ec.updated_at,
+                COUNT(DISTINCT le.id) as event_count
+            FROM event_categories ec
+            LEFT JOIN log_events le ON ec.id = le.category_id
+            GROUP BY ec.id
+            ORDER BY ec.display_order, ec.name
+        """
+
+        stats = fetch_one_as_dict(stats_query)
+        breakdown = fetch_all_as_dict(breakdown_query)
+
+        # 确保统计字段不为NULL
+        stats = {
+            "total_categories": stats.get("total_categories") or 0,
+            "active_categories": stats.get("active_categories") or 0,
+            "categories_with_events": stats.get("categories_with_events") or 0,
+        }
+
+        # 构建详细分类统计列表
+        category_breakdown = []
+        for row in breakdown:
+            category_breakdown.append({
+                "id": row["id"],
+                "name": row["name"],
+                "name_cn": row.get("name_cn"),
+                "description": row.get("description"),
+                "color": row.get("color"),
+                "icon": row.get("icon"),
+                "is_active": bool(row.get("is_active")),
+                "display_order": row.get("display_order"),
+                "event_count": row.get("event_count") or 0,
+                "created_at": row.get("created_at"),
+                "updated_at": row.get("updated_at"),
+            })
+
+        stats["category_breakdown"] = category_breakdown
+        return stats
