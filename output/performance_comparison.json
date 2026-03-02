@@ -1,0 +1,57 @@
+{
+  "v8_version": "V8.0.0",
+  "v9_version": "V9.0.0",
+  "v8_timestamp": "2026-03-02 18:25:34",
+  "v9_timestamp": "2026-03-02 18:25:49",
+  "api_improvements": [
+    {
+      "endpoint": "/api/games",
+      "v8_ms": 13.3,
+      "v9_ms": 15.15,
+      "improvement_pct": -13.9
+    },
+    {
+      "endpoint": "/api/events",
+      "v8_ms": 15.27,
+      "v9_ms": 7.0,
+      "improvement_pct": 54.2
+    },
+    {
+      "endpoint": "/api/parameters/all",
+      "v8_ms": 30.18,
+      "v9_ms": 15.52,
+      "improvement_pct": 48.6
+    }
+  ],
+  "cache_comparison": {
+    "v8_hit_rate": 71.79,
+    "v9_hit_rate": 77.55,
+    "improvement": 5.76
+  },
+  "query_comparison": [
+    {
+      "query": "N+1\u67e5\u8be2\u6a21\u62df",
+      "v8_ms": 0.71,
+      "v9_ms": 1.0,
+      "improvement_pct": -40.8
+    },
+    {
+      "query": "Count\u67e5\u8be2",
+      "v8_ms": 0.37,
+      "v9_ms": 0.53,
+      "improvement_pct": -43.2
+    },
+    {
+      "query": "Join\u67e5\u8be2",
+      "v8_ms": 0.37,
+      "v9_ms": 0.62,
+      "improvement_pct": -67.6
+    }
+  ],
+  "memory_comparison": {
+    "v8_mb": 33.59,
+    "v9_mb": 33.82,
+    "change_mb": 0.23,
+    "change_pct": 0.7
+  }
+}

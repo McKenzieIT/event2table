@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Performance Baseline Test - V8.0.0
+Performance Baseline Test - V9.0.0
 
-This script establishes a performance baseline before optimization.
+This script establishes a performance baseline after Phase 1 optimization.
 It tests API response times, cache hit rate, query performance, and memory usage.
 
 Usage:
     python scripts/benchmark/performance_baseline.py
 
 Output:
-    output/performance_baseline_v8.json - Baseline results
+    output/performance_baseline_v9.json - Baseline results
 """
 import time
 import json
@@ -28,7 +28,7 @@ class PerformanceBaseline:
 
     def __init__(self):
         self.results = {
-            'version': 'V8.0.0',
+            'version': 'V9.0.0',
             'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
             'tests': {}
         }
@@ -229,7 +229,7 @@ class PerformanceBaseline:
     def run_all_tests(self) -> None:
         """Run all baseline tests and save results"""
         print("="*60)
-        print("🚀 Performance Baseline Test - V8.0.0")
+        print("🚀 Performance Baseline Test - V9.0.0")
         print("="*60)
 
         # Run all tests
@@ -240,7 +240,7 @@ class PerformanceBaseline:
 
         # Save results
         os.makedirs('output', exist_ok=True)
-        output_path = 'output/performance_baseline_v8.json'
+        output_path = 'output/performance_baseline_v9.json'
 
         with open(output_path, 'w') as f:
             json.dump(self.results, f, indent=2)
