@@ -335,7 +335,10 @@ class DDLGenerator:
         """
         # 如果字段有明确的类型指定（通过自定义属性），使用它
         if hasattr(field, "hive_type") and field.hive_type:
-            return field.hive_type
+            hive_type = field.hive_type
+            if not isinstance(hive_type, str):
+                raise TypeError(f"field.hive_type must be str, got {type(hive_type)}")
+            return hive_type
 
         # 根据字段名推断类型
         field_name_lower = field.name.lower()

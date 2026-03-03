@@ -89,7 +89,7 @@ class HQLFacade:
             field=data.get("field", ""),
             operator=data.get("operator", "="),
             value=data.get("value", ""),
-            logic=data.get("logic", "AND"),
+            logical_op=data.get("logic", "AND"),
         )
 
     def validate_hql(self, hql: str) -> Dict[str, Any]:
