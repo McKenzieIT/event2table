@@ -1,30 +1,35 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Games Management Module (API Only) - PARTIALLY DEPRECATED
-=========================================================
+Games Management Module (API Only) - ⚠️ FULLY DEPRECATED
+========================================================
 
-Handles game-related API endpoints for session context.
-Most routes have been migrated to backend/api/routes/games.py.
+STATUS: This file is deprecated and will be removed in Phase 4 cleanup.
 
-MIGRATION STATUS (2026-02-20):
+MIGRATION STATUS (2026-03-03):
   ✅ GET /api/games -> backend/api/routes/games.py::api_list_games()
   ✅ POST /api/games -> backend/api/routes/games.py::api_create_game()
   ✅ GET /api/games/<gid> -> backend/api/routes/games.py::api_get_game()
   ✅ PUT /api/games/<gid> -> backend/api/routes/games.py::api_update_game()
   ✅ DELETE /api/games/<gid> -> backend/api/routes/games.py::api_delete_game()
+  ✅ POST /api/set-game-context -> backend/api/routes/games.py::set_game_context()
+  ✅ GET /api/games/by-gid/<gid> -> backend/api/routes/games.py::get_game_by_gid()
 
-ACTIVE ROUTES (still using games_bp):
-  - POST /api/set-game-context -> Session management
-  - GET /api/games/by-gid/<gid> -> Alias route
+REPLACEMENT: All functionality has been migrated to:
+  - backend/api/routes/games.py (new ERS-compliant routes)
+  - backend/services/games/game_service.py (Service layer)
 
-Legacy template routes have been removed as part of frontend-backend separation.
+DEPRECATION PLAN:
+  - Phase 4 (2026-03-03): Mark as deprecated
+  - Phase 5: Delete this file after verification
+
 Created: 2026-01-25
-Updated: 2026-02-20
+Deprecated: 2026-03-03
 """
 
 
 from flask import Blueprint, jsonify, request, session
+import warnings
 
 from backend.core.cache.cache_system import clear_game_cache
 from backend.core.logging import get_logger
@@ -37,6 +42,15 @@ from backend.core.utils import (
 )
 
 logger = get_logger(__name__)
+
+# 发出弃用警告
+warnings.warn(
+    "backend/services/games/games.py is deprecated. "
+    "Use backend/api/routes/games.py instead. "
+    "This file will be removed in Phase 4 cleanup.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 games_bp = Blueprint("games_service", __name__)
 
