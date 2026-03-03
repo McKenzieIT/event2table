@@ -7,8 +7,8 @@ HQL Statement Repository (HQL语句仓储层)
 """
 
 from typing import List, Optional, Dict, Any
-from backend.models.repositories.generic_repository import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, execute_write
+from backend.core.data_access import GenericRepository
+from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, get_db_connection
 
 
 class HQLStatementRepository(GenericRepository):
@@ -75,7 +75,9 @@ class HQLStatementRepository(GenericRepository):
 
         # 如果当前不是最新版本，则激活
         if current["hql_version"] > 1:
-            execute_write(
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
                 f"""
                 UPDATE {self.table_name}
                 SET is_active = 1, updated_at = CURRENT_TIMESTAMP
@@ -83,6 +85,8 @@ class HQLStatementRepository(GenericRepository):
             """,
                 (statement_id,),
             )
+            conn.commit()
+            conn.close()
             return True
 
         return False

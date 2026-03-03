@@ -10,7 +10,7 @@ Event Category Repository (事件类别数据访问层)
 
 from typing import Optional, List, Dict, Any
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, execute_write, get_db_connection
+from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, get_db_connection
 
 
 class EventCategoryRepository(GenericRepository):
@@ -68,11 +68,15 @@ class EventCategoryRepository(GenericRepository):
             return default_category["id"]
 
         # 创建"未分类"类别
-        category_id = execute_write(
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
             "INSERT INTO event_categories (name) VALUES (?)",
-            ("未分类",),
-            return_last_id=True
+            ("未分类",)
         )
+        category_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
         return category_id
 
     def exists_by_id(self, category_id: int) -> bool:
