@@ -42,9 +42,45 @@
 | 409 | Conflict | 资源冲突（如重复创建） |
 | 500 | Internal Server Error | 服务器错误 |
 
+### Critical Rules ⚠️
+
+**1. Use Correct Endpoint Names**
+
+❌ **WRONG**:
+```javascript
+fetch('/api/parameters')  // 404 Not Found
+```
+
+✅ **CORRECT**:
+```javascript
+fetch('/api/parameters/all?game_gid=10000147')  // 200 OK
+```
+
+**2. Always Pass `game_gid` Parameter**
+
+❌ **WRONG**:
+```javascript
+fetch('/api/categories')  // 400 Bad Request: "game_gid required"
+```
+
+✅ **CORRECT**:
+```javascript
+fetch('/api/categories?game_gid=10000147')  // 200 OK
+```
+
+**3. Handle Pagination**
+
+```javascript
+// Page 1 (default)
+fetch('/api/parameters/all?game_gid=10000147&page=1&limit=50')
+
+// Page 2
+fetch('/api/parameters/all?game_gid=10000147&page=2&limit=50')
+```
+
 ---
 
-## 架构变更 (V8.0.0)
+## 架构概述 (V9.0.0)
 
 ### 双API架构
 
@@ -98,205 +134,311 @@
 └─────────────────────────────────────────────────────┘
 ```
 
-**各层职责**:
-- ✅ Entity层: Pydantic模型统一数据验证
-- ✅ Repository层: 基于GenericRepository的数据访问抽象
-- ✅ Service层: 业务逻辑封装和缓存管理
-- ✅ API层: REST + GraphQL双端点
-
-**关键优势**:
-- 🎯 **类型安全**: Repository返回Entity对象而非字典
-- 🚀 **性能优化**: 读写分离缓存策略（读用@cached，写用@cache_invalidate）
-- 🧪 **易于测试**: Repository可Mock，Service可单元测试
-- 📦 **代码复用**: GenericRepository提供通用CRUD操作
-
-### 缓存系统
-
-**缓存覆盖率100%**:
-- L1缓存: 热数据60秒TTL
-- L2缓存: 共享数据300秒TTL
-- 自动失效: 写操作自动清理相关缓存
-- 性能提升: 67% (267ms → 88ms)
-
-**缓存装饰器**:
-```python
-# 读操作：使用缓存
-@cached(ttl=1800)
-def get_events(game_gid):
-    return event_repo.find_by_game_gid(game_gid)
-
-# 写操作：清理缓存
-@cache_invalidate
-def create_event(data):
-    return event_repo.create(data)
-```
-
-### 零破坏性变更
-
-- ✅ 所有旧API端点保持兼容
-- ✅ 新增端点使用新架构
-- ✅ 渐进式迁移策略
-
 ---
 
-## API模块索引
+## API端点索引
 
-### REST API (84个端点)
+### Categories API (8 endpoints)
 
-#### 核心业务模块
+| 方法 | 端点 | 描述 | Phase |
+|------|------|------|-------|
+| GET | `/api/categories` | 列出分类 | Phase 1 |
+| GET | `/api/categories/<id>` | 获取单个分类 | Phase 1 |
+| POST | `/api/categories` | 创建分类 | Phase 1 |
+| PUT/PATCH | `/api/categories/<id>` | 更新分类 | Phase 1 |
+| DELETE | `/api/categories/<id>` | 删除分类 | Phase 1 |
+| POST | `/api/categories/batch-delete` | 批量删除分类 | Phase 3 |
+| PUT | `/api/categories/batch-update` | 批量更新分类 | Phase 5 |
+| GET | `/api/categories/stats` | 获取分类统计 | Phase 5 |
 
-| 模块 | 文档 | 端点数 | 状态 |
-|------|------|--------|------|
-| **Categories** | [Categories API](CATEGORIES-API.md) | 8 | ✅ Phase 5增强 |
-| **Events** | [Events API](EVENTS-API.md) | 9 | ✅ Phase 5完全迁移 |
-| **Parameters** | [Parameters API](PARAMETERS-API.md) | 16 | ✅ Phase 5大幅扩展 |
-| **Field Builder** | [Field Builder API](FIELD-BUILDER-API.md) | 6 | ✅ Phase 5新增 |
+**详细文档**: [CATEGORIES-API.md](CATEGORIES-API.md)
 
-#### 支持模块
-
-| 模块 | 文档 | 端点数 | 状态 |
-|------|------|--------|------|
-| **Games** | [Games API](GAMES-API.md) | 7 | ✅ Phase 1-2 |
-| **Join Configs** | [Join Configs API](JOIN-CONFIGS-API.md) | 5 | ✅ Phase 3 |
-| **Flows/Canvas** | [Flows API](FLOWS-API.md) | 11 | ✅ Phase 2-3 |
-| **Cache** | [Cache API](CACHE-API.md) | 23 | ✅ 完整实现 |
-
-### GraphQL API (78个操作)
-
-| 文档 | 操作数 | 调用次数 | 状态 |
-|------|--------|----------|------|
-| **GraphQL API** | [GraphQL API](GRAPHQL_API.md) | 78 | 113 | ✅ 完整实现 |
-
-**GraphQL优势**:
-- ✅ 按需查询，避免over-fetching
-- ✅ 单次请求获取多个资源
-- ✅ 强类型Schema自动验证
-- ✅ 实时订阅支持
-
----
-
-## API版本管理
-
-### 版本策略
-
-**V8.0.0** (当前版本):
-- ✅ **REST API**: 稳定版本，84个端点
-- ✅ **GraphQL API**: 新一代API，78个操作
-- ✅ **双API共存**: 平滑迁移路径
-
-### API选择指南
-
-**何时使用REST API**:
-- ✅ 简单的CRUD操作
-- ✅ 需要标准HTTP状态码
-- ✅ 缓存策略明确
-- ✅ 与现有系统集成
-
-**何时使用GraphQL API**:
-- ✅ 需要灵活的数据查询
-- ✅ 复杂的关联数据获取
-- ✅ 实时数据订阅
-- ✅ 减少网络请求次数
-
-### 迁移建议
-
-**渐进式迁移路径**:
-```
-REST API → GraphQL混合 → 完全GraphQL
-  ↓            ↓              ↓
- 当前状态    推荐方案      未来目标
-```
-
-**迁移示例**:
+**使用示例**:
 ```javascript
-// REST API
-const events = await fetch('/api/events?game_gid=10000147').then(r => r.json());
+// GET /api/categories?game_gid=<gid>
+const response = await fetch('/api/categories?game_gid=10000147');
+const data = await response.json();
 
-// GraphQL API (等效查询)
-const query = gql`
-  query GetEvents($gameGid: Int!) {
-    events(gameGid: $gameGid) {
+// Response:
+{
+  "success": true,
+  "data": [
+    {
+      "id": 57,
+      "name": "登录/认证",
+      "description": null,
+      "is_active": true,
+      "created_at": "Thu, 12 Feb 2026 08:41:09 GMT"
+    },
+    ...
+  ]
+}
+```
+
+---
+
+### Events API (8 endpoints)
+
+| 方法 | 端点 | 描述 | Phase |
+|------|------|------|-------|
+| GET | `/api/events` | 列出事件（分页） | Phase 3 |
+| GET | `/api/events/<id>` | 获取事件详情 | Phase 1 |
+| POST | `/api/events` | 创建事件 | Phase 1 |
+| PUT/PATCH | `/api/events/<id>` | 更新事件 | Phase 1 |
+| DELETE | `/api/events/batch` | 批量删除事件 | Phase 3 |
+| PUT | `/api/events/batch-update` | 批量更新事件 | Phase 5 |
+| GET | `/api/events/<id>/parameters` | 获取事件参数 | Phase 2 |
+| GET | `/api/events/<event_id>/params` | 获取参数（别名） | Phase 2 |
+
+**详细文档**: [EVENTS-API.md](EVENTS-API.md)
+
+---
+
+### Parameters API (16 endpoints)
+
+#### 基础CRUD
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/parameters/all` | 获取所有参数（去重） |
+| GET | `/api/parameters/<id>` | 获取单个参数 |
+| POST | `/api/parameters` | 创建参数 |
+| PUT | `/api/parameters/<id>` | 更新参数 |
+| DELETE | `/api/parameters/<id>` | 删除参数 |
+
+#### 查询和统计
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/parameters/<param_name>/details` | 获取参数详情 |
+| GET | `/api/parameters/stats` | 获取参数统计 |
+| POST | `/api/parameters/search` | 搜索参数 |
+| GET | `/api/parameters/common` | 获取通用参数 |
+| GET | `/api/parameters/validate` | 验证参数名称 |
+
+#### 参数库管理
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/param-library/check` | 检查参数库 |
+| POST | `/api/event-params/<param_id>/link-library` | 关联到参数库 |
+| POST | `/api/param-library/batch-check` | 批量检查参数库 |
+
+#### 其他功能
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/alter-table/<param_id>` | 生成ALTER TABLE SQL |
+
+**详细文档**: [PARAMETERS-API.md](PARAMETERS-API.md)
+
+---
+
+### Field Builder API (6 endpoints)
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/field-builder/configs` | 列出配置 |
+| GET | `/api/field-builder/configs/<id>` | 获取配置 |
+| POST | `/api/field-builder/configs` | 创建配置 |
+| PUT/PATCH | `/api/field-builder/configs/<id>` | 更新配置 |
+| DELETE | `/api/field-builder/configs/<id>` | 删除配置 |
+| POST | `/api/field-builder/preview` | 预览HQL |
+
+**详细文档**: [FIELD-BUILDER-API.md](FIELD-BUILDER-API.md)
+
+---
+
+### Games API (7 endpoints)
+
+| 方法 | 端点 | 描述 | Phase |
+|------|------|------|-------|
+| GET | `/api/games` | 列出游戏 | Phase 1 |
+| GET | `/api/games/<id>` | 获取单个游戏 | Phase 1 |
+| POST | `/api/games` | 创建游戏 | Phase 1 |
+| PUT/PATCH | `/api/games/<id>` | 更新游戏 | Phase 1 |
+| DELETE | `/api/games/<id>` | 删除游戏 | Phase 3 |
+| GET | `/api/games/<gid>/stats` | 获取游戏统计 | Phase 2 |
+| POST | `/api/games/<gid>/clone` | 克隆游戏配置 | Phase 4 |
+
+**详细文档**: [GAMES-API.md](GAMES-API.md)
+
+---
+
+### Flows API (6 endpoints)
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/flows` | 列出流程 |
+| GET | `/api/flows/<id>` | 获取单个流程 |
+| POST | `/api/flows` | 创建流程 |
+| PUT/PATCH | `/api/flows/<id>` | 更新流程 |
+| DELETE | `/api/flows/<id>` | 删除流程 |
+| POST | `/api/flows/<flow_id>/generate-hql` | 生成HQL |
+
+**详细文档**: [FLOWS-API.md](FLOWS-API.md)
+
+---
+
+### Canvas API (4 endpoints)
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/canvas` | 列出Canvas |
+| GET | `/api/canvas/<id>` | 获取Canvas |
+| POST | `/api/canvas` | 创建/保存Canvas |
+| POST | `/api/canvas/<canvas_id>/generate-hql` | 生成HQL |
+
+**详细文档**: [CANVAS-API.md](CANVAS-API.md)
+
+---
+
+### Event Nodes API (5 endpoints)
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/event-nodes` | 列出事件节点 |
+| GET | `/api/event-nodes/<id>` | 获取单个节点 |
+| POST | `/api/event-nodes` | 创建节点 |
+| PUT/PATCH | `/api/event-nodes/<id>` | 更新节点 |
+| DELETE | `/api/event-nodes/<id>` | 删除节点 |
+
+**详细文档**: [EVENT-NODES-API.md](EVENT-NODES-API.md)
+
+---
+
+### Join Configs API (8 endpoints)
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/join-configs` | 列出Join配置 |
+| GET | `/api/join-configs/<id>` | 获取单个配置 |
+| POST | `/api/join-configs` | 创建配置 |
+| PUT/PATCH | `/api/join-configs/<id>` | 更新配置 |
+| DELETE | `/api/join-configs/<id>` | 删除配置 |
+| POST | `/api/join-configs/<config_id>/clone` | 克隆配置 |
+| GET | `/api/join-configs/stats` | 获取配置统计 |
+| POST | `/api/join-configs/batch-delete` | 批量删除 |
+
+**详细文档**: [JOIN-CONFIGS-API.md](JOIN-CONFIGS-API.md)
+
+---
+
+### Dashboard API (3 endpoints)
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/dashboard/stats` | 获取Dashboard统计 |
+| GET | `/api/dashboard/recent-events` | 获取最近事件 |
+| GET | `/api/dashboard/system-health` | 系统健康检查 |
+
+**详细文档**: [DASHBOARD-API.md](DASHBOARD-API.md)
+
+---
+
+### Import/Export API (4 endpoints)
+
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| POST | `/api/import/events` | 导入事件 |
+| POST | `/api/import/validate` | 验证导入数据 |
+| GET | `/api/export/hql/<event_id>` | 导出HQL |
+| POST | `/api/export/batch` | 批量导出 |
+
+**详细文档**: [IMPORT-EXPORT-API.md](IMPORT-EXPORT-API.md)
+
+---
+
+### GraphQL API (78 operations)
+
+**端点**: `http://127.0.0.1:5001/graphql`
+
+**查询 (Queries)**: 27个
+**变更 (Mutations)**: 34个
+**订阅 (Subscriptions)**: 8个
+
+**快速开始**:
+```javascript
+import { useQuery, gql } from '@apollo/client';
+
+const GET_GAMES = gql`
+  query GetGames($limit: Int) {
+    games(limit: $limit) {
       id
-      eventName
-      eventNameCn
+      gid
+      name
+      isActive
     }
   }
 `;
-const { data } = await client.query({ query, variables: { gameGid: 10000147 } });
+
+function GamesList() {
+  const { loading, error, data } = useQuery(GET_GAMES, {
+    variables: { limit: 10 }
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return data.games.map(game => (
+    <div key={game.id}>{game.name}</div>
+  ));
+}
 ```
 
-### 版本兼容性
-
-| API版本 | 状态 | 废弃计划 |
-|---------|------|----------|
-| REST API V8.0.0 | ✅ 稳定 | 无计划 |
-| GraphQL API V1.0 | ✅ 稳定 | 无计划 |
-| REST API V7.x | ⚠️ 维护模式 | 2027-01-01 |
+**完整文档**: [GRAPHQL-API.md](GRAPHQL-API.md)
 
 ---
 
-## 快速参考
+## 错误处理
 
-### 游戏上下文
+### 统一错误响应格式
 
-**所有API需要游戏上下文** (`game_gid`):
-
-```bash
-# 推荐方式：使用业务GID
-GET /api/events?game_gid=10000147
-
-# 向后兼容：也支持game_id（将逐步废弃）
-GET /api/events?game_id=1
+```json
+{
+  "success": false,
+  "error": "具体错误消息",
+  "message": "用户友好的错误描述"
+}
 ```
 
-### 分页参数
+### 常见错误场景
 
-**支持分页的API**:
-
-```bash
-GET /api/events?page=1&per_page=20
+**400 Bad Request - 参数验证失败**:
+```json
+{
+  "success": false,
+  "error": "Validation error: game_name is required",
+  "message": "Game name is required. Must be 1-100 characters."
+}
 ```
 
-- `page`: 页码（从1开始，默认1）
-- `per_page`: 每页数量（默认20，最大100）
-
-### 批量操作
-
-**支持批量操作的API**:
-
-```bash
-# 批量删除
-DELETE /api/events/batch
-Body: {"ids": [1, 2, 3]}
-
-# 批量更新
-PUT /api/events/batch-update
-Body: {"ids": [1, 2, 3], "updates": {...}}
+**404 Not Found - 资源不存在**:
+```json
+{
+  "success": false,
+  "error": "Game 10000147 not found",
+  "message": "Game 10000147 not found. Check the gid or create the game first."
+}
 ```
 
----
-
-## 安全性
-
-### 输入验证
-
-- ✅ **Pydantic Entity验证**: 自动类型检查和长度限制
-- ✅ **XSS防护**: HTML实体转义
-- ✅ **SQL注入防护**: 参数化查询
-- ✅ **长度限制**: 防止DoS攻击
-
-### 游戏保护
-
-**STAR001保护规则**:
-```python
-# ✅ 正确：使用测试GID
-TEST_GID_START = 90000000
-
-# ❌ 错误：禁止删除生产数据
-game_gid = 10000147  # STAR001 - 禁止删除
+**409 Conflict - 资源冲突**:
+```json
+{
+  "success": false,
+  "error": "Game 10000147 already exists",
+  "message": "Game 10000147 already exists. Use PUT to update or DELETE to remove."
+}
 ```
 
-详见: [STAR001-GAME-PROTECTION.md](../development/STAR001-GAME-PROTECTION.md)
+**500 Internal Server Error - 服务器错误**:
+```json
+{
+  "success": false,
+  "error": "Internal server error",
+  "message": "Internal server error. Please try again later or contact support."
+}
+```
 
 ---
 
@@ -304,690 +446,54 @@ game_gid = 10000147  # STAR001 - 禁止删除
 
 ### 缓存策略
 
-**读操作**:
-```python
-@cached(ttl=1800)  # 30分钟缓存
-def get_events(game_gid):
-    ...
-```
-
-**写操作**:
-```python
-@cache_invalidate  # 自动清理缓存
-def create_event(game_gid, data):
-    ...
-```
-
-### 性能指标
-
-| 操作 | 优化前 | 优化后 | 提升 |
-|------|--------|--------|------|
-| 获取参数列表 | 267ms | 88ms | 67% |
-| 获取游戏列表 | 120ms | 45ms | 63% |
-| 创建事件 | 350ms | 150ms | 57% |
-
----
-
-## 错误处理
-
-### 标准错误响应
-
-```json
-{
-  "success": false,
-  "error": "错误描述",
-  "message": "用户友好的错误消息"
-}
-```
-
-### 常见错误
-
-| 错误 | 状态码 | 解决方案 |
-|------|--------|----------|
-| `game_gid required` | 400 | 提供game_gid参数 |
-| `Game not found` | 404 | 检查game_gid是否正确 |
-| `Validation error` | 400 | 检查请求参数格式 |
-| `Already exists` | 409 | 资源已存在，使用唯一标识 |
-
----
-
-## Repository 模式架构
-
-> **🆕 V8.0.0**: 100% ERS架构，所有模块使用Repository模式
-
-### 核心组件
-
-**1. GenericRepository 基类**
-
-提供通用CRUD操作和安全验证：
-
-```python
-from backend.core.data_access import GenericRepository
-
-class GameRepository(GenericRepository):
-    """游戏仓储类"""
-
-    def __init__(self):
-        super().__init__(
-            table_name="games",
-            primary_key="id",
-            enable_cache=True,
-            cache_timeout=120
-        )
-
-    # 继承的方法：
-    # - find_by_id(id)          # 按ID查询
-    # - find_by_field(f, v)     # 按字段查询
-    # - find_where(cond)        # 按条件查询
-    # - find_all()              # 查询所有
-    # - create(data)            # 创建记录
-    # - update(id, data)        # 更新记录
-    # - delete(id)              # 删除记录
-```
-
-**2. Entity 统一模型**
-
-Pydantic Entity作为单一真相来源：
-
-```python
-from backend.models.entities import GameEntity
-
-# Entity自动验证输入
-game = GameEntity(
-    gid="10000147",
-    name="Game Name",
-    ods_db="ieu_ods"
-)
-
-# API层使用Entity验证
-game_data = GameEntity(**request.json)
-
-# Repository返回Entity
-game = game_repo.find_by_gid(10000147)  # 返回GameEntity
-
-# API层响应使用Entity序列化
-return json_success_response(data=game.model_dump())
-```
-
-**3. Service 层缓存**
-
-使用装饰器简化缓存管理：
-
-```python
-from backend.core.cache.decorators import cached, cache_invalidate
-
-class GameService:
-    @cached(ttl=1800)  # 读操作：使用缓存
-    def get_games(self):
-        return self.game_repo.find_all()
-
-    @cache_invalidate  # 写操作：清理缓存
-    def create_game(self, data):
-        return self.game_repo.create(data)
-```
-
-### 数据流向
-
-**完整请求流程**：
-
-```
-1. HTTP Request (JSON)
-   ↓
-2. API Layer (request.get_json())
-   ↓
-3. Entity Validation (Pydantic)
-   ↓
-4. Service Layer (Business Logic + Cache)
-   ↓
-5. Repository Layer (SQL Query)
-   ↓
-6. Database (SQLite)
-   ↓
-7. Repository Layer (Entity)
-   ↓
-8. Service Layer (Entity)
-   ↓
-9. API Layer (Entity.model_dump())
-   ↓
-10. HTTP Response (JSON)
-```
-
-### 使用示例
-
-**创建新API端点（Entity架构）**：
-
-```python
-from flask import Blueprint, request
-from backend.models.entities import GameEntity
-from backend.services.games.game_service import GameService
-from backend.core.utils import json_success_response, json_error_response
-
-games_bp = Blueprint('games', __name__)
-
-@games_bp.route('/api/games', methods=['POST'])
-def create_game():
-    """创建游戏API - Entity架构"""
-    try:
-        # 1. 解析和验证请求参数（Entity自动验证）
-        data = request.get_json()
-        game_data = GameEntity(**data)  # ⭐ Entity自动验证类型、长度、格式
-
-        # 2. 调用Service层（处理业务逻辑和缓存）
-        service = GameService()
-        game = service.create_game(game_data)
-
-        # 3. 返回响应（Entity序列化为JSON）
-        return json_success_response(
-            data=game.model_dump(),  # ⭐ Entity.model_dump()序列化
-            message="Game created successfully"
-        )
-
-    except ValidationError as e:
-        # Pydantic自动捕获验证错误
-        return json_error_response(f"Validation error: {e}", status_code=400)
-    except ValueError as e:
-        # Service层业务逻辑错误
-        return json_error_response(str(e), status_code=409)
-    except Exception as e:
-        # 未知错误
-        logger.error(f"Error creating game: {e}")
-        return json_error_response("Failed to create game", status_code=500)
-```
-
-**Entity vs Dict对比**：
-
-```python
-# ❌ 旧架构（Dict-based） - 需要手动验证
-def create_game_old(request):
-    data = request.get_json()
-
-    # 手动验证
-    if not data.get('name'):
-        return {'error': 'Name is required'}, 400
-    if len(data.get('name', '')) > 100:
-        return {'error': 'Name too long'}, 400
-
-    # 直接使用字典（无类型检查）
-    game_id = execute_insert(
-        "INSERT INTO games (name, gid) VALUES (?, ?)",
-        (data['name'], data['gid'])
-    )
-
-    # 返回字典（无自动序列化）
-    return {'data': {'id': game_id, **data}}
-
-# ✅ 新架构（Entity-based） - 自动验证和类型安全
-def create_game_new(request):
-    data = request.get_json()
-
-    # Entity自动验证（类型、长度、格式）
-    game_data = GameEntity(**data)
-
-    # Service层处理业务逻辑
-    service = GameService()
-    game = service.create_game(game_data)
-
-    # Entity自动序列化
-    return json_success_response(
-        data=game.model_dump(),  # 转换为字典
-        message="Success"
-    )
-```
-
-**创建自定义Repository**：
-
-```python
-from backend.core.data_access import GenericRepository
-from backend.models.entities import GameEntity
-from typing import Optional, List
-
-class GameRepository(GenericRepository):
-    """游戏仓储类"""
-
-    def __init__(self):
-        super().__init__(
-            table_name="games",
-            enable_cache=True,
-            cache_timeout=120
-        )
-
-    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
-        """根据业务GID查询"""
-        query = "SELECT * FROM games WHERE gid = ?"
-        row = fetch_one_as_dict(query, (gid,))
-        return GameEntity(**row) if row else None
-
-    def get_all_with_stats(self) -> List[GameEntity]:
-        """获取游戏及其统计信息"""
-        query = """
-            SELECT g.*, COUNT(e.id) as event_count
-            FROM games g
-            LEFT JOIN log_events e ON g.gid = e.game_gid
-            GROUP BY g.id
-        """
-        rows = fetch_all_as_dict(query)
-        return [GameEntity(**row) for row in rows]
-```
-
-### 完整文档
-
-详细内容请参考：
-- **[Repository Pattern Guide](../development/repository-pattern-guide.md)** - Repository模式完整指南 ⭐
-- **[架构设计文档](../development/architecture.md)** - 分层架构详解
-- **[Entity架构迁移指南](../development/ENTITY-ARCHITECTURE-MIGRATION-GUIDE.md)** - Entity架构说明
-
----
-
-## Entity架构迁移指南 ⭐
-
-> **从Dict-based迁移到Entity-based架构的完整指南**
-
-### 迁移动机
-
-**为什么需要迁移？**
-
-| 方面 | 旧架构 (Dict) | 新架构 (Entity) | 收益 |
-|------|--------------|----------------|------|
-| **数据验证** | 手动验证每个字段 | Pydantic自动验证 | 减少80%验证代码 |
-| **类型安全** | 无类型检查 | 完整类型注解 | IDE自动补全，减少bug |
-| **序列化** | 手动dict操作 | Entity.model_dump() | 自动转换，避免遗漏字段 |
-| **文档** | 手动编写API文档 | Pydantic自动生成文档 | 始终保持同步 |
-| **维护性** | 3套模型 (Domain/Schema/Dict) | 1套Entity | 减少40%代码量 |
-
-### 迁移步骤
-
-#### Step 1: 定义Entity
-
-**旧代码** (无Entity定义):
-```python
-# backend/api/routes/games.py
-def create_game():
-    data = request.get_json()
-    # 直接使用字典，无验证
-    game_id = execute_insert(
-        "INSERT INTO games (name, gid) VALUES (?, ?)",
-        (data['name'], data['gid'])
-    )
-    return {'id': game_id, **data}
-```
-
-**新代码** (Entity定义):
-```python
-# backend/models/entities.py
-from pydantic import BaseModel, Field, field_validator
-import html
-
-class GameEntity(BaseModel):
-    """游戏实体 - 单一真相来源"""
-    id: Optional[int] = None
-    gid: str = Field(..., min_length=1, max_length=50, description="游戏业务GID")
-    name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
-    ods_db: str = Field(..., pattern=r'^(ieu_ods|overseas_ods)$')
-    description: Optional[str] = None
-    dwd_prefix: str = Field("dwd")
-
-    model_config = {"from_attributes": True}
-
-    @field_validator('name')
-    @classmethod
-    def sanitize_name(cls, v: str) -> str:
-        """防止XSS攻击"""
-        return html.escape(v.strip())
-```
-
-#### Step 2: 更新Repository返回Entity
-
-**旧代码** (返回Dict):
-```python
-class GameRepository:
-    def find_by_gid(self, gid: int) -> Optional[Dict]:
-        query = "SELECT * FROM games WHERE gid = ?"
-        return fetch_one_as_dict(query, (gid,))  # 返回字典
-```
-
-**新代码** (返回Entity):
-```python
-class GameRepository:
-    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
-        query = "SELECT * FROM games WHERE gid = ?"
-        row = fetch_one_as_dict(query, (gid,))
-        return GameEntity(**row) if row else None  # ⭐ 返回Entity
-```
-
-#### Step 3: 更新Service使用Entity
-
-**旧代码** (Dict处理):
-```python
-class GameService:
-    def create_game(self, data: Dict) -> Dict:
-        # 手动验证
-        if not data.get('name'):
-            raise ValueError("Name required")
-
-        # 手动调用Repository
-        game_id = self.game_repo.create(data)
-
-        # 手动查询返回
-        return self.game_repo.find_by_id(game_id)
-```
-
-**新代码** (Entity处理):
-```python
-class GameService:
-    def create_game(self, game_data: GameEntity) -> GameEntity:
-        # Entity已验证，直接使用
-        existing = self.game_repo.find_by_gid(game_data.gid)
-        if existing:
-            raise ValueError(f"Game {game_data.gid} already exists")
-
-        # 使用model_dump()转换为字典
-        game_id = self.game_repo.create(game_data.model_dump())
-
-        # 返回Entity对象
-        return self.game_repo.find_by_id(game_id)
-```
-
-#### Step 4: 更新API层
-
-**旧代码** (手动验证):
-```python
-@games_bp.route('/api/games', methods=['POST'])
-def create_game():
-    try:
-        data = request.get_json()
-
-        # 手动验证
-        if not data.get('name'):
-            return {'error': 'Name required'}, 400
-
-        # 调用Service
-        service = GameService()
-        game = service.create_game(data)
-
-        return jsonify({'success': True, 'data': game})
-    except Exception as e:
-        return {'error': str(e)}, 500
-```
-
-**新代码** (Entity自动验证):
-```python
-@games_bp.route('/api/games', methods=['POST'])
-def create_game():
-    try:
-        data = request.get_json()
-
-        # ⭐ Entity自动验证
-        game_data = GameEntity(**data)
-
-        # ⭐ Service处理
-        service = GameService()
-        game = service.create_game(game_data)
-
-        # ⭐ Entity序列化
-        return json_success_response(
-            data=game.model_dump(),
-            message="Game created successfully"
-        )
-    except ValidationError as e:
-        # ⭐ Pydantic自动捕获验证错误
-        return json_error_response(f"Validation error: {e}", status_code=400)
-    except ValueError as e:
-        # ⭐ Service层业务错误
-        return json_error_response(str(e), status_code=409)
-    except Exception as e:
-        # ⭐ 未知错误
-        logger.error(f"Error creating game: {e}")
-        return json_error_response("Failed to create game", status_code=500)
-```
-
-### 迁移检查清单
-
-**API层**:
-- [ ] 使用Entity解析请求参数：`GameEntity(**request.get_json())`
-- [ ] 捕获ValidationError异常
-- [ ] 使用Entity.model_dump()序列化响应
-- [ ] 返回统一的JSON格式
-
-**Service层**:
-- [ ] 方法参数使用Entity类型
-- [ ] 返回Entity对象
-- [ ] 使用Entity.model_dump()调用Repository
-- [ ] 添加缓存装饰器
-
-**Repository层**:
-- [ ] 所有查询方法返回Entity对象
-- [ ] 使用Entity(**row)构造对象
-- [ ] 更新类型注解
-
-**Entity定义**:
-- [ ] 所有字段有类型注解
-- [ ] 添加Field验证规则
-- [ ] 添加field_validator进行复杂验证
-- [ ] 设置model_config = {"from_attributes": True}
-
-### 常见迁移问题
-
-#### 问题1: Entity验证失败
-
-**症状**:
-```
-ValidationError: 1 validation error for GameEntity
-name
-  Field required [type=missing, ...]
-```
-
-**原因**: 请求参数缺少必填字段
-
-**解决方案**:
-```python
-# ✅ 前端发送完整参数
-fetch('/api/games', {
-  method: 'POST',
-  body: JSON.stringify({
-    gid: "10000147",
-    name: "Game Name",
-    ods_db: "ieu_ods"
-    # ⭐ 所有必填字段都要提供
-  })
-})
-```
-
-#### 问题2: Entity.model_dump()丢失字段
-
-**症状**: 响应数据不完整
-
-**原因**: Entity定义中字段为Optional且数据库为NULL
-
-**解决方案**:
-```python
-# ✅ 使用model_dump()时包含所有字段
-data = game.model_dump(exclude_none=False)  # 保留None值
-data = game.model_dump(mode='json')  # JSON序列化模式
-```
-
-#### 问题3: 字典无法转换为Entity
-
-**症状**:
-```
-TypeError: Object of type int is not JSON serializable
-```
-
-**原因**: datetime等特殊类型未序列化
-
-**解决方案**:
-```python
-# ✅ Entity配置JSON编码器
-class GameEntity(BaseModel):
-    created_at: Optional[datetime] = None
-
-    model_config = {
-        "from_attributes": True,
-        "json_encoders": {
-            datetime: lambda v: v.isoformat()
-        }
-    }
-```
-
-### 迁移前后对比
-
-**代码量对比**:
-```
-旧架构 (Dict):     216行
-新架构 (Entity):    130行
-减少:              86行 (40%)
-```
-
-**验证代码对比**:
-```
-旧架构: 手动验证 20+ 行
-新架构: Entity定义 5行
-减少: 15行 (75%)
-```
-
-**错误处理对比**:
-```
-旧架构: 分散在各处
-新架构: Pydantic统一处理
-```
-
-### 迁移验证
-
-**单元测试**:
-```python
-def test_create_game_with_entity():
-    # ⭐ 使用Entity测试
-    game_data = GameEntity(
-        gid="10000147",
-        name="Test Game",
-        ods_db="ieu_ods"
-    )
-
-    service = GameService()
-    game = service.create_game(game_data)
-
-    # ⭐ 断言Entity对象
-    assert isinstance(game, GameEntity)
-    assert game.gid == "10000147"
-    assert game.name == "Test Game"
-```
-
-**API测试**:
-```bash
-# 测试Entity验证
-curl -X POST http://127.0.0.1:5001/api/games \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Test"}'  # ❌ 缺少gid字段
-
-# 预期响应：
-# {
-#   "success": false,
-#   "error": "Validation error: 1 validation error for GameEntity\n  gid\n    Field required [type=missing]"
-# }
-```
-
-### 相关文档
-
-- **[Entity架构迁移指南](../development/ENTITY-ARCHITECTURE-MIGRATION-GUIDE.md)** - 完整迁移步骤
-- **[Repository Pattern Guide](../development/repository-pattern-guide.md)** - Repository使用指南
-- **[Pydantic文档](https://docs.pydantic.dev/)** - Pydantic官方文档
-
----
-
-## 开发指南
-
-### 前端调用示例
-
-```javascript
-// 获取游戏列表
-const games = await fetch('/api/games').then(r => r.json());
-
-// 获取事件（带分页）
-const events = await fetch('/api/events?game_gid=10000147&page=1&per_page=20')
-  .then(r => r.json());
-
-// 创建事件
-const result = await fetch('/api/events', {
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify({
-    game_gid: 10000147,
-    event_name: 'login',
-    event_name_cn: '登录'
-  })
-}).then(r => r.json());
-```
-
-### cURL示例
-
-```bash
-# 获取游戏列表
-curl http://127.0.0.1:5001/api/games
-
-# 获取事件
-curl http://127.0.0.1:5001/api/events?game_gid=10000147
-
-# 创建事件
-curl -X POST http://127.0.0.1:5001/api/events \
-  -H "Content-Type: application/json" \
-  -d '{
-    "game_gid": 10000147,
-    "event_name": "login",
-    "event_name_cn": "登录"
-  }'
-```
-
----
-
-## 版本历史
-
-| 版本 | 日期 | 变更 |
-|------|------|------|
-| 8.0.0 | 2026-03-02 | 双API架构：REST 84端点 + GraphQL 78操作 |
-| 8.0.0 | 2026-03-01 | V8.0.0架构：100% ERS覆盖、缓存100%覆盖 |
-| 7.8.0 | 2026-02-26 | Entity架构统一完成 |
-| 7.6.0 | 2026-02-25 | 缓存系统文档完善 |
-| 7.0.0 | 2026-02-10 | ERS架构引入 |
+**Redis缓存**:
+- 游戏列表: TTL 1800秒 (30分钟)
+- 事件列表: TTL 300秒 (5分钟)
+- 参数列表: TTL 600秒 (10分钟)
+- Dashboard统计: TTL 120秒 (2分钟)
+
+**缓存失效**:
+- 创建/更新/删除操作后自动失效相关缓存
+- 使用`CacheInvalidator`统一管理
+
+### DataLoader优化
+
+**批量加载**:
+- EventLoader: ↓82% 查询次数
+- ParameterLoader: ↓98% 查询次数
+- CategoryLoader: ↓98% 查询次数
+
+### 分页支持
+
+**标准分页参数**:
+- `page`: 页码（默认1）
+- `limit`: 每页数量（默认20，最大100）
+- `sort_by`: 排序字段
+- `sort_order`: 排序方向（asc/desc）
 
 ---
 
 ## 相关文档
 
-### 架构与开发
-- [架构设计](../development/architecture.md)
-- [开发指南](../development/contributing.md)
-- [API开发规范](../development/api-development.md)
-- [缓存系统](../cache/README.md)
-
-### API文档
-- [GraphQL API](GRAPHQL_API.md) - GraphQL接口文档
-- [REST到GraphQL迁移指南](REST_TO_GRAPHQL_MIGRATION.md) - 迁移最佳实践
-- [迁移进度报告](MIGRATION_PROGRESS_REPORT.md) - 迁移状态跟踪
-- [API状态](API_STATUS.md) - API健康状态
-
-### 测试与验证
-- [迁移测试报告](MIGRATION_TEST_REPORT.md) - 测试覆盖
-- [REST API移除计划](REST_API_REMOVAL_PLAN.md) - 废弃路线图
+- **[GraphQL API文档](GRAPHQL_API.md)** - GraphQL完整文档
+- **[REST到GraphQL迁移指南](REST_TO_GRAPHQL_MIGRATION.md)** - 迁移指南
+- **[API架构迁移状态](API-ARCHITECTURE-MIGRATION-STATUS.md)** - 迁移进度
+- **[经验文档 - API设计模式](../lessons-learned/api-design-patterns.md)** - API设计最佳实践
+- **[经验文档 - 缓存策略](../lessons-learned/performance-patterns.md#缓存策略)** - 缓存使用规范
+- **[经验文档 - 安全要点](../lessons-learned/security-essentials.md)** - API安全规范
 
 ---
 
-## 联系方式
+## 版本历史
 
-- **项目**: Event2Table
-- **文档维护**: Event2Table Development Team
-- **最后更新**: 2026-03-02
-
----
-
-## API统计总览
-
-| API类型 | 端点/操作数 | 调用次数 | 覆盖率 | 状态 |
-|---------|-------------|----------|--------|------|
-| **REST API** | 84个端点 | - | 100% | ✅ 稳定 |
-| **GraphQL API** | 78个操作 | 113次调用 | 100% | ✅ 稳定 |
-| **总计** | 162个 | - | 100% | ✅ 生产就绪 |
-
-**模块分布**:
-- 核心业务模块: 39个REST端点 + 45个GraphQL操作
-- 支持模块: 45个REST端点 + 33个GraphQL操作
-- 缓存系统: 23个REST端点（共享）
-- Canvas/Flows: 11个REST端点（专用）
+| 版本 | 日期 | 变更内容 |
+|------|------|----------|
+| 9.0.0 | 2026-03-03 | Repository Pattern迁移，75%完成 |
+| 8.0.0 | 2026-02-25 | GraphQL API完全集成 |
+| 7.0.0 | 2026-02-20 | 双API架构（REST + GraphQL）|
+| 6.0.0 | 2026-02-18 | game_gid迁移完成 |
+| 5.0.0 | 2026-02-15 | ERS架构实施 |
+| 4.0.0 | 2026-02-10 | API契约测试系统 |
+| 3.0.0 | 2026-02-05 | 缓存系统集成 |
+| 2.0.0 | 2026-01-30 | Service层重构 |
+| 1.0.0 | 2026-01-15 | 初始版本 |
