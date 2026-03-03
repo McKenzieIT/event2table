@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ApolloProvider } from "@apollo/client/react";
+import { ApolloProvider } from "@apollo/client";
 import { Toaster } from "react-hot-toast";
 import { ToastProvider } from "@shared/ui";
 import ErrorBoundary from "@shared/components/ErrorBoundary";

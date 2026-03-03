@@ -1,6 +1,6 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useState, useCallback, useMemo } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
 import { GET_GAMES } from '@/graphql/queries';
 import {

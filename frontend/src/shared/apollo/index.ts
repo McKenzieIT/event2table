@@ -6,7 +6,7 @@
  * Provides ApolloProvider, client instance, and React hooks
  */
 
-import { ApolloProvider } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 import { client } from './client';
 
 // Export ApolloProvider for wrapping the app
@@ -16,7 +16,7 @@ export { ApolloProvider };
 export { client };
 
 // Export Apollo Client hooks for convenience
-export { useQuery, useMutation, useLazyQuery, useSubscription } from '@apollo/client';
+export { useQuery, useMutation, useLazyQuery, useSubscription } from '@apollo/client/react';
 
 // Export custom hooks
 export * from './hooks';

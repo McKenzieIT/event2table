@@ -5,7 +5,6 @@
  */
 
 import { useQuery, useMutation } from '@apollo/client/react';
-import { TypedDocumentNode } from '@apollo/client/core';
 
 // Type definitions for GraphQL responses
 interface Game {

@@ -2,7 +2,7 @@
 // TypeScript strict mode errors are suppressed to allow compilation
 // The file will be regenerated once the GraphQL schema and queries are fixed
 import { DocumentNode } from 'graphql';
-import * as Apollo from '@apollo/client';
+import * as Apollo from '@apollo/client/react';
 export type Maybe<T> = T | null | undefined;
 export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };

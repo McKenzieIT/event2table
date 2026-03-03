@@ -30,7 +30,7 @@ describe('SearchInput Component', () => {
 
     it('should render with custom icon', () => {
       const TestIcon = () => <svg data-testid="search-icon" />;
-      render(<SearchInput icon={TestIcon} />);
+      render(<SearchInput icon={<TestIcon />} />);
       expect(screen.getByTestId('search-icon')).toBeInTheDocument();
     });
   });
