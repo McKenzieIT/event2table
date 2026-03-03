@@ -16,7 +16,6 @@ from backend.models.entities import ParameterEntity, CommonParameterEntity
 from backend.models.repositories.parameters import ParameterRepository
 from backend.core.cache.cache_system import CacheInvalidator, cached
 from backend.core.config.config import CacheConfig
-from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 
 logger = logging.getLogger(__name__)
 
@@ -83,82 +82,14 @@ class ParameterService:
                 raise ValueError(f"Game {game_gid} not found")
             game_id = game.id
 
-        # Build WHERE clause
-        where_clauses = ["ep.is_active = 1"]
-        params = []
-
-        if game_id:
-            where_clauses.append("le.game_id = ?")
-            params.append(game_id)
-
-        where_clause = " AND ".join(where_clauses)
-
-        # Build base query
-        query = f"""
-            SELECT
-                ep.id,
-                ep.param_name,
-                ep.param_name_cn,
-                ep.param_type,
-                ep.json_path,
-                ep.event_id,
-                ep.template_id,
-                pt.base_type,
-                COUNT(DISTINCT le.id) as usage_count
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE {where_clause}
-        """
-
-        # Add filters
-        if search:
-            query += " AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)"
-            params.extend([f"%{search}%", f"%{search}%"])
-
-        if type_filter:
-            query += " AND pt.base_type = ?"
-            params.append(type_filter)
-
-        # Add grouping, ordering, and pagination
-        query += " GROUP BY ep.param_name, pt.base_type"
-        query += " ORDER BY usage_count DESC, ep.param_name ASC"
-        query += " LIMIT ? OFFSET ?"
-
-        # Save base params (before pagination)
-        base_params = params.copy()
-        params.extend([page_size, (page - 1) * page_size])
-
-        # Fetch paginated data
-        parameters = fetch_all_as_dict(query, tuple(params))
-
-        # Get total count (without pagination)
-        count_query = f"""
-            SELECT COUNT(DISTINCT ep.param_name) as total
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE {where_clause} AND ep.is_active = 1
-        """
-        count_params = base_params.copy()
-
-        if search:
-            count_query += " AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)"
-            count_params.extend([f"%{search}%", f"%{search}%"])
-
-        if type_filter:
-            count_query += " AND pt.base_type = ?"
-            count_params.append(type_filter)
-
-        total_result = fetch_one_as_dict(count_query, tuple(count_params))
-        total = total_result["total"] if total_result else 0
-
-        return {
-            "parameters": parameters,
-            "total": total,
-            "page": page,
-            "has_more": page * page_size < total,
-        }
+        # Use Repository method
+        return self.param_repo.get_parameters_paginated(
+            game_id=game_id,
+            search=search,
+            type_filter=type_filter,
+            page=page,
+            page_size=page_size
+        )
 
     @cached("parameters.by_event", timeout=180)
     def get_parameters_by_event(
@@ -220,15 +151,8 @@ class ParameterService:
         from backend.core.utils.business_helpers import validate_game_gid
         validate_game_gid(game_gid)
 
-        query = """
-            SELECT ep.*, le.game_gid
-            FROM event_params ep
-            INNER JOIN log_events le ON ep.event_id = le.id
-            WHERE le.game_gid = ? AND ep.is_active = 1
-            ORDER BY ep.id
-        """
-        params_dicts = fetch_all_as_dict(query, (game_gid,))
-        return [self.param_repo._row_to_entity(p) for p in params_dicts]
+        # Use Repository method
+        return self.param_repo.get_parameters_by_game(game_gid)
 
     @cached("parameters.common", timeout=360)
     def get_common_parameters(
@@ -310,13 +234,9 @@ class ParameterService:
             raise ValueError(f"JSON path must start with '$.', got: {json_path}")
 
         # 获取game_gid
-        event = fetch_one_as_dict(
-            "SELECT game_gid FROM log_events WHERE id = ?", (event_id,)
-        )
-        if not event:
+        game_gid = self.param_repo.get_event_game_gid(event_id)
+        if not game_gid:
             raise ValueError(f"Event not found: {event_id}")
-
-        game_gid = event["game_gid"]
 
         # 确保data中有game_gid
         data["game_gid"] = game_gid
@@ -440,8 +360,8 @@ class ParameterService:
         for pid in param_ids:
             param = self.param_repo.find_by_id(pid)
             if param:
-                affected_events.add(param.get("event_id"))
-                affected_games.add(param.get("game_gid"))
+                affected_events.add(param.event_id)
+                affected_games.add(param.game_gid)
 
         # 批量删除 (use delete_batch from GenericRepository)
         deleted_count = self.param_repo.delete_batch(param_ids)
@@ -485,14 +405,8 @@ class ParameterService:
 
     def _get_total_event_count(self, game_gid: Optional[int]) -> int:
         """获取游戏的事件总数"""
-        if game_gid:
-            count = fetch_one_as_dict(
-                "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
-                (game_gid,),
-            )
-        else:
-            count = fetch_one_as_dict("SELECT COUNT(*) as count FROM log_events")
-        return count["count"] if count else 1
+        # Use Repository method
+        return self.param_repo.get_total_event_count(game_gid)
 
     # ========== 新增方法: 参数类型管理 ==========
 
@@ -651,27 +565,8 @@ class ParameterService:
         from backend.core.utils.business_helpers import validate_game_gid
         validate_game_gid(game_gid)
 
-        query = """
-            SELECT
-                ep.template_id,
-                COUNT(*) as count
-            FROM event_params ep
-            INNER JOIN log_events le ON ep.event_id = le.id
-            WHERE le.game_gid = ? AND ep.is_active = 1
-            GROUP BY ep.template_id
-        """
-        results = fetch_all_as_dict(query, (game_gid,))
-
-        # 转换为{"base": X, "param": Y, ...}格式
-        stats = {"base": 0, "param": 0, "common": 0, "calculate": 0}
-        type_map = {1: "base", 2: "param", 3: "common", 4: "calculate"}
-
-        for row in results:
-            template_id = row.get("template_id", 1)
-            param_type = type_map.get(template_id, "base")
-            stats[param_type] = row.get("count", 0)
-
-        return stats
+        # Use Repository method
+        return self.param_repo.count_by_game(game_gid)
 
     @cached("parameters.count_by_event", timeout=300)
     def count_by_event(self, event_id: int) -> Dict[str, int]:
@@ -690,26 +585,8 @@ class ParameterService:
         if not event_id or event_id <= 0:
             raise ValueError(f"Invalid event_id: {event_id}")
 
-        query = """
-            SELECT
-                ep.template_id,
-                COUNT(*) as count
-            FROM event_params ep
-            WHERE ep.event_id = ? AND ep.is_active = 1
-            GROUP BY ep.template_id
-        """
-        results = fetch_all_as_dict(query, (event_id,))
-
-        # 转换为{"base": X, "param": Y, ...}格式
-        stats = {"base": 0, "param": 0, "common": 0, "calculate": 0}
-        type_map = {1: "base", 2: "param", 3: "common", 4: "calculate"}
-
-        for row in results:
-            template_id = row.get("template_id", 1)
-            param_type = type_map.get(template_id, "base")
-            stats[param_type] = row.get("count", 0)
-
-        return stats
+        # Use Repository method
+        return self.param_repo.count_by_event(event_id)
 
     @cached("parameters.usage_stats", timeout=360)
     def usage_stats(
@@ -732,83 +609,8 @@ class ParameterService:
             - most_common_params: 最常用参数列表
             - type_distribution: 类型分布
         """
-        # 构建查询条件
-        where_conditions = ["ep.is_active = 1"]
-        params = []
-
-        if game_gid:
-            where_conditions.append("le.game_gid = ?")
-            params.append(game_gid)
-
-        if param_name:
-            where_conditions.append("ep.param_name = ?")
-            params.append(param_name)
-
-        where_clause = " AND ".join(where_conditions)
-
-        # 总参数数
-        total_params_query = f"""
-            SELECT COUNT(*) as count
-            FROM event_params ep
-            INNER JOIN log_events le ON ep.event_id = le.id
-            WHERE {where_clause}
-        """
-        total_params_result = fetch_one_as_dict(total_params_query, tuple(params))
-        total_params = total_params_result.get("count", 0) if total_params_result else 0
-
-        # 总事件数
-        if game_gid:
-            total_events_query = "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?"
-            total_events_result = fetch_one_as_dict(total_events_query, (game_gid,))
-        else:
-            total_events_query = "SELECT COUNT(*) as count FROM log_events"
-            total_events_result = fetch_one_as_dict(total_events_query)
-
-        total_events = total_events_result.get("count", 0) if total_events_result else 0
-
-        # 平均参数数
-        avg_params = total_params / total_events if total_events > 0 else 0
-
-        # 类型分布
-        type_dist_query = f"""
-            SELECT
-                ep.template_id,
-                COUNT(*) as count
-            FROM event_params ep
-            INNER JOIN log_events le ON ep.event_id = le.id
-            WHERE {where_clause}
-            GROUP BY ep.template_id
-        """
-        type_dist_results = fetch_all_as_dict(type_dist_query, tuple(params))
-
-        type_map = {1: "base", 2: "param", 3: "common", 4: "calculate"}
-        type_distribution = {}
-        for row in type_dist_results:
-            template_id = row.get("template_id", 1)
-            param_type = type_map.get(template_id, "base")
-            type_distribution[param_type] = row.get("count", 0)
-
-        # 最常用参数 (Top 10)
-        most_common_query = f"""
-            SELECT
-                ep.param_name,
-                COUNT(DISTINCT ep.event_id) as usage_count
-            FROM event_params ep
-            INNER JOIN log_events le ON ep.event_id = le.id
-            WHERE {where_clause}
-            GROUP BY ep.param_name
-            ORDER BY usage_count DESC
-            LIMIT 10
-        """
-        most_common_params = fetch_all_as_dict(most_common_query, tuple(params))
-
-        return {
-            "total_params": total_params,
-            "total_events": total_events,
-            "avg_params_per_event": round(avg_params, 2),
-            "type_distribution": type_distribution,
-            "most_common_params": most_common_params,
-        }
+        # Use Repository method
+        return self.param_repo.get_usage_stats(game_gid, param_name)
 
     def get_cache_stats(self) -> Dict[str, Any]:
         """
@@ -842,8 +644,8 @@ class ParameterService:
         if not game_gid or game_gid <= 0:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
-        # Validate game exists
-        game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
+        # Validate game exists using Repository
+        game = self.param_repo.get_game_by_gid(game_gid)
         if not game:
             raise ValueError(f"Game not found: {game_gid}")
 
@@ -881,19 +683,15 @@ class ParameterService:
         if not game_gid or game_gid <= 0:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
-        # Validate game exists and get game_id
-        game = fetch_one_as_dict(
-            "SELECT id, gid FROM games WHERE gid = ?", (game_gid,)
-        )
+        # Validate game exists and get game_id using Repository
+        game = self.param_repo.get_game_with_id(game_gid)
         if not game:
             raise ValueError(f"Game not found: {game_gid}")
 
         game_id = game["id"]
 
-        # Get all events for this game
-        events = fetch_all_as_dict(
-            "SELECT id, event_name FROM log_events WHERE game_gid = ?", (game_gid,)
-        )
+        # Get all events for this game using Repository
+        events = self.param_repo.get_events_by_game(game_gid)
 
         if not events:
             return {
@@ -986,8 +784,8 @@ class ParameterService:
         if not param_id or param_id <= 0:
             raise ValueError(f"Invalid param_id: {param_id}")
 
-        # Get param info to determine game_gid for cache invalidation
-        param = fetch_one_as_dict("SELECT id, game_gid FROM common_params WHERE id = ?", (param_id,))
+        # Get param info to determine game_gid for cache invalidation using Repository
+        param = self.param_repo.get_common_param_with_game(param_id)
         if not param:
             raise ValueError(f"Common parameter not found: {param_id}")
 
@@ -1067,57 +865,8 @@ class ParameterService:
         if not game_gid or game_gid <= 0:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
-        # Get parameter basic info
-        param_info = fetch_one_as_dict(
-            """
-            SELECT
-                ep.param_name,
-                MIN(ep.param_name_cn) as param_name_cn,
-                pt.base_type,
-                COUNT(DISTINCT ep.event_id) as event_count
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE ep.param_name = ? AND le.game_gid = ? AND ep.is_active = 1
-            GROUP BY ep.param_name, pt.base_type
-        """,
-            (param_name, game_gid),
-        )
-
-        if not param_info:
-            return None
-
-        # Get events using this parameter
-        events = fetch_all_as_dict(
-            """
-            SELECT
-                e.id,
-                e.event_name,
-                e.event_name_cn,
-                ep.is_active
-            FROM event_params ep
-            INNER JOIN log_events e ON ep.event_id = e.id
-            WHERE ep.param_name = ? AND e.game_gid = ?
-            ORDER BY e.event_name
-        """,
-            (param_name, game_gid),
-        )
-
-        # Check if it's a common parameter
-        # Note: common_params table uses game_gid
-        is_common_result = fetch_one_as_dict(
-            """
-            SELECT id FROM common_params
-            WHERE param_name = ? AND game_gid = ?
-        """,
-            (param_name, game_gid),
-        )
-        is_common = bool(is_common_result)
-
-        param_info["events"] = events
-        param_info["is_common"] = is_common
-
-        return param_info
+        # Use Repository method
+        return self.param_repo.get_parameter_details(param_name, game_gid)
 
     @cached("parameters.stats", timeout=300)
     def get_parameter_stats(self, game_gid: int) -> Dict[str, Any]:
@@ -1140,51 +889,8 @@ class ParameterService:
         if not game_gid or game_gid <= 0:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
-        # Get basic stats
-        stats = fetch_one_as_dict(
-            """
-            SELECT
-                COUNT(DISTINCT ep.param_name) as total_unique_params,
-                SUM(CASE WHEN ep.is_active = 1 THEN 1 ELSE 0 END) as total_event_params
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            WHERE le.game_gid = ?
-        """,
-            (game_gid,),
-        )
-
-        # Get data type distribution
-        type_stats = fetch_all_as_dict(
-            """
-            SELECT pt.base_type, COUNT(DISTINCT ep.param_name) as count
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE le.game_gid = ? AND ep.is_active = 1
-            GROUP BY pt.base_type
-            ORDER BY count DESC
-        """,
-            (game_gid,),
-        )
-
-        # Get common params count
-        # Note: common_params table uses game_gid
-        common_result = fetch_one_as_dict(
-            """
-            SELECT COUNT(*) as count
-            FROM common_params
-            WHERE game_gid = ?
-        """,
-            (game_gid,),
-        )
-        common_params_count = common_result["count"] if common_result else 0
-
-        return {
-            "total_unique_params": stats["total_unique_params"] if stats else 0,
-            "total_event_params": stats["total_event_params"] if stats else 0,
-            "common_params_count": common_params_count,
-            "data_type_distribution": type_stats,
-        }
+        # Use Repository method
+        return self.param_repo.get_parameter_stats(game_gid)
 
     @cached("parameters.search_full", timeout=120)
     def search_parameters(
@@ -1213,27 +919,8 @@ class ParameterService:
         if not game_gid or game_gid <= 0:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
-        keyword_pattern = f"%{keyword}%"
-
-        query = """
-            SELECT DISTINCT ep.param_name, MIN(ep.param_name_cn) as param_name_cn, pt.base_type
-            FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE le.game_gid = ?
-              AND (ep.param_name LIKE ? OR ep.param_name_cn LIKE ?)
-              AND ep.is_active = 1
-            GROUP BY ep.param_name, pt.base_type
-        """
-        params = [game_gid, keyword_pattern, keyword_pattern]
-
-        if data_type:
-            query += " AND pt.base_type = ?"
-            params.append(data_type)
-
-        query += " ORDER BY ep.param_name LIMIT 100"
-
-        return fetch_all_as_dict(query, params)
+        # Use Repository method
+        return self.param_repo.search_parameters_advanced(keyword, game_gid, data_type)
 
     def validate_parameter_name(
         self, param_name: str, game_gid: int
@@ -1259,17 +946,10 @@ class ParameterService:
         if not game_gid or game_gid <= 0:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
-        # Check if parameter exists
-        existing = fetch_one_as_dict(
-            """
-            SELECT ep.param_name FROM event_params ep
-            JOIN log_events le ON ep.event_id = le.id
-            WHERE le.game_gid = ? AND ep.param_name = ?
-        """,
-            (game_gid, param_name),
-        )
-
-        return {"valid": True, "exists": bool(existing)}
+        # Use Repository method (note: parameter order is different)
+        result = self.param_repo.validate_parameter_name(game_gid, param_name)
+        # Ensure consistent return format
+        return {"valid": result.get("valid", True), "exists": result.get("exists", False)}
 
     # ========== Param Library Management ==========
 
@@ -1294,15 +974,8 @@ class ParameterService:
         if not template_id or template_id <= 0:
             raise ValueError(f"Invalid template_id: {template_id}")
 
-        library_param = fetch_one_as_dict(
-            """SELECT pl.*, pt.template_name
-               FROM param_library pl
-               JOIN param_templates pt ON pl.template_id = pt.id
-               WHERE pl.param_name = ? AND pl.template_id = ?""",
-            (param_name, template_id),
-        )
-
-        return library_param
+        # Use Repository method
+        return self.param_repo.check_param_library(param_name, template_id)
 
     def batch_check_param_library(
         self, parameters: List[Dict[str, Any]]
@@ -1324,63 +997,8 @@ class ParameterService:
         if not parameters or len(parameters) > 100:
             raise ValueError("Invalid parameters count (max 100)")
 
-        matched = []
-        unmatched = []
-
-        if not parameters:
-            return {"matched": matched, "unmatched": unmatched}
-
-        # Build query conditions
-        conditions = []
-        values = []
-        for param in parameters:
-            param_name = param.get("param_name")
-            template_id = param.get("template_id")
-
-            if not param_name or template_id is None:
-                continue
-
-            conditions.append("(pl.param_name = ? AND pl.template_id = ?)")
-            values.extend([param_name, template_id])
-
-        if conditions:
-            where_clause = " OR ".join(conditions)
-            library_params = fetch_all_as_dict(
-                f"""SELECT pl.*, pt.template_name
-                   FROM param_library pl
-                   JOIN param_templates pt ON pl.template_id = pt.id
-                   WHERE {where_clause}""",
-                tuple(values),
-            )
-
-            library_map = {
-                (p["param_name"], p["template_id"]): p for p in library_params
-            }
-
-            for param in parameters:
-                param_name = param.get("param_name")
-                template_id = param.get("template_id")
-
-                if not param_name or template_id is None:
-                    continue
-
-                key = (param_name, template_id)
-                if key in library_map:
-                    library_param = library_map[key]
-                    matched.append(
-                        {
-                            "param_name": param_name,
-                            "template_id": template_id,
-                            "library_id": library_param["id"],
-                            "library_param": library_param,
-                        }
-                    )
-                else:
-                    unmatched.append(
-                        {"param_name": param_name, "template_id": template_id}
-                    )
-
-        return {"matched": matched, "unmatched": unmatched}
+        # Use Repository method
+        return self.param_repo.batch_check_param_library(parameters)
 
     def link_event_param_to_library(
         self, param_id: int, library_id: int
@@ -1404,33 +1022,21 @@ class ParameterService:
         if not library_id or library_id <= 0:
             raise ValueError(f"Invalid library_id: {library_id}")
 
-        # Verify event parameter exists
-        event_param = fetch_one_as_dict(
-            "SELECT id, event_id FROM event_params WHERE id = ?", (param_id,)
-        )
+        # Verify event parameter exists using Repository
+        event_param = self.param_repo.get_event_param(param_id)
         if not event_param:
             raise ValueError(f"Event parameter not found: {param_id}")
 
-        # Verify library parameter exists
-        library_param = fetch_one_as_dict(
-            "SELECT id, param_name, template_id FROM param_library WHERE id = ?", (library_id,)
-        )
+        # Verify library parameter exists using Repository
+        library_param = self.param_repo.get_library_param(library_id)
         if not library_param:
             raise ValueError(f"Library parameter not found: {library_id}")
 
-        # Link event parameter to library
-        from backend.core.utils import execute_write
+        # Link event parameter to library using Repository
+        self.param_repo.update_event_param_library_link(param_id, library_id)
 
-        execute_write(
-            "UPDATE event_params SET library_id = ?, is_from_library = 1 WHERE id = ?",
-            (library_id, param_id),
-        )
-
-        # Update usage count
-        execute_write(
-            "UPDATE param_library SET usage_count = usage_count + 1 WHERE id = ?",
-            (library_id,),
-        )
+        # Update usage count using Repository
+        self.param_repo.update_library_usage_count(library_id)
 
         logger.info(f"Linked event param {param_id} to library param {library_id}")
 
@@ -1454,38 +1060,5 @@ class ParameterService:
         if not param_id or param_id <= 0:
             raise ValueError(f"Invalid param_id: {param_id}")
 
-        # Get parameter details with game information
-        param = fetch_one_as_dict(
-            """
-            SELECT
-                p.id,
-                p.param_name,
-                p.param_name_cn,
-                p.param_type,
-                p.table_name,
-                g.name as game_name,
-                g.gid
-            FROM common_params p
-            JOIN games g ON p.game_gid = g.gid
-            WHERE p.id = ?
-        """,
-            (param_id,),
-        )
-
-        if not param:
-            return None
-
-        # Generate ALTER TABLE HQL
-        from backend.services.hql.manager import HQLManager
-
-        manager = HQLManager()
-        alter_sql = manager.generate_alter_table_hql(
-            target_table=param["table_name"],
-            param_name=param["param_name"],
-            param_type=param["param_type"],
-            param_name_cn=param["param_name_cn"],
-        )
-
-        logger.info(f"Generated ALTER TABLE SQL for param_id={param_id}")
-
-        return {"param": param, "alter_sql": alter_sql}
+        # Use Repository method
+        return self.param_repo.get_alter_table_sql(param_id)

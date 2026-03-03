@@ -442,6 +442,7 @@ class CanvasService:
 
         # 更新字段
         update_data = EventNodeEntity(
+            game_gid=existing_node.game_gid,
             name=name or existing_node.name,
             event_id=event_id,
             config_json=config_json or existing_node.config_json,

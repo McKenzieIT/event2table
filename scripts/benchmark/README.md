@@ -12,7 +12,8 @@ The benchmark suite is designed to:
 
 ## Files
 
-- `performance_baseline.py` - Main baseline testing script
+- `performance_baseline.py` - Main baseline testing script (Python requests)
+- `api_performance_test.py` - Apache Bench (ab) based load testing
 - `README.md` - This file
 
 ## Usage
@@ -36,13 +37,25 @@ The benchmark suite is designed to:
 
 ### Running the Baseline Test
 
+**Option 1: Python requests (basic)**
 ```bash
 python scripts/benchmark/performance_baseline.py
 ```
 
+**Option 2: Apache Bench (load testing)**
+```bash
+# Install Apache Bench first
+# macOS: brew install httpd
+# Ubuntu: sudo apt-get install apache2-utils
+
+python scripts/benchmark/api_performance_test.py
+```
+
 ### Output
 
-Results are saved to: `output/performance_baseline_v8.json`
+**performance_baseline.py**: Results saved to `output/performance_baseline_v8.json`
+
+**api_performance_test.py**: Results saved to `output/benchmark/benchmark_results_YYYYMMDD_HHMMSS.json`
 
 Example output format:
 ```json
@@ -142,6 +155,19 @@ python web_app.py
 Initialize the database:
 ```bash
 python scripts/setup/init_db.py
+```
+
+### "ab: command not found" (Apache Bench not found)
+Install Apache Bench:
+```bash
+# macOS
+brew install httpd
+
+# Ubuntu/Debian
+sudo apt-get install apache2-utils
+
+# CentOS/RHEL
+sudo yum install httpd-tools
 ```
 
 ### "Redis not installed"

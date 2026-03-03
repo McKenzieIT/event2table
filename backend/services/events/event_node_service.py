@@ -120,7 +120,10 @@ class EventNodeService(BaseService):
         self.invalidate_game_cache(node.game_gid)
         self.invalidate_pattern(f"event_nodes.game:{node.game_gid}:*")
 
-        return self.node_repo.find_by_id(node_id)
+        created_node = self.node_repo.find_by_id(node_id)
+        if created_node is None:
+            raise ValueError(f"Failed to retrieve created node with id {node_id}")
+        return created_node
 
     def update_node(self, node_id: int, node: EventNodeEntity) -> EventNodeEntity:
         """
@@ -167,7 +170,10 @@ class EventNodeService(BaseService):
         if node.game_gid != existing.game_gid:
             self.invalidate_game_cache(node.game_gid)
 
-        return self.node_repo.find_by_id(node_id)
+        updated_node = self.node_repo.find_by_id(node_id)
+        if updated_node is None:
+            raise ValueError(f"Failed to retrieve updated node with id {node_id}")
+        return updated_node
 
     def delete_node(self, node_id: int) -> bool:
         """
@@ -267,7 +273,7 @@ class EventNodeService(BaseService):
 
         return result
 
-    def update_node(self, node_id: int, updates: Dict[str, Any]) -> EventNodeEntity:
+    def update_node_partial(self, node_id: int, updates: Dict[str, Any]) -> EventNodeEntity:
         """
         更新事件节点（部分字段更新）
 
@@ -305,14 +311,18 @@ class EventNodeService(BaseService):
                 )
 
         # 更新节点
-        self.node_repo.update(node_id, updates)
+        # Cast to suppress type error since repository has overloaded update method
+        self.node_repo.update(node_id, updates)  # type: ignore[arg-type]
 
         # 清理缓存
         self.invalidate_game_cache(existing.game_gid)
         if "game_gid" in updates and updates["game_gid"] != existing.game_gid:
             self.invalidate_game_cache(updates["game_gid"])
 
-        return self.node_repo.find_by_id(node_id)
+        updated_node = self.node_repo.find_by_id(node_id)
+        if updated_node is None:
+            raise ValueError(f"Failed to retrieve updated node with id {node_id}")
+        return updated_node
 
     def soft_delete_node(self, node_id: int) -> bool:
         """
@@ -366,8 +376,11 @@ class EventNodeService(BaseService):
             game_gid=original.game_gid,
             name=new_name,
             event_id=original.event_id,
-            config_json=original.config_json,
-            is_active=True
+            config_json=original.config_json if original.config_json else {},
+            is_active=True,
+            id=None,  # Will be auto-generated
+            created_at=None,  # Will be auto-generated
+            updated_at=None  # Will be auto-generated
         )
 
         # 创建节点
@@ -377,7 +390,10 @@ class EventNodeService(BaseService):
         self.invalidate_game_cache(original.game_gid)
         self.invalidate_pattern(f"event_nodes.game:{original.game_gid}:*")
 
-        return self.node_repo.find_by_id(new_node_id)
+        copied_node = self.node_repo.find_by_id(new_node_id)
+        if copied_node is None:
+            raise ValueError(f"Failed to retrieve copied node with id {new_node_id}")
+        return copied_node
 
     def search_nodes(
         self,

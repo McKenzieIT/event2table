@@ -1,12 +1,10 @@
-import { lazy } from "react";
 import type { RouteObject } from "react-router-dom";
 import MainLayout from "@analytics/components/layouts/MainLayout";
 
-// Lazy load page components for code splitting
 // ============================================================================
-// REACT QUERY PAGES (Direct Import - CRITICAL)
-// Reason: React Query hooks are incompatible with React.lazy() + Suspense
-// Impact: Prevents React Error #321, #310, and removeChild errors
+// ALL PAGES - Direct Import (FIX: Playwright test timeout issue)
+// Reason: Removing all lazy loading to eliminate double Suspense nesting issues
+// Impact: Slightly larger initial bundle, but pages load reliably
 // ============================================================================
 import Dashboard from "@analytics/pages/DashboardGraphQL";
 import CanvasPage from "@features/canvas/pages/CanvasPage";
@@ -27,39 +25,24 @@ import ParameterCompare from "@analytics/pages/ParameterCompare";
 import ParametersEnhanced from "@analytics/pages/ParametersEnhancedGraphQL";
 import EventDetail from "@analytics/pages/EventDetailGraphQL";
 
-// ============================================================================
-// NON-REACT QUERY PAGES (Safe for Lazy Loading)
-// Reason: Do not use React Query hooks, safe to lazy load
-// Benefit: Reduced initial bundle size
-// ============================================================================
-const NotFound = lazy(() => import("@analytics/pages/NotFound"));
-const HqlEdit = lazy(() => import("@analytics/pages/HqlEdit"));
-const FlowBuilder = lazy(() => import("@features/canvas/pages/FlowBuilder"));
-const ImportEvents = lazy(() => import("@analytics/pages/ImportEvents"));
-
-// 🔧 FIX: 移除不必要的 lazy loading（修复加载超时问题）
-// ApiDocs 和 ValidationRules 都是极简组件（<50行），lazy loading 的收益极小
-// 但会导致双重 Suspense 嵌套问题，使页面卡在 "Loading Event2Table..." 状态
+// Previously lazy-loaded components - now direct imports
+import NotFound from "@analytics/pages/NotFound";
+import HqlEdit from "@analytics/pages/HqlEdit";
+import FlowBuilder from "@features/canvas/pages/FlowBuilder";
+import ImportEvents from "@analytics/pages/ImportEvents";
 import ApiDocs from "@analytics/pages/ApiDocs";
 import ValidationRules from "@analytics/pages/ValidationRules";
-
-const BatchOperations = lazy(() => import("@analytics/pages/BatchOperations"));
-const LogDetail = lazy(() => import("@analytics/pages/LogDetail"));
-
-// 🔧 FIX: 移除不必要的 lazy loading（修复加载超时问题）
-// Parameter 系列页面都是小型组件，lazy loading 会导致双重 Suspense 嵌套问题
+import BatchOperations from "@analytics/pages/BatchOperations";
+import LogDetail from "@analytics/pages/LogDetail";
 import ParameterDashboard from "@analytics/pages/ParameterDashboard";
 import ParameterUsage from "@analytics/pages/ParameterUsage";
 import ParameterHistory from "@analytics/pages/ParameterHistory";
 import ParameterNetwork from "@analytics/pages/ParameterNetwork";
-
-const FieldBuilder = lazy(() => import("@event-builder/pages/FieldBuilder"));
-const Generate = lazy(() => import("@analytics/pages/Generate"));
-const GenerateResult = lazy(() => import("@analytics/pages/GenerateResult"));
-// Direct import for AlterSql (uses fetch/hooks)
+import FieldBuilder from "@event-builder/pages/FieldBuilder";
+import Generate from "@analytics/pages/Generate";
+import GenerateResult from "@analytics/pages/GenerateResult";
 import AlterSql from "@analytics/pages/AlterSql";
-// Lazy load AlterSqlBuilder (manual tool, no fetch)
-const AlterSqlBuilder = lazy(() => import("@analytics/pages/AlterSqlBuilder"));
+import AlterSqlBuilder from "@analytics/pages/AlterSqlBuilder";
 
 // Route configuration
 // Note: More specific routes must come before general routes

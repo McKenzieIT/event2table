@@ -951,9 +951,9 @@ python scripts/git-hooks/install_hooks.py
 | **🗄️ 数据库迁移** | [数据库模式 - game_gid](docs/lessons-learned/database-patterns.md#game_gid迁移) | P0 |
 | **🔧 API错误处理** | [API设计模式 - 错误处理](docs/lessons-learned/api-design-patterns.md#错误处理) | P0 |
 | **🐛 Bug调试方法** | [调试技能](docs/lessons-learned/debugging-skills.md) | P1 |
-| **🚀 并行开发任务** | [项目管理 - 并行开发策略](docs/docs/lessons-learned/project-management.md#并行开发策略) | P0 |
-| **🏗️ 大规模重构** | [项目管理 - 分阶段重构](docs/docs/lessons-learned/project-management.md#分阶段重构策略) | P0 |
-| **🚢 部署与运维** | [部署与运维](docs/docs/lessons-learned/deployment-operations.md) | P1 |
+| **🚀 并行开发任务** | [项目管理 - 并行开发策略](docs/lessons-learned/project-management.md#并行开发策略) | P0 |
+| **🏗️ 大规模重构** | [项目管理 - 分阶段重构](docs/lessons-learned/project-management.md#分阶段重构策略) | P0 |
+| **🚢 部署与运维** | [部署与运维](docs/lessons-learned/deployment-operations.md) | P1 |
 
 ### 完整经验文档索引
 
@@ -966,8 +966,8 @@ python scripts/git-hooks/install_hooks.py
 - **[API设计模式](docs/lessons-learned/api-design-patterns.md)** - 分层架构、错误处理
 - **[调试技能](docs/lessons-learned/debugging-skills.md)** - Chrome DevTools MCP、Subagent分析
 - **[重构检查清单](docs/lessons-learned/refactoring-checklist.md)** - TDD、代码审查、技术债务
-- **[项目管理](docs/docs/lessons-learned/project-management.md)** - 并行开发、分阶段重构、零破坏性变更 🆕
-- **[部署与运维](docs/docs/lessons-learned/deployment-operations.md)** - 部署流程、运维监控、故障排查 🆕
+- **[项目管理](docs/lessons-learned/project-management.md)** - 并行开发、分阶段重构、零破坏性变更 🆕
+- **[部署与运维](docs/lessons-learned/deployment-operations.md)** - 部署流程、运维监控、故障排查 🆕
 
 ### 经验文档使用说明
 
@@ -1423,9 +1423,9 @@ def get_game_by_gid(game_gid):  # 新API
 
 ### 相关经验文档
 
-- **[经验文档 - 项目管理](docs/docs/lessons-learned/project-management.md)** - 详细的项目管理经验
-- **[经验文档 - 重构检查清单](docs/docs/lessons-learned/refactoring-checklist.md)** - 重构最佳实践
-- **[经验文档 - 调试技能](docs/docs/lessons-learned/debugging-skills.md)** - 并行开发调试技巧
+- **[经验文档 - 项目管理](docs/lessons-learned/project-management.md)** - 详细的项目管理经验
+- **[经验文档 - 重构检查清单](docs/lessons-learned/refactoring-checklist.md)** - 重构最佳实践
+- **[经验文档 - 调试技能](docs/lessons-learned/debugging-skills.md)** - 并行开发调试技巧
 
 ---
 

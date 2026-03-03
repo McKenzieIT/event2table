@@ -618,7 +618,7 @@ type HqlResult {
 
 ## 📚 参考资料
 
-- [GraphQL Complete Documentation](../GRAPHQL_COMPLETE_DOCUMENTATION.md)
+- [GraphQL Complete Documentation](./GRAPHQL_COMPLETE_DOCUMENTATION.md)
 - [CLAUDE.md](../../CLAUDE.md)
 - [V2 API Routes](../../backend/api/routes/games_v2.py)
 - [Events V2 API Routes](../../backend/api/routes/events_v2.py)

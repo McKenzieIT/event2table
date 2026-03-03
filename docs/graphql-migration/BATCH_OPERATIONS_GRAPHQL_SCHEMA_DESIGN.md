@@ -354,7 +354,7 @@ class BatchOperationResultType(graphene.ObjectType):
 
 ## 📚 参考资料
 
-- [GraphQL Complete Documentation](../GRAPHQL_COMPLETE_DOCUMENTATION.md)
+- [GraphQL Complete Documentation](./GRAPHQL_COMPLETE_DOCUMENTATION.md)
 - [V2 API Migration Execution Summary](./V2_API_MIGRATION_EXECUTION_SUMMARY.md)
 - [Games API Routes](../../backend/api/routes/games.py)
 - [Events API Routes](../../backend/api/routes/events.py)

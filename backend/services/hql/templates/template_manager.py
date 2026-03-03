@@ -1,85 +1,72 @@
 """
 HQL模板管理器
 
-管理预定义的HQL模板，支持快速加载和配置
+管理HQL生成模板，支持从数据库加载和缓存
 """
 
-import yaml
-import os
+import json
 from typing import List, Dict, Any, Optional
 from pathlib import Path
+
+from backend.models.repositories.hql_template_repository import HQLTemplateRepository
+from backend.core.cache.decorators import cached, cache_invalidate
 
 
 class TemplateManager:
     """
     HQL模板管理器
 
-    从YAML文件加载模板，提供模板查询和应用功能
+    从数据库加载模板，提供模板查询和应用功能，支持缓存
     """
 
-    def __init__(self, template_file: Optional[str] = None):
-        """
-        初始化模板管理器
+    def __init__(self):
+        """初始化模板管理器"""
+        self.repo = HQLTemplateRepository()
 
-        Args:
-            template_file: 模板文件路径（可选）
-        """
-        if template_file is None:
-            # 默认模板文件路径
-            current_dir = Path(__file__).parent
-            template_file = current_dir / "hql_templates.yaml"
-
-        self.template_file = template_file
-        self.templates = []
-        self.categories = {}
-        self.tags = {}
-
-        self._load_templates()
-
-    def _load_templates(self):
-        """从YAML文件加载模板"""
-        if not os.path.exists(self.template_file):
-            return
-
-        with open(self.template_file, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-
-        self.templates = data.get("templates", [])
-        self.categories = {cat["id"]: cat for cat in data.get("categories", [])}
-        self.tags = {tag["id"]: tag for tag in data.get("tags", [])}
-
+    @cached(ttl=3600)  # 缓存1小时
     def list_templates(
-        self, category: Optional[str] = None, tag: Optional[str] = None, popular_only: bool = False
+        self,
+        template_type: Optional[str] = None,
+        is_system: Optional[bool] = None,
+        search_keyword: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """
         列出模板
 
         Args:
-            category: 按类别过滤
-            tag: 按标签过滤
-            popular_only: 只返回热门模板
+            template_type: 按类型过滤 (union, join, where等)
+            is_system: True=仅系统模板, False=仅用户模板, None=全部
+            search_keyword: 搜索关键词
 
         Returns:
             List[Dict]: 模板列表
         """
-        templates = self.templates
+        # 如果有搜索关键词，使用搜索
+        if search_keyword:
+            templates = self.repo.search_by_name(search_keyword)
+        # 按类型过滤
+        elif template_type:
+            templates = self.repo.find_by_type(template_type)
+        # 系统模板
+        elif is_system is True:
+            templates = self.repo.find_system_templates()
+        # 用户模板
+        elif is_system is False:
+            templates = self.repo.find_user_templates()
+        # 全部模板
+        else:
+            templates = self.repo.get_all()
 
-        # 过滤条件
-        if popular_only:
-            templates = [t for t in templates if t.get("popular", False)]
-
-        if category:
-            templates = [t for t in templates if t.get("category") == category]
-
-        if tag:
-            # TODO: 实现标签过滤
-            pass
+        # 二次过滤（如果需要组合条件）
+        if template_type and is_system is not None:
+            templates = [t for t in templates if t.get("is_system") == (1 if is_system else 0)]
 
         return templates
 
-    def get_template(self, template_id: str) -> Optional[Dict[str, Any]]:
+    @cached(ttl=3600)
+    def get_template(self, template_id: int) -> Optional[Dict[str, Any]]:
         """
-        获取指定模板
+        根据ID获取模板
 
         Args:
             template_id: 模板ID
@@ -87,13 +74,132 @@ class TemplateManager:
         Returns:
             Dict: 模板配置，如果不存在返回None
         """
-        for template in self.templates:
-            if template["id"] == template_id:
-                return template
-        return None
+        return self.repo.find_by_id(template_id)
+
+    @cached(ttl=3600)
+    def get_template_by_name(self, template_name: str) -> Optional[Dict[str, Any]]:
+        """
+        根据名称获取模板
+
+        Args:
+            template_name: 模板名称
+
+        Returns:
+            Dict: 模板配置，如果不存在返回None
+        """
+        return self.repo.find_by_name(template_name)
+
+    @cached(ttl=3600)
+    def get_template_types(self) -> List[str]:
+        """
+        获取所有模板类型
+
+        Returns:
+            List[str]: 模板类型列表
+        """
+        return self.repo.get_types()
+
+    @cached(ttl=3600)
+    def get_popular_templates(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        获取常用模板（返回系统模板）
+
+        Args:
+            limit: 返回数量限制
+
+        Returns:
+            List[Dict]: 常用模板列表
+        """
+        templates = self.repo.find_system_templates()
+        return templates[:limit]
+
+    @cache_invalidate
+    def create_template(
+        self,
+        template_name: str,
+        display_name: str,
+        template_type: str,
+        template_content: str,
+        variables: Optional[Dict[str, Any]] = None,
+        description: Optional[str] = None,
+        is_system: bool = False,
+    ) -> int:
+        """
+        创建新模板
+
+        Args:
+            template_name: 模板名称（唯一）
+            display_name: 显示名称
+            template_type: 模板类型
+            template_content: 模板内容
+            variables: 变量定义（字典格式）
+            description: 描述
+            is_system: 是否为系统模板
+
+        Returns:
+            新创建的模板ID
+        """
+        # 将变量字典转为JSON字符串
+        variables_json = json.dumps(variables) if variables else None
+
+        return self.repo.create_template(
+            template_name=template_name,
+            display_name=display_name,
+            template_type=template_type,
+            template_content=template_content,
+            variables=variables_json,
+            description=description,
+            is_system=is_system,
+        )
+
+    @cache_invalidate
+    def update_template(
+        self,
+        template_id: int,
+        display_name: Optional[str] = None,
+        template_content: Optional[str] = None,
+        variables: Optional[Dict[str, Any]] = None,
+        description: Optional[str] = None,
+    ) -> bool:
+        """
+        更新模板
+
+        Args:
+            template_id: 模板ID
+            display_name: 显示名称
+            template_content: 模板内容
+            variables: 变量定义
+            description: 描述
+
+        Returns:
+            是否更新成功
+        """
+        # 将变量字典转为JSON字符串
+        variables_json = json.dumps(variables) if variables else None
+
+        return self.repo.update_template(
+            template_id=template_id,
+            display_name=display_name,
+            template_content=template_content,
+            variables=variables_json,
+            description=description,
+        )
+
+    @cache_invalidate
+    def delete_template(self, template_id: int) -> bool:
+        """
+        删除模板
+
+        Args:
+            template_id: 模板ID
+
+        Returns:
+            是否删除成功
+        """
+        return self.repo.delete_template(template_id)
 
     def apply_template(
-        self, template_id: str, overrides: Optional[Dict[str, Any]] = None
+        self, template_id: int, overrides: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         应用模板
@@ -110,19 +216,22 @@ class TemplateManager:
         if not template:
             raise ValueError(f"Template not found: {template_id}")
 
-        # 获取默认配置
-        config = template.get("default_config", {})
+        # 构建配置
+        config = {
+            "template_id": template_id,
+            "template_name": template["template_name"],
+            "display_name": template["display_name"],
+            "template_type": template["template_type"],
+            "template_content": template["template_content"],
+            "variables": json.loads(template["variables"]) if template.get("variables") else {},
+            "description": template.get("description", ""),
+        }
 
         # 应用覆盖
         if overrides:
             config = self._deep_merge(config, overrides)
 
-        return {
-            "template_id": template_id,
-            "template_name": template["name"],
-            "template_category": template.get("category"),
-            "config": config,
-        }
+        return config
 
     def search_templates(self, query: str) -> List[Dict[str, Any]]:
         """
@@ -134,36 +243,7 @@ class TemplateManager:
         Returns:
             List[Dict]: 匹配的模板列表
         """
-        query_lower = query.lower()
-
-        matches = []
-        for template in self.templates:
-            # 在名称、描述、ID中搜索
-            if (
-                query_lower in template["id"].lower()
-                or query_lower in template["name"].lower()
-                or query_lower in template["description"].lower()
-            ):
-                matches.append(template)
-
-        return matches
-
-    def get_categories(self) -> List[Dict[str, Any]]:
-        """获取所有模板分类"""
-        return list(self.categories.values())
-
-    def get_popular_templates(self, limit: int = 5) -> List[Dict[str, Any]]:
-        """
-        获取热门模板
-
-        Args:
-            limit: 返回数量限制
-
-        Returns:
-            List[Dict]: 热门模板列表
-        """
-        popular = [t for t in self.templates if t.get("popular", False)]
-        return popular[:limit]
+        return self.list_templates(search_keyword=query)
 
     def _deep_merge(self, base: Dict, override: Dict) -> Dict:
         """深度合并字典"""
@@ -180,23 +260,30 @@ class TemplateManager:
 
 # 便捷函数
 def list_templates(
-    category: Optional[str] = None, popular_only: bool = False
+    template_type: Optional[str] = None,
+    is_system: Optional[bool] = None,
+    search_keyword: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     列出模板（便捷函数）
 
     Args:
-        category: 按类别过滤
-        popular_only: 只返回热门模板
+        template_type: 按类型过滤
+        is_system: True=仅系统模板, False=仅用户模板
+        search_keyword: 搜索关键词
 
     Returns:
         List[Dict]: 模板列表
     """
     manager = TemplateManager()
-    return manager.list_templates(category=category, popular_only=popular_only)
+    return manager.list_templates(
+        template_type=template_type,
+        is_system=is_system,
+        search_keyword=search_keyword,
+    )
 
 
-def get_template(template_id: str) -> Optional[Dict[str, Any]]:
+def get_template(template_id: int) -> Optional[Dict[str, Any]]:
     """
     获取模板（便捷函数）
 
@@ -210,5 +297,24 @@ def get_template(template_id: str) -> Optional[Dict[str, Any]]:
     return manager.get_template(template_id)
 
 
+def get_template_by_name(template_name: str) -> Optional[Dict[str, Any]]:
+    """
+    根据名称获取模板（便捷函数）
+
+    Args:
+        template_name: 模板名称
+
+    Returns:
+        Dict: 模板配置
+    """
+    manager = TemplateManager()
+    return manager.get_template_by_name(template_name)
+
+
 # 导出
-__all__ = ["TemplateManager", "list_templates", "get_template"]
+__all__ = [
+    "TemplateManager",
+    "list_templates",
+    "get_template",
+    "get_template_by_name",
+]

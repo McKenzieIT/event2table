@@ -31,7 +31,7 @@ const __dirname = path.dirname(__filename);
  * For manual setup: python3 scripts/test/setup_e2e_test_data.py
  */
 export default defineConfig({
-  testDir: './test',
+  testDir: './test/e2e',
 
   // Global setup - runs before all tests
   // Seeds test data (games, events, parameters)

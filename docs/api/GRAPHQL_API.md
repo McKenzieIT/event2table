@@ -371,13 +371,13 @@ query GetEventsPaginated($gameGid: Int!, $page: Int!, $perPage: Int!) {
 
 ### 迁移文档
 - [REST到GraphQL迁移](./REST_TO_GRAPHQL_MIGRATION.md)
-- [GraphQL迁移计划](../GRAPHQL_MIGRATION_PLAN.md)
-- [GraphQL迁移进度](../GRAPHQL_MIGRATION_PROGRESS.md)
-- [GraphQL迁移最终报告](../GRAPHQL_MIGRATION_FINAL_REPORT.md)
+- [GraphQL迁移计划](../graphql-migration/GRAPHQL_MIGRATION_PLAN.md)
+- [GraphQL迁移进度](../graphql-migration/GRAPHQL_MIGRATION_PROGRESS.md)
+- [GraphQL迁移最终报告](../graphql-migration/GRAPHQL_MIGRATION_FINAL_REPORT.md)
 
 ### 实现文档
-- [GraphQL API文档](../GRAPHQL_API_DOCUMENTATION.md)
-- [GraphQL完整文档](../GRAPHQL_COMPLETE_DOCUMENTATION.md)
+- [GraphQL API文档](../graphql-migration/GRAPHQL_API_DOCUMENTATION.md)
+- [GraphQL完整文档](../graphql-migration/GRAPHQL_COMPLETE_DOCUMENTATION.md)
 
 ### 修改记录
 - [GraphQL Mutations重构总结](../reports/2026-02-26/graphql-mutations-refactoring-summary.md)

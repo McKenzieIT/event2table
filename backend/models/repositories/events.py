@@ -707,3 +707,238 @@ class EventRepository(GenericRepository):
         params = event_names + [game_gid]
         rows = fetch_all_as_dict(query, tuple(params))
         return [EventEntity(**row) for row in rows]
+
+    # ========== 新增方法：修复Service层架构违规 ==========
+
+    def get_paginated(
+        self,
+        game_gid: Optional[int] = None,
+        page: int = 1,
+        per_page: int = 20,
+        search: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        获取分页事件列表（支持搜索和游戏过滤）
+
+        Args:
+            game_gid: 可选的游戏GID过滤
+            page: 页码（从1开始）
+            per_page: 每页数量
+            search: 搜索关键词
+
+        Returns:
+            包含事件列表和分页信息的字典
+        """
+        # 构建基础查询
+        query = """
+            SELECT
+                le.*,
+                g.gid, g.name as game_name, g.ods_db,
+                ec.name as category_name,
+                (SELECT COUNT(*) FROM event_params ep
+                 WHERE ep.event_id = le.id AND ep.is_active = 1) as param_count
+            FROM log_events le
+            LEFT JOIN games g ON le.game_gid = g.gid
+            LEFT JOIN event_categories ec ON le.category_id = ec.id
+        """
+
+        # 构建WHERE子句
+        where_clauses = []
+        params = []
+
+        if game_gid:
+            where_clauses.append("le.game_gid = ?")
+            params.append(game_gid)
+
+        if search:
+            where_clauses.append(
+                "(le.event_name LIKE ? OR le.event_name_cn LIKE ? OR ec.name LIKE ?)"
+            )
+            search_pattern = f"%{search}%"
+            params.extend([search_pattern, search_pattern, search_pattern])
+
+        # 添加WHERE子句
+        if where_clauses:
+            query += " WHERE " + " AND ".join(where_clauses)
+
+        # 获取总数
+        count_query = "SELECT COUNT(*) as total FROM log_events le LEFT JOIN event_categories ec ON le.category_id = ec.id"
+        if where_clauses:
+            count_query += " WHERE " + " AND ".join(where_clauses)
+        total_result = fetch_one_as_dict(count_query, tuple(params))
+        total_events = total_result["total"] if total_result else 0
+
+        # 添加分页
+        offset = (page - 1) * per_page
+        query += " ORDER BY le.id DESC LIMIT ? OFFSET ?"
+        events = fetch_all_as_dict(query, tuple(params + [per_page, offset]))
+
+        total_pages = max(1, (total_events + per_page - 1) // per_page)
+
+        return {
+            "events": events,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": total_events,
+                "total_pages": total_pages,
+            }
+        }
+
+    def find_detail_with_game(self, event_id: int, game_gid: int) -> Optional[Dict[str, Any]]:
+        """
+        获取事件详情（包含游戏信息）
+
+        Args:
+            event_id: 事件ID
+            game_gid: 游戏GID
+
+        Returns:
+            事件详情字典，不存在返回None
+        """
+        query = """
+            SELECT
+                le.*,
+                g.gid,
+                g.name as game_name,
+                g.ods_db,
+                ec.name as category_name
+            FROM log_events le
+            LEFT JOIN games g ON le.game_gid = g.gid
+            LEFT JOIN event_categories ec ON le.category_id = ec.id
+            WHERE le.id = ? AND le.game_gid = ?
+        """
+        return fetch_one_as_dict(query, (event_id, game_gid))
+
+    def get_event_parameters(self, event_id: int) -> List[Dict[str, Any]]:
+        """
+        获取事件参数列表
+
+        Args:
+            event_id: 事件ID
+
+        Returns:
+            参数列表
+        """
+        parameters = fetch_all_as_dict(
+            """
+            SELECT
+                ep.id,
+                ep.param_name,
+                ep.param_name_cn,
+                pt.template_name as param_type,
+                ep.param_description as description,
+                ep.is_active,
+                ep.created_at,
+                ep.updated_at
+            FROM event_params ep
+            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            WHERE ep.event_id = ? AND ep.is_active = 1
+            ORDER BY ep.id
+        """,
+            (event_id,),
+        )
+        return parameters
+
+    def create_with_parameters(
+        self,
+        event_data: Dict[str, Any],
+        game_id: int,
+        parameters: List[Dict[str, Any]]
+    ) -> Optional[EventEntity]:
+        """
+        创建事件及其参数
+
+        Args:
+            event_data: 事件数据
+            game_id: 游戏数据库ID
+            parameters: 参数列表
+
+        Returns:
+            创建的EventEntity
+        """
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            # 生成表名
+            from backend.models.entities import EventEntity
+            temp_entity = EventEntity(**event_data)
+            source_table = f"{event_data.get('ods_db', 'ieu_ods')}.ods_{temp_entity.game_gid}_all_view"
+            target_table = f"dwd.v_dwd_{temp_entity.game_gid}_{temp_entity.name}_di"
+
+            # 插入事件
+            cursor.execute(
+                """INSERT INTO log_events (game_id, game_gid, event_name, event_name_cn, category_id, source_table, target_table, include_in_common_params)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    game_id,  # game_id (数据库自增ID)
+                    temp_entity.game_gid,
+                    temp_entity.name,
+                    temp_entity.name_cn or "",
+                    event_data.get("category_id"),
+                    source_table,
+                    target_table,
+                    event_data.get("include_in_common_params", 1),
+                ),
+            )
+            event_id = cursor.lastrowid
+
+            # 插入参数
+            for param in parameters:
+                cursor.execute(
+                    """INSERT INTO event_params
+                           (event_id, param_name, param_name_cn, template_id, param_description, is_active, version)
+                           VALUES (?, ?, ?, ?, ?, 1, 1)""",
+                    (
+                        event_id,
+                        param.get("param_name"),
+                        param.get("param_name_cn", ""),
+                        param.get("template_id", 1),
+                        param.get("param_description", ""),
+                    ),
+                )
+
+            conn.commit()
+            return self.find_by_id(event_id)
+
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+    def count_by_filters(
+        self,
+        game_gid: Optional[int] = None,
+        search: Optional[str] = None
+    ) -> int:
+        """
+        获取事件数量（带过滤条件）
+
+        Args:
+            game_gid: 可选的游戏GID过滤
+            search: 可选的搜索关键词
+
+        Returns:
+            事件数量
+        """
+        # 构建查询条件
+        conditions = []
+        params = []
+
+        if game_gid is not None:
+            conditions.append("game_gid = ?")
+            params.append(game_gid)
+
+        if search:
+            conditions.append("event_name LIKE ?")
+            params.append(f"%{search}%")
+
+        where_clause = " AND ".join(conditions) if conditions else "1=1"
+
+        # 执行计数查询
+        query = f"SELECT COUNT(*) as total FROM log_events WHERE {where_clause}"
+        result = fetch_one_as_dict(query, tuple(params))
+
+        return result["total"] if result else 0

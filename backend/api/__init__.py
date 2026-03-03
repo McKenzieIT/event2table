@@ -39,6 +39,7 @@ from .routes import (
     field_builder,
     flows,
     games,
+    health,  # Health check endpoint
     hql_generation,
     join_configs,
     parameters,  # 添加 parameters 模块

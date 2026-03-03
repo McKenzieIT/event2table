@@ -288,7 +288,7 @@ class EventService:
         """
         return self.event_repo.get_event_statistics(event_id)
 
-    def get_bloom_filter_stats(self) -> dict:
+    def get_bloom_filter_stats(self) -> Dict[str, Any]:
         """
         获取Bloom Filter统计信息
 
@@ -297,7 +297,7 @@ class EventService:
         """
         return self.bloom_filter.get_stats()
 
-    def rebuild_bloom_filter(self) -> dict:
+    def rebuild_bloom_filter(self) -> Dict[str, Any]:
         """
         重建Bloom Filter (从数据库)
 
@@ -396,7 +396,7 @@ class EventService:
             ValueError: 游戏不存在或事件已存在
         """
         # 验证游戏存在
-        game = self.game_repo.find_by_gid(event_data.game_gid)
+        game: Optional[Any] = self.game_repo.find_by_gid(event_data.game_gid)
         if not game:
             raise ValueError(f"Game not found: gid={event_data.game_gid}")
 
@@ -411,15 +411,21 @@ class EventService:
         event_dict = event_data.model_dump()
         event_dict['ods_db'] = game.ods_db  # 添加ods_db字段用于生成表名
 
-        result = self.event_repo.create_with_parameters(
+        # Ensure game.id is available
+        game_id: int = game.id if hasattr(game, 'id') and game.id is not None else 0
+
+        result: Optional[EventEntity] = self.event_repo.create_with_parameters(
             event_data=event_dict,
-            game_id=game.id,
+            game_id=game_id,
             parameters=parameters
         )
 
+        if result is None:
+            raise ValueError("Failed to create event with parameters")
+
         # 失效缓存
         self.invalidator.invalidate_pattern("events.list")
-        self.invalidator.invalidate_key("dashboard_statistics")
+        self.invalidator.invalidate_pattern("dashboard_statistics")
 
         # 添加到Bloom Filter
         cache_key = f"events:{result.id}"

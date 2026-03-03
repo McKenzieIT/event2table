@@ -10,7 +10,7 @@ Game Service - 业务逻辑层 (精简架构)
 - 集成Bloom Filter防止缓存穿透 (2026-02-25)
 """
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import logging
 import threading
 import os
@@ -125,9 +125,12 @@ class GameService:
             raise ValueError(f"Game GID {game_data.gid} already exists")
 
         # 创建游戏 (Entity已通过Pydantic验证)
-        result = self.game_repo.create(game_data.model_dump())
+        result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
         if result is None:
             raise ValueError("Failed to create game")
+
+        # Convert dict to GameEntity
+        created_game = GameEntity(**result)
 
         # 失效游戏列表缓存
         self.invalidator.invalidate_pattern("games.list")
@@ -138,9 +141,9 @@ class GameService:
 
         logger.info(f"游戏创建成功,已失效缓存并更新Bloom Filter: gid={game_data.gid}")
 
-        return result
+        return created_game
 
-    def update_game(self, game_gid: int, updates: dict) -> GameEntity:
+    def update_game(self, game_gid: int, updates: Dict[str, Any]) -> GameEntity:
         """
         更新游戏 (自动失效缓存)
 
@@ -169,7 +172,11 @@ class GameService:
         self.invalidator.invalidate_pattern(f"games.detail:{game_gid}")
         logger.info(f"游戏更新成功,已失效缓存: gid={game_gid}")
 
-        return self.get_game_by_gid(game_gid)
+        updated_game = self.get_game_by_gid(game_gid)
+        if updated_game is None:
+            raise ValueError(f"Failed to retrieve updated game: gid={game_gid}")
+
+        return updated_game
 
     def delete_game(self, game_gid: int) -> None:
         """
@@ -252,7 +259,7 @@ class GameService:
         """获取游戏的事件数量"""
         from backend.core.utils.converters import fetch_one_as_dict
 
-        count = fetch_one_as_dict(
+        count: Optional[Dict[str, Any]] = fetch_one_as_dict(
             "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
             (game_gid,),
         )
@@ -262,13 +269,13 @@ class GameService:
         """获取游戏的流程数量"""
         from backend.core.utils.converters import fetch_one_as_dict
 
-        count = fetch_one_as_dict(
+        count: Optional[Dict[str, Any]] = fetch_one_as_dict(
             "SELECT COUNT(*) as count FROM canvas_flows WHERE game_gid = ?",
             (game_gid,),
         )
         return count["count"] if count else 0
 
-    def get_bloom_filter_stats(self) -> dict:
+    def get_bloom_filter_stats(self) -> Dict[str, Any]:
         """
         获取Bloom Filter统计信息
 
@@ -277,7 +284,7 @@ class GameService:
         """
         return self.bloom_filter.get_stats()
 
-    def rebuild_bloom_filter(self) -> dict:
+    def rebuild_bloom_filter(self) -> Dict[str, Any]:
         """
         重建Bloom Filter (从Redis缓存或数据库)
 
@@ -303,7 +310,7 @@ class GameService:
         return stats
 
     @cached("games.detailed_stats", timeout=300)
-    def get_games_with_detailed_stats(self) -> List[dict]:
+    def get_games_with_detailed_stats(self) -> List[Dict[str, Any]]:
         """
         获取所有游戏及其详细统计信息（带缓存）
 
@@ -339,7 +346,7 @@ class GameService:
         return games
 
     @cached("games.deletion_impact", timeout=60)
-    def check_deletion_impact(self, game_gid: int) -> dict:
+    def check_deletion_impact(self, game_gid: int) -> Dict[str, Any]:
         """
         检查删除游戏的影响范围 (带缓存 - 短TTL用于实时数据)
 

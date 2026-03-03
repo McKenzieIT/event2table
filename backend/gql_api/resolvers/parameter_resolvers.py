@@ -286,7 +286,7 @@ def resolve_event_fields(
                 'is_common': field.get('is_common', False),
                 'data_type': _infer_data_type(field),
                 'json_path': field.get('json_path'),
-                'usage_count: _calculate_field_usage(field.get("name"), event_id)
+                'usage_count': _calculate_field_usage(field.get("name"), event_id)
             }
             graphql_fields.append(graphql_field)
 
