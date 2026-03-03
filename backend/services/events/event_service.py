@@ -17,6 +17,7 @@ import os
 from backend.models.entities import EventEntity
 from backend.models.repositories.events import EventRepository
 from backend.models.repositories.games import GameRepository
+from backend.models.repositories.event_categories import EventCategoryRepository
 from backend.core.cache.cache_system import cached
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 
@@ -29,6 +30,7 @@ class EventService:
     def __init__(self):
         self.event_repo = EventRepository()
         self.game_repo = GameRepository()
+        self.category_repo = EventCategoryRepository()
         from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
@@ -338,63 +340,13 @@ class EventService:
         Returns:
             包含事件列表和分页信息的字典
         """
-        from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
-
-        # 构建基础查询
-        query = """
-            SELECT
-                le.*,
-                g.gid, g.name as game_name, g.ods_db,
-                ec.name as category_name,
-                (SELECT COUNT(*) FROM event_params ep
-                 WHERE ep.event_id = le.id AND ep.is_active = 1) as param_count
-            FROM log_events le
-            LEFT JOIN games g ON le.game_gid = g.gid
-            LEFT JOIN event_categories ec ON le.category_id = ec.id
-        """
-
-        # 构建WHERE子句
-        where_clauses = []
-        params = []
-
-        if game_gid:
-            where_clauses.append("le.game_gid = ?")
-            params.append(game_gid)
-
-        if search:
-            where_clauses.append(
-                "(le.event_name LIKE ? OR le.event_name_cn LIKE ? OR ec.name LIKE ?)"
-            )
-            search_pattern = f"%{search}%"
-            params.extend([search_pattern, search_pattern, search_pattern])
-
-        # 添加WHERE子句
-        if where_clauses:
-            query += " WHERE " + " AND ".join(where_clauses)
-
-        # 获取总数
-        count_query = "SELECT COUNT(*) as total FROM log_events le LEFT JOIN event_categories ec ON le.category_id = ec.id"
-        if where_clauses:
-            count_query += " WHERE " + " AND ".join(where_clauses)
-        total_result = fetch_one_as_dict(count_query, tuple(params))
-        total_events = total_result["total"] if total_result else 0
-
-        # 添加分页
-        offset = (page - 1) * per_page
-        query += " ORDER BY le.id DESC LIMIT ? OFFSET ?"
-        events = fetch_all_as_dict(query, tuple(params + [per_page, offset]))
-
-        total_pages = max(1, (total_events + per_page - 1) // per_page)
-
-        return {
-            "events": events,
-            "pagination": {
-                "page": page,
-                "per_page": per_page,
-                "total": total_events,
-                "total_pages": total_pages,
-            }
-        }
+        # 使用Repository方法（修复架构违规）
+        return self.event_repo.get_paginated(
+            game_gid=game_gid,
+            page=page,
+            per_page=per_page,
+            search=search
+        )
 
     @cached("events.detail.with_game", timeout=300)
     def get_event_detail_with_game(self, event_id: int, game_gid: int) -> Optional[Dict[str, Any]]:
@@ -408,21 +360,8 @@ class EventService:
         Returns:
             事件详情字典，不存在返回None
         """
-        from backend.core.utils.converters import fetch_one_as_dict
-
-        query = """
-            SELECT
-                le.*,
-                g.gid,
-                g.name as game_name,
-                g.ods_db,
-                ec.name as category_name
-            FROM log_events le
-            LEFT JOIN games g ON le.game_gid = g.gid
-            LEFT JOIN event_categories ec ON le.category_id = ec.id
-            WHERE le.id = ? AND le.game_gid = ?
-        """
-        return fetch_one_as_dict(query, (event_id, game_gid))
+        # 使用Repository方法（修复架构违规）
+        return self.event_repo.find_detail_with_game(event_id, game_gid)
 
     @cached("event_params.list", timeout=300)
     def get_event_parameters(self, event_id: int) -> List[Dict[str, Any]]:
@@ -435,27 +374,8 @@ class EventService:
         Returns:
             参数列表
         """
-        from backend.core.utils.converters import fetch_all_as_dict
-
-        parameters = fetch_all_as_dict(
-            """
-            SELECT
-                ep.id,
-                ep.param_name,
-                ep.param_name_cn,
-                pt.template_name as param_type,
-                ep.param_description as description,
-                ep.is_active,
-                ep.created_at,
-                ep.updated_at
-            FROM event_params ep
-            LEFT JOIN param_templates pt ON ep.template_id = pt.id
-            WHERE ep.event_id = ? AND ep.is_active = 1
-            ORDER BY ep.id
-        """,
-            (event_id,),
-        )
-        return parameters
+        # 使用Repository方法（修复架构违规）
+        return self.event_repo.get_event_parameters(event_id)
 
     def create_event_with_parameters(
         self,
@@ -475,8 +395,6 @@ class EventService:
         Raises:
             ValueError: 游戏不存在或事件已存在
         """
-        from backend.core.utils import execute_write
-
         # 验证游戏存在
         game = self.game_repo.find_by_gid(event_data.game_gid)
         if not game:
@@ -489,98 +407,61 @@ class EventService:
                 f"Event '{event_data.name}' already exists for game {event_data.game_gid}"
             )
 
-        # 生成表名
-        source_table = f"{game.ods_db}.ods_{event_data.game_gid}_all_view"
-        target_table = f"dwd.v_dwd_{event_data.game_gid}_{event_data.name}_di"
+        # 使用Repository方法创建事件和参数（修复架构违规）
+        event_dict = event_data.model_dump()
+        event_dict['ods_db'] = game.ods_db  # 添加ods_db字段用于生成表名
 
-        # 插入事件
-        event_id = execute_write(
-            """INSERT INTO log_events (game_id, game_gid, event_name, event_name_cn, category_id, source_table, target_table, include_in_common_params)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                game.id,  # game_id (数据库自增ID)
-                event_data.game_gid,
-                event_data.name,
-                event_data.name_cn or "",
-                event_data.model_dump().get("category_id"),
-                source_table,
-                target_table,
-                event_data.model_dump().get("include_in_common_params", 1),
-            ),
-            return_last_id=True,
+        result = self.event_repo.create_with_parameters(
+            event_data=event_dict,
+            game_id=game.id,
+            parameters=parameters
         )
-
-        # 插入参数
-        for param in parameters:
-            execute_write(
-                """INSERT INTO event_params
-                       (event_id, param_name, param_name_cn, template_id, param_description, is_active, version)
-                       VALUES (?, ?, ?, ?, ?, 1, 1)""",
-                (
-                    event_id,
-                    param.get("param_name"),
-                    param.get("param_name_cn", ""),
-                    param.get("template_id", 1),
-                    param.get("param_description", ""),
-                ),
-            )
 
         # 失效缓存
         self.invalidator.invalidate_pattern("events.list")
         self.invalidator.invalidate_key("dashboard_statistics")
 
         # 添加到Bloom Filter
-        cache_key = f"events:{event_id}"
+        cache_key = f"events:{result.id}"
         self.bloom_filter.add(cache_key)
 
         logger.info(
-            f"事件创建成功: event_id={event_id}, game_gid={event_data.game_gid}, "
+            f"事件创建成功: event_id={result.id}, game_gid={event_data.game_gid}, "
             f"parameters_count={len(parameters)}"
         )
 
-        return self.event_repo.find_by_id(event_id)
+        return result
 
+    @cached("event_categories.default", timeout=1800)
     def get_or_create_default_category(self) -> int:
         """
-        获取或创建"未分类"类别
+        获取或创建"未分类"类别（带缓存）
 
         Returns:
             类别ID
+
+        Note:
+            使用EventCategoryRepository（ERS架构合规）
         """
-        from backend.core.utils import fetch_one_as_dict, execute_write
-
-        # 尝试获取"未分类"类别
-        default_category = fetch_one_as_dict(
-            "SELECT id, name FROM event_categories WHERE name = ?", ("未分类",)
-        )
-        if default_category:
-            return default_category["id"]
-
-        # 创建"未分类"类别
-        category_id = execute_write(
-            "INSERT INTO event_categories (name) VALUES (?)",
-            ("未分类",),
-            return_last_id=True
-        )
-        logger.info(f"创建默认类别'未分类': category_id={category_id}")
+        category_id = self.category_repo.get_or_create_default()
+        logger.info(f"获取或创建默认类别'未分类': category_id={category_id}")
         return category_id
 
+    @cached("event_categories.exists", timeout=1800)
     def validate_category_exists(self, category_id: int) -> bool:
         """
-        验证类别是否存在
+        验证类别是否存在（带缓存）
 
         Args:
             category_id: 类别ID
 
         Returns:
             是否存在
-        """
-        from backend.core.utils import fetch_one_as_dict
 
-        category = fetch_one_as_dict(
-            "SELECT id, name FROM event_categories WHERE id = ?", (category_id,)
-        )
-        return category is not None
+        Note:
+            使用EventCategoryRepository（ERS架构合规）
+        """
+        return self.category_repo.exists_by_id(category_id)
 
     def update_event_with_invalidation(
         self,
@@ -606,17 +487,19 @@ class EventService:
         Raises:
             ValueError: 事件不存在
         """
-        from backend.core.utils import execute_write
-
         event = self.event_repo.find_by_id(event_id)
         if not event:
             raise ValueError(f"Event not found: id={event_id}")
 
-        # 更新事件
-        execute_write(
-            "UPDATE log_events SET event_name = ?, event_name_cn = ?, category_id = ?, include_in_common_params = ? WHERE id = ?",
-            (event_name, event_name_cn, category_id, include_in_common_params, event_id),
-        )
+        # 使用Repository更新方法（修复架构违规）
+        updates = {
+            "event_name": event_name,
+            "event_name_cn": event_name_cn,
+            "category_id": category_id,
+            "include_in_common_params": include_in_common_params
+        }
+
+        self.event_repo.update(event_id, updates)
 
         # 失效缓存
         self.invalidator.invalidate_pattern("events.list")
@@ -636,9 +519,8 @@ class EventService:
         Returns:
             删除的事件数量
         """
-        from backend.core.data_access import Repositories
-
-        deleted_count = Repositories.LOG_EVENTS.delete_batch(event_ids)
+        # 使用Repository的批量删除方法（修复架构违规）
+        deleted_count = self.event_repo.delete_batch(event_ids)
 
         # 失效缓存
         self.invalidator.invalidate_pattern("events.list")
@@ -661,9 +543,8 @@ class EventService:
         Returns:
             更新的事件数量
         """
-        from backend.core.data_access import Repositories
-
-        updated_count = Repositories.LOG_EVENTS.update_batch(event_ids, updates)
+        # 使用Repository的批量更新方法（修复架构违规）
+        updated_count = self.event_repo.update_batch(event_ids, updates)
 
         # 失效缓存
         self.invalidator.invalidate_pattern("events.list")
@@ -687,24 +568,5 @@ class EventService:
         Returns:
             事件数量
         """
-        from backend.core.utils.converters import fetch_one_as_dict
-
-        # 构建查询条件
-        conditions = []
-        params = []
-
-        if game_gid is not None:
-            conditions.append("game_gid = ?")
-            params.append(game_gid)
-
-        if search:
-            conditions.append("event_name LIKE ?")
-            params.append(f"%{search}%")
-
-        where_clause = " AND ".join(conditions) if conditions else "1=1"
-
-        # 执行计数查询
-        query = f"SELECT COUNT(*) as total FROM log_events WHERE {where_clause}"
-        result = fetch_one_as_dict(query, tuple(params))
-
-        return result["total"] if result else 0
+        # 使用Repository方法（修复架构违规）
+        return self.event_repo.count_by_filters(game_gid, search)
