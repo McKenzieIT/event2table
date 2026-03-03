@@ -4,7 +4,7 @@ WHERE条件构建器
 负责将抽象Condition模型转换为SQL WHERE子句
 """
 
-from typing import List, Optional
+from typing import List, Optional, Any
 from ..models.event import Condition, Operator, LogicalOperator
 
 
@@ -146,7 +146,7 @@ class WhereBuilder:
         # 简化版：都用AND连接
         return " AND\n  ".join(clauses)
 
-    def _format_value(self, value: any) -> str:
+    def _format_value(self, value: Any) -> str:
         """
         格式化值
 
@@ -194,11 +194,11 @@ class WhereBuilder:
             return self._build_partition_filter(context)
 
         # 分组：按AND/OR分组
-        and_groups = []
-        or_groups = []
+        and_groups: List[List[Condition]] = []
+        or_groups: List[List[Condition]] = []
 
-        current_group = []
-        current_op = LogicalOperator.AND.value
+        current_group: List[Condition] = []
+        current_op: str = LogicalOperator.AND.value
 
         for cond in conditions:
             if cond.logical_op == LogicalOperator.OR.value:

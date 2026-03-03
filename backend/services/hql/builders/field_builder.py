@@ -162,6 +162,8 @@ class FieldBuilder:
             CAST(get_json_object(params, '$.level') AS BIGINT) AS level
         """
         # 构建JSON提取表达式
+        if not field.json_path:
+            raise ValueError("param field must have json_path")
         json_path = field.json_path if field.json_path.startswith("$") else f"$.{field.json_path}"
         sql = f"get_json_object(params, '{json_path}')"
 

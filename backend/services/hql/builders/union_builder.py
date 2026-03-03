@@ -92,6 +92,8 @@ class UnionBuilder:
 
         elif field.type == FieldType.CUSTOM.value:
             # 自定义表达式
+            if not field.custom_expression:
+                raise ValueError("Custom field must have custom_expression")
             return field.custom_expression
 
         elif field.type == FieldType.FIXED.value:

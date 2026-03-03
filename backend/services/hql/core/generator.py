@@ -4,7 +4,7 @@
 完全无框架依赖的HQL生成器
 """
 
-from typing import List, Union
+from typing import List, Union, Dict, Any
 from ..models.event import Event, Field, Condition
 from ..builders.field_builder import FieldBuilder
 from ..builders.where_builder import WhereBuilder
@@ -204,14 +204,13 @@ class DebuggableHQLGenerator(HQLGenerator):
     可以返回生成过程的详细信息
     """
 
-    def generate(
+    def generate(  # type: ignore[override]
         self,
         events: List[Event],
         fields: List[Field],
         conditions: List[Condition],
-        debug: bool = False,
         **options,
-    ) -> Union[str, dict]:
+    ) -> Union[str, Dict[str, Any]]:
         """
         生成HQL（支持调试模式）
 
@@ -219,19 +218,21 @@ class DebuggableHQLGenerator(HQLGenerator):
             events: 事件列表
             fields: 字段列表
             conditions: 条件列表
-            debug: 是否启用调试模式
             **options: 额外选项
+                - debug: 是否启用调试模式
 
         Returns:
             str: 普通模式返回HQL字符串
             dict: 调试模式返回详细信息
         """
+        debug = options.get("debug", False)
+
         if not debug:
             # 普通模式：调用父类方法
             return super().generate(events, fields, conditions, **options)
 
         # 调试模式：返回详细跟踪
-        trace = {
+        trace: Dict[str, Any] = {
             "steps": [],
             "events": [e.__dict__ for e in events],
             "fields": [f.__dict__ for f in fields],

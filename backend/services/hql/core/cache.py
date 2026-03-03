@@ -45,9 +45,9 @@ class HQLCacheManager:
             maxsize: 最大缓存条目数
         """
         self.maxsize = maxsize
-        self._cache = {}
-        self._hits = 0
-        self._misses = 0
+        self._cache: Dict[str, Dict[str, Any]] = {}
+        self._hits: int = 0
+        self._misses: int = 0
 
     def get_cache_key(
         self, events: List[Dict], fields: List[Dict], conditions: List[Dict], options: Dict
@@ -86,7 +86,11 @@ class HQLCacheManager:
         """
         if cache_key in self._cache:
             self._hits += 1
-            return self._cache[cache_key]["hql"]
+            hql = self._cache[cache_key]["hql"]
+            # Ensure the cached value is a string
+            if not isinstance(hql, str):
+                raise TypeError(f"Cached HQL must be a string, got {type(hql)}")
+            return hql
 
         self._misses += 1
         return None

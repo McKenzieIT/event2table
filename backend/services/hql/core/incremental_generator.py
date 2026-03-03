@@ -50,7 +50,7 @@ class IncrementalHQLGenerator:
         """初始化增量生成器"""
         self.generator = HQLGenerator()
         self.cache = HQLCache()
-        self.previous_config = {"events": [], "fields": [], "conditions": []}
+        self.previous_config: Dict[str, List[Any]] = {"events": [], "fields": [], "conditions": []}
 
     def generate_incremental(
         self,
@@ -331,7 +331,7 @@ WHERE
 
     def _extract_stable_parts(self, hql: str, diff: HQLDiff) -> Dict[str, str]:
         """从HQL中提取稳定部分"""
-        stable = {}
+        stable: Dict[str, str] = {}
 
         if not hql:
             return stable

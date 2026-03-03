@@ -9,7 +9,6 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 
 from backend.models.repositories.hql_template_repository import HQLTemplateRepository
-from backend.core.cache.decorators import cached, cache_invalidate
 
 
 class TemplateManager:
@@ -23,7 +22,6 @@ class TemplateManager:
         """初始化模板管理器"""
         self.repo = HQLTemplateRepository()
 
-    @cached(ttl=3600)  # 缓存1小时
     def list_templates(
         self,
         template_type: Optional[str] = None,
@@ -55,7 +53,7 @@ class TemplateManager:
             templates = self.repo.find_user_templates()
         # 全部模板
         else:
-            templates = self.repo.get_all()
+            templates = self.repo.find_all()
 
         # 二次过滤（如果需要组合条件）
         if template_type and is_system is not None:
@@ -63,7 +61,6 @@ class TemplateManager:
 
         return templates
 
-    @cached(ttl=3600)
     def get_template(self, template_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID获取模板
@@ -76,7 +73,6 @@ class TemplateManager:
         """
         return self.repo.find_by_id(template_id)
 
-    @cached(ttl=3600)
     def get_template_by_name(self, template_name: str) -> Optional[Dict[str, Any]]:
         """
         根据名称获取模板
@@ -89,7 +85,6 @@ class TemplateManager:
         """
         return self.repo.find_by_name(template_name)
 
-    @cached(ttl=3600)
     def get_template_types(self) -> List[str]:
         """
         获取所有模板类型
@@ -99,7 +94,6 @@ class TemplateManager:
         """
         return self.repo.get_types()
 
-    @cached(ttl=3600)
     def get_popular_templates(self, limit: int = 5) -> List[Dict[str, Any]]:
         """
         获取常用模板（返回系统模板）
@@ -113,7 +107,6 @@ class TemplateManager:
         templates = self.repo.find_system_templates()
         return templates[:limit]
 
-    @cache_invalidate
     def create_template(
         self,
         template_name: str,
@@ -152,7 +145,6 @@ class TemplateManager:
             is_system=is_system,
         )
 
-    @cache_invalidate
     def update_template(
         self,
         template_id: int,
@@ -185,7 +177,6 @@ class TemplateManager:
             description=description,
         )
 
-    @cache_invalidate
     def delete_template(self, template_id: int) -> bool:
         """
         删除模板

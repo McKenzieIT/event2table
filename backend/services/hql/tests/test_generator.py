@@ -124,7 +124,7 @@ class TestHQLGenerator:
         """测试生成简单HQL"""
         event = Event(name="login", table_name="ieu_ods.ods_10000147_all_view")
         fields = [Field(name="ds", type="base"), Field(name="role_id", type="base")]
-        conditions = []
+        conditions: list[Condition] = []
 
         hql = self.generator.generate(events=[event], fields=fields, conditions=conditions)
 
@@ -152,7 +152,7 @@ class TestHQLGenerator:
             Field(name="role_id", type="base"),
             Field(name="zone_id", type="param", json_path="$.zone_id", alias="zone"),
         ]
-        conditions = []
+        conditions: list[Condition] = []
 
         hql = self.generator.generate(events=[event], fields=fields, conditions=conditions)
 
@@ -163,7 +163,7 @@ class TestHQLGenerator:
         """测试生成带聚合函数的HQL"""
         event = Event(name="login", table_name="ieu_ods.ods_10000147_all_view")
         fields = [Field(name="role_id", type="base", aggregate_func="COUNT", alias="count")]
-        conditions = []
+        conditions: list[Condition] = []
 
         hql = self.generator.generate(events=[event], fields=fields, conditions=conditions)
 
@@ -173,7 +173,7 @@ class TestHQLGenerator:
         """测试生成包含注释的HQL"""
         event = Event(name="login", table_name="ieu_ods.ods_10000147_all_view")
         fields = [Field(name="role_id", type="base")]
-        conditions = []
+        conditions: list[Condition] = []
 
         hql = self.generator.generate(
             events=[event], fields=fields, conditions=conditions, include_comments=True

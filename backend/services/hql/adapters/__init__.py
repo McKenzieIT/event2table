@@ -11,4 +11,6 @@ Available adapters:
 # Note: v2_to_v1_transformer and v1_to_v2_transformer were removed in Phase 4.2 cleanup (2026-03-01)
 # They were unused and are no longer needed.
 
-__all__ = []
+from typing import List
+
+__all__: List[str] = []

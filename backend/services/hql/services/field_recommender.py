@@ -121,15 +121,6 @@ class FieldRecommender:
         },
     }
 
-    def __init__(self, db_path: Optional[str] = None):
-        """
-        初始化推荐器
-
-        Args:
-            db_path: 数据库路径（用于历史统计）
-        """
-        self.db_path = db_path
-
     def recommend_fields(
         self,
         event_name: Optional[str] = None,
@@ -249,7 +240,7 @@ class FieldRecommender:
         if event_name_lower not in self.EVENT_SPECIFIC_FIELDS:
             return []
 
-        field_names = self.EVENT_SPECIFIC_FIELDS[event_name_lower]["recommended"]
+        field_names = list(self.EVENT_SPECIFIC_FIELDS[event_name_lower]["recommended"])
         return self._build_field_recommendations(field_names)
 
     def _fuzzy_match_fields(self, partial: str) -> List[Dict[str, Any]]:

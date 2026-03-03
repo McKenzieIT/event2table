@@ -10,6 +10,7 @@ HQL History Service (HQL历史业务服务 - 精简架构)
 """
 
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 from backend.services.base_service import BaseService
 from backend.models.entities import HQLHistoryEntity
 from backend.models.repositories.hql_history_repository import HQLHistoryRepository
@@ -139,6 +140,7 @@ class HQLHistoryService(BaseService):
 
         # 创建Entity
         history = HQLHistoryEntity(
+            id=None,
             user_id=user_id,
             session_id=session_id,
             events_json=events,
@@ -152,6 +154,7 @@ class HQLHistoryService(BaseService):
             game_gid=game_gid,
             name_en=name_en,
             name_cn=name_cn,
+            created_at=datetime.now(),
         )
 
         # 保存到数据库
@@ -257,10 +260,14 @@ class HQLHistoryService(BaseService):
             # 应用日期过滤
             if date_from or date_to:
                 filtered = []
+                # Parse date strings to datetime objects if needed
+                date_from_dt: Optional[datetime] = datetime.fromisoformat(date_from) if isinstance(date_from, str) else date_from
+                date_to_dt: Optional[datetime] = datetime.fromisoformat(date_to) if isinstance(date_to, str) else date_to
+
                 for item in results:
-                    if date_from and item.created_at and item.created_at < date_from:
+                    if date_from_dt and item.created_at and item.created_at < date_from_dt:
                         continue
-                    if date_to and item.created_at and item.created_at > date_to:
+                    if date_to_dt and item.created_at and item.created_at > date_to_dt:
                         continue
                     filtered.append(item)
                 return filtered[:limit]
@@ -332,8 +339,9 @@ class HQLHistoryService(BaseService):
         # 删除不在保留列表中的记录
         deleted_count = 0
         for history_id in delete_ids:
-            if self.history_repo.delete(history_id):
-                deleted_count += 1
+            if history_id is not None:
+                if self.history_repo.delete(history_id):
+                    deleted_count += 1
 
         # 清理缓存
         if deleted_count > 0:
