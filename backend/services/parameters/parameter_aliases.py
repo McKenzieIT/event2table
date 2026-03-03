@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Parameter Aliases Management Module
-Handles parameter alias CRUD operations
+Parameter Aliases Management Module - REFACTORED
+===============================================
+
+Refactored to use Repository pattern instead of direct database access.
+
+Migration Status: Repository Pattern Implementation (2026-03-03)
+- Removed direct database access
+- Added ParameterAliasRepository integration
+- All methods now use Repository layer
+- Maintained backward compatibility
 """
 
 from flask import Blueprint, request
 from backend.core.logging import get_logger
-from backend.core.utils import (
-    fetch_all_as_dict,
-    fetch_one_as_dict,
-    execute_write,
-    json_success_response,
-    json_error_response,
-)
+from backend.core.utils import json_success_response, json_error_response
+from backend.models.repositories.parameter_alias_repository import ParameterAliasRepository
+from backend.models.repositories.games import GameRepository
+from backend.models.repositories.parameters import ParameterRepository
 
 logger = get_logger(__name__)
 
@@ -32,18 +37,9 @@ def get_parameter_aliases():
     if not param_id:
         return json_error_response("param_id is required", status_code=400)
 
-    # Get aliases, ordered by is_preferred (preferred first), then usage_count
-    # Note: param_id references event_params table (not the old 'parameters' table)
-    aliases = fetch_all_as_dict(
-        """
-        SELECT pa.*, ep.param_name, ep.param_name_cn
-        FROM parameter_aliases pa
-        LEFT JOIN event_params ep ON pa.param_id = ep.id
-        WHERE pa.game_gid = ? AND pa.param_id = ?
-        ORDER BY pa.is_preferred DESC, pa.usage_count DESC, pa.last_used_at DESC
-    """,
-        (game_gid, param_id),
-    )
+    # Use Repository
+    alias_repo = ParameterAliasRepository()
+    aliases = alias_repo.find_by_param_and_game(param_id, game_gid)
 
     return json_success_response(data=aliases, message="Parameter aliases retrieved")
 
@@ -65,62 +61,43 @@ def create_parameter_alias():
     display_name = data.get("display_name", "")
     is_preferred = data.get("is_preferred", 0)
 
-    # Validate game exists
-    game = fetch_one_as_dict("SELECT id, gid FROM games WHERE gid = ?", (game_gid,))
+    # Use Repositories
+    game_repo = GameRepository()
+    game = game_repo.find_by_gid(game_gid)
     if not game:
         return json_error_response("Game not found", status_code=404)
 
-    # Get game_id for legacy support (both game_id and game_gid are stored)
-    game_id = game["id"]
+    # Get game_id for legacy support
+    game_id = game.id
 
     # Validate parameter exists (param_id references event_params table)
-    param = fetch_one_as_dict("SELECT id, param_name, event_id, game_gid FROM event_params WHERE id = ?", (param_id,))
+    param_repo = ParameterRepository()
+    param = param_repo.find_by_id(param_id)
     if not param:
         return json_error_response("Parameter not found", status_code=404)
 
     # Check if alias already exists
-    existing = fetch_one_as_dict(
-        """
-        SELECT id FROM parameter_aliases
-        WHERE game_gid = ? AND param_id = ? AND alias = ?
-    """,
-        (game_gid, param_id, alias),
-    )
+    alias_repo = ParameterAliasRepository()
+    existing = alias_repo.find_by_alias_and_game(alias, game_gid)
 
     if existing:
         return json_error_response(
             "Alias already exists for this parameter", status_code=400
         )
 
-    # If setting as preferred, unset other preferred aliases
-    if is_preferred:
-        execute_write(
-            """
-            UPDATE parameter_aliases
-            SET is_preferred = 0
-            WHERE game_gid = ? AND param_id = ?
-        """,
-            (game_gid, param_id),
-        )
-
-    # Create alias (store both game_id and game_gid for migration support)
-    alias_id = execute_write(
-        """
-        INSERT INTO parameter_aliases (game_id, game_gid, param_id, alias, display_name, is_preferred, usage_count, last_used_at)
-        VALUES (?, ?, ?, ?, ?, ?, 0, NULL)
-    """,
-        (game_id, game_gid, param_id, alias, display_name, is_preferred),
-        return_last_id=True,
+    # Create alias
+    alias_id = alias_repo.create_alias(
+        game_id=game_id,
+        game_gid=game_gid,
+        param_id=param_id,
+        alias=alias,
+        display_name=display_name,
+        is_preferred=bool(is_preferred),
     )
 
-    alias = fetch_one_as_dict(
-        """SELECT id, param_id, alias, display_name, usage_count, last_used_at,
-                  is_preferred, game_gid, created_at, updated_at
-           FROM parameter_aliases WHERE id = ?""",
-        (alias_id,)
-    )
+    created_alias = alias_repo.find_by_id(alias_id)
     return json_success_response(
-        data=alias, message="Parameter alias created", status_code=201
+        data=created_alias, message="Parameter alias created", status_code=201
     )
 
 
@@ -129,57 +106,25 @@ def update_parameter_alias(alias_id):
     """API: Update a parameter alias"""
     data = request.get_json()
 
-    # Get existing alias
-    alias = fetch_one_as_dict(
-        """SELECT id, param_id, alias, display_name, usage_count, last_used_at,
-                  is_preferred, game_gid, created_at, updated_at
-           FROM parameter_aliases WHERE id = ?""",
-        (alias_id,)
-    )
+    # Use Repository
+    alias_repo = ParameterAliasRepository()
+    alias = alias_repo.find_by_id(alias_id)
+
     if not alias:
         return json_error_response("Parameter alias not found", status_code=404)
 
-    # Update fields
-    update_fields = []
-    update_values = []
-
-    if "alias" in data:
-        update_fields.append("alias = ?")
-        update_values.append(data["alias"])
-
-    if "display_name" in data:
-        update_fields.append("display_name = ?")
-        update_values.append(data["display_name"])
-
-    if "is_preferred" in data:
-        # If setting as preferred, unset other preferred aliases
-        if data["is_preferred"]:
-            execute_write(
-                """
-                UPDATE parameter_aliases
-                SET is_preferred = 0
-                WHERE game_gid = ? AND param_id = ? AND id != ?
-            """,
-                (alias["game_gid"], alias["param_id"], alias_id),
-            )
-
-        update_fields.append("is_preferred = ?")
-        update_values.append(data["is_preferred"])
-
-    if update_fields:
-        update_values.append(alias_id)
-        execute_write(
-            f"""
-            UPDATE parameter_aliases
-            SET {", ".join(update_fields)}, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        """,
-            update_values,
-        )
-
-    updated_alias = fetch_one_as_dict(
-        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
+    # Update alias
+    success = alias_repo.update_alias(
+        alias_id=alias_id,
+        alias=data.get("alias"),
+        display_name=data.get("display_name"),
+        is_preferred=data.get("is_preferred"),
     )
+
+    if not success:
+        return json_error_response("Failed to update alias", status_code=500)
+
+    updated_alias = alias_repo.find_by_id(alias_id)
     return json_success_response(data=updated_alias, message="Parameter alias updated")
 
 
@@ -188,53 +133,20 @@ def update_parameter_alias(alias_id):
 )
 def set_preferred_alias(alias_id):
     """API: Set an alias as preferred"""
-    # Get existing alias
-    alias = fetch_one_as_dict(
-        """SELECT id, param_id, alias, display_name, usage_count, last_used_at,
-                  is_preferred, game_gid, created_at, updated_at
-           FROM parameter_aliases WHERE id = ?""",
-        (alias_id,)
-    )
+    # Use Repository
+    alias_repo = ParameterAliasRepository()
+    alias = alias_repo.find_by_id(alias_id)
+
     if not alias:
         return json_error_response("Parameter alias not found", status_code=404)
 
-    # Handle both game_id and game_gid (migration support)
-    game_gid = alias.get("game_gid")
-    if not game_gid and alias.get("game_id"):
-        # Convert game_id to game_gid if needed
-        game_record = fetch_one_as_dict(
-            "SELECT gid FROM games WHERE id = ?", (alias["game_id"],)
-        )
-        game_gid = game_record["gid"] if game_record else None
+    # Set as preferred
+    success = alias_repo.set_preferred_alias(alias_id)
 
-    if not game_gid:
-        return json_error_response("Game not found for alias", status_code=400)
+    if not success:
+        return json_error_response("Failed to set preferred alias", status_code=500)
 
-    param_id = alias["param_id"]
-
-    # Unset other preferred aliases
-    execute_write(
-        """
-        UPDATE parameter_aliases
-        SET is_preferred = 0
-        WHERE game_gid = ? AND param_id = ?
-    """,
-        (game_gid, param_id),
-    )
-
-    # Set this alias as preferred
-    execute_write(
-        """
-        UPDATE parameter_aliases
-        SET is_preferred = 1, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-    """,
-        (alias_id,),
-    )
-
-    updated_alias = fetch_one_as_dict(
-        "SELECT * FROM parameter_aliases WHERE id = ?", (alias_id,)
-    )
+    updated_alias = alias_repo.find_by_id(alias_id)
     return json_success_response(data=updated_alias, message="Preferred alias set")
 
 
@@ -244,7 +156,7 @@ def set_preferred_alias(alias_id):
 def update_parameter_display_name(param_id):
     """API: Update parameter's display name
 
-    Note: This endpoint references event_params table (not the old 'parameters' table)
+    Note: This endpoint references event_params table
     """
     data = request.get_json()
 
@@ -253,26 +165,21 @@ def update_parameter_display_name(param_id):
 
     display_name = data["display_name"]
 
-    # Get existing parameter (param_id references event_params table)
-    param = fetch_one_as_dict("SELECT id, param_name, event_id, game_gid FROM event_params WHERE id = ?", (param_id,))
+    # Use Repository
+    param_repo = ParameterRepository()
+    param = param_repo.find_by_id(param_id)
+
     if not param:
         return json_error_response("Parameter not found", status_code=404)
 
-    # Update parameter
-    execute_write(
-        """
-        UPDATE event_params
-        SET param_name_cn = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-    """,
-        (display_name, param_id),
-    )
+    # Update parameter display name
+    updated_param = param_repo.update(param_id, {"name_cn": display_name})
 
-    updated_param = fetch_one_as_dict(
-        """SELECT id, param_name, event_id, game_gid, is_common, param_type, hive_type
-           FROM event_params WHERE id = ?""",
-        (param_id,)
-    )
+    if not updated_param:
+        return json_error_response("Failed to update parameter", status_code=500)
+
+    # Convert to dict for response
+    param_dict = updated_param.model_dump() if hasattr(updated_param, 'model_dump') else updated_param
     return json_success_response(
-        data=updated_param, message="Parameter display name updated"
+        data=param_dict, message="Parameter display name updated"
     )

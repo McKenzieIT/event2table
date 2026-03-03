@@ -258,3 +258,165 @@ class EventNodeRepository(GenericRepository):
         '''
         result = fetch_one_as_dict(query, (game_gid,))
         return result["count"] if result else 0
+
+    def update(self, node_id: int, updates: Dict) -> bool:
+        """
+        更新事件节点（部分字段更新）
+
+        Args:
+            node_id: 节点ID
+            updates: 要更新的字段字典
+
+        Returns:
+            是否更新成功
+        """
+        if not updates:
+            return False
+
+        # 构建UPDATE语句
+        set_parts = []
+        params = []
+
+        for key, value in updates.items():
+            if key == "config_json":
+                set_parts.append("config_json = ?")
+                params.append(serialize_json_field(value))
+            elif key == "is_active":
+                set_parts.append("is_active = ?")
+                params.append(1 if value else 0)
+            else:
+                set_parts.append(f"{key} = ?")
+                params.append(value)
+
+        set_parts.append("updated_at = datetime('now')")
+        params.append(node_id)
+
+        update_sql = f'''
+            UPDATE "{self.table_name}"
+            SET {", ".join(set_parts)}
+            WHERE id = ?
+        '''
+
+        result = execute_write(update_sql, tuple(params))
+        return result > 0
+
+    def soft_delete(self, node_id: int) -> bool:
+        """
+        软删除事件节点（设置is_active=False）
+
+        Args:
+            node_id: 节点ID
+
+        Returns:
+            是否删除成功
+        """
+        update_sql = f'''
+            UPDATE "{self.table_name}"
+            SET is_active = 0, updated_at = datetime('now')
+            WHERE id = ?
+        '''
+
+        result = execute_write(update_sql, (node_id,))
+        return result > 0
+
+    def search_nodes(
+        self,
+        game_gid: int,
+        keyword: str = "",
+        event_id: Optional[int] = None,
+        field_count_min: Optional[int] = None,
+        field_count_max: Optional[int] = None,
+        limit: int = 100,
+        offset: int = 0
+    ) -> List[EventNodeEntity]:
+        """
+        搜索事件节点
+
+        Args:
+            game_gid: 游戏GID
+            keyword: 事件名称关键词
+            event_id: 事件ID过滤
+            field_count_min: 最小字段数
+            field_count_max: 最大字段数
+            limit: 返回数量限制
+            offset: 偏移量
+
+        Returns:
+            EventNodeEntity列表
+        """
+        # 构建查询
+        query = '''
+            SELECT
+                en.*,
+                e.name as event_name
+            FROM event_nodes en
+            INNER JOIN log_events e ON en.event_id = e.id
+            WHERE e.game_gid = ? AND en.is_active = 1
+        '''
+        params = [game_gid]
+
+        # 应用过滤条件
+        if keyword:
+            query += " AND e.name LIKE ?"
+            params.append(f"%{keyword}%")
+
+        if event_id:
+            query += " AND en.event_id = ?"
+            params.append(event_id)
+
+        # 分组（用于字段数过滤）
+        query += " GROUP BY en.id"
+
+        # 应用字段数过滤
+        if field_count_min is not None:
+            query += " HAVING json_array_length(config_json) >= ?"
+            params.append(field_count_min)
+
+        if field_count_max is not None:
+            query += " HAVING json_array_length(config_json) <= ?"
+            params.append(field_count_max)
+
+        # 排序和分页
+        query += f" ORDER BY en.updated_at DESC LIMIT {limit} OFFSET {offset}"
+
+        rows = fetch_all_as_dict(query, tuple(params))
+
+        # 转换为Entity
+        entities = []
+        for row in rows:
+            row["config_json"] = deserialize_json_field(row.get("config_json"))
+            # 移除event_name字段（用于显示，不属于Entity）
+            event_name = row.pop("event_name", None)
+            entity = EventNodeEntity(**row)
+            # 动态添加event_name属性（仅用于显示）
+            if event_name:
+                setattr(entity, "event_name", event_name)
+            entities.append(entity)
+
+        return entities
+
+    def get_nodes_stats(self, game_gid: int) -> Dict:
+        """
+        获取游戏的节点统计信息
+
+        Args:
+            game_gid: 游戏GID
+
+        Returns:
+            统计信息字典，包含:
+            - total_nodes: 总节点数
+            - unique_events: 唯一事件数
+            - total_fields: 总字段数
+        """
+        query = '''
+            SELECT
+                COUNT(DISTINCT en.id) as total_nodes,
+                COUNT(DISTINCT en.event_id) as unique_events,
+                SUM(json_array_length(config_json)) as total_fields
+            FROM event_nodes en
+            INNER JOIN log_events e ON en.event_id = e.id
+            WHERE e.game_gid = ? AND en.is_active = 1
+        '''
+
+        result = fetch_one_as_dict(query, (game_gid,))
+        return result if result else {"total_nodes": 0, "unique_events": 0, "total_fields": 0}

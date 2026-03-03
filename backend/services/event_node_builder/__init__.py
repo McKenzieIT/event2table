@@ -17,9 +17,6 @@ from backend.core.logging import get_logger
 from backend.core.utils import (
     json_success_response,
     json_error_response,
-    # TODO: 逐步移除这些直接DB访问函数
-    fetch_one_as_dict,
-    fetch_all_as_dict,
 )
 # ERS架构 - 使用Service层
 from backend.services.events.event_node_service import EventNodeService
@@ -143,9 +140,9 @@ def preview_hql():
 @event_node_builder_bp.route("/api/params", methods=["GET"])
 def get_event_params():
     """
-    API: 获取事件的参数列表
+    API: 获取事件的参数列表 (ERS架构)
 
-    转发到现有的 /api/events/<id>/params 路由
+    迁移后使用EventService替代直接数据库访问
     """
     try:
         event_id = request.args.get("event_id", type=int)
@@ -153,25 +150,27 @@ def get_event_params():
         if not event_id:
             return json_error_response("event_id is required", status_code=400)
 
-        # 查询事件的参数
-        params = fetch_all_as_dict(
-            """
-            SELECT
-                ep.id,
-                ep.param_name,
-                ep.param_name_cn,
-                ep.param_description,
-                ep.hql_config,
-                ep.json_path,
-                ep.is_active
-            FROM event_params ep
-            WHERE ep.event_id = ? AND ep.is_active = 1
-            ORDER BY ep.id
-        """,
-            (event_id,),
-        )
+        # 使用EventService获取事件的参数
+        from backend.services.events.event_service import EventService
 
-        return json_success_response(data=params, message="Event parameters retrieved")
+        event_service = EventService()
+        params = event_service.get_event_params(event_id)
+
+        # 转换为适合前端的格式（仅包含需要的字段）
+        params_data = [
+            {
+                "id": p.id,
+                "param_name": p.param_name,
+                "param_name_cn": p.param_name_cn,
+                "param_description": p.param_description,
+                "hql_config": p.hql_config,
+                "json_path": p.json_path,
+                "is_active": p.is_active,
+            }
+            for p in params
+        ]
+
+        return json_success_response(data=params_data, message="Event parameters retrieved")
 
     except Exception as e:
         logger.error(f"Error fetching event params: {e}")
@@ -239,9 +238,9 @@ def save_config():
 @event_node_builder_bp.route("/api/update", methods=["POST"])
 def update_config():
     """
-    API: 更新事件节点配置
+    API: 更新事件节点配置 (ERS架构)
 
-    转发到现有的 /api/event-nodes/<id> 路由（PUT）
+    迁移后使用EventNodeService替代直接数据库访问
     """
     try:
         data = request.get_json()
@@ -254,69 +253,34 @@ def update_config():
         if not node_id:
             return json_error_response("node_id is required", status_code=400)
 
-        # 获取现有节点
-        node = fetch_one_as_dict(
-            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
-                      en.is_active, en.created_at, en.updated_at,
-                      le.event_name, le.event_name_cn
-               FROM event_nodes en
-               LEFT JOIN log_events le ON en.event_id = le.id
-               WHERE en.id = ?""",
-            (node_id,)
-        )
-        if not node:
-            return json_error_response("Event node not found", status_code=404)
-
-        # 导入必要的函数
-        from backend.core.utils import execute_write
+        # 导入Entity模型
+        from backend.models.entities import EventNodeEntity
         import json
 
-        # 更新字段
-        update_fields = []
-        update_values = []
-
+        # 准备更新数据
+        update_data = {}
         if "name" in data:
-            update_fields.append("name = ?")
-            update_values.append(data["name"])
-
+            update_data["name"] = data["name"]
         if "event_id" in data:
-            update_fields.append("event_id = ?")
-            update_values.append(data["event_id"])
-
+            update_data["event_id"] = data["event_id"]
         if "config" in data:
-            config_json = json.dumps(data["config"], ensure_ascii=False)
-            update_fields.append("config_json = ?")
-            update_values.append(config_json)
-
+            update_data["config_json"] = json.dumps(data["config"], ensure_ascii=False)
         if "is_active" in data:
-            update_fields.append("is_active = ?")
-            update_values.append(data["is_active"])
+            update_data["is_active"] = data["is_active"]
 
-        if update_fields:
-            update_values.append(node_id)
-            execute_write(
-                f"""
-                UPDATE event_nodes
-                SET {", ".join(update_fields)}, updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
-            """,
-                update_values,
+        # 使用EventNodeService更新节点
+        try:
+            updated_node = event_node_service.update_node(node_id, update_data)
+
+            # 获取带详情的节点数据
+            node_with_details = event_node_service.get_node_with_details(node_id)
+
+            return json_success_response(
+                data={"node": node_with_details}, message="Event node updated"
             )
 
-        # 返回更新后的节点
-        updated_node = fetch_one_as_dict(
-            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
-                      en.is_active, en.created_at, en.updated_at,
-                      le.event_name, le.event_name_cn
-               FROM event_nodes en
-               LEFT JOIN log_events le ON en.event_id = le.id
-               WHERE en.id = ?""",
-            (node_id,)
-        )
-
-        return json_success_response(
-            data={"node": updated_node}, message="Event node updated"
-        )
+        except ValueError as e:
+            return json_error_response(str(e), status_code=404 if "not found" in str(e).lower() else 400)
 
     except Exception as e:
         logger.error(f"Error updating config: {e}", exc_info=True)
@@ -328,31 +292,26 @@ def update_config():
 @event_node_builder_bp.route("/api/load/<int:config_id>", methods=["GET"])
 def load_config(config_id):
     """
-    API: 加载事件节点配置
+    API: 加载事件节点配置 (ERS架构)
+
+    迁移后使用EventNodeService替代直接数据库访问
     """
     try:
-        node = fetch_one_as_dict(
-            """
-            SELECT en.*, le.event_name, le.event_name_cn
-            FROM event_nodes en
-            LEFT JOIN log_events le ON en.event_id = le.id
-            WHERE en.id = ?
-        """,
-            (config_id,),
-        )
-
-        if not node:
-            return json_error_response("Event node not found", status_code=404)
+        # 使用EventNodeService获取节点
+        try:
+            node_with_details = event_node_service.get_node_with_details(config_id)
+        except ValueError as e:
+            return json_error_response(str(e), status_code=404)
 
         # 解析 config_json
         import json
 
         try:
-            node["config"] = json.loads(node["config_json"])
+            node_with_details["config"] = json.loads(node_with_details["config_json"])
         except (json.JSONDecodeError, TypeError, ValueError):
-            node["config"] = {}
+            node_with_details["config"] = {}
 
-        return json_success_response(data={"node": node}, message="Event node loaded")
+        return json_success_response(data={"node": node_with_details}, message="Event node loaded")
 
     except Exception as e:
         logger.error(f"Error loading config: {e}", exc_info=True)
@@ -362,39 +321,41 @@ def load_config(config_id):
 @event_node_builder_bp.route("/api/list", methods=["GET"])
 def list_configs():
     """
-    API: 获取事件节点配置列表
+    API: 获取事件节点配置列表 (ERS架构)
+
+    迁移后使用EventNodeService + GameService替代直接数据库访问
     """
     try:
         game_gid = request.args.get("game_gid", type=str)
         if not game_gid:
             return json_error_response("game_gid is required", status_code=400)
 
-        # 验证游戏存在
-        game = fetch_one_as_dict("SELECT gid FROM games WHERE gid = ?", (game_gid,))
+        # 验证游戏存在（使用GameService）
+        game = game_service.get_game_by_gid(int(game_gid))
         if not game:
             return json_error_response("Game not found", status_code=404)
 
-        nodes = fetch_all_as_dict(
-            """
-            SELECT en.*, le.event_name, le.event_name_cn
-            FROM event_nodes en
-            LEFT JOIN log_events le ON en.event_id = le.id
-            WHERE en.game_gid = ? AND en.is_active = 1
-            ORDER BY en.created_at DESC
-        """,
-            (game_gid,),
-        )
+        # 使用EventNodeService获取节点列表
+        nodes = event_node_service.get_nodes_by_game_gid(int(game_gid))
 
-        # 解析 config_json
+        # 转换为带详情的格式
+        nodes_with_details = []
         import json
 
         for node in nodes:
-            try:
-                node["config"] = json.loads(node["config_json"])
-            except (json.JSONDecodeError, TypeError, ValueError):
-                node["config"] = {}
+            node_dict = node.model_dump()
+            node_dict["event_name"] = node.event_name if hasattr(node, "event_name") else None
+            node_dict["event_name_cn"] = node.event_name_cn if hasattr(node, "event_name_cn") else None
 
-        return json_success_response(data=nodes, message="Event nodes retrieved")
+            # 解析 config_json
+            try:
+                node_dict["config"] = json.loads(node.config_json)
+            except (json.JSONDecodeError, TypeError, ValueError):
+                node_dict["config"] = {}
+
+            nodes_with_details.append(node_dict)
+
+        return json_success_response(data=nodes_with_details, message="Event nodes retrieved")
 
     except Exception as e:
         logger.error(f"Error fetching config list: {e}", exc_info=True)
@@ -406,25 +367,16 @@ def list_configs():
 @event_node_builder_bp.route("/api/delete/<int:config_id>", methods=["DELETE"])
 def delete_config(config_id):
     """
-    API: 删除事件节点配置
+    API: 删除事件节点配置 (ERS架构)
+
+    迁移后使用EventNodeService替代直接数据库访问
     """
     try:
-        from backend.core.utils import execute_write
-
-        node = fetch_one_as_dict(
-            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
-                      en.is_active, en.created_at, en.updated_at,
-                      le.event_name, le.event_name_cn
-               FROM event_nodes en
-               LEFT JOIN log_events le ON en.event_id = le.id
-               WHERE en.id = ?""",
-            (config_id,)
-        )
-        if not node:
-            return json_error_response("Event node not found", status_code=404)
-
-        # 软删除
-        execute_write("UPDATE event_nodes SET is_active = 0 WHERE id = ?", (config_id,))
+        # 使用EventNodeService软删除节点
+        try:
+            event_node_service.soft_delete_node(config_id)
+        except ValueError as e:
+            return json_error_response(str(e), status_code=404)
 
         return json_success_response(message="Event node deleted")
 
@@ -438,51 +390,22 @@ def delete_config(config_id):
 @event_node_builder_bp.route("/api/copy/<int:node_id>", methods=["POST"])
 def copy_node(node_id):
     """
-    API: 复制事件节点
+    API: 复制事件节点 (ERS架构)
+
+    迁移后使用EventNodeService替代直接数据库访问
     """
     try:
-        from backend.core.utils import execute_write
+        # 使用EventNodeService复制节点
+        try:
+            new_node = event_node_service.copy_node(node_id)
+        except ValueError as e:
+            return json_error_response(str(e), status_code=404)
 
-        # 获取原节点
-        node = fetch_one_as_dict(
-            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
-                      en.is_active, en.created_at, en.updated_at,
-                      le.event_name, le.event_name_cn
-               FROM event_nodes en
-               LEFT JOIN log_events le ON en.event_id = le.id
-               WHERE en.id = ?""",
-            (node_id,)
-        )
-
-        if not node:
-            return json_error_response("Event node not found", status_code=404)
-
-        # 复制节点（修改名称）
-        original_name = node["name"]
-        new_name = f"{original_name} (Copy)"
-
-        # 创建新节点
-        new_node_id = execute_write(
-            """
-            INSERT INTO event_nodes (game_gid, name, event_id, config_json)
-            VALUES (?, ?, ?, ?)
-        """,
-            (node["game_gid"], new_name, node["event_id"], node["config_json"]),
-        )
-
-        # 返回新节点
-        new_node = fetch_one_as_dict(
-            """SELECT en.id, en.game_gid, en.name, en.event_id, en.config_json,
-                      en.is_active, en.created_at, en.updated_at,
-                      le.event_name, le.event_name_cn
-               FROM event_nodes en
-               LEFT JOIN log_events le ON en.event_id = le.id
-               WHERE en.id = ?""",
-            (new_node_id,)
-        )
+        # 获取带详情的节点数据
+        node_with_details = event_node_service.get_node_with_details(new_node.id)
 
         return json_success_response(
-            data={"node": new_node}, message="Event node copied", status_code=201
+            data={"node": node_with_details}, message="Event node copied", status_code=201
         )
 
     except Exception as e:
@@ -499,7 +422,9 @@ def copy_node(node_id):
 @event_node_builder_bp.route("/api/search", methods=["GET"])
 def search_event_nodes():
     """
-    Search event nodes with filters
+    Search event nodes with filters (ERS架构)
+
+    迁移后使用EventNodeService + GameService替代直接数据库访问
 
     Query Parameters:
         game_gid (int, required): Game GID
@@ -525,52 +450,33 @@ def search_event_nodes():
         event_id = request.args.get("event_id", type=int)
         field_count_min = request.args.get("field_count_min", type=int)
         field_count_max = request.args.get("field_count_max", type=int)
-        today_modified = request.args.get("today_modified", type=bool)
-
-        # Build query
-        query = """SELECT
-                en.*,
-                e.name as event_name,
-                COUNT(DISTINCT ep.id) as field_count
-            FROM event_nodes en
-            INNER JOIN log_events e ON en.event_id = e.id
-            LEFT JOIN event_params ep ON en.id = ep.event_node_id
-            WHERE e.game_gid = ?
-            GROUP BY en.id
-        """
-        params = [game_gid]
-
-        # Apply filters
-        if keyword:
-            query += " AND e.name LIKE ?"
-            params.append(f"%{keyword}%")
-
-        if event_id:
-            query += " AND en.event_id = ?"
-            params.append(event_id)
-
-        if field_count_min is not None:
-            query += " HAVING COUNT(DISTINCT ep.id) >= ?"
-            params.append(field_count_min)
-
-        if field_count_max is not None:
-            query += " HAVING COUNT(DISTINCT ep.id) <= ?"
-            params.append(field_count_max)
-
         limit = request.args.get("limit", 100, type=int)
         limit = min(max(limit, 1), 100)
         offset = request.args.get("offset", 0, type=int)
         offset = max(offset, 0)
 
-        query += f" ORDER BY en.updated_at DESC LIMIT {limit} OFFSET {offset}"
+        # 使用EventNodeService搜索节点
+        try:
+            nodes = event_node_service.search_nodes(
+                game_gid=game_gid,
+                keyword=keyword,
+                event_id=event_id,
+                field_count_min=field_count_min,
+                field_count_max=field_count_max,
+                limit=limit,
+                offset=offset
+            )
+        except ValueError as e:
+            return json_error_response(str(e), status_code=400)
 
-        nodes = fetch_all_as_dict(query, tuple(params))
+        # 转换为字典格式
+        nodes_data = [node.model_dump() for node in nodes]
 
         # 包装成符合 EventNodesListResponse 的格式
         return json_success_response(
             data={
-                "nodes": nodes,
-                "total": len(nodes),
+                "nodes": nodes_data,
+                "total": len(nodes_data),
                 "page": 1,
                 "per_page": 100,
                 "total_pages": 1,
@@ -586,7 +492,9 @@ def search_event_nodes():
 @event_node_builder_bp.route("/api/stats", methods=["GET"])
 def get_event_nodes_stats():
     """
-    Get event nodes statistics for a game
+    Get event nodes statistics for a game (ERS架构)
+
+    迁移后使用EventNodeService + GameService替代直接数据库访问
 
     Query Parameters:
         game_gid (int, required): Game GID
@@ -605,33 +513,17 @@ def get_event_nodes_stats():
         if not validate_game_exists(game_gid):
             return json_error_response("Game not found", status_code=404)
 
-        # Get statistics
-        query = """SELECT
-                COUNT(DISTINCT en.id) as total_nodes,
-                COUNT(DISTINCT en.event_id) as unique_events,
-                COUNT(DISTINCT ep.id) as total_fields
-            FROM event_nodes en
-            INNER JOIN log_events e ON en.event_id = e.id
-            LEFT JOIN event_params ep ON en.id = ep.event_node_id
-            WHERE e.game_gid = ?
-        """
-
-        stats = fetch_one_as_dict(query, (game_gid,))
-
-        if not stats:
-            # Return zero stats if no nodes found
-            stats = {"total_nodes": 0, "unique_events": 0, "total_fields": 0}
-
-        # 计算平均字段数（avg_fields）
-        total_nodes = stats.get("total_nodes", 0)
-        total_fields = stats.get("total_fields", 0)
-        avg_fields = round(total_fields / total_nodes, 2) if total_nodes > 0 else 0
+        # 使用EventNodeService获取统计信息
+        try:
+            stats = event_node_service.get_nodes_stats(game_gid)
+        except ValueError as e:
+            return json_error_response(str(e), status_code=404)
 
         return json_success_response(
             data={
                 "total_nodes": stats["total_nodes"],
                 "unique_events": stats["unique_events"],
-                "avg_fields": avg_fields,
+                "avg_fields": stats["avg_fields"],
             },
             message="Event nodes statistics retrieved successfully",
         )
