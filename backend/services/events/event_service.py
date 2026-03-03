@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Event Service - 业务逻辑层 (精简架构)
+"""Event Service - Business logic layer (simplified architecture).
 
-提供事件相关的业务逻辑服务
-- 使用统一Entity模型 (EventEntity)
-- 移除DDD抽象,简化业务逻辑
-- 集成缓存防护和失效机制
-- 集成Bloom Filter防止缓存穿透 (2026-02-25)
+This service provides business logic for event management:
+- Uses unified Entity model (EventEntity)
+- Removes DDD abstractions to simplify business logic
+- Integrates cache protection and invalidation mechanisms
+- Integrates Bloom Filter to prevent cache penetration (2026-02-25)
 """
 
 from typing import List, Optional, Dict, Any
@@ -25,9 +24,14 @@ logger = logging.getLogger(__name__)
 
 
 class EventService:
-    """事件业务服务 (精简架构 + Bloom Filter防护)"""
+    """Event business service with Bloom Filter protection.
+
+    This service handles event management operations including CRUD,
+    caching, and Bloom Filter integration for cache penetration prevention.
+    """
 
     def __init__(self):
+        """Initialize the EventService with required repositories and cache."""
         self.event_repo = EventRepository()
         self.game_repo = GameRepository()
         self.category_repo = EventCategoryRepository()
@@ -42,7 +46,11 @@ class EventService:
 
     @property
     def bloom_filter(self):
-        """延迟加载Bloom Filter（线程安全）"""
+        """Lazy-loaded Bloom Filter instance (thread-safe).
+
+        Returns:
+            EnhancedBloomFilter: The Bloom Filter instance for event ID validation.
+        """
         if self._bloom_filter is None:
             with self._bloom_filter_lock:
                 if self._bloom_filter is None:
@@ -57,7 +65,11 @@ class EventService:
         return self._bloom_filter
 
     def _is_test_mode(self) -> bool:
-        """检测是否在测试环境"""
+        """Check if the code is running in test mode.
+
+        Returns:
+            bool: True if in test mode, False otherwise.
+        """
         return (
             os.environ.get("TESTING") == "true" or
             os.environ.get("PYTEST_CURRENT_TEST") is not None
@@ -67,19 +79,28 @@ class EventService:
     def get_events_by_game(
         self, game_gid: int, page: int = 1, per_page: int = 20
     ) -> Dict[str, Any]:
-        """
-        根据游戏GID获取事件列表 (带缓存)
+        """Get paginated event list by game GID with caching.
 
         Args:
-            game_gid: 游戏业务GID
-            page: 页码（从1开始）
-            per_page: 每页数量
+            game_gid: Game business GID.
+            page: Page number starting from 1.
+            per_page: Number of events per page.
 
         Returns:
-            包含事件列表和分页信息的字典
+            A dictionary containing:
+                - events: List of EventEntity objects
+                - total: Total number of events
+                - page: Current page number
+                - per_page: Events per page
+                - total_pages: Total number of pages
 
         Raises:
-            ValueError: 游戏不存在
+            ValueError: If the game does not exist.
+
+        Example:
+            >>> service = EventService()
+            >>> result = service.get_events_by_game(10000147, page=1, per_page=20)
+            >>> print(f"Total events: {result['total']}")
         """
         game = self.game_repo.find_by_gid(game_gid)
         if not game:
@@ -98,16 +119,22 @@ class EventService:
 
     @cached("events.detail", timeout=300)
     def get_event_by_id(self, event_id: int) -> Optional[EventEntity]:
-        """
-        根据ID获取事件 (带Bloom Filter防护)
+        """Get event by ID with Bloom Filter protection.
 
-        使用Bloom Filter防止查询不存在的事件ID导致数据库压力
+        Uses Bloom Filter to prevent database pressure from querying non-existent
+        event IDs.
 
         Args:
-            event_id: 事件ID
+            event_id: Event ID.
 
         Returns:
-            EventEntity, 不存在返回None
+            EventEntity if found, None otherwise.
+
+        Example:
+            >>> service = EventService()
+            >>> event = service.get_event_by_id(1)
+            >>> if event:
+            ...     print(f"Event: {event.event_name}")
         """
         # 检查Bloom Filter
         cache_key = f"events:{event_id}"
@@ -131,30 +158,45 @@ class EventService:
 
     @cached("events.with_params", timeout=300)
     def get_event_with_params(self, event_id: int) -> Optional[Dict[str, Any]]:
-        """
-        获取事件及其参数 (带缓存)
+        """Get event with its parameters with caching.
 
         Args:
-            event_id: 事件ID
+            event_id: Event ID.
 
         Returns:
-            包含事件和参数信息的字典, 不存在返回None
+            Dictionary containing event and parameter information,
+            or None if not found.
+
+        Example:
+            >>> service = EventService()
+            >>> event_data = service.get_event_with_params(1)
+            >>> if event_data:
+            ...     print(f"Event: {event_data['event']}")
+            ...     print(f"Params: {event_data['parameters']}")
         """
         return self.event_repo.get_with_parameters(event_id)
 
     def create_event(self, event_data: EventEntity) -> EventEntity:
-        """
-        创建事件 (自动失效缓存 + 更新Bloom Filter)
+        """Create a new event with cache invalidation and Bloom Filter update.
 
         Args:
-            event_data: 事件Entity (已通过Pydantic验证)
+            event_data: Event Entity (validated by Pydantic).
 
         Returns:
-            创建的EventEntity
+            The created EventEntity.
 
         Raises:
-            ValueError: game不存在或事件已存在
-            ValidationError: 数据验证失败
+            ValueError: If game does not exist or event name already exists.
+            ValidationError: If data validation fails.
+
+        Example:
+            >>> service = EventService()
+            >>> event = EventEntity(
+            ...     game_gid=10000147,
+            ...     name="login",
+            ...     event_name_cn="登录"
+            ... )
+            >>> created = service.create_event(event)
         """
         # 验证游戏存在
         game = self.game_repo.find_by_gid(event_data.game_gid)
@@ -189,18 +231,21 @@ class EventService:
     def update_event(
         self, event_id: int, updates: Dict[str, Any]
     ) -> EventEntity:
-        """
-        更新事件 (自动失效缓存)
+        """Update event with automatic cache invalidation.
 
         Args:
-            event_id: 事件ID
-            updates: 更新字段字典
+            event_id: Event ID.
+            updates: Dictionary of fields to update.
 
         Returns:
-            更新后的EventEntity
+            The updated EventEntity.
 
         Raises:
-            ValueError: 事件不存在
+            ValueError: If event does not exist.
+
+        Example:
+            >>> service = EventService()
+            >>> updated = service.update_event(1, {"event_name_cn": "登录V2"})
         """
         event = self.event_repo.find_by_id(event_id)
         if event is None:
@@ -220,14 +265,17 @@ class EventService:
         return result
 
     def delete_event(self, event_id: int) -> None:
-        """
-        删除事件 (自动失效缓存)
+        """Delete event with automatic cache invalidation.
 
         Args:
-            event_id: 事件ID
+            event_id: Event ID.
 
         Raises:
-            ValueError: 事件不存在
+            ValueError: If event does not exist.
+
+        Example:
+            >>> service = EventService()
+            >>> service.delete_event(1)
         """
         event = self.event_repo.find_by_id(event_id)
         if not event:
@@ -247,15 +295,18 @@ class EventService:
     def search_events(
         self, keyword: str, game_gid: Optional[int] = None
     ) -> List[EventEntity]:
-        """
-        搜索事件 (带缓存)
+        """Search events by keyword with caching.
 
         Args:
-            keyword: 搜索关键词
-            game_gid: 可选的游戏GID过滤
+            keyword: Search keyword.
+            game_gid: Optional game GID filter.
 
         Returns:
-            匹配的EventEntity列表
+            List of matching EventEntity objects.
+
+        Example:
+            >>> service = EventService()
+            >>> results = service.search_events("login", game_gid=10000147)
         """
         return self.event_repo.search_events(keyword, game_gid)
 
@@ -263,46 +314,67 @@ class EventService:
     def get_recent_events(
         self, game_gid: Optional[int] = None, limit: int = 10
     ) -> List[EventEntity]:
-        """
-        获取最近的事件 (带缓存 - 短TTL用于实时数据)
+        """Get recent events with caching (short TTL for real-time data).
 
         Args:
-            game_gid: 可选的游戏GID过滤
-            limit: 返回数量限制
+            game_gid: Optional game GID filter.
+            limit: Maximum number of events to return.
 
         Returns:
-            最近的EventEntity列表
+            List of recent EventEntity objects.
+
+        Example:
+            >>> service = EventService()
+            >>> recent = service.get_recent_events(game_gid=10000147, limit=5)
         """
         return self.event_repo.get_recent_events(game_gid, limit)
 
     @cached("events.statistics", timeout=300)
     def get_event_statistics(self, event_id: int) -> Optional[Dict[str, Any]]:
-        """
-        获取事件统计 (带缓存)
+        """Get event statistics with caching.
 
         Args:
-            event_id: 事件ID
+            event_id: Event ID.
 
         Returns:
-            事件统计信息字典, 不存在返回None
+            Dictionary of event statistics, or None if not found.
+
+        Example:
+            >>> service = EventService()
+            >>> stats = service.get_event_statistics(1)
         """
         return self.event_repo.get_event_statistics(event_id)
 
     def get_bloom_filter_stats(self) -> Dict[str, Any]:
-        """
-        获取Bloom Filter统计信息
+        """Get Bloom Filter statistics.
 
         Returns:
-            Bloom Filter统计字典
+            Dictionary containing Bloom Filter statistics including:
+                - total_items: Number of items in the filter
+                - size: Filter size in bytes
+                - capacity: Filter capacity
+                - error_rate: Current error rate
+
+        Example:
+            >>> service = EventService()
+            >>> stats = service.get_bloom_filter_stats()
+            >>> print(f"Items: {stats['total_items']}")
         """
         return self.bloom_filter.get_stats()
 
     def rebuild_bloom_filter(self) -> Dict[str, Any]:
-        """
-        重建Bloom Filter (从数据库)
+        """Rebuild Bloom Filter from database.
+
+        This method clears and rebuilds the Bloom Filter by loading all
+        existing events from the database.
 
         Returns:
-            重建统计信息
+            Dictionary containing rebuild statistics.
+
+        Example:
+            >>> service = EventService()
+            >>> stats = service.rebuild_bloom_filter()
+            >>> print(f"Rebuilt {stats['total_items']} items")
         """
         logger.info("🔄 Rebuilding Events Bloom Filter from database...")
 

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Parameter Service - 业务逻辑层 (精简架构)
+"""Parameter Service - Business logic layer (simplified architecture).
 
-提供参数相关的业务逻辑服务
-- 使用统一Entity模型 (ParameterEntity)
-- 移除DDD抽象,简化业务逻辑
-- 集成缓存防护和失效机制
+This service provides business logic for parameter management:
+- Uses unified Entity model (ParameterEntity)
+- Removes DDD abstractions to simplify business logic
+- Integrates cache protection and invalidation mechanisms
 """
 
 from typing import List, Optional, Dict, Any, Union
@@ -21,9 +20,14 @@ logger = logging.getLogger(__name__)
 
 
 class ParameterService:
-    """参数业务服务 (精简架构)"""
+    """Parameter business service with cache management.
+
+    This service handles parameter management operations including CRUD,
+    caching, and common parameter management.
+    """
 
     def __init__(self):
+        """Initialize the ParameterService with required repositories and cache."""
         self.param_repo = ParameterRepository()
         from backend.core.cache.cache_system import HierarchicalCache
         self.cache = HierarchicalCache()
@@ -31,14 +35,18 @@ class ParameterService:
 
     @cached("parameters.list", timeout=CacheConfig.CACHE_TIMEOUT_PARAMS)
     def get_all_parameters(self) -> List[ParameterEntity]:
-        """
-        获取所有参数 (带缓存)
+        """Get all parameters with caching.
 
         Returns:
-            参数Entity列表
+            List of all ParameterEntity objects.
 
         Raises:
-            DatabaseError: 数据库查询失败
+            DatabaseError: If database query fails.
+
+        Example:
+            >>> service = ParameterService()
+            >>> params = service.get_all_parameters()
+            >>> print(f"Total parameters: {len(params)}")
         """
         # ParameterRepository现在直接返回ParameterEntity
         return self.param_repo.find_all()
@@ -116,17 +124,22 @@ class ParameterService:
 
     @cached("parameters.by_id", timeout=300)
     def get_parameter_by_id(self, param_id: int) -> Optional[ParameterEntity]:
-        """
-        根据ID获取参数 (带缓存)
+        """Get parameter by ID with caching.
 
         Args:
-            param_id: 参数ID
+            param_id: Parameter ID.
 
         Returns:
-            ParameterEntity, 不存在返回None
+            ParameterEntity if found, None otherwise.
 
         Raises:
-            ValueError: param_id无效
+            ValueError: If param_id is invalid.
+
+        Example:
+            >>> service = ParameterService()
+            >>> param = service.get_parameter_by_id(1)
+            >>> if param:
+            ...     print(f"Parameter: {param.name}")
         """
         if not param_id or param_id <= 0:
             raise ValueError(f"Invalid param_id: {param_id}")
@@ -189,17 +202,26 @@ class ParameterService:
         param_data: Union[Dict[str, Any], ParameterEntity],
         **kwargs
     ) -> ParameterEntity:
-        """
-        创建参数 (自动失效缓存)
+        """Create a new parameter with automatic cache invalidation.
 
         Args:
-            param_data: 参数数据 (字典或ParameterEntity)
+            param_data: Parameter data (dict or ParameterEntity).
+            **kwargs: Additional keyword arguments.
 
         Returns:
-            创建的ParameterEntity
+            The created ParameterEntity.
 
         Raises:
-            ValueError: 参数验证失败
+            ValueError: If parameter validation fails.
+
+        Example:
+            >>> service = ParameterService()
+            >>> param = service.create_parameter({
+            ...     "event_id": 1,
+            ...     "name": "zone_id",
+            ...     "param_type": "param",
+            ...     "json_path": "$.zoneId"
+            ... })
         """
         # 处理不同类型的输入
         if isinstance(param_data, ParameterEntity):

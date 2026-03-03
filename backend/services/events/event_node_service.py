@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Event Node Service (事件节点业务服务 - 精简架构)
+"""Event Node Service - Business logic layer (simplified architecture).
 
-提供事件节点的业务逻辑处理
-- 使用EventNodeEntity进行类型安全的数据传递
-- 集成缓存管理
-- 简化业务逻辑，移除DDD抽象
+This service provides business logic for event node management:
+- Uses EventNodeEntity for type-safe data transfer
+- Integrates cache management
+- Simplifies business logic by removing DDD abstractions
 """
 
 from typing import List, Optional, Dict, Any
@@ -19,17 +18,16 @@ from backend.core.cache.cache_system import cached
 
 
 class EventNodeService(BaseService):
-    """
-    事件节点业务服务 (精简架构)
+    """Event node business service (simplified architecture).
 
-    职责:
-    - 事件节点CRUD操作
-    - 业务规则验证
-    - 缓存管理
+    Responsibilities:
+    - Event node CRUD operations
+    - Business rule validation
+    - Cache management
     """
 
     def __init__(self):
-        """初始化服务"""
+        """Initialize the EventNodeService with required repositories."""
         super().__init__()
         self.node_repo = EventNodeRepository()
         self.game_repo = GameRepository()
@@ -37,14 +35,19 @@ class EventNodeService(BaseService):
 
     @cached("event_nodes.byId", timeout=120)
     def get_node_by_id(self, node_id: int) -> Optional[EventNodeEntity]:
-        """
-        根据ID获取事件节点 (带缓存)
+        """Get event node by ID with caching.
 
         Args:
-            node_id: 节点ID
+            node_id: Node ID.
 
         Returns:
-            EventNodeEntity, 不存在返回None
+            EventNodeEntity if found, None otherwise.
+
+        Example:
+            >>> service = EventNodeService()
+            >>> node = service.get_node_by_id(1)
+            >>> if node:
+            ...     print(f"Node: {node.name}")
         """
         return self.node_repo.find_by_id(node_id)
 
@@ -75,17 +78,17 @@ class EventNodeService(BaseService):
         return self.node_repo.find_by_event_id(event_id)
 
     def create_node(self, node: EventNodeEntity) -> EventNodeEntity:
-        """
-        创建事件节点
+        """Create a new event node with validation and cache invalidation.
 
         Args:
-            node: EventNodeEntity实例
+            node: EventNodeEntity instance.
 
         Returns:
-            创建的EventNodeEntity
+            The created EventNodeEntity.
 
         Raises:
-            ValueError: 当游戏或事件不存在时
+            ValueError: If game or event does not exist, or if event does not
+                belong to the specified game.
 
         Example:
             >>> service = EventNodeService()
@@ -96,6 +99,7 @@ class EventNodeService(BaseService):
             ...     config_json={"fields": [], "mode": "single"}
             ... )
             >>> created = service.create_node(node)
+            >>> print(f"Created node: {created.id}")
         """
         # 验证游戏存在
         game = self.game_repo.find_by_gid(node.game_gid)
