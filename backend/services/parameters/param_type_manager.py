@@ -1,21 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Parameter Type Manager
-Handles parameter type templates and type-related operations
+Parameter Type Manager - REFACTORED
+===================================
+
+Refactored to use Repository pattern instead of direct database access.
+
+Migration Status: Repository Pattern Implementation (2026-03-03)
+- Removed direct database access
+- Added ParamTemplateRepository integration
+- All methods now use Repository layer
+- Maintained backward compatibility
 """
 
 import json
 from typing import Dict, List, Optional, Any
 from functools import lru_cache
 from backend.core.logging import get_logger
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict
+from backend.models.repositories.param_template_repository import ParamTemplateRepository
 
 logger = get_logger(__name__)
 
 
 class ParamTypeManager:
-    """Parameter type template management"""
+    """Parameter type template management (Repository Pattern Implementation)"""
 
     # 基础类型定义
     PRIMITIVE_TYPES = ["string", "int", "bigint", "float", "double", "boolean", "datetime"]
@@ -24,24 +32,24 @@ class ParamTypeManager:
     COMPLEX_TYPES = ["array", "map"]
 
     def __init__(self):
-        """Initialize type manager"""
+        """Initialize type manager with Repository"""
+        self.template_repo = ParamTemplateRepository()
+        logger.debug("ParamTypeManager initialized with ParamTemplateRepository")
 
     def get_all_templates(self, include_system: bool = True) -> List[Dict[str, Any]]:
         """获取所有类型模板（带缓存）"""
-        return _get_all_templates_cached(include_system)
+        return self.template_repo.get_all_templates(include_system)
 
     def get_template_by_name(self, template_name: str) -> Optional[Dict[str, Any]]:
         """根据名称获取类型模板（带缓存）"""
-        return _get_template_by_name_cached(template_name)
+        return self.template_repo.find_by_name(template_name)
 
     def get_template_by_id(self, template_id: int) -> Optional[Dict[str, Any]]:
         """根据ID获取类型模板（带缓存）"""
-        return _get_template_by_id_cached(template_id)
+        return self.template_repo.find_by_id(template_id)
 
     def create_template(self, template_data: Dict[str, Any]) -> int:
         """创建自定义类型模板"""
-        from backend.core.database import get_db_connection
-
         # 解析类型定义
         type_def = json.loads(template_data["type_definition"])
 
@@ -49,30 +57,18 @@ class ParamTypeManager:
         if "hql_parse_template" not in template_data or not template_data["hql_parse_template"]:
             template_data["hql_parse_template"] = self._generate_hql_template(type_def)
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            """
-            INSERT INTO param_templates
-            (template_name, display_name, base_type, element_type, nesting_level,
-             type_definition, hql_parse_template, description, is_system)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
-        """,
-            (
-                template_data["template_name"],
-                template_data["display_name"],
-                type_def.get("base_type", type_def.get("type")),
-                type_def.get("element_type"),
-                type_def.get("nesting_level", 1),
-                template_data["type_definition"],
-                template_data["hql_parse_template"],
-                template_data.get("description", ""),
-            ),
+        # 使用Repository创建
+        template_id = self.template_repo.create_template(
+            template_name=template_data["template_name"],
+            display_name=template_data["display_name"],
+            base_type=type_def.get("base_type", type_def.get("type")),
+            element_type=type_def.get("element_type"),
+            nesting_level=type_def.get("nesting_level", 1),
+            type_definition=type_def,
+            hql_parse_template=template_data["hql_parse_template"],
+            description=template_data.get("description", ""),
         )
 
-        template_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
         logger.info(f"Created custom template: {template_data['template_name']}")
         return template_id
 
@@ -174,24 +170,7 @@ class ParamTypeManager:
         Returns:
             分组的类型列表
         """
-        templates = self.get_all_templates()
-
-        grouped = {"基础类型": [], "数组类型": [], "Map类型": [], "复杂嵌套": [], "自定义": []}
-
-        for t in templates:
-            if t["base_type"] in self.PRIMITIVE_TYPES:
-                grouped["基础类型"].append(t)
-            elif t["base_type"] == "array":
-                if t["nesting_level"] == 1:
-                    grouped["数组类型"].append(t)
-                else:
-                    grouped["复杂嵌套"].append(t)
-            elif t["base_type"] == "map":
-                grouped["Map类型"].append(t)
-            elif not t["is_system"]:
-                grouped["自定义"].append(t)
-
-        return grouped
+        return self.template_repo.get_available_types_grouped()
 
     def get_cast_type(self, param_type: str) -> str:
         """获取参数对应的CAST类型
@@ -202,6 +181,12 @@ class ParamTypeManager:
         Returns:
             SQL CAST类型字符串
         """
+        # 使用Repository
+        template = self.template_repo.find_by_name(param_type)
+        if template:
+            return self.template_repo.get_cast_type(template["id"])
+
+        # Fallback to hardcoded mapping
         cast_map = {
             "int": "INT",
             "bigint": "BIGINT",
@@ -213,6 +198,12 @@ class ParamTypeManager:
 
     def needs_cast(self, param_type: str) -> bool:
         """判断参数类型是否需要CAST转换"""
+        # 使用Repository
+        template = self.template_repo.find_by_name(param_type)
+        if template:
+            return self.template_repo.needs_cast(template["id"])
+
+        # Fallback
         return param_type in ["int", "bigint", "float", "double", "boolean"]
 
     def format_param_field(self, param_name: str, param_type: str, param_name_cn: str = "") -> str:
@@ -243,8 +234,6 @@ class ParamTypeManager:
         Returns:
             创建的模板ID，失败返回None
         """
-        from backend.core.database import get_db_connection
-
         # 解析类型定义
         type_def = self.parse_type_string(type_str)
 
@@ -252,7 +241,7 @@ class ParamTypeManager:
         template_name = type_str.replace(" ", "")
 
         # 检查是否已存在
-        existing = self.get_template_by_name(template_name)
+        existing = self.template_repo.find_by_name(template_name)
         if existing:
             return existing["id"]
 
@@ -265,45 +254,23 @@ class ParamTypeManager:
         else:
             display_name = template_name
 
-        # 类型定义JSON
-        type_definition = json.dumps(type_def, ensure_ascii=False)
-
-        # 生成HQL解析模板
-        hql_template = self._generate_hql_template(type_def)
-
-        # 插入数据库
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # 使用Repository创建
         try:
-            cursor.execute(
-                """
-                INSERT INTO param_templates
-                (template_name, display_name, base_type, element_type, nesting_level,
-                 type_definition, hql_parse_template, description, is_system)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
-            """,
-                (
-                    template_name,
-                    display_name,
-                    type_def["type"],
-                    type_def.get("element_type"),
-                    type_def.get("nesting_level", 1),
-                    type_definition,
-                    hql_template,
-                    f"自定义复杂类型: {template_name}",
-                ),
+            template_id = self.template_repo.create_template(
+                template_name=template_name,
+                display_name=display_name,
+                base_type=type_def["type"],
+                element_type=type_def.get("element_type"),
+                nesting_level=type_def.get("nesting_level", 1),
+                type_definition=type_def,
+                hql_parse_template=self._generate_hql_template(type_def),
+                description=f"自定义复杂类型: {template_name}",
             )
-
-            template_id = cursor.lastrowid
-            conn.commit()
             logger.info(f"Created complex type template: {template_name}")
             return template_id
         except Exception as e:
-            conn.rollback()
             logger.error(f"Failed to create complex type template {template_name}: {e}")
             return None
-        finally:
-            conn.close()
 
     def parse_complex_type(self, type_str: str) -> Dict[str, Any]:
         """解析复杂类型字符串，返回完整结构
@@ -325,31 +292,6 @@ class ParamTypeManager:
                 result["element_definition"] = inner_def
 
         return result
-
-
-# Module-level cached functions (to work with singleton pattern)
-@lru_cache(maxsize=8)
-def _get_all_templates_cached(include_system: bool = True) -> List[Dict[str, Any]]:
-    """获取所有类型模板（缓存层）"""
-    query = "SELECT * FROM param_templates"
-    if not include_system:
-        query += " WHERE is_system = 0"
-    query += " ORDER BY base_type, nesting_level, template_name"
-    return fetch_all_as_dict(query)
-
-
-@lru_cache(maxsize=32)
-def _get_template_by_name_cached(template_name: str) -> Optional[Dict[str, Any]]:
-    """根据名称获取类型模板（缓存层）"""
-    return fetch_one_as_dict(
-        "SELECT * FROM param_templates WHERE template_name = ?", (template_name,)
-    )
-
-
-@lru_cache(maxsize=32)
-def _get_template_by_id_cached(template_id: int) -> Optional[Dict[str, Any]]:
-    """根据ID获取类型模板（缓存层）"""
-    return fetch_one_as_dict("SELECT * FROM param_templates WHERE id = ?", (template_id,))
 
 
 # Singleton instance
