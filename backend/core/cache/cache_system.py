@@ -38,7 +38,10 @@ import logging
 import random
 import threading
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
+
+# TypeVar for cached decorator
+F = TypeVar('F', bound=Callable[..., Any])
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +150,7 @@ class HierarchicalCache:
     - L2命中自动回填L1
     """
 
-    def __init__(self, l1_size=1000, l1_ttl=60, l2_ttl=3600):
+    def __init__(self, l1_size: int = 1000, l1_ttl: int = 60, l2_ttl: int = 3600) -> None:
         """
         初始化分层缓存
 
@@ -559,7 +562,7 @@ class CacheInvalidator:
     - 批量失效：使用Redis Pipeline优化批量删除
     """
 
-    def __init__(self, cache: HierarchicalCache):
+    def __init__(self, cache: HierarchicalCache) -> None:
         """
         初始化缓存失效管理器
 
@@ -679,7 +682,7 @@ class CacheInvalidator:
 # ============================================================================
 
 
-def cached(pattern: str, timeout: Optional[int] = None):
+def cached(pattern: str, timeout: Optional[int] = None) -> Callable[[F], F]:
     """
     简单缓存装饰器（使用Flask-Cache）
 
@@ -693,9 +696,9 @@ def cached(pattern: str, timeout: Optional[int] = None):
         timeout: 超时时间（秒）
     """
 
-    def decorator(f):
+    def decorator(f: F) -> F:
         @wraps(f)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             # 生成缓存键
             key = CacheKeyBuilder.build(pattern, **kwargs)
 
@@ -703,9 +706,9 @@ def cached(pattern: str, timeout: Optional[int] = None):
             cache = None
             try:
                 cache = current_app.cache
-                cached = cache.get(key)
-                if cached is not None:
-                    return cached
+                cached_val = cache.get(key)
+                if cached_val is not None:
+                    return cached_val
             except (AttributeError, RuntimeError):
                 pass
 
@@ -721,7 +724,7 @@ def cached(pattern: str, timeout: Optional[int] = None):
 
             return result
 
-        return wrapper
+        return wrapper  # type: ignore[return-value]
 
     return decorator
 

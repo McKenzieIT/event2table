@@ -26,12 +26,13 @@ class ParameterService:
     caching, and common parameter management.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the ParameterService with required repositories and cache."""
-        self.param_repo = ParameterRepository()
         from backend.core.cache.cache_system import HierarchicalCache
-        self.cache = HierarchicalCache()
-        self.invalidator = CacheInvalidator(self.cache)
+
+        self.param_repo = ParameterRepository()
+        self.cache: HierarchicalCache = HierarchicalCache()
+        self.invalidator: CacheInvalidator = CacheInvalidator(self.cache)
 
     @cached("parameters.list", timeout=CacheConfig.CACHE_TIMEOUT_PARAMS)
     def get_all_parameters(self) -> List[ParameterEntity]:

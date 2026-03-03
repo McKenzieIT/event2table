@@ -23,7 +23,7 @@ class ParameterRepository(GenericRepository):
     返回ParameterEntity而非字典,确保类型安全
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         初始化参数仓储
 

@@ -146,9 +146,16 @@
 ### 架构与设计
 
 - **[架构设计](development/architecture.md)** - 分层架构设计
-  - 四层架构（API → Service → Repository → Schema）
+  - 四层架构（API → Service → Repository → Entity）
   - 关注点分离原则
-  - DDD架构实施
+  - ERS架构（Entity-Repository-Service）
+
+- **[Repository模式指南](development/repository-pattern-guide.md)** ⭐ **NEW**
+  - GenericRepository使用方法
+  - Entity架构集成
+  - 缓存策略最佳实践
+  - Service层集成示例
+  - 完整的代码示例和常见问题
 
 - **[game_gid迁移指南](development/GAME_GID_MIGRATION_GUIDE.md)** - game_gid迁移
   - game_gid vs game_id区别

@@ -24,7 +24,7 @@ class EventRepository(GenericRepository):
     返回EventEntity而非字典,确保类型安全
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         初始化事件仓储
 

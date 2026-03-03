@@ -30,26 +30,30 @@ class EventService:
     caching, and Bloom Filter integration for cache penetration prevention.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the EventService with required repositories and cache."""
+        from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
+
         self.event_repo = EventRepository()
         self.game_repo = GameRepository()
         self.category_repo = EventCategoryRepository()
-        from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
-        self.cache = HierarchicalCache()
-        self.invalidator = CacheInvalidator(self.cache)
+        self.cache: HierarchicalCache = HierarchicalCache()
+        self.invalidator: CacheInvalidator = CacheInvalidator(self.cache)
 
         # Bloom Filter延迟初始化（lazy loading）
-        self._bloom_filter = None
+        self._bloom_filter: Optional[EnhancedBloomFilter] = None
         self._bloom_filter_lock = threading.Lock()
         logger.info("✅ EventService initialized (Bloom Filter lazy)")
 
     @property
-    def bloom_filter(self):
+    def bloom_filter(self) -> EnhancedBloomFilter:
         """Lazy-loaded Bloom Filter instance (thread-safe).
 
         Returns:
             EnhancedBloomFilter: The Bloom Filter instance for event ID validation.
+
+        Raises:
+            AssertionError: If bloom_filter is None (should never happen after initialization).
         """
         if self._bloom_filter is None:
             with self._bloom_filter_lock:
@@ -62,6 +66,8 @@ class EventService:
                         strict_validation=self._is_test_mode()
                     )
                     logger.info("✅ EventService Bloom Filter initialized")
+        # Assert non-None for type checker (property always returns non-None after initialization)
+        assert self._bloom_filter is not None, "Bloom Filter should be initialized after property access"
         return self._bloom_filter
 
     def _is_test_mode(self) -> bool:
@@ -387,7 +393,7 @@ class EventService:
             cache_key = f"events:{event.id}"
             self.bloom_filter.add(cache_key)
 
-        stats = self.bloom_filter.get_stats()
+        stats: Dict[str, Any] = self.bloom_filter.get_stats()
         logger.info(f"✅ Events Bloom Filter rebuilt: {stats['total_items']} items")
 
         return stats

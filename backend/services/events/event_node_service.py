@@ -26,12 +26,12 @@ class EventNodeService(BaseService):
     - Cache management
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the EventNodeService with required repositories."""
-        super().__init__()
-        self.node_repo = EventNodeRepository()
-        self.game_repo = GameRepository()
-        self.event_repo = EventRepository()
+        super().__init__()  # type: ignore[no-untyped-call]
+        self.node_repo = EventNodeRepository()  # type: ignore[no-untyped-call]
+        self.game_repo = GameRepository()  # type: ignore[no-untyped-call]
+        self.event_repo = EventRepository()  # type: ignore[no-untyped-call]
 
     @cached("event_nodes.byId", timeout=120)
     def get_node_by_id(self, node_id: int) -> Optional[EventNodeEntity]:
