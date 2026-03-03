@@ -256,9 +256,18 @@ class SyntaxValidator:
 
         return errors
 
-    def _check_semantics(self, hql: str, parse_tree) -> List[SyntaxError]:
-        """检查语义"""
-        errors = []
+    def _check_semantics(self, hql: str, parse_tree: Any) -> List[SyntaxError]:
+        """
+        检查语义
+
+        Args:
+            hql: HQL语句
+            parse_tree: 解析树
+
+        Returns:
+            List[SyntaxError]: 语义错误列表
+        """
+        errors: List[SyntaxError] = []
 
         # 检查1: 引号匹配
         errors.extend(self._check_quotes(hql))
@@ -352,9 +361,18 @@ class SyntaxValidator:
 
         return errors
 
-    def _check_joins(self, hql: str, parse_tree) -> List[SyntaxError]:
-        """检查JOIN语法"""
-        errors = []
+    def _check_joins(self, hql: str, parse_tree: Any) -> List[SyntaxError]:
+        """
+        检查JOIN语法
+
+        Args:
+            hql: HQL语句
+            parse_tree: 解析树
+
+        Returns:
+            List[SyntaxError]: JOIN语法错误列表
+        """
+        errors: List[SyntaxError] = []
 
         # 检查JOIN是否包含ON条件
         join_pattern = r"(?:INNER|LEFT|RIGHT|FULL|CROSS)?\s+JOIN\s+(\w+)"

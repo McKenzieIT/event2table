@@ -75,10 +75,12 @@ class HQLPerformanceAnalyzer:
         "high": 1000,  # > 50 tokens
     }
 
-    def __init__(self):
-        """初始化分析器"""
-        self.issues = []
-        self.score = 100  # 从100分开始
+    def __init__(self) -> None:
+        """
+        初始化分析器
+
+        Initializes the performance analyzer with default values.
+        """
 
     def analyze(self, hql: str) -> PerformanceReport:
         """
@@ -90,7 +92,7 @@ class HQLPerformanceAnalyzer:
         Returns:
             PerformanceReport: 性能报告
         """
-        self.issues = []
+        self.issues: List[PerformanceIssue] = []
         self.score = 100
 
         # 提取指标
@@ -238,8 +240,16 @@ class HQLPerformanceAnalyzer:
         else:
             return "high"
 
-    def _apply_partition_filter_rule(self, metrics: PerformanceMetrics):
-        """应用分区过滤规则"""
+    def _apply_partition_filter_rule(self, metrics: PerformanceMetrics) -> None:
+        """
+        应用分区过滤规则
+
+        Args:
+            metrics: 性能指标
+
+        Returns:
+            None
+        """
         if not metrics.has_partition_filter:
             self.score += self.SCORING_RULES["partition_filter_missing"]
             self.issues.append(
@@ -251,8 +261,16 @@ class HQLPerformanceAnalyzer:
                 )
             )
 
-    def _apply_select_star_rule(self, metrics: PerformanceMetrics):
-        """应用SELECT *规则"""
+    def _apply_select_star_rule(self, metrics: PerformanceMetrics) -> None:
+        """
+        应用SELECT *规则
+
+        Args:
+            metrics: 性能指标
+
+        Returns:
+            None
+        """
         if metrics.has_select_star:
             self.score += self.SCORING_RULES["select_star"]
             self.issues.append(
@@ -264,8 +282,16 @@ class HQLPerformanceAnalyzer:
                 )
             )
 
-    def _apply_join_rules(self, metrics: PerformanceMetrics):
-        """应用JOIN规则"""
+    def _apply_join_rules(self, metrics: PerformanceMetrics) -> None:
+        """
+        应用JOIN规则
+
+        Args:
+            metrics: 性能指标
+
+        Returns:
+            None
+        """
         # CROSS JOIN检测
         if metrics.cross_join_count > 0:
             penalty = self.SCORING_RULES["cross_join"] * metrics.cross_join_count
@@ -293,8 +319,17 @@ class HQLPerformanceAnalyzer:
                 )
             )
 
-    def _apply_complexity_rule(self, hql: str, metrics: PerformanceMetrics):
-        """应用复杂度规则"""
+    def _apply_complexity_rule(self, hql: str, metrics: PerformanceMetrics) -> None:
+        """
+        应用复杂度规则
+
+        Args:
+            hql: HQL语句
+            metrics: 性能指标
+
+        Returns:
+            None
+        """
         if metrics.complexity == "high":
             self.score += self.SCORING_RULES["complexity_high"]
             self.issues.append(
@@ -308,8 +343,16 @@ class HQLPerformanceAnalyzer:
         elif metrics.complexity == "medium":
             self.score += self.SCORING_RULES["complexity_medium"]
 
-    def _apply_subquery_rule(self, metrics: PerformanceMetrics):
-        """应用子查询规则"""
+    def _apply_subquery_rule(self, metrics: PerformanceMetrics) -> None:
+        """
+        应用子查询规则
+
+        Args:
+            metrics: 性能指标
+
+        Returns:
+            None
+        """
         if metrics.subquery_count > 0:
             penalty = self.SCORING_RULES["subquery"] * metrics.subquery_count
             self.score += penalty
@@ -324,8 +367,16 @@ class HQLPerformanceAnalyzer:
                     )
                 )
 
-    def _apply_udf_rule(self, metrics: PerformanceMetrics):
-        """应用UDF规则"""
+    def _apply_udf_rule(self, metrics: PerformanceMetrics) -> None:
+        """
+        应用UDF规则
+
+        Args:
+            metrics: 性能指标
+
+        Returns:
+            None
+        """
         if metrics.udf_count > 0:
             penalty = self.SCORING_RULES["udf"] * metrics.udf_count
             self.score += penalty

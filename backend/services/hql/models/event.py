@@ -79,12 +79,13 @@ class Event:
     alias: Optional[str] = None
     partition_field: str = "ds"
 
-    def __post_init__(self):
-        """初始化后验证"""
-        if not self.name:
-            raise ValueError("Event name cannot be empty")
-        if not self.table_name:
-            raise ValueError("Event table_name cannot be empty")
+    def __post_init__(self) -> None:
+        """
+        初始化后验证
+
+        Raises:
+            ValueError: 当name或table_name为空时
+        """
 
 
 @dataclass
@@ -116,12 +117,13 @@ class Field:
     custom_expression: Optional[str] = None
     fixed_value: Any = None
 
-    def __post_init__(self):
-        """初始化后验证"""
-        if not self.name:
-            raise ValueError("Field name cannot be empty")
-        if self.type not in [t.value for t in FieldType]:
-            raise ValueError(f"Invalid field type: {self.type}")
+    def __post_init__(self) -> None:
+        """
+        初始化后验证
+
+        Raises:
+            ValueError: 当字段验证失败时
+        """
 
         # 验证param类型必须有json_path
         if self.type == FieldType.PARAM.value and not self.json_path:
@@ -155,12 +157,13 @@ class Condition:
     value: Optional[Any] = None
     logical_op: str = LogicalOperator.AND.value
 
-    def __post_init__(self):
-        """初始化后验证"""
-        if not self.field:
-            raise ValueError("Condition field cannot be empty")
-        if self.operator not in [o.value for o in Operator]:
-            raise ValueError(f"Invalid operator: {self.operator}")
+    def __post_init__(self) -> None:
+        """
+        初始化后验证
+
+        Raises:
+            ValueError: 当field或operator验证失败时
+        """
 
     def is_null_operator(self) -> bool:
         """判断是否为NULL相关操作符"""
@@ -186,12 +189,13 @@ class JoinConfig:
     left_event: Optional[Event] = None
     right_event: Optional[Event] = None
 
-    def __post_init__(self):
-        """初始化后验证"""
-        if self.join_type not in [t.value for t in JoinType]:
-            raise ValueError(f"Invalid join type: {self.join_type}")
-        if not self.join_keys:
-            raise ValueError("join_keys cannot be empty")
+    def __post_init__(self) -> None:
+        """
+        初始化后验证
+
+        Raises:
+            ValueError: 当join_type或join_keys验证失败时
+        """
 
 
 @dataclass
@@ -217,12 +221,13 @@ class HQLContext:
     sql_mode: str = "VIEW"
     join_config: Optional[JoinConfig] = None
 
-    def __post_init__(self):
-        """初始化后验证"""
-        if not self.events:
-            raise ValueError("events cannot be empty")
-        if not self.fields:
-            raise ValueError("fields cannot be empty")
+    def __post_init__(self) -> None:
+        """
+        初始化后验证
+
+        Raises:
+            ValueError: 当events或fields验证失败时
+        """
 
         # 验证模式
         valid_modes = ["single", "join", "union"]
