@@ -1,11 +1,12 @@
 # Event2Table API 文档
 
-**V8.0.0架构** - REST API + GraphQL API
+**V9.0.0架构** - Repository Pattern Migration
 
-**版本**: 8.0.0
-**最后更新**: 2026-03-02
-**架构**: ERS (Entity-Repository-Service)
+**版本**: 9.0.0
+**最后更新**: 2026-03-03
+**架构**: ERS (Entity-Repository-Service) + Repository Pattern
 **API统计**: REST API 84端点 | GraphQL 78操作
+**迁移状态**: 6/8核心模块已迁移到Repository模式 (75%)
 
 ---
 
@@ -53,13 +54,61 @@
 - ✅ **统一架构**: 共享Entity-Repository-Service层
 - ✅ **渐进迁移**: REST → GraphQL平滑过渡
 
-### ERS架构
+### ERS架构 (Entity-Repository-Service)
 
 **100% ERS架构覆盖**:
+
+```
+┌─────────────────────────────────────────────────────┐
+│         API Layer (HTTP + GraphQL端点)               │
+│  - RESTful API: backend/api/routes/                  │
+│  - GraphQL API: backend/gql_api/ (V2)               │
+│  - 处理HTTP请求/响应                                  │
+│  - 参数解析和验证 (Pydantic Entity)                   │
+│  - 调用Service层                                      │
+└─────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────┐
+│           Service Layer (业务逻辑)                   │
+│  backend/services/                                   │
+│  - 实现业务逻辑                                       │
+│  - 协调多个Repository                                │
+│  - 缓存管理 (@cached, @cache_invalidate)             │
+│  - Bloom Filter集成                                  │
+└─────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────┐
+│        Repository Layer (数据访问)                   │
+│  backend/models/repositories/                        │
+│  - GenericRepository基类                             │
+│  - 封装数据访问逻辑                                   │
+│  - CRUD操作                                          │
+│  - 返回Entity对象 (而非Dict) ⭐                       │
+└─────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────┐
+│      Entity Layer (统一数据模型) ⭐                    │
+│  - Pydantic Entity: backend/models/entities.py       │
+│  - 单一真相来源 (Schema + Domain Model)              │
+│  - 自动输入验证                                       │
+│  - 序列化/反序列化                                    │
+└─────────────────────────────────────────────────────┘
+```
+
+**各层职责**:
 - ✅ Entity层: Pydantic模型统一数据验证
-- ✅ Repository层: 数据访问抽象
-- ✅ Service层: 业务逻辑封装
+- ✅ Repository层: 基于GenericRepository的数据访问抽象
+- ✅ Service层: 业务逻辑封装和缓存管理
 - ✅ API层: REST + GraphQL双端点
+
+**关键优势**:
+- 🎯 **类型安全**: Repository返回Entity对象而非字典
+- 🚀 **性能优化**: 读写分离缓存策略（读用@cached，写用@cache_invalidate）
+- 🧪 **易于测试**: Repository可Mock，Service可单元测试
+- 📦 **代码复用**: GenericRepository提供通用CRUD操作
 
 ### 缓存系统
 
@@ -68,6 +117,19 @@
 - L2缓存: 共享数据300秒TTL
 - 自动失效: 写操作自动清理相关缓存
 - 性能提升: 67% (267ms → 88ms)
+
+**缓存装饰器**:
+```python
+# 读操作：使用缓存
+@cached(ttl=1800)
+def get_events(game_gid):
+    return event_repo.find_by_game_gid(game_gid)
+
+# 写操作：清理缓存
+@cache_invalidate
+def create_event(data):
+    return event_repo.create(data)
+```
 
 ### 零破坏性变更
 
@@ -286,6 +348,548 @@ def create_event(game_gid, data):
 | `Game not found` | 404 | 检查game_gid是否正确 |
 | `Validation error` | 400 | 检查请求参数格式 |
 | `Already exists` | 409 | 资源已存在，使用唯一标识 |
+
+---
+
+## Repository 模式架构
+
+> **🆕 V8.0.0**: 100% ERS架构，所有模块使用Repository模式
+
+### 核心组件
+
+**1. GenericRepository 基类**
+
+提供通用CRUD操作和安全验证：
+
+```python
+from backend.core.data_access import GenericRepository
+
+class GameRepository(GenericRepository):
+    """游戏仓储类"""
+
+    def __init__(self):
+        super().__init__(
+            table_name="games",
+            primary_key="id",
+            enable_cache=True,
+            cache_timeout=120
+        )
+
+    # 继承的方法：
+    # - find_by_id(id)          # 按ID查询
+    # - find_by_field(f, v)     # 按字段查询
+    # - find_where(cond)        # 按条件查询
+    # - find_all()              # 查询所有
+    # - create(data)            # 创建记录
+    # - update(id, data)        # 更新记录
+    # - delete(id)              # 删除记录
+```
+
+**2. Entity 统一模型**
+
+Pydantic Entity作为单一真相来源：
+
+```python
+from backend.models.entities import GameEntity
+
+# Entity自动验证输入
+game = GameEntity(
+    gid="10000147",
+    name="Game Name",
+    ods_db="ieu_ods"
+)
+
+# API层使用Entity验证
+game_data = GameEntity(**request.json)
+
+# Repository返回Entity
+game = game_repo.find_by_gid(10000147)  # 返回GameEntity
+
+# API层响应使用Entity序列化
+return json_success_response(data=game.model_dump())
+```
+
+**3. Service 层缓存**
+
+使用装饰器简化缓存管理：
+
+```python
+from backend.core.cache.decorators import cached, cache_invalidate
+
+class GameService:
+    @cached(ttl=1800)  # 读操作：使用缓存
+    def get_games(self):
+        return self.game_repo.find_all()
+
+    @cache_invalidate  # 写操作：清理缓存
+    def create_game(self, data):
+        return self.game_repo.create(data)
+```
+
+### 数据流向
+
+**完整请求流程**：
+
+```
+1. HTTP Request (JSON)
+   ↓
+2. API Layer (request.get_json())
+   ↓
+3. Entity Validation (Pydantic)
+   ↓
+4. Service Layer (Business Logic + Cache)
+   ↓
+5. Repository Layer (SQL Query)
+   ↓
+6. Database (SQLite)
+   ↓
+7. Repository Layer (Entity)
+   ↓
+8. Service Layer (Entity)
+   ↓
+9. API Layer (Entity.model_dump())
+   ↓
+10. HTTP Response (JSON)
+```
+
+### 使用示例
+
+**创建新API端点（Entity架构）**：
+
+```python
+from flask import Blueprint, request
+from backend.models.entities import GameEntity
+from backend.services.games.game_service import GameService
+from backend.core.utils import json_success_response, json_error_response
+
+games_bp = Blueprint('games', __name__)
+
+@games_bp.route('/api/games', methods=['POST'])
+def create_game():
+    """创建游戏API - Entity架构"""
+    try:
+        # 1. 解析和验证请求参数（Entity自动验证）
+        data = request.get_json()
+        game_data = GameEntity(**data)  # ⭐ Entity自动验证类型、长度、格式
+
+        # 2. 调用Service层（处理业务逻辑和缓存）
+        service = GameService()
+        game = service.create_game(game_data)
+
+        # 3. 返回响应（Entity序列化为JSON）
+        return json_success_response(
+            data=game.model_dump(),  # ⭐ Entity.model_dump()序列化
+            message="Game created successfully"
+        )
+
+    except ValidationError as e:
+        # Pydantic自动捕获验证错误
+        return json_error_response(f"Validation error: {e}", status_code=400)
+    except ValueError as e:
+        # Service层业务逻辑错误
+        return json_error_response(str(e), status_code=409)
+    except Exception as e:
+        # 未知错误
+        logger.error(f"Error creating game: {e}")
+        return json_error_response("Failed to create game", status_code=500)
+```
+
+**Entity vs Dict对比**：
+
+```python
+# ❌ 旧架构（Dict-based） - 需要手动验证
+def create_game_old(request):
+    data = request.get_json()
+
+    # 手动验证
+    if not data.get('name'):
+        return {'error': 'Name is required'}, 400
+    if len(data.get('name', '')) > 100:
+        return {'error': 'Name too long'}, 400
+
+    # 直接使用字典（无类型检查）
+    game_id = execute_insert(
+        "INSERT INTO games (name, gid) VALUES (?, ?)",
+        (data['name'], data['gid'])
+    )
+
+    # 返回字典（无自动序列化）
+    return {'data': {'id': game_id, **data}}
+
+# ✅ 新架构（Entity-based） - 自动验证和类型安全
+def create_game_new(request):
+    data = request.get_json()
+
+    # Entity自动验证（类型、长度、格式）
+    game_data = GameEntity(**data)
+
+    # Service层处理业务逻辑
+    service = GameService()
+    game = service.create_game(game_data)
+
+    # Entity自动序列化
+    return json_success_response(
+        data=game.model_dump(),  # 转换为字典
+        message="Success"
+    )
+```
+
+**创建自定义Repository**：
+
+```python
+from backend.core.data_access import GenericRepository
+from backend.models.entities import GameEntity
+from typing import Optional, List
+
+class GameRepository(GenericRepository):
+    """游戏仓储类"""
+
+    def __init__(self):
+        super().__init__(
+            table_name="games",
+            enable_cache=True,
+            cache_timeout=120
+        )
+
+    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
+        """根据业务GID查询"""
+        query = "SELECT * FROM games WHERE gid = ?"
+        row = fetch_one_as_dict(query, (gid,))
+        return GameEntity(**row) if row else None
+
+    def get_all_with_stats(self) -> List[GameEntity]:
+        """获取游戏及其统计信息"""
+        query = """
+            SELECT g.*, COUNT(e.id) as event_count
+            FROM games g
+            LEFT JOIN log_events e ON g.gid = e.game_gid
+            GROUP BY g.id
+        """
+        rows = fetch_all_as_dict(query)
+        return [GameEntity(**row) for row in rows]
+```
+
+### 完整文档
+
+详细内容请参考：
+- **[Repository Pattern Guide](../development/repository-pattern-guide.md)** - Repository模式完整指南 ⭐
+- **[架构设计文档](../development/architecture.md)** - 分层架构详解
+- **[Entity架构迁移指南](../development/ENTITY-ARCHITECTURE-MIGRATION-GUIDE.md)** - Entity架构说明
+
+---
+
+## Entity架构迁移指南 ⭐
+
+> **从Dict-based迁移到Entity-based架构的完整指南**
+
+### 迁移动机
+
+**为什么需要迁移？**
+
+| 方面 | 旧架构 (Dict) | 新架构 (Entity) | 收益 |
+|------|--------------|----------------|------|
+| **数据验证** | 手动验证每个字段 | Pydantic自动验证 | 减少80%验证代码 |
+| **类型安全** | 无类型检查 | 完整类型注解 | IDE自动补全，减少bug |
+| **序列化** | 手动dict操作 | Entity.model_dump() | 自动转换，避免遗漏字段 |
+| **文档** | 手动编写API文档 | Pydantic自动生成文档 | 始终保持同步 |
+| **维护性** | 3套模型 (Domain/Schema/Dict) | 1套Entity | 减少40%代码量 |
+
+### 迁移步骤
+
+#### Step 1: 定义Entity
+
+**旧代码** (无Entity定义):
+```python
+# backend/api/routes/games.py
+def create_game():
+    data = request.get_json()
+    # 直接使用字典，无验证
+    game_id = execute_insert(
+        "INSERT INTO games (name, gid) VALUES (?, ?)",
+        (data['name'], data['gid'])
+    )
+    return {'id': game_id, **data}
+```
+
+**新代码** (Entity定义):
+```python
+# backend/models/entities.py
+from pydantic import BaseModel, Field, field_validator
+import html
+
+class GameEntity(BaseModel):
+    """游戏实体 - 单一真相来源"""
+    id: Optional[int] = None
+    gid: str = Field(..., min_length=1, max_length=50, description="游戏业务GID")
+    name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
+    ods_db: str = Field(..., pattern=r'^(ieu_ods|overseas_ods)$')
+    description: Optional[str] = None
+    dwd_prefix: str = Field("dwd")
+
+    model_config = {"from_attributes": True}
+
+    @field_validator('name')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        """防止XSS攻击"""
+        return html.escape(v.strip())
+```
+
+#### Step 2: 更新Repository返回Entity
+
+**旧代码** (返回Dict):
+```python
+class GameRepository:
+    def find_by_gid(self, gid: int) -> Optional[Dict]:
+        query = "SELECT * FROM games WHERE gid = ?"
+        return fetch_one_as_dict(query, (gid,))  # 返回字典
+```
+
+**新代码** (返回Entity):
+```python
+class GameRepository:
+    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
+        query = "SELECT * FROM games WHERE gid = ?"
+        row = fetch_one_as_dict(query, (gid,))
+        return GameEntity(**row) if row else None  # ⭐ 返回Entity
+```
+
+#### Step 3: 更新Service使用Entity
+
+**旧代码** (Dict处理):
+```python
+class GameService:
+    def create_game(self, data: Dict) -> Dict:
+        # 手动验证
+        if not data.get('name'):
+            raise ValueError("Name required")
+
+        # 手动调用Repository
+        game_id = self.game_repo.create(data)
+
+        # 手动查询返回
+        return self.game_repo.find_by_id(game_id)
+```
+
+**新代码** (Entity处理):
+```python
+class GameService:
+    def create_game(self, game_data: GameEntity) -> GameEntity:
+        # Entity已验证，直接使用
+        existing = self.game_repo.find_by_gid(game_data.gid)
+        if existing:
+            raise ValueError(f"Game {game_data.gid} already exists")
+
+        # 使用model_dump()转换为字典
+        game_id = self.game_repo.create(game_data.model_dump())
+
+        # 返回Entity对象
+        return self.game_repo.find_by_id(game_id)
+```
+
+#### Step 4: 更新API层
+
+**旧代码** (手动验证):
+```python
+@games_bp.route('/api/games', methods=['POST'])
+def create_game():
+    try:
+        data = request.get_json()
+
+        # 手动验证
+        if not data.get('name'):
+            return {'error': 'Name required'}, 400
+
+        # 调用Service
+        service = GameService()
+        game = service.create_game(data)
+
+        return jsonify({'success': True, 'data': game})
+    except Exception as e:
+        return {'error': str(e)}, 500
+```
+
+**新代码** (Entity自动验证):
+```python
+@games_bp.route('/api/games', methods=['POST'])
+def create_game():
+    try:
+        data = request.get_json()
+
+        # ⭐ Entity自动验证
+        game_data = GameEntity(**data)
+
+        # ⭐ Service处理
+        service = GameService()
+        game = service.create_game(game_data)
+
+        # ⭐ Entity序列化
+        return json_success_response(
+            data=game.model_dump(),
+            message="Game created successfully"
+        )
+    except ValidationError as e:
+        # ⭐ Pydantic自动捕获验证错误
+        return json_error_response(f"Validation error: {e}", status_code=400)
+    except ValueError as e:
+        # ⭐ Service层业务错误
+        return json_error_response(str(e), status_code=409)
+    except Exception as e:
+        # ⭐ 未知错误
+        logger.error(f"Error creating game: {e}")
+        return json_error_response("Failed to create game", status_code=500)
+```
+
+### 迁移检查清单
+
+**API层**:
+- [ ] 使用Entity解析请求参数：`GameEntity(**request.get_json())`
+- [ ] 捕获ValidationError异常
+- [ ] 使用Entity.model_dump()序列化响应
+- [ ] 返回统一的JSON格式
+
+**Service层**:
+- [ ] 方法参数使用Entity类型
+- [ ] 返回Entity对象
+- [ ] 使用Entity.model_dump()调用Repository
+- [ ] 添加缓存装饰器
+
+**Repository层**:
+- [ ] 所有查询方法返回Entity对象
+- [ ] 使用Entity(**row)构造对象
+- [ ] 更新类型注解
+
+**Entity定义**:
+- [ ] 所有字段有类型注解
+- [ ] 添加Field验证规则
+- [ ] 添加field_validator进行复杂验证
+- [ ] 设置model_config = {"from_attributes": True}
+
+### 常见迁移问题
+
+#### 问题1: Entity验证失败
+
+**症状**:
+```
+ValidationError: 1 validation error for GameEntity
+name
+  Field required [type=missing, ...]
+```
+
+**原因**: 请求参数缺少必填字段
+
+**解决方案**:
+```python
+# ✅ 前端发送完整参数
+fetch('/api/games', {
+  method: 'POST',
+  body: JSON.stringify({
+    gid: "10000147",
+    name: "Game Name",
+    ods_db: "ieu_ods"
+    # ⭐ 所有必填字段都要提供
+  })
+})
+```
+
+#### 问题2: Entity.model_dump()丢失字段
+
+**症状**: 响应数据不完整
+
+**原因**: Entity定义中字段为Optional且数据库为NULL
+
+**解决方案**:
+```python
+# ✅ 使用model_dump()时包含所有字段
+data = game.model_dump(exclude_none=False)  # 保留None值
+data = game.model_dump(mode='json')  # JSON序列化模式
+```
+
+#### 问题3: 字典无法转换为Entity
+
+**症状**:
+```
+TypeError: Object of type int is not JSON serializable
+```
+
+**原因**: datetime等特殊类型未序列化
+
+**解决方案**:
+```python
+# ✅ Entity配置JSON编码器
+class GameEntity(BaseModel):
+    created_at: Optional[datetime] = None
+
+    model_config = {
+        "from_attributes": True,
+        "json_encoders": {
+            datetime: lambda v: v.isoformat()
+        }
+    }
+```
+
+### 迁移前后对比
+
+**代码量对比**:
+```
+旧架构 (Dict):     216行
+新架构 (Entity):    130行
+减少:              86行 (40%)
+```
+
+**验证代码对比**:
+```
+旧架构: 手动验证 20+ 行
+新架构: Entity定义 5行
+减少: 15行 (75%)
+```
+
+**错误处理对比**:
+```
+旧架构: 分散在各处
+新架构: Pydantic统一处理
+```
+
+### 迁移验证
+
+**单元测试**:
+```python
+def test_create_game_with_entity():
+    # ⭐ 使用Entity测试
+    game_data = GameEntity(
+        gid="10000147",
+        name="Test Game",
+        ods_db="ieu_ods"
+    )
+
+    service = GameService()
+    game = service.create_game(game_data)
+
+    # ⭐ 断言Entity对象
+    assert isinstance(game, GameEntity)
+    assert game.gid == "10000147"
+    assert game.name == "Test Game"
+```
+
+**API测试**:
+```bash
+# 测试Entity验证
+curl -X POST http://127.0.0.1:5001/api/games \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test"}'  # ❌ 缺少gid字段
+
+# 预期响应：
+# {
+#   "success": false,
+#   "error": "Validation error: 1 validation error for GameEntity\n  gid\n    Field required [type=missing]"
+# }
+```
+
+### 相关文档
+
+- **[Entity架构迁移指南](../development/ENTITY-ARCHITECTURE-MIGRATION-GUIDE.md)** - 完整迁移步骤
+- **[Repository Pattern Guide](../development/repository-pattern-guide.md)** - Repository使用指南
+- **[Pydantic文档](https://docs.pydantic.dev/)** - Pydantic官方文档
 
 ---
 

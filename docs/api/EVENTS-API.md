@@ -2,9 +2,9 @@
 
 **事件管理API**
 
-**版本**: 8.0.0 (Phase 5完全迁移)
+**版本**: 9.0.0 (Repository Pattern Migration)
 **文件**: `backend/api/routes/events.py`
-**架构**: EventService → EventRepository → EventEntity
+**架构**: API Layer → EventService → EventRepository → EventEntity
 
 ---
 
@@ -18,12 +18,119 @@
 - ✅ 批量删除和更新
 - ✅ 事件参数管理
 - ✅ 自动缓存管理
-- ✅ Pydantic验证
+- ✅ Entity架构 (EventEntity) ⭐
+- ✅ Repository模式 ⭐
 
-**架构变更**:
-- Phase 5: 完全迁移到EventService
-- Phase 3: 引入分页和批量操作
-- Phase 1: 基础CRUD实现
+**架构层次**:
+```
+API Layer (events.py)
+    ↓
+EventService (业务逻辑)
+    ↓
+EventRepository (数据访问)
+    ↓
+EventEntity (数据模型 + 验证)
+    ↓
+Database (SQLite)
+```
+
+**Entity架构优势** ⭐:
+- 自动验证: Pydantic Entity自动验证输入
+- 类型安全: 完整的类型注解和IDE支持
+- 序列化: Entity.model_dump()自动转换为JSON
+- 关联查询: 自动加载category_name等关联数据
+
+---
+
+## Repository Pattern ⭐
+
+### 架构模式
+
+所有数据访问都通过Repository层进行，遵循单一职责原则：
+
+```python
+# ✅ 正确：使用Service层
+from backend.services.events.event_service import EventService
+
+service = EventService()
+events = service.get_events_by_game_gid(game_gid)
+
+# ❌ 错误：直接数据库访问
+events = fetch_all_as_dict('SELECT * FROM log_events WHERE game_gid = ?', (game_gid,))
+```
+
+### Repository层职责
+
+**EventRepository** (`backend/models/repositories/events.py`):
+- 封装所有event相关的SQL查询
+- 返回Entity对象（而非字典）
+- 提供CRUD操作
+- 管理缓存策略
+
+**示例**:
+```python
+class EventRepository(GenericRepository):
+    """事件仓储类"""
+
+    def find_by_game_gid(self, game_gid: int) -> List[EventEntity]:
+        """根据游戏GID查询事件"""
+        query = "SELECT * FROM log_events WHERE game_gid = ?"
+        rows = fetch_all_as_dict(query, (game_gid,))
+        return [EventEntity(**row) for row in rows]  # ⭐ 返回Entity列表
+
+    def find_with_category(self, event_id: int) -> Optional[EventEntity]:
+        """查询事件及其分类"""
+        query = """
+            SELECT
+                le.*,
+                ec.name as category_name
+            FROM log_events le
+            LEFT JOIN event_categories ec ON le.category_id = ec.id
+            WHERE le.id = ?
+        """
+        row = fetch_one_as_dict(query, (event_id,))
+        return EventEntity(**row) if row else None  # ⭐ 返回Entity
+```
+
+### Entity对象访问 ⭐
+
+API响应返回Entity对象，支持属性访问：
+
+```python
+# 旧方式：字典访问
+event['name']
+event['game_gid']
+
+# 新方式：Entity属性访问 ⭐
+event.name
+event.game_gid
+event.category_name  # 关联数据自动加载
+```
+
+### 缓存策略
+
+**读取操作** (自动缓存):
+- Events列表: 1800秒TTL
+- Event详情: 900秒TTL
+- 分页查询: 600秒TTL
+
+**写入操作** (自动失效):
+- CREATE: 自动清理相关缓存
+- UPDATE: 自动清理相关缓存
+- DELETE: 自动清理相关缓存
+
+```python
+from backend.core.cache.decorators import cached, cache_invalidate
+
+class EventService:
+    @cached(ttl=1800)  # ⭐ 读取：使用缓存
+    def get_events_by_game_gid(self, game_gid: int) -> List[EventEntity]:
+        return self.event_repo.find_by_game_gid(game_gid)
+
+    @cache_invalidate  # ⭐ 写入：清理缓存
+    def create_event(self, event_data: EventEntity) -> EventEntity:
+        return self.event_repo.create(event_data.model_dump())
+```
 
 ---
 

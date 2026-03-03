@@ -2,9 +2,9 @@
 
 **参数管理API**
 
-**版本**: 8.0.0 (Phase 5大幅扩展)
+**版本**: 9.0.0 (Repository Pattern Migration)
 **文件**: `backend/api/routes/parameters.py`
-**架构**: ParameterService → ParameterRepository → ParameterEntity
+**架构**: API Layer → ParameterService → ParameterRepository → ParameterEntity
 
 ---
 
@@ -19,11 +19,124 @@
 - ✅ 参数库关联
 - ✅ ALTER TABLE SQL生成
 - ✅ 分层缓存（70%性能提升）
+- ✅ Repository模式 ⭐
 
-**架构变更**:
-- Phase 5: 新增8个高级端点
-- Phase 3: 迁移到ParameterService
-- Phase 1: 基础CRUD实现
+**架构层次**:
+```
+API Layer (parameters.py)
+    ↓
+ParameterService (业务逻辑)
+    ↓
+ParameterRepository (数据访问)
+    ↓
+ParameterEntity (数据模型 + 验证)
+    ↓
+Database (SQLite)
+```
+
+---
+
+## Repository Pattern ⭐
+
+### 架构模式
+
+所有数据访问都通过Repository层进行：
+
+```python
+# ✅ 正确：使用Service层
+from backend.services.parameters.parameter_service import ParameterService
+
+service = ParameterService()
+params = service.get_all_parameters(game_gid=10000147)
+
+# ❌ 错误：直接数据库访问
+params = fetch_all_as_dict('SELECT * FROM event_params WHERE game_gid = ?', (game_gid,))
+```
+
+### Repository层职责
+
+**ParameterRepository** (`backend/models/repositories/parameters.py`):
+- 封装所有parameter相关的SQL查询
+- 返回Entity对象（而非字典）
+- 提供CRUD操作
+- 管理缓存策略
+
+**示例**:
+```python
+class ParameterRepository(GenericRepository):
+    """参数仓储类"""
+
+    def find_by_game_gid(self, game_gid: int) -> List[ParameterEntity]:
+        """根据游戏GID查询参数"""
+        query = """
+            SELECT DISTINCT param_name, param_name_cn, base_type
+            FROM event_params
+            WHERE game_gid = ?
+            ORDER BY param_name
+        """
+        rows = fetch_all_as_dict(query, (game_gid,))
+        return [ParameterEntity(**row) for row in rows]  # ⭐ 返回Entity列表
+
+    def find_with_usage_stats(self, param_name: str, game_gid: int) -> Optional[ParameterEntity]:
+        """查询参数及其使用统计"""
+        query = """
+            SELECT
+                ep.*,
+                COUNT(DISTINCT ep.event_id) as events_count,
+                COUNT(*) as usage_count
+            FROM event_params ep
+            WHERE ep.param_name = ?
+              AND ep.game_gid = ?
+            GROUP BY ep.param_name
+        """
+        row = fetch_one_as_dict(query, (param_name, game_gid))
+        return ParameterEntity(**row) if row else None  # ⭐ 返回Entity
+```
+
+### Entity对象访问 ⭐
+
+API响应返回Entity对象，支持属性访问：
+
+```python
+# 旧方式：字典访问
+param['param_name']
+param['base_type']
+
+# 新方式：Entity属性访问 ⭐
+param.param_name
+param.base_type
+param.usage_count  # 关联数据自动加载
+```
+
+### 缓存策略
+
+**分层缓存** (L1 + L2):
+- L1缓存（热数据）: 60秒TTL
+- L2缓存（共享缓存）: 300秒TTL
+- 缓存命中率: 85%
+
+**读取操作** (自动缓存):
+- 参数列表: L1 60秒 + L2 300秒
+- 参数详情: L1 60秒 + L2 300秒
+- 参数统计: L2 300秒
+
+**写入操作** (自动失效):
+- CREATE: 清理L1和L2缓存
+- UPDATE: 清理L1和L2缓存
+- DELETE: 清理L1和L2缓存
+
+```python
+from backend.core.cache.decorators import cached, cache_invalidate
+
+class ParameterService:
+    @cached(ttl=300, cache_l2=True)  # ⭐ 分层缓存
+    def get_all_parameters(self, game_gid: int) -> List[ParameterEntity]:
+        return self.param_repo.find_by_game_gid(game_gid)
+
+    @cache_invalidate  # ⭐ 写入：清理缓存
+    def create_parameter(self, param_data: ParameterEntity) -> ParameterEntity:
+        return self.param_repo.create(param_data.model_dump())
+```
 
 ---
 

@@ -1,16 +1,17 @@
 # 架构设计文档
 
-> **版本**: 8.0 | **最后更新**: 2026-02-23
+> **版本**: 9.0.0 (Repository Pattern Migration) | **最后更新**: 2026-03-03
 >
 > 本文档详细说明 Event2Table 项目的架构设计、模块职责和数据流向。
 >
-> **🆕 最新变更**: 技术负债与双轨制问题分析 (2026-02-23) - 新增技术负债章节
+> **🆕 最新变更**: Repository模式迁移完成 (2026-03-03) - 6/8核心模块已迁移
 
 ---
 
 ## 目录
 
 - [架构概览](#架构概览)
+- [Repository模式详解 ⭐](#repository模式详解)
 - [分层架构说明](#分层架构说明)
 - [模块职责](#模块职责)
 - [Canvas系统设计](#canvas系统设计)
@@ -18,6 +19,411 @@
 - [数据流向](#数据流向)
 - [技术栈说明](#技术栈说明)
 - [技术负债与双轨制问题](#技术负债与双轨制问题)
+
+---
+
+## Repository模式详解 ⭐
+
+> **🆕 2026-03-03**: Repository模式迁移完成，6/8核心模块已迁移
+
+### 什么是Repository模式？
+
+Repository模式是一种数据访问设计模式，它将数据访问逻辑封装在单独的层中，使业务逻辑与数据访问逻辑分离。
+
+**核心概念**:
+- **Repository**: 数据访问层的封装，提供类似集合的接口
+- **Entity**: 统一的数据模型，包含验证和序列化
+- **Service**: 业务逻辑层，协调Repository和Entity
+
+### 架构对比
+
+#### 旧架构（直接数据库访问）
+
+```
+API Layer
+    ↓
+Service Layer
+    ↓
+直接SQL查询 ❌
+    ↓
+Database
+```
+
+**问题**:
+- ❌ 数据访问逻辑散落在各处
+- ❌ 难以测试（无法Mock）
+- ❌ 代码重复
+- ❌ 缓存管理混乱
+
+#### 新架构（Repository模式）
+
+```
+API Layer
+    ↓
+Service Layer (业务逻辑)
+    ↓
+Repository Layer (数据访问) ⭐
+    ↓
+Entity Layer (数据模型 + 验证) ⭐
+    ↓
+Database
+```
+
+**优势**:
+- ✅ 数据访问逻辑集中
+- ✅ 易于测试（可Mock Repository）
+- ✅ 缓存策略统一
+- ✅ 类型安全（Entity对象）
+- ✅ 自动验证（Pydantic）
+
+### Repository模式示例
+
+#### 1. Entity层（数据模型）
+
+**文件**: `backend/models/entities.py`
+
+```python
+from pydantic import BaseModel, Field, field_validator
+from typing import Optional
+import html
+
+class GameEntity(BaseModel):
+    """
+    游戏实体 - 全局唯一的模型定义 ⭐
+
+    所有模块 (GameService/GameRepository/API) 都使用这个模型
+    """
+    # 主键
+    id: Optional[int] = None  # 数据库自增ID
+
+    # 业务字段（自动验证）
+    gid: str = Field(..., min_length=1, max_length=50, description="游戏业务GID")
+    name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
+    ods_db: str = Field(..., pattern=r'^(ieu_ods|overseas_ods)$', description="ODS数据库")
+    description: Optional[str] = Field(None, description="游戏描述")
+    dwd_prefix: str = Field("dwd", description="DWD表前缀")
+
+    # 元数据
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    # 关联数据（仅在查询时填充）
+    event_count: Optional[int] = Field(0, description="事件数量统计")
+
+    model_config = {"from_attributes": True}
+
+    @field_validator('name')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        """防止XSS攻击"""
+        return html.escape(v.strip())
+```
+
+**Entity优势**:
+- ✅ 单一真相来源（消除Schema/Domain Model重复）
+- ✅ 自动验证输入数据
+- ✅ 类型安全（完整类型注解）
+- ✅ 自动序列化（model_dump()）
+- ✅ 防止XSS攻击（field_validator）
+
+#### 2. Repository层（数据访问）
+
+**文件**: `backend/models/repositories/games.py`
+
+```python
+from backend.core.data_access import GenericRepository
+from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.models.entities import GameEntity
+from typing import Optional, List
+
+class GameRepository(GenericRepository):
+    """游戏仓储类"""
+
+    def __init__(self):
+        """初始化游戏仓储，启用缓存"""
+        super().__init__(
+            table_name="games",
+            primary_key="id",
+            enable_cache=True,
+            cache_timeout=120  # 2分钟缓存
+        )
+
+    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
+        """根据业务GID查询游戏"""
+        query = "SELECT * FROM games WHERE gid = ?"
+        row = fetch_one_as_dict(query, (gid,))
+        return GameEntity(**row) if row else None  # ⭐ 返回Entity
+
+    def get_all_with_event_count(self) -> List[GameEntity]:
+        """获取所有游戏及其事件数量"""
+        query = """
+            SELECT
+                g.*,
+                COUNT(DISTINCT le.id) as event_count
+            FROM games g
+            LEFT JOIN log_events le ON g.id = le.game_id
+            GROUP BY g.id
+            ORDER BY g.name
+        """
+        rows = fetch_all_as_dict(query)
+        return [GameEntity(**row) for row in rows]  # ⭐ 返回Entity列表
+```
+
+**Repository职责**:
+- ✅ 封装SQL查询逻辑
+- ✅ 返回Entity对象（而非字典）
+- ✅ 管理缓存策略
+- ✅ 提供CRUD操作
+
+#### 3. Service层（业务逻辑）
+
+**文件**: `backend/services/games/game_service.py`
+
+```python
+from backend.models.repositories.games import GameRepository
+from backend.models.entities import GameEntity
+from backend.core.cache.decorators import cached, cache_invalidate
+from typing import List
+
+class GameService:
+    """游戏业务服务"""
+
+    def __init__(self):
+        """初始化服务，注入Repository"""
+        self.game_repo = GameRepository()
+
+    @cached(ttl=1800)  # ⭐ 读操作：使用缓存
+    def get_games(self) -> List[GameEntity]:
+        """获取所有游戏（带缓存）"""
+        return self.game_repo.find_all()
+
+    @cached(ttl=60)
+    def get_game_by_gid(self, gid: int) -> GameEntity:
+        """根据GID获取游戏"""
+        game = self.game_repo.find_by_gid(gid)
+        if not game:
+            raise ValueError(f"Game {gid} not found")
+        return game
+
+    @cache_invalidate  # ⭐ 写操作：清理缓存
+    def create_game(self, game_data: GameEntity) -> GameEntity:
+        """
+        创建游戏
+
+        业务逻辑：
+        1. 验证gid唯一性
+        2. 创建游戏
+        3. 初始化默认配置
+        """
+        # 1. 检查gid是否已存在
+        existing = self.game_repo.find_by_gid(game_data.gid)
+        if existing:
+            raise ValueError(f"Game gid {game_data.gid} already exists")
+
+        # 2. 创建游戏（使用model_dump()转换）
+        game_id = self.game_repo.create(game_data.model_dump())
+
+        # 3. 返回创建的游戏
+        return self.game_repo.find_by_id(game_id)
+
+    @cache_invalidate
+    def delete_game(self, game_gid: int) -> None:
+        """
+        删除游戏
+
+        业务逻辑：
+        1. 检查游戏是否存在
+        2. 检查是否有关联事件
+        3. 删除游戏（级联删除事件）
+        """
+        # 1. 检查游戏存在
+        game = self.game_repo.find_by_gid(game_gid)
+        if not game:
+            raise ValueError(f"Game {game_gid} not found")
+
+        # 2. 检查关联事件
+        from backend.models.repositories.events import EventRepository
+        event_repo = EventRepository()
+        events = event_repo.find_by_game_gid(game_gid)
+        if events:
+            raise ValueError(f"Cannot delete game with {len(events)} events")
+
+        # 3. 删除游戏
+        self.game_repo.delete_by_gid(game_gid)
+```
+
+**Service职责**:
+- ✅ 实现业务逻辑
+- ✅ 协调多个Repository
+- ✅ 管理缓存失效
+- ✅ 使用Entity对象
+
+#### 4. API层（HTTP端点）
+
+**文件**: `backend/api/routes/games.py`
+
+```python
+from flask import Blueprint, request
+from backend.services.games.game_service import GameService
+from backend.models.entities import GameEntity
+from backend.core.utils import json_success_response, json_error_response
+import logging
+
+logger = logging.getLogger(__name__)
+games_bp = Blueprint('games', __name__)
+
+@games_bp.route('/api/games', methods=['POST'])
+def create_game():
+    """创建游戏API"""
+    try:
+        # 1. 解析和验证请求参数
+        data = request.get_json()
+        game_data = GameEntity(**data)  # ⭐ Entity自动验证
+
+        # 2. 调用Service层
+        service = GameService()
+        game = service.create_game(game_data)
+
+        # 3. 返回响应
+        return json_success_response(
+            data=game.model_dump(),  # ⭐ Entity自动序列化
+            message="Game created successfully"
+        )
+
+    except ValueError as e:
+        return json_error_response(str(e), status_code=409)
+    except Exception as e:
+        logger.error(f"Error creating game: {e}")
+        return json_error_response("Failed to create game", status_code=500)
+
+@games_bp.route('/api/games', methods=['GET'])
+def list_games():
+    """列出所有游戏"""
+    try:
+        service = GameService()
+        games = service.get_games()  # ⭐ 返回Entity列表
+
+        # Entity.model_dump()自动转换为字典列表
+        return json_success_response(
+            data=[game.model_dump() for game in games]
+        )
+
+    except Exception as e:
+        logger.error(f"Error listing games: {e}")
+        return json_error_response("Failed to list games", status_code=500)
+```
+
+**API职责**:
+- ✅ 处理HTTP请求/响应
+- ✅ 参数解析和验证（Entity自动验证）
+- ✅ 调用Service层
+- ✅ 返回JSON响应（Entity自动序列化）
+
+### Repository模式最佳实践
+
+#### 1. Entity定义规范
+
+```python
+# ✅ 正确：完整的Entity定义
+class EventEntity(BaseModel):
+    """事件实体"""
+    id: Optional[int] = None
+    game_gid: int = Field(..., description="游戏业务GID")
+    name: str = Field(..., min_length=1, max_length=200)
+    name_cn: str = Field(..., min_length=1, max_length=200)
+
+    # 自动验证
+    @field_validator('name', 'name_cn')
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
+        import html
+        return html.escape(v.strip())
+
+# ❌ 错误：缺少验证
+class EventEntity(BaseModel):
+    id: Optional[int] = None
+    name: str  # ❌ 没有长度限制
+    game_gid: int  # ❌ 没有描述
+```
+
+#### 2. Repository使用规范
+
+```python
+# ✅ 正确：返回Entity对象
+def find_by_gid(self, gid: int) -> Optional[GameEntity]:
+    query = "SELECT * FROM games WHERE gid = ?"
+    row = fetch_one_as_dict(query, (gid,))
+    return GameEntity(**row) if row else None
+
+# ❌ 错误：返回字典
+def find_by_gid(self, gid: int) -> Optional[Dict]:
+    return fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (gid,))
+```
+
+#### 3. Service使用规范
+
+```python
+# ✅ 正确：使用Entity对象
+class GameService:
+    def create_game(self, game_data: GameEntity) -> GameEntity:
+        # Entity已验证，直接使用
+        existing = self.game_repo.find_by_gid(game_data.gid)
+        if existing:
+            raise ValueError(f"Game {game_data.gid} already exists")
+
+        # 使用model_dump()转换为字典
+        game_id = self.game_repo.create(game_data.model_dump())
+
+        # 返回Entity对象
+        return self.game_repo.find_by_id(game_id)
+
+# ❌ 错误：使用字典
+class GameService:
+    def create_game(self, game_data: Dict) -> Dict:
+        # ❌ 没有验证
+        return self.game_repo.create(game_data)
+```
+
+#### 4. 缓存使用规范
+
+```python
+# ✅ 正确：使用缓存装饰器
+class GameService:
+    @cached(ttl=1800)  # 读操作：使用缓存
+    def get_games(self) -> List[GameEntity]:
+        return self.game_repo.find_all()
+
+    @cache_invalidate  # 写操作：清理缓存
+    def create_game(self, game_data: GameEntity) -> GameEntity:
+        return self.game_repo.create(game_data.model_dump())
+
+# ❌ 错误：手动管理缓存
+class GameService:
+    def get_games(self):
+        # ❌ 缓存逻辑混在业务逻辑中
+        cached_data = cache.get('games:all')
+        if cached_data:
+            return cached_data
+        games = self.game_repo.find_all()
+        cache.set('games:all', games, ttl=1800)
+        return games
+```
+
+### 迁移状态
+
+**已迁移模块** (6/8 = 75%):
+- ✅ Games模块 (GameRepository + GameService)
+- ✅ Events模块 (EventRepository + EventService)
+- ✅ Parameters模块 (ParameterRepository + ParameterService)
+- ✅ Event Categories模块 (EventCategoryRepository + EventCategoryService)
+- ✅ Join Configs模块 (JoinConfigRepository + JoinConfigService)
+- ✅ Canvas模块 (CanvasRepository + CanvasService)
+
+**待迁移模块** (2/8 = 25%):
+- ⏳ Event Nodes模块
+- ⏳ Flows模块
+
+**迁移指南**: [Repository Pattern Guide](repository-pattern-guide.md)
 
 ---
 
@@ -103,38 +509,70 @@
 
 ### Schema层（数据验证层）
 
-**位置**: `backend/models/schemas.py`
+**位置**: `backend/models/entities.py` ⭐
 
 **职责**：
-- 定义数据传输对象（DTO）
-- 验证输入数据
-- 数据序列化/反序列化
-- 提供API文档
+- 定义统一的数据模型（Entity）⭐
+- 验证输入数据（Pydantic自动验证）
+- 数据序列化/反序列化（model_dump()）
+- 提供API文档（自动生成）
+- **单一真相来源**（所有层共享同一个Entity）⭐
 
 **技术选型**：Pydantic
+
+**Entity架构优势** ⭐:
+- ✅ 单一模型定义（消除Schema/Domain Model重复）
+- ✅ 自动验证输入数据
+- ✅ 类型安全（完整类型注解）
+- ✅ 自动序列化（model_dump()）
+- ✅ 防止XSS攻击（field_validator）
+- ✅ 自动生成API文档
 
 **示例**：
 
 ```python
-from pydantic import BaseModel, Field, validator
-from typing import Literal
+# backend/models/entities.py
+from pydantic import BaseModel, Field, field_validator
+from typing import Optional, Literal
 import html
 
-class GameCreate(BaseModel):
-    """游戏创建Schema"""
-    gid: str = Field(..., min_length=1, max_length=50, description="游戏业务ID")
+class GameEntity(BaseModel):
+    """
+    游戏实体 - 全局唯一的模型定义 ⭐
+
+    所有模块 (GameService/GameRepository/API) 都使用这个模型
+    消除了Schema、Domain Model、Dict的三层重复定义
+    """
+    # 主键
+    id: Optional[int] = None  # 数据库自增ID
+
+    # 业务字段（自动验证）
+    gid: str = Field(..., min_length=1, max_length=50, description="游戏业务GID")
     name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
     ods_db: Literal["ieu_ods", "overseas_ods"] = Field(..., description="ODS数据库名称")
+    description: Optional[str] = Field(None, description="游戏描述")
+    dwd_prefix: str = Field("dwd", description="DWD表前缀")
 
-    @validator("name")
-    def sanitize_name(cls, v):
+    # 元数据
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    # 关联数据
+    event_count: Optional[int] = Field(0, description="事件数量统计")
+
+    model_config = {"from_attributes": True}
+
+    @field_validator("name")
+    @classmethod
+    def sanitize_name(cls, v: str) -> str:
         """防止XSS攻击：转义HTML字符"""
         if v:
             return html.escape(v.strip())
         return v
 
-    @validator("gid")
-    def validate_gid(cls, v):
+    @field_validator("gid")
+    @classmethod
+    def validate_gid(cls, v: str) -> str:
         """验证gid格式"""
         v = v.strip()
         if not v.isdigit():
@@ -142,11 +580,15 @@ class GameCreate(BaseModel):
         return v
 ```
 
-**优势**：
-- ✅ 自动验证输入数据
-- ✅ 生成API文档
-- ✅ 防止XSS攻击
-- ✅ 类型安全
+**Entity vs 旧架构对比** ⭐:
+
+| 方面 | 旧架构 (Schema + Domain + Dict) | 新架构 (Entity Only) |
+|------|--------------------------------|---------------------|
+| **模型数量** | 3套模型定义 | 1套统一Entity ✅ |
+| **验证方式** | Schema验证 + 手动检查 | Pydantic自动验证 ✅ |
+| **类型安全** | 部分类型注解 | 完整类型注解 ✅ |
+| **代码量** | 216行 | 130行 (-40%) ✅ |
+| **维护性** | 需同步3套模型 | 单一模型 ✅ |
 
 ### Repository层（数据访问层）
 
@@ -157,6 +599,7 @@ class GameCreate(BaseModel):
 - 提供CRUD操作
 - 实现复杂查询
 - 管理缓存策略
+- **返回Entity对象（而非字典）** ⭐
 
 **技术选型**：基于GenericRepository
 
@@ -164,8 +607,9 @@ class GameCreate(BaseModel):
 
 ```python
 from backend.core.data_access import GenericRepository
-from backend.core.database.converters import fetch_one_as_dict, fetch_all_as_dict
-from typing import Optional, List, Dict, Any
+from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.models.entities import GameEntity
+from typing import Optional, List
 
 class GameRepository(GenericRepository):
     """游戏仓储类"""
@@ -179,12 +623,13 @@ class GameRepository(GenericRepository):
             cache_timeout=120  # 2分钟缓存
         )
 
-    def find_by_gid(self, gid: int) -> Optional[Dict[str, Any]]:
+    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
         """根据业务GID查询游戏"""
         query = "SELECT * FROM games WHERE gid = ?"
-        return fetch_one_as_dict(query, (gid,))
+        row = fetch_one_as_dict(query, (gid,))
+        return GameEntity(**row) if row else None  # ⭐ 返回Entity
 
-    def get_all_with_event_count(self) -> List[Dict[str, Any]]:
+    def get_all_with_event_count(self) -> List[GameEntity]:
         """获取所有游戏及其事件数量"""
         query = """
             SELECT
@@ -195,7 +640,35 @@ class GameRepository(GenericRepository):
             GROUP BY g.id
             ORDER BY g.name
         """
-        return fetch_all_as_dict(query)
+        rows = fetch_all_as_dict(query)
+        return [GameEntity(**row) for row in rows]  # ⭐ 返回Entity列表
+```
+
+**GenericRepository 基类功能**：
+
+```python
+# 查询操作
+record = repo.find_by_id(1)              # 按ID查询
+record = repo.find_by_field("gid", 1001)  # 按字段查询
+records = repo.find_all()                  # 查询所有
+records = repo.find_by_ids([1, 2, 3])     # 批量查询
+
+# 创建操作
+record_id = repo.create({"name": "Game 1"})
+record_ids = repo.create_batch([...])     # 批量创建
+
+# 更新操作
+updated = repo.update(1, {"name": "Updated"})
+count = repo.update_batch([1, 2], {...})   # 批量更新
+
+# 删除操作
+deleted = repo.delete(1)
+count = repo.delete_batch([1, 2, 3])       # 批量删除
+
+# 统计操作
+count = repo.count()
+count = repo.count_where({"game_gid": 1001})
+exists = repo.exists(1)
 ```
 
 **优势**：
@@ -203,6 +676,25 @@ class GameRepository(GenericRepository):
 - ✅ 易于测试（Mock Repository）
 - ✅ 缓存策略统一
 - ✅ 复用通用CRUD
+- ✅ **类型安全（返回Entity对象）** ⭐
+- ✅ **自动验证（Entity构造时验证）** ⭐
+
+**Entity返回模式** ⭐:
+```python
+# ✅ 正确：Repository返回Entity对象
+def find_by_gid(self, gid: int) -> Optional[GameEntity]:
+    query = "SELECT * FROM games WHERE gid = ?"
+    row = fetch_one_as_dict(query, (gid,))
+    return GameEntity(**row) if row else None  # ⭐ 返回Entity
+
+# ❌ 错误：Repository返回字典（旧架构）
+def find_by_gid(self, gid: int) -> Optional[Dict]:
+    return fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (gid,))
+```
+
+**完整文档**：
+- **[Repository Pattern Guide](repository-pattern-guide.md)** - Repository模式完整指南 ⭐
+- **[Entity架构迁移指南](ENTITY-ARCHITECTURE-MIGRATION-GUIDE.md)** - Entity架构说明
 
 ### Service层（业务逻辑层）
 
@@ -213,14 +705,16 @@ class GameRepository(GenericRepository):
 - 协调多个Repository
 - 管理事务
 - 调用HQL生成器
+- **缓存管理（@cached, @cache_invalidate）** ⭐
 
 **示例**：
 
 ```python
 from backend.models.repositories.games import GameRepository
 from backend.models.repositories.events import EventRepository
-from backend.models.schemas import GameCreate, GameResponse
-from typing import Dict, Any
+from backend.models.entities import GameEntity
+from backend.core.cache.decorators import cached, cache_invalidate
+from typing import List
 
 class GameService:
     """游戏业务服务"""
@@ -230,7 +724,21 @@ class GameService:
         self.game_repo = GameRepository()
         self.event_repo = EventRepository()
 
-    def create_game(self, game_data: GameCreate) -> Dict[str, Any]:
+    @cached(ttl=1800)  # ⭐ 读操作：使用缓存
+    def get_games(self) -> List[GameEntity]:
+        """获取所有游戏（带缓存）"""
+        return self.game_repo.find_all()
+
+    @cached(ttl=60)
+    def get_game_by_gid(self, gid: int) -> GameEntity:
+        """根据GID获取游戏"""
+        game = self.game_repo.find_by_gid(gid)
+        if not game:
+            raise ValueError(f"Game {gid} not found")
+        return game
+
+    @cache_invalidate  # ⭐ 写操作：清理缓存
+    def create_game(self, game_data: GameEntity) -> GameEntity:
         """
         创建游戏
 
@@ -244,12 +752,13 @@ class GameService:
         if existing:
             raise ValueError(f"Game gid {game_data.gid} already exists")
 
-        # 2. 创建游戏
-        game_id = self.game_repo.create(game_data.dict())
+        # 2. 创建游戏（使用model_dump()转换）
+        game_id = self.game_repo.create(game_data.model_dump())
 
         # 3. 返回创建的游戏
         return self.game_repo.find_by_id(game_id)
 
+    @cache_invalidate
     def delete_game(self, game_gid: int) -> None:
         """
         删除游戏
@@ -270,7 +779,25 @@ class GameService:
             raise ValueError(f"Cannot delete game with {len(events)} events")
 
         # 3. 删除游戏
-        self.game_repo.delete(game['id'])
+        self.game_repo.delete_by_gid(game_gid)
+```
+
+**缓存装饰器**：
+
+```python
+from backend.core.cache.decorators import cached_service, invalidate_cache
+
+class GameService:
+    @cached_service("game:{gid}", ttl_l1=60, ttl_l2=300, key_params=['gid'])
+    def get_game_by_gid(self, gid: int) -> GameEntity:
+        """获取游戏（带缓存）"""
+        return self.game_repo.find_by_gid(gid)
+
+    @invalidate_cache("game:{gid}", key_params=['gid'])
+    @invalidate_cache("games:list")
+    def update_game(self, gid: int, data: dict) -> GameEntity:
+        """更新游戏（自动清理缓存）"""
+        return self.game_repo.update_by_gid(gid, data)
 ```
 
 **优势**：
@@ -278,6 +805,38 @@ class GameService:
 - ✅ 事务管理清晰
 - ✅ 易于扩展
 - ✅ 可复用性强
+- ✅ **缓存管理简化** ⭐
+- ✅ **类型安全（使用Entity对象）** ⭐
+- ✅ **自动验证（Entity自动验证）** ⭐
+
+**Entity使用模式** ⭐:
+```python
+# ✅ 正确：Service层使用Entity对象
+class GameService:
+    def get_game_by_gid(self, gid: int) -> GameEntity:
+        """获取游戏（返回Entity）"""
+        game = self.game_repo.find_by_gid(gid)  # ⭐ 接收Entity
+        if not game:
+            raise ValueError(f"Game {gid} not found")
+        return game  # ⭐ 返回Entity
+
+    def create_game(self, game_data: GameEntity) -> GameEntity:
+        """创建游戏（参数和返回值都是Entity）"""
+        # Entity已验证，直接使用
+        existing = self.game_repo.find_by_gid(game_data.gid)
+        if existing:
+            raise ValueError(f"Game {game_data.gid} already exists")
+
+        # 使用model_dump()转换为字典
+        game_id = self.game_repo.create(game_data.model_dump())
+
+        # 返回Entity对象
+        return self.game_repo.find_by_id(game_id)
+```
+
+**完整文档**：
+- **[Repository Pattern Guide](repository-pattern-guide.md)** - Repository模式完整指南 ⭐
+- **[Entity架构迁移指南](ENTITY-ARCHITECTURE-MIGRATION-GUIDE.md)** - Entity架构说明
 
 #### Service层改进 (2026-02-20优化)
 
