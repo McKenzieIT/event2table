@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from backend.core.cache.decorators import cached
+
 # -*- coding: utf-8 -*-
 """
 Helper functions for parameter API routes
@@ -56,6 +58,8 @@ def resolve_game_context() -> Tuple[Optional[int], Optional[str], Optional[str]]
     return game_id, game_gid, None
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_where_clause_for_game(
     game_gid: Optional[str] = None, game_id: Optional[int] = None
 ) -> Tuple[str, Any]:

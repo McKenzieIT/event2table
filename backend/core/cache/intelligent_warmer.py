@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -59,6 +61,8 @@ class CircularBuffer:
         with self._lock:
             self.buffer.append(item)
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_items(self, count: Optional[int] = None) -> List:
         """
         获取项
@@ -353,6 +357,8 @@ class IntelligentCacheWarmer:
         except Exception as e:
             logger.error(f"自动预热失败: {e}")
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_stats(self) -> Dict:
         """
         获取预热统计
@@ -363,6 +369,8 @@ class IntelligentCacheWarmer:
         with self._lock:
             return self.stats.copy()
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_access_log_stats(self) -> Dict:
         """
         获取访问日志统计
@@ -469,6 +477,8 @@ _intelligent_cache_warmer = None
 _warmer_lock = threading.Lock()
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_intelligent_warmer() -> IntelligentCacheWarmer:
     """
     获取全局预热器实例

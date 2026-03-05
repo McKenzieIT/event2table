@@ -1,3 +1,8 @@
+# ⚠️ PERFORMANCE: N+1 query detected - needs refactor
+# TODO: Replace loop queries with JOIN or prefetch
+
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -31,6 +36,8 @@ class CachedDataLoader:
         self.cache = HierarchicalCache()
         self.cache_prefix = cache_prefix
     
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def _get_cache_key(self, key: Any) -> str:
         """生成缓存键"""
         return f"{self.cache_prefix}:{key}"
@@ -264,6 +271,8 @@ _parameter_loader = None
 _game_loader = None
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_event_loader() -> EventLoader:
     """获取事件加载器实例"""
     global _event_loader
@@ -272,6 +281,8 @@ def get_event_loader() -> EventLoader:
     return _event_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_parameter_loader() -> ParameterLoader:
     """获取参数加载器实例"""
     global _parameter_loader
@@ -280,6 +291,8 @@ def get_parameter_loader() -> ParameterLoader:
     return _parameter_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_game_loader() -> GameLoader:
     """获取游戏加载器实例"""
     global _game_loader

@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE ISSUE: N+1 query detected in this file
 # TODO: Refactor to use JOIN or prefetch pattern
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -55,6 +57,8 @@ class EventParamManager:
 
     # ========== Delegated Methods (use ParameterService) ==========
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_event_parameters(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:
@@ -68,6 +72,8 @@ class EventParamManager:
         # Convert ParameterEntity to dict for backward compatibility
         return [p.model_dump() for p in params]
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_by_id(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID获取参数（带缓存）
@@ -272,6 +278,8 @@ class EventParamManager:
             logger.info(f"Updated parameter {event_param_id} to version {new_version}")
             return True
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_history(self, event_param_id: int) -> List[Dict[str, Any]]:
         """
         获取参数变更历史
@@ -373,6 +381,8 @@ class EventParamManager:
             logger.info(f"Updated config for parameter {event_param_id}")
             return True
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_config(self, event_param_id: int) -> Optional[Dict[str, Any]]:
         """
         获取参数配置
@@ -403,6 +413,8 @@ class EventParamManager:
 
             return result
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def rollback_to_version(self, event_param_id: int, target_version: int) -> bool:
         """
         回滚参数到指定版本
@@ -470,6 +482,8 @@ class EventParamManager:
             )
             return True
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_with_children(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         获取参数及其子参数（用于array类型）
@@ -499,6 +513,8 @@ class EventParamManager:
 
         return param
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_event_parameters_hierarchy(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:
@@ -652,6 +668,8 @@ class EventParamManager:
 # ========== Module-level cached functions (deprecated, kept for compatibility) ==========
 
 @lru_cache(maxsize=128)
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def _get_event_parameters_cached(
     event_id: int, include_inactive: bool = False
 ) -> List[Dict[str, Any]]:
@@ -668,6 +686,8 @@ def _get_event_parameters_cached(
 
 
 @lru_cache(maxsize=256)
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def _get_parameter_by_id_cached(param_id: int) -> Optional[Dict[str, Any]]:
     """
     根据ID获取参数（缓存层）

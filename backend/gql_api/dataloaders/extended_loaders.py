@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 """
 扩展的GraphQL DataLoader实现
 
@@ -354,6 +356,8 @@ _join_config_loader = None
 _game_stats_loader = None
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_category_loader() -> CategoryLoader:
     """获取分类加载器实例"""
     global _category_loader
@@ -362,6 +366,8 @@ def get_category_loader() -> CategoryLoader:
     return _category_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_template_loader() -> TemplateLoader:
     """获取模板加载器实例"""
     global _template_loader
@@ -370,6 +376,8 @@ def get_template_loader() -> TemplateLoader:
     return _template_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_node_loader() -> NodeLoader:
     """获取节点加载器实例"""
     global _node_loader
@@ -378,6 +386,8 @@ def get_node_loader() -> NodeLoader:
     return _node_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_flow_loader() -> FlowLoader:
     """获取流程加载器实例"""
     global _flow_loader
@@ -386,6 +396,8 @@ def get_flow_loader() -> FlowLoader:
     return _flow_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_join_config_loader() -> JoinConfigLoader:
     """获取Join配置加载器实例"""
     global _join_config_loader
@@ -394,6 +406,8 @@ def get_join_config_loader() -> JoinConfigLoader:
     return _join_config_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_game_stats_loader() -> GameStatsLoader:
     """获取游戏统计加载器实例"""
     global _game_stats_loader

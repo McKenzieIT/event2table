@@ -1,3 +1,8 @@
+# ⚠️ PERFORMANCE: N+1 query detected - needs refactor
+# TODO: Replace loop queries with JOIN or prefetch
+
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -113,6 +118,8 @@ class AggregateFunctionBuilder:
 # ============================================================================
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_field_name(field: Dict, fallback_key: str = "name") -> str:
     """
     从字段字典中获取字段名（支持多种键名）

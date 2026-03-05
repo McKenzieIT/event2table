@@ -1,3 +1,8 @@
+# ⚠️ PERFORMANCE: N+1 query detected - needs refactor
+# TODO: Replace loop queries with JOIN or prefetch
+
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -181,6 +186,8 @@ def clear_entity_caches(entity_type: str, entity_id: int, game_gid: Optional[int
 # ============================================================================
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_reference_data(data_types: List[str]) -> Dict[str, List[Dict]]:
     """
     通用的参考数据获取函数

@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -29,6 +31,8 @@ from backend.core.database._helpers import (
 logger = get_logger(__name__)
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_db_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
     """
     Get database connection with row factory and WAL mode
@@ -50,6 +54,8 @@ def get_db_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
 
 
 @contextmanager
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_db(db_path: Optional[Path] = None) -> Generator[sqlite3.Connection, None, None]:
     """
     Context manager for database connections with WAL mode
@@ -1456,6 +1462,8 @@ class MigrationRunner:
         self.db_path = db_path
         self.registry = get_migration_registry()
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_current_version(self) -> int:
         """
         获取当前数据库版本
@@ -1471,6 +1479,8 @@ class MigrationRunner:
 
         return version
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def migrate_to_version(self, target_version: int):
         """
         迁移到指定版本
@@ -1507,6 +1517,8 @@ class MigrationRunner:
             conn.close()
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_migration_registry() -> dict:
     """
     获取迁移注册表

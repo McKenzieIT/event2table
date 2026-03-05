@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -141,6 +143,8 @@ class ParameterRepository(GenericRepository):
         finally:
             conn.close()
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_active_by_event(self, event_id: int) -> List[ParameterEntity]:
         """
         获取指定事件的所有活跃参数
@@ -167,6 +171,8 @@ class ParameterRepository(GenericRepository):
         rows = fetch_all_as_dict(query, (event_id,))
         return [self._row_to_entity(row) for row in rows]
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name_and_event(self, param_name: str, event_id: int) -> Optional[ParameterEntity]:
         """
         根据参数名和事件ID查询参数
@@ -193,6 +199,8 @@ class ParameterRepository(GenericRepository):
         row = fetch_one_as_dict(query, (param_name, event_id))
         return self._row_to_entity(row) if row else None
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_all_by_event(
         self, event_id: int, include_inactive: bool = False
     ) -> List[ParameterEntity]:
@@ -233,6 +241,8 @@ class ParameterRepository(GenericRepository):
         rows = fetch_all_as_dict(query, (event_id,))
         return [self._row_to_entity(row) for row in rows]
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, param_id: int) -> Optional[ParameterEntity]:
         """
         根据参数ID查询参数
@@ -254,6 +264,8 @@ class ParameterRepository(GenericRepository):
         row = fetch_one_as_dict(query, (param_id,))
         return self._row_to_entity(row) if row else None
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_by_template(
         self, template_id: int, limit: Optional[int] = None
     ) -> List[ParameterEntity]:
@@ -332,6 +344,8 @@ class ParameterRepository(GenericRepository):
         rows = fetch_all_as_dict(query, tuple(params))
         return [self._row_to_entity(row) for row in rows]
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_common_parameters(self, game_gid: Optional[int] = None) -> List[Dict[str, Any]]:
         """
         获取公共参数列表
@@ -382,6 +396,8 @@ class ParameterRepository(GenericRepository):
             """
             return fetch_all_as_dict(query)
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_usage_stats(self, param_name: str) -> Optional[Dict[str, Any]]:
         """
         获取参数使用统计
@@ -411,6 +427,8 @@ class ParameterRepository(GenericRepository):
         """
         return fetch_one_as_dict(query, (param_name,))
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_by_id_with_event(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         根据参数ID获取参数及其关联事件信息
@@ -556,6 +574,8 @@ class ParameterRepository(GenericRepository):
         """
         return execute_write(query, (event_id, *param_ids))
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameters_by_type(
         self, template_id: int, event_id: Optional[int] = None
     ) -> List[ParameterEntity]:
@@ -671,6 +691,8 @@ class ParameterRepository(GenericRepository):
 
     # ========== Common Params Methods ==========
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_common_params_by_game(self, game_gid: int) -> List[Dict[str, Any]]:
         """
         获取指定游戏的公共参数列表
@@ -709,6 +731,8 @@ class ParameterRepository(GenericRepository):
         """
         return fetch_all_as_dict(query, (game_gid,))
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_common_param_by_name(self, game_gid: int, param_name: str) -> Optional[Dict[str, Any]]:
         """
         根据游戏GID和参数名查找公共参数
@@ -841,6 +865,8 @@ class ParameterRepository(GenericRepository):
         finally:
             conn.close()
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def batch_find_by_event_ids(self, event_ids: List[int]) -> Dict[int, List[ParameterEntity]]:
         """
         批量查询事件参数（解决N+1查询问题）
@@ -883,6 +909,8 @@ class ParameterRepository(GenericRepository):
 
         return result
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def batch_get_game_gids_by_param_ids(self, param_ids: List[int]) -> Dict[int, int]:
         """
         批量获取参数ID对应的游戏GID（解决N+1查询）
@@ -910,6 +938,8 @@ class ParameterRepository(GenericRepository):
 
     # ========== Extended Methods (from parameter_service_extended.py) ==========
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_details(self, param_name: str, game_gid: int) -> Optional[Dict[str, Any]]:
         """
         获取参数详情（跨事件使用情况）
@@ -977,6 +1007,8 @@ class ParameterRepository(GenericRepository):
 
         return param_info
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_stats(self, game_gid: int) -> Dict[str, Any]:
         """
         获取参数统计信息
@@ -1103,6 +1135,8 @@ class ParameterRepository(GenericRepository):
 
         return {"valid": True, "exists": bool(existing)}
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_common_params_with_event_count(self, game_gid: int) -> List[Dict[str, Any]]:
         """
         获取公共参数列表（包含事件计数）
@@ -1231,6 +1265,8 @@ class ParameterRepository(GenericRepository):
 
         return {"matched": matched, "unmatched": unmatched}
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_alter_table_sql(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         获取ALTER TABLE SQL语句
@@ -1275,6 +1311,8 @@ class ParameterRepository(GenericRepository):
 
         return {"param": param, "alter_sql": alter_sql}
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_all_parameters_paginated(
         self,
         game_gid: int,

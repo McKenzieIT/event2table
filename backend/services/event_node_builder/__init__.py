@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE ISSUE: N+1 query detected in this file
 # TODO: Refactor to use JOIN or prefetch pattern
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -142,6 +144,8 @@ def preview_hql():
 
 
 @event_node_builder_bp.route("/api/params", methods=["GET"])
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_event_params():
     """
     API: 获取事件的参数列表 (ERS架构)
@@ -494,6 +498,8 @@ def search_event_nodes():
 
 
 @event_node_builder_bp.route("/api/stats", methods=["GET"])
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_event_nodes_stats():
     """
     Get event nodes statistics for a game (ERS架构)

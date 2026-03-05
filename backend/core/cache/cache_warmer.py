@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -268,6 +270,8 @@ class CacheWarmer:
         else:
             logger.info("⏹️ 定时预热已停止")
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_warmup_stats(self) -> dict:
         """
         获取预热统计信息

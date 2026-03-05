@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE ISSUE: N+1 query detected in this file
 # TODO: Refactor to use JOIN or prefetch pattern
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -1103,6 +1105,8 @@ def save_history():
 
 
 @hql_preview_v2_bp.route("/hql-preview-v2/api/history/list", methods=["GET"])
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_history_list():
     """
     获取历史记录列表
@@ -1163,6 +1167,8 @@ def get_history_list():
 @hql_preview_v2_bp.route(
     "/hql-preview-v2/api/history/<int:history_id>", methods=["GET"]
 )
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_history_by_id(history_id: int):
     """
     获取单个历史记录

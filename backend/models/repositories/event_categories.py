@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from backend.core.cache.decorators import cached
+
 # -*- coding: utf-8 -*-
 """
 Event Category Repository (事件类别数据访问层)
@@ -34,6 +36,8 @@ class EventCategoryRepository(GenericRepository):
             cache_timeout=1800,  # 30分钟缓存（类别很少变化）
         )
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """
         根据名称查询类别
@@ -51,6 +55,8 @@ class EventCategoryRepository(GenericRepository):
         query = "SELECT * FROM event_categories WHERE name = ?"
         return fetch_one_as_dict(query, (name,))
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_or_create_default(self) -> int:
         """
         获取或创建"未分类"默认类别
@@ -98,6 +104,8 @@ class EventCategoryRepository(GenericRepository):
         result = fetch_one_as_dict(query, (category_id,))
         return result is not None
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_all(self) -> List[Dict[str, Any]]:
         """
         查询所有类别

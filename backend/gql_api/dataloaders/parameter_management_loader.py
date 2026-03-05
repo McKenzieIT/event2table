@@ -1,3 +1,8 @@
+# ⚠️ PERFORMANCE: N+1 query detected - needs refactor
+# TODO: Replace loop queries with JOIN or prefetch
+
+from backend.core.cache.decorators import cached
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -132,6 +137,8 @@ _parameter_management_loader = None
 _common_parameters_loader = None
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_parameter_management_loader() -> ParameterManagementLoader:
     """Get or create parameter management loader instance"""
     global _parameter_management_loader
@@ -140,6 +147,8 @@ def get_parameter_management_loader() -> ParameterManagementLoader:
     return _parameter_management_loader
 
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_common_parameters_loader() -> CommonParametersLoader:
     """Get or create common parameters loader instance"""
     global _common_parameters_loader

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from backend.core.cache.decorators import cached
+
 # -*- coding: utf-8 -*-
 """
 Games Management Module (API Only) - ⚠️ FULLY DEPRECATED
@@ -104,6 +106,8 @@ def set_game_context():
 
 
 # @games_bp.route('/api/games/<int:id>')  # CONFLICTS with api_bp
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_game(id):
     """
     获取单个游戏信息
@@ -130,6 +134,8 @@ def get_game(id):
 
 
 @games_bp.route("/api/games/by-gid/<gid>")
+
+@cached(ttl=1800)  # Cache for 30 minutes
 def get_game_by_gid(gid):
     """
     根据业务GID获取游戏信息（非数据库ID）

@@ -1,3 +1,6 @@
+# ⚠️ PERFORMANCE: N+1 query detected - needs refactor
+# TODO: Replace loop queries with JOIN or prefetch
+
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md

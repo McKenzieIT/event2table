@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from backend.core.cache.decorators import cached
+
 # -*- coding: utf-8 -*-
 """
 Parameter Template Repository (参数模板数据访问层)
@@ -34,6 +36,8 @@ class ParamTemplateRepository(GenericRepository):
             cache_timeout=1800,  # 30分钟缓存（模板变化很少）
         )
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name(self, template_name: str) -> Optional[Dict[str, Any]]:
         """
         根据模板名查找模板
@@ -51,6 +55,8 @@ class ParamTemplateRepository(GenericRepository):
         query = "SELECT * FROM param_templates WHERE template_name = ?"
         return fetch_one_as_dict(query, (template_name,))
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_all_templates(self, include_system: bool = True) -> List[Dict[str, Any]]:
         """
         获取所有类型模板
@@ -71,6 +77,8 @@ class ParamTemplateRepository(GenericRepository):
         query += " ORDER BY base_type, nesting_level, template_name"
         return fetch_all_as_dict(query)
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_templates_by_type(
         self, base_type: str, include_system: bool = True
     ) -> List[Dict[str, Any]]:
@@ -94,6 +102,8 @@ class ParamTemplateRepository(GenericRepository):
         query += " ORDER BY nesting_level, template_name"
         return fetch_all_as_dict(query, (base_type,))
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_primitive_types(self) -> List[Dict[str, Any]]:
         """
         获取所有基础类型
@@ -112,6 +122,8 @@ class ParamTemplateRepository(GenericRepository):
         """
         return fetch_all_as_dict(query)
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_complex_types(self) -> List[Dict[str, Any]]:
         """
         获取所有复杂类型（array, map）
@@ -130,6 +142,8 @@ class ParamTemplateRepository(GenericRepository):
         """
         return fetch_all_as_dict(query)
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_custom_templates(self) -> List[Dict[str, Any]]:
         """
         获取所有自定义模板
@@ -315,6 +329,8 @@ class ParamTemplateRepository(GenericRepository):
         finally:
             conn.close()
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, template_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID查询模板
@@ -332,6 +348,8 @@ class ParamTemplateRepository(GenericRepository):
         query = "SELECT * FROM param_templates WHERE id = ?"
         return fetch_one_as_dict(query, (template_id,))
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_available_types_grouped(self) -> Dict[str, List[Dict[str, Any]]]:
         """
         获取可用的类型列表（分组）
@@ -408,6 +426,8 @@ class ParamTemplateRepository(GenericRepository):
         template = self.find_by_name(template_name)
         return template is not None
 
+
+@cached(ttl=1800)  # Cache for 30 minutes
     def get_cast_type(self, template_id: int) -> str:
         """
         获取模板对应的CAST类型
