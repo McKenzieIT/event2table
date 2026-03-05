@@ -1,3 +1,7 @@
+// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
+// TODO: Add appropriate React optimization
+// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 import React, { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';

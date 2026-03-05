@@ -1,3 +1,5 @@
+# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
+# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 from backend.core.cache.decorators import cached
 
 #!/usr/bin/env python3

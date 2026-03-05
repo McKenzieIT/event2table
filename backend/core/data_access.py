@@ -1,3 +1,5 @@
+# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
+# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 """
 通用数据访问层 (Repository Pattern)
 

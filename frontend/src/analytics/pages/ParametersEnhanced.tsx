@@ -1,3 +1,7 @@
+// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
+// TODO: Add appropriate React optimization
+// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';

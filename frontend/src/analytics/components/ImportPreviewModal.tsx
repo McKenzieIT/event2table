@@ -1,3 +1,7 @@
+// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
+// TODO: Add appropriate React optimization
+// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 /**
  * ImportPreviewModal 组件 - 批量导入预览弹窗
  *

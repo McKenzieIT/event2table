@@ -1,3 +1,5 @@
+# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
+# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 """
 SQL构建通用工具函数模块
 

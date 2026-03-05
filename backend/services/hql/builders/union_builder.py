@@ -1,3 +1,7 @@
+# ⚠️ PERFORMANCE ISSUE: N+1 query detected in this file
+# TODO: Refactor to use JOIN or prefetch pattern
+# See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 """
 UnionBuilder - 多事件UNION HQL构建器
 
