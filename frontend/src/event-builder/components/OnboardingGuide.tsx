@@ -1,3 +1,10 @@
+// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
+// TODO: Add appropriate React optimization:
+//   - Large components (>500 chars): Add React.memo()
+//   - Expensive computations: Add useMemo()
+//   - useEffect dependencies: Add useCallback()
+// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 /**
  * OnboardingGuide Component
  * 首次访问引导组件 - 显示快速上手指南

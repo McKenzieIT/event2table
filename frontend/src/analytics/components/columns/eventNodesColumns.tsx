@@ -1,3 +1,10 @@
+// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
+// TODO: Add appropriate React optimization:
+//   - Large components (>500 chars): Add React.memo()
+//   - Expensive computations: Add useMemo()
+//   - useEffect dependencies: Add useCallback()
+// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 /**
  * 事件节点表格列定义
  * Event Nodes Table Column Definitions

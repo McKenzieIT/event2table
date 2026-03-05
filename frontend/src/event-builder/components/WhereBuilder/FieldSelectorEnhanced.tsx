@@ -1,3 +1,10 @@
+// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
+// TODO: Add appropriate React optimization:
+//   - Large components (>500 chars): Add React.memo()
+//   - Expensive computations: Add useMemo()
+//   - useEffect dependencies: Add useCallback()
+// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 /**
  * FieldSelectorEnhanced Component
  * 增强版字段选择器，支持事件的所有参数字段 + 已在画布标记

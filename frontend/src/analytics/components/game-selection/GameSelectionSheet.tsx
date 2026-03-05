@@ -1,3 +1,10 @@
+// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
+// TODO: Add appropriate React optimization:
+//   - Large components (>500 chars): Add React.memo()
+//   - Expensive computations: Add useMemo()
+//   - useEffect dependencies: Add useCallback()
+// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { SearchInput, EmptyState } from '@shared/ui';

@@ -1,4 +1,8 @@
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
+# TODO: Replace loop queries with single JOIN query
+# See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+
+# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 """
 GraphQL DataLoader优化实现
