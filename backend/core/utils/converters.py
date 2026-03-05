@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 """
 数据转换函数模块
 
@@ -446,6 +448,8 @@ def ensure_game_gid_int(value: Any) -> int:
 # ============================================================================
 
 
+
+@cached(ttl=1800)
 def fetch_all_as_dict(query: str, params: Optional[Tuple] = None) -> List[Dict[str, Any]]:
     """
     执行查询并返回字典列表
@@ -479,6 +483,8 @@ def fetch_all_as_dict(query: str, params: Optional[Tuple] = None) -> List[Dict[s
         return []
 
 
+
+@cached(ttl=1800)
 def fetch_one_as_dict(query: str, params: Optional[Tuple] = None) -> Optional[Dict[str, Any]]:
     """
     执行查询并返回单个字典

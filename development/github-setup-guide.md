@@ -1,0 +1,1 @@
+/Users/mckenzie/Documents/event2table/docs/development/github-setup-guide.md
