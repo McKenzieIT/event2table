@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -795,6 +797,8 @@ def safe_int_convert(value, default=0, min_value=None, max_value=None):
         return default
 
 
+
+@cached(ttl=1800)
 def fetch_all_as_dict(query: str, params: Tuple = None) -> List[Dict[str, Any]]:
     """
     Execute a query and return all rows as dictionaries
@@ -817,6 +821,8 @@ def fetch_all_as_dict(query: str, params: Tuple = None) -> List[Dict[str, Any]]:
         conn.close()
 
 
+
+@cached(ttl=1800)
 def fetch_one_as_dict(query: str, params: Tuple = None) -> Optional[Dict[str, Any]]:
     """
     Execute a query and return one row as dictionary

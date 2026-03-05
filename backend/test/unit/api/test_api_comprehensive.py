@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -885,6 +887,8 @@ class TestParameterAliasesAPI(APITestCase):
         self.game_gid = self.test_game_gid if self.test_game_gid else 10000147
         self.game_id = self.test_game_ids[0] if self.test_game_ids else 1
 
+
+@cached(ttl=1800)
     def test_01_list_parameter_aliases(self):
         """Test GET /api/parameter-aliases - List parameter aliases"""
         # Get actual param_id from event_params table

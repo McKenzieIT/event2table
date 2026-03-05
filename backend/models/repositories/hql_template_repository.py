@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -56,6 +58,8 @@ class HQLTemplateRepository(GenericRepository):
         """
         return fetch_all_as_dict(query, (template_type,))
 
+
+@cached(ttl=1800)
     def find_system_templates(self) -> List[Dict[str, Any]]:
         """
         获取所有系统模板
@@ -70,6 +74,8 @@ class HQLTemplateRepository(GenericRepository):
         """
         return fetch_all_as_dict(query)
 
+
+@cached(ttl=1800)
     def find_user_templates(self) -> List[Dict[str, Any]]:
         """
         获取所有用户自定义模板
@@ -104,6 +110,8 @@ class HQLTemplateRepository(GenericRepository):
         pattern = f"%{keyword}%"
         return fetch_all_as_dict(query, (pattern, pattern, pattern))
 
+
+@cached(ttl=1800)
     def get_types(self) -> List[str]:
         """
         获取所有模板类型

@@ -1,3 +1,5 @@
+from backend.core.cache.decorators import cached
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -64,6 +66,8 @@ class CategoryRepository(GenericRepository):
         row = fetch_one_as_dict(query, (name,))
         return EventCategoryEntity(**row) if row else None
 
+
+@cached(ttl=1800)
     def find_all(self) -> List[EventCategoryEntity]:
         """
         查询所有类别
