@@ -1,0 +1,11 @@
+[
+  "backend/services/games/game_service.py",
+  "backend/services/hql/core/incremental_generator.py",
+  "backend/services/hql/core/dml_generator.py",
+  "backend/services/hql/builders/union_builder.py",
+  "backend/services/hql/builders/join_builder.py",
+  "backend/services/hql/validators/syntax_validator.py",
+  "backend/services/hql/validators/test_performance_analyzer_extended.py",
+  "backend/api/routes/join_configs_old_backup.py",
+  "backend/api/routes/cache.py"
+]

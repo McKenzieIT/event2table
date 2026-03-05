@@ -1,0 +1,11 @@
+[
+  "backend/services/event_node_builder/__init__.py",
+  "backend/services/cache/cache_warmup.py",
+  "backend/services/bulk_operations/bulk_routes.py",
+  "backend/services/field_builder/field_builder_service.py",
+  "backend/services/canvas/canvas.py",
+  "backend/services/hql/hql_history_service.py",
+  "backend/services/parameters/param_library_manager.py",
+  "backend/services/parameters/event_param_manager.py",
+  "backend/services/parameters/parameter_service.py"
+]

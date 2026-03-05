@@ -1,0 +1,11 @@
+[
+  "backend/api/routes/legacy_api.py",
+  "backend/api/routes/hql_preview_v2.py",
+  "backend/api/routes/hql_generation.py",
+  "backend/test/unit/services/field_builder/test_field_builder_service.py",
+  "backend/test/unit/services/hql/test_dml_generator.py",
+  "backend/test/unit/services/hql/test_hql_preview_v2_api.py",
+  "backend/test/unit/services/parameters/test_batch_queries.py",
+  "backend/test/unit/services/parameters/test_parameters_performance.py",
+  "backend/test/unit/services/parameters/test_common_params.py"
+]

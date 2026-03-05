@@ -1,0 +1,7 @@
+{
+  "worker": "p0_fixer_worker_3",
+  "fixed": 3,
+  "skipped": 6,
+  "errors": 0,
+  "total": 9
+}
