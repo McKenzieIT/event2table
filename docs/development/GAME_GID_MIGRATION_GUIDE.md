@@ -473,7 +473,7 @@ cd frontend && npm run test:e2e
 ## 📚 相关文档
 
 - [开发规范 - 游戏标识符规范](../../CLAUDE.md#游戏标识符规范-⚠️-极其重要---强制执行)
-- [后端优化报告](../optimization/FINAL_OPTIMIZATION_REPORT.md)
+- [后端优化报告](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 - [API文档](../api/README.md)
 - [快速开始指南](./QUICKSTART.md)
 

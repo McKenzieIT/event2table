@@ -7,7 +7,7 @@ Enforces Event2Table's critical rule: Use game_gid not game_id for data associat
 import re
 from pathlib import Path
 from typing import List
-from ..core.base_detector import BaseDetector, Issue, Severity, IssueCategory
+from core.base_detector import BaseDetector, Issue, Severity, IssueCategory
 
 
 class GameGidDetector(BaseDetector):

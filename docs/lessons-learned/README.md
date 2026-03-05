@@ -1,7 +1,7 @@
 # 经验文档索引
 
 > **🎯 目标**: 避免重复经验，提供集中的知识库
-> **📊 来源**: 整合了399个文档的精华经验
+> **📊 来源**: 整合了446个文档的精华经验
 > **🔄 更新**: 持续更新，每次问题修复后立即更新
 
 ---
@@ -107,6 +107,12 @@
 
 | 场景 | 经验文档 | 章节 |
 |-----|---------|-----|
+| 🚨 React应用挂载 | [测试指南](./testing-guide.md) | React挂载问题诊断 |
+| 🔍 Chrome DevTools调试 | [测试指南](./testing-guide.md) | Chrome MCP调试法 |
+| 📝 mypy类型错误 | [Python开发](./python-development.md) | mypy --strict合规 |
+| ⚡ Vite-Apollo兼容性 | [React最佳实践](./react-best-practices.md) | Vite兼容性 |
+| 💾 缓存失效分析 | [性能模式](./performance-patterns.md) | 缓存失效分析 |
+| 🚀 并行优化策略 | [性能模式](./performance-patterns.md) | 并行优化 |
 | 🚨 React Hooks错误 | [React最佳实践](./react-best-practices.md) | Hooks规则 |
 | 🐌 页面加载超时 | [React最佳实践](./react-best-practices.md) | Lazy Loading |
 | 🔒 SQL注入风险 | [安全要点](./security-essentials.md) | SQL注入防护 |
@@ -158,14 +164,56 @@
 
 ## 统计信息
 
-- **经验文档总数**: 11个
-- **P0核心经验**: 7个主题（22个经验点）
-- **P1重要经验**: 10个主题（42个经验点）
+- **经验文档总数**: 12个
+- **P0核心经验**: 8个主题（34个经验点 +6个）
+- **P1重要经验**: 10个主题（46个经验点 +4个）
 - **P0完成度**: 100% ✅
 - **P1完成度**: 100% ✅
-- **整合文档数**: 399个
-- **归档报告数**: 269个
-- **文档减少率**: 87.5% (399 → 50)
+- **整合文档数**: 493个 (+47个2026-03报告)
+- **归档报告数**: 369个 (+50个)
+- **文档减少率**: 92.5% (493 → 37个活跃文档)
+
+## 新增经验 (2026-03-05)
+
+### 测试指南
+- [E2E测试完整流程](./testing-guide.md#e2e测试完整流程) - Chrome DevTools MCP 6步流程 (P0)
+- [测试失败诊断方法](./testing-guide.md#测试失败诊断) - React Hooks、加载超时、API错误 (P0)
+- [Ralph Loop迭代测试法](./testing-guide.md#ralph-loop迭代测试法) - 5步迭代测试 (P1)
+- [API契约测试](./testing-guide.md#api契约测试) - 端点存在性、参数一致性 (P0)
+- [React应用挂载问题诊断](./testing-guide.md#react应用挂载问题诊断) - E2E测试经验 (P0)
+- [Chrome DevTools MCP调试法](./testing-guide.md#chrome-devtools-mcp测试流程) - 标准调试流程 (P0)
+
+### React最佳实践
+- [Lazy Loading决策标准](./react-best-practices.md#lazy-loading最佳实践) - 组件大小与使用规范 (P0)
+- [双重Suspense嵌套问题](./react-best-practices.md#lazy-loading最佳实践) - 问题诊断与解决 (P0)
+- [React Hooks规则更新](./react-best-practices.md#react-hooks-规则) - 条件返回之前调用Hook (P0)
+- [Vite与Apollo Client兼容性](./react-best-practices.md#vite与apollo-client兼容性) - Vite 7.x兼容性 (P1)
+
+### 调试技能
+- [Chrome DevTools MCP调试流程](./debugging-skills.md#chrome-devtools-mcp调试法) - 6步标准流程 (P0)
+- [错误检测模式](./debugging-skills.md#chrome-devtools-mcp调试法) - React Hooks、加载超时、API错误 (P0)
+- [Canvas组件调试](./debugging-skills.md#canvas组件调试) - 事件节点配置问题诊断 (P1)
+- [并行Subagent分析](./debugging-skills.md#subagent并行分析法) - 3步分析策略 (P1)
+
+### API设计模式
+- [路由参数设计规范](./api-design-patterns.md#路由参数设计规范) - game_gid vs game_id (P0)
+- [API契约一致性验证](./api-design-patterns.md#api契约一致性验证) - 验证工具和检查项 (P0)
+
+### 重构检查清单
+- [Canvas架构重构](./refactoring-checklist.md#canvas架构重构) - 事件节点架构优化 (P1)
+
+### Python开发
+- [mypy --strict合规](./python-development.md#mypy---strict合规) - 类型注解最佳实践 (P0)
+- [GenericRepository类型安全](./python-development.md#genericsrepository类型安全) - 泛型Repository设计 (P1)
+
+### 性能优化
+- [缓存失效分析](./performance-patterns.md#缓存失效分析) - 缓存未命中原因和策略 (P0)
+- [并行优化策略](./performance-patterns.md#并行优化策略) - 并行执行模式 (P0)
+
+### 归档文档
+- 15个E2E测试报告 → docs/archive/2026/03-march/reports/
+- 55个PNG截图 → docs/archive/2026/03-march/screenshots/
+- 5个临时指南 → docs/archive/2026/03-march/temp-guides/
 
 ---
 

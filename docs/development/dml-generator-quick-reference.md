@@ -267,8 +267,9 @@ WHERE ds = '${bizdate}'"""
 
 ## 🔗 相关文档
 
-- [DML Generator实现总结](../../reports/2026-02-17/dml-generator-implementation-summary.md)
-- [HQL V2架构文档](../../development/hql-v2-architecture.md)
+- [DML Generator实现总结](../archive/2026-02/reports/2026-02-17/dml-generator-implementation-summary.md)
+- [HQL文档中心](../hql/README.md) - HQL生成器完整文档
+- [HQL安全指南](../hql/hql-security-guide.md) - HQL注入防护
 - [使用示例集](../../../backend/services/hql/examples/dml_usage_examples.py)
 
 ---

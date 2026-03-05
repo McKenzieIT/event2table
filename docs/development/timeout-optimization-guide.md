@@ -426,8 +426,8 @@ expect(response.status()).toBe(200);
 
 - [Playwright Timeouts Documentation](https://playwright.dev/docs/test-timeouts)
 - [Playwright Best Practices](https://playwright.dev/docs/best-practices)
-- [Project E2E Testing Guide](../../test/e2e/README.md)
-- [E2E Testing Guide](/Users/mckenzie/Documents/event2table/E2E_TESTING_GUIDE.md)
+- [测试指南](../lessons-learned/testing-guide.md)
+- [E2E测试指南](../archive/2026-02/testing/e2e-testing-guide.md)
 
 ---
 

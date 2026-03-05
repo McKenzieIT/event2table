@@ -13,11 +13,12 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, SearchInput, Skeleton, ErrorState, useToast } from '@shared/ui';
 import EmptyState from '@shared/ui/EmptyState/EmptyState';
 import { useGameStore } from '@/stores/gameStore';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { useQueryParam } from '@shared/hooks/useQueryParams';
 import CategoryModal from '../components/categories/CategoryModal';
 import { useCategories, useDeleteCategory, useCreateCategory, useUpdateCategory } from '@/graphql/hooks';
 import './CategoriesList.css';
@@ -44,7 +45,6 @@ interface ConfirmState {
  */
 export default function CategoriesListGraphQL() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { currentGame, setCurrentGame } = useGameStore();
   const { success, error: showError } = useToast();
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -58,9 +58,8 @@ export default function CategoriesListGraphQL() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  // Read game_gid from URL parameters
-  const searchParams = new URLSearchParams(location.search);
-  const gameGid = searchParams.get('game_gid');
+  // Read game_gid from URL parameters (works with both HashRouter and BrowserRouter)
+  const gameGid = useQueryParam('game_gid');
 
   // Load game data if game_gid is in URL but not in store
   useEffect(() => {

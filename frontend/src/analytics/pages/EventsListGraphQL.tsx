@@ -228,7 +228,7 @@ function EventsListGraphQL() {
             </Button>
             <Button
               variant="primary"
-              onClick={() => navigate('/events/create')}
+              onClick={() => navigate(`/events/create?game_gid=${currentGame?.gid}`)}
               data-testid="add-event-button"
             >
               新增事件

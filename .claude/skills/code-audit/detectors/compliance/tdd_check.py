@@ -7,7 +7,7 @@ Validates Test-Driven Development compliance.
 import re
 from pathlib import Path
 from typing import List
-from ..core.base_detector import BaseDetector, Issue, Severity, IssueCategory
+from core.base_detector import BaseDetector, Issue, Severity, IssueCategory
 
 
 class TddDetector(BaseDetector):

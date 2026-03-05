@@ -361,6 +361,342 @@ black backend/
 
 ---
 
+## Canvas组件重构步骤（分离关注点） ⭐ (2026-03-04新增)
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [CANVAS-EVENT-NODES-FIX-GUIDE.md](../../reports/2026-03-03/CANVAS-EVENT-NODES-FIX-GUIDE.md)
+
+### 分离关注点的重构策略
+
+**问题背景**: Canvas和Event Nodes模块存在以下架构问题
+- 路由配置混乱，URL直接访问失败
+- API连接管理分散，错误处理不统一
+- 组件职责不清，UI逻辑与业务逻辑混合
+- 缺少统一的错误边界和加载状态
+
+### 重构步骤
+
+#### 第1步：路由层重构（URL访问基础）
+
+**目标**: 确保所有Canvas相关页面可以通过URL直接访问
+
+**重构前问题**:
+```typescript
+// ❌ 路由配置不完整
+<Routes>
+  <Route path="/event-node-builder" element={<EventNodeBuilder />} />
+</Routes>
+
+// ❌ 缺少Suspense包装
+<Route path="/canvas" element={<Canvas />} />
+```
+
+**重构后方案**:
+```typescript
+// ✅ 完整的路由配置
+const routes = (
+  <BrowserRouter>
+    <Routes>
+      <Route
+        path="/event-node-builder"
+        element={
+          <Suspense fallback={<GlobalLoading />}>
+            <EventNodeBuilder />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/event-nodes"
+        element={
+          <Suspense fallback={<GlobalLoading />}>
+            <EventNodesManagement />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/canvas"
+        element={
+          <Suspense fallback={<GlobalLoading />}>
+            <Canvas />
+          </Suspense>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
+)
+```
+
+#### 第2步：API层重构（数据访问层）
+
+**目标**: 统一API调用管理，分离数据获取逻辑
+
+**重构前问题**:
+```typescript
+// ❌ 组件内直接调用API
+function EventNodeBuilder() {
+  const [params, setParams] = useState([]);
+
+  useEffect(() => {
+    fetch(`/api/parameters?game_gid=${gameGid}`)
+      .then(res => res.json())
+      .then(data => setParams(data))
+      .catch(error => console.error(error));
+  }, []);
+}
+```
+
+**重构后方案**:
+```typescript
+// ✅ 创建专门的API Service
+import { apiService } from '@/shared/services/apiService';
+
+class EventNodeService {
+  async getParameters(gameGid) {
+    return apiService.get('/api/parameters', { game_gid: gameGid });
+  }
+
+  async createNode(gameGid, nodeData) {
+    return apiService.post('/api/event-nodes', { ...nodeData, game_gid: gameGid });
+  }
+}
+
+// ✅ 组件使用Service
+function EventNodeBuilder() {
+  const [params, setParams] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const loadParameters = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await eventNodeService.getParameters(gameGid);
+      setParams(data);
+    } catch (err) {
+      setError('加载参数失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+}
+```
+
+#### 第3步：组件层重构（UI组件分离）
+
+**目标**: 分离可复用组件，提高代码复用性
+
+**重构前问题**:
+```typescript
+// ❌ 所有逻辑都在一个组件中
+function Canvas() {
+  // 复杂的状态管理
+  // 复杂的渲染逻辑
+  // 复杂的事件处理
+  // 硬编码的面包屑
+  // 重复的错误处理
+}
+```
+
+**重构后方案**:
+```typescript
+// ✅ 分离可复用组件
+// 1. 面包屑组件
+export function DynamicBreadcrumb({ path }) {
+  const breadcrumbs = breadcrumbMap[path] || [];
+  // ...
+}
+
+// 2. 游戏上下文组件
+export function GameContextBar() {
+  const gameGid = useGameGid();
+  const gameInfo = useGameInfo(gameGid);
+  // ...
+}
+
+// 3. 加载状态组件
+export function CanvasLoading({ message }) {
+  return (
+    <div className="canvas-loading">
+      <Spinner />
+      <p>{message || '正在加载...'}</p>
+    </div>
+  );
+}
+
+// 4. 空状态组件
+export function EmptyCanvasState() {
+  return (
+    <div className="empty-state">
+      <div className="empty-icon">🎨</div>
+      <h2>暂无画布配置</h2>
+      <p>开始创建您的第一个事件节点</p>
+      <button onClick={onCreateFirstNode}>
+        创建事件节点
+      </button>
+    </div>
+  );
+}
+
+// ✅ 简化的主组件
+function Canvas() {
+  const [nodes, setNodes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  if (loading) return <CanvasLoading />;
+  if (nodes.length === 0) return <EmptyCanvasState />;
+
+  return (
+    <div className="canvas">
+      <DynamicBreadcrumb path="/canvas" />
+      <GameContextBar />
+      <CanvasNodes nodes={nodes} />
+    </div>
+  );
+}
+```
+
+#### 第4步：错误处理重构（统一的错误边界）
+
+**目标**: 建立统一的错误处理机制
+
+**重构前问题**:
+```typescript
+// ❌ 分散的错误处理
+try {
+  // API调用
+} catch (error) {
+  console.error(error);
+  alert('Error');
+}
+```
+
+**重构后方案**:
+```typescript
+// ✅ 全局错误边界
+export class ErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Canvas Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="error-boundary">
+          <h2>出现错误</h2>
+          <p>{this.state.error?.message}</p>
+          <button onClick={() => window.location.reload()}>
+            重新加载页面
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// ✅ 组件使用错误边界
+function CanvasWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <Canvas />
+    </ErrorBoundary>
+  );
+}
+```
+
+### 前后端集成验证（4步验证）
+
+**验证目标**: 确保重构后的系统正常工作
+
+#### 步骤1：路由访问验证
+```bash
+# ✅ 所有Canvas相关URL必须可访问
+curl -I http://localhost:5173/event-node-builder?game_gid=10000147
+curl -I http://localhost:5173/event-nodes?game_gid=10000147
+curl -I http://localhost:5173/canvas?game_gid=10000147
+
+# 预期响应: HTTP 200
+```
+
+#### 步骤2：API连接验证
+```bash
+# ✅ 所有API端点正常响应
+curl -s "http://127.0.0.1:5001/api/parameters?game_gid=10000147" | jq .
+curl -s "http://127.0.0.1:5001/api/events?game_gid=10000147" | jq .
+curl -s "http://127.0.0.1:5001/api/event-nodes?game_gid=10000147" | jq .
+
+# 预期响应: 正常JSON数据
+```
+
+#### 步骤3：组件功能验证
+```typescript
+// ✅ 验证关键组件功能
+describe('Canvas Components', () => {
+  test('EventNodeBuilder loads parameters', async () => {
+    render(<EventNodeBuilder />);
+    expect(screen.getByText('正在加载...')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('参数列表')).toBeInTheDocument();
+    });
+  });
+
+  test('Canvas shows game context', () => {
+    render(<Canvas />);
+    expect(screen.getByText('当前游戏:')).toBeInTheDocument();
+    expect(screen.getByText('10000147')).toBeInTheDocument();
+  });
+});
+```
+
+#### 步骤4：用户体验验证
+```typescript
+// ✅ 验证用户体验改进
+test('Breadcrumbs show correct navigation', () => {
+  render(<DynamicBreadcrumb path="/canvas" />);
+  expect(screen.getByText('首页')).toBeInTheDocument();
+  expect(screen.getByText('HQL画布')).toBeInTheDocument();
+});
+
+test('Game context bar shows game info', () => {
+  render(<GameContextBar gameGid="10000147" />);
+  expect(screen.getByText('GID: 10000147')).toBeInTheDocument();
+});
+```
+
+### 重构收益
+
+**架构改进**:
+- ✅ **关注点分离**: 路由、API、UI、错误处理各司其职
+- ✅ **代码复用**: 提取了4个可复用组件
+- ✅ **错误统一**: 全局错误边界处理
+- ✅ **类型安全**: TypeScript类型覆盖
+
+**开发体验**:
+- ✅ **组件化**: 组件职责明确，易于维护
+- ✅ **可测试性**: 每个组件可独立测试
+- ✅ **可扩展性**: 新功能可快速集成
+
+**用户体验**:
+- ✅ **响应式**: 加载状态和错误提示清晰
+- ✅ **导航清晰**: 动态面包屑指引
+- ✅ **上下文明确**: 游戏信息始终可见
+
+### 重构检查清单
+
+- [ ] 路由配置是否完整且支持参数？
+- [ ] API服务是否抽象为独立层？
+- [ ] 组件是否按功能分离？
+- [ ] 错误处理是否统一？
+- [ ] TypeScript类型是否完整？
+- [ ] 所有功能是否正常工作？
+- [ ] 性能是否得到优化？
+- [ ] 是否更新了相关文档？
+
 ### 相关经验
 
 - [测试指南 - TDD实践](./testing-guide.md#tdd实践) - 避免测试债务

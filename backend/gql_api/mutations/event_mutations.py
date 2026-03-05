@@ -13,20 +13,20 @@ logger = logging.getLogger(__name__)
 
 class CreateEvent(graphene.Mutation):
     """Create a new event"""
-    
+
     class Arguments:
         game_gid = Int(required=True, description="游戏GID")
         event_name = String(required=True, description="事件英文名")
         event_name_cn = String(required=True, description="事件中文名")
-        category_id = Int(required=True, description="分类ID")
+        category_id = Int(description="分类ID")  # ✅ 改为可选，支持"未分类"
         include_in_common_params = Boolean(default_value=False, description="是否包含在公共参数中")
     
     ok = Boolean(description="操作是否成功")
     event = Field(lambda: __import__('backend.gql_api.types.event_type', fromlist=['EventType']).EventType, description="创建的事件")
     errors = List(String, description="错误信息")
     
-    def mutate(self, info, game_gid: int, event_name: str, event_name_cn: str, 
-               category_id: int, include_in_common_params: bool = False):
+    def mutate(self, info, game_gid: int, event_name: str, event_name_cn: str,
+               category_id: int = None, include_in_common_params: bool = False):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict

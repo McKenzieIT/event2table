@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput, Skeleton, ErrorState, EmptyState } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { useQueryParam } from '@shared/hooks/useQueryParams';
 import './CommonParamsList.css';
 
 /**
@@ -37,7 +38,6 @@ interface ConfirmState {
 
 export default function CommonParamsList(): React.JSX.Element {
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -49,8 +49,8 @@ export default function CommonParamsList(): React.JSX.Element {
   });
   const { success, error, warning } = useToast();
 
-  // Read game_gid from URL parameters
-  const gameGid = new URLSearchParams(location.search).get('game_gid');
+  // Read game_gid from URL parameters (works with both HashRouter and BrowserRouter)
+  const gameGid = useQueryParam('game_gid');
 
   // Fetch common parameters with React Query (requires game_gid)
   const { data: params = [] as CommonParam[], isLoading, error: queryError } = useQuery<CommonParam[]>({

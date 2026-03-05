@@ -7,7 +7,7 @@ Detects missing XSS protection.
 import re
 from pathlib import Path
 from typing import List
-from ..core.base_detector import BaseDetector, Issue, Severity, IssueCategory
+from core.base_detector import BaseDetector, Issue, Severity, IssueCategory
 
 
 class XssDetector(BaseDetector):
@@ -22,9 +22,9 @@ class XssDetector(BaseDetector):
 
     # XSS risk patterns
     XSS_PATTERNS = [
-        (r'f["']<.*?\{.*?\}.*?>["']', "f-string with variable in HTML"),
-        (r'return\s+f["']<.*?\{', "Returning f-string HTML with variable"),
-        (r'<[^>]*?\{[^}]*\}[^>]*>', "Variable in HTML tag"),
+        (r'''f['"]<.*?\{.*?\}.*?>['"]''', "f-string with variable in HTML"),
+        (r'''return\s+f['"]<.*?\{''', "Returning f-string HTML with variable"),
+        (r'''<[^>]*?\{[^}]*\}[^>]*>''', "Variable in HTML tag"),
     ]
 
     def __init__(self):

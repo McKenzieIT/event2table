@@ -1267,9 +1267,9 @@ if (data && typeof data === 'object' && 'name' in data) {
 
 ### Event2Table 项目资源
 
-- [前端开发指南](/Users/mckenzie/Documents/event2table/docs/development/frontend-development.md)
-- [架构设计文档](/Users/mckenzie/Documents/event2table/docs/development/architecture.md)
-- [贡献指南](/Users/mckenzie/Documents/event2table/docs/development/contributing.md)
+- [React最佳实践](../lessons-learned/react-best-practices.md)
+- [架构设计文档](./architecture.md)
+- [贡献指南](./contributing.md)
 
 ---
 

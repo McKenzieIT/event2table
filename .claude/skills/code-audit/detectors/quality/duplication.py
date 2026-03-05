@@ -6,7 +6,7 @@ Detects duplicate code blocks.
 
 from pathlib import Path
 from typing import List, Dict
-from ..core.base_detector import BaseDetector, Issue, Severity, IssueCategory
+from core.base_detector import BaseDetector, Issue, Severity, IssueCategory
 
 
 class DuplicationDetector(BaseDetector):

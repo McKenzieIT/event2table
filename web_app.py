@@ -9,6 +9,7 @@ from pathlib import Path
 import os
 from flask import Flask, render_template, send_from_directory
 from flask_caching import Cache
+from flask_cors import CORS
 from backend.core.database import init_db, migrate_db, get_db_connection, create_indexes
 from backend.core.config import get_db_path, FlaskConfig, CacheConfig, BASE_DIR, OUTPUT_DIR
 from backend.core.logging import get_logger
@@ -134,6 +135,21 @@ cache.init_app(app)
 
 # Attach cache to app for access via current_app.cache
 app.cache = cache
+
+# CORS configuration - Allow frontend-originated requests
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    },
+    r"/api/graphql": {
+        "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
+logger.info("✅ CORS已启用: 允许来自 localhost:5173 的请求")
 
 # Check cache status and log
 try:

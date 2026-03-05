@@ -1,7 +1,7 @@
 # 调试技能
 
 > **来源**: 整合了E2E测试和Subagent分析的调试经验
-> **最后更新**: 2026-02-24
+> **最后更新**: 2026-03-04（新增前端加载问题调试模式）
 > **维护**: 每次调试问题后立即更新
 
 ---
@@ -82,6 +82,102 @@ mcp__chrome-devtools__click({ uid: "clickable-element-uid" })
 - ❌ 批量测试 - 应该使用自动化测试工具
 - ❌ CI/CD集成 - 应该使用无头浏览器
 
+### 2026-03-04 新增：前端加载问题调试模式 ⭐ **P0重要**
+
+**问题现象**：
+- 页面卡在 "Loading Event2Table..." 状态超过30秒
+- 控制台显示模块导入错误
+- CORS 错误阻止 GraphQL 请求
+- React 应用无法完全挂载
+
+### 错误检测模式
+
+**Apollo Provider 导入错误**:
+```
+❌ Uncaught SyntaxError: The requested module
+   '/node_modules/.vite/deps/@apollo_client.js?v=1744da38'
+   does not provide an export named 'ApolloProvider'
+
+❌ 错误根因：从 @apollo/client 导入 React 组件
+   ✅ 修复：从 @apollo/client/react 导入
+```
+
+**CORS 策略阻止错误**:
+```
+❌ Access to fetch at 'http://127.0.0.1:5001/api/graphql' from origin 'http://localhost:5173'
+   has been blocked by CORS policy: Response to preflight request doesn't pass access control check:
+   No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+❌ 错误根因：Flask 未配置 CORS
+   ✅ 修复：添加 Flask-CORS 配置
+```
+
+**双重错误链分析**:
+```
+Layer 1: 代码层 - Apollo 导入路径错误
+Layer 2: 配置层 - CORS 未配置
+结果：页面卡住，无法加载
+```
+
+### 6步前端加载调试流程
+
+**步骤1: 确认服务器状态**
+```javascript
+// 列出所有页面，确认前后端服务器运行
+mcp__chrome-devtools__list_pages()
+// 预期：应有前端和后端服务器页面
+```
+
+**步骤2: 导航到问题页面**
+```javascript
+mcp__chrome-devtools__navigate_page({
+  type: "url",
+  url: "http://localhost:5173"
+})
+// 预期：应显示 "Loading Event2Table..."
+```
+
+**步骤3: 获取页面快照**
+```javascript
+mcp__chrome-devtools__take_snapshot()
+// 重点检查：
+// - 是否卡在加载状态
+// - 页面内容是否完整
+// - 导航菜单是否显示
+```
+
+**步骤4: 检查控制台错误**
+```javascript
+mcp__chrome-devtools__list_console_messages({
+  types: ["error", "warn"]
+})
+// 查找关键错误：
+// - Apollo Provider 导入错误
+// - CORS 错误
+// - 模块解析失败
+```
+
+**步骤5: 分析错误链**
+```javascript
+// 错误链分析示例
+// 错误1：Apollo Provider 模块不存在
+// 错误2：CORS 策略阻止请求
+// 根本原因：导入路径错误 + CORS 未配置
+```
+
+**步骤6: 验证修复效果**
+```javascript
+// 修复后重新测试
+mcp__chrome-devtools__navigate_page({ type: "reload" })
+mcp__chrome-devtools__take_snapshot()
+
+// 成功标志：
+// ✅ 页面标题正常显示
+// ✅ 导航菜单完整
+// ✅ 游戏列表正常
+// ✅ 无控制台错误
+```
+
 ### 相关经验
 
 - [测试指南 - E2E测试](./testing-guide.md#e2e测试) - E2E测试方法论
@@ -127,6 +223,182 @@ Task(subagent_type="general-purpose", prompt="分析加载超时模式")
 **并行vs顺序**:
 - **并行**: 多个独立分析任务（如分析不同方面的根因）
 - **顺序**: 依赖前一个分析结果的任务
+
+### Canvas组件调试 ⭐ (2026-03-04新增)
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [CANVAS-EVENT-NODES-FIX-GUIDE.md](../../reports/2026-03-03/CANVAS-EVENT-NODES-FIX-GUIDE.md)
+
+### 事件节点配置问题诊断
+
+**常见症状**:
+- ✅ 路由配置问题：直接访问URL显示首页或错误页面
+- ✅ API连接失败：显示"加载参数失败: INTERNAL SERVER ERROR"
+- ✅ 面包屑导航错误：显示不正确的页面标题
+- ✅ 游戏上下文缺失：页面不显示当前游戏GID
+
+**三步诊断法**:
+
+#### 第1步：确认基础设施状态
+```bash
+# 1. 检查服务器运行状态
+curl http://127.0.0.1:5001/api/health
+
+# 2. 检查API端点可用性
+curl "http://127.0.0.1:5001/api/parameters?game_gid=10000147"
+curl "http://127.0.0.1:5001/api/events?game_gid=10000147"
+
+# 3. 检查数据库连接
+sqlite3 data/dwd_generator.db "SELECT COUNT(*) FROM games;"
+```
+
+#### 第2步：使用Chrome DevTools MCP深度分析
+```javascript
+// 1. 导航到问题页面
+mcp__chrome-devtools__navigate_page({
+  type: "url",
+  url: "http://localhost:5173/event-node-builder?game_gid=10000147"
+})
+
+// 2. 获取页面快照，查看错误状态
+mcp__chrome-devtools__take_snapshot()
+
+// 3. 检查控制台错误
+mcp__chrome-devtools__list_console_messages({
+  types: ["error", "warn"]
+})
+
+// 4. 截图记录问题
+mcp__chrome-devtools__take_screenshot({
+  filePath: "debug/canvas-node-builder-error.png",
+  fullPage: true
+})
+```
+
+#### 第3步：并行Subagent分析策略
+```javascript
+// 启动2个并行subagent进行深度分析
+Task(subagent_type="general-purpose", prompt="分析Canvas路由配置问题")
+Task(subagent_type="general-purpose", prompt="分析React组件懒加载问题")
+
+// 综合分析结果，识别根本原因
+// - 路由参数处理缺失
+// - 组件导入路径错误
+// - Suspense配置不当
+```
+
+### 前后端集成验证
+
+**4步验证流程**:
+
+#### 步骤1：路由配置验证
+```typescript
+// ✅ 正确的路由配置示例
+const routes = (
+  <BrowserRouter>
+    <Routes>
+      <Route
+        path="/event-node-builder"
+        element={
+          <Suspense fallback={<Loading />}>
+            <EventNodeBuilder />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/canvas"
+        element={
+          <Suspense fallback={<Loading />}>
+            <Canvas />
+          </Suspense>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
+)
+```
+
+#### 步骤2：API连接验证
+```bash
+# 验证所有Canvas相关API
+curl -w "\nStatus: %{http_code}\n" \
+  "http://127.0.0.1:5001/api/parameters?game_gid=10000147"
+curl -w "\nStatus: %{http_code}\n" \
+  "http://127.0.0.1:5001/api/events?game_gid=10000147"
+curl -w "\nStatus: %{http_code}\n" \
+  "http://127.0.0.1:5001/api/event-nodes?game_gid=10000147"
+```
+
+#### 步骤3：组件渲染验证
+```typescript
+// ✅ 正确的组件参数处理
+function EventNodeBuilder() {
+  const [searchParams] = useSearchParams();
+  const gameGid = searchParams.get('game_gid');
+
+  // 验证必需参数
+  if (!gameGid) {
+    return <Navigate to="/" />;
+  }
+
+  // 使用参数获取数据
+  useEffect(() => {
+    fetchParameters(gameGid);
+  }, [gameGid]);
+
+  return <div>Event Node Builder</div>;
+}
+```
+
+#### 步骤4：用户体验验证
+```typescript
+// ✅ 动态面包屑配置
+const breadcrumbMap = {
+  '/event-node-builder': [
+    { label: '首页', path: '/' },
+    { label: '事件节点构建器', path: '/event-node-builder' }
+  ],
+  '/canvas': [
+    { label: '首页', path: '/' },
+    { label: 'HQL画布', path: '/canvas' }
+  ]
+};
+
+// ✅ 游戏上下文显示
+function GameContextBar() {
+  const [searchParams] = useSearchParams();
+  const gameGid = searchParams.get('game_gid');
+
+  return (
+    <div className="game-context">
+      当前游戏: {gameName} (GID: {gameGid})
+    </div>
+  );
+}
+```
+
+### 调试工具集成
+
+**Canvas专用调试组合**:
+1. **Chrome DevTools MCP** - 页面导航和交互测试
+2. **Subagent并行分析** - 根因深度分析
+3. **curl API测试** - 后端接口验证
+4. **路由配置检查** - React Router诊断
+
+### 预防措施
+
+**开发阶段的预防**:
+- ✅ 所有路由必须支持 `game_gid` 参数
+- ✅ 使用动态面包屑而非硬编码
+- ✅ 在关键页面添加游戏上下文显示
+- ✅ 实现 Error Boundary 捕获组件错误
+- ✅ 配置适当的 Suspense fallback
+
+**部署前的检查清单**:
+- [ ] 直接访问所有Canvas相关URL
+- [ ] 验证API端点响应
+- [ ] 检查面包屑导航正确性
+- [ ] 确认游戏上下文显示
+- [ ] 测试错误处理机制
 
 ### 相关经验
 

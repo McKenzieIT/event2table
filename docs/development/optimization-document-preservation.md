@@ -122,9 +122,9 @@
 
 ### 相关文档
 
-- [完整优化提案](../optimization/OPTIMIZATION-PROPOSAL.md) - 保留完整版本 ⭐
-- [E2E 测试经验总结](../development/e2e-testing-lessons.md) - 测试经验
-- [文档整理报告](../reports/2026-02-18/documentation-cleanup-report.md) - 文档整理总结
+- [完整优化提案](../archive/2026-02/optimization/OPTIMIZATION-PROPOSAL.md) - 保留完整版本 ⭐
+- [E2E 测试经验总结](./e2e-testing-lessons.md) - 测试经验
+- [文档整理报告](../archive/2026-02/reports/2026-02-18/documentation-cleanup-report.md) - 文档整理总结
 
 ---
 

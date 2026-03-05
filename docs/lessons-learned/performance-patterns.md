@@ -1,7 +1,7 @@
 # 性能模式
 
-> **来源**: 整合了2个文档的性能相关经验
-> **最后更新**: 2026-02-24
+> **来源**: 整合了4个文档的性能相关经验
+> **最后更新**: 2026-03-04
 > **维护**: 每次性能问题修复后立即更新
 
 ---
@@ -695,6 +695,314 @@ class EventService:
 ### 案例文档
 
 - [Events迁移统计](../../reports/2026-03-01/EVENTS-PY-MIGRATION-STATS.md)
+
+---
+
+## 缓存失效分析 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [CACHE-MISS-ANALYSIS-REPORT](../archive/2026-03/02-march/reports/CACHE-MISS-ANALYSIS-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- 缓存命中率低（<60%）
+- API响应时间长（>1秒）
+- 数据库查询频繁
+- 用户感觉到数据更新延迟
+
+**影响范围**:
+- 所有使用缓存的API
+- 数据一致性要求高的场景
+
+### 缓存未命中原因
+
+**1. 缓存键生成错误**
+```python
+# ❌ 错误：缓存键不包含重要参数
+@cached(ttl=300)
+def get_events(game_gid: int):
+    return fetch_all_as_dict("SELECT * FROM log_events WHERE game_gid = ?", (game_gid,))
+# 问题：所有game_gid共享同一缓存！
+
+# ✅ 正确：缓存键包含参数
+@cached(ttl=300)
+def get_events(game_gid: int):
+    # 装饰器自动将参数包含在缓存键中
+    return fetch_all_as_dict("SELECT * FROM log_events WHERE game_gid = ?", (game_gid,))
+# 不同game_gid有不同缓存：events:10000147, events:10000148
+```
+
+**2. 缓存TTL过短**
+```python
+# ❌ 错误：TTL太短（5秒）
+@cached(ttl=5)
+def get_games():
+    return fetch_all_as_dict("SELECT * FROM games")
+# 问题：缓存频繁失效，命中率低
+
+# ✅ 正确：TTL合理（5-10分钟）
+@cached(ttl=300)  # 5分钟
+def get_games():
+    return fetch_all_as_dict("SELECT * FROM games")
+```
+
+**3. 数据更新后未清理缓存**
+```python
+# ❌ 错误：更新数据库后未清理缓存
+@app.route('/api/games/<int:game_gid>', methods=['PUT'])
+def update_game(game_gid):
+    execute_update("UPDATE games SET name = ? WHERE gid = ?", (name, game_gid))
+    # 问题：缓存未清理，用户看到旧数据
+
+# ✅ 正确：使用@cache_invalidate装饰器
+@app.route('/api/games/<int:game_gid>', methods=['PUT'])
+@cache_invalidate  # ✅ 自动清理缓存
+def update_game(game_gid):
+    execute_update("UPDATE games SET name = ? WHERE gid = ?", (name, game_gid))
+```
+
+**4. Bloom Filter误判**
+```python
+# Bloom Filter误判导致缓存未命中
+if event_id not in bloom_filter:
+    return None  # 快速拒绝
+# 问题：Bloom Filter可能有误判（<0.1%）
+```
+
+### 缓存失效策略
+
+**策略1: 自动失效装饰器**
+```python
+from backend.core.cache.decorators import cached, cache_invalidate
+
+# ✅ 读操作使用缓存
+@cached(ttl=300)
+def get_events(game_gid: int):
+    return fetch_all_as_dict("SELECT * FROM log_events WHERE game_gid = ?", (game_gid,))
+
+# ✅ 写操作自动清理缓存
+@cache_invalidate
+def create_event(game_gid: int, event_data: dict):
+    return execute_insert("INSERT INTO log_events ...", (...))
+
+@cache_invalidate
+def update_event(event_id: int, event_data: dict):
+    execute_update("UPDATE log_events SET ... WHERE id = ?", (event_id,))
+
+@cache_invalidate
+def delete_event(event_id: int):
+    execute_update("DELETE FROM log_events WHERE id = ?", (event_id,))
+```
+
+**策略2: 手动清理缓存**
+```python
+from backend.core.cache.cache_system import cache_result
+
+# ✅ 手动删除缓存
+def delete_game(game_gid: int):
+    execute_update("DELETE FROM games WHERE gid = ?", (game_gid,))
+    # 清理相关缓存
+    cache_result.delete_many(f"games:*")
+    cache_result.delete_many(f"events:{game_gid}:*")
+    cache_result.delete_many(f"params:{game_gid}:*")
+```
+
+**策略3: Cache Tags批量失效**
+```python
+# 设置缓存时添加标签
+cache_manager.set(
+    key="game:10000147",
+    value=game_data,
+    timeout=300,
+    tags=["games", "game:10000147"]  # ✅ 添加标签
+)
+
+# 按标签批量失效
+cache_manager.delete_many(tags=["games"])  # 失效所有games相关缓存
+cache_manager.delete_many(tags=["game:10000147"])  # 失效特定游戏的所有缓存
+```
+
+### 缓存一致性验证
+
+**验证脚本**:
+```python
+def verify_cache_consistency():
+    """验证缓存与数据库一致性"""
+    # 1. 获取数据库中的游戏数量
+    db_count = fetch_one_as_dict("SELECT COUNT(*) as count FROM games")["count"]
+
+    # 2. 获取缓存中的游戏数量
+    cached_games = cache.get("games:all")
+    cache_count = len(cached_games) if cached_games else 0
+
+    # 3. 对比数量
+    if db_count != cache_count:
+        logger.warning(f"Cache inconsistency detected: DB={db_count}, Cache={cache_count}")
+        # 清理缓存
+        cache.delete("games:all")
+        return False
+
+    return True
+```
+
+### 代码审查清单
+
+**缓存检查**:
+- [ ] 所有查询函数是否使用`@cached`装饰器？
+- [ ] 缓存TTL是否合理（5-10分钟）？
+- [ ] 所有修改数据的API是否使用`@cache_invalidate`？
+- [ ] 缓存键是否包含所有必要参数？
+- [ ] 是否定期验证缓存一致性？
+
+### 相关经验
+
+- [缓存策略](#缓存策略) - 缓存TTL和清理策略
+- [多级缓存架构](#多级缓存架构) - 三级缓存设计
+
+---
+
+## 并行优化策略 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [PARALLEL-OPTIMIZATION-FINAL-REPORT](../archive/2026-03/02-march/reports/PARALLEL-OPTIMIZATION-FINAL-REPORT.md)
+
+### 核心原则
+
+**独立任务并行执行，依赖任务串行执行**
+
+**并行执行模式**:
+```
+串行执行: 12小时
+Phase 1 → Phase 2 → Phase 3 → Phase 4
+
+并行执行: 3.5小时 (提升70%)
+Phase 1 ↘
+Phase 2 → 同时执行 → 总时间 = max(Phase时间)
+Phase 3 ↗
+Phase 4 (依赖Phase 1-3)
+```
+
+### 识别独立任务
+
+**独立任务特征**:
+- ✅ 修改不同的文件（games.py vs events.py）
+- ✅ 修改不同的模块（Service层 vs Repository层）
+- ✅ 修改不同的功能域（缓存系统 vs 验证器）
+- ✅ 无共享状态
+- ✅ 无数据依赖
+
+**依赖任务特征**:
+- ❌ Service层依赖Repository层 → 必须串行
+- ❌ 前端依赖后端API → 必须串行
+- ❌ 测试依赖实现 → 必须串行
+
+### 并行执行案例
+
+**案例: 后端架构全面优化**
+
+**Phase 1: 紧急修复（独立）**
+- 修复games.py双规制
+- 修复hql_generation.py双规制
+- 标记删除EventParamRepository
+
+**Phase 2: Service层重构（独立）**
+- 重构参数管理模块
+- 统一HQL服务层
+- 修复Event Importer
+- 创建CanvasService
+- 扩展GameService
+- 扩展ParameterService
+
+**Phase 3: 核心模块迁移（依赖Phase 2）**
+- Join Configs模块迁移
+- Event Categories模块迁移
+- 新增stats和batch-delete端点
+
+**Phase 4: 全面清理（依赖Phase 1-3）**
+- 清理V2废弃文件
+- Repository层更新
+- 删除EventParamRepository
+- 完善缓存策略
+- 更新项目文档
+
+**并行执行**:
+```
+Phase 1 (紧急修复) ↘
+Phase 2 (Service重构) → 同时执行（3.5小时）
+Phase 3 (模块迁移) ↗
+                 ↓
+Phase 4 (全面清理) → 依赖Phase 1-3完成
+
+总时间: max(2h, 3h, 3.5h) + 1.5h = 5h
+串行时间: 2h + 3h + 3.5h + 1.5h = 12h
+性能提升: (12 - 5) / 12 = 58% 实际提升
+```
+
+### 并行开发工具
+
+**使用Claude Code Subagent**:
+```python
+# 并行启动3个subagents
+Task(
+    description="修复games.py双规制",
+    prompt="修复games.py中的双规制问题...",
+    subagent_type="general-purpose"
+)
+
+Task(
+    description="修复hql_generation.py双规制",
+    prompt="修复hql_generation.py中的双规制问题...",
+    subagent_type="general-purpose"
+)
+
+Task(
+    description="重构参数管理模块",
+    prompt="重构参数管理模块，统一Service层...",
+    subagent_type="general-purpose"
+)
+
+# 3个subagents同时执行
+```
+
+**使用Git Worktrees**:
+```bash
+# 为每个独立任务创建worktree
+git worktree add ../event2table-phase1 -b phase1-fixes
+git worktree add ../event2table-phase2 -b phase2-service
+git worktree add ../event2table-phase3 -b phase3-migration
+
+# 在3个worktree中并行开发
+cd ../event2table-phase1  # 修复games.py
+cd ../event2table-phase2  # 重构Service层
+cd ../event2table-phase3  # 迁移模块
+```
+
+### 并行执行风险
+
+**风险1: 合并冲突**
+- **原因**: 多个开发者修改同一文件
+- **缓解**: 使用Git分支，定期合并
+
+**风险2: 依赖变化**
+- **原因**: "独立"任务后来发现有依赖
+- **缓解**: 在执行前仔细分析依赖关系
+
+**风险3: 测试复杂度**
+- **原因**: 并行开发的代码需要集成测试
+- **缓解**: Phase完成后立即集成测试
+
+### 代码审查清单
+
+**并行开发检查**:
+- [ ] 任务是否真正独立（无共享状态）？
+- [ ] 是否有明确的依赖关系？
+- [ ] 并行任务是否有冲突的文件修改？
+- [ ] 是否有集成测试计划？
+- [ ] Git分支策略是否合理？
+
+### 相关经验
+
+- [项目管理 - 并行开发策略](./project-management.md#并行开发策略) - 项目级并行开发
+- [项目管理 - 大规模重构](./project-management.md#大规模重构) - 分阶段执行策略
 
 ---
 

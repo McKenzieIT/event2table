@@ -6,6 +6,7 @@ UnionBuilder - 多事件UNION HQL构建器
 
 from typing import List, Dict, Any
 from ..models.event import Event, Field, FieldType
+from backend.core.security.sql_validator import SQLValidator
 
 
 class UnionBuilder:
@@ -19,8 +20,39 @@ class UnionBuilder:
     - 支持参数字段（JSON提取）
     """
 
+    # 允许的SQL操作符白名单
+    VALID_OPERATORS = ["=", "!=", "<>", "<", ">", "<=", ">=", "LIKE", "NOT LIKE", "IN", "NOT IN", "IS NULL", "IS NOT NULL"]
+
     def __init__(self):
         """初始化UnionBuilder"""
+
+    def _validate_where_condition(self, cond: Dict[str, Any]) -> None:
+        """
+        验证WHERE条件的安全性
+
+        Args:
+            cond: WHERE条件字典
+
+        Raises:
+            ValueError: 如果条件不安全
+        """
+        if "field" not in cond:
+            raise ValueError("WHERE condition must have 'field'")
+
+        # 验证字段名（SQL标识符）
+        field = cond["field"]
+        SQLValidator.validate_identifier(field, "field")
+
+        # 验证操作符
+        operator = cond.get("operator", "=")
+        if operator not in self.VALID_OPERATORS:
+            raise ValueError(
+                f"Invalid operator: '{operator}'. "
+                f"Must be one of: {', '.join(self.VALID_OPERATORS)}"
+            )
+
+        # 值可以是任意字符串（由调用者确保安全）
+        # 这是HQL生成器，value可能包含占位符如'${bizdate}'
 
     def build_union_all(
         self, events: List[Event], fields: List[Field], use_aliases: bool = False
@@ -163,9 +195,13 @@ class UnionBuilder:
         from_clause = event.table_name
         if use_alias:
             from_clause += f" AS {event.name}"
+            # 安全：这是HQL生成器，用于构建Hive查询字符串
+            # event.name和partition_field已通过Event模型验证
+            # partition_value是调用者的占位符（如'${bizdate}'）
             where_clause = f"{event.name}.{partition_field} = {partition_value}"
         else:
             # 使用事件名作为前缀
+            # 安全：同上，这是HQL字符串构建，不是直接SQL执行
             where_clause = f"{event.name}.{partition_field} = {partition_value}"
 
         return f"SELECT\n  {fields_str}\nFROM {from_clause}\nWHERE {where_clause}"
@@ -231,14 +267,23 @@ class UnionBuilder:
         if use_alias:
             from_clause += f" AS {event.name}"
 
-        # 构建WHERE
+        # 构建WHERE（带安全验证）
         if where_conditions:
             where_parts = []
             for cond in where_conditions:
+                # 验证条件安全性
+                self._validate_where_condition(cond)
+
                 field = cond["field"]
                 operator = cond["operator"]
                 value = cond.get("value", "")
+
+                # 安全：这是HQL生成器，用于构建Hive查询字符串
+                # field已通过SQLValidator.validate_identifier()验证
+                # operator已在VALID_OPERATORS白名单中验证
+                # value是调用者提供的值（可能包含HQL占位符如'${bizdate}'）
                 where_parts.append(f"{field} {operator} {value}")
+
             where_clause = " AND ".join(where_parts)
             return f"SELECT\n  {fields_str}\nFROM {from_clause}\nWHERE {where_clause}"
         else:

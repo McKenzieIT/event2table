@@ -945,7 +945,7 @@ import type {
 
 - [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
-- [Event2Table前端开发规范](/Users/mckenzie/Documents/event2table/docs/development/frontend-development.md)
+- [React最佳实践](../lessons-learned/react-best-practices.md)
 
 ---
 

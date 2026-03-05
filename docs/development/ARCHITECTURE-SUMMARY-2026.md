@@ -273,7 +273,7 @@ backend/
 
 - **迁移指南**: [docs/development/MIGRATION-GUIDE.md](MIGRATION-GUIDE.md)
 - **开发规范**: [CLAUDE.md](../../CLAUDE.md)
-- **优化报告**: [docs/optimization/FINAL_OPTIMIZATION_REPORT.md](../optimization/FINAL_OPTIMIZATION_REPORT.md)
+- **优化报告**: [docs/archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ---
 

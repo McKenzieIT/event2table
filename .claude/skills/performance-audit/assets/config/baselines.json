@@ -1,0 +1,17 @@
+{
+  "frontend": {
+    "first_contentful_paint": 1200,
+    "largest_contentful_paint": 2500,
+    "time_to_interactive": 3500
+  },
+  "backend": {
+    "api_response_p50": 200,
+    "api_response_p95": 500,
+    "api_response_p99": 1000
+  },
+  "database": {
+    "query_p50": 50,
+    "query_p95": 150,
+    "query_p99": 300
+  }
+}

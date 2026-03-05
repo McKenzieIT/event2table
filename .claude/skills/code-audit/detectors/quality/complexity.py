@@ -7,7 +7,7 @@ Analyzes code complexity.
 import ast
 from pathlib import Path
 from typing import List
-from ..core.base_detector import BaseDetector, Issue, Severity, IssueCategory
+from core.base_detector import BaseDetector, Issue, Severity, IssueCategory
 
 
 class ComplexityDetector(BaseDetector):

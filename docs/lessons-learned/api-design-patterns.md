@@ -1088,6 +1088,157 @@ FROM {table_names}
 
 ---
 
+## 路由参数设计规范 ⭐ **P0极其重要 - 2026-03-04新增**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [PARAMETER-ROUTES-VERIFICATION.md](../../reports/2026-03-03/PARAMETER-ROUTES-VERIFICATION.md)
+
+### 游戏标识符规范
+
+**核心原则**：
+```javascript
+// ✅ 正确：使用 gameData.gid
+const gameGid = gameData.gid;  // 10000147
+const odsDb = gameData.ods_db;  // ieu_ods
+const tableName = `${odsDb}.ods_${gameGid}_all_view`;
+
+// ✅ 正确：API调用
+fetch(`/api/events?game_gid=${gameGid}`)
+fetch(`/api/parameters/all?game_gid=${gameGid}`)
+
+// ❌ 错误：不要使用 gameId
+const tableName = `ods_${gameId}_all_view`;  // 错误！
+fetch(`/api/events?game_id=${gameId}`)  // 错误！
+```
+
+### 表名生成规范
+
+**使用 game_gid 生成表名**：
+```python
+# ✅ 正确：游戏查询
+game = fetch_one_as_dict('SELECT * FROM games WHERE gid = ?', (game_gid,))
+
+# ✅ 正确：事件查询
+events = fetch_all_as_dict('SELECT * FROM log_events WHERE game_gid = ?', (game_gid,))
+
+# ✅ 正确：表名生成
+source_table = f'{game["ods_db"]}.ods_{game["gid"]}_all_view'  # ieu_ods.ods_10000147_all_view
+target_table = f'dwd.v_dwd_{game["gid"]}_{event}_di'  # dwd.v_dwd_10000147_login_di
+
+# ❌ 错误：不要使用 game_id
+source_table = f'{ods_db}.ods_{game_id}_all_view'  # 错误！
+```
+
+### 路由参数设计模式
+
+**前端路由哈希模式**：
+```javascript
+// ✅ 正确：使用哈希路由（避免刷新）
+const routes = [
+  { path: '/parameters', title: '参数管理' },
+  { path: '/parameters/dashboard', title: '参数统计' },
+  { path: '/parameters/compare', title: '参数对比' },
+  { path: '/parameters/enhanced', title: 'Enhanced' },
+  { path: '/parameter-dashboard', title: '参数统计' }
+];
+
+// ✅ 正确：路由顺序（具体路由优先）
+// routes.tsx 中必须按从具体到一般的顺序定义
+{ path: "parameters/dashboard", element: <ParameterDashboard /> },  // 必须先定义
+{ path: "parameters", element: <ParametersList /> }                   // 后定义
+```
+
+**后端路由参数**：
+```python
+# ✅ 正确：路由参数设计
+@events_bp.route('/api/events', methods=['GET'])
+def get_events():
+    game_gid = request.args.get('game_gid', type=int)
+    # 使用 game_gid 进行查询
+
+# ✅ 正确：参数验证
+from flask import request
+
+def validate_game_gid(game_gid):
+    if not game_gid:
+        return json_error_response('Game context required', status_code=400)
+    return game_gid
+```
+
+### API契约一致性验证
+
+**端点存在性检查**：
+```bash
+# 验证后端端点是否存在
+curl -X GET http://127.0.0.1:5001/api/health
+
+# 验证前端路由是否正确映射
+grep -A10 "path: \"parameters\"" frontend/src/routes/routes.tsx
+```
+
+**参数格式一致性**：
+```javascript
+// ✅ 前端和后端使用相同的参数名
+// 前端
+fetch(`/api/events?game_gid=${gameGid}`)
+
+// 后端
+@events_bp.route('/api/events', methods=['GET'])
+def get_events():
+    game_gid = request.args.get('game_gid', type=int)  // ✅ 一致
+    # return events...
+```
+
+### 路由验证工具
+
+**自动化测试脚本**：
+```javascript
+// 浏览器控制台测试脚本
+const routes = [
+  { path: '/parameters', title: '参数管理' },
+  { path: '/parameters/dashboard', title: '参数统计' },
+  { path: '/parameters/compare', title: '参数对比' },
+  { path: '/parameters/enhanced', title: 'Enhanced' },
+  { path: '/parameter-dashboard', title: '参数统计' }
+];
+
+routes.forEach((route, index) => {
+  setTimeout(() => {
+    window.location.hash = route.path;
+    console.log(`Testing: ${route.path} - Expected: ${route.title}`);
+  }, index * 2000);
+});
+```
+
+**预期输出**：
+```
+Testing: /parameters - Expected: 参数管理
+Testing: /parameters/dashboard - Expected: 参数统计
+Testing: /parameters/compare - Expected: 参数对比
+Testing: /parameters/enhanced - Expected: Enhanced
+Testing: /parameter-dashboard - Expected: 参数统计
+```
+
+### 成功验证标准
+
+**完整路由测试清单**：
+- ✅ 所有5个路由加载无控制台错误
+- ✅ 每个路由显示正确的页面标题
+- ✅ 每个路由显示正确的页面内容
+- ✅ 无"Select Game"提示（如果游戏已选择）
+- ✅ 无无限加载旋转器
+- ✅ 无404页面
+
+### 代码审查清单
+
+**路由参数检查**：
+- [ ] 是否使用 game_gid 而非 game_id？
+- [ ] 表名生成是否使用 game["gid"] 而非 game["id"]？
+- [ ] API调用是否使用 game_gid 参数？
+- [ ] 路由顺序是否从具体到一般？
+- [ ] 前后端参数名是否一致？
+
+---
+
 ## API契约测试的重要性 ⚠️ **P0极其重要**
 
 **优先级**: P0 | **出现次数**: 1次 | **来源**: [api-architecture-migration-status.md](../../api/api-architecture-migration-status.md)
@@ -1165,4 +1316,5 @@ git commit
 ## 相关经验文档
 
 - [安全要点 - SQL注入防护](./security-essentials.md#sql注入防护) - API安全
-- [测试指南 - TDD实践](./testing-guide.md#tdd实践) - API测试
+- [测试指南 - API契约测试](../testing-guide.md#api契约测试) - API契约测试方法
+- [测试指南 - TDD实践](../testing-guide.md#tdd实践) - API测试

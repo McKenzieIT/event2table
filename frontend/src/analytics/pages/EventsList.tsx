@@ -411,7 +411,7 @@ function EventsList() {
           </Button>
           <Button
             variant="primary"
-            onClick={() => navigate('/events/create')}
+            onClick={() => navigate(`/events/create?game_gid=${currentGame?.gid}`)}
             data-testid="add-event-button"
           >
             新增事件
@@ -492,7 +492,7 @@ function EventsList() {
           description="暂无事件，请先创建事件。"
           action={{
             label: '创建事件',
-            onClick: () => navigate('/events/create')
+            onClick: () => navigate(`/events/create?game_gid=${currentGame?.gid}`)
           }}
         />
       ) : (

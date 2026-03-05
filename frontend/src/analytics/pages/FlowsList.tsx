@@ -1,9 +1,10 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { useState, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { useQueryParam } from '@shared/hooks/useQueryParams';
 import './FlowsList.css';
 
 /**
@@ -59,7 +60,6 @@ interface ConfirmState {
  */
 export default function FlowsList(): JSX.Element {
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
 
   // Local state
@@ -73,8 +73,8 @@ export default function FlowsList(): JSX.Element {
     message: ''
   });
 
-  // Read game_gid from URL parameters
-  const gameGid: string | null = new URLSearchParams(location.search).get('game_gid');
+  // Read game_gid from URL parameters (works with both HashRouter and BrowserRouter)
+  const gameGid: string | null = useQueryParam('game_gid');
 
   // 获取流程列表（requires game_gid）
   const { data: apiResponse, isLoading, error } = useQuery<FlowsAPIResponse>({

@@ -1,7 +1,7 @@
 # 测试指南
 
-> **来源**: 整合了3个文档的测试相关经验
-> **最后更新**: 2026-02-24
+> **来源**: 整合了9个文档的测试相关经验
+> **最后更新**: 2026-03-04 ✨ 新增E2E测试完整流程章节
 > **维护**: 每次测试相关问题修复后立即更新
 
 ---
@@ -84,6 +84,221 @@ mcp__chrome-devtools__click({ uid: "clickable-element-uid" })
 **API错误**:
 ```
 [error] Failed to load resource: 400 (BAD REQUEST)
+```
+
+**React应用挂载错误**:
+```
+页面状态：React应用无法挂载到DOM
+HTML结构：`#app-root`为空，`#initial-loader`一直显示
+症状：页面卡在"Loading Event2Table..."状态
+```
+
+### React应用挂载问题诊断 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [E2E-TEST-P0-ISSUE](../archive/2026-03/03-march/reports/E2E-TEST-P0-ISSUE.md)
+
+#### 问题现象
+
+**症状描述**:
+- React应用完全无法挂载到DOM
+- `#app-root`元素保持空状态
+- 初始加载器(`#initial-loader`)一直显示
+- 页面停留在"Loading Event2Table..."状态
+- 无任何交互元素（0个按钮、0个输入框）
+
+**影响范围**:
+- 所有前端页面
+- 导致E2E测试无法进行
+
+#### 根本原因
+
+**技术原因**:
+1. **JavaScript执行错误** - Apollo Client初始化失败
+2. **查询客户端初始化失败** - QueryClient初始化错误
+3. **依赖模块导入失败** - 某个依赖模块导入失败
+4. **ErrorBoundary捕获渲染错误** - 组件渲染错误被ErrorBoundary捕获
+
+**常见错误**:
+- Apollo Client GraphQL端点URL错误
+- React组件循环依赖
+- TypeScript编译错误
+- node_modules损坏或Vite缓存问题
+
+#### 诊断流程
+
+**步骤1: 检查HTML结构**
+```bash
+# 使用Chrome DevTools MCP
+mcp__chrome-devtools__take_snapshot()
+
+# 检查HTML
+# ❌ 错误状态：
+<div id="app-root"></div>  <!-- 空！ -->
+<div id="initial-loader">
+  <div class="spinner"></div>
+  <div class="text">Loading Event2Table...</div>
+</div>
+
+# ✅ 正确状态：
+<div id="app-root">
+  <div class="dashboard-container">...</div>
+</div>
+```
+
+**步骤2: 检查浏览器控制台（P0优先级）**
+```bash
+# 打开Chrome DevTools (F12)
+# → Console标签页
+# → 记录所有红色错误信息
+```
+
+**常见控制台错误**:
+```javascript
+// React Hooks错误
+[error] React has detected a change in the order of Hooks called
+[error] Uncaught Error: Rendered more hooks than during the previous render
+
+// 模块解析错误
+[error] Uncaught Error: Cannot find module 'xxx'
+[error] Error: Cannot read property of undefined
+
+// GraphQL错误
+[error] GraphQL error: Network request failed
+[error] Unable to reach GraphQL endpoint
+```
+
+**步骤3: 检查JavaScript加载**
+```bash
+# 检查main.tsx是否可访问
+curl -I http://localhost:5173/src/main.tsx
+
+# 检查Vite依赖解析
+# → Network标签页
+# → 查找失败的请求（红色）
+# → 特别注意 .tsx, .ts, .jsx文件
+```
+
+**步骤4: 验证前端服务器**
+```bash
+# 检查Vite进程
+ps aux | grep vite
+
+# 检查端口
+lsof -i :5173
+
+# 检查HTTP响应
+curl -I http://localhost:5173
+```
+
+#### 解决方案
+
+**解决方案1: 重启前端服务器（首选）**
+```bash
+# 1. 停止当前Vite进程
+kill <vite-pid>
+# 或
+lsof -ti:5173 | xargs kill -9
+
+# 2. 清理Vite缓存
+cd frontend
+rm -rf node_modules/.vite
+
+# 3. 重新启动
+npm run dev
+
+# 4. 验证服务器启动
+curl -I http://localhost:5173
+# 应该返回: HTTP/1.1 200 OK
+```
+
+**解决方案2: 检查依赖安装**
+```bash
+cd frontend
+
+# 检查依赖是否完整
+npm list
+
+# 重新安装依赖
+rm -rf node_modules package-lock.json
+npm install
+
+# 验证关键依赖
+npm list react
+npm list @apollo/client
+npm list vite
+```
+
+**解决方案3: TypeScript编译检查**
+```bash
+cd frontend
+
+# 检查类型错误
+npx tsc --noEmit
+
+# 查看错误列表
+# 修复类型错误后重新启动服务器
+```
+
+**解决方案4: 检查Apollo Client配置**
+```typescript
+// frontend/src/shared/apollo/client.ts
+
+// ✅ 正确：检查GraphQL端点URL
+const httpLink = createHttpLink({
+  uri: 'http://127.0.0.1:5001/graphql',  // ← 确认URL正确
+});
+
+// ✅ 正确：检查Apollo Client初始化
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
+  connectToDevTools: true,  // 开发环境启用
+});
+```
+
+#### 代码审查清单
+
+**React应用检查**:
+- [ ] main.tsx中的`#app-root`元素存在？
+- [ ] ReactDOM.createRoot正确调用？
+- [ ] ErrorBoundary正确配置？
+- [ ] ApolloProvider正确配置？
+- [ ] 所有依赖正确安装？
+
+**Apollo Client检查**:
+- [ ] GraphQL端点URL正确？
+- [ ] HttpLink正确配置？
+- [ ] InMemoryCache正确初始化？
+- [ ] ApolloProvider包裹App组件？
+
+#### 预防措施
+
+**开发环境检查**:
+```bash
+# 每次开发前检查
+npm run dev  # → 启动前端服务器
+python3 web_app.py  # → 启动后端服务器
+curl http://localhost:5173  # → 验证前端可访问
+curl http://127.0.0.1:5001/api/health  # → 验证后端可访问
+```
+
+**CI/CD集成**:
+```yaml
+# .github/workflows/e2e-test.yml
+- name: Start frontend server
+  run: |
+    cd frontend
+    npm run dev &
+    npm run wait-for-dev-server  # 等待服务器启动
+
+- name: Start backend server
+  run: |
+    python3 web_app.py &
+
+- name: Run health check
+  run: |
+    curl http://localhost:5173
+    curl http://127.0.0.1:5001/api/health
 ```
 
 ### 测试工具选择
@@ -439,7 +654,337 @@ ensureBackendReady()
 
 ---
 
-## 相关经验文档
+## E2E测试完整流程 ⭐ (2026-03-04新增)
+
+### 测试执行模式（基于11/11页面100%覆盖）
+
+**测试覆盖统计**:
+- ✅ **完全正常**: 1/11 (9%) - Event Nodes Management
+- ⚠️ **部分工作**: 3/11 (27%) - Dashboard, Event Node Builder, Canvas
+- ❌ **完全失败**: 7/11 (64%) - Events, Parameters, Flows, Categories, Common Params
+
+**健康度评分**:
+- 🟢 100%: Event Nodes Management（唯一完全正常）
+- 🟡 50%: 部分工作页面（基础加载正常，功能部分工作）
+- 🔴 <20%: 完全失败（路由、API、配置问题）
+
+### Ralph Loop迭代测试法
+
+**核心流程**:
+```
+发现问题 → Subagent深度分析 → 设计修复方案 → 实施修复 → Chrome MCP验证 → 记录结果
+```
+
+**迭代周期**:
+1. **发现问题** - 执行E2E测试，记录页面状态、控制台错误、功能缺失
+2. **Subagent深度分析** - 使用并行Subagent分析根本原因（GraphQL配置、路由问题、API错误等）
+3. **设计修复方案** - 使用Brainstorming skill系统化设计修复策略
+4. **实施修复** - 代码修复（路由配置、API实现、错误处理等）
+5. **Chrome MCP验证** - 使用Chrome DevTools MCP验证修复效果
+6. **记录结果** - 更新测试报告和经验文档
+
+### Chrome DevTools MCP测试流程（标准6步）
+
+```javascript
+// 1. 列出所有页面
+mcp__chrome-devtools__list_pages()
+
+// 2. 导航到测试页面
+mcp__chrome-devtools__navigate_page({
+  type: "url",
+  url: "http://localhost:5173/parameter-dashboard?game_gid=10000147"
+})
+
+// 3. 获取页面快照
+mcp__chrome-devtools__take_snapshot()
+
+// 4. 检查控制台错误
+mcp__chrome-devtools__list_console_messages({
+  types: ["error", "warn"]
+})
+
+// 5. 截图记录
+mcp__chrome-devtools__take_screenshot({
+  filePath: "docs/reports/2026-03-03/e2e-test-screenshot.png",
+  fullPage: true
+})
+
+// 6. 点击交互元素
+mcp__chrome-devtools__click({ uid: "clickable-element-uid" })
+```
+
+### 测试失败诊断方法
+
+**React应用挂载错误**:
+```
+症状: 页面卡在"Loading Event2Table..."状态
+检查: #app-root为空，无JavaScript错误
+原因: Apollo Client配置错误、依赖模块导入失败
+```
+
+**GraphQL API错误**:
+```
+症状: "加载失败 - Failed to fetch"
+检查: 网络标签红色请求，/graphql端点返回HTML
+原因: 后端GraphQL未启动或配置错误
+```
+
+**路由参数解析错误**:
+```
+症状: URL包含参数但页面未收到（/flows?game_gid=10000147）
+检查: HashRouter是否正确解析查询参数
+原因: 路由配置或组件参数获取逻辑错误
+```
+
+**API后端500错误**:
+```
+症状: "INTERNAL SERVER ERROR"
+检查: 后端日志、数据库连接、SQL查询
+原因: 代码异常、数据库错误、权限问题
+```
+
+### E2E测试报告模板（结构化）
+
+**执行摘要**:
+```markdown
+| 页面分类 | 页面数 | 测试状态 | 通过率 |
+|---------|-------|---------|--------|
+| Dashboard | 1 | ⚠️ 部分问题 | 50% |
+| 事件管理 | 2 | ❌ 失败 | 0% |
+| 参数管理 | 3 | ❌ 失败 | 0% |
+| 高级功能 | 3 | ⚠️ 部分工作 | 33% |
+| 管理功能 | 3 | ❌ 失败 | 0% |
+| 总计 | **11** | **❌ 整体失败** | **17%** |
+```
+
+**关键统计**:
+- ✅ **完全正常**: 1/11 (9%)
+- ⚠️ **部分工作**: 3/11 (27%)
+- ❌ **完全失败**: 7/11 (64%)
+
+**问题分类统计**:
+| 优先级 | 问题数量 | 影响页面 |
+|--------|---------|---------|
+| **P0 (阻塞)** | 8个 | Events (2), Parameters (2), Flows, Categories, Common Params, GraphQL |
+| **P1 (重要)** | 5个 | Dashboard (2), Event Node Builder, Canvas, Events Create |
+| **P2 (一般)** | 3个 | Dashboard (1), Flows (1), Canvas (1) |
+
+### 关键问题修复经验
+
+**P0 - 立即修复问题**:
+
+1. **React应用挂载问题**:
+   - 根因: `routes.tsx`导入不存在的模块路径
+   - 修复: 注释掉无效导入，验证所有导入路径
+
+2. **GraphQL后端配置**:
+   - 根因: 前端已迁移到GraphQL，后端未启动
+   - 修复: 检查`web_app.py`中GraphQL路由，确保后端GraphQL服务运行
+
+3. **路由参数解析**:
+   - 根因: HashRouter查询参数解析失败
+   - 修复: 验证路由配置和参数传递逻辑
+
+4. **API端点错误**:
+   - 根因: 后端500错误或404
+   - 修复: 检查后端日志，定位具体错误代码
+
+**P1 - 重要问题修复**:
+
+1. **游戏上下文提示**:
+   - 问题: 无游戏上下文时显示不明确
+   - 修复: 创建`RequireGameContext`组件，提供清晰的选择游戏提示
+
+2. **错误消息改进**:
+   - 问题: "INTERNAL SERVER ERROR"对用户不友好
+   - 修复: 实施统一错误处理，开发环境显示详细错误，生产环境使用友好消息
+
+3. **路由守卫逻辑**:
+   - 问题: 路由重定向逻辑混乱
+   - 修复: 简化路由守卫，确保正确的重定向行为
+
+### 测试工具对比
+
+| 工具 | 适用场景 | 优势 | 劣势 |
+|------|----------|------|------|
+| **Chrome DevTools MCP** | 探索性测试、根因分析 | 交互式调试、实时监控 | 需要人工操作 |
+| **Playwright** | 自动化测试、回归测试 | 可重复、CI/CD集成 | 编写脚本复杂 |
+| **组合使用** | 完整测试策略 | 深度+广度覆盖 | 协调成本高 |
+
+### 测试最佳实践
+
+**测试前准备**:
+```bash
+# 1. 检查服务器状态
+curl http://localhost:5173  # 前端
+curl http://127.0.0.1:5001/api/health  # 后端
+
+# 2. 启动测试服务器
+cd frontend
+npm run dev &
+
+# 3. 准备测试数据
+sqlite3 data/dwd_generator.db "SELECT COUNT(*) FROM games;"
+```
+
+**测试执行要求**:
+- [ ] 测试所有11个页面（100%覆盖）
+- [ ] 记录每个页面的健康度评分
+- [ ] 检查控制台所有错误（error/warn）
+- [ ] 截图记录关键问题
+- [ ] 区分P0/P1/P2优先级
+
+**修复验证流程**:
+1. 修复代码
+2. 重启服务（前端+后端）
+3. 重新执行E2E测试
+4. 验证问题已解决
+5. 更新测试报告
+
+### 问题分类和优先级
+
+**P0 - 阻塞性问题**（影响基本功能）:
+- React应用无法挂载
+- GraphQL后端不可用
+- 关键API路由失败
+- 用户无法完成核心任务
+
+**P1 - 重要问题**（影响用户体验）:
+- 游戏上下文提示不明确
+- 错误消息不友好
+- 某些功能不可用
+- 用户体验障碍
+
+**P2 - 一般问题**（优化改进）:
+- UI显示问题
+- 性能问题
+- 文档缺失
+- 代码质量问题
+
+### API契约测试 ⭐ **P0极其重要 - 2026-03-04新增**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [PARAMETER-ROUTES-VERIFICATION.md](../../reports/2026-03-03/PARAMETER-ROUTES-VERIFICATION.md)
+
+### 前端路由哈希模式测试
+
+**核心测试场景**：
+```javascript
+// 浏览器控制台测试脚本
+const routes = [
+  { path: '/parameters', title: '参数管理' },
+  { path: '/parameters/dashboard', title: '参数统计' },
+  { path: '/parameters/compare', title: '参数对比' },
+  { path: '/parameters/enhanced', title: 'Enhanced' },
+  { path: '/parameter-dashboard', title: '参数统计' }
+];
+
+routes.forEach((route, index) => {
+  setTimeout(() => {
+    window.location.hash = route.path;
+    console.log(`Testing: ${route.path} - Expected: ${route.title}`);
+  }, index * 2000);
+});
+```
+
+### 参数格式一致性验证
+
+**参数设计规范**：
+```javascript
+// ✅ 正确：使用 gameGid 参数
+const gameGid = gameData.gid;  // 10000147
+fetch(`/api/events?game_gid=${gameGid}`)  // 参数名一致
+
+// ❌ 错误：参数名不一致
+fetch(`/api/events?game_id=${gameGid}`)  // 错误的参数名
+```
+
+### 路由验证工具
+
+**自动化端点测试**：
+```javascript
+// 浏览器控制台 - 验证API端点
+const testEndpoints = [
+  { method: 'GET', url: 'http://127.0.0.1:5001/api/health' },
+  { method: 'GET', url: 'http://127.0.0.1:5001/api/events?game_gid=10000147' },
+  { method: 'GET', url: 'http://127.0.0.1:5001/api/games' }
+];
+
+testEndpoints.forEach(async (endpoint) => {
+  try {
+    const response = await fetch(endpoint.url);
+    console.log(`${endpoint.method} ${endpoint.url}: ${response.status}`);
+  } catch (error) {
+    console.error(`${endpoint.method} ${endpoint.url}: FAIL - ${error.message}`);
+  }
+});
+```
+
+### 常见问题及解决方案
+
+**问题1: 404路由错误**
+```bash
+# 检查路由定义
+grep -A5 "path: \"parameters\"" frontend/src/routes/routes.tsx
+
+# 预期输出
+#   // More specific parameter routes must come before general "parameters" route
+#   { path: "parameters/dashboard", element: <ParameterDashboard /> },
+#   { path: "parameters/compare", element: <ParameterCompare /> },
+#   { path: "parameters/enhanced", element: <ParametersEnhanced /> },
+#   { path: "parameters", element: <ParametersList /> },
+```
+
+**问题2: API参数错误**
+```javascript
+// 检查前端API调用
+// ✅ 正确
+fetch(`/api/events?game_gid=${gameGid}`)
+
+// ❌ 错误
+fetch(`/api/events?game_id=${gameGid}`)
+```
+
+### 验证步骤清单
+
+**完整验证流程**：
+1. ✅ 打开浏览器 DevTools（F12）
+2. ✅ 清除控制台（🚫 按钮）
+3. ✅ 依次访问每个路由：
+   - `http://localhost:5173/#/parameters`
+   - `http://localhost:5173/#/parameters/dashboard`
+   - `http://localhost:5173/#/parameters/compare`
+   - `http://localhost:5173/#/parameters/enhanced`
+   - `http://localhost:5173/#/parameter-dashboard`
+4. ✅ 检查每个路由的页面标题和内容
+5. ✅ 确保控制台无错误
+6. ✅ 验证显示正确的页面（不是"Select Game"提示）
+
+### 成功标准
+
+**通过标准**：
+- ✅ 所有5个路由加载无控制台错误
+- ✅ 每个路由显示正确的页面标题
+- ✅ 每个路由显示正确的页面内容
+- ✅ 无"Select Game"提示（如果游戏已选择）
+- ✅ 无无限加载旋转器
+- ✅ 无404页面
+
+### 测试文档生成标准
+
+**必生成的文档**:
+1. **[E2E-TEST-REPORT.md](../../reports/2026-03-03/E2E-TEST-REPORT.md)** - 详细测试报告
+2. **[FIX-GUIDE.md](../../reports/2026-03-03/FIX-GUIDE.md)** - 修复指南
+3. **[TEST-SUMMARY.md](../../reports/2026-03-03/TEST-SUMMARY.md)** - 测试总结
+
+**必生成的截图**:
+- `/frontend/screenshots/e2e-*.png` - 所有页面截图
+- `/tmp/*.png` - Agent生成截图
+
+**必生成的日志**:
+- Vite日志: `/tmp/vite-restart.log`
+- Chrome DevTools MCP session: `~/Library/Caches/superpowers/browser/2026-03-03/session-*`
+
+### 相关经验文档
 
 - [React最佳实践 - Hooks规则](./react-best-practices.md#react-hooks-规则) - React组件测试常见问题
 - [调试技能](./debugging-skills.md) - 测试失败后的调试方法

@@ -374,7 +374,7 @@ title: '[BUG] '
 
 ## 代码规范
 
-- 遵守 [CLAUDE.md](CLAUDE.md) 中的开发规范
+- 遵守 [CLAUDE.md](../../CLAUDE.md) 中的开发规范
 - 使用语义化提交信息
 - 添加单元测试
 - 更新相关文档

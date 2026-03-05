@@ -902,17 +902,17 @@ jobs:
 ## 📚 相关文档
 
 **审计报告**：
-- [COMPREHENSIVE_ARCHITECTURE_AUDIT.md](./COMPREHENSIVE_ARCHITECTURE_AUDIT.md) - 全面架构审计报告
-- [PERFORMANCE_OPTIMIZATION_AUDIT.md](./PERFORMANCE_OPTIMIZATION_AUDIT.md) - 性能优化审计
+- [COMPREHENSIVE_ARCHITECTURE_AUDIT.md](../archive/2026-03/02-march/reports/COMPREHENSIVE_ARCHITECTURE_AUDIT.md) - 全面架构审计报告（已归档）
+- [PERFORMANCE_OPTIMIZATION_AUDIT.md](../archive/2026-03/02-march/reports/PERFORMANCE_OPTIMIZATION_AUDIT.md) - 性能优化审计（已归档）
 
 **优化指南**：
-- [docs/lessons-learned/performance-patterns.md](../../lessons-learned/performance-patterns.md) - 性能优化最佳实践
-- [docs/lessons-learned/react-best-practices.md](../../lessons-learned/react-best-practices.md) - React最佳实践
-- [docs/development/architecture.md](../../development/architecture.md) - 架构设计文档
+- [docs/lessons-learned/performance-patterns.md](../lessons-learned/performance-patterns.md) - 性能优化最佳实践
+- [docs/lessons-learned/react-best-practices.md](../lessons-learned/react-best-practices.md) - React最佳实践
+- [docs/development/architecture.md](../development/architecture.md) - 架构设计文档
 
 **历史报告**：
-- [docs/reports/2026-03-01/REGRESSION-TEST-REPORT.md](../2026-03-01/REGRESSION-TEST-REPORT.md) - 回归测试报告
-- [docs/reports/2026-03-01/FINAL-100-PERCENT-COMPLETE.md](../2026-03-01/FINAL-100-PERCENT-COMPLETE.md) - V8.0.0完成报告
+- [docs/reports/2026-03-01/REGRESSION-TEST-REPORT.md](../archive/testing-reports/legacy/REGRESSION-TEST-REPORT.md) - 回归测试报告（已归档）
+- [docs/reports/2026-03-01/FINAL-100-PERCENT-COMPLETE.md](../archive/testing-reports/2026-03-01/2026-03-01/FINAL-100-PERCENT-COMPLETE.md) - V8.0.0完成报告（已归档）
 
 ---
 

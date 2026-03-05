@@ -178,7 +178,7 @@ delete_game(90000001)  # 只删除测试游戏
 
 - [CLAUDE.md](../CLAUDE.md) - 项目开发规范
 - [开发规范 - 游戏标识符规范](../CLAUDE.md#游戏标识符规范--重要)
-- [测试规范](../testing/README.md) - 测试相关规范
+- [测试指南](../lessons-learned/testing-guide.md) - 测试相关规范
 
 ---
 

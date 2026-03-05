@@ -9,8 +9,9 @@ import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink } from '@apollo
 import { setContext } from '@apollo/client/link/context';
 
 // HTTP link to GraphQL endpoint
+// Use relative URI to leverage Vite proxy in development
 const httpLink = createHttpLink({
-  uri: 'http://localhost:5001/api/graphql',
+  uri: '/api/graphql',
 });
 
 // Auth link (optional - add authentication if needed)

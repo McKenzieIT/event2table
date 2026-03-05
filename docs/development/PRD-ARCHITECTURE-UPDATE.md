@@ -416,9 +416,9 @@ def build_hql_field_alias(field_name: str) -> str:
 
 ## 相关文档
 
-- **完整架构文档**: [docs/development/architecture-refactoring.md](../development/architecture-refactoring.md)
-- **详细实施计划**: [用户讨论记录](../../.claude/plans/rustling-marinating-rainbow.md)
+- **完整架构文档**: [architecture-refactoring.md](./architecture-refactoring.md)
 - **迁移进度**: 查看`CHANGELOG.md`和Git提交记录
+- **详细计划**: 讨论记录已归档到 `.claude/plans/` 目录
 
 ---
 

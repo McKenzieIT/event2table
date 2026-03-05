@@ -677,8 +677,8 @@ const handleDragEnd = useCallback((event) => {
 - [Optimizing Performance - React Docs](https://react.dev/learn/render-and-commit/optimizing-performance)
 
 **项目文档**:
-- [事件节点构建器修复报告](../reports/2026-02-18/event-node-builder-fixes-complete.md)
-- [E2E测试报告](../reports/2026-02-18/e2e-test-results-event-node-builder.md)
+- [事件节点构建器修复报告](../archive/2026-02/reports/2026-02-18/event-node-builder-fixes-complete.md)
+- [E2E测试报告](../archive/2026-02/reports/2026-02-18/e2e-test-results-event-node-builder.md)
 
 ---
 

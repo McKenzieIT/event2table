@@ -7,7 +7,7 @@ Validates frontend-backend API contract consistency.
 import re
 from pathlib import Path
 from typing import List, Dict, Set
-from ..core.base_detector import BaseDetector, Issue, Severity, IssueCategory
+from core.base_detector import BaseDetector, Issue, Severity, IssueCategory
 
 
 class ApiContractDetector(BaseDetector):
@@ -21,15 +21,15 @@ class ApiContractDetector(BaseDetector):
 
     # Frontend API call patterns
     FRONTEND_PATTERNS = [
-        r'fetch\(["'](/api/[^"']+)["']',
-        r'axios\.(get|post|put|delete|patch)\(["'](/api/[^"']+)["']',
-        r'\.(get|post|put|delete|patch)\(["'](/api/[^"']+)["']',
+        r'''fetch\(['"](/api/[^'"]+)['"]''',
+        r'''axios\.(get|post|put|delete|patch)\(['"](/api/[^'"]+)['"]''',
+        r'''\.(get|post|put|delete|patch)\(['"](/api/[^'"]+)['"]''',
     ]
 
     # Backend route patterns
     BACKEND_PATTERNS = [
-        r'@.*\.route\(["'](/api/[^"']+)["']\s*,\s*methods=\["']([^"']+)["']',
-        r'@.*\.route\(["'](/api/[^"']+)["']',
+        r'''@.*\.route\(['"](/api/[^'"]+)['"]\s*,\s*methods=\['"]([^'"]+)['"]''',
+        r'''@.*\.route\(['"](/api/[^'"]+)['"]''',
     ]
 
     def __init__(self):
@@ -103,7 +103,7 @@ class ApiContractDetector(BaseDetector):
                         methods = match.group(2).split(',') if match.lastindex >= 2 else ['GET']
                         routes.append({
                             'endpoint': endpoint,
-                            'methods': [m.strip().strip('"'') for m in methods],
+                            'methods': [m.strip().strip('"\'') for m in methods],
                             'line': line_num,
                             'file': str(file_path)
                         })

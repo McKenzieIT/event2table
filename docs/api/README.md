@@ -289,7 +289,7 @@ const data = await response.json();
 | POST | `/api/canvas` | 创建/保存Canvas |
 | POST | `/api/canvas/<canvas_id>/generate-hql` | 生成HQL |
 
-**详细文档**: [CANVAS-API.md](CANVAS-API.md)
+**Note**: Canvas API endpoints are documented in the Canvas module documentation.
 
 ---
 
@@ -303,7 +303,7 @@ const data = await response.json();
 | PUT/PATCH | `/api/event-nodes/<id>` | 更新节点 |
 | DELETE | `/api/event-nodes/<id>` | 删除节点 |
 
-**详细文档**: [EVENT-NODES-API.md](EVENT-NODES-API.md)
+**Note**: Event Nodes API is documented in the Canvas module documentation.
 
 ---
 
@@ -320,7 +320,7 @@ const data = await response.json();
 | GET | `/api/join-configs/stats` | 获取配置统计 |
 | POST | `/api/join-configs/batch-delete` | 批量删除 |
 
-**详细文档**: [JOIN-CONFIGS-API.md](JOIN-CONFIGS-API.md)
+**Note**: Join Configs API documentation is available in the HQL module documentation.
 
 ---
 
@@ -332,7 +332,7 @@ const data = await response.json();
 | GET | `/api/dashboard/recent-events` | 获取最近事件 |
 | GET | `/api/dashboard/system-health` | 系统健康检查 |
 
-**详细文档**: [DASHBOARD-API.md](DASHBOARD-API.md)
+**Note**: Dashboard API is documented in the Dashboard module documentation.
 
 ---
 
@@ -345,7 +345,7 @@ const data = await response.json();
 | GET | `/api/export/hql/<event_id>` | 导出HQL |
 | POST | `/api/export/batch` | 批量导出 |
 
-**详细文档**: [IMPORT-EXPORT-API.md](IMPORT-EXPORT-API.md)
+**Note**: Import/Export API is documented in the Events module documentation.
 
 ---
 
@@ -477,7 +477,7 @@ function GamesList() {
 
 - **[GraphQL API文档](GRAPHQL_API.md)** - GraphQL完整文档
 - **[REST到GraphQL迁移指南](REST_TO_GRAPHQL_MIGRATION.md)** - 迁移指南
-- **[API架构迁移状态](API-ARCHITECTURE-MIGRATION-STATUS.md)** - 迁移进度
+- **[迁移进度报告](MIGRATION_PROGRESS_REPORT.md)** - 迁移进度
 - **[经验文档 - API设计模式](../lessons-learned/api-design-patterns.md)** - API设计最佳实践
 - **[经验文档 - 缓存策略](../lessons-learned/performance-patterns.md#缓存策略)** - 缓存使用规范
 - **[经验文档 - 安全要点](../lessons-learned/security-essentials.md)** - API安全规范

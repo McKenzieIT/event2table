@@ -23,7 +23,232 @@ description: Interactive E2E testing system for Event2Table using Chrome DevTool
 
 **工具**: Chrome DevTools MCP (mcp__chrome-devtools__*)
 
-**不使用**: Playwright自动化测试框架（用于独立场景）
+**不使用**: Playwright自动化测试框架（仅用于独立回归测试场景）
+
+---
+
+## ⚠️ 铁则: Chrome DevTools MCP 优先 (IRON RULE)
+
+> **🚨 2026-03-03 新增铁则**
+>
+> **铁则内容**: 遇到Chrome DevTools MCP问题时，必须尝试解决而不是改用Playwright
+
+### 铁则解释
+
+**为什么必须有这条铁则？**
+
+1. **问题诊断能力** - Chrome DevTools MCP提供实时交互式诊断，可以发现Playwright无法发现的深层次问题
+2. **根本原因分析** - 通过DOM + Console + Network实时分析，可以定位问题的真正原因
+3. **修复验证效率** - 交互式测试可以立即验证修复是否有效，不需要编写测试脚本
+4. **用户体验真实性** - Chrome DevTools MCP模拟真实用户操作，而Playwright只是自动化脚本
+
+**Chrome DevTools MCP vs Playwright**:
+
+| 能力 | Chrome DevTools MCP | Playwright |
+|------|-------------------|------------|
+| 实时交互式诊断 | ✅ | ❌ |
+| 深度DOM分析 | ✅ | ⚠️ |
+| Console实时监控 | ✅ | ⚠️ |
+| 网络请求分析 | ✅ | ✅ |
+| 问题根本原因分析 | ✅ | ❌ |
+| 修复立即验证 | ✅ | ❌ |
+| 回归测试自动化 | ❌ | ✅ |
+| CI/CD集成 | ❌ | ✅ |
+
+### 铁则执行标准
+
+**场景1: Chrome DevTools MCP工具调用失败**
+
+❌ **错误做法**:
+```
+"mcp__chrome-devtools__click 返回错误，让我改用Playwright测试"
+```
+
+✅ **正确做法**:
+```
+"mcp__chrome-devtools__click 返回错误，让我：
+1. 检查元素UID是否正确
+2. 使用take_snapshot()验证元素存在
+3. 使用evaluate_script()检查元素可交互性
+4. 分析错误根因并记录
+5. 尝试替代方法（如直接执行JavaScript点击）"
+```
+
+**场景2: 页面加载超时**
+
+❌ **错误做法**:
+```
+"页面加载太慢，Playwright可能有更好的超时处理，让我切换"
+```
+
+✅ **正确做法**:
+```
+"页面加载超时，让我：
+1. 使用list_network_requests()检查API响应时间
+2. 使用evaluate_script()测量实际加载时间
+3. 检查Console是否有JavaScript错误
+4. 分析性能瓶颈（large bundle、N+1 queries等）
+5. 提供具体的性能优化建议"
+```
+
+**场景3: 元素定位困难**
+
+❌ **错误做法**:
+```
+"元素选择器太难写，Playwright的选择器更灵活，让我切换"
+```
+
+✅ **正确做法**:
+```
+"元素定位困难，让我：
+1. 使用take_snapshot()分析完整DOM结构
+2. 使用evaluate_script()通过自定义逻辑定位元素
+3. 尝试多种选择器策略（data-testid、text、CSS选择器）
+4. 记录选择器最佳实践
+5. 向开发团队建议添加data-testid属性"
+```
+
+**场景4: 复杂交互场景**
+
+❌ **错误做法**:
+```
+"这个拖拽操作太复杂，Playwright的drag API更简单，让我切换"
+```
+
+✅ **正确做法**:
+```
+"复杂拖拽场景，让我：
+1. 使用take_screenshot()记录拖拽前状态
+2. 使用evaluate_script()模拟拖拽事件
+3. 检查拖拽后的DOM变化
+4. 分析拖拽失败的根本原因（事件监听器、z-index等）
+5. 提供具体的修复方案"
+```
+
+### 铁则例外情况
+
+**唯一可以使用Playwright的场景**:
+
+✅ **回归测试套件** - 当需要运行完整的自动化回归测试时：
+- 发布前的完整回归测试
+- CI/CD流程中的自动化测试
+- 大规模测试（50+页面）
+
+❌ **不适用场景**:
+- 问题诊断
+- 功能验证
+- 用户体验测试
+- 性能分析
+
+### 铁则检查清单
+
+**在使用Chrome DevTools MCP遇到问题时，必须**:
+- [ ] 尝试至少3种不同的解决方法
+- [ ] 使用所有可用的诊断工具（snapshot、evaluate_script、console、network）
+- [ ] 记录问题的完整诊断过程
+- [ ] 分析根本原因而不是绕过问题
+- [ ] 提供具体的修复建议
+- [ ] 只有在确认Chrome DevTools MCP无法满足需求时，才考虑Playwright
+
+### 铁则执行示例
+
+**示例1: 元素点击失败**
+
+```javascript
+// ❌ 违反铁则
+try {
+  await mcp__chrome-devtools__click({ uid: "button-uid" });
+} catch (error) {
+  // 直接切换到Playwright - 错误！
+  console.log("切换到Playwright");
+}
+
+// ✅ 遵循铁则
+try {
+  await mcp__chrome-devtools__click({ uid: "button-uid" });
+} catch (error) {
+  // 尝试解决
+  const snapshot = await mcp__chrome-devtools__take_snapshot();
+  const elementExists = snapshot.elements.some(el => el.uid === "button-uid");
+
+  if (!elementExists) {
+    // 元素不存在，分析原因
+    const pageContent = await mcp__chrome-devtools__evaluate_script({
+      function: "() => document.body.innerHTML"
+    });
+    // 记录发现并提供修复建议
+  } else {
+    // 元素存在但无法点击，检查是否可交互
+    const isClickable = await mcp__chrome-devtools__evaluate_script({
+      function: "(uid) => { const el = document.querySelector(`[uid=${uid}]`); return el && !el.disabled && el.offsetParent !== null; }",
+      args: [{ uid: "button-uid" }]
+    });
+    // 提供具体的修复建议
+  }
+}
+```
+
+**示例2: 页面加载失败**
+
+```javascript
+// ❌ 违反铁则
+if (pageLoadTimeout) {
+  // 直接切换到Playwright，因为Playwright有更好的超时处理 - 错误！
+  console.log("Playwright处理超时更好");
+}
+
+// ✅ 遵循铁则
+if (pageLoadTimeout) {
+  // 深度分析超时原因
+  const networkRequests = await mcp__chrome-devtools__list_network_requests();
+  const slowRequests = networkRequests.filter(req => req.duration > 1000);
+
+  const consoleErrors = await mcp__chrome-devtools__list_console_messages({
+    types: ["error"]
+  });
+
+  const performanceMetrics = await mcp__chrome-devtools__evaluate_script({
+    function: `
+      () => {
+        const timing = performance.timing;
+        return {
+          pageLoadTime: timing.loadEventEnd - timing.navigationStart,
+          domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart
+        };
+      }
+    `
+  });
+
+  // 分析根本原因并提供建议
+  if (slowRequests.length > 0) {
+    return {
+      issue: "API响应时间过长",
+      slowRequests: slowRequests.map(req => ({ url: req.url, duration: req.duration })),
+      recommendation: "优化后端API性能或添加缓存"
+    };
+  }
+}
+```
+
+### 铁则背后的原理
+
+**为什么坚持使用Chrome DevTools MCP？**
+
+1. **问题发现 vs 问题回避**
+   - Chrome DevTools MCP: 发现问题并分析根因 → 永久解决
+   - Playwright: 绕过问题 → 问题仍然存在
+
+2. **一次性成本 vs 长期成本**
+   - Chrome DevTools MCP: 花时间解决问题 → 一次投入，长期受益
+   - Playwright: 快速绕过 → 每次都要处理相同问题
+
+3. **技术债务积累**
+   - Chrome DevTools MCP: 解决问题 → 减少技术债务
+   - Playwright: 绕过问题 → 技术债务积累
+
+4. **团队能力提升**
+   - Chrome DevTools MCP: 深入理解问题 → 团队能力提升
+   - Playwright: 依赖工具 → 团队能力停滞
 
 ---
 
@@ -110,29 +335,36 @@ mcp__chrome-devtools__list_pages
 5. ✅ 重新打开 VSCode 和项目
 6. ✅ 在新会话中测试 MCP 工具
 
-**替代方案**: 如果 MCP 仍不可用，使用 Playwright 测试
-```bash
-cd frontend
-npm run test:e2e
-```
+**⚠️ 铁则**: 不要因为遇到困难就切换到 Playwright！参考上面的"铁则: Chrome DevTools MCP 优先"章节。
+
+**常见问题及解决方法**:
+
+| 问题 | 可能原因 | 解决方法（不要切换到Playwright） |
+|------|---------|-------------------------------|
+| **元素点击失败** | 元素UID错误 | 使用take_snapshot()验证，尝试evaluate_script()点击 |
+| **页面加载超时** | API慢或JS错误 | 使用list_network_requests()分析，检查console错误 |
+| **元素定位困难** | 选择器问题 | 使用evaluate_script()自定义查找逻辑 |
+| **交互无响应** | 事件监听器问题 | 检查DOM，分析事件监听器，提供修复建议 |
+| **拖拽不工作** | 复杂交互 | 模拟拖拽事件，分析失败原因，优化建议 |
 
 #### 测试方法选择
 
-**方法1: Chrome DevTools MCP（推荐）** - 交互式诊断
+**方法1: Chrome DevTools MCP（⭐ 首选）** - 交互式诊断
 - 实时页面分析
 - 智能问题发现
 - 深度 DOM + Console + Network 分析
-- 适用于: 问题诊断、UX 测试、功能验证
+- 适用于: **所有测试场景**（问题诊断、UX 测试、功能验证）
 
-**方法2: Playwright 自动化（回退）** - 回归测试
+**方法2: Playwright 自动化（仅限回归测试）** - 回归测试
 - 完整自动化测试套件
 - 11页面全面测试
-- 适用于: 回归测试、CI/CD
+- 适用于: **仅用于**完整回归测试、CI/CD
 
 **如何选择**:
-- 发现新问题 → 使用 Chrome DevTools MCP
-- 验证修复 → 使用 Chrome DevTools MCP
-- 完整回归 → 使用 Playwright
+- ✅ 发现新问题 → 使用 Chrome DevTools MCP（必须）
+- ✅ 验证修复 → 使用 Chrome DevTools MCP（必须）
+- ✅ 功能测试 → 使用 Chrome DevTools MCP（必须）
+- ⚠️ 完整回归 → 使用 Playwright（唯一允许的场景）
 
 ---
 
@@ -1446,7 +1678,7 @@ if (whitespace > 40) {
 
 ---
 
-**Skill Version**: 2.4 (100% Coverage Requirements)
-**Last Updated**: 2026-02-21
+**Skill Version**: 2.5 (Iron Rule: Chrome DevTools MCP First)
+**Last Updated**: 2026-03-03
 **Status**: Production Ready
 **Maintainer**: Event2Table Development Team

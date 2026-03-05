@@ -1,0 +1,14 @@
+{
+  "bundle_size": {
+    "warning": 500000,
+    "critical": 1000000
+  },
+  "load_time": {
+    "warning": 3000,
+    "critical": 5000
+  },
+  "api_response": {
+    "warning": 500,
+    "critical": 1000
+  }
+}

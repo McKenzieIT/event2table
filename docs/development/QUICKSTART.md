@@ -378,19 +378,19 @@ cache.clear()
 - [贡献指南](./contributing.md) - 如何贡献代码
 
 ### 专题文档
-- [API开发指南](./api-development.md) - API开发规范
-- [前端开发指南](./frontend-development.md) - 前端开发规范
-- [E2E测试指南](../testing/e2e-testing-guide.md) - E2E测试规范
+- [API设计模式](../lessons-learned/api-design-patterns.md) - API开发规范
+- [React最佳实践](../lessons-learned/react-best-practices.md) - 前端开发规范
+- [E2E测试指南](../archive/2026-02/testing/e2e-testing-guide.md) - E2E测试规范
 - [SQL Validator指南](./sql-validator-guidelines.md) - SQL注入防护
 
 ### 优化文档
-- [后端优化报告](../optimization/FINAL_OPTIMIZATION_REPORT.md) - 6阶段优化总结
-- [核心优化指南](../optimization/CORE_OPTIMIZATION_GUIDE.md) - 优化实施指南
-- [缓存优化](../optimization/CACHE_OPTIMIZATION_SUMMARY.md) - 缓存系统优化
+- [后端优化报告](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md) - 6阶段优化总结
+- [核心优化指南](../archive/2026-02/optimization/CORE_OPTIMIZATION_GUIDE.md) - 优化实施指南
+- [缓存优化](../archive/2026-02/optimization/CACHE_OPTIMIZATION_SUMMARY.md) - 缓存系统优化
 
 ### 测试文档
-- [快速测试指南](../testing/quick-test-guide.md) - PATH问题排查
-- [TDD实践](./tdd-practices.md) - 测试驱动开发实践
+- [快速测试指南](../archive/2026-02/testing/quick-test-guide.md) - PATH问题排查
+- [测试指南](../lessons-learned/testing-guide.md) - TDD和E2E测试实践
 
 ---
 
@@ -412,7 +412,7 @@ cache.clear()
 1. 遵循[CLAUDE.md规范](../../CLAUDE.md)
 2. 定期运行[API契约测试](#api契约测试)
 3. 执行完整的[E2E测试](#e2e测试)
-4. 参考[优化文档](../optimization/)
+4. 参考[优化文档](../archive/2026-02/optimization/)
 
 ---
 

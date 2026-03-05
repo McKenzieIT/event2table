@@ -60,6 +60,55 @@ which python3  # 应该显示: /Users/mckenzie/Documents/event2table/backend/ven
 
 ## 问题修复记录
 
+### 2026-03-05: 文档整合与经验提取 ⚠️ **重要**
+
+**整合范围**: 722个文档 → 归档612个，活跃110个
+
+#### 经验提取（4个高价值报告）
+- ✅ E2E测试完整流程 → testing-guide.md
+  - Chrome DevTools MCP 6步标准流程
+  - 测试失败诊断方法（React Hooks、加载超时、API错误）
+  - Ralph Loop迭代测试法
+  - API契约测试验证
+- ✅ 前端加载问题修复 → react-best-practices.md
+  - Lazy Loading决策标准（<10KB直接导入）
+  - 双重Suspense嵌套问题诊断
+  - React Hooks规则（条件返回之前调用）
+- ✅ Canvas组件调试 → debugging-skills.md
+  - Canvas事件节点配置问题诊断
+  - 并行Subagent分析策略
+- ✅ API路由验证 → api-design-patterns.md
+  - game_gid vs game_id使用规范
+  - API契约一致性验证
+
+#### 文档归档
+- ✅ 归档15个E2E测试报告（docs/reports/2026-03-03/ → docs/archive/2026/03-march/reports/）
+- ✅ 归档55个PNG截图（节省~20MB空间）
+- ✅ 归档5个临时修复指南
+
+#### 索引更新
+- ✅ 更新经验文档索引（docs/lessons-learned/README.md）
+- ✅ 更新CLAUDE.md引用（添加本条目）
+- ✅ 创建文档导航指南（docs/documentation-navigation.md）
+- ✅ 创建归档README（docs/archive/2026/03-march/README.md）
+
+**影响文件**:
+- docs/lessons-learned/testing-guide.md - 新增E2E测试完整流程、API契约测试
+- docs/lessons-learned/react-best-practices.md - 新增Lazy Loading决策、React Hooks规则
+- docs/lessons-learned/debugging-skills.md - 新增Canvas调试、错误检测模式
+- docs/lessons-learned/api-design-patterns.md - 新增路由参数设计、API契约验证
+- docs/lessons-learned/refactoring-checklist.md - 新增Canvas架构重构
+- docs/lessons-learned/README.md - 更新经验和索引
+- CLAUDE.md - 添加本条目
+
+**预期成果**:
+- 📚 活跃文档精简12%（125 → 110个）
+- 📖 经验覆盖率100%（零经验丢失）
+- 🔍 文档可发现性提升（更新索引）
+- 🗂️ 归档结构化（按日期组织）
+
+---
+
 ### 2026-03-01: 后端架构全面优化完成 ⚠️ **极其重要**
 
 **修复范围**: Phase 1-4 全面优化
@@ -789,7 +838,44 @@ query = f"SELECT * FROM {table_name} WHERE {column} = ?"  # SQL注入风险！
 
 **详细指南**: [sql-validator-guidelines.md](docs/development/sql-validator-guidelines.md)
 
-**4. 错误处理不暴露敏感信息**：
+**4. HQL生成器安全**：
+> **🚨 HQL（HiveQL）生成器用于构建Hive查询字符串，必须遵循特殊安全规范**
+
+```python
+from backend.core.security.sql_validator import SQLValidator
+
+# ✅ 正确：验证HQL标识符
+table_name = SQLValidator.validate_table_name("ieu_ods.ods_10000147_all_view")
+field_name = SQLValidator.validate_column_name("role_id")
+
+# ✅ 正确：使用操作符白名单
+VALID_OPERATORS = ["=", "!=", "<", ">", "<=", ">=", "LIKE"]
+if operator not in VALID_OPERATORS:
+    raise ValueError(f"Invalid operator: {operator}")
+
+# ✅ 正确：验证自定义表达式
+DANGEROUS_KEYWORDS = ["DROP", "DELETE", "TRUNCATE", "--", ";"]
+expr_upper = expression.upper()
+for keyword in DANGEROUS_KEYWORDS:
+    if keyword in expr_upper:
+        raise ValueError(f"Dangerous keyword '{keyword}' found")
+
+# ❌ 错误：直接拼接用户输入到HQL
+hql = f"SELECT * FROM {user_table} WHERE {user_field} {user_operator} '{user_value}'"
+```
+
+**核心原则**：
+- HQL用于生成查询字符串（非直接执行），防止语法破坏
+- 所有标识符必须使用`SQLValidator`验证
+- 操作符必须使用白名单（不用黑名单）
+- 自定义表达式必须检测危险关键字
+- 占位符值必须验证格式（如：日期格式`YYYYMMDD`）
+
+**详细指南**：
+- [HQL安全开发指南](docs/hql/hql-security-guide.md) - HQL安全规范 ⭐
+- [HQL注入防护示例](docs/hql/hql-injection-prevention.md) - 实际漏洞案例 ⭐
+
+**5. 错误处理不暴露敏感信息**：
 ```python
 # ✅ 正确：通用错误消息
 try:
@@ -935,7 +1021,221 @@ python scripts/git-hooks/install_hooks.py
 
 ---
 
-## 经验文档快速查找 ⭐ **极其重要 - 2026-02-24新增**
+### CORS跨域配置规范 ⚠️ **极其重要 - 2026-03-04新增**
+
+> **🚨 所有前后端分离项目必须正确配置CORS**
+> **🆕 更新 (2026-03-04)**: 建立CORS配置规范，解决前后端跨域请求问题
+
+#### 核心原则
+
+**CORS (Cross-Origin Resource Sharing)** 是浏览器的安全机制，用于限制跨域HTTP请求。
+
+**问题表现**：
+```
+Access to fetch at 'http://127.0.0.1:5001/api/graphql' from origin 'http://localhost:5173'
+has been blocked by CORS policy: Response to preflight request doesn't pass access control check:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+**根本原因**：
+- 前端（http://localhost:5173）与后端（http://127.0.0.1:5001）是不同的源（Origin）
+- 浏览器默认阻止跨域请求，除非后端明确允许
+
+#### Flask-CORS 配置
+
+**1. 安装依赖**：
+
+```bash
+# 添加到 requirements.txt
+echo "Flask-CORS==6.0.2" >> requirements.txt
+
+# 安装包
+source backend/venv/bin/activate
+pip install flask-cors
+```
+
+**2. 在 web_app.py 中配置 CORS**：
+
+```python
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+
+# CORS configuration - Allow frontend-originated requests
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    },
+    r"/api/graphql": {
+        "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
+logger.info("✅ CORS已启用: 允许来自 localhost:5173 的请求")
+```
+
+**3. 重启后端服务器**：
+
+```bash
+# 停止旧服务器
+kill <旧进程PID>
+
+# 启动新服务器
+source backend/venv/bin/activate
+nohup python web_app.py > logs/backend.log 2>&1 &
+```
+
+#### CORS 配置说明
+
+**resources 参数**：
+- `r"/api/*"` - 匹配所有 `/api/` 开头的路径
+- `r"/api/graphql"` - 匹配 GraphQL 端点（更具体的规则优先）
+
+**origins 参数**：
+- `http://localhost:5173` - Vite 开发服务器
+- `http://127.0.0.1:5173` - 本地回环地址
+- 生产环境应添加实际域名，如 `https://event2table.com`
+
+**methods 参数**：
+- `GET` - 读取数据
+- `POST` - 创建数据
+- `PUT` - 更新数据
+- `DELETE` - 删除数据
+- `OPTIONS` - CORS preflight 请求（必需）
+
+**allow_headers 参数**：
+- `Content-Type` - 请求内容类型
+- `Authorization` - 认证令牌
+
+#### 验证 CORS 配置
+
+**方法 1: 使用 curl 验证 preflight 请求**：
+
+```bash
+curl -s -H "Origin: http://localhost:5173" \
+  -H "Access-Control-Request-Method: POST" \
+  -X OPTIONS http://127.0.0.1:5001/api/graphql -I | grep -i "access-control"
+```
+
+**预期输出**：
+```
+Access-Control-Allow-Origin: http://localhost:5173
+Access-Control-Allow-Methods: GET, OPTIONS, POST
+Access-Control-Allow-Headers: Content-Type, Authorization
+```
+
+**方法 2: 检查后端日志**：
+
+```bash
+tail -20 logs/backend.log | grep CORS
+```
+
+**预期输出**：
+```
+2026-03-04 13:19:13 - __main__ - INFO - ✅ CORS已启用: 允许来自 localhost:5173 的请求
+```
+
+**方法 3: 浏览器控制台检查**：
+
+1. 打开浏览器开发者工具（F12）
+2. 访问 `http://localhost:5173`
+3. 查看 Console 标签页
+4. 确认无 CORS 错误
+
+#### 生产环境配置
+
+**生产环境应使用实际的域名**：
+
+```python
+import os
+
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://event2table.com')
+
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [FRONTEND_URL],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
+```
+
+**环境变量配置**：
+
+```bash
+# .env 或生产环境变量
+FRONTEND_URL=https://event2table.com
+```
+
+#### 常见问题
+
+**Q1: CORS 配置后仍然报错？**
+
+A: 检查以下几点：
+1. ✅ 后端服务器是否重启？
+2. ✅ CORS 配置的 origins 是否包含前端地址？
+3. ✅ 浏览器缓存是否清理？（Ctrl+Shift+R 强制刷新）
+4. ✅ 浏览器控制台的错误信息是什么？
+
+**Q2: 如何允许多个前端域名？**
+
+A: 在 origins 列表中添加多个域名：
+```python
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "http://localhost:5173",
+            "https://event2table.com",
+            "https://staging.event2table.com"
+        ],
+        # ...
+    }
+})
+```
+
+**Q3: 生产环境是否应该允许所有来源？**
+
+A: ❌ **强烈不推荐**：
+```python
+# ❌ 危险：允许任何来源
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+# ✅ 安全：只允许特定域名
+CORS(app, resources={r"/api/*": {"origins": ["https://event2table.com"]}})
+```
+
+#### 代码审查强制检查项
+
+**每次配置 CORS 时必须检查**：
+- [ ] Flask-CORS 是否已安装？（requirements.txt）
+- [ ] web_app.py 是否导入 CORS？
+- [ ] CORS 配置的 origins 是否包含前端地址？
+- [ ] 是否配置了必要的 HTTP methods？
+- [ ] 是否配置了必要的 headers？
+- [ ] 后端服务器是否重启？
+- [ ] 是否使用 curl 验证 preflight 请求？
+- [ ] 生产环境是否使用实际域名而非 `*`？
+
+**违规后果**：
+- ⚠️ 前端无法访问后端 API
+- ⚠️ GraphQL 请求被浏览器阻止
+- ⚠️ 用户看到空白页面或加载失败
+- ⚠️ CORS 错误会暴露在浏览器控制台
+- ❌ Code Review必须拒绝
+
+#### 相关文档
+
+- [Flask-CORS 官方文档](https://flask-cors.readthedocs.io/)
+- [MDN - CORS 详解](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+- [前端加载问题修复报告](docs/reports/2026-03-04/COMPLETE-FIX-SUMMARY.md)
+
+---
+
+## 经验文档快速查找 ⭐ **极其重要 - 2026-03-04更新**
 
 > **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
 
@@ -943,8 +1243,14 @@ python scripts/git-hooks/install_hooks.py
 
 | 场景 | 查看文档 | 优先级 |
 |------|----------|--------|
+| **🚨 React应用挂载** | [测试指南 - React挂载诊断](docs/lessons-learned/testing-guide.md#react应用挂载问题诊断) | P0 |
+| **🔍 Chrome DevTools调试** | [测试指南 - MCP调试法](docs/lessons-learned/testing-guide.md#chrome-devtools-mcp测试流程) | P0 |
+| **📝 mypy类型错误** | [Python开发 - mypy合规](docs/lessons-learned/python-development.md#mypy---strict合规) | P0 |
 | **🚨 React Hooks错误** | [React最佳实践 - Hooks规则](docs/lessons-learned/react-best-practices.md#react-hooks-规则) | P0 |
-| **🐌 页面加载超时** | [React最佳实践 - Lazy Loading](docs/lessons-learned/react-best-practices.md#lazy-loading) | P0 |
+| **⚡ Vite-Apollo兼容性** | [React最佳实践 - Vite兼容性](docs/lessons-learned/react-best-practices.md#vite与apollo-client兼容性) | P1 |
+| **🐌 页面加载超时** | [React最佳实践 - Lazy Loading](docs/lessons-learned/react-best-practices.md#lazy-loading最佳实践) | P0 |
+| **💾 缓存失效分析** | [性能模式 - 缓存失效](docs/lessons-learned/performance-patterns.md#缓存失效分析) | P0 |
+| **🚀 并行优化策略** | [性能模式 - 并行优化](docs/lessons-learned/performance-patterns.md#并行优化策略) | P0 |
 | **🔒 SQL注入风险** | [安全要点 - SQL注入防护](docs/lessons-learned/security-essentials.md#sql注入防护) | P0 |
 | **🧪 E2E测试失败** | [测试指南 - E2E测试](docs/lessons-learned/testing-guide.md#e2e测试) | P0 |
 | **⚡ 查询性能差** | [性能模式 - N+1查询](docs/lessons-learned/performance-patterns.md#n1查询优化) | P0 |
@@ -958,10 +1264,11 @@ python scripts/git-hooks/install_hooks.py
 ### 完整经验文档索引
 
 - **[经验文档索引](docs/lessons-learned/README.md)** - 所有经验文档的导航中心 ⭐
-- **[React最佳实践](docs/lessons-learned/react-best-practices.md)** - Hooks规则、Lazy Loading、性能优化
-- **[测试指南](docs/lessons-learned/testing-guide.md)** - E2E测试、TDD、自动化测试
+- **[React最佳实践](docs/lessons-learned/react-best-practices.md)** - Hooks规则、Lazy Loading、Vite兼容性 🆕
+- **[测试指南](docs/lessons-learned/testing-guide.md)** - E2E测试、TDD、React挂载诊断 🆕
+- **[Python开发](docs/lessons-learned/python-development.md)** - mypy类型安全、GenericRepository 🆕
 - **[安全要点](docs/lessons-learned/security-essentials.md)** - XSS防护、SQL注入、输入验证
-- **[性能模式](docs/lessons-learned/performance-patterns.md)** - 缓存、N+1查询、优化技巧
+- **[性能模式](docs/lessons-learned/performance-patterns.md)** - 缓存、N+1查询、并行优化 🆕
 - **[数据库模式](docs/lessons-learned/database-patterns.md)** - game_gid使用、事务、迁移
 - **[API设计模式](docs/lessons-learned/api-design-patterns.md)** - 分层架构、错误处理
 - **[调试技能](docs/lessons-learned/debugging-skills.md)** - Chrome DevTools MCP、Subagent分析
@@ -972,7 +1279,7 @@ python scripts/git-hooks/install_hooks.py
 ### 经验文档使用说明
 
 **为什么建立经验文档系统**：
-- ✅ 整合了399个文档的精华经验，避免重复
+- ✅ 整合了446个文档的精华经验，避免重复 (+47个新文档)
 - ✅ 集中管理，便于查找和维护
 - ✅ 持续更新，每次问题修复后立即更新
 

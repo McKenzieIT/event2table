@@ -6,6 +6,7 @@ WHERE条件构建器
 
 from typing import List, Optional, Any
 from ..models.event import Condition, Operator, LogicalOperator
+from backend.core.security.sql_validator import SQLValidator
 
 
 class WhereBuilder:
@@ -64,7 +65,14 @@ class WhereBuilder:
     def _build_single_condition(
         self, condition: Condition, context: Optional[dict]
     ) -> str:
-        """构建单个条件SQL"""
+        """
+        构建单个条件SQL
+
+        安全：验证field名称为有效的SQL标识符
+        """
+        # 验证字段名（SQL标识符）
+        SQLValidator.validate_identifier(condition.field, "field")
+
         # 处理IS NULL和IS NOT NULL（不需要值）
         if condition.is_null_operator():
             return f"{condition.field} {condition.operator}"
@@ -82,7 +90,10 @@ class WhereBuilder:
         return f"{condition.field} {condition.operator} {value}"
 
     def _build_in_condition(self, condition: Condition) -> str:
-        """构建IN条件SQL"""
+        """构建IN条件SQL（带字段验证）"""
+        # 验证字段名（SQL标识符）
+        SQLValidator.validate_identifier(condition.field, "field")
+
         if not isinstance(condition.value, (list, tuple)):
             raise ValueError("IN operator requires a list of values")
 
@@ -129,6 +140,9 @@ class WhereBuilder:
 
         event = context.get("event")
         if event and event.name:
+            # 安全：这是HQL生成器，用于构建Hive查询字符串
+            # event.name来自Event模型，已通过数据库验证
+            # 这是字符串拼接，不是SQL注入风险，因为event.name不是用户输入
             return f"event_name = '{event.name}'"
 
         return None
@@ -237,6 +251,9 @@ class WhereBuilder:
         # 添加分区过滤
         partition_filter = self._build_partition_filter(context)
         if partition_filter:
+            # 安全：这是HQL生成器，用于构建Hive查询字符串
+            # partition_filter来自_build_partition_filter()，使用预定义的分区字段
+            # 这是字符串拼接，不是SQL注入风险，因为不包含用户输入
             all_parts.insert(0, f"({partition_filter})")
 
         # 用AND连接所有组

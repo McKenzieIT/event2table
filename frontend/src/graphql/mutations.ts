@@ -61,7 +61,7 @@ export const CREATE_EVENT = gql`
     $gameGid: Int!
     $eventName: String!
     $eventNameCn: String!
-    $categoryId: Int!
+    $categoryId: Int
     $includeInCommonParams: Boolean
   ) {
     createEvent(

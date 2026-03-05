@@ -626,7 +626,7 @@ const CanvasFlow: React.FC<CanvasFlowProps> = ({ gameData, flowId }) => {
             )}
 
             {/* Promise-based confirm dialog */}
-            {ConfirmDialogComponent}
+            <ConfirmDialogComponent />
         </div>
     );
 };

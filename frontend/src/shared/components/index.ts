@@ -9,3 +9,6 @@ export type { NavLinkWithGameContextProps } from './NavLinkWithGameContext';
 
 export { default as ErrorBoundary } from './ErrorBoundary';
 export type { ErrorBoundaryProps } from './ErrorBoundary';
+
+export { RequireGameContext } from './RequireGameContext';
+

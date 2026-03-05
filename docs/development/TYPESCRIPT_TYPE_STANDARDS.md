@@ -1977,8 +1977,8 @@ export async function fetchGames(
 ### 10.1 项目文档
 
 - **[CLAUDE.md](../../CLAUDE.md)** - 项目开发规范
-- **[React组件开发指南](./react-component-guide.md)** - 组件开发最佳实践
-- **[API开发指南](./api-development.md)** - API开发规范
+- **[React最佳实践](../lessons-learned/react-best-practices.md)** - React组件开发最佳实践
+- **[API设计模式](../lessons-learned/api-design-patterns.md)** - API开发规范
 
 ### 10.2 类型定义文件
 

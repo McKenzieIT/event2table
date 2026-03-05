@@ -91,7 +91,7 @@ class AuditRunner:
 
                 if detector.is_applicable(str(file_path)):
                     try:
-                        issues = detector.detect(str(file_path))
+                        issues = detector.detect(file_path)  # Pass Path object, not string
                         all_issues.extend(issues)
                     except Exception as e:
                         # Log error but continue

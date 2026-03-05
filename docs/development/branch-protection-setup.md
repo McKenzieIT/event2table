@@ -143,7 +143,7 @@ JSON
 
 - [GitHub Docs: About branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-merge-behavior-of-your-repository/about-protected-branches)
 - [GitHub Docs: Configuring protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-protected-branches)
-- [贡献指南](../CONTRIBUTING.md)
+- [贡献指南](./contributing.md)
 
 ---
 

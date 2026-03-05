@@ -7,6 +7,7 @@
 import re
 from typing import Optional
 from ..models.event import Field, FieldType
+from backend.core.security.sql_validator import SQLValidator
 
 
 class FieldBuilder:
@@ -45,10 +46,13 @@ class FieldBuilder:
         验证标识符是否安全
 
         只允许字母、数字、下划线和$
+        使用SQLValidator进行验证
         """
-        if not identifier:
+        try:
+            SQLValidator.validate_identifier(identifier, "identifier")
+            return True
+        except ValueError:
             return False
-        return bool(re.match(r"^[a-zA-Z_][a-zA-Z0-9_$]*$", identifier))
 
     def _escape_identifier(self, identifier: str) -> str:
         """

@@ -15,8 +15,9 @@ import type { FetchResult } from '@apollo/client';
 import type { DocumentNode } from 'graphql';
 
 // HTTP link to GraphQL endpoint
+// Use relative URI to leverage Vite proxy in development
 const httpLink = createHttpLink({
-  uri: 'http://127.0.0.1:5001/api/graphql',
+  uri: '/api/graphql',
   credentials: 'same-origin',
 });
 

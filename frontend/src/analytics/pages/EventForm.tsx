@@ -1,7 +1,7 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React from 'react';
 import { useNavigate, useParams, useSearchParams, useOutletContext } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@apollo/client/react';
 import {
   Input,
   Select,
@@ -12,6 +12,8 @@ import {
   useToast,
   SelectGamePrompt
 } from '@shared/ui';
+import { CREATE_EVENT, UPDATE_EVENT } from '@/graphql/mutations';
+import { GET_EVENTS, GET_CATEGORIES, GET_EVENT } from '@/graphql/queries';
 import './EventForm.css';
 
 /**
@@ -65,7 +67,6 @@ function EventForm() {
   const { id } = useParams<{ id?: string }>();
   const { currentGame } = useOutletContext<OutletContext>();
   const [searchParams] = useSearchParams();
-  const queryClient = useQueryClient();
   const { success, error: showError } = useToast();
 
   const isEdit = !!id;
@@ -90,49 +91,29 @@ function EventForm() {
   const [errors, setErrors] = React.useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
-  // Fetch categories for dropdown (requires game_gid)
-  const gameGid = searchParams.get('game_gid');
-  const { data: categoriesData } = useQuery<CategoriesResponse>({
-    queryKey: ['categories', gameGid],
-    queryFn: async () => {
-      if (!gameGid) {
-        // Return empty categories if no game selected
-        return { data: [] };
-      }
-
-      const response = await fetch(`/api/categories?game_gid=${gameGid}`);
-      if (!response.ok) throw new Error('获取分类失败');
-      const result: CategoriesResponse = await response.json();
-      return result;
-    },
-    enabled: !!gameGid // Only run query if gameGid exists
+  // Fetch categories for dropdown using GraphQL
+  const { data: categoriesData } = useQuery(GET_CATEGORIES, {
+    variables: { limit: 100, offset: 0 },
+    fetchPolicy: 'cache-first'
   });
 
-  // Fetch event data (edit mode)
-  const { data: eventData, isLoading } = useQuery<EventResponse>({
-    queryKey: ['event', id],
-    queryFn: async () => {
-      if (!isEdit) return null as any;
-      const gameGid = searchParams.get('game_gid');
-      const params = gameGid ? `?game_gid=${gameGid}` : '';
-      const response = await fetch(`/api/events/${id}${params}`);
-      if (!response.ok) throw new Error('获取事件失败');
-      const result: EventResponse = await response.json();
-      return result;
-    },
-    enabled: isEdit,
+  // Fetch event data (edit mode) using GraphQL
+  const { data: eventData, isLoading } = useQuery(GET_EVENT, {
+    variables: { id: parseInt(id) },
+    skip: !isEdit,
+    fetchPolicy: 'cache-and-network'
   });
 
   // When event data loads successfully, populate form
   React.useEffect(() => {
-    if (eventData?.data && isEdit) {
-      const event = eventData.data;
+    if (eventData?.event && isEdit) {
+      const event = eventData.event;
       setFormData({
-        event_name: event.event_name || '',
-        event_name_cn: event.event_name_cn || '',
-        category_id: event.category_id || '',
-        game_gid: event.game_gid || '',
-        include_in_common_params: event.include_in_common_params ?? 1
+        event_name: event.eventName || '',
+        event_name_cn: event.eventNameCn || '',
+        category_id: event.categoryId?.toString() || '',
+        game_gid: event.gameGid?.toString() || '',
+        include_in_common_params: event.includeInCommonParams ? 1 : 0
       });
     }
   }, [eventData, isEdit]);
@@ -159,8 +140,35 @@ function EventForm() {
 
   // Handle cancel button click
   const handleCancel = React.useCallback(() => {
-    navigate('/events');
+    navigate('../events');  // Use relative path to navigate to events list
   }, [navigate]);
+
+  // GraphQL mutation hook for creating/updating events
+  const [executeMutation, { loading: isSaving }] = useMutation(
+    isEdit ? UPDATE_EVENT : CREATE_EVENT,
+    {
+      onCompleted: (data) => {
+        const response = isEdit ? data.updateEvent : data.createEvent;
+        if (response.ok) {
+          success(isEdit ? '事件更新成功' : '事件创建成功');
+          navigate('/events', { replace: true });
+        } else {
+          showError(`失败: ${response.errors?.join(', ') || '未知错误'}`);
+        }
+      },
+      onError: (error) => {
+        showError(`失败: ${error.message}`);
+      },
+      refetchQueries: isEdit
+        ? undefined
+        : [
+            {
+              query: GET_EVENTS,
+              variables: { gameGid: parseInt(formData.game_gid) }
+            }
+          ]
+    }
+  );
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -184,33 +192,24 @@ function EventForm() {
     setIsSubmitting(true);
 
     try {
-      const url = isEdit ? `/api/events/${id}` : '/api/events';
-      const method = isEdit ? 'PUT' : 'POST';
+      // Prepare mutation variables
+      const variables = isEdit
+        ? {
+            id: parseInt(id),
+            eventNameCn: formData.event_name_cn,
+            categoryId: formData.category_id ? parseInt(formData.category_id) : null,
+            includeInCommonParams: formData.include_in_common_params === 1
+          }
+        : {
+            gameGid: parseInt(formData.game_gid),
+            eventName: formData.event_name,
+            eventNameCn: formData.event_name_cn,
+            categoryId: formData.category_id ? parseInt(formData.category_id) : null,
+            includeInCommonParams: formData.include_in_common_params === 1
+          };
 
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        const result: EventResponse = await response.json();
-        throw new Error(result.message || (isEdit ? '更新失败' : '创建失败'));
-      }
-
-      // Show success toast
-      success(isEdit ? '事件更新成功' : '事件创建成功');
-
-      // Invalidate events cache to refresh the list
-      const gameGid = searchParams.get('game_gid') || currentGame?.gid;
-      if (gameGid) {
-        queryClient.invalidateQueries({
-          queryKey: ['events', parseInt(gameGid)]
-        });
-      }
-
-      // Navigate back to events list
-      navigate('/events', { replace: true });
+      // Execute GraphQL mutation
+      await executeMutation({ variables });
     } catch (err) {
       // Show error toast
       showError(err instanceof Error ? err.message : '未知错误');
@@ -230,7 +229,7 @@ function EventForm() {
     );
   }
 
-  const categories = categoriesData?.data || [];
+  const categories = categoriesData?.categories || [];
 
   // Prepare category options for Select component
   const categoryOptions = [
@@ -270,7 +269,7 @@ function EventForm() {
             type="number"
             value={formData.game_gid}
             onChange={handleChange}
-            disabled={isSubmitting || isEdit}
+            disabled={isSubmitting || isSaving || isEdit}
             placeholder="例如: 10000147"
             required
             error={errors.game_gid}
@@ -286,7 +285,7 @@ function EventForm() {
             type="text"
             value={formData.event_name}
             onChange={handleChange}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isSaving}
             placeholder="例如: game.role.login"
             required
             error={errors.event_name}
@@ -302,7 +301,7 @@ function EventForm() {
             type="text"
             value={formData.event_name_cn}
             onChange={handleChange}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isSaving}
             placeholder="例如: 角色登录"
             required
             error={errors.event_name_cn}
@@ -315,7 +314,7 @@ function EventForm() {
             label="事件分类"
             value={formData.category_id}
             onChange={handleCategoryChange}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isSaving}
             options={categoryOptions}
             error={errors.category_id}
             helperText="可选，未选择时将自动归类为'未分类'"
@@ -329,7 +328,7 @@ function EventForm() {
               label="包含在公共参数中"
               checked={formData.include_in_common_params === 1}
               onChange={handleChange}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSaving}
             />
             <span className="form-hint">
               <i className="bi bi-info-circle"></i>
@@ -342,9 +341,9 @@ function EventForm() {
             <Button
               type="submit"
               variant={isEdit ? 'warning' : 'success'}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSaving}
             >
-              {isSubmitting ? (
+              {isSubmitting || isSaving ? (
                 <>
                   <Spinner size="sm" className="me-2" />
                   提交中...
@@ -357,7 +356,7 @@ function EventForm() {
               type="button"
               variant="ghost"
               onClick={handleCancel}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSaving}
             >
               取消
             </Button>

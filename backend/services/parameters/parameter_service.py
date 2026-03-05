@@ -81,23 +81,21 @@ class ParameterService:
         Raises:
             ValueError: game_id转换失败
         """
-        # Convert game_gid to game_id if provided
-        game_id = None
+        # Validate game_gid if provided
         if game_gid:
             from backend.services.games.game_service import GameService
             game_service = GameService()
             game = game_service.get_game_by_gid(game_gid)
             if not game:
                 raise ValueError(f"Game {game_gid} not found")
-            game_id = game.id
 
-        # Use Repository method
-        return self.param_repo.get_parameters_paginated(
-            game_id=game_id,
-            search=search,
-            type_filter=type_filter,
+        # Use Repository method (now expects game_gid and limit)
+        return self.param_repo.get_all_parameters_paginated(
+            game_gid=game_gid,
+            search=search if search else "",
+            type_filter=type_filter if type_filter else "",
             page=page,
-            page_size=page_size
+            limit=page_size
         )
 
     @cached("parameters.by_event", timeout=180)

@@ -1,11 +1,12 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput, Skeleton, ErrorState, useToast } from '@shared/ui';
 import EmptyState from '@shared/ui/EmptyState/EmptyState';
 import { useGameStore } from '@/stores/gameStore';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { useQueryParam } from '@shared/hooks/useQueryParams';
 import CategoryModal from '../components/categories/CategoryModal';
 import './CategoriesList.css';
 
@@ -44,7 +45,6 @@ interface ConfirmState {
  */
 export default function CategoriesList(): JSX.Element {
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
   const { currentGame, setCurrentGame } = useGameStore();
   const { success, error: showError } = useToast();
@@ -61,8 +61,8 @@ export default function CategoriesList(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  // Read game_gid from URL parameters
-  const gameGid: string | null = new URLSearchParams(location.search).get('game_gid');
+  // Read game_gid from URL parameters (works with both HashRouter and BrowserRouter)
+  const gameGid: string | null = useQueryParam('game_gid');
 
   // Load game data if game_gid is in URL but not in store
   useEffect(() => {

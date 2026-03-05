@@ -1,0 +1,30 @@
+/**
+ * RequireGameContext Component Styles
+ */
+
+.require-game-context {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.prompt-container {
+  text-align: center;
+  max-width: 500px;
+  padding: 3rem;
+}
+
+.prompt-container h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-primary, #06b6d4);
+}
+
+.prompt-container p {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary, #64748b);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}

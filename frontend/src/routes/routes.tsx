@@ -42,7 +42,7 @@ import FieldBuilder from "@event-builder/pages/FieldBuilder";
 import Generate from "@analytics/pages/Generate";
 import GenerateResult from "@analytics/pages/GenerateResult";
 import AlterSql from "@analytics/pages/AlterSql";
-import AlterSqlBuilder from "@analytics/pages/AlterSqlBuilder";
+// import AlterSqlBuilder from "@analytics/pages/AlterSqlBuilder";  // Temporarily disabled for debugging
 
 // Route configuration
 // Note: More specific routes must come before general routes
@@ -61,6 +61,10 @@ export const routes: RouteObject[] = [
       { path: "events/:id/edit", element: <EventForm /> },
       { path: "events", element: <EventsList /> },
       { path: "common-params", element: <CommonParamsList /> },
+      // More specific parameter routes must come before general "parameters" route
+      { path: "parameters/dashboard", element: <ParameterDashboard /> },
+      { path: "parameters/compare", element: <ParameterCompare /> },
+      { path: "parameters/enhanced", element: <ParametersEnhanced /> },
       { path: "parameters", element: <ParametersList /> },
       { path: "hql-manage", element: <HqlManage /> },
       { path: "import-events", element: <ImportEvents /> },
@@ -68,12 +72,12 @@ export const routes: RouteObject[] = [
       { path: "batch-operations", element: <BatchOperations /> },
       { path: "log-detail", element: <LogDetail /> },
       { path: "validation-rules", element: <ValidationRules /> },
+      // Legacy root-level parameter-dashboard route (kept for backward compatibility)
       { path: "parameter-dashboard", element: <ParameterDashboard /> },
       { path: "parameter-usage", element: <ParameterUsage /> },
       { path: "parameter-history", element: <ParameterHistory /> },
       { path: "logs/create", element: <LogForm /> },
       { path: "logs/:id/edit", element: <LogForm /> },
-      { path: "parameters/compare", element: <ParameterCompare /> },
       { path: "hql/:id/edit", element: <HqlEdit /> },
       { path: "flow-builder", element: <FlowBuilder /> },
       { path: "field-builder", element: <FieldBuilder /> },
@@ -82,10 +86,9 @@ export const routes: RouteObject[] = [
       { path: "generate/result", element: <GenerateResult /> },
       { path: "hql-results", element: <HqlResults /> },
       { path: "alter-sql/:paramId", element: <AlterSql /> },
-      { path: "alter-sql-builder", element: <AlterSqlBuilder /> },
+      // { path: "alter-sql-builder", element: <AlterSqlBuilder /> },  // Temporarily disabled for debugging
       { path: "parameter-analysis", element: <ParameterAnalysis /> },
       { path: "parameter-network", element: <ParameterNetwork /> },
-      { path: "parameters/enhanced", element: <ParametersEnhanced /> },
       { path: "*", element: <NotFound /> }, // Catch-all 404 route
     ],
   },

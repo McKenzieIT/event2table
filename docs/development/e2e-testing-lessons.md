@@ -362,5 +362,5 @@ module.exports = {
 ---
 
 **经验来源**: Ralph Loop E2E 测试迭代（2026-02-18）
-**报告位置**: [docs/ralph/FINAL-REPORT.md](../ralph/FINAL-REPORT.md)（已归档）
-**相关文档**: [E2E测试指南](e2e-testing-guide.md)
+**报告位置**: [docs/archive/ralph-testing/ralph/FINAL-REPORT.md](../archive/ralph-testing/ralph/FINAL-REPORT.md)（已归档）
+**相关文档**: [E2E测试指南](../archive/2026-02/testing/e2e-testing-guide.md)

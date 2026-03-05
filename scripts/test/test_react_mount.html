@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React Mount Test</title>
+    <script>
+        // Wait for page to load
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                // Check if React mounted
+                var appRoot = document.getElementById('app-root');
+                var loader = document.getElementById('initial-loader');
+
+                console.log('=== React Mount Diagnostic ===');
+                console.log('app-root element:', appRoot);
+                console.log('app-root children:', appRoot ? appRoot.children.length : 0);
+                console.log('app-root innerHTML length:', appRoot ? appRoot.innerHTML.length : 0);
+                console.log('initial-loader display:', loader ? window.getComputedStyle(loader).display : 'not found');
+
+                // Send results to parent
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'react-mount-test',
+                        appRootChildren: appRoot ? appRoot.children.length : 0,
+                        loaderDisplay: loader ? window.getComputedStyle(loader).display : 'not found'
+                    }, '*');
+                }
+            }, 5000); // Wait 5 seconds for React to mount
+        });
+    </script>
+</head>
+<body>
+    <h1>React Mount Test</h1>
+    <p>This page tests if React mounts correctly.</p>
+    <iframe src="http://localhost:5173" style="width: 100%; height: 600px; border: 1px solid #ccc;"></iframe>
+</body>
+</html>

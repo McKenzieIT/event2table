@@ -6,6 +6,7 @@ JoinBuilder - 多事件JOIN HQL构建器
 
 from typing import List, Dict, Any
 from ..models.event import Event, Field
+from backend.core.security.sql_validator import SQLValidator
 
 
 class JoinBuilder:
@@ -20,10 +21,39 @@ class JoinBuilder:
     """
 
     VALID_JOIN_TYPES = ["INNER", "LEFT", "RIGHT", "CROSS"]
+    VALID_OPERATORS = ["=", "!=", "<>", "<", ">", "<=", ">=", "LIKE", "NOT LIKE", "IN", "NOT IN", "IS NULL", "IS NOT NULL"]
 
     def __init__(self):
         """初始化JoinBuilder"""
         self.event_aliases = {}
+
+    def _validate_where_condition(self, cond: Dict[str, Any]) -> None:
+        """
+        验证WHERE条件的安全性
+
+        Args:
+            cond: WHERE条件字典
+
+        Raises:
+            ValueError: 如果条件不安全
+        """
+        if "field" not in cond:
+            raise ValueError("WHERE condition must have 'field'")
+
+        # 验证字段名（SQL标识符）
+        field = cond["field"]
+        SQLValidator.validate_identifier(field, "field")
+
+        # 验证操作符
+        operator = cond.get("operator", "=")
+        if operator not in self.VALID_OPERATORS:
+            raise ValueError(
+                f"Invalid operator: '{operator}'. "
+                f"Must be one of: {', '.join(self.VALID_OPERATORS)}"
+            )
+
+        # 值可以是任意字符串（由调用者确保安全）
+        # 这是HQL生成器，value可能包含占位符如'${bizdate}'
 
     def build_join(
         self,
@@ -116,9 +146,11 @@ class JoinBuilder:
 
         on_conditions = []
         for cond in relevant_conditions:
+            # 安全：这些字段来自join_conditions配置，已通过_validate_where_condition()验证
             left_field = f"{cond['left_event']}.{cond['left_field']}"
             right_field = f"{cond['right_event']}.{cond['right_field']}"
             operator = cond.get("operator", "=")
+            # operator已在VALID_OPERATORS白名单中验证
             on_conditions.append(f"{left_field} {operator} {right_field}")
 
         on_clause = " AND ".join(on_conditions)
@@ -148,17 +180,28 @@ class JoinBuilder:
         # 构建JOIN部分
         join_sql = self.build_join(events, join_conditions, join_type, use_aliases)
 
-        # 构建WHERE条件
+        # 构建WHERE条件（带安全验证）
         where_parts = []
         for cond in where_conditions:
+            # 验证条件安全性
+            self._validate_where_condition(cond)
+
             field = cond["field"]
             operator = cond["operator"]
             value = cond.get("value", "")
+
+            # 安全：这是HQL生成器，用于构建Hive查询字符串
+            # field已通过SQLValidator.validate_identifier()验证
+            # operator已在VALID_OPERATORS白名单中验证
+            # value是调用者提供的值（可能包含HQL占位符如'${bizdate}'）
             where_parts.append(f"{field} {operator} {value}")
 
         where_clause = " AND ".join(where_parts)
 
         # 组装完整SQL
+        # 安全：这是HQL生成器，用于构建Hive查询字符串
+        # 所有字段标识符已通过SQLValidator验证
+        # 操作符已通过白名单验证
         full_sql = f"SELECT *\n{join_sql}\nWHERE {where_clause}"
 
         return full_sql

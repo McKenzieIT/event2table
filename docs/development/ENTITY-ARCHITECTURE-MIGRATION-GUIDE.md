@@ -409,8 +409,8 @@ def get_games(self) -> List[GameEntity]:
 
 ## References
 
-- [Entity Migration Status](../reports/2026-02-26/ENTITY-MIGRATION-STATUS.md)
-- [DDD Infrastructure Cleanup Plan](../reports/2026-02-26/DDD-INFRASTRUCTURE-CLEANUP-PLAN.md)
+- [Entity Migration Status](../archive/2026-02/reports/2026-02-26/ENTITY-MIGRATION-STATUS.md)
+- [DDD Infrastructure Cleanup Plan](../archive/2026-02/reports/2026-02-26/DDD-INFRASTRUCTURE-CLEANUP-PLAN.md)
 - [Architecture Summary 2026](ARCHITECTURE-SUMMARY-2026.md)
 - [Cache System Documentation](../cache/README.md)
 
