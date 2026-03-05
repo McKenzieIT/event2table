@@ -1,0 +1,7 @@
+{
+  "worker": "worker_1_p0_fixer",
+  "analyzed": 27,
+  "fixed": 1,
+  "manual_fix_required": 26,
+  "total": 27
+}
