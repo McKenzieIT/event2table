@@ -271,7 +271,7 @@ class CacheWarmer:
             logger.info("⏹️ 定时预热已停止")
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_warmup_stats(self) -> dict:
         """
         获取预热统计信息

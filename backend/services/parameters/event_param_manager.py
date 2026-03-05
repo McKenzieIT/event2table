@@ -58,7 +58,7 @@ class EventParamManager:
     # ========== Delegated Methods (use ParameterService) ==========
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_event_parameters(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:
@@ -73,7 +73,7 @@ class EventParamManager:
         return [p.model_dump() for p in params]
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_by_id(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID获取参数（带缓存）
@@ -279,7 +279,7 @@ class EventParamManager:
             return True
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_history(self, event_param_id: int) -> List[Dict[str, Any]]:
         """
         获取参数变更历史
@@ -382,7 +382,7 @@ class EventParamManager:
             return True
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_config(self, event_param_id: int) -> Optional[Dict[str, Any]]:
         """
         获取参数配置
@@ -414,7 +414,7 @@ class EventParamManager:
             return result
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def rollback_to_version(self, event_param_id: int, target_version: int) -> bool:
         """
         回滚参数到指定版本
@@ -483,7 +483,7 @@ class EventParamManager:
             return True
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_parameter_with_children(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         获取参数及其子参数（用于array类型）
@@ -514,7 +514,7 @@ class EventParamManager:
         return param
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_event_parameters_hierarchy(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:

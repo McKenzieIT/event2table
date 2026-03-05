@@ -37,7 +37,7 @@ class ParamLibraryRepository(GenericRepository):
         )
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name(self, param_name: str) -> Optional[Dict[str, Any]]:
         """
         根据参数名查找库参数
@@ -62,7 +62,7 @@ class ParamLibraryRepository(GenericRepository):
         return fetch_one_as_dict(query, (param_name,))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id_with_template(self, library_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID查找库参数（包含模板信息）
@@ -87,7 +87,7 @@ class ParamLibraryRepository(GenericRepository):
         return fetch_one_as_dict(query, (library_id,))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_all_parameters(
         self,
         game_gid: Optional[int] = None,
@@ -143,7 +143,7 @@ class ParamLibraryRepository(GenericRepository):
         return fetch_all_as_dict(query, tuple(params) if params else ())
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_frequently_used_parameters(
         self, min_usage: int = 2, limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
@@ -369,7 +369,7 @@ class ParamLibraryRepository(GenericRepository):
             conn.close()
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_categories(self) -> List[str]:
         """
         获取所有参数类别
@@ -391,7 +391,7 @@ class ParamLibraryRepository(GenericRepository):
         return [row["category"] for row in rows]
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_parameters_by_category(
         self, category: str, include_standard: bool = True
     ) -> List[Dict[str, Any]]:
@@ -424,7 +424,7 @@ class ParamLibraryRepository(GenericRepository):
         return fetch_all_as_dict(query, (category,))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_statistics(self) -> Dict[str, Any]:
         """
         获取参数库统计信息
@@ -469,7 +469,7 @@ class ParamLibraryRepository(GenericRepository):
         }
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, library_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID查询库参数

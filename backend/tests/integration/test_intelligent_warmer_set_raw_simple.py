@@ -66,7 +66,7 @@ class TestIntelligentWarmerSetRawIntegration:
             assert result['skipped'] == 1
 
 
-@cached(ttl=1800)
+    @cached(ttl=1800)
     def test_warm_up_cache_handles_fetch_failure(self):
         """测试预热时处理数据获取失败"""
         # Mock fetch_callback返回None（模拟失败）

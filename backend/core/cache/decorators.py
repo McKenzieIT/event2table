@@ -17,6 +17,51 @@ _cache = HierarchicalCache()
 _invalidator = CacheInvalidator(_cache)
 
 
+def cached(ttl: int = 300, key_prefix: str = None):
+    """
+    简化的缓存装饰器 (为Worker 4性能优化添加)
+
+    Args:
+        ttl: 缓存过期时间(秒), 默认300秒(5分钟)
+        key_prefix: 缓存键前缀(可选)
+
+    Returns:
+        装饰器函数
+
+    Example:
+        @cached(ttl=1800)  # 缓存30分钟
+        def get_something(id: int):
+            return fetch_one_as_dict('SELECT * FROM table WHERE id = ?', (id,))
+    """
+    def decorator(func: Callable) -> Callable:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # 构建缓存键
+            if key_prefix:
+                cache_key = f"{key_prefix}:{func.__name__}:{args}:{kwargs}"
+            else:
+                cache_key = f"{func.__name__}:{args}:{kwargs}"
+
+            # 尝试从缓存获取
+            cached_value = _cache.get(cache_key)
+            if cached_value is not None:
+                logger.debug(f"缓存命中: {cache_key}")
+                return cached_value
+
+            # 执行原函数
+            result = func(*args, **kwargs)
+
+            # 写入缓存
+            if result is not None:
+                _cache.set(cache_key, result, ttl_l1=ttl)
+                logger.debug(f"已缓存: {cache_key}")
+
+            return result
+
+        return wrapper
+    return decorator
+
+
 def cached_service(
     key_template: str,
     ttl_l1: int = 60,

@@ -362,10 +362,8 @@ class CacheProtection:
             return cached
         
         key = CacheKeyBuilder.build(pattern, **kwargs)
-        
-        # 2. 获取数据（带锁或不带锁）
 
-@cached(ttl=1800)
+        # 2. 获取数据（带锁或不带锁）
         def fetch_data():
             data = func()
             

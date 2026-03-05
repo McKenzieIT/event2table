@@ -45,7 +45,7 @@ class EventNodeRepository(GenericRepository):
         )
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, node_id: int) -> Optional[EventNodeEntity]:
         """
         根据ID查找事件节点
@@ -71,7 +71,7 @@ class EventNodeRepository(GenericRepository):
         return EventNodeEntity(**row) if row else None
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_game_gid(self, game_gid: int) -> List[EventNodeEntity]:
         """
         根据游戏GID查找所有事件节点
@@ -104,7 +104,7 @@ class EventNodeRepository(GenericRepository):
         return entities
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_event_id(self, event_id: int) -> List[EventNodeEntity]:
         """
         根据事件ID查找所有事件节点
@@ -408,7 +408,7 @@ class EventNodeRepository(GenericRepository):
         return entities
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_nodes_stats(self, game_gid: int) -> Dict:
         """
         获取游戏的节点统计信息

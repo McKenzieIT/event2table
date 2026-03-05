@@ -37,7 +37,7 @@ class ParameterAliasRepository(GenericRepository):
         )
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_param_and_game(
         self, param_id: int, game_gid: int
     ) -> List[Dict[str, Any]]:
@@ -65,7 +65,7 @@ class ParameterAliasRepository(GenericRepository):
         return fetch_all_as_dict(query, (game_gid, param_id))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_alias_and_game(
         self, alias: str, game_gid: int
     ) -> Optional[Dict[str, Any]]:
@@ -90,7 +90,7 @@ class ParameterAliasRepository(GenericRepository):
         return fetch_one_as_dict(query, (game_gid, alias))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_preferred_alias(self, param_id: int, game_gid: int) -> Optional[Dict[str, Any]]:
         """
         获取指定参数的首选别名
@@ -306,7 +306,7 @@ class ParameterAliasRepository(GenericRepository):
         return result > 0
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, alias_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID查询别名
@@ -357,7 +357,7 @@ class ParameterAliasRepository(GenericRepository):
             conn.close()
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_all_aliases_by_game(self, game_gid: int) -> List[Dict[str, Any]]:
         """
         获取游戏的所有别名

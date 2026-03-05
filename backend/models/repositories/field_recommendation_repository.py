@@ -45,7 +45,7 @@ class FieldRecommendationRepository(GenericRepository):
         )
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_history_recommendations(
         self, days: int = 30, limit: int = 1000
     ) -> List[Dict[str, Any]]:
@@ -115,7 +115,7 @@ class FieldRecommendationRepository(GenericRepository):
         return recommendations
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_collaborative_recommendations(
         self, event_name: str, limit: int = 100
     ) -> List[Dict[str, Any]]:
@@ -182,7 +182,7 @@ class FieldRecommendationRepository(GenericRepository):
         return recommendations
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_field_usage_statistics(self, days: int = 30) -> Dict[str, int]:
         """
         获取字段使用统计

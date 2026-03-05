@@ -25,7 +25,7 @@ class HQLStatementRepository(GenericRepository):
         super().__init__(table_name="hql_statements")
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, statement_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID获取HQL语句
@@ -45,7 +45,7 @@ class HQLStatementRepository(GenericRepository):
         return fetch_one_as_dict(query, (statement_id,))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_latest_version(self, statement_id: int) -> Optional[Dict[str, Any]]:
         """
         获取HQL语句的最新版本信息
@@ -98,7 +98,7 @@ class HQLStatementRepository(GenericRepository):
         return False
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_game_and_event(
         self, game_gid: int, event_name: str
     ) -> List[Dict[str, Any]]:
@@ -120,7 +120,7 @@ class HQLStatementRepository(GenericRepository):
         return fetch_all_as_dict(query, (game_gid, event_name))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_active_by_game_and_event(
         self, game_gid: int, event_name: str
     ) -> Optional[Dict[str, Any]]:

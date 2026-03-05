@@ -37,7 +37,7 @@ class CachedDataLoader:
         self.cache_prefix = cache_prefix
     
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def _get_cache_key(self, key: Any) -> str:
         """生成缓存键"""
         return f"{self.cache_prefix}:{key}"

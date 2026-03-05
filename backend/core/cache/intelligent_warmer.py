@@ -62,7 +62,7 @@ class CircularBuffer:
             self.buffer.append(item)
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_items(self, count: Optional[int] = None) -> List:
         """
         获取项
@@ -358,7 +358,7 @@ class IntelligentCacheWarmer:
             logger.error(f"自动预热失败: {e}")
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_stats(self) -> Dict:
         """
         获取预热统计
@@ -370,7 +370,7 @@ class IntelligentCacheWarmer:
             return self.stats.copy()
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_access_log_stats(self) -> Dict:
         """
         获取访问日志统计

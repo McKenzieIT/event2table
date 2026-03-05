@@ -37,7 +37,7 @@ class EventCategoryRepository(GenericRepository):
         )
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """
         根据名称查询类别
@@ -56,7 +56,7 @@ class EventCategoryRepository(GenericRepository):
         return fetch_one_as_dict(query, (name,))
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def get_or_create_default(self) -> int:
         """
         获取或创建"未分类"默认类别
@@ -105,7 +105,7 @@ class EventCategoryRepository(GenericRepository):
         return result is not None
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800)  # Cache for 30 minutes
     def find_all(self) -> List[Dict[str, Any]]:
         """
         查询所有类别

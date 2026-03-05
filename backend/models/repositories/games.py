@@ -58,8 +58,7 @@ class GameRepository(GenericRepository):
         row = fetch_one_as_dict(query, (gid,))
         return GameEntity(**row) if row else None
 
-
-@cached(ttl=1800)
+    @cached(ttl=1800)
     def find_all(self) -> List[GameEntity]:
         """
         查询所有游戏

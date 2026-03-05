@@ -71,7 +71,7 @@ class CategoryRepository(GenericRepository):
         return EventCategoryEntity(**row) if row else None
 
 
-@cached(ttl=1800)
+    @cached(ttl=1800)
     def find_all(self) -> List[EventCategoryEntity]:
         """
         查询所有类别
