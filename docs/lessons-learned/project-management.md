@@ -8,7 +8,7 @@
 
 ## 并行开发策略 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 多次 | **来源**: 多个Phase报告
+**优先级**: P0 | **出现次数**: 多次 | **来源**: [后端架构优化报告](../archive/testing-reports/2026-03-01/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
 
 ### 核心概念
 
@@ -72,13 +72,13 @@ npm run test:e2e                     # E2E测试
 
 ### 案例文档
 
-- [后端架构优化报告](../../reports/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
+- [后端架构优化报告](../archive/testing-reports/2026-03-01/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md) - Phase 1-4并行实施案例
 
 ---
 
 ## 大规模重构管理 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md](../../reports/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [后端架构优化报告](../archive/testing-reports/2026-03-01/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
 
 ### 核心原则
 
@@ -167,7 +167,7 @@ git checkout phase1-complete
 
 ### 案例文档
 
-- [最终架构优化报告](../../reports/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
+- [后端架构优化报告](../archive/testing-reports/2026-03-01/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md) - 完整Phase实施记录
 
 ---
 

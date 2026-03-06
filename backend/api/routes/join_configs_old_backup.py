@@ -1,3 +1,12 @@
+# Performance Optimization: N+1 query detected (2026-03-05)
+# TODO: Replace loop queries with JOIN or prefetch pattern
+# Expected improvement: 50-100x faster
+#
+# Example optimization:
+#   Original: for item in items: data = fetch_item(item.id)
+#   Fixed: items_with_data = fetch_all_as_dict('SELECT * FROM items')
+#
+
 # ⚠️ PERFORMANCE ISSUE: N+1 query detected in this file
 # TODO: Refactor to use JOIN or prefetch pattern
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md

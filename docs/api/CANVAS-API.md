@@ -510,7 +510,7 @@ getFlow(123).then(result => {
 - **[Flows API文档](FLOWS-API.md)** - Flows API完整文档
 - **[Event Nodes API文档](EVENT-NODES-API.md)** - 事件节点管理
 - **[HQL生成器文档](../hql/)** - HQL生成器详细说明
-- **[经验文档 - Canvas最佳实践](../lessons-learned/canvas-best-practices.md)** - Canvas使用经验
+- **[Canvas架构文档](../canvas/)** - Canvas架构和使用说明
 
 ---
 

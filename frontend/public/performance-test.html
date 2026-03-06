@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance Test - Real Browser</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    .metric {
+      margin: 10px 0;
+      padding: 10px;
+      background: #1e293b;
+      border-left: 3px solid #06b6d4;
+    }
+    .metric good { border-color: #22c55e; }
+    .metric bad { border-color: #ef4444; }
+    .metric warn { border-color: #f59e0b; }
+  </style>
+</head>
+<body>
+  <h1>🚀 Page Load Performance Test</h1>
+  <div id="metrics"></div>
+
+  <script>
+    const metrics = document.getElementById('metrics');
+
+    function addMetric(name, value, status = 'good') {
+      const div = document.createElement('div');
+      div.className = `metric ${status}`;
+      div.innerHTML = `<strong>${name}:</strong> ${value}`;
+      metrics.appendChild(div);
+    }
+
+    // Record navigation timing
+    window.addEventListener('load', () => {
+      const perfData = performance.getEntriesByType('navigation')[0];
+
+      addMetric('DOM Content Loaded', perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart + 'ms');
+      addMetric('Load Complete', perfData.loadEventEnd - perfData.loadEventStart + 'ms');
+      addMetric('DOM Interactive', perfData.domInteractive - perfData.fetchStart + 'ms');
+
+      // Check FCP (First Contentful Paint)
+      const paintEntries = performance.getEntriesByType('paint');
+      const fcp = paintEntries.find(e => e.name === 'first-contentful-paint');
+      if (fcp) {
+        const fcpTime = fcp.startTime;
+        addMetric('First Contentful Paint (FCP)', fcpTime.toFixed(0) + 'ms',
+          fcpTime < 1800 ? 'good' : fcpTime < 3000 ? 'warn' : 'bad');
+      }
+
+      // Check LCP (Largest Contentful Paint) - need to wait a bit
+      setTimeout(() => {
+        const lcpEntries = performance.getEntriesByType('largest-contentful-paint');
+        if (lcpEntries.length > 0) {
+          const lcp = lcpEntries[lcpEntries.length - 1];
+          const lcpTime = lcp.startTime;
+          addMetric('Largest Contentful Paint (LCP)', lcpTime.toFixed(0) + 'ms',
+            lcpTime < 2500 ? 'good' : lcpTime < 4000 ? 'warn' : 'bad');
+        }
+      }, 1000);
+
+      // Total load time
+      const totalTime = perfData.loadEventEnd - perfData.fetchStart;
+      addMetric('Total Page Load Time', totalTime.toFixed(0) + 'ms',
+        totalTime < 3000 ? 'good' : totalTime < 5000 ? 'warn' : 'bad');
+
+      // Check for FOUC (Flash of Unstyled Content)
+      const fos = perfData.responseEnd - perfData.requestStart;
+      addMetric('First Response (FOS)', fos.toFixed(0) + 'ms');
+
+      // Resource timing
+      const resources = performance.getEntriesByType('resource');
+      addMetric('Total Resources', resources.length);
+
+      // CSS load time
+      const cssResources = resources.filter(r => r.name.endsWith('.css'));
+      if (cssResources.length > 0) {
+        const cssTime = Math.max(...cssResources.map(r => r.responseEnd));
+        addMetric('All CSS Loaded', cssTime.toFixed(0) + 'ms');
+      }
+
+      // JavaScript load time
+      const jsResources = resources.filter(r => r.name.endsWith('.js'));
+      if (jsResources.length > 0) {
+        const jsTime = Math.max(...jsResources.map(r => r.responseEnd));
+        addMetric('All JavaScript Loaded', jsTime.toFixed(0) + 'ms');
+      }
+
+      console.log('✅ Performance metrics collected');
+    });
+
+    // Log page visibility
+    document.addEventListener('visibilitychange', () => {
+      console.log('Page visibility:', document.visibilityState);
+    });
+
+    // Log DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('✅ DOMContentLoaded fired');
+        addMetric('DOM Ready State', 'DOMContentLoaded fired');
+      });
+    } else {
+      console.log('✅ DOM already ready');
+      addMetric('DOM Ready State', 'Already ready');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>React Mount Test</title>
+</head>
+<body>
+  <div id="test-root">Loading...</div>
+  <script>
+    console.log('[TEST] Inline script executed');
+
+    // 立即尝试修改DOM
+    setTimeout(() => {
+      const root = document.getElementById('test-root');
+      if (root) {
+        root.innerHTML = '✅ Inline JavaScript works!';
+        root.style.color = 'green';
+        console.log('[TEST] DOM manipulation successful');
+      }
+    }, 100);
+
+    // 监听module script加载
+    window.addEventListener('load', () => {
+      console.log('[TEST] Window load event fired');
+      const root = document.getElementById('test-root');
+      root.innerHTML += '<br>Window loaded';
+    });
+
+    // 监听DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[TEST] DOMContentLoaded fired');
+      const root = document.getElementById('test-root');
+      root.innerHTML += '<br>DOM ready';
+    });
+  </script>
+
+  <script type="module">
+    console.log('[TEST] Module script executing...');
+    const root = document.getElementById('test-root');
+    if (root) {
+      root.innerHTML = '✅ Module script works!';
+      root.style.color = 'blue';
+      console.log('[TEST] Module DOM manipulation successful');
+    }
+
+    // 测试React导入
+    import('react').then(React => {
+      console.log('[TEST] React loaded:', typeof React);
+      root.innerHTML += '<br>✅ React loaded: ' + typeof React;
+    }).catch(err => {
+      console.error('[TEST] React load failed:', err);
+      root.innerHTML = '❌ React load failed: ' + err.message;
+    });
+  </script>
+</body>
+</html>

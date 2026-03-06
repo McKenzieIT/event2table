@@ -8,7 +8,7 @@
 
 ## 缓存预热策略 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [CACHE-COVERAGE-PHASE-4.4-IMPLEMENTATION.md](../../reports/2026-03-01/CACHE-COVERAGE-PHASE-4.4-IMPLEMENTATION.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [缓存优化报告](../archive/2026-02/optimization/)
 
 ### 核心原则
 
@@ -131,7 +131,7 @@ def warm_up_large_dataset():
 
 ### 案例文档
 
-- [缓存覆盖率Phase 4.4实施](../../reports/2026-03-01/CACHE-COVERAGE-PHASE-4.4-IMPLEMENTATION.md)
+- [缓存覆盖率Phase 4.4实施](../archive/testing-reports/2026-03-01/2026-03-01/CACHE-COVERAGE-PHASE-4.4-IMPLEMENTATION.md)
 
 ---
 

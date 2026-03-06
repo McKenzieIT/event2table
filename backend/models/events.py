@@ -53,8 +53,8 @@ from backend.core.utils import (
 from backend.core.cache.cache_system import (
     clear_event_cache,
     clear_game_cache,
-    cache_result,
 )
+from backend.core.cache.decorators import cached
 from backend.core.config import CacheConfig
 from backend.core.exceptions import DatabaseError, ValidationError, NotFoundError
 
@@ -310,10 +310,7 @@ def _build_event_from_form(request_data) -> EventData:
 # ==============================================================================
 
 
-@cache_result(
-    "events:list_by_game:{game_gid}:{page}:{per_page}",
-    timeout=CacheConfig.CACHE_TIMEOUT_EVENTS,
-)
+@cached(ttl=1800)
 def get_events_paginated_cached(
     game_gid: int, page: int, per_page: int
 ) -> List[Dict[str, Any]]:
@@ -350,9 +347,7 @@ def get_events_paginated_cached(
     )
 
 
-@cache_result(
-    "params:active_by_event:{event_id}", timeout=CacheConfig.CACHE_TIMEOUT_PARAMS
-)
+@cached(ttl=1800)
 def get_active_parameters_cached(event_id: int) -> List[Dict[str, Any]]:
     """
     **性能优化**: Cached function to get active parameters for an event
@@ -378,9 +373,7 @@ def get_active_parameters_cached(event_id: int) -> List[Dict[str, Any]]:
     )
 
 
-@cache_result(
-    "events:count_by_game:{game_gid}", timeout=CacheConfig.CACHE_TIMEOUT_EVENTS
-)
+@cached(ttl=1800)
 def get_events_count_cached(game_gid: int) -> int:
     """
     **性能优化**: Cached function to get event count for a game

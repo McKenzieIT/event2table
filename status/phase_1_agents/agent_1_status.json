@@ -1,0 +1,10 @@
+{
+  "agent_id": "agent_1",
+  "phase": 1,
+  "status": "completed",
+  "current_task": "",
+  "progress": 100,
+  "total": 100,
+  "errors": [],
+  "last_heartbeat": "2026-03-05T23:52:02.382740"
+}

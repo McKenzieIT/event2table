@@ -328,9 +328,11 @@ if hql_bp:
 # Register module blueprints (API endpoints must be registered BEFORE React shell)
 # NOTE: games_bp routes are now in api_bp (backend.api.routes.games)
 # Old games_bp from backend.services.games has conflicting routes - DO NOT USE
-if react_bp:
-    app.register_blueprint(react_bp)
-app.register_blueprint(events_bp)
+# NOTE: events_bp is deprecated and conflicts with React SPA routes - DO NOT REGISTER
+# All event operations now use GraphQL API (/api/graphql) or REST API (/api/events)
+# if react_bp:
+#     app.register_blueprint(react_bp)
+# app.register_blueprint(events_bp)  # ❌ DEPRECATED - Conflicts with React Router /events
 app.register_blueprint(common_params_bp)
 
 # Register React shell LAST as catch-all for all frontend routes

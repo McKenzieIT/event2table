@@ -380,8 +380,8 @@ query GetEventsPaginated($gameGid: Int!, $page: Int!, $perPage: Int!) {
 - [GraphQL完整文档](../graphql-migration/GRAPHQL_COMPLETE_DOCUMENTATION.md)
 
 ### 修改记录
-- [GraphQL Mutations重构总结](../reports/2026-02-26/graphql-mutations-refactoring-summary.md)
-- [GraphQL迁移速查表](../reports/2026-02-26/graphql-migrations-cheatsheet.md)
+- [GraphQL Mutations重构总结](../archive/2026-02/reports/2026-02-26/graphql-mutations-refactoring-summary.md)
+- [GraphQL迁移速查表](../archive/2026-02/reports/2026-02-26/graphql-migrations-cheatsheet.md)
 
 ---
 
@@ -413,5 +413,5 @@ python scripts/verify_graphql_schema.py
 
 如有问题，请查看：
 - [API文档索引](./README.md)
-- [经验文档 - API设计模式](../docs/lessons-learned/api-design-patterns.md)
+- [经验文档 - API设计模式](../lessons-learned/api-design-patterns.md)
 - [GraphQL官方文档](https://graphql.org/learn/)

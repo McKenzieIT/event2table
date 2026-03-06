@@ -6,7 +6,7 @@
  * 利用GraphQL的灵活性优化数据获取
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { BaseModal, Button, Input, Select, useToast, SearchInput, Skeleton } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import {
@@ -302,4 +302,7 @@ const EventManagementModalGraphQL: React.FC<EventManagementModalProps> = ({ isOp
   );
 };
 
-export default EventManagementModalGraphQL;
+// ✅ 添加 React.memo 优化渲染性能
+const EventManagementModalGraphQLMemo = memo(EventManagementModalGraphQL);
+
+export default EventManagementModalGraphQLMemo;

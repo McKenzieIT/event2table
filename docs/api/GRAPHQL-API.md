@@ -735,7 +735,7 @@ graphql-playground --endpoint http://127.0.0.1:5001/graphql
 
 - **[REST API文档](README.md)** - RESTful API完整文档
 - **[REST到GraphQL迁移指南](REST_TO_GRAPHQL_MIGRATION.md)** - 从REST迁移到GraphQL
-- **[API架构迁移状态](API-ARCHITECTURE-MIGRATION-STATUS.md)** - 架构迁移进度
+- **[GraphQL迁移最终报告](../graphql-migration/GRAPHQL_MIGRATION_FINAL_REPORT.md)** - GraphQL迁移完整记录
 - **[经验文档 - API设计模式](../lessons-learned/api-design-patterns.md)** - API设计最佳实践
 
 ---

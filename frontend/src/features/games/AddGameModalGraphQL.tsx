@@ -5,7 +5,7 @@
  * 使用GraphQL Mutation替代REST API
  */
 
-import React, { ChangeEvent, FormEvent } from 'react';
+import React, { ChangeEvent, FormEvent, memo } from 'react';
 import { BaseModal, Button, Input, Select, useToast } from '@shared/ui';
 import { useCreateGame } from '../../graphql/hooks';
 import { useFormValidation } from '@shared/hooks/useFormValidation';
@@ -143,4 +143,7 @@ const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClo
   );
 };
 
-export default AddGameModalGraphQL;
+// ✅ 添加 React.memo 优化渲染性能
+const AddGameModalGraphQLMemo = memo(AddGameModalGraphQL);
+
+export default AddGameModalGraphQLMemo;

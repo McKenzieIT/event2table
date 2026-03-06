@@ -6,7 +6,7 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useCallback, useEffect, ReactNode } from 'react';
+import React, { useState, useCallback, useEffect, ReactNode, memo } from 'react';
 import ReactFlow, {
     Background,
     Controls,
@@ -638,4 +638,7 @@ const CanvasFlow: React.FC<CanvasFlowProps> = ({ gameData, flowId }) => {
     );
 };
 
-export default CanvasFlow;
+// ✅ 添加 React.memo 优化渲染性能
+const CanvasFlowMemo = memo(CanvasFlow);
+
+export default CanvasFlowMemo;

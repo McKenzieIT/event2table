@@ -1,0 +1,3789 @@
+{
+  "phase_1": {
+    "p0_join": {
+      "chunk_1_agent_3": [
+        "backend/api/routes/__init__.py"
+      ],
+      "chunk_2_agent_4": [
+        "backend/test/unit/services/field_builder/test_field_builder_service.py",
+        "backend/test/unit/services/parameters/test_common_params.py"
+      ],
+      "chunk_3_agent_5": [
+        "backend/services/cache/cache_warmup.py",
+        "backend/services/parameters/event_param_manager.py",
+        "backend/api/routes/join_configs_old_backup.py",
+        "backend/api/routes/legacy_api.py"
+      ]
+    },
+    "test_infrastructure": {
+      "agent_1_backend": {
+        "type": "backend_500_errors",
+        "description": "Backend API\u8fd4\u56de500\u9519\u8bef",
+        "test_names": [
+          "test_game_create_api",
+          "test_event_creation_flow",
+          "test_parameter_management"
+        ]
+      },
+      "agent_2_frontend": {
+        "type": "frontend_timeouts",
+        "description": "\u524d\u7aef\u9875\u9762\u5bfc\u822a\u8d85\u65f6",
+        "test_names": [
+          "test_page_navigation",
+          "test_canvas_loading",
+          "test_events_list_display"
+        ]
+      }
+    }
+  },
+  "phase_2": {
+    "gate_criteria": {
+      "critical_tests": [
+        "test_game_create_api",
+        "test_event_node_builder",
+        "test_canvas_navigation"
+      ],
+      "acceptable_warnings": [
+        "test_deprecated_features",
+        "test_edge_cases"
+      ]
+    }
+  },
+  "phase_3": {
+    "performance": {
+      "batch_1": [
+        {
+          "id": "issue_0",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 1
+        },
+        {
+          "id": "issue_1",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_3",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 4
+        },
+        {
+          "id": "issue_4",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_6",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 7
+        },
+        {
+          "id": "issue_7",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_9",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 10
+        },
+        {
+          "id": "issue_10",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_12",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 13
+        },
+        {
+          "id": "issue_13",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_15",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 16
+        },
+        {
+          "id": "issue_16",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_18",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 19
+        },
+        {
+          "id": "issue_19",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_21",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 22
+        },
+        {
+          "id": "issue_22",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_24",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 25
+        },
+        {
+          "id": "issue_25",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_27",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 28
+        },
+        {
+          "id": "issue_28",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_30",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 31
+        },
+        {
+          "id": "issue_31",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 32
+        },
+        {
+          "id": "issue_33",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 34
+        },
+        {
+          "id": "issue_34",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 35
+        },
+        {
+          "id": "issue_36",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 37
+        },
+        {
+          "id": "issue_37",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 38
+        },
+        {
+          "id": "issue_39",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 40
+        },
+        {
+          "id": "issue_40",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 41
+        },
+        {
+          "id": "issue_42",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 43
+        },
+        {
+          "id": "issue_43",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 44
+        },
+        {
+          "id": "issue_45",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 46
+        },
+        {
+          "id": "issue_46",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 47
+        },
+        {
+          "id": "issue_48",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 49
+        },
+        {
+          "id": "issue_49",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 50
+        },
+        {
+          "id": "issue_51",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_52",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 3
+        },
+        {
+          "id": "issue_54",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_55",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 6
+        },
+        {
+          "id": "issue_57",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_58",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 9
+        },
+        {
+          "id": "issue_60",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_61",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 12
+        },
+        {
+          "id": "issue_63",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_64",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 15
+        },
+        {
+          "id": "issue_66",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_67",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 18
+        },
+        {
+          "id": "issue_69",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_70",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 21
+        },
+        {
+          "id": "issue_72",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_73",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 24
+        },
+        {
+          "id": "issue_75",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_76",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 27
+        },
+        {
+          "id": "issue_78",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_79",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 30
+        },
+        {
+          "id": "issue_81",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 32
+        },
+        {
+          "id": "issue_82",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 33
+        },
+        {
+          "id": "issue_84",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 35
+        },
+        {
+          "id": "issue_85",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 36
+        },
+        {
+          "id": "issue_87",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 38
+        },
+        {
+          "id": "issue_88",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 39
+        },
+        {
+          "id": "issue_90",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 41
+        },
+        {
+          "id": "issue_91",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 42
+        },
+        {
+          "id": "issue_93",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 44
+        },
+        {
+          "id": "issue_94",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 45
+        },
+        {
+          "id": "issue_96",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 47
+        },
+        {
+          "id": "issue_97",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 48
+        },
+        {
+          "id": "issue_99",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 50
+        },
+        {
+          "id": "issue_100",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 1
+        },
+        {
+          "id": "issue_102",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 3
+        },
+        {
+          "id": "issue_103",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 4
+        },
+        {
+          "id": "issue_105",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 6
+        },
+        {
+          "id": "issue_106",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 7
+        },
+        {
+          "id": "issue_108",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 9
+        },
+        {
+          "id": "issue_109",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 10
+        },
+        {
+          "id": "issue_111",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 12
+        },
+        {
+          "id": "issue_112",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 13
+        },
+        {
+          "id": "issue_114",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 15
+        },
+        {
+          "id": "issue_115",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 16
+        },
+        {
+          "id": "issue_117",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 18
+        },
+        {
+          "id": "issue_118",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 19
+        },
+        {
+          "id": "issue_120",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 21
+        },
+        {
+          "id": "issue_121",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 22
+        },
+        {
+          "id": "issue_123",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 24
+        },
+        {
+          "id": "issue_124",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 25
+        },
+        {
+          "id": "issue_126",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 27
+        },
+        {
+          "id": "issue_127",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 28
+        },
+        {
+          "id": "issue_129",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 30
+        },
+        {
+          "id": "issue_130",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 31
+        },
+        {
+          "id": "issue_132",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 33
+        },
+        {
+          "id": "issue_133",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 34
+        },
+        {
+          "id": "issue_135",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 36
+        },
+        {
+          "id": "issue_136",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 37
+        },
+        {
+          "id": "issue_138",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 39
+        },
+        {
+          "id": "issue_139",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 40
+        },
+        {
+          "id": "issue_141",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 42
+        },
+        {
+          "id": "issue_142",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 43
+        },
+        {
+          "id": "issue_144",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 45
+        },
+        {
+          "id": "issue_145",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 46
+        },
+        {
+          "id": "issue_147",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 48
+        },
+        {
+          "id": "issue_148",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 49
+        },
+        {
+          "id": "issue_150",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 1
+        },
+        {
+          "id": "issue_151",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_153",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 4
+        },
+        {
+          "id": "issue_154",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_156",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 7
+        },
+        {
+          "id": "issue_157",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_159",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 10
+        },
+        {
+          "id": "issue_160",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_162",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 13
+        },
+        {
+          "id": "issue_163",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_165",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 16
+        },
+        {
+          "id": "issue_166",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_168",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 19
+        },
+        {
+          "id": "issue_169",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_171",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 22
+        },
+        {
+          "id": "issue_172",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_174",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 25
+        },
+        {
+          "id": "issue_175",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_177",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 28
+        },
+        {
+          "id": "issue_178",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_180",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 31
+        },
+        {
+          "id": "issue_181",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 32
+        },
+        {
+          "id": "issue_183",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 34
+        },
+        {
+          "id": "issue_184",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 35
+        },
+        {
+          "id": "issue_186",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 37
+        },
+        {
+          "id": "issue_187",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 38
+        },
+        {
+          "id": "issue_189",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 40
+        },
+        {
+          "id": "issue_190",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 41
+        },
+        {
+          "id": "issue_192",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 43
+        },
+        {
+          "id": "issue_193",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 44
+        },
+        {
+          "id": "issue_195",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 46
+        },
+        {
+          "id": "issue_196",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 47
+        },
+        {
+          "id": "issue_198",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 49
+        },
+        {
+          "id": "issue_199",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 50
+        },
+        {
+          "id": "issue_201",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_202",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 3
+        },
+        {
+          "id": "issue_204",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_205",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 6
+        },
+        {
+          "id": "issue_207",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_208",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 9
+        },
+        {
+          "id": "issue_210",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_211",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 12
+        },
+        {
+          "id": "issue_213",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_214",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 15
+        },
+        {
+          "id": "issue_216",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_217",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 18
+        },
+        {
+          "id": "issue_219",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_220",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 21
+        },
+        {
+          "id": "issue_222",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_223",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 24
+        },
+        {
+          "id": "issue_225",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_226",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 27
+        },
+        {
+          "id": "issue_228",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_229",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 30
+        },
+        {
+          "id": "issue_231",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 32
+        },
+        {
+          "id": "issue_232",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 33
+        },
+        {
+          "id": "issue_234",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 35
+        },
+        {
+          "id": "issue_235",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 36
+        },
+        {
+          "id": "issue_237",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 38
+        },
+        {
+          "id": "issue_238",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 39
+        },
+        {
+          "id": "issue_240",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 41
+        },
+        {
+          "id": "issue_241",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 42
+        },
+        {
+          "id": "issue_243",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 44
+        },
+        {
+          "id": "issue_244",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 45
+        },
+        {
+          "id": "issue_246",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 47
+        },
+        {
+          "id": "issue_247",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 48
+        },
+        {
+          "id": "issue_249",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 50
+        },
+        {
+          "id": "issue_250",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 1
+        },
+        {
+          "id": "issue_252",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 3
+        },
+        {
+          "id": "issue_253",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 4
+        },
+        {
+          "id": "issue_255",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 6
+        },
+        {
+          "id": "issue_256",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 7
+        },
+        {
+          "id": "issue_258",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 9
+        },
+        {
+          "id": "issue_259",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 10
+        },
+        {
+          "id": "issue_261",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 12
+        },
+        {
+          "id": "issue_262",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 13
+        },
+        {
+          "id": "issue_264",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 15
+        },
+        {
+          "id": "issue_265",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 16
+        },
+        {
+          "id": "issue_267",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 18
+        },
+        {
+          "id": "issue_268",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 19
+        },
+        {
+          "id": "issue_270",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 21
+        },
+        {
+          "id": "issue_271",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 22
+        },
+        {
+          "id": "issue_273",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 24
+        },
+        {
+          "id": "issue_274",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 25
+        },
+        {
+          "id": "issue_276",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 27
+        },
+        {
+          "id": "issue_277",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 28
+        },
+        {
+          "id": "issue_279",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 30
+        },
+        {
+          "id": "issue_280",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 31
+        },
+        {
+          "id": "issue_282",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 33
+        },
+        {
+          "id": "issue_283",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 34
+        },
+        {
+          "id": "issue_285",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 36
+        },
+        {
+          "id": "issue_286",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 37
+        },
+        {
+          "id": "issue_288",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 39
+        },
+        {
+          "id": "issue_289",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 40
+        },
+        {
+          "id": "issue_291",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 42
+        },
+        {
+          "id": "issue_292",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 43
+        },
+        {
+          "id": "issue_294",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 45
+        },
+        {
+          "id": "issue_295",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 46
+        },
+        {
+          "id": "issue_297",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 48
+        },
+        {
+          "id": "issue_298",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 49
+        },
+        {
+          "id": "issue_300",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 1
+        },
+        {
+          "id": "issue_301",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_303",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 4
+        },
+        {
+          "id": "issue_304",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_306",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 7
+        },
+        {
+          "id": "issue_307",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_309",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 10
+        },
+        {
+          "id": "issue_310",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_312",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 13
+        },
+        {
+          "id": "issue_313",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_315",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 16
+        },
+        {
+          "id": "issue_316",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_318",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 19
+        },
+        {
+          "id": "issue_319",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_321",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 22
+        },
+        {
+          "id": "issue_322",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_324",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 25
+        },
+        {
+          "id": "issue_325",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_327",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 28
+        },
+        {
+          "id": "issue_328",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_330",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 31
+        },
+        {
+          "id": "issue_331",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 32
+        },
+        {
+          "id": "issue_333",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 34
+        },
+        {
+          "id": "issue_334",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 35
+        },
+        {
+          "id": "issue_336",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 37
+        },
+        {
+          "id": "issue_337",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 38
+        },
+        {
+          "id": "issue_339",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 40
+        },
+        {
+          "id": "issue_340",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 41
+        },
+        {
+          "id": "issue_342",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 43
+        },
+        {
+          "id": "issue_343",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 44
+        },
+        {
+          "id": "issue_345",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 46
+        },
+        {
+          "id": "issue_346",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 47
+        },
+        {
+          "id": "issue_348",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 49
+        },
+        {
+          "id": "issue_349",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 50
+        },
+        {
+          "id": "issue_351",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_352",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 3
+        },
+        {
+          "id": "issue_354",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_355",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 6
+        },
+        {
+          "id": "issue_357",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_358",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 9
+        },
+        {
+          "id": "issue_360",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_361",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 12
+        },
+        {
+          "id": "issue_363",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_364",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 15
+        },
+        {
+          "id": "issue_366",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_367",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 18
+        },
+        {
+          "id": "issue_369",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_370",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 21
+        },
+        {
+          "id": "issue_372",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_373",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 24
+        },
+        {
+          "id": "issue_375",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_376",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 27
+        },
+        {
+          "id": "issue_378",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_379",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 30
+        },
+        {
+          "id": "issue_381",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 32
+        },
+        {
+          "id": "issue_382",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 33
+        },
+        {
+          "id": "issue_384",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 35
+        },
+        {
+          "id": "issue_385",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 36
+        },
+        {
+          "id": "issue_387",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 38
+        },
+        {
+          "id": "issue_388",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 39
+        },
+        {
+          "id": "issue_390",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 41
+        },
+        {
+          "id": "issue_391",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 42
+        },
+        {
+          "id": "issue_393",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 44
+        },
+        {
+          "id": "issue_394",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 45
+        },
+        {
+          "id": "issue_396",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 47
+        },
+        {
+          "id": "issue_397",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 48
+        },
+        {
+          "id": "issue_399",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 50
+        },
+        {
+          "id": "issue_400",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 1
+        },
+        {
+          "id": "issue_402",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 3
+        },
+        {
+          "id": "issue_403",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 4
+        },
+        {
+          "id": "issue_405",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 6
+        },
+        {
+          "id": "issue_406",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 7
+        },
+        {
+          "id": "issue_408",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 9
+        },
+        {
+          "id": "issue_409",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 10
+        },
+        {
+          "id": "issue_411",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 12
+        },
+        {
+          "id": "issue_412",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 13
+        },
+        {
+          "id": "issue_414",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 15
+        },
+        {
+          "id": "issue_415",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 16
+        },
+        {
+          "id": "issue_417",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 18
+        },
+        {
+          "id": "issue_418",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 19
+        },
+        {
+          "id": "issue_420",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 21
+        },
+        {
+          "id": "issue_421",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 22
+        },
+        {
+          "id": "issue_423",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 24
+        },
+        {
+          "id": "issue_424",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 25
+        },
+        {
+          "id": "issue_426",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 27
+        },
+        {
+          "id": "issue_427",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 28
+        },
+        {
+          "id": "issue_429",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 30
+        },
+        {
+          "id": "issue_430",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 31
+        },
+        {
+          "id": "issue_432",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 33
+        },
+        {
+          "id": "issue_433",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 34
+        },
+        {
+          "id": "issue_435",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 36
+        },
+        {
+          "id": "issue_436",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 37
+        },
+        {
+          "id": "issue_438",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 39
+        },
+        {
+          "id": "issue_439",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 40
+        },
+        {
+          "id": "issue_441",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 42
+        },
+        {
+          "id": "issue_442",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 43
+        },
+        {
+          "id": "issue_444",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 45
+        },
+        {
+          "id": "issue_445",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 46
+        },
+        {
+          "id": "issue_447",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 48
+        },
+        {
+          "id": "issue_448",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 49
+        },
+        {
+          "id": "issue_450",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 1
+        },
+        {
+          "id": "issue_451",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_453",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 4
+        },
+        {
+          "id": "issue_454",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_456",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 7
+        },
+        {
+          "id": "issue_457",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_459",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 10
+        },
+        {
+          "id": "issue_460",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_462",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 13
+        },
+        {
+          "id": "issue_463",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_465",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 16
+        },
+        {
+          "id": "issue_466",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_468",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 19
+        },
+        {
+          "id": "issue_469",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_471",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 22
+        },
+        {
+          "id": "issue_472",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_474",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 25
+        },
+        {
+          "id": "issue_475",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_477",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 28
+        },
+        {
+          "id": "issue_478",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_480",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 31
+        },
+        {
+          "id": "issue_481",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 32
+        },
+        {
+          "id": "issue_483",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 34
+        },
+        {
+          "id": "issue_484",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 35
+        },
+        {
+          "id": "issue_486",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 37
+        },
+        {
+          "id": "issue_487",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 38
+        },
+        {
+          "id": "issue_489",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 40
+        },
+        {
+          "id": "issue_490",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 41
+        },
+        {
+          "id": "issue_492",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 43
+        },
+        {
+          "id": "issue_493",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 44
+        },
+        {
+          "id": "issue_495",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 46
+        },
+        {
+          "id": "issue_496",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 47
+        },
+        {
+          "id": "issue_498",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 49
+        },
+        {
+          "id": "issue_499",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 50
+        },
+        {
+          "id": "issue_501",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 2
+        },
+        {
+          "id": "issue_502",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 3
+        },
+        {
+          "id": "issue_504",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 5
+        },
+        {
+          "id": "issue_505",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 6
+        },
+        {
+          "id": "issue_507",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 8
+        },
+        {
+          "id": "issue_508",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 9
+        },
+        {
+          "id": "issue_510",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 11
+        },
+        {
+          "id": "issue_511",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 12
+        },
+        {
+          "id": "issue_513",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 14
+        },
+        {
+          "id": "issue_514",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 15
+        },
+        {
+          "id": "issue_516",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 17
+        },
+        {
+          "id": "issue_517",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 18
+        },
+        {
+          "id": "issue_519",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 20
+        },
+        {
+          "id": "issue_520",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 21
+        },
+        {
+          "id": "issue_522",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component2.tsx",
+          "line": 23
+        },
+        {
+          "id": "issue_523",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 24
+        },
+        {
+          "id": "issue_525",
+          "type": "n_plus_1_query",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component0.tsx",
+          "line": 26
+        },
+        {
+          "id": "issue_526",
+          "type": "missing_react_memo",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component1.tsx",
+          "line": 27
+        },
+        {
+          "id": "issue_528",
+          "type": "n_plus_1_query",
+          "severity": "HIGH",
+          "file_path": "frontend/src/components/Component3.tsx",
+          "line": 29
+        },
+        {
+          "id": "issue_529",
+          "type": "missing_react_memo",
+          "severity": "MEDIUM",
+          "file_path": "frontend/src/components/Component4.tsx",
+          "line": 30
+        }
+      ],
+      "batch_2": [
+        {
+          "id": "issue_2",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 3
+        },
+        {
+          "id": "issue_17",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 18
+        },
+        {
+          "id": "issue_32",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 33
+        },
+        {
+          "id": "issue_47",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 48
+        },
+        {
+          "id": "issue_62",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 13
+        },
+        {
+          "id": "issue_77",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 28
+        },
+        {
+          "id": "issue_92",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 43
+        },
+        {
+          "id": "issue_107",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 8
+        },
+        {
+          "id": "issue_122",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 23
+        },
+        {
+          "id": "issue_137",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 38
+        },
+        {
+          "id": "issue_152",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 3
+        },
+        {
+          "id": "issue_167",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 18
+        },
+        {
+          "id": "issue_182",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 33
+        },
+        {
+          "id": "issue_197",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 48
+        },
+        {
+          "id": "issue_212",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 13
+        },
+        {
+          "id": "issue_227",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 28
+        },
+        {
+          "id": "issue_242",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 43
+        },
+        {
+          "id": "issue_257",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 8
+        },
+        {
+          "id": "issue_272",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 23
+        },
+        {
+          "id": "issue_287",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 38
+        },
+        {
+          "id": "issue_302",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 3
+        },
+        {
+          "id": "issue_317",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 18
+        },
+        {
+          "id": "issue_332",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 33
+        },
+        {
+          "id": "issue_347",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 48
+        },
+        {
+          "id": "issue_362",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 13
+        },
+        {
+          "id": "issue_377",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 28
+        },
+        {
+          "id": "issue_392",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 43
+        },
+        {
+          "id": "issue_407",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 8
+        },
+        {
+          "id": "issue_422",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 23
+        },
+        {
+          "id": "issue_437",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 38
+        },
+        {
+          "id": "issue_452",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 3
+        },
+        {
+          "id": "issue_467",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 18
+        },
+        {
+          "id": "issue_482",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 33
+        },
+        {
+          "id": "issue_497",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 48
+        },
+        {
+          "id": "issue_512",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_2.py",
+          "line": 13
+        },
+        {
+          "id": "issue_527",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_2.py",
+          "line": 28
+        }
+      ],
+      "batch_3": [
+        {
+          "id": "issue_5",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 6
+        },
+        {
+          "id": "issue_20",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 21
+        },
+        {
+          "id": "issue_35",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 36
+        },
+        {
+          "id": "issue_50",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 1
+        },
+        {
+          "id": "issue_65",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 16
+        },
+        {
+          "id": "issue_80",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 31
+        },
+        {
+          "id": "issue_95",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 46
+        },
+        {
+          "id": "issue_110",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 11
+        },
+        {
+          "id": "issue_125",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 26
+        },
+        {
+          "id": "issue_140",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 41
+        },
+        {
+          "id": "issue_155",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 6
+        },
+        {
+          "id": "issue_170",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 21
+        },
+        {
+          "id": "issue_185",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 36
+        },
+        {
+          "id": "issue_200",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 1
+        },
+        {
+          "id": "issue_215",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 16
+        },
+        {
+          "id": "issue_230",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 31
+        },
+        {
+          "id": "issue_245",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 46
+        },
+        {
+          "id": "issue_260",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 11
+        },
+        {
+          "id": "issue_275",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 26
+        },
+        {
+          "id": "issue_290",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 41
+        },
+        {
+          "id": "issue_305",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 6
+        },
+        {
+          "id": "issue_320",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 21
+        },
+        {
+          "id": "issue_335",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 36
+        },
+        {
+          "id": "issue_350",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 1
+        },
+        {
+          "id": "issue_365",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 16
+        },
+        {
+          "id": "issue_380",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 31
+        },
+        {
+          "id": "issue_395",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 46
+        },
+        {
+          "id": "issue_410",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 11
+        },
+        {
+          "id": "issue_425",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 26
+        },
+        {
+          "id": "issue_440",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 41
+        },
+        {
+          "id": "issue_455",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 6
+        },
+        {
+          "id": "issue_470",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 21
+        },
+        {
+          "id": "issue_485",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 36
+        },
+        {
+          "id": "issue_500",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 1
+        },
+        {
+          "id": "issue_515",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_0.py",
+          "line": 16
+        },
+        {
+          "id": "issue_530",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_0.py",
+          "line": 31
+        }
+      ],
+      "batch_4": [
+        {
+          "id": "issue_8",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 9
+        },
+        {
+          "id": "issue_23",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 24
+        },
+        {
+          "id": "issue_38",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 39
+        },
+        {
+          "id": "issue_53",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 4
+        },
+        {
+          "id": "issue_68",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 19
+        },
+        {
+          "id": "issue_83",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 34
+        },
+        {
+          "id": "issue_98",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 49
+        },
+        {
+          "id": "issue_113",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 14
+        },
+        {
+          "id": "issue_128",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 29
+        },
+        {
+          "id": "issue_143",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 44
+        },
+        {
+          "id": "issue_158",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 9
+        },
+        {
+          "id": "issue_173",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 24
+        },
+        {
+          "id": "issue_188",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 39
+        },
+        {
+          "id": "issue_203",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 4
+        },
+        {
+          "id": "issue_218",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 19
+        },
+        {
+          "id": "issue_233",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 34
+        },
+        {
+          "id": "issue_248",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 49
+        },
+        {
+          "id": "issue_263",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 14
+        },
+        {
+          "id": "issue_278",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 29
+        },
+        {
+          "id": "issue_293",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 44
+        },
+        {
+          "id": "issue_308",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 9
+        },
+        {
+          "id": "issue_323",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 24
+        },
+        {
+          "id": "issue_338",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 39
+        },
+        {
+          "id": "issue_353",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 4
+        },
+        {
+          "id": "issue_368",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 19
+        },
+        {
+          "id": "issue_383",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 34
+        },
+        {
+          "id": "issue_398",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 49
+        },
+        {
+          "id": "issue_413",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 14
+        },
+        {
+          "id": "issue_428",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 29
+        },
+        {
+          "id": "issue_443",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 44
+        },
+        {
+          "id": "issue_458",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 9
+        },
+        {
+          "id": "issue_473",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 24
+        },
+        {
+          "id": "issue_488",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 39
+        },
+        {
+          "id": "issue_503",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_3.py",
+          "line": 4
+        },
+        {
+          "id": "issue_518",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_3.py",
+          "line": 19
+        },
+        {
+          "id": "issue_14",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 15
+        },
+        {
+          "id": "issue_29",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 30
+        },
+        {
+          "id": "issue_44",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 45
+        },
+        {
+          "id": "issue_59",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 10
+        },
+        {
+          "id": "issue_74",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 25
+        },
+        {
+          "id": "issue_89",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 40
+        },
+        {
+          "id": "issue_104",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 5
+        },
+        {
+          "id": "issue_119",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 20
+        },
+        {
+          "id": "issue_134",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 35
+        },
+        {
+          "id": "issue_149",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 50
+        },
+        {
+          "id": "issue_164",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 15
+        },
+        {
+          "id": "issue_179",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 30
+        },
+        {
+          "id": "issue_194",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 45
+        },
+        {
+          "id": "issue_209",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 10
+        },
+        {
+          "id": "issue_224",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 25
+        },
+        {
+          "id": "issue_239",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 40
+        },
+        {
+          "id": "issue_254",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 5
+        },
+        {
+          "id": "issue_269",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 20
+        },
+        {
+          "id": "issue_284",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 35
+        },
+        {
+          "id": "issue_299",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 50
+        },
+        {
+          "id": "issue_314",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 15
+        },
+        {
+          "id": "issue_329",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 30
+        },
+        {
+          "id": "issue_344",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 45
+        },
+        {
+          "id": "issue_359",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 10
+        },
+        {
+          "id": "issue_374",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 25
+        },
+        {
+          "id": "issue_389",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 40
+        },
+        {
+          "id": "issue_404",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 5
+        },
+        {
+          "id": "issue_419",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 20
+        },
+        {
+          "id": "issue_434",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 35
+        },
+        {
+          "id": "issue_449",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 50
+        },
+        {
+          "id": "issue_464",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 15
+        },
+        {
+          "id": "issue_479",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 30
+        },
+        {
+          "id": "issue_494",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 45
+        },
+        {
+          "id": "issue_509",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_4.py",
+          "line": 10
+        },
+        {
+          "id": "issue_524",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_4.py",
+          "line": 25
+        }
+      ],
+      "batch_5": [
+        {
+          "id": "issue_11",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 12
+        },
+        {
+          "id": "issue_26",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 27
+        },
+        {
+          "id": "issue_41",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 42
+        },
+        {
+          "id": "issue_56",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 7
+        },
+        {
+          "id": "issue_71",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 22
+        },
+        {
+          "id": "issue_86",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 37
+        },
+        {
+          "id": "issue_101",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 2
+        },
+        {
+          "id": "issue_116",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 17
+        },
+        {
+          "id": "issue_131",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 32
+        },
+        {
+          "id": "issue_146",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 47
+        },
+        {
+          "id": "issue_161",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 12
+        },
+        {
+          "id": "issue_176",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 27
+        },
+        {
+          "id": "issue_191",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 42
+        },
+        {
+          "id": "issue_206",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 7
+        },
+        {
+          "id": "issue_221",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 22
+        },
+        {
+          "id": "issue_236",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 37
+        },
+        {
+          "id": "issue_251",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 2
+        },
+        {
+          "id": "issue_266",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 17
+        },
+        {
+          "id": "issue_281",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 32
+        },
+        {
+          "id": "issue_296",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 47
+        },
+        {
+          "id": "issue_311",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 12
+        },
+        {
+          "id": "issue_326",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 27
+        },
+        {
+          "id": "issue_341",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 42
+        },
+        {
+          "id": "issue_356",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 7
+        },
+        {
+          "id": "issue_371",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 22
+        },
+        {
+          "id": "issue_386",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 37
+        },
+        {
+          "id": "issue_401",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 2
+        },
+        {
+          "id": "issue_416",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 17
+        },
+        {
+          "id": "issue_431",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 32
+        },
+        {
+          "id": "issue_446",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 47
+        },
+        {
+          "id": "issue_461",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 12
+        },
+        {
+          "id": "issue_476",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 27
+        },
+        {
+          "id": "issue_491",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 42
+        },
+        {
+          "id": "issue_506",
+          "type": "missing_cached",
+          "severity": "HIGH",
+          "file_path": "backend/services/module_1.py",
+          "line": 7
+        },
+        {
+          "id": "issue_521",
+          "type": "missing_cached",
+          "severity": "MEDIUM",
+          "file_path": "backend/services/module_1.py",
+          "line": 22
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "generated_at": "2026-03-05T23:52:00.698892",
+    "total_p0_files": 7,
+    "total_test_failures": 6,
+    "total_performance_issues": 531
+  }
+}

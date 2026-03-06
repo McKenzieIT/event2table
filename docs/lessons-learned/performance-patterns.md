@@ -8,7 +8,7 @@
 
 ## 缓存策略 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 3次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md), [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md), [缓存清理记录](../../CLAUDE.md#2026-02-22-redis缓存清理与数据一致性)
+**优先级**: P0 | **出现次数**: 3次 | **来源**: [缓存优化总结](../archive/2026-02/optimization/CACHE_OPTIMIZATION_SUMMARY.md), [最终优化报告](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md), [缓存清理记录](../../CLAUDE.md#2026-02-22-redis缓存清理与数据一致性)
 
 ### 缓存TTL建议
 
@@ -103,13 +103,13 @@ def verify_cache_consistency():
 ### 案例文档
 
 - [Redis缓存清理与数据一致性](../../CLAUDE.md#2026-02-22-redis缓存清理与数据一致性)
-- [后端优化Phase 2 - 性能优化](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md#phase-2-性能优化)
+- [后端优化Phase 2 - 性能优化](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md#phase-2-性能优化)
 
 ---
 
 ## N+1查询优化 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 2次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md), [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [缓存优化总结](../archive/2026-02/optimization/CACHE_OPTIMIZATION_SUMMARY.md), [最终优化报告](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 问题现象
 
@@ -194,14 +194,14 @@ sqlite3 data/dwd_generator.db "EXPLAIN QUERY PLAN SELECT * FROM log_events INNER
 
 ### 案例文档
 
-- [后端优化Phase 2 - 性能优化](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md#phase-2-性能优化)
+- [后端优化Phase 2 - 性能优化](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md#phase-2-性能优化)
 - [性能测试脚本](../../scripts/performance/parameter_management_performance.py)
 
 ---
 
 ## 数据库索引 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization/OPTIMIZATION_LESSONS_LEARNED.md)
 
 ### 索引设计原则
 
@@ -247,7 +247,7 @@ SEARCH log_events USING INDEX idx_log_events_game_gid (game_gid=?)
 
 ## 分页支持 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 2](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 2](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 问题现象
 
@@ -314,7 +314,7 @@ def list_events():
 
 ## game_gid转换缓存 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 2](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 2](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 问题现象
 
@@ -357,7 +357,7 @@ def get_game_gid_from_id(game_id: int) -> Optional[int]:
 
 ## Dashboard统计查询合并 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 2](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 2](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 优化前（5个查询）:
 ```python
@@ -402,7 +402,7 @@ recent = fetch_all_as_dict('''
 
 ## 多级缓存架构 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存优化报告](../archive/2026-02/optimization-reports/CACHE_OPTIMIZATION_SUMMARY.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存优化报告](../archive/2026-02/optimization/CACHE_OPTIMIZATION_SUMMARY.md)
 
 ### 三级缓存架构
 
@@ -474,7 +474,7 @@ def get_game_with_cache(game_gid: int):
 
 ## Cache Tags系统 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存优化报告](../archive/2026-02/optimization-reports/CACHE_OPTIMIZATION_SUMMARY.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存优化报告](../archive/2026-02/optimization/CACHE_OPTIMIZATION_SUMMARY.md)
 
 ### Cache Tags概念
 
@@ -543,7 +543,7 @@ cache_manager.delete_many(tags=["games", "dashboard"])
 
 ## 性能监控装饰器 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存优化报告](../archive/2026-02/optimization-reports/CACHE_OPTIMIZATION_SUMMARY.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存优化报告](../archive/2026-02/optimization/CACHE_OPTIMIZATION_SUMMARY.md)
 
 ### 性能监控装饰器
 
@@ -632,7 +632,7 @@ def get_performance_stats():
 
 ## Bloom Filter在数据库防护中的应用 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [EVENTS-PY-MIGRATION-STATS.md](../../reports/2026-03-01/EVENTS-PY-MIGRATION-STATS.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [EVENTS-PY-MIGRATION-STATS.md](../archive/testing-reports/2026-03-01/2026-03-01/EVENTS-PY-MIGRATION-STATS.md)
 
 ### 应用场景
 
@@ -694,7 +694,7 @@ class EventService:
 
 ### 案例文档
 
-- [Events迁移统计](../../reports/2026-03-01/EVENTS-PY-MIGRATION-STATS.md)
+- [Events迁移统计](../archive/testing-reports/2026-03-01/2026-03-01/EVENTS-PY-MIGRATION-STATS.md)
 
 ---
 

@@ -541,7 +541,7 @@ exportBatchHQL([1, 2, 3], '20260305').then(hql => {
 
 - **[Events API文档](EVENTS-API.md)** - 事件管理API
 - **[HQL生成器文档](../hql/)** - HQL生成器详细说明
-- **[经验文档 - 数据导入最佳实践](../lessons-learned/data-import-best-practices.md)** - 数据导入经验
+- **[经验文档 - 数据导入最佳实践](../lessons-learned/database-patterns.md#数据导入)** - 数据导入经验
 
 ---
 

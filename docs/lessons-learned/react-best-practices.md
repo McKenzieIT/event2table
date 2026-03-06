@@ -8,7 +8,7 @@
 
 ## React Hooks规则 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 4次 | **来源**: [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing-reports/TESTING_LESSONS_LEARNED.md), [iteration-2修复报告](../archive/2026-02/e2e-test-reports/iteration-2/), [CLAUDE.md](../../CLAUDE.md)
+**优先级**: P0 | **出现次数**: 4次 | **来源**: [E2E测试指南](./testing-guide.md), [iteration-2修复报告](../archive/2026-02/e2e-test-reports/iteration-2/), [CLAUDE.md](../../CLAUDE.md)
 
 ### 问题现象
 
@@ -104,14 +104,13 @@ module.exports = {
 
 ### 案例文档
 
-- [E2E测试迭代2修复报告 - 案例1](../archive/2026-02/e2e-test-reports/iteration-2/FIX-REPORT.md#案例1-hooks规则修复)
-- [HqlManage组件修复](../archive/2026-02/e2e-test-reports/iteration-2/SUMMARY.md)
+- [E2E测试指南](./testing-guide.md) - 完整的E2E测试方法论
 
 ---
 
 ## Lazy Loading最佳实践 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 3次 | **来源**: [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing-reports/TESTING_LESSONS_LEARNED.md), [iteration-2修复报告](../archive/2026-02/e2e-test-reports/iteration-2/), [routes.jsx分析](../../frontend/src/routes/routes.jsx)
+**优先级**: P0 | **出现次数**: 3次 | **来源**: [E2E测试指南](./testing-guide.md), [iteration-2修复报告](../archive/2026-02/e2e-test-reports/iteration-2/), [routes.jsx分析](../../frontend/src/routes/routes.jsx)
 
 ### 问题现象
 
@@ -200,14 +199,13 @@ const ApiDocs = lazy(() => import("@analytics/pages/ApiDocs")); // <50行
 
 ### 案例文档
 
-- [E2E测试迭代2修复报告 - 案例2](../archive/2026-02/e2e-test-reports/iteration-2/FIX-REPORT.md#案例2-lazy-loading修复)
-- [routes.jsx修复记录](../archive/2026-02/e2e-test-reports/iteration-2/SUMMARY.md)
+- [E2E测试指南](./testing-guide.md) - Lazy Loading决策标准和测试方法
 
 ---
 
 ## 性能优化技巧 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 2次 | **来源**: [CLAUDE.md](../../CLAUDE.md), [性能优化报告](../archive/2026-02/optimization-reports/)
+**优先级**: P1 | **出现次数**: 2次 | **来源**: [CLAUDE.md](../../CLAUDE.md), [性能模式](./performance-patterns.md)
 
 ### React.memo优化
 
@@ -347,7 +345,7 @@ const handleClick = useCallback((id) => {
 
 ## React子组件定义顺序 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [iteration-6 FIX-REPORT-FLOW-BUILDER.md](../archive/2026-02/e2e-test-reports/iteration-6/)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [React组件规范](../../CLAUDE.md#react子组件定义顺序)
 
 ### 问题现象
 
@@ -399,7 +397,7 @@ Card.Body = CardBody;
 
 ## useEffect依赖数组最佳实践 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [event-node-builder-fixes-complete.md](../archive/2026-02/e2e-test-reports/iteration-8/)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [useEffect最佳实践](./testing-guide.md#usee xeffect依赖数组)
 
 ### 问题现象
 
@@ -455,7 +453,7 @@ useEffect(() => {
 
 ## 组件导出规范 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [iteration-7 COMPLETE-FIX-REPORT.md](../archive/2026-02/e2e-test-reports/iteration-7/)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [组件导出规范](../../CLAUDE.md#组件导出规范)
 
 ### 问题现象
 
@@ -508,7 +506,7 @@ export * from './Modal';
 
 ## API响应数据结构处理 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [iteration-7 COMPLETE-FIX-REPORT.md](../archive/2026-02/e2e-test-reports/iteration-7/)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [API响应处理](../../CLAUDE.md#api响应数据结构处理)
 
 ### 问题现象
 
@@ -555,7 +553,7 @@ const parameters = result.data?.parameters || [];
 
 ## TypeScript严格模式迁移 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL-COMPREHENSIVE-REPORT.md](../../reports/2026-03-01/FINAL-COMPREHENSIVE-REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [项目迁移指南](../../CLAUDE.md#typescript严格模式)
 
 ### 问题现象
 
@@ -630,13 +628,13 @@ export interface LabeledComponentProps extends BaseComponentProps {
 
 ### 案例文档
 
-- [TypeScript完整迁移报告](../../reports/2026-03-01/FINAL-COMPREHENSIVE-REPORT.md)
+- [TypeScript开发规范](../../CLAUDE.md#typescript严格模式迁移) - TypeScript配置和类型系统设计
 
 ---
 
 ## Ralph Loop迭代测试方法论 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 9次迭代 | **来源**: [Ralph Testing Final Report](../archive/ralph-testing/ralph/FINAL-REPORT.md), [迭代1-9报告](../archive/ralph-testing/ralph/)
+**优先级**: P1 | **出现次数**: 9次迭代 | **来源**: [E2E测试指南](./testing-guide.md), [Ralph Testing方法](./testing-guide.md#ralph-loop迭代测试方法论)
 
 ### 核心概念
 
@@ -750,9 +748,8 @@ mcp__chrome-devtools__take_screenshot({ filePath: "fix-verification.png" })
 
 ### 案例文档
 
-- [Ralph Testing Final Report](../archive/ralph-testing/ralph/FINAL-REPORT.md) - 完整测试报告
-- [迭代2修复报告](../archive/ralph-testing/ralph/iteration-2/FIX-REPORT.md) - Hooks规则修复案例
-- [迭代8修复报告](../archive/ralph-testing/ralph/iteration-8/EVENT-NODE-BUILDER-E2E-TEST-REPORT.md) - 事件节点构建器修复
+- [E2E测试指南](./testing-guide.md) - 完整的E2E测试方法论
+- [测试快速参考](../../CLAUDE.md#e2e测试关键学习成果) - E2E测试核心要点
 
 ### 相关经验
 
@@ -763,7 +760,7 @@ mcp__chrome-devtools__take_screenshot({ filePath: "fix-verification.png" })
 
 ## Chrome DevTools MCP工作流 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 9次迭代 | **来源**: [Ralph Testing Final Report](../archive/ralph-testing/ralph/FINAL-REPORT.md), [CLAUDE.md E2E测试关键学习](../../CLAUDE.md#e2e测试关键学习成果)
+**优先级**: P1 | **出现次数**: 多次 | **来源**: [E2E测试指南](./testing-guide.md), [CLAUDE.md E2E测试关键学习](../../CLAUDE.md#e2e测试关键学习成果)
 
 ### 核心工具
 
@@ -960,7 +957,7 @@ await mcp__chrome-devtools__evaluate_script({
 
 ## Subagent并行分析策略 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 多次 | **来源**: [CLAUDE.md 并行开发策略](../../CLAUDE.md#项目管理最佳实践), [Ralph Testing迭代2](../archive/ralph-testing/ralph/iteration-2/)
+**优先级**: P1 | **出现次数**: 多次 | **来源**: [项目管理 - 并行开发策略](./project-management.md), [Ralph Loop迭代测试](#ralph-loop迭代测试方法论)
 
 ### 核心概念
 
@@ -1041,7 +1038,7 @@ npm run test:e2e                     # E2E测试
 
 ## 性能分析模式 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 多次 | **来源**: [性能优化报告](../archive/2026-02/optimization-reports/), [CLAUDE.md 性能模式](../../CLAUDE.md#性能模式)
+**优先级**: P1 | **出现次数**: 多次 | **来源**: [性能模式](./performance-patterns.md), [CLAUDE.md 性能优化](../../CLAUDE.md#性能优化)
 
 ### React性能分析
 
@@ -1139,7 +1136,7 @@ const sorted = useMemo(() =>
 
 ## Vite与Apollo Client兼容性 ⚠️ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [VITE-APOLLO-CONFIG-DIAGNOSIS](../archive/2026-03/04-march/reports/VITE-APOLLO-CONFIG-DIAGNOSIS.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [前端加载问题修复报告](../reports/2026-03-04/FRONTEND-LOADING-FIX-REPORT.md)
 
 ### 问题现象
 

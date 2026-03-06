@@ -8,7 +8,7 @@
 
 ## game_gid迁移经验 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 2次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md), [GAME_GID_MIGRATION_GUIDE.md](../development/GAME_GID_MIGRATION_GUIDE.md)
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md), [GAME_GID_MIGRATION_GUIDE.md](../development/GAME_GID_MIGRATION_GUIDE.md)
 
 ### game_id vs game_gid
 
@@ -109,7 +109,7 @@ fetch(`/api/events?game_id=${gameId}`)  // 错误！
 
 ### 案例文档
 
-- [后端优化Phase 5 - game_gid迁移](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md#phase-5-game_gid迁移)
+- [后端优化Phase 5 - game_gid迁移](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md#phase-5-game_gid迁移)
 - [GAME_GID迁移指南](../development/GAME_GID_MIGRATION_GUIDE.md)
 
 ---

@@ -8,7 +8,7 @@
 
 ## SQL注入防护 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 3次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md), [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md), [sql-validator-guidelines.md](../development/sql-validator-guidelines.md)
+**优先级**: P0 | **出现次数**: 3次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization/OPTIMIZATION_LESSONS_LEARNED.md), [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md), [sql-validator-guidelines.md](../development/sql-validator-guidelines.md)
 
 ### 问题现象
 
@@ -100,14 +100,14 @@ query = f"SELECT * FROM {validated_table} WHERE {validated_column} = ?"
 
 ### 案例文档
 
-- [后端优化Phase 1 - 安全加固](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md#phase-1-安全加固)
+- [后端优化Phase 1 - 安全加固](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md#phase-1-安全加固)
 - [SQLValidator使用指南](../development/sql-validator-guidelines.md)
 
 ---
 
 ## XSS防护 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 3次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md), [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P0 | **出现次数**: 3次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization/OPTIMIZATION_LESSONS_LEARNED.md), [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 问题现象
 
@@ -174,7 +174,7 @@ class GameCreate(BaseModel):
 
 ## 输入验证 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 2次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md)
+**优先级**: P1 | **出现次数**: 2次 | **来源**: [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization/OPTIMIZATION_LESSONS_LEARNED.md)
 
 ### Pydantic Schema验证
 
@@ -221,7 +221,7 @@ game_data = GameCreate(**request.json)
 
 ## 异常信息脱敏 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 2次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 问题现象
 
@@ -262,7 +262,7 @@ except Exception as e:
 
 ## Legacy API废弃管理 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 1](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 1](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 安全风险
 
@@ -314,7 +314,7 @@ def list_games_legacy():
 
 ## GenericRepository安全验证 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 0](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 0](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 问题现象
 
@@ -357,7 +357,7 @@ game = game_repo.find_by_field("gid", 10000147)  # 自动验证字段名
 
 ## 批量删除验证 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 1](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Phase 1](../archive/2026-02/optimization/FINAL_OPTIMIZATION_REPORT.md)
 
 ### 问题现象
 

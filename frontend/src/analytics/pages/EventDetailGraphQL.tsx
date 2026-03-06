@@ -1,9 +1,9 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/PHASE-2-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
@@ -19,6 +19,11 @@ import './EventDetail.css';
  * - 使用GraphQL查询GET_EVENT和GET_PARAMETERS
  * - 自动类型检查（通过GraphQL Code Generator）
  *
+ * 性能优化:
+ * - React.memo: 避免父组件更新时重新渲染
+ * - useCallback: 稳定导航函数引用
+ * - useMemo: 缓存计算值
+ *
  * 最佳实践: 并行加载 + 提前返回
  */
 function EventDetailGraphQL() {
@@ -29,7 +34,9 @@ function EventDetailGraphQL() {
 
   // Priority: URL params > useGameContext > localStorage
   const gameGidFromUrl = searchParams.get('game_gid');
-  const gameGid = gameGidFromUrl || currentGameGid || localStorage.getItem('selectedGameGid');
+  const gameGid = useMemo(() => {
+    return gameGidFromUrl || currentGameGid || localStorage.getItem('selectedGameGid');
+  }, [gameGidFromUrl, currentGameGid]);
 
   // 并行加载事件数据和参数数据
   const { data: eventData, loading: eventLoading, error: eventError } = useQuery(GET_EVENT, {
@@ -45,8 +52,17 @@ function EventDetailGraphQL() {
   });
 
   // 合并加载和错误状态
-  const isLoading = eventLoading || paramsLoading;
-  const loadingError = eventError || paramsError;
+  const isLoading = useMemo(() => eventLoading || paramsLoading, [eventLoading, paramsLoading]);
+  const loadingError = useMemo(() => eventError || paramsError, [eventError, paramsError]);
+
+  // 导航处理函数 - 使用useCallback稳定引用
+  const handleNavigateBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const handleNavigateEdit = useCallback(() => {
+    navigate(`/events/${id}/edit?game_gid=${gameGid}`);
+  }, [navigate, id, gameGid]);
 
   // 提前返回优化
   if (isLoading) {
@@ -69,7 +85,7 @@ function EventDetailGraphQL() {
     return (
       <div className="error">
         <p>{isMissingGameContext ? '请先选择游戏' : '事件不存在'}</p>
-        <Button variant="primary" onClick={() => navigate(-1)}>
+        <Button variant="primary" onClick={handleNavigateBack}>
           返回
         </Button>
       </div>
@@ -99,13 +115,13 @@ function EventDetailGraphQL() {
           <div className="header-actions">
             <Button
               variant="outline-secondary"
-              onClick={() => navigate(-1)}
+              onClick={handleNavigateBack}
             >
               返回
             </Button>
             <Button
               variant="outline-primary"
-              onClick={() => navigate(`/events/${id}/edit?game_gid=${gameGid}`)}
+              onClick={handleNavigateEdit}
             >
               编辑
             </Button>
@@ -242,4 +258,6 @@ function getTypeBadgeVariant(type: string): string {
   return variantMap[type] || 'secondary';
 }
 
-export default EventDetailGraphQL;
+// 使用 React.memo 优化性能 - 避免不必要的重新渲染
+const EventDetailGraphQLMemo = React.memo(EventDetailGraphQL);
+export default EventDetailGraphQLMemo;

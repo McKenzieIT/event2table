@@ -8,7 +8,7 @@
 
 ## E2E测试方法论 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 2次 | **来源**: [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing-reports/TESTING_LESSONS_LEARNED.md), [phase2-lessons-learned.md](../archive/2026-02/testing-reports/phase2-lessons-learned.md), [FINAL-REPORT](../archive/2026-02/e2e-test-reports/FINAL-REPORT.md)
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing/TESTING_LESSONS_LEARNED.md), [phase2-lessons-learned.md](../archive/2026-02/testing/phase2-lessons-learned.md), [FINAL-REPORT](../archive/ralph-testing/ralph/FINAL-REPORT.md)
 
 ### 核心测试哲学
 
@@ -326,7 +326,7 @@ curl http://127.0.0.1:5001/api/health  # → 验证后端可访问
 
 ## TDD实践 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [CLAUDE.md](../../CLAUDE.md), [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing-reports/TESTING_LESSONS_LEARNED.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [CLAUDE.md](../../CLAUDE.md), [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing/TESTING_LESSONS_LEARNED.md)
 
 ### TDD铁律
 
@@ -372,7 +372,7 @@ curl http://127.0.0.1:5001/api/health  # → 验证后端可访问
 
 ## 测试自动化 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 2次 | **来源**: [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing-reports/TESTING_LESSONS_LEARNED.md)
+**优先级**: P1 | **出现次数**: 2次 | **来源**: [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing/TESTING_LESSONS_LEARNED.md)
 
 ### Pre-commit Hook强制测试
 
@@ -437,7 +437,7 @@ pytest backend/test/ --cov=backend --cov-report=html
 
 ## 错误消息质量对用户体验的影响 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 2次 | **来源**: [phase2-lessons-learned.md](../archive/2026-02/testing-reports/phase2-lessons-learned.md)
+**优先级**: P1 | **出现次数**: 2次 | **来源**: [phase2-lessons-learned.md](../archive/2026-02/testing/phase2-lessons-learned.md)
 
 ### 核心原则
 
@@ -481,7 +481,7 @@ throw new Error(errorMessage);
 
 ## 避免重复工作 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 2次 | **来源**: [phase2-lessons-learned.md](../archive/2026-02/testing-reports/phase2-lessons-learned.md)
+**优先级**: P1 | **出现次数**: 2次 | **来源**: [phase2-lessons-learned.md](../archive/2026-02/testing/phase2-lessons-learned.md)
 
 ### 问题调查流程
 
@@ -512,7 +512,7 @@ throw new Error(errorMessage);
 
 ## 测试方法论演进 ⭐ **P1重要**
 
-**优先级**: P1 | **来源**: [phase2-lessons-learned.md](../archive/2026-02/testing-reports/phase2-lessons-learned.md)
+**优先级**: P1 | **来源**: [phase2-lessons-learned.md](../archive/2026-02/testing/phase2-lessons-learned.md)
 
 ### Phase 1方法论（浅层测试）❌
 
@@ -565,7 +565,7 @@ throw new Error(errorMessage);
 
 ## E2E健康检查机制 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [TRACK-5-API-CONNECTIVITY-HEALTH-CHECK.md](../../reports/2026-03-01/TRACK-5-API-CONNECTIVITY-HEALTH-CHECK.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: 已归档 (2026-03-01)
 
 ### 问题现象
 
@@ -650,7 +650,7 @@ ensureBackendReady()
 
 ### 案例文档
 
-- [API连接健康检查报告](../../reports/2026-03-01/TRACK-5-API-CONNECTIVITY-HEALTH-CHECK.md)
+- [API连接健康检查报告](../archive/testing-reports/2026-03-01/2026-03-01/TRACK-5-API-CONNECTIVITY-HEALTH-CHECK.md) (已归档)
 
 ---
 
@@ -863,7 +863,7 @@ sqlite3 data/dwd_generator.db "SELECT COUNT(*) FROM games;"
 
 ### API契约测试 ⭐ **P0极其重要 - 2026-03-04新增**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [PARAMETER-ROUTES-VERIFICATION.md](../../reports/2026-03-03/PARAMETER-ROUTES-VERIFICATION.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: 已归档 (2026-03-03)
 
 ### 前端路由哈希模式测试
 
@@ -972,9 +972,11 @@ fetch(`/api/events?game_id=${gameGid}`)
 ### 测试文档生成标准
 
 **必生成的文档**:
-1. **[E2E-TEST-REPORT.md](../../reports/2026-03-03/E2E-TEST-REPORT.md)** - 详细测试报告
-2. **[FIX-GUIDE.md](../../reports/2026-03-03/FIX-GUIDE.md)** - 修复指南
-3. **[TEST-SUMMARY.md](../../reports/2026-03-03/TEST-SUMMARY.md)** - 测试总结
+1. **E2E-TEST-REPORT.md** - 详细测试报告
+2. **FIX-GUIDE.md** - 修复指南
+3. **TEST-SUMMARY.md** - 测试总结
+
+> **注意**: 以上文档模板已归档至 `docs/archive/2026/03-march/reports/`
 
 **必生成的截图**:
 - `/frontend/screenshots/e2e-*.png` - 所有页面截图

@@ -1,0 +1,311 @@
+{
+  "optimized": [
+    {
+      "fileName": "AlterSql.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 124
+    },
+    {
+      "fileName": "AlterSqlBuilder.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 275
+    },
+    {
+      "fileName": "ApiDocs.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 49
+    },
+    {
+      "fileName": "BatchOperations.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 32
+    },
+    {
+      "fileName": "CategoriesList.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 378
+    },
+    {
+      "fileName": "CategoriesListGraphQL.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 367
+    },
+    {
+      "fileName": "CategoryForm.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 190
+    },
+    {
+      "fileName": "CommonParamsList.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 387
+    },
+    {
+      "fileName": "Dashboard.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": false,
+      "hasUseMemo": true,
+      "lines": 293
+    },
+    {
+      "fileName": "DashboardGraphQL.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 306
+    },
+    {
+      "fileName": "EventDetail.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 339
+    },
+    {
+      "fileName": "EventDetailGraphQL.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 264
+    },
+    {
+      "fileName": "EventForm.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": false,
+      "lines": 372
+    },
+    {
+      "fileName": "EventNodes.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 657
+    },
+    {
+      "fileName": "EventsList.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 638
+    },
+    {
+      "fileName": "EventsListGraphQL.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 431
+    },
+    {
+      "fileName": "FlowsList.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 278
+    },
+    {
+      "fileName": "GamesListGraphQL.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 287
+    },
+    {
+      "fileName": "Generate.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 199
+    },
+    {
+      "fileName": "GenerateResult.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": false,
+      "lines": 143
+    },
+    {
+      "fileName": "HqlEdit.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 31
+    },
+    {
+      "fileName": "HqlManage.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 274
+    },
+    {
+      "fileName": "HqlResults.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 103
+    },
+    {
+      "fileName": "ImportEvents.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": false,
+      "lines": 221
+    },
+    {
+      "fileName": "LogDetail.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": false,
+      "hasUseMemo": false,
+      "lines": 30
+    },
+    {
+      "fileName": "LogForm.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 375
+    },
+    {
+      "fileName": "NotFound.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": false,
+      "lines": 70
+    },
+    {
+      "fileName": "ParameterAnalysis.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 133
+    },
+    {
+      "fileName": "ParameterCompare.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 272
+    },
+    {
+      "fileName": "ParameterDashboard.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": false,
+      "hasUseMemo": false,
+      "lines": 31
+    },
+    {
+      "fileName": "ParameterHistory.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 44
+    },
+    {
+      "fileName": "ParameterNetwork.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 82
+    },
+    {
+      "fileName": "ParameterUsage.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 32
+    },
+    {
+      "fileName": "ParametersEnhanced.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 136
+    },
+    {
+      "fileName": "ParametersEnhancedGraphQL.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 194
+    },
+    {
+      "fileName": "ParametersList.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 415
+    },
+    {
+      "fileName": "ParametersListGraphQL.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": true,
+      "hasUseMemo": true,
+      "lines": 378
+    },
+    {
+      "fileName": "ValidationRules.tsx",
+      "status": "optimized",
+      "hasMemo": true,
+      "hasUseCallback": false,
+      "hasUseMemo": false,
+      "lines": 31
+    }
+  ],
+  "needsOptimization": [],
+  "noHooks": [],
+  "unknown": []
+}

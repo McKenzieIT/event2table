@@ -3,7 +3,7 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
@@ -273,3 +273,5 @@ export default function FlowsList(): JSX.Element {
     </div>
   );
 }
+
+// Note: React.memo removed - default export is already on line 65

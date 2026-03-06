@@ -163,28 +163,28 @@
 **新增经验点**:
 ```markdown
 ### 测试指南
-- [E2E测试完整流程](./testing-guide.md#e2e测试完整流程)
-- [测试失败诊断方法](./testing-guide.md#测试失败诊断)
-- [Ralph Loop迭代测试法](./testing-guide.md#ralph-loop迭代测试法)
-- [API契约测试](./testing-guide.md#api契约测试)
+- [E2E测试完整流程](../lessons-learned/testing-guide.md#e2e测试完整流程)
+- [测试失败诊断方法](../lessons-learned/testing-guide.md#测试失败诊断)
+- [Ralph Loop迭代测试法](../lessons-learned/testing-guide.md#ralph-loop迭代测试法)
+- [API契约测试](../lessons-learned/testing-guide.md#api契约测试)
 
 ### React最佳实践
-- [Lazy Loading决策标准](./react-best-practices.md#lazy-loading最佳实践)
-- [双重Suspense嵌套问题](./react-best-practices.md#lazy-loading最佳实践)
-- [React Hooks规则更新](./react-best-practices.md#react-hooks-规则)
+- [Lazy Loading决策标准](../lessons-learned/react-best-practices.md#lazy-loading最佳实践)
+- [双重Suspense嵌套问题](../lessons-learned/react-best-practices.md#lazy-loading最佳实践)
+- [React Hooks规则更新](../lessons-learned/react-best-practices.md#react-hooks-规则)
 
 ### 调试技能
-- [Chrome DevTools MCP调试流程](./debugging-skills.md#chrome-devtools-mcp调试法)
-- [错误检测模式](./debugging-skills.md#chrome-devtools-mcp调试法)
-- [Canvas组件调试](./debugging-skills.md#canvas组件调试)
-- [并行Subagent分析](./debugging-skills.md#subagent并行分析法)
+- [Chrome DevTools MCP调试流程](../lessons-learned/debugging-skills.md#chrome-devtools-mcp调试法)
+- [错误检测模式](../lessons-learned/debugging-skills.md#chrome-devtools-mcp调试法)
+- [Canvas组件调试](../lessons-learned/debugging-skills.md#canvas组件调试)
+- [并行Subagent分析](../lessons-learned/debugging-skills.md#subagent并行分析法)
 
 ### API设计模式
-- [路由参数设计规范](./api-design-patterns.md#路由参数设计规范)
-- [API契约一致性验证](./api-design-patterns.md#api契约一致性验证)
+- [路由参数设计规范](../lessons-learned/api-design-patterns.md#路由参数设计规范)
+- [API契约一致性验证](../lessons-learned/api-design-patterns.md#api契约一致性验证)
 
 ### 重构检查清单
-- [Canvas架构重构](./refactoring-checklist.md#canvas架构重构)
+- [Canvas架构重构](../lessons-learned/refactoring-checklist.md#canvas架构重构)
 ```
 
 #### 2. CLAUDE.md引用
@@ -593,9 +593,9 @@ docs/
 
 ### A. 相关文档
 
-- **[经验文档索引](../lessons-learned/README.md)** - 查找所有提取的经验
-- **[文档导航指南](../documentation-navigation.md)** - 快速查找文档
-- **[归档文档索引](../archive/README.md)** - 查看所有归档文档
+- **[经验文档索引](../../lessons-learned/README.md)** - 查找所有提取的经验
+- **[文档导航指南](../../documentation-navigation.md)** - 快速查找文档
+- **[归档文档索引](../../archive/README.md)** - 查看所有归档文档
 - **[CLAUDE.md](../../CLAUDE.md)** - 项目开发规范
 
 ### B. 工具脚本

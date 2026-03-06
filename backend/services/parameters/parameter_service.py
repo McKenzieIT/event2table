@@ -33,8 +33,10 @@ class ParameterService:
     def __init__(self) -> None:
         """Initialize the ParameterService with required repositories and cache."""
         from backend.core.cache.cache_system import HierarchicalCache
+        from backend.models.repositories.games import GameRepository
 
         self.param_repo = ParameterRepository()
+        self.game_repo = GameRepository()  # ✅ Added for get_common_params validation
         self.cache: HierarchicalCache = HierarchicalCache()
         self.invalidator: CacheInvalidator = CacheInvalidator(self.cache)
 
@@ -670,7 +672,7 @@ class ParameterService:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
         # Validate game exists using Repository
-        game = self.param_repo.get_game_by_gid(game_gid)
+        game = self.game_repo.find_by_gid(game_gid)  # ✅ Fixed: use GameRepository not ParameterRepository
         if not game:
             raise ValueError(f"Game not found: {game_gid}")
 

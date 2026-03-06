@@ -1,0 +1,10 @@
+{
+  "agent_id": "agent_4",
+  "phase": 1,
+  "status": "idle",
+  "current_task": "",
+  "progress": 0,
+  "total": 100,
+  "errors": [],
+  "last_heartbeat": "2026-03-05T23:52:01.375641"
+}

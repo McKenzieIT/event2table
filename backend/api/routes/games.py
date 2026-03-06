@@ -73,8 +73,11 @@ def list_games():
             games = [game.model_dump() for game in games]
 
         return json_success_response(data=games)
+    except ValidationError as e:
+        logger.error(f"Validation error listing games: {e}")
+        return json_error_response(f"Data validation error: {str(e)}", status_code=500)
     except Exception as e:
-        logger.error(f"Error listing games: {e}")
+        logger.error(f"Error listing games: {e}", exc_info=True)
         return json_error_response("Failed to list games", status_code=500)
 
 

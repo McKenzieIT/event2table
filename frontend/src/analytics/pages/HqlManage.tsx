@@ -1,6 +1,6 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/PHASE-2-OPTIMIZATION-REPORT.md
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -14,7 +14,12 @@ import './HqlManage.css';
  *
  * 查看、编辑和管理已生成的HQL语句
  * 迁移自: templates/hql_manage.html
- * 最佳实践: useMemo + useCallback + 所有Hooks在顶层（修复React Hooks顺序错误）
+ *
+ * 性能优化:
+ * - React.memo: 避免父组件更新时重新渲染
+ * - useCallback: 稳定事件处理函数引用
+ * - useMemo: 缓存过滤后的HQL列表
+ * - 所有Hooks在顶层（修复React Hooks顺序错误）
  */
 
 // Type Definitions
@@ -263,4 +268,6 @@ function HqlManage(): React.JSX.Element {
   );
 }
 
-export default HqlManage;
+// 使用 React.memo 优化性能 - 避免不必要的重新渲染
+const HqlManageMemo = React.memo(HqlManage);
+export default HqlManageMemo;

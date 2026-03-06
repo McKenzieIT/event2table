@@ -503,7 +503,7 @@ Event Nodes API和Canvas API紧密相关：
 - **[Canvas API文档](CANVAS-API.md)** - Canvas流程管理
 - **[Events API文档](EVENTS-API.md)** - 事件管理
 - **[HQL生成器文档](../hql/)** - HQL生成器详细说明
-- **[经验文档 - Canvas最佳实践](../lessons-learned/canvas-best-practices.md)** - Canvas使用经验
+- **[经验文档 - Canvas最佳实践](../canvas/)** - Canvas架构和使用说明
 
 ---
 

@@ -227,9 +227,9 @@ filter.add_sensitive_field('my_custom_secret')
 
 ## Related Documentation
 
-- [Security Guidelines](/docs/development/security-essentials.md)
-- [Logging Best Practices](/docs/development/logging-guidelines.md)
-- [Sensitive Data Handling](/docs/development/sensitive-data-handling.md)
+- [Security Guidelines](../lessons-learned/security-essentials.md) - 安全要点指南
+- [Logging Best Practices] - TODO: 创建日志最佳实践文档
+- [Sensitive Data Handling] - TODO: 创建敏感数据处理文档
 
 ## References
 

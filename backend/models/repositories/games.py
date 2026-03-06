@@ -61,14 +61,29 @@ class GameRepository(GenericRepository):
     @cached(ttl=1800)
     def find_all(self) -> List[GameEntity]:
         """
-        查询所有游戏
+        查询所有游戏（跳过无效数据）
 
         Returns:
             GameEntity列表
         """
+        import logging
+        from pydantic import ValidationError
+
+        logger = logging.getLogger(__name__)
         query = "SELECT * FROM games ORDER BY name"
         rows = fetch_all_as_dict(query)
-        return [GameEntity(**row) for row in rows]
+
+        # 过滤掉无效的游戏数据（避免Pydantic验证失败）
+        valid_games = []
+        for row in rows:
+            try:
+                game = GameEntity(**row)
+                valid_games.append(game)
+            except ValidationError as e:
+                logger.warning(f"Skipping invalid game data (id={row.get('id')}): {e}")
+                continue
+
+        return valid_games
 
     def find_by_id(self, game_id: int) -> Optional[GameEntity]:
         """

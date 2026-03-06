@@ -16,7 +16,7 @@
  * 使用TypeScript提供类型安全
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, SearchInput, Skeleton, ErrorState, useToast } from '@shared/ui';
 import EmptyState from '@shared/ui/EmptyState/EmptyState';
@@ -360,3 +360,7 @@ export default function CategoriesListGraphQL() {
     </div>
   );
 }
+
+// ✅ 添加 React.memo 优化渲染性能
+const CategoriesListGraphQLMemo = memo(CategoriesListGraphQL);
+

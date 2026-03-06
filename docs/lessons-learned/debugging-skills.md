@@ -8,7 +8,7 @@
 
 ## Chrome DevTools MCP调试法 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 2次 | **来源**: [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing-reports/TESTING_LESSONS_LEARNED.md), [E2E测试报告](../archive/2026-02/e2e-test-reports/)
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [E2E测试报告](../archive/2026-02/testing-reports/)
 
 ### 标准调试流程
 
@@ -187,7 +187,7 @@ mcp__chrome-devtools__take_snapshot()
 
 ## Subagent并行分析法 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [Ralph Loop迭代测试法](../archive/2026-02/e2e-test-reports/)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [测试指南 - E2E测试](./testing-guide.md#e2e测试)
 
 ### 根因分析策略
 
@@ -226,7 +226,7 @@ Task(subagent_type="general-purpose", prompt="分析加载超时模式")
 
 ### Canvas组件调试 ⭐ (2026-03-04新增)
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [CANVAS-EVENT-NODES-FIX-GUIDE.md](../../reports/2026-03-03/CANVAS-EVENT-NODES-FIX-GUIDE.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [CANVAS-EVENT-NODES-FIX-GUIDE.md](../archive/2026/03-march/temp-guides/CANVAS-EVENT-NODES-FIX-GUIDE.md)
 
 ### 事件节点配置问题诊断
 
@@ -510,7 +510,7 @@ npm run test:e2e  # E2E测试
 
 ### 案例文档
 
-- [后端架构优化报告](../../reports/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
+- [后端架构优化报告](../archive/testing-reports/2026-03-01/2026-03-01/FINAL-ARCHITECTURE-OPTIMIZATION-REPORT.md)
 
 ---
 

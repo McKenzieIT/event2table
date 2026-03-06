@@ -58,7 +58,11 @@ function FieldBuilder() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Parse URL parameters
-  const urlGameGid = parseInt(searchParams.get('gameGid') || gameGid || '0');
+  // ✅ Fixed: Read game_gid parameter (snake_case) instead of gameGid (camelCase)
+  // Priority: URL parameter > route param > localStorage > default
+  const gameGidFromUrl = searchParams.get('game_gid');
+  const gameGidFromStorage = typeof window !== 'undefined' ? localStorage.getItem('selectedGameGid') : null;
+  const urlGameGid = parseInt(gameGidFromUrl || gameGid || gameGidFromStorage || '10000147');
   const urlEventId = searchParams.get('eventId') ? parseInt(searchParams.get('eventId')) : null;
   const urlConfigId = searchParams.get('configId') ? parseInt(searchParams.get('configId')) : null;
 
@@ -156,9 +160,9 @@ function FieldBuilder() {
   // Update URL when selected event changes
   useEffect(() => {
     if (selectedEventId) {
-      setSearchParams({ gameGid: urlGameGid.toString(), eventId: selectedEventId.toString() });
+      setSearchParams({ game_gid: urlGameGid.toString(), eventId: selectedEventId.toString() });
     } else {
-      setSearchParams({ gameGid: urlGameGid.toString() });
+      setSearchParams({ game_gid: urlGameGid.toString() });
     }
   }, [selectedEventId, urlGameGid, setSearchParams]);
 

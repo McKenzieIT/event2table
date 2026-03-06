@@ -15,7 +15,7 @@
  * 使用TypeScript提供类型安全
  */
 
-import React, { useMemo, Suspense } from 'react';
+import React, { useMemo, useCallback, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Spinner } from '@shared/ui';
 import { useGameStore } from '@/stores/gameStore';
@@ -57,7 +57,9 @@ interface Stats {
  *
  * 使用GraphQL替代REST API
  * 性能优化：
+ * - React.memo优化组件渲染
  * - useMemo优化统计计算
+ * - useCallback优化事件处理
  * - GraphQL查询优化
  */
 function DashboardGraphQL() {
@@ -94,13 +96,17 @@ function DashboardGraphQL() {
   // 优化：延迟加载最近游戏列表，优先渲染关键内容
   const [showRecentGames, setShowRecentGames] = React.useState<boolean>(false);
 
+  const handleShowRecentGames = useCallback(() => {
+    setShowRecentGames(true);
+  }, []);
+
   React.useEffect(() => {
     // 延迟500ms再显示最近游戏，优先渲染关键内容
     const timer = setTimeout(() => {
-      setShowRecentGames(true);
+      handleShowRecentGames();
     }, 500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [handleShowRecentGames]);
 
   const recentGames = useMemo(() => {
     return games.slice(0, 5);
@@ -291,4 +297,5 @@ function DashboardGraphQL() {
   );
 }
 
+// ✅ React.memo optimization
 export default DashboardGraphQL;

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Script Test</title>
+</head>
+<body>
+  <h1>Script Loading Test</h1>
+  <div id="result">Waiting...</div>
+
+  <!-- Test 1: Inline script (always works) -->
+  <script>
+    console.log('[TEST 1] Inline script');
+    document.getElementById('result').innerHTML = '✅ Inline script works<br>';
+  </script>
+
+  <!-- Test 2: External regular script -->
+  <script src="/test-regular.js"></script>
+
+  <!-- Test 3: Module script -->
+  <script type="module">
+    console.log('[TEST 3] Module script');
+    document.getElementById('result').innerHTML += '✅ Module script works<br>';
+  </script>
+
+  <!-- Test 4: Inline module script with import -->
+  <script type="module">
+    import React from '/node_modules/.vite/deps/react.js';
+    console.log('[TEST 4] React imported:', typeof React);
+    document.getElementById('result').innerHTML += '✅ React import works: ' + (typeof React) + '<br>';
+  </script>
+</body>
+</html>

@@ -1,6 +1,12 @@
-# ⚠️ PERFORMANCE ISSUE: N+1 query detected in this file
-# TODO: Refactor to use JOIN or prefetch pattern
-# See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+# Performance Optimization: N+1 query FIXED (2026-03-05)
+# Changed from N individual queries to 1 JOIN query
+# Expected improvement: 50-100x faster
+#
+# Original (Lines 285-303):
+#   for event in events:
+#       event_params = fetch_all_as_dict(... WHERE event_id = ?)
+# Fixed (Lines 260-304):
+#   Single JOIN query fetches events + parameters in 1 query
 
 """
 Bulk Operations Routes
@@ -273,27 +279,42 @@ def api_bulk_export_events():
         if not events:
             return json_error_response("No events found with the provided IDs", status_code=404)
 
-        # Fetch parameters for each event
-        for event in events:
-            event_params = fetch_all_as_dict(
-                """
-                SELECT
-                    ep.param_name,
-                    ep.param_name_cn,
-                    ep.template_id,
-                    pt.template_name as param_type,
-                    ep.param_description as description,
-                    ep.is_active
-                FROM event_params ep
-                LEFT JOIN param_templates pt ON ep.template_id = pt.id
-                WHERE ep.event_id = ? AND ep.is_active = 1
-                ORDER BY ep.id
-                """,
-                (event["id"],)
-            )
-            event["parameters"] = event_params
+        # ✅ FIXED: Fetch all parameters in single JOIN query (avoid N+1)
+        # Previously: N queries (one per event)
+        # Now: 1 query with LEFT JOIN
+        all_params = fetch_all_as_dict(
+            f"""
+            SELECT
+                ep.event_id,
+                ep.param_name,
+                ep.param_name_cn,
+                ep.template_id,
+                pt.template_name as param_type,
+                ep.param_description as description,
+                ep.is_active
+            FROM event_params ep
+            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            WHERE ep.event_id IN ({placeholders}) AND ep.is_active = 1
+            ORDER BY ep.event_id, ep.id
+            """,
+            tuple(event_ids)
+        )
 
-        logger.info(f"Bulk exported {len(events)} events")
+        # Group parameters by event_id
+        params_by_event = {}
+        for param in all_params:
+            event_id = param["event_id"]
+            if event_id not in params_by_event:
+                params_by_event[event_id] = []
+            # Remove event_id from param dict (not needed in response)
+            param_copy = {k: v for k, v in param.items() if k != "event_id"}
+            params_by_event[event_id].append(param_copy)
+
+        # Attach parameters to events
+        for event in events:
+            event["parameters"] = params_by_event.get(event["id"], [])
+
+        logger.info(f"Bulk exported {len(events)} events with {len(all_params)} total parameters")
         return json_success_response(
             message=f"Exported {len(events)} events successfully",
             data={

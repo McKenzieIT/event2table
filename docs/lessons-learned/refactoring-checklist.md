@@ -8,7 +8,7 @@
 
 ## TDD重构流程 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [CLAUDE.md](../../CLAUDE.md#tdd开发模式), [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing-reports/TESTING_LESSONS_LEARNED.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [CLAUDE.md](../../CLAUDE.md#tdd开发模式), [TESTING_LESSONS_LEARNED.md](../archive/2026-02/testing/TESTING_LESSONS_LEARNED.md)
 
 ### TDD铁律
 
@@ -108,7 +108,7 @@ def create_event(config: EventConfig):
 
 ## 代码审查清单 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 多次 | **来源**: [CLAUDE.md](../../CLAUDE.md), [多个审查报告](../archive/2026-02/)
+**优先级**: P0 | **出现次数**: 多次 | **来源**: [CLAUDE.md](../../CLAUDE.md), [多个审查报告](../archive/2026-02/reports/)
 
 ### React组件审查
 
@@ -222,7 +222,7 @@ def create_event(config: EventConfig):
 
 ## 技术债务管理 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [技术债务管理文档](../development/technical_debt_management.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [技术债务管理流程](#技术债务管理流程)
 
 ### 识别技术债务
 
@@ -264,7 +264,7 @@ def create_event(config: EventConfig):
 
 ## 技术债务管理流程 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [cache-cleanup-report.md](../../reports/2026-03-01/cache-cleanup-report.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存清理案例](../archive/2026-02/reports/2026-02-25/cache-cleanup-report.md)
 
 ### 核心原则
 
@@ -357,13 +357,14 @@ black backend/
 
 ### 案例文档
 
-- [缓存清理报告](../../reports/2026-03-01/cache-cleanup-report.md)
+- [Redis缓存清理报告](../archive/2026-02/reports/2026-02-22/redis-cache-cleanup-report.md) - 2026-02-22
+- [缓存覆盖率实施报告](../archive/2026-02/reports/2026-02-25/cache-cleanup-report.md) - 2026-02-25
 
 ---
 
 ## Canvas组件重构步骤（分离关注点） ⭐ (2026-03-04新增)
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [CANVAS-EVENT-NODES-FIX-GUIDE.md](../../reports/2026-03-03/CANVAS-EVENT-NODES-FIX-GUIDE.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [Canvas Event Nodes修复指南](../archive/2026/03-march/temp-guides/CANVAS-EVENT-NODES-FIX-GUIDE.md)
 
 ### 分离关注点的重构策略
 

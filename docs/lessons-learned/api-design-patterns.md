@@ -8,7 +8,7 @@
 
 ## 分层架构 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 2次 | **来源**: [架构设计文档](../development/architecture.md), [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md)
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [架构设计文档](../development/architecture.md), [CLAUDE.md](../../CLAUDE.md)
 
 ### 四层架构设计
 
@@ -179,7 +179,7 @@ def create_game():
 
 ## 错误处理 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 2次 | **来源**: [phase2-lessons-learned.md](../archive/2026-02/testing-reports/phase2-lessons-learned.md)
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [测试指南](./testing-guide.md), [错误处理最佳实践](../../CLAUDE.md#api安全规范)
 
 ### 错误处理模式
 
@@ -255,7 +255,7 @@ except Exception as e:
 
 ## GraphQL实施经验 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [GraphQL迁移完成报告](../graphql-migration/GRAPHQL_MIGRATION_FINAL_REPORT.md), [GraphQL完整文档](../graphql-migration/GRAPHQL_COMPLETE_DOCUMENTATION.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [GraphQL API文档](../api/GRAPHQL-API.md), [CLAUDE.md GraphQL规范](../../CLAUDE.md#graphql实施经验)
 
 ### GraphQL vs REST
 
@@ -598,15 +598,14 @@ function DashboardGraphQL() {
 
 ### 案例文档
 
-- [GraphQL迁移完成报告](../graphql-migration/GRAPHQL_MIGRATION_FINAL_REPORT.md) - 完整迁移过程
-- [GraphQL完整文档](../graphql-migration/GRAPHQL_COMPLETE_DOCUMENTATION.md) - API使用指南
-- [Batch Operations Schema Design](../graphql-migration/BATCH_OPERATIONS_GRAPHQL_SCHEMA_DESIGN.md) - 批量操作设计
+- [GraphQL API文档](../api/GRAPHQL-API.md) - GraphQL Schema设计和查询指南
+- [缓存系统开发规范](../../CLAUDE.md#缓存系统开发规范) - GraphQL缓存策略
 
 ---
 
 ## Service层缓存集成 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Section 2.1](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存系统文档](../cache/README.md), [CLAUDE.md缓存规范](../../CLAUDE.md#缓存系统开发规范)
 
 ### 缓存装饰器使用
 
@@ -655,7 +654,7 @@ def create_game(self, game_data):
 
 ## API缓存失效策略 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [FINAL_OPTIMIZATION_REPORT.md Section 2.2](../archive/2026-02/optimization-reports/FINAL_OPTIMIZATION_REPORT.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [缓存系统文档](../cache/README.md), [API缓存失效策略](../../CLAUDE.md#缓存失效分析)
 
 ### Games API缓存失效
 
@@ -704,7 +703,7 @@ CacheInvalidator.invalidate_pattern("events.list:*")
 
 ## DDD架构实施 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [架构设计文档](../development/architecture.md), [OPTIMIZATION_LESSONS_LEARNED.md](../archive/2026-02/optimization-reports/OPTIMIZATION_LESSONS_LEARNED.md)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [架构设计文档](../development/architecture.md), [Entity架构迁移](../../CLAUDE.md#entity架构迁移完成)
 
 ### 领域驱动设计（DDD）原则
 
@@ -836,7 +835,7 @@ class IGameRepository(ABC):
 
 ## Canvas系统设计模式 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [Canvas系统文档](../archive/2026-02/), [HQL生成器文档](../archive/2026-02/)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [Canvas API文档](../api/CANVAS-API.md), [HQL生成器文档](../hql/README.md)
 
 ### Canvas系统架构
 
@@ -955,7 +954,7 @@ result = strategy.process(node, context)
 
 ## HQL生成器重构经验 ⭐ **P1重要**
 
-**优先级**: P1 | **出现次数**: 1次 | **来源**: [HQL生成器重构报告](../archive/2026-02/), [优化报告](../archive/2026-02/optimization-reports/)
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [HQL生成器文档](../hql/README.md), [重构检查清单](./refactoring-checklist.md)
 
 ### 重构前的问题
 
@@ -1090,7 +1089,7 @@ FROM {table_names}
 
 ## 路由参数设计规范 ⭐ **P0极其重要 - 2026-03-04新增**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [PARAMETER-ROUTES-VERIFICATION.md](../../reports/2026-03-03/PARAMETER-ROUTES-VERIFICATION.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [路由参数验证](../../CLAUDE.md#游戏标识符规范), [API契约测试](../../CLAUDE.md#api契约测试规范)
 
 ### 游戏标识符规范
 
@@ -1241,7 +1240,7 @@ Testing: /parameter-dashboard - Expected: 参数统计
 
 ## API契约测试的重要性 ⚠️ **P0极其重要**
 
-**优先级**: P0 | **出现次数**: 1次 | **来源**: [api-architecture-migration-status.md](../../api/api-architecture-migration-status.md)
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [API契约测试规范](../../CLAUDE.md#api契约测试规范), [测试指南](./testing-guide.md)
 
 ### 核心原则
 
@@ -1316,5 +1315,4 @@ git commit
 ## 相关经验文档
 
 - [安全要点 - SQL注入防护](./security-essentials.md#sql注入防护) - API安全
-- [测试指南 - API契约测试](../testing-guide.md#api契约测试) - API契约测试方法
-- [测试指南 - TDD实践](../testing-guide.md#tdd实践) - API测试
+- [测试指南 - API契约测试](./testing-guide.md#api契约测试) - API契约测试方法
