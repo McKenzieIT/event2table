@@ -19,7 +19,6 @@ import {
   EmptyState
 } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
-import Table from '@shared/ui/Table';
 import './EventsList.css';
 
 // ========== 类型定义 ==========
@@ -497,101 +496,97 @@ function EventsList() {
           }}
         />
       ) : (
-        <Table
-          variant="bordered"
-          size="md"
-          striped
-          hoverable
-          className="events-table"
-        >
-          <Table.Header>
-            <Table.Row>
-              <Table.Head align="center" style={{ width: '50px' }}>
-                <Checkbox
-                  checked={selectedEvents.length === filteredEvents.length && filteredEvents.length > 0}
-                  onChange={handleSelectAll}
-                />
-              </Table.Head>
-              <Table.Head style={{ width: '70px' }}>ID</Table.Head>
-              <Table.Head style={{ width: '25%' }}>事件名称</Table.Head>
-              <Table.Head style={{ width: '20%' }}>游戏</Table.Head>
-              <Table.Head style={{ width: '120px' }}>分类</Table.Head>
-              <Table.Head align="center" style={{ width: '80px' }}>参数</Table.Head>
-              <Table.Head style={{ width: '220px' }}>操作</Table.Head>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {filteredEvents.map(event => (
-              <Table.Row
-                key={event.id}
-                className={selectedEvents.includes(event.id) ? 'selected' : ''}
-              >
-                <Table.Cell align="center">
+        <div className="events-table-container">
+          <table className="oled-table">
+            <thead>
+              <tr>
+                <th style={{ width: '50px', textAlign: 'center' }}>
                   <Checkbox
-                    checked={selectedEvents.includes(event.id)}
-                    onChange={() => handleToggleSelect(event.id)}
+                    checked={selectedEvents.length === filteredEvents.length && filteredEvents.length > 0}
+                    onChange={handleSelectAll}
                   />
-                </Table.Cell>
-                <Table.Cell className="text-muted">#{event.id}</Table.Cell>
-                <Table.Cell>
-                  <div>
-                    <div className="event-name">{event.event_name}</div>
-                    <div className="event-name-cn">{event.event_name_cn}</div>
-                  </div>
-                </Table.Cell>
-                <Table.Cell>
-                  <div className="game-info">
-                    <span>{event.game_name} ({event.gid})</span>
-                  </div>
-                </Table.Cell>
-                <Table.Cell>
-                  {event.category_name ? (
-                    <Badge variant="info">
-                      {event.category_name}
+                </th>
+                <th style={{ width: '70px' }}>ID</th>
+                <th style={{ width: '25%' }}>事件名称</th>
+                <th style={{ width: '20%' }}>游戏</th>
+                <th style={{ width: '120px' }}>分类</th>
+                <th style={{ width: '80px', textAlign: 'center' }}>参数</th>
+                <th style={{ width: '220px' }}>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEvents.map(event => (
+                <tr
+                  key={event.id}
+                  className={`event-row ${selectedEvents.includes(event.id) ? 'selected' : ''}`}
+                >
+                  <td style={{ textAlign: 'center' }}>
+                    <Checkbox
+                      checked={selectedEvents.includes(event.id)}
+                      onChange={() => handleToggleSelect(event.id)}
+                    />
+                  </td>
+                  <td className="text-muted">#{event.id}</td>
+                  <td>
+                    <div>
+                      <div className="event-name">{event.event_name}</div>
+                      <div className="event-name-cn">{event.event_name_cn}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="game-info">
+                      <span>{event.game_name} ({event.gid})</span>
+                    </div>
+                  </td>
+                  <td>
+                    {event.category_name ? (
+                      <Badge variant="info">
+                        {event.category_name}
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">
+                        未分类
+                      </Badge>
+                    )}
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <Badge variant="primary">
+                      {event.param_count !== undefined ? event.param_count : '-'}
                     </Badge>
-                  ) : (
-                    <Badge variant="secondary">
-                      未分类
-                    </Badge>
-                  )}
-                </Table.Cell>
-                <Table.Cell align="center">
-                  <Badge variant="primary">
-                    {event.param_count !== undefined ? event.param_count : '-'}
-                  </Badge>
-                </Table.Cell>
-                <Table.Cell>
-                  <div className="action-buttons">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => handleViewEvent(event.id)}
-                      title="查看事件详情"
-                    >
-                      查看
-                    </Button>
-                    <Button
-                      variant="outline-info"
-                      size="sm"
-                      onClick={() => handleEditEvent(event.id)}
-                      title="编辑事件"
-                    >
-                      编辑
-                    </Button>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => handleDeleteEvent(event.id, event.event_name_cn || event.event_name)}
-                      title="删除事件"
-                    >
-                      删除
-                    </Button>
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => handleViewEvent(event.id)}
+                        title="查看事件详情"
+                      >
+                        查看
+                      </Button>
+                      <Button
+                        variant="outline-info"
+                        size="sm"
+                        onClick={() => handleEditEvent(event.id)}
+                        title="编辑事件"
+                      >
+                        编辑
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDeleteEvent(event.id, event.event_name_cn || event.event_name)}
+                        title="删除事件"
+                      >
+                        删除
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* 分页 */}
