@@ -48,7 +48,7 @@ interface CodeBlockProps {
 /**
  * CodeBlock Component
  */
-export default function CodeBlock({
+function CodeBlock({
   code,
   language = 'sql',
   showLineNumbers = true,
@@ -128,3 +128,18 @@ export default function CodeBlock({
 }
 
 CodeBlock.displayName = 'CodeBlock';
+
+// Memoize CodeBlock - only re-render when code, language, or className changes
+const MemoizedCodeBlock = React.memo(CodeBlock, (prevProps, nextProps) => {
+  return (
+    prevProps.code === nextProps.code &&
+    prevProps.language === nextProps.language &&
+    prevProps.showLineNumbers === nextProps.showLineNumbers &&
+    prevProps.maxHeight === nextProps.maxHeight &&
+    prevProps.className === nextProps.className
+  );
+});
+
+MemoizedCodeBlock.displayName = 'MemoizedCodeBlock';
+
+export default MemoizedCodeBlock;

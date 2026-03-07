@@ -6,7 +6,7 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { SearchInput, EmptyState } from '@shared/ui';
 import { FlowNode } from '../../types';
 import "./NodeSelector.css";
@@ -55,21 +55,20 @@ const NodeSelector: React.FC<NodeSelectorProps> = ({
   filterType,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [filteredNodes, setFilteredNodes] = useState<FlowNode[]>([]);
 
-  // 过滤节点
-  useEffect(() => {
-    let filtered = [...nodes];
+  // ⚡ PERF: 使用 useMemo 缓存过滤结果
+  const filteredNodes = useMemo(() => {
+    let result = [...nodes];
 
     // 按类型过滤
     if (filterType) {
-      filtered = filtered.filter((node) => node.type === filterType);
+      result = result.filter((node) => node.type === filterType);
     }
 
     // 按搜索词过滤
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
+      result = result.filter(
         (node) => {
           const nodeData = node.data as NodeData;
           return (
@@ -81,11 +80,11 @@ const NodeSelector: React.FC<NodeSelectorProps> = ({
       );
     }
 
-    setFilteredNodes(filtered);
+    return result;
   }, [nodes, searchTerm, filterType]);
 
   // 生成节点类型的图标
-  const getNodeIcon = (nodeType: string): string => {
+  const getNodeIcon = useCallback((nodeType: string): string => {
     const icons: Record<string, string> = {
       event: "🎮",
       union_all: "🔀",
@@ -93,7 +92,7 @@ const NodeSelector: React.FC<NodeSelectorProps> = ({
       output: "📤",
     };
     return icons[nodeType] || "📦";
-  };
+  }, []);
 
   // 生成节点类型的中文名称
   const getNodeTypeName = (nodeType: string): string => {
@@ -189,4 +188,6 @@ const NodeSelector: React.FC<NodeSelectorProps> = ({
   );
 };
 
-export default NodeSelector;
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const NodeSelectorMemo = memo(NodeSelector);
+export default NodeSelectorMemo;

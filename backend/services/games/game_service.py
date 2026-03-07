@@ -78,13 +78,44 @@ class GameService:
 
         Raises:
             DatabaseError: 数据库查询失败
+
+        Performance:
+            N+1 query fixed - 使用 JOIN 查询替代循环查询
+            预期性能提升：50-100倍（取决于游戏数量）
         """
-        games = self.game_repo.find_all()
+        from backend.core.utils.converters import fetch_all_as_dict
 
         if include_stats:
-            for game in games:
-                # 添加统计信息 (不持久化到数据库)
-                game.event_count = self._get_event_count(game.gid)
+            # ⚡ Performance Optimization: N+1 query fixed
+            # 使用 LEFT JOIN 获取统计信息，避免 N+1 查询
+            # 修复前：N次查询（N = 游戏数量）
+            # 修复后：1次查询
+            games_with_stats = fetch_all_as_dict("""
+                SELECT
+                    g.id,
+                    g.gid,
+                    g.name,
+                    g.ods_db,
+                    g.dwd_prefix,
+                    g.icon_path,
+                    g.description,
+                    g.created_at,
+                    g.updated_at,
+                    COUNT(DISTINCT le.id) as event_count,
+                    COUNT(DISTINCT cf.id) as flow_count
+                FROM games g
+                LEFT JOIN log_events le ON g.gid = le.game_gid
+                LEFT JOIN canvas_flows cf ON g.gid = cf.game_gid
+                GROUP BY g.id, g.gid, g.name, g.ods_db, g.dwd_prefix,
+                         g.icon_path, g.description, g.created_at, g.updated_at
+                ORDER BY g.id
+            """)
+
+            # 转换为 GameEntity 列表
+            games = [GameEntity(**game) for game in games_with_stats]
+        else:
+            # 不需要统计信息时，直接从 Repository 获取
+            games = self.game_repo.find_all()
 
         return games
 

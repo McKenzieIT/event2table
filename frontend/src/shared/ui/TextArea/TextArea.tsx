@@ -40,6 +40,8 @@
 import React, {
   forwardRef,
   useId,
+  useCallback,
+  useMemo,
   TextareaHTMLAttributes,
   ChangeEvent,
   FocusEvent,
@@ -212,34 +214,43 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   // Calculate current length for character count
   const currentLength = value?.length || 0;
 
-  // Handle change event
-  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  // PERFORMANCE: useCallback to stable event handlers
+  // Prevents re-creation of functions on every render
+  const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(event);
-  };
+  }, [onChange]);
 
-  // Handle blur event
-  const handleBlur = (event: FocusEvent<HTMLTextAreaElement>) => {
+  // PERFORMANCE: useCallback to stable event handlers
+  // Prevents re-creation of functions on every render
+  const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement>) => {
     onBlur?.(event);
-  };
+  }, [onBlur]);
 
-  // Handle focus event
-  const handleFocus = (event: FocusEvent<HTMLTextAreaElement>) => {
+  // PERFORMANCE: useCallback to stable event handlers
+  // Prevents re-creation of functions on every render
+  const handleFocus = useCallback((event: FocusEvent<HTMLTextAreaElement>) => {
     onFocus?.(event);
-  };
+  }, [onFocus]);
 
-  // Build wrapper CSS classes
-  const wrapperClass = [
-    'cyber-textarea-wrapper',
-    isInvalid && 'cyber-textarea-wrapper--invalid',
-    disabled && 'cyber-textarea-wrapper--disabled'
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const wrapperClass = useMemo(() => {
+    return [
+      'cyber-textarea-wrapper',
+      isInvalid && 'cyber-textarea-wrapper--invalid',
+      disabled && 'cyber-textarea-wrapper--disabled'
+    ].filter(Boolean).join(' ');
+  }, [isInvalid, disabled]);
 
-  // Build textarea CSS classes
-  const textareaClass = [
-    'cyber-textarea',
-    isInvalid && 'cyber-textarea--invalid',
-    disabled && 'cyber-textarea--disabled'
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const textareaClass = useMemo(() => {
+    return [
+      'cyber-textarea',
+      isInvalid && 'cyber-textarea--invalid',
+      disabled && 'cyber-textarea--disabled'
+    ].filter(Boolean).join(' ');
+  }, [isInvalid, disabled]);
 
   return (
     <div className={['cyber-textarea', className].filter(Boolean).join(' ')}>

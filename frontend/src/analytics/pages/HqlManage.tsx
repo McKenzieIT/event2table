@@ -6,7 +6,8 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Button, SearchInput, Spinner, useToast, EmptyState } from '@shared/ui';
-import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import ConfirmDialog from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import Table from '@shared/ui/Table';
 import './HqlManage.css';
 
 /**
@@ -162,50 +163,56 @@ function HqlManage(): React.JSX.Element {
 
       {/* HQL Table */}
       <div className="hql-table-card glass-card">
-        <table className="oled-table">
-          <thead>
-            <tr>
-              <th>类型</th>
-              <th>事件名</th>
-              <th>游戏</th>
-              <th>版本</th>
-              <th>状态</th>
-              <th>编辑状态</th>
-              <th>最后更新</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table
+          variant="bordered"
+          size="md"
+          striped
+          hoverable
+          className="hql-table"
+        >
+          <Table.Header>
+            <Table.Row>
+              <Table.Head>类型</Table.Head>
+              <Table.Head>事件名</Table.Head>
+              <Table.Head>游戏</Table.Head>
+              <Table.Head>版本</Table.Head>
+              <Table.Head>状态</Table.Head>
+              <Table.Head>编辑状态</Table.Head>
+              <Table.Head>最后更新</Table.Head>
+              <Table.Head>操作</Table.Head>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
             {filteredHql.length === 0 ? (
-              <tr>
-                <td colSpan={8}>
+              <Table.Row>
+                <Table.Cell style={{ textAlign: 'center', padding: '2rem' }}>
                   <EmptyState
                     icon={<span style={{ fontSize: '48px' }}>📥</span>}
                     title="未找到HQL记录"
                   />
-                </td>
-              </tr>
+                </Table.Cell>
+              </Table.Row>
             ) : (
               filteredHql.map(hql => (
-                <tr key={hql.id} className={hql.is_user_edited ? 'user-edited-row' : ''}>
-                  <td>
+                <Table.Row key={hql.id} className={hql.is_user_edited ? 'user-edited-row' : ''}>
+                  <Table.Cell>
                     <span className={`badge badge-\${hql.hql_type === 'create' ? 'primary' : 'success'}`}>
                       {hql.hql_type === 'create' ? '📊' : '🔗'}
                       {hql.hql_type?.toUpperCase()}
                     </span>
-                  </td>
-                  <td>
+                  </Table.Cell>
+                  <Table.Cell>
                     <div className="event-name">{hql.event_name}</div>
                     <div className="event-name-cn">{hql.event_name_cn}</div>
-                  </td>
-                  <td>
+                  </Table.Cell>
+                  <Table.Cell>
                     <span className="text-muted">🎮</span>
                     {hql.game_name}
-                  </td>
-                  <td>
+                  </Table.Cell>
+                  <Table.Cell>
                     <span className="badge badge-secondary">v{hql.hql_version}</span>
-                  </td>
-                  <td>
+                  </Table.Cell>
+                  <Table.Cell>
                     {hql.is_active ? (
                       <span className="badge badge-success">
                         ✅ 激活
@@ -215,16 +222,16 @@ function HqlManage(): React.JSX.Element {
                         ⏸️ 停用
                       </span>
                     )}
-                  </td>
-                  <td>
+                  </Table.Cell>
+                  <Table.Cell>
                     {hql.is_user_edited && (
                       <span className="badge badge-info">
                         ✏️ 已编辑
                       </span>
                     )}
-                  </td>
-                  <td>{new Date(hql.updated_at).toLocaleString('zh-CN')}</td>
-                  <td>
+                  </Table.Cell>
+                  <Table.Cell>{new Date(hql.updated_at).toLocaleString('zh-CN')}</Table.Cell>
+                  <Table.Cell>
                     <div className="action-buttons">
                       <Link to={`/hql/\${hql.id}/edit`}>
                         <Button variant="outline-primary" size="sm">
@@ -246,12 +253,12 @@ function HqlManage(): React.JSX.Element {
                         删除
                       </Button>
                     </div>
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.Row>
               ))
             )}
-          </tbody>
-        </table>
+          </Table.Body>
+        </Table>
       </div>
 
       <ConfirmDialog

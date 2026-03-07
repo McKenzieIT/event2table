@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import './Pagination.css';
 
 export interface PaginationProps {
@@ -63,11 +63,19 @@ const Pagination: React.FC<PaginationProps> = ({
     return pages;
   }, [currentPage, totalPages]);
 
-  const goToPage = (page: number) => {
+  // PERFORMANCE: useCallback to stable page change handler
+  // Prevents re-creation of function on every render
+  const goToPage = useCallback((page: number) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
       onPageChange(page);
     }
-  };
+  }, [totalPages, currentPage, onPageChange]);
+
+  // PERFORMANCE: useCallback to stable page size change handler
+  // Prevents re-creation of function on every render
+  const handlePageSizeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    onPageSizeChange?.(Number(e.target.value));
+  }, [onPageSizeChange]);
 
   if (totalItems === 0) {
     return null;
@@ -142,7 +150,7 @@ const Pagination: React.FC<PaginationProps> = ({
           <select
             className="pagination__size-select"
             value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            onChange={handlePageSizeChange}
           >
             {pageSizeOptions.map(size => (
               <option key={size} value={size}>
@@ -156,4 +164,22 @@ const Pagination: React.FC<PaginationProps> = ({
   );
 };
 
-export default React.memo(Pagination);
+// PERFORMANCE: React.memo with custom comparison
+// Prevents re-renders when only irrelevant props change
+const MemoizedPagination = React.memo(Pagination, (prevProps, nextProps) => {
+  return (
+    prevProps.currentPage === nextProps.currentPage &&
+    prevProps.totalPages === nextProps.totalPages &&
+    prevProps.pageSize === nextProps.pageSize &&
+    prevProps.totalItems === nextProps.totalItems &&
+    prevProps.onPageChange === nextProps.onPageChange &&
+    prevProps.onPageSizeChange === nextProps.onPageSizeChange &&
+    prevProps.showPageSize === nextProps.showPageSize &&
+    prevProps.showPageInfo === nextProps.showPageInfo &&
+    prevProps.className === nextProps.className
+  );
+});
+
+MemoizedPagination.displayName = 'MemoizedPagination';
+
+export default MemoizedPagination;

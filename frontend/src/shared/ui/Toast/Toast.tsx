@@ -1,6 +1,12 @@
 /**
  * Toast Component - Cyberpunk Lab Theme
  *
+ * PERF: React Performance Optimization - Phase 3
+ * - React.memo for ToastContainer and ToastItem
+ * - useCallback for all event handlers
+ * - Conditional rendering (return null when no toasts)
+ * See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
+ *
  * Glassmorphism toast notifications with slide-in animations
  */
 

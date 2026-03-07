@@ -6,7 +6,7 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback, memo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -24,7 +24,7 @@ import { useGameData } from '../hooks/useGameData';
  *
  * @returns JSX.Element
  */
-export default function CanvasPage(): JSX.Element {
+const CanvasPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -60,6 +60,19 @@ export default function CanvasPage(): JSX.Element {
   // Check if this is a "no games" state
   const isNoGamesState = error?.message === '请先创建游戏' || errorMessage === '暂无游戏，请先创建游戏';
 
+  // ✅ 使用 useCallback 优化 - Navigate handlers
+  const handleNavigateToCreateGame = useCallback(() => {
+    navigate('/');
+  }, [navigate]);
+
+  const handleRetry = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  const handleNavigateBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -80,7 +93,7 @@ export default function CanvasPage(): JSX.Element {
         <p>{errorMessage}</p>
         {isNoGamesState ? (
           <Button
-            onClick={() => navigate('/')}
+            onClick={handleNavigateToCreateGame}
             variant="primary"
             data-testid="create-game-button"
           >
@@ -88,10 +101,10 @@ export default function CanvasPage(): JSX.Element {
           </Button>
         ) : (
           <>
-            <Button onClick={() => refetch()} variant="primary" data-testid="retry-button">
+            <Button onClick={handleRetry} variant="primary" data-testid="retry-button">
               重试
             </Button>
-            <Button onClick={() => navigate(-1)} variant="secondary" data-testid="back-button">
+            <Button onClick={handleNavigateBack} variant="secondary" data-testid="back-button">
               返回
             </Button>
           </>
@@ -108,4 +121,9 @@ export default function CanvasPage(): JSX.Element {
       </div>
     </ReactFlowProvider>
   );
-}
+};
+
+// ✅ 添加 React.memo 优化渲染性能
+const CanvasPageMemo = memo(CanvasPage);
+
+export default CanvasPageMemo;

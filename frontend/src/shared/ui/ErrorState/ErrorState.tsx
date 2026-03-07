@@ -37,4 +37,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   );
 };
 
-export default ErrorState;
+// Memoize ErrorState to prevent unnecessary re-renders
+const MemoizedErrorState = React.memo(ErrorState);
+MemoizedErrorState.displayName = 'MemoizedErrorState';
+
+export default MemoizedErrorState;

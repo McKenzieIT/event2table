@@ -110,19 +110,24 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     }
   }, [enabled]);
 
-  // Get FPS color
-  const getFPSColor = (fps: number): string => {
+  // Get FPS color - memoized to prevent recalculation
+  const getFPSColor = useCallback((fps: number): string => {
     if (fps >= 55) return '#52c41a'; // Green
     if (fps >= 45) return '#faad14'; // Yellow
     return '#ff4d4f'; // Red
-  };
+  }, []);
 
-  // Get memory color
-  const getMemoryColor = (memory: number): string => {
+  // Get memory color - memoized to prevent recalculation
+  const getMemoryColor = useCallback((memory: number): string => {
     if (memory < 100) return '#52c41a';
     if (memory < 200) return '#faad14';
     return '#ff4d4f';
-  };
+  }, []);
+
+  // Close button handler - memoized
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+  }, []);
 
   if (!enabled || !isVisible) return null;
 
@@ -131,7 +136,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       <div className="perf-header">
         <span>Performance Monitor</span>
         <button
-          onClick={() => setIsVisible(false)}
+          onClick={handleClose}
           className="perf-close"
           aria-label="Close"
         >
@@ -180,6 +185,10 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     </div>
   );
 };
+
+// Memoize PerformanceMonitor - only re-render when props change
+const MemoizedPerformanceMonitor = React.memo(PerformanceMonitor);
+MemoizedPerformanceMonitor.displayName = 'MemoizedPerformanceMonitor';
 
 /**
  * PerformanceMonitor.css
@@ -294,4 +303,4 @@ const css = `
 // Export CSS for use in CSS file
 export const performanceMonitorCSS = css;
 
-export default PerformanceMonitor;
+export default MemoizedPerformanceMonitor;

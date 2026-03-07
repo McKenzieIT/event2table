@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Button } from '@shared/ui';
 import './SearchBar.css';
 import type { SearchBarProps } from './types';
@@ -19,14 +19,14 @@ import type { SearchBarProps } from './types';
  * @example
  * <SearchBar onSearch={(term) => console.log(term)} />
  */
-export default function SearchBar({ onSearch }: SearchBarProps): React.JSX.Element {
+function SearchBar({ onSearch }: SearchBarProps): React.JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleToggle = (): void => {
+  const handleToggle = useCallback((): void => {
     setIsExpanded(!isExpanded);
-  };
+  }, [isExpanded]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function SearchBar({ onSearch }: SearchBarProps): React.JSX.Eleme
     };
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value;
     setSearchTerm(value);
 
@@ -50,26 +50,27 @@ export default function SearchBar({ onSearch }: SearchBarProps): React.JSX.Eleme
     debounceRef.current = setTimeout(() => {
       onSearch(value);
     }, 300);
-  };
+  }, [onSearch]);
 
-  const handleClear = (): void => {
+  const handleClear = useCallback((): void => {
     setSearchTerm('');
     onSearch('');
-  };
+  }, [onSearch]);
 
-  const searchIcon = (
+  // Memoize icons to prevent recreation on each render
+  const searchIcon = useMemo(() => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8"></circle>
       <path d="m21 21-4.35-4.35"></path>
     </svg>
-  );
+  ), []);
 
-  const clearIcon = (
+  const clearIcon = useMemo(() => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <line x1="18" y1="6" x2="6" y2="18"></line>
       <line x1="6" y1="6" x2="18" y2="18"></line>
     </svg>
-  );
+  ), []);
 
   return (
     <div className={`search-bar ${isExpanded ? 'expanded' : 'collapsed'}`}>
@@ -108,3 +109,12 @@ export default function SearchBar({ onSearch }: SearchBarProps): React.JSX.Eleme
     </div>
   );
 }
+
+// Memoize SearchBar - only re-render when onSearch callback changes
+const MemoizedSearchBar = React.memo(SearchBar, (prevProps, nextProps) => {
+  return prevProps.onSearch === nextProps.onSearch;
+});
+
+MemoizedSearchBar.displayName = 'MemoizedSearchBar';
+
+export default MemoizedSearchBar;

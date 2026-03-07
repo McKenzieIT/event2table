@@ -30,7 +30,7 @@
  * />
  */
 
-import React, { useCallback, useEffect, forwardRef, useRef, RefObject } from 'react';
+import React, { useCallback, useEffect, forwardRef, useRef, useMemo, RefObject } from 'react';
 import './Checkbox.css';
 
 /**
@@ -147,20 +147,28 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
     }
   }, [disabled, onChange]);
 
-  const wrapperClass = [
-    'cyber-checkbox-wrapper',
-    isInvalid && 'cyber-checkbox-wrapper--invalid',
-    disabled && 'cyber-checkbox-wrapper--disabled',
-    className
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const wrapperClass = useMemo(() => {
+    return [
+      'cyber-checkbox-wrapper',
+      isInvalid && 'cyber-checkbox-wrapper--invalid',
+      disabled && 'cyber-checkbox-wrapper--disabled',
+      className
+    ].filter(Boolean).join(' ');
+  }, [isInvalid, disabled, className]);
 
-  const checkboxClass = [
-    'cyber-checkbox',
-    checked && 'cyber-checkbox--checked',
-    indeterminate && 'cyber-checkbox--indeterminate',
-    isInvalid && 'cyber-checkbox--invalid',
-    disabled && 'cyber-checkbox--disabled'
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const checkboxClass = useMemo(() => {
+    return [
+      'cyber-checkbox',
+      checked && 'cyber-checkbox--checked',
+      indeterminate && 'cyber-checkbox--indeterminate',
+      isInvalid && 'cyber-checkbox--invalid',
+      disabled && 'cyber-checkbox--disabled'
+    ].filter(Boolean).join(' ');
+  }, [checked, indeterminate, isInvalid, disabled]);
 
   return (
     <div className={wrapperClass}>

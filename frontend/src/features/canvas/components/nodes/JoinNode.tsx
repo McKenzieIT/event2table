@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import './JoinNode.css';
 
@@ -43,7 +43,7 @@ interface JoinNodeProps {
  * - One output port
  * - Displays join type badge (INNER, LEFT, RIGHT, FULL, CROSS)
  */
-export default function JoinNode({ data }: JoinNodeProps): React.ReactElement {
+function JoinNode({ data }: JoinNodeProps): React.ReactElement {
   const joinType = data.config?.join_type || 'INNER';
 
   return (
@@ -89,3 +89,7 @@ export default function JoinNode({ data }: JoinNodeProps): React.ReactElement {
     </div>
   );
 }
+
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const JoinNodeMemo = memo(JoinNode);
+export default JoinNodeMemo;

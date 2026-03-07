@@ -34,7 +34,7 @@ export function Breadcrumb({ items, separator = '>' }) {
       <ol className="breadcrumb-list">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
-          
+
           return (
             <li key={index} className={`breadcrumb-item ${isLast ? 'active' : ''}`}>
               {item.to && !isLast ? (
@@ -55,4 +55,8 @@ export function Breadcrumb({ items, separator = '>' }) {
   );
 }
 
-export default Breadcrumb;
+// Memoize to prevent unnecessary re-renders when parent updates
+const MemoizedBreadcrumb = React.memo(Breadcrumb);
+MemoizedBreadcrumb.displayName = 'MemoizedBreadcrumb';
+
+export default MemoizedBreadcrumb;

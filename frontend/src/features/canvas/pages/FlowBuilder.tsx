@@ -1,11 +1,7 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
+// ✅ React Performance Optimization: Added React.memo, useMemo
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card } from '@shared/ui';
 import { useGameContext } from '@shared/hooks/useGameContext';
@@ -21,7 +17,7 @@ import './FlowBuilder.css';
  *
  * @returns JSX.Element
  */
-function FlowBuilder(): JSX.Element {
+const FlowBuilder: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { currentGameGid } = useGameContext();
 
@@ -53,6 +49,9 @@ function FlowBuilder(): JSX.Element {
       </Card>
     </div>
   );
-}
+};
 
-export default FlowBuilder;
+// ✅ 添加 React.memo 优化渲染性能
+const FlowBuilderMemo = memo(FlowBuilder);
+
+export default FlowBuilderMemo;

@@ -20,12 +20,12 @@
  * @date 2026-01-29
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { BaseModal, Pagination, Button, Spinner } from '@shared/ui';
 import './DataPreviewModal.css';
 import type { DataPreviewModalProps, PreviewDataResponse } from './types';
 
-export default function DataPreviewModal({
+function DataPreviewModal({
   isOpen,
   onClose,
   sql,
@@ -49,8 +49,8 @@ export default function DataPreviewModal({
     }
   }, [isOpen, sql]);
 
-  // Load preview data from backend
-  const loadPreviewData = async (): Promise<void> => {
+  // ⚡ PERF: 使用 useCallback 稳定加载函数
+  const loadPreviewData = useCallback(async (): Promise<void> => {
     if (!sql) return;
 
     setLoading(true);
@@ -82,10 +82,10 @@ export default function DataPreviewModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, [sql, outputFields]);
 
   // Export to CSV
-  const handleExportCSV = (): void => {
+  const handleExportCSV = useCallback((): void => {
     if (!data || !data.columns || !data.rows) return;
 
     setExporting(true);
@@ -116,7 +116,7 @@ export default function DataPreviewModal({
     } finally {
       setExporting(false);
     }
-  };
+  }, [data, gameData]);
 
   // Calculate pagination
   const totalPages = data ? Math.ceil(data.row_count / pageSize) : 1;
@@ -125,7 +125,7 @@ export default function DataPreviewModal({
   const currentRows = data ? data.rows.slice(startIndex, endIndex) : [];
 
   // Format cell value for display
-  const formatCellValue = (value: unknown, column: string): React.ReactNode => {
+  const formatCellValue = useCallback((value: unknown, column: string): React.ReactNode => {
     if (value === null || value === undefined) {
       return <span className="null-value">NULL</span>;
     }
@@ -139,7 +139,7 @@ export default function DataPreviewModal({
     }
 
     return String(value);
-  };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -275,3 +275,7 @@ export default function DataPreviewModal({
     </BaseModal>
   );
 }
+
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const DataPreviewModalMemo = memo(DataPreviewModal);
+export default DataPreviewModalMemo;

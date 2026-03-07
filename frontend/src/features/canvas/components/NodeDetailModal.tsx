@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React from "react";
+import React, { memo } from "react";
 import "./NodeDetailModal.css";
 import type { NodeDetailModalProps, CanvasNode } from "./types";
 
@@ -13,7 +13,7 @@ import type { NodeDetailModalProps, CanvasNode } from "./types";
  * 节点详情模态框
  * 显示节点的完整信息，包括事件配置、字段列表等
  */
-export default function NodeDetailModal({
+function NodeDetailModal({
   isOpen,
   node,
   onClose,
@@ -150,3 +150,7 @@ export default function NodeDetailModal({
     </div>
   );
 }
+
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const NodeDetailModalMemo = memo(NodeDetailModal);
+export default NodeDetailModalMemo;

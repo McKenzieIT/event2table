@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Handle, Position, Node } from 'reactflow';
 import './EventNode.css';
 
@@ -59,7 +59,7 @@ interface EventNodeProps extends Node<EventNodeData> {
  * />
  * ```
  */
-export default function EventNode({ data }: EventNodeProps): React.ReactElement {
+function EventNode({ data }: EventNodeProps): React.ReactElement {
     return (
         <div className="custom-node event-node">
             {/* Output port */}
@@ -99,4 +99,7 @@ export default function EventNode({ data }: EventNodeProps): React.ReactElement 
     );
 }
 
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const EventNodeMemo = memo(EventNode);
+export default EventNodeMemo;
 export type { EventNodeData, EventNodeProps };

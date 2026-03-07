@@ -1,9 +1,6 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF - Canvas: Optimized with React.memo, useCallback
+// ✅ Performance optimization: Prevent unnecessary re-renders in canvas flow editor
+// See: docs/reports/2026-03-06/FEATURES-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useState, useCallback, useEffect, ReactNode, memo } from 'react';
@@ -352,6 +349,20 @@ const CanvasFlow: React.FC<CanvasFlowProps> = ({ gameData, flowId }) => {
         }
     }, [gameData.gid, nodes, edges, toastWarning, getAvailableFields]);
 
+    // ⚡ PERF: 使用 useCallback 稳定 onSelectionChange 回调
+    const handleSelectionChange = useCallback((params: OnSelectionChangeParams) => {
+        // Update properties panel when selection changes
+        if (params.nodes.length === 1) {
+            const selectedNode = nodes.find(n => n.id === params.nodes[0]);
+            if (selectedNode) {
+                setSelectedForProperties(selectedNode);
+                setShowPropertiesPanel(true);
+            }
+        } else if (params.nodes.length === 0) {
+            // Don't auto-hide panel when clicking on canvas, user must close it manually
+        }
+    }, [nodes]);
+
     // Apply JOIN configuration
     const handleJoinConfigApply = useCallback((config: Record<string, unknown>) => {
         if (!selectedNode) return;
@@ -565,18 +576,7 @@ const CanvasFlow: React.FC<CanvasFlowProps> = ({ gameData, flowId }) => {
                     onDragOver={onDragOver}
                     onNodeClick={onNodeClick}
                     onNodeDoubleClick={onNodeDoubleClick}
-                    onSelectionChange={(params: OnSelectionChangeParams) => {
-                        // Update properties panel when selection changes
-                        if (params.nodes.length === 1) {
-                            const selectedNode = nodes.find(n => n.id === params.nodes[0]);
-                            if (selectedNode) {
-                                setSelectedForProperties(selectedNode);
-                                setShowPropertiesPanel(true);
-                            }
-                        } else if (params.nodes.length === 0) {
-                            // Don't auto-hide panel when clicking on canvas, user must close it manually
-                        }
-                    }}
+                    onSelectionChange={handleSelectionChange}
                     nodeTypes={nodeTypes}
                     fitView
                     className="react-flow-canvas"

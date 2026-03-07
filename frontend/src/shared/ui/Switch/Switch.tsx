@@ -29,7 +29,7 @@
  * />
  */
 
-import React, { useCallback, useEffect, forwardRef, useRef, useId } from 'react';
+import React, { useCallback, useEffect, forwardRef, useRef, useMemo, useId } from 'react';
 import './Switch.css';
 
 /**
@@ -135,19 +135,27 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
     }
   }, [disabled, onChange]);
 
-  const wrapperClass = [
-    'cyber-switch-wrapper',
-    isInvalid && 'cyber-switch-wrapper--invalid',
-    disabled && 'cyber-switch-wrapper--disabled',
-    className
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const wrapperClass = useMemo(() => {
+    return [
+      'cyber-switch-wrapper',
+      isInvalid && 'cyber-switch-wrapper--invalid',
+      disabled && 'cyber-switch-wrapper--disabled',
+      className
+    ].filter(Boolean).join(' ');
+  }, [isInvalid, disabled, className]);
 
-  const switchClass = [
-    'cyber-switch',
-    checked && 'cyber-switch--checked',
-    isInvalid && 'cyber-switch--invalid',
-    disabled && 'cyber-switch--disabled'
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const switchClass = useMemo(() => {
+    return [
+      'cyber-switch',
+      checked && 'cyber-switch--checked',
+      isInvalid && 'cyber-switch--invalid',
+      disabled && 'cyber-switch--disabled'
+    ].filter(Boolean).join(' ');
+  }, [checked, isInvalid, disabled]);
 
   return (
     <div className={wrapperClass}>

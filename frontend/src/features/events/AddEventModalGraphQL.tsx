@@ -1,3 +1,7 @@
+// ⚡️ REACT PERF - Features: Optimized with React.memo, useCallback
+// ✅ Performance optimization: Prevent unnecessary re-renders in add event form
+// See: docs/reports/2026-03-06/FEATURES-OPTIMIZATION-REPORT.md
+
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * AddEventModalGraphQL - 添加事件模态框（GraphQL版本）
@@ -5,7 +9,7 @@
  * 使用GraphQL Mutation替代REST API
  */
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useCallback, memo } from 'react';
 import { BaseModal, Button, Input, Select, useToast } from '@shared/ui';
 import { useCreateEvent } from '../../graphql/hooks';
 import './AddEventModal.css';
@@ -44,8 +48,8 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
   // GraphQL Mutation
   const [createEvent, { loading: isSubmitting }] = useCreateEvent();
 
-  // Handle input change
-  const handleChange = (field: keyof FormData, value: string | boolean) => {
+  // ✅ 使用 useCallback 优化 - Handle input change
+  const handleChange = useCallback((field: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -57,7 +61,7 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
         [field]: undefined
       }));
     }
-  };
+  }, [errors]);
 
   // Validate form
   const validateForm = (): boolean => {
@@ -81,8 +85,8 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle submit
-  const handleSubmit = async (e: FormEvent) => {
+  // ✅ 使用 useCallback 优化 - Handle submit
+  const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -117,10 +121,10 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
       const error = err as { message?: string };
       showError(`创建失败: ${error.message || 'Unknown error'}`);
     }
-  };
+  }, [gameGid, formData, createEvent, success, showError, onClose]);
 
-  // Handle close
-  const handleClose = () => {
+  // ✅ 使用 useCallback 优化 - Handle close
+  const handleClose = useCallback(() => {
     setFormData({
       eventName: '',
       eventNameCn: '',
@@ -129,7 +133,7 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
     });
     setErrors({});
     onClose();
-  };
+  }, [onClose]);
 
   return (
     <BaseModal isOpen={isOpen} onClose={handleClose} title="添加事件" size="md">
@@ -201,4 +205,7 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
   );
 };
 
-export default AddEventModalGraphQL;
+// ✅ 添加 React.memo 优化渲染性能
+const AddEventModalGraphQLMemo = memo(AddEventModalGraphQL);
+
+export default AddEventModalGraphQLMemo;

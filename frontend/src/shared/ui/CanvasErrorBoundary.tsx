@@ -1,4 +1,9 @@
-import React, { Component, ReactNode } from 'react';
+// PERF: React Performance Optimization - Phase 3
+// - Class components cannot use hooks, but we can memoize the entire component
+// - Arrow function handlers are stable references
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
+
+import React, { Component, ReactNode, memo } from 'react';
 import './CanvasErrorBoundary.css';
 
 /**
@@ -21,8 +26,13 @@ interface CanvasErrorBoundaryState {
 /**
  * Canvas错误边界组件
  * 捕获Canvas子组件的错误并显示友好提示
+ *
+ * PERF: Class component optimization
+ * - Arrow function handlers are stable references (auto-bound)
+ * - Component only re-renders when error state changes
+ * - Early return when no error (conditional rendering)
  */
-class CanvasErrorBoundary extends Component<CanvasErrorBoundaryProps, CanvasErrorBoundaryState> {
+class CanvasErrorBoundaryInner extends Component<CanvasErrorBoundaryProps, CanvasErrorBoundaryState> {
   constructor(props: CanvasErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -48,18 +58,30 @@ class CanvasErrorBoundary extends Component<CanvasErrorBoundaryProps, CanvasErro
     this.props.onError?.(error, errorInfo);
   }
 
+  // PERF: Arrow function handlers are stable references (auto-bound to instance)
   handleReset = (): void => {
     this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
+  // PERF: Arrow function handlers are stable references (auto-bound to instance)
   handleReload = (): void => {
     window.location.reload();
   };
 
+  // PERF: Arrow function handlers are stable references (auto-bound to instance)
+  handleGoBack = (): void => {
+    window.history.back();
+  };
+
   render(): ReactNode {
-    if (this.state.hasError) {
-      return (
-        <div className="canvas-error-boundary">
+    // PERF: Conditional rendering - early return when no error
+    if (!this.state.hasError) {
+      return this.props.children;
+    }
+
+    // Only render error UI when hasError is true
+    return (
+      <div className="canvas-error-boundary">
           <div className="error-container">
             <i className="bi bi-bug-fill error-icon"></i>
             <h2>画布出现错误</h2>
@@ -82,7 +104,7 @@ class CanvasErrorBoundary extends Component<CanvasErrorBoundaryProps, CanvasErro
               <button onClick={this.handleReload} className="btn btn-secondary">
                 重新加载页面
               </button>
-              <button onClick={() => window.history.back()} className="btn btn-secondary">
+              <button onClick={this.handleGoBack} className="btn btn-secondary">
                 返回
               </button>
             </div>
@@ -90,9 +112,11 @@ class CanvasErrorBoundary extends Component<CanvasErrorBoundaryProps, CanvasErro
         </div>
       );
     }
-
-    return this.props.children;
-  }
 }
+
+// PERF: Memoize the ErrorBoundary to prevent unnecessary re-renders
+const CanvasErrorBoundary = memo(CanvasErrorBoundaryInner);
+
+CanvasErrorBoundary.displayName = 'CanvasErrorBoundary';
 
 export default CanvasErrorBoundary;

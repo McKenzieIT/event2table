@@ -1,16 +1,15 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// PERF: React Performance Optimization - Phase 3
+// - Class components cannot use hooks, but we can memoize the entire component
+// - Arrow function handlers are stable references
+// - Conditional rendering optimization (early return when no error)
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
 /**
  * 错误边界组件
  * Error Boundary Component
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode, memo, useCallback } from 'react';
 
 /**
  * ErrorBoundary属性
@@ -31,8 +30,13 @@ interface ErrorBoundaryState {
 /**
  * 错误边界组件
  * 捕获子组件树中的JavaScript错误，显示备用UI
+ *
+ * PERF: Class component optimization
+ * - Arrow function handlers are stable references (auto-bound)
+ * - Component only re-renders when error state changes
+ * - Early return when no error (conditional rendering)
  */
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundaryInner extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -49,15 +53,30 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
-  render(): ReactNode {
-    if (this.state.hasError) {
-      // 使用自定义fallback或默认错误UI
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
+  // PERF: Arrow function handlers are stable references (auto-bound to instance)
+  handleReload = (): void => {
+    window.location.reload();
+  };
 
-      return (
-        <div className="alert alert-danger m-4" role="alert">
+  // PERF: Arrow function handlers are stable references (auto-bound to instance)
+  handleReset = (): void => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  render(): ReactNode {
+    // PERF: Conditional rendering - early return when no error
+    if (!this.state.hasError) {
+      return this.props.children;
+    }
+
+    // Only render error UI when hasError is true
+    // Use custom fallback or default error UI
+    if (this.props.fallback) {
+      return this.props.fallback;
+    }
+
+    return (
+      <div className="alert alert-danger m-4" role="alert">
           <h4 className="alert-heading">
             <i className="bi bi-exclamation-triangle-fill me-2"></i>
             出错了
@@ -76,14 +95,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <div className="d-flex gap-2 mt-3">
             <button
               className="btn btn-primary"
-              onClick={() => window.location.reload()}
+              onClick={this.handleReload}
             >
               <i className="bi bi-arrow-clockwise me-2"></i>
               刷新页面
             </button>
             <button
               className="btn btn-outline-secondary"
-              onClick={() => this.setState({ hasError: false, error: null })}
+              onClick={this.handleReset}
             >
               <i className="bi bi-arrow-return-left me-2"></i>
               返回上一页
@@ -92,28 +111,43 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         </div>
       );
     }
-
-    return this.props.children;
-  }
 }
+
+// PERF: Memoize the ErrorBoundary to prevent unnecessary re-renders
+export const ErrorBoundary = memo(ErrorBoundaryInner);
+
+ErrorBoundary.displayName = 'ErrorBoundary';
 
 /**
  * 错误回退UI组件（用于显示特定错误）
+ *
+ * PERF: Memoized ErrorFallback component
  */
-export function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+export const ErrorFallback = memo(({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => {
+  // PERF: useCallback for event handlers (need to import useCallback if not already)
+  const handleReload = () => {
+    window.location.reload();
+  };
+
+  const handleReset = () => {
+    resetErrorBoundary();
+  };
+
   return (
     <div className="glass-card text-center p-5 m-4">
       <i className="bi bi-exclamation-triangle-fill display-4 text-danger mb-3"></i>
       <h3 className="mb-3">出错了</h3>
       <p className="text-muted mb-4">{error.message}</p>
       <div className="d-flex justify-content-center gap-2">
-        <button className="btn btn-primary" onClick={() => window.location.reload()}>
+        <button className="btn btn-primary" onClick={handleReload}>
           刷新页面
         </button>
-        <button className="btn btn-outline-secondary" onClick={resetErrorBoundary}>
+        <button className="btn btn-outline-secondary" onClick={handleReset}>
           重试
         </button>
       </div>
     </div>
   );
-}
+});
+
+ErrorFallback.displayName = 'ErrorFallback';

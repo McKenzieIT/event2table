@@ -5,14 +5,14 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useCallback } from "react";
+import React, { useCallback, memo } from "react";
 import { useReactFlow } from "reactflow";
 import { Button, useToast } from "@shared/ui";
-import { ConfirmDialog } from "@shared/ui/ConfirmDialog/ConfirmDialog";
+import ConfirmDialog from "@shared/ui/ConfirmDialog/ConfirmDialog";
 import "./Toolbar.css";
 import type { ToolbarProps, GameData } from "./types";
 
-export default function Toolbar({ gameData, onExecute, onLocateNodes }: ToolbarProps): React.JSX.Element {
+function Toolbar({ gameData, onExecute, onLocateNodes }: ToolbarProps): React.JSX.Element {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
   const { success: toastSuccess, error: toastError, warning: toastWarning } = useToast();
   const [confirmState, setConfirmState] = React.useState<{
@@ -136,18 +136,7 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }: ToolbarP
     }
   }, [getNodes, getEdges, gameData, toastWarning, toastSuccess, toastError]);
 
-  // 生成HQL（使用新执行引擎）
-  const generateHQL = useCallback(() => {
-    if (onExecute) {
-      // 使用新执行引擎
-      onExecute();
-    } else {
-      // 降级到旧API
-      generateFallbackHQL();
-    }
-  }, [onExecute]);
-
-  // 降级到旧API的HQL生成
+  // ⚡ PERF: 降级到旧API的HQL生成（移到前面以避免TDZ错误）
   const generateFallbackHQL = useCallback(async () => {
     const nodes = getNodes();
     const edges = getEdges();
@@ -214,6 +203,17 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }: ToolbarP
       toastError("生成失败，请检查网络连接");
     }
   }, [getNodes, getEdges, toastWarning, toastError]);
+
+  // 生成HQL（使用新执行引擎）
+  const generateHQL = useCallback(() => {
+    if (onExecute) {
+      // 使用新执行引擎
+      onExecute();
+    } else {
+      // 降级到旧API
+      generateFallbackHQL();
+    }
+  }, [onExecute, generateFallbackHQL]);
 
   // 适应视图
   const fitView = useCallback(() => {
@@ -294,3 +294,7 @@ export default function Toolbar({ gameData, onExecute, onLocateNodes }: ToolbarP
     </div>
   );
 }
+
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const ToolbarMemo = memo(Toolbar);
+export default ToolbarMemo;

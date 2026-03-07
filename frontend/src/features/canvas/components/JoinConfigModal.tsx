@@ -20,13 +20,13 @@
  * @date 2026-01-29
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { BaseModal } from '@shared/ui/BaseModal';
 import { Button, useToast, EmptyState } from '@shared/ui';
 import './JoinConfigModal.css';
 import type { JoinConfigModalProps, JoinConfig, JoinCondition, AvailableFields } from './types';
 
-export default function JoinConfigModal({
+function JoinConfigModal({
   isOpen,
   onClose,
   node,
@@ -43,28 +43,26 @@ export default function JoinConfigModal({
     { leftField: '', rightField: '', operator: '=' }
   ]);
 
-  // 添加条件
-  const addCondition = (): void => {
+  // ⚡ PERF: 使用 useCallback 稳定处理函数
+  const addCondition = useCallback((): void => {
     setConditions([...conditions, {
       leftField: '',
       rightField: '',
       operator: '='
     }]);
-  };
+  }, [conditions]);
 
-  // 删除条件
-  const removeCondition = (index: number): void => {
+  const removeCondition = useCallback((index: number): void => {
     setConditions(conditions.filter((_, i) => i !== index));
-  };
+  }, [conditions]);
 
-  // 更新条件字段
-  const updateCondition = (index: number, field: keyof JoinCondition, value: string): void => {
+  const updateCondition = useCallback((index: number, field: keyof JoinCondition, value: string): void => {
     const newConditions = [...conditions];
     newConditions[index] = { ...newConditions[index], [field]: value };
     setConditions(newConditions);
-  };
+  }, [conditions]);
 
-  // 生成SQL预览
+  // ⚡ PERF: SQL预览使用useMemo缓存计算结果
   const sqlPreview = useMemo(() => {
     const validConditions = conditions.filter(
       c => c.leftField && c.rightField
@@ -81,8 +79,7 @@ export default function JoinConfigModal({
     return `SELECT *\nFROM table1\n${joinType} JOIN table2\nON ${conditionStr};`;
   }, [joinType, conditions]);
 
-  // 应用配置
-  const handleApply = (): void => {
+  const handleApply = useCallback((): void => {
     const validConditions = conditions.filter(
       c => c.leftField && c.rightField
     );
@@ -99,7 +96,7 @@ export default function JoinConfigModal({
 
     onApply(config);
     onClose();
-  };
+  }, [conditions, joinType, onApply, onClose, toastWarning]);
 
   if (!isOpen) return null;
 
@@ -263,3 +260,7 @@ export default function JoinConfigModal({
     </BaseModal>
   );
 }
+
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const JoinConfigModalMemo = memo(JoinConfigModal);
+export default JoinConfigModalMemo;

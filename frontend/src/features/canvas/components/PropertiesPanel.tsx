@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useState, useEffect, useMemo, ChangeEvent } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, ChangeEvent, memo } from 'react';
 import { Button, Input, EmptyState } from '@shared/ui';
 import { FlowNode, FlowEdge } from '../types';
 import './PropertiesPanel.css';
@@ -110,7 +110,7 @@ interface Connections {
  * />
  * ```
  */
-export default function PropertiesPanel({
+function PropertiesPanel({
     selectedNode,
     nodes,
     edges,
@@ -153,32 +153,29 @@ export default function PropertiesPanel({
         return { inputs, outputs };
     }, [selectedNode, edges, nodes]);
 
-    // Handle label change
-    const handleLabelChange = (value: string): void => {
+    // ⚡ PERF: 使用 useCallback 稳定处理函数
+    const handleLabelChange = useCallback((value: string): void => {
         setEditedLabel(value);
         setHasChanges(value !== (selectedNode?.data.label as string || ''));
-    };
+    }, [selectedNode?.data.label]);
 
-    // Handle save changes
-    const handleSave = (): void => {
+    const handleSave = useCallback((): void => {
         if (selectedNode && hasChanges) {
             onUpdateNode(selectedNode.id, { label: editedLabel });
             setHasChanges(false);
         }
-    };
+    }, [selectedNode, hasChanges, editedLabel, onUpdateNode]);
 
-    // Handle cancel changes
-    const handleCancel = (): void => {
+    const handleCancel = useCallback((): void => {
         setEditedLabel(selectedNode?.data.label as string || '');
         setHasChanges(false);
-    };
+    }, [selectedNode?.data.label]);
 
-    // Handle open configuration
-    const handleOpenConfig = (): void => {
+    const handleOpenConfig = useCallback((): void => {
         if (onConfigure && selectedNode) {
             onConfigure(selectedNode);
         }
-    };
+    }, [onConfigure, selectedNode]);
 
     // Render node-specific content
     const renderNodeContent = () => {
@@ -373,9 +370,9 @@ export default function PropertiesPanel({
         output: '输出节点'
     };
 
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
         handleLabelChange(e.target.value);
-    };
+    }, [handleLabelChange]);
 
     return (
         <div className="properties-panel">
@@ -463,4 +460,7 @@ export default function PropertiesPanel({
     );
 }
 
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const PropertiesPanelMemo = memo(PropertiesPanel);
+export default PropertiesPanelMemo;
 export type { PropertiesPanelProps };

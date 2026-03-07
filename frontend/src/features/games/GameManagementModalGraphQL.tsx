@@ -9,7 +9,7 @@
 // 游戏管理组件 - GraphQL版本 (已迁移)
 // 替代原有的REST API版本
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { 
   GET_GAMES, 
@@ -90,8 +90,8 @@ export const GameManagementModal: React.FC = () => {
     },
   });
 
-  // 处理创建游戏
-  const handleCreateGame = (gameData: any) => {
+  // ✅ 使用 useCallback 优化 - 处理创建游戏
+  const handleCreateGame = useCallback((gameData: any) => {
     createGame({
       variables: {
         gid: parseInt(gameData.gid),
@@ -99,12 +99,12 @@ export const GameManagementModal: React.FC = () => {
         ods_db: gameData.ods_db,
       },
     });
-  };
+  }, [createGame]);
 
-  // 处理更新游戏
-  const handleUpdateGame = (gameData: any) => {
+  // ✅ 使用 useCallback 优化 - 处理更新游戏
+  const handleUpdateGame = useCallback((gameData: any) => {
     if (!editingGame) return;
-    
+
     updateGame({
       variables: {
         gid: editingGame.gid,
@@ -112,10 +112,10 @@ export const GameManagementModal: React.FC = () => {
         ods_db: gameData.ods_db,
       },
     });
-  };
+  }, [editingGame, updateGame]);
 
-  // 处理删除游戏
-  const handleDeleteGame = (game: Game) => {
+  // ✅ 使用 useCallback 优化 - 处理删除游戏
+  const handleDeleteGame = useCallback((game: Game) => {
     if (confirm(`确定要删除游戏 "${game.name}" 吗?`)) {
       deleteGame({
         variables: {
@@ -124,7 +124,7 @@ export const GameManagementModal: React.FC = () => {
         },
       });
     }
-  };
+  }, [deleteGame]);
 
   if (loading) return <div className="loading">加载中...</div>;
   if (error) return <div className="error">错误: {error.message}</div>;
@@ -277,4 +277,7 @@ const GameForm: React.FC<GameFormProps> = ({ game, onSubmit, onCancel, loading }
   );
 };
 
-export default GameManagementModal;
+// ✅ 添加 React.memo 优化渲染性能
+const GameManagementModalGraphQLMemo = memo(GameManagementModal);
+
+export default GameManagementModalGraphQLMemo;

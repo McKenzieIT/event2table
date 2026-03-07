@@ -6,7 +6,7 @@
  * @description 提供ESC关闭、点击背景关闭、焦点管理等功能的模态框基础组件
  */
 
-import React, { useState, useEffect, useRef, ReactNode } from 'react';
+import React, { useState, useEffect, useRef, ReactNode, useCallback, useMemo } from 'react';
 import { useEscHandlerWithClosing } from './useEscHandler';
 import ConfirmDialog from './ConfirmDialog';
 import { MODAL_ANIMATION_DELAY } from '@shared/constants/timeouts';
@@ -127,16 +127,16 @@ export const BaseModal = React.memo(function BaseModal({
   const triggerElementRef = useRef<HTMLElement | null>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
 
-  // 构建遮罩层className
-  const overlayClasses = [
+  // PERF: useMemo - 缓存className计算，避免每次渲染重新计算
+  const overlayClasses = useMemo(() => [
     'modal-overlay',
     animation === 'fadeIn' && 'modal-overlay--fadeIn',
     glassmorphism && 'modal-overlay--glassmorphism',
     overlayClassName,
-  ].filter(Boolean).join(' ');
+  ].filter(Boolean).join(' '), [animation, glassmorphism, overlayClassName]);
 
-  // 构建内容className
-  const contentClasses = [
+  // PERF: useMemo - 缓存className计算，避免每次渲染重新计算
+  const contentClasses = useMemo(() => [
     'modal-content',
     `modal-content--${animation}`,
     glassmorphism && 'modal-content--glassmorphism',
@@ -144,18 +144,18 @@ export const BaseModal = React.memo(function BaseModal({
     `modal-content--${variant}`,
     className, // 支持通用的 className prop
     contentClassName, // 支持特定的 contentClassName prop
-  ].filter(Boolean).join(' ');
+  ].filter(Boolean).join(' '), [animation, glassmorphism, size, variant, className, contentClassName]);
 
-  // 确认对话框默认配置
-  const defaultConfirmConfig: Required<ConfirmConfig> = {
+  // PERF: useMemo - 缓存确认对话框配置
+  const defaultConfirmConfig = useMemo<Required<ConfirmConfig>>(() => ({
     title: confirmConfig.title || '确认关闭',
     message: confirmConfig.message || '有未保存的内容，确定要关闭吗？',
     confirmText: confirmConfig.confirmText || '放弃修改',
     cancelText: confirmConfig.cancelText || '继续编辑',
-  };
+  }), [confirmConfig.title, confirmConfig.message, confirmConfig.confirmText, confirmConfig.cancelText]);
 
-  // 处理关闭逻辑
-  const handleClose = async () => {
+  // PERF: useCallback - 稳定关闭回调引用
+  const handleClose = useCallback(async () => {
     // 如果正在关闭中，忽略关闭请求
     if (isClosing) return;
 
@@ -171,10 +171,10 @@ export const BaseModal = React.memo(function BaseModal({
 
     // 执行关闭
     performClose();
-  };
+  }, [isClosing, onBeforeClose]);
 
-  // 执行实际的关闭操作
-  const performClose = () => {
+  // PERF: useCallback - 稳定关闭执行回调引用
+  const performClose = useCallback(() => {
     setIsClosing(true);
     setShowConfirm(false);
 
@@ -184,25 +184,25 @@ export const BaseModal = React.memo(function BaseModal({
       setIsClosing(false);
       onAfterClose?.();
     }, MODAL_ANIMATION_DELAY);
-  };
+  }, [onClose, onAfterClose]);
 
-  // 处理确认对话框的确认操作
-  const handleConfirm = () => {
+  // PERF: useCallback - 稳定确认回调引用
+  const handleConfirm = useCallback(() => {
     setShowConfirm(false);
     performClose();
-  };
+  }, [performClose]);
 
-  // 处理确认对话框的取消操作
-  const handleCancelConfirm = () => {
+  // PERF: useCallback - 稳定取消确认回调引用
+  const handleCancelConfirm = useCallback(() => {
     setShowConfirm(false);
-  };
+  }, []);
 
-  // 处理背景点击
-  const handleBackdropClick = () => {
+  // PERF: useCallback - 稳定背景点击回调引用
+  const handleBackdropClick = useCallback(() => {
     if (closeOnBackdropClick && !isClosing) {
       handleClose();
     }
-  };
+  }, [closeOnBackdropClick, isClosing, handleClose]);
 
   // ESC键处理
   useEscHandlerWithClosing(isClosing, handleClose, {

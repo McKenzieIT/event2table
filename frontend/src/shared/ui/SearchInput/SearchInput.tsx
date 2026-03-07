@@ -1,10 +1,3 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
-
 /**
  * SearchInput Component - 全功能搜索输入组件
  *
@@ -14,6 +7,11 @@
  * - 300ms防抖
  * - Ctrl+K / Cmd+K 快捷键
  * - 清除按钮（有内容时显示）
+ *
+ * 性能优化：
+ * - React.memo防止不必要的重新渲染
+ * - useCallback稳定事件处理器
+ * - useMemo缓存CSS类名计算
  *
  * @example
  * // 基础使用
@@ -33,7 +31,7 @@
  * />
  */
 
-import React, { useState, useEffect, useCallback, useRef, ReactNode, KeyboardEvent, ChangeEvent } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, ReactNode, KeyboardEvent, ChangeEvent } from 'react';
 import './SearchInput.css';
 
 /**
@@ -147,18 +145,26 @@ function SearchInput({
     setShowClearButton((value || '').length > 0);
   }, [value]);
 
-  const wrapperClass = [
-    'search-input-wrapper',
-    disabled && 'search-input-wrapper--disabled',
-    className
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const wrapperClass = useMemo(() => {
+    return [
+      'search-input-wrapper',
+      disabled && 'search-input-wrapper--disabled',
+      className
+    ].filter(Boolean).join(' ');
+  }, [disabled, className]);
 
-  const inputClass = [
-    'search-input',
-    isFocused && 'search-input--focused',
-    showClearButton && 'search-input--has-clear',
-    disabled && 'search-input--disabled'
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const inputClass = useMemo(() => {
+    return [
+      'search-input',
+      isFocused && 'search-input--focused',
+      showClearButton && 'search-input--has-clear',
+      disabled && 'search-input--disabled'
+    ].filter(Boolean).join(' ');
+  }, [isFocused, showClearButton, disabled]);
 
   return (
     <div className={wrapperClass}>
@@ -205,4 +211,20 @@ function SearchInput({
   );
 }
 
-export default SearchInput;
+// PERFORMANCE: React.memo with custom comparison
+// Prevents re-renders when only irrelevant props change
+const MemoizedSearchInput = React.memo(SearchInput, (prevProps, nextProps) => {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.onChange === nextProps.onChange &&
+    prevProps.onClear === nextProps.onClear &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.debounceMs === nextProps.debounceMs &&
+    prevProps.className === nextProps.className
+  );
+});
+
+MemoizedSearchInput.displayName = 'MemoizedSearchInput';
+
+export default MemoizedSearchInput;

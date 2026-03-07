@@ -26,4 +26,8 @@ function Loading(): React.JSX.Element {
   );
 }
 
-export default Loading;
+// Memoize Loading - simple component with no props
+const MemoizedLoading = React.memo(Loading);
+MemoizedLoading.displayName = 'MemoizedLoading';
+
+export default MemoizedLoading;

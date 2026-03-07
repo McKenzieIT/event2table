@@ -41,7 +41,7 @@
  * />
  */
 
-import React, { useCallback, useEffect, forwardRef, useRef } from 'react';
+import React, { useCallback, useEffect, forwardRef, useRef, useMemo } from 'react';
 import './Radio.css';
 
 /**
@@ -145,19 +145,27 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(({
     }
   }, [disabled, onChange]);
 
-  const wrapperClass = [
-    'cyber-radio-wrapper',
-    isInvalid && 'cyber-radio-wrapper--invalid',
-    disabled && 'cyber-radio-wrapper--disabled',
-    className
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const wrapperClass = useMemo(() => {
+    return [
+      'cyber-radio-wrapper',
+      isInvalid && 'cyber-radio-wrapper--invalid',
+      disabled && 'cyber-radio-wrapper--disabled',
+      className
+    ].filter(Boolean).join(' ');
+  }, [isInvalid, disabled, className]);
 
-  const radioClass = [
-    'cyber-radio',
-    checked && 'cyber-radio--checked',
-    isInvalid && 'cyber-radio--invalid',
-    disabled && 'cyber-radio--disabled'
-  ].filter(Boolean).join(' ');
+  // PERFORMANCE: useMemo to cache CSS class computations
+  // Prevents re-creation of class strings on every render
+  const radioClass = useMemo(() => {
+    return [
+      'cyber-radio',
+      checked && 'cyber-radio--checked',
+      isInvalid && 'cyber-radio--invalid',
+      disabled && 'cyber-radio--disabled'
+    ].filter(Boolean).join(' ');
+  }, [checked, isInvalid, disabled]);
 
   return (
     <div className={wrapperClass}>

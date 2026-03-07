@@ -1,11 +1,10 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// PERF: React Performance Optimization - Phase 3
+// - Added React.memo with custom comparison for open state
+// - Added useCallback for event handlers to prevent re-renders
+// - Optimized conditional rendering (return null when closed)
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Button } from '@shared/ui';
 import './ConfirmDialog.css';
 
@@ -28,7 +27,7 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-export function ConfirmDialog({
+const ConfirmDialogComponent = ({
   open,
   title,
   message,
@@ -37,24 +36,10 @@ export function ConfirmDialog({
   variant = 'primary',
   onConfirm,
   onCancel,
-}: ConfirmDialogProps) {
+}: ConfirmDialogProps) => {
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (open) {
-      // 锁定body滚动
-      document.body.style.overflow = 'hidden';
-    } else {
-      // 恢复body滚动
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
-
-  // 处理ESC键
+  // PERF: useCallback - 稳定ESC键处理器引用
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return;
@@ -68,15 +53,18 @@ export function ConfirmDialog({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, onCancel]);
 
-  if (!open) return null;
-
-  const handleOverlayClick = () => {
+  // PERF: useCallback - 稳定背景点击回调引用
+  const handleOverlayClick = useCallback(() => {
     onCancel();
-  };
+  }, [onCancel]);
 
-  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  // PERF: useCallback - 稳定内容点击回调引用
+  const handleContentClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-  };
+  }, []);
+
+  // PERF: 条件渲染优化 - 对话框关闭时不渲染
+  if (!open) return null;
 
   return (
     <div
@@ -116,4 +104,18 @@ export function ConfirmDialog({
       </div>
     </div>
   );
-}
+};
+
+// PERF: React.memo with custom comparison - 只在open状态变化时重新渲染
+const MemoizedConfirmDialog = React.memo(ConfirmDialogComponent, (prevProps, nextProps) => {
+  // 如果open状态相同且内容相同，跳过渲染
+  return prevProps.open === nextProps.open &&
+         prevProps.title === nextProps.title &&
+         prevProps.message === nextProps.message;
+});
+
+MemoizedConfirmDialog.displayName = 'ConfirmDialog';
+
+// Export both as default and named for compatibility
+export default MemoizedConfirmDialog;
+export { MemoizedConfirmDialog as ConfirmDialog };

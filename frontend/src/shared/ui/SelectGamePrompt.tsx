@@ -5,6 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
+import React from 'react';
 import './SelectGamePrompt.css';
 
 /**
@@ -43,4 +44,11 @@ export function SelectGamePrompt({ message }: SelectGamePromptProps): React.JSX.
   );
 }
 
-export default SelectGamePrompt;
+// Memoize SelectGamePrompt - only re-render when message changes
+const MemoizedSelectGamePrompt = React.memo(SelectGamePrompt, (prevProps, nextProps) => {
+  return prevProps.message === nextProps.message;
+});
+
+MemoizedSelectGamePrompt.displayName = 'MemoizedSelectGamePrompt';
+
+export default MemoizedSelectGamePrompt;

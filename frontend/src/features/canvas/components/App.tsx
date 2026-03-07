@@ -32,4 +32,8 @@ function App(): React.JSX.Element {
   );
 }
 
-export default App;
+// Memoize App - simple component with no props changes after mount
+const MemoizedApp = React.memo(App);
+MemoizedApp.displayName = 'MemoizedApp';
+
+export default MemoizedApp;

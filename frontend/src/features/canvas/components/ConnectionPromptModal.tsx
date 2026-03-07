@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, memo } from "react";
 import { Button, Checkbox } from "@shared/ui";
 import "./ConnectionPromptModal.css";
 import type { ConnectionPromptModalProps } from "./types";
@@ -26,7 +26,7 @@ import type { ConnectionPromptModalProps } from "./types";
  *   onSkip={handleSkip}
  * />
  */
-export default function ConnectionPromptModal({
+function ConnectionPromptModal({
   isOpen,
   onClose,
   sourceNode,
@@ -93,7 +93,7 @@ export default function ConnectionPromptModal({
   }, []);
 
   // 生成节点类型的图标
-  const getNodeIcon = (nodeType: string): string => {
+  const getNodeIcon = useCallback((nodeType: string): string => {
     const icons: Record<string, string> = {
       event: "🎮",
       union_all: "🔀",
@@ -101,7 +101,7 @@ export default function ConnectionPromptModal({
       output: "📤",
     };
     return icons[nodeType] || "📦";
-  };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -210,3 +210,7 @@ export default function ConnectionPromptModal({
     </div>
   );
 }
+
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const ConnectionPromptModalMemo = memo(ConnectionPromptModal);
+export default ConnectionPromptModalMemo;

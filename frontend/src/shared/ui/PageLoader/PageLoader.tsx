@@ -10,11 +10,11 @@ interface PageLoaderProps {
   className?: string;
 }
 
-export const PageLoader: React.FC<PageLoaderProps> = ({ 
-  message = '加载中...', 
+export const PageLoader: React.FC<PageLoaderProps> = ({
+  message = '加载中...',
   size = 'lg',
   fullPage = true,
-  className = '' 
+  className = ''
 }) => {
   const content = (
     <div className={`page-loader ${fullPage ? 'page-loader--full' : ''} ${className}`}>
@@ -34,4 +34,8 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
   return content;
 };
 
-export default PageLoader;
+// Memoize PageLoader to prevent unnecessary re-renders
+const MemoizedPageLoader = React.memo(PageLoader);
+MemoizedPageLoader.displayName = 'MemoizedPageLoader';
+
+export default MemoizedPageLoader;

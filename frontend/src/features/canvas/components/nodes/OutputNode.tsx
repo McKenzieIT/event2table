@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Handle, Position } from 'reactflow';
 import './OutputNode.css';
 
@@ -43,8 +43,9 @@ interface OutputNodeProps {
  * - Displays the target view name
  * - No output ports (terminal node)
  */
-export default function OutputNode({ data }: OutputNodeProps): React.ReactElement {
-  const viewName = data.config?.view_name || '未命名';
+function OutputNode({ data }: OutputNodeProps): React.ReactElement {
+  // ⚡ PERF: 使用 useMemo 缓存视图名称
+  const viewName = useMemo(() => data.config?.view_name || '未命名', [data.config?.view_name]);
 
   return (
     <div className="custom-node output-node">
@@ -71,4 +72,7 @@ export default function OutputNode({ data }: OutputNodeProps): React.ReactElemen
   );
 }
 
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const OutputNodeMemo = memo(OutputNode);
+export default OutputNodeMemo;
 export type { OutputNodeData, OutputNodeProps };

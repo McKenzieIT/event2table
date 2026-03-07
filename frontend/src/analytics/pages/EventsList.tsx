@@ -1,3 +1,7 @@
+// ⚡️ REACT PERF: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
+
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useMemo, useCallback } from 'react';

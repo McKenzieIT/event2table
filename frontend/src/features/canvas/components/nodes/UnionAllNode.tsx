@@ -5,7 +5,7 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import './UnionAllNode.css';
 
@@ -35,7 +35,7 @@ interface UnionAllNodeProps {
  * - Single output port
  * - No configuration needed (simple pass-through)
  */
-export default function UnionAllNode({ data }: UnionAllNodeProps): React.ReactElement {
+function UnionAllNode({ data }: UnionAllNodeProps): React.ReactElement {
   return (
     <div className="custom-node union-all-node">
       {/* 输入端口 */}
@@ -68,4 +68,7 @@ export default function UnionAllNode({ data }: UnionAllNodeProps): React.ReactEl
   );
 }
 
+// ⚡ PERF: 使用 React.memo 优化渲染性能
+const UnionAllNodeMemo = memo(UnionAllNode);
+export default UnionAllNodeMemo;
 export type { UnionAllNodeData, UnionAllNodeProps };
