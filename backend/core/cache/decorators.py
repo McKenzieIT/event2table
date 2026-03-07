@@ -116,15 +116,15 @@ def cached_service(
 def invalidate_cache(key_pattern: str, key_params: Optional[list] = None):
     """
     缓存失效装饰器
-    
+
     Args:
         key_pattern: 缓存键模式,支持通配符
             例如: "game:{gid}", "events:{game_gid}:*"
         key_params: 用于构建缓存键的参数名列表
-    
+
     Returns:
         装饰器函数
-    
+
     Example:
         @invalidate_cache("game:{gid}", key_params=['gid'])
         @invalidate_cache("games:list")
@@ -136,10 +136,10 @@ def invalidate_cache(key_pattern: str, key_params: Optional[list] = None):
         def wrapper(*args, **kwargs):
             # 执行原函数
             result = func(*args, **kwargs)
-            
+
             # 失效缓存
             cache_key = _build_cache_key(key_pattern, key_params, args, kwargs, func)
-            
+
             # 如果包含通配符,使用模式失效
             if '*' in cache_key:
                 _invalidator.invalidate_pattern(cache_key)
@@ -147,11 +147,98 @@ def invalidate_cache(key_pattern: str, key_params: Optional[list] = None):
             else:
                 _cache.delete(cache_key)
                 logger.info(f"已失效缓存: {cache_key}")
-            
+
             return result
-        
+
         return wrapper
     return decorator
+
+
+def cache_invalidate(func: Callable) -> Callable:
+    """
+    ⚡ PERF: 自动缓存失效装饰器 (Phase 1.1 - Critical Fix)
+
+    自动失效与函数相关的所有缓存键,无需手动指定键模式。
+
+    工作原理:
+    1. 执行被装饰的函数(CREATE/UPDATE/DELETE操作)
+    2. 根据函数名自动推断需要失效的缓存键
+    3. 自动调用缓存失效逻辑
+
+    Args:
+        func: 需要自动失效缓存的函数
+
+    Returns:
+        包装后的函数
+
+    Example:
+        @cache_invalidate
+        def create_event(self, event_data: dict):
+            # 创建事件后自动失效以下缓存:
+            # - dashboard_statistics
+            # - events:{game_gid}
+            return self.event_repo.create(event_data)
+
+    Supported Cache Keys (自动推断):
+        - create_* → 失效 {resource}_list, dashboard_statistics
+        - update_* → 失效 {resource}:{id}, {resource}_list, dashboard_statistics
+        - delete_* → 失效 {resource}:{id}, {resource}_list, dashboard_statistics
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # 执行原函数
+        result = func(*args, **kwargs)
+
+        # 根据函数名推断需要失效的缓存键
+        func_name = func.__name__
+
+        # 自动失效dashboard_statistics (所有数据变更都影响)
+        try:
+            _cache.delete("dashboard_statistics")
+            logger.info(f"✅ 已失效缓存: dashboard_statistics (由 {func_name} 触发)")
+        except Exception as e:
+            logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+        # 根据函数类型推断其他缓存键
+        if func_name.startswith('create_'):
+            resource = func_name.replace('create_', '')
+            # 失效资源列表缓存
+            list_key = f"{resource}s"
+            try:
+                _cache.delete(list_key)
+                logger.info(f"✅ 已失效缓存: {list_key}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效{list_key}失败: {e}")
+
+        elif func_name.startswith('update_') or func_name.startswith('delete_'):
+            resource = func_name.replace('update_', '').replace('delete_', '')
+
+            # 尝试从参数中获取ID
+            resource_id = None
+            if args:
+                # 假设第一个参数是ID (对于update/delete通常如此)
+                resource_id = args[0] if len(args) > 0 else None
+
+            # 失效具体资源缓存
+            if resource_id:
+                resource_key = f"{resource}:{resource_id}"
+                try:
+                    _cache.delete(resource_key)
+                    logger.info(f"✅ 已失效缓存: {resource_key}")
+                except Exception as e:
+                    logger.warning(f"⚠️ 失效{resource_key}失败: {e}")
+
+            # 失效资源列表缓存
+            list_key = f"{resource}s"
+            try:
+                _cache.delete(list_key)
+                logger.info(f"✅ 已失效缓存: {list_key}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效{list_key}失败: {e}")
+
+        return result
+
+    return wrapper
 
 
 def _build_cache_key(

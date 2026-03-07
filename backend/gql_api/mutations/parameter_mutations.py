@@ -31,13 +31,15 @@ class CreateParameter(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
             from backend.gql_api.types.parameter_type import ParameterType
 
             # Validate event exists
             event = fetch_one_as_dict("SELECT * FROM log_events WHERE id = ?", (event_id,))
             if not event:
                 return CreateParameter(ok=False, errors=[f"Event {event_id} not found"])
+
+            game_gid = event['game_gid']
 
             # Create parameter
             param_id = execute_write(
@@ -48,9 +50,19 @@ class CreateParameter(graphene.Mutation):
                 return_last_id=True
             )
 
-            # Clear cache
-            clear_cache_pattern(f"parameters:{event_id}:*")
-            clear_cache_pattern(f"events:{event['game_gid']}:*")
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics (参数创建)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+            try:
+                hierarchical_cache.delete(f"parameters:{event_id}")
+                hierarchical_cache.delete(f"events:{game_gid}")
+                logger.info(f"✅ 已失效缓存: parameters:{event_id}, events:{game_gid}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效parameters/events缓存失败: {e}")
 
             logger.info(f"Parameter created via GraphQL: {param_name} (ID: {param_id})")
 
@@ -91,7 +103,7 @@ class UpdateParameter(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
 
             # Check if parameter exists
             param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
@@ -131,11 +143,24 @@ class UpdateParameter(graphene.Mutation):
 
             # Get event for cache invalidation
             event = fetch_one_as_dict("SELECT game_gid FROM log_events WHERE id = ?", (param['event_id'],))
+            event_id = param['event_id']
+            game_gid = event['game_gid'] if event else None
 
-            # Clear cache
-            clear_cache_pattern(f"parameters:{param['event_id']}:*")
-            if event:
-                clear_cache_pattern(f"events:{event['game_gid']}:*")
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics (参数更新)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+            try:
+                hierarchical_cache.delete(f"parameters:{event_id}")
+                hierarchical_cache.delete(f"parameter:{id}")
+                if game_gid:
+                    hierarchical_cache.delete(f"events:{game_gid}")
+                logger.info(f"✅ 已失效缓存: parameters:{event_id}, parameter:{id}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效parameters/parameter缓存失败: {e}")
 
             logger.info(f"Parameter updated via GraphQL: ID {id}")
 
@@ -172,7 +197,7 @@ class DeleteParameter(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
 
             # Check if parameter exists
             param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
@@ -192,11 +217,23 @@ class DeleteParameter(graphene.Mutation):
 
             # Get event for cache invalidation
             event = fetch_one_as_dict("SELECT game_gid FROM log_events WHERE id = ?", (event_id,))
+            game_gid = event['game_gid'] if event else None
 
-            # Clear cache
-            clear_cache_pattern(f"parameters:{event_id}:*")
-            if event:
-                clear_cache_pattern(f"events:{event['game_gid']}:*")
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics (参数删除)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+            try:
+                hierarchical_cache.delete(f"parameters:{event_id}")
+                hierarchical_cache.delete(f"parameter:{id}")
+                if game_gid:
+                    hierarchical_cache.delete(f"events:{game_gid}")
+                logger.info(f"✅ 已失效缓存: parameters:{event_id}, parameter:{id}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效parameters/parameter缓存失败: {e}")
 
             logger.info(f"Parameter deleted via GraphQL: ID {id} (hard_delete={hard_delete})")
 

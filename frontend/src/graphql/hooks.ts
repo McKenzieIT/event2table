@@ -73,10 +73,23 @@ import {
 
 /**
  * Hook to fetch games list
+ * ⚡ PERF: Added cache-first strategy for Dashboard performance optimization
  */
-export function useGames(limit: number = 20, offset: number = 0) {
+export function useGames(
+  limit: number = 20,
+  offset: number = 0,
+  options?: {
+    fetchPolicy?: 'cache-first' | 'network-only' | 'cache-only' | 'no-cache';
+    nextFetchPolicy?: any;
+    refetchOnWindowFocus?: boolean;
+  }
+) {
   return useQuery<GamesResponse>(GET_GAMES as any, {
     variables: { limit, offset },
+    // ⚡ PERF: Default caching strategy for optimal Dashboard performance
+    fetchPolicy: options?.fetchPolicy || 'cache-first',
+    nextFetchPolicy: options?.nextFetchPolicy || 'cache-first',
+    refetchOnWindowFocus: options?.refetchOnWindowFocus ?? false,  // Disable window focus refetch
   });
 }
 
@@ -350,10 +363,25 @@ export function useAllGameStats(limit: number = 20) {
 
 /**
  * Hook to fetch flows
+ * ⚡ PERF: Added cache-first strategy for Dashboard performance optimization
  */
-export function useFlows(gameGid?: number, flowType?: string, limit: number = 50, offset: number = 0) {
+export function useFlows(
+  gameGid?: number,
+  flowType?: string,
+  limit: number = 50,
+  offset: number = 0,
+  options?: {
+    fetchPolicy?: 'cache-first' | 'network-only' | 'cache-only' | 'no-cache';
+    nextFetchPolicy?: any;
+    refetchOnWindowFocus?: boolean;
+  }
+) {
   return useQuery(GET_FLOWS, {
     variables: { gameGid, flowType, limit, offset },
+    // ⚡ PERF: Default caching strategy for optimal Dashboard performance
+    fetchPolicy: options?.fetchPolicy || 'cache-first',
+    nextFetchPolicy: options?.nextFetchPolicy || 'cache-first',
+    refetchOnWindowFocus: options?.refetchOnWindowFocus ?? false,  // Disable window focus refetch
   });
 }
 

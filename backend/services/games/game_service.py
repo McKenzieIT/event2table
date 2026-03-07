@@ -21,6 +21,7 @@ import os
 from backend.models.entities import GameEntity
 from backend.models.repositories.games import GameRepository
 from backend.core.cache.cache_system import cached
+from backend.core.cache.decorators import cache_invalidate  # ⚡ PERF: Phase 1.3
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 from backend.core.config.config import CacheConfig
 from backend.core.utils.business_helpers import validate_game_gid
@@ -140,6 +141,7 @@ class GameService:
 
         return game
 
+    @cache_invalidate  # ⚡ PERF: Phase 1.3 - Auto-invalidate dashboard_statistics
     def create_game(self, game_data: GameEntity) -> GameEntity:
         """
         创建游戏 (自动失效缓存 + 更新Bloom Filter)
@@ -178,6 +180,7 @@ class GameService:
 
         return created_game
 
+    @cache_invalidate  # ⚡ PERF: Phase 1.3 - Auto-invalidate dashboard_statistics
     def update_game(self, game_gid: int, updates: Dict[str, Any]) -> GameEntity:
         """
         更新游戏 (自动失效缓存)
@@ -213,6 +216,7 @@ class GameService:
 
         return updated_game
 
+    @cache_invalidate  # ⚡ PERF: Phase 1.3 - Auto-invalidate dashboard_statistics
     def delete_game(self, game_gid: int) -> None:
         """
         删除游戏 (自动失效缓存 + 从Bloom Filter移除)

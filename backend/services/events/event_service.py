@@ -18,6 +18,7 @@ from backend.models.repositories.events import EventRepository
 from backend.models.repositories.games import GameRepository
 from backend.models.repositories.event_categories import EventCategoryRepository
 from backend.core.cache.cache_system import cached
+from backend.core.cache.decorators import cache_invalidate  # ⚡ PERF: Phase 1.3
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 
 logger = logging.getLogger(__name__)
@@ -182,6 +183,7 @@ class EventService:
         """
         return self.event_repo.get_with_parameters(event_id)
 
+    @cache_invalidate  # ⚡ PERF: Phase 1.3 - Auto-invalidate dashboard_statistics
     def create_event(self, event_data: EventEntity) -> EventEntity:
         """Create a new event with cache invalidation and Bloom Filter update.
 
@@ -234,6 +236,7 @@ class EventService:
 
         return result
 
+    @cache_invalidate  # ⚡ PERF: Phase 1.3 - Auto-invalidate dashboard_statistics
     def update_event(
         self, event_id: int, updates: Dict[str, Any]
     ) -> EventEntity:
@@ -270,6 +273,7 @@ class EventService:
 
         return result
 
+    @cache_invalidate  # ⚡ PERF: Phase 1.3 - Auto-invalidate dashboard_statistics
     def delete_event(self, event_id: int) -> None:
         """Delete event with automatic cache invalidation.
 

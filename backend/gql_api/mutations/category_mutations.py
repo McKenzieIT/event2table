@@ -25,7 +25,7 @@ class CreateCategory(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
             from backend.gql_api.types.category_type import CategoryType
 
             # Check if category already exists
@@ -40,8 +40,13 @@ class CreateCategory(graphene.Mutation):
                 return_last_id=True
             )
 
-            # Clear cache
-            clear_cache_pattern("categories:*")
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                hierarchical_cache.delete("categories")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics, categories (分类创建)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效缓存失败: {e}")
 
             logger.info(f"Category created via GraphQL: {name} (ID: {category_id})")
 
@@ -80,7 +85,7 @@ class UpdateCategory(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
 
             # Check if category exists
             category = fetch_one_as_dict("SELECT * FROM event_categories WHERE id = ?", (id,))
@@ -101,9 +106,14 @@ class UpdateCategory(graphene.Mutation):
                 (name, id)
             )
 
-            # Clear cache
-            clear_cache_pattern("categories:*")
-            clear_cache_pattern("events:*")
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                hierarchical_cache.delete("categories")
+                hierarchical_cache.delete(f"category:{id}")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics, categories (分类更新)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效缓存失败: {e}")
 
             logger.info(f"Category updated via GraphQL: ID {id}")
 
@@ -141,7 +151,7 @@ class DeleteCategory(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
 
             # Check if category exists
             category = fetch_one_as_dict("SELECT * FROM event_categories WHERE id = ?", (id,))
@@ -163,8 +173,14 @@ class DeleteCategory(graphene.Mutation):
             # Delete category
             execute_write("DELETE FROM event_categories WHERE id = ?", (id,))
 
-            # Clear cache
-            clear_cache_pattern("categories:*")
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                hierarchical_cache.delete("categories")
+                hierarchical_cache.delete(f"category:{id}")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics, categories (分类删除)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效缓存失败: {e}")
 
             logger.info(f"Category deleted via GraphQL: ID {id}")
 

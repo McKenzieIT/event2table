@@ -30,34 +30,43 @@ class CreateEvent(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
             from backend.gql_api.types.event_type import EventType
-            
+
             # Validate game exists
             game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
             if not game:
                 return CreateEvent(ok=False, errors=[f"Game {game_gid} not found"])
-            
+
             # Generate table names
             ods_db = game['ods_db']
             source_table = f"{ods_db}.ods_{game_gid}_all_view"
             dwd_prefix = "ieu_cdm" if ods_db == "ieu_ods" else ods_db
             clean_name = event_name.replace(".", "_")
             target_table = f"{dwd_prefix}.v_dwd_{game_gid}_{clean_name}_di"
-            
+
             # Create event
             event_id = execute_write(
-                """INSERT INTO log_events 
+                """INSERT INTO log_events
                    (game_gid, event_name, event_name_cn, category_id, source_table, target_table, include_in_common_params)
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                (game_gid, event_name, event_name_cn, category_id, source_table, target_table, 
+                (game_gid, event_name, event_name_cn, category_id, source_table, target_table,
                  1 if include_in_common_params else 0),
                 return_last_id=True
             )
-            
-            # Clear cache
-            clear_cache_pattern(f"events:{game_gid}:*")
-            clear_cache_pattern("dashboard_statistics")
+
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics (事件创建)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+            try:
+                hierarchical_cache.delete(f"events:{game_gid}")
+                logger.info(f"✅ 已失效缓存: events:{game_gid}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效events:{game_gid}失败: {e}")
             
             logger.info(f"Event created via GraphQL: {event_name} (ID: {event_id})")
             
@@ -97,40 +106,51 @@ class UpdateEvent(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
-            
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
+
             # Check if event exists
             event = fetch_one_as_dict("SELECT * FROM log_events WHERE id = ?", (id,))
             if not event:
                 return UpdateEvent(ok=False, errors=["Event not found"])
-            
+
             # Build update query
             updates = []
             params = []
-            
+
             if event_name_cn:
                 updates.append("event_name_cn = ?")
                 params.append(event_name_cn)
-            
+
             if category_id:
                 updates.append("category_id = ?")
                 params.append(category_id)
-            
+
             if include_in_common_params is not None:
                 updates.append("include_in_common_params = ?")
                 params.append(1 if include_in_common_params else 0)
-            
+
             if not updates:
                 return UpdateEvent(ok=False, errors=["No fields to update"])
-            
+
             params.append(id)
             query = f"UPDATE log_events SET {', '.join(updates)} WHERE id = ?"
-            
+
             execute_write(query, tuple(params))
-            
-            # Clear cache
-            clear_cache_pattern(f"events:{event['game_gid']}:*")
-            clear_cache_pattern("dashboard_statistics")
+
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            game_gid = event['game_gid']
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics (事件更新)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+            try:
+                hierarchical_cache.delete(f"events:{game_gid}")
+                hierarchical_cache.delete(f"event:{id}")
+                logger.info(f"✅ 已失效缓存: events:{game_gid}, event:{id}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效events/event缓存失败: {e}")
             
             logger.info(f"Event updated via GraphQL: ID {id}")
             
@@ -166,27 +186,37 @@ class DeleteEvent(graphene.Mutation):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
-            from backend.core.cache.cache_system import clear_cache_pattern
-            
+            from backend.core.cache.cache_system import hierarchical_cache  # ⚡ PERF: Phase 1.2 Fix
+
             # Check if event exists
             event = fetch_one_as_dict("SELECT * FROM log_events WHERE id = ?", (id,))
             if not event:
                 return DeleteEvent(ok=False, errors=["Event not found"])
-            
+
             game_gid = event['game_gid']
-            
+
             # Delete associated parameters
             execute_write("DELETE FROM event_params WHERE event_id = ?", (id,))
-            
+
             # Delete event
             execute_write("DELETE FROM log_events WHERE id = ?", (id,))
-            
-            # Clear cache
-            clear_cache_pattern(f"events:{game_gid}:*")
-            clear_cache_pattern("dashboard_statistics")
-            
+
+            # ⚡ PERF: Phase 1.2 Fix - Correct cache invalidation
+            try:
+                hierarchical_cache.delete("dashboard_statistics")
+                logger.info(f"✅ 已失效缓存: dashboard_statistics (事件删除)")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+            try:
+                hierarchical_cache.delete(f"events:{game_gid}")
+                hierarchical_cache.delete(f"event:{id}")
+                logger.info(f"✅ 已失效缓存: events:{game_gid}, event:{id}")
+            except Exception as e:
+                logger.warning(f"⚠️ 失效events/event缓存失败: {e}")
+
             logger.info(f"Event deleted via GraphQL: ID {id}")
-            
+
             return DeleteEvent(ok=True, message="Event deleted successfully")
             
         except Exception as e:
