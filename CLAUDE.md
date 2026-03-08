@@ -517,6 +517,218 @@ except Exception as e:
 - [ ] 输出编码（JSON响应，不暴露内部信息）
 - [ ] 错误处理（适当的HTTP状态码：400/404/409/500）
 
+---
+
+### GraphQL类型同步规范 ⚠️ **极其重要 - 2026-03-08新增**
+
+> **🚨 前端TypeScript类型必须与后端GraphQL schema保持一致**
+> **🆕 更新 (2026-03-08)**: 建立GraphQL类型同步规范，防止前后端类型不一致导致的运行时错误
+
+#### 核心原则
+
+**类型一致性**：前端TypeScript枚举和类型必须完全匹配后端GraphQL schema定义
+
+**为什么重要**：
+- 类型不匹配会导致GraphQL 400错误（Bad Request）
+- 枚举值大小写或格式不一致会直接导致API调用失败
+- 开发时难以发现，只在运行时暴露问题
+
+#### GraphQL枚举命名规范
+
+**后端GraphQL Schema**：
+```graphql
+# ✅ 正确：UPPER_SNAKE_CASE（GraphQL标准）
+enum HqlJoinType {
+  LEFT_JOIN
+  RIGHT_JOIN
+  INNER_JOIN
+  FULL_JOIN
+}
+
+enum NodeType {
+  EVENT
+  JOIN
+  UNION
+  FILTER
+}
+```
+
+**前端TypeScript**：
+```typescript
+// ✅ 正确：完全匹配GraphQL schema（大小写、格式）
+export enum HqlJoinType {
+  LEFT_JOIN = "LEFT_JOIN",
+  RIGHT_JOIN = "RIGHT_JOIN",
+  INNER_JOIN = "INNER_JOIN",
+  FULL_JOIN = "FULL_JOIN"
+}
+
+// ❌ 错误：使用连字符导致400错误
+export enum HqlJoinType {
+  LEFT_JOIN = "LEFT-JOIN",      // GraphQL无法解析
+  RIGHT_JOIN = "RIGHT-JOIN"     // GraphQL无法解析
+}
+```
+
+**错误示例**：
+```typescript
+// ❌ 错误：枚举值不匹配
+const mutation = CREATE_EVENT_NODE({
+  variables: {
+    input: {
+      joinType: "LEFT-JOIN"  // GraphQL期望: LEFT_JOIN
+    }
+  }
+});
+
+// 错误信息：Enum 'HqlJoinType' cannot represent value: 'LEFT-JOIN'
+// HTTP状态码：400 Bad Request
+```
+
+#### Pydantic模型完整性
+
+**后端Pydantic Schema** (`backend/models/schemas.py`)：
+```python
+from pydantic import BaseModel, Field
+from typing import Optional
+
+class EventNodeInput(BaseModel):
+    """Event node creation/update input"""
+
+    # ✅ 所有字段必须在Pydantic模型中定义
+    id: Optional[int] = Field(None, description="Node ID")
+    node_type: str = Field(..., description="Node type")
+    event_type: Optional[str] = Field(None, description="Event type")  # ← 必须定义
+    table_name: Optional[str] = Field(None, description="Table name")
+    join_type: Optional[str] = Field(None, description="Join type")
+```
+
+**Service层访问**：
+```python
+def create_event_node(self, node_data: EventNodeInput):
+    # ✅ 安全：所有字段已在Pydantic模型中定义
+    event_type = node_data.event_type  # 字段存在，无AttributeError
+
+    # ❌ 危险：如果event_type未定义，会抛出AttributeError
+    # AttributeError: 'EventNodeInput' object has no attribute 'event_type'
+```
+
+#### 自动化类型生成
+
+**使用graphql-codegen生成类型**：
+
+```bash
+# 安装graphql-codegen
+npm install --save-dev @graphql-codegen/cli
+npm install --save-dev @graphql-codegen/typescript
+npm install --save-dev @graphql-codegen/typescript-operations
+
+# 配置文件：codegen.yml
+schema:
+  - http://127.0.0.1:5001/api/graphql
+
+documents:
+  - "frontend/src/graphql/**/*.tsx"
+
+generates:
+  frontend/src/graphql/generated-types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+```
+
+**生成类型**：
+```bash
+# 从GraphQL schema自动生成TypeScript类型
+npx graphql-codegen
+
+# 添加到package.json scripts
+"scripts": {
+  "generate:types": "graphql-codegen",
+  "predev": "npm run generate:types"  # 开发前自动生成
+}
+```
+
+**使用生成的类型**：
+```typescript
+// frontend/src/canvas/components/EventNodeBuilder.tsx
+import { CreateEventNodeMutation, HqlJoinType } from '@/graphql/generated-types';
+
+function EventNodeBuilder() {
+  const [createNode] = useMutation(CREATE_EVENT_NODE);
+
+  const handleCreate = async () => {
+    // ✅ 类型安全：所有类型从GraphQL schema生成
+    const result = await createNode({
+      variables: {
+        input: {
+          nodeType: NodeType.Join,
+          joinType: HqlJoinType.LeftJoin  // 枚举类型安全
+        }
+      }
+    });
+  };
+}
+```
+
+#### 代码审查检查清单
+
+**后端检查**：
+- [ ] Pydantic模型是否包含所有Service层访问的字段？
+- [ ] 所有字段是否有正确的类型注解（Optional[str]、str、int）？
+- [ ] GraphQL枚举是否使用UPPER_SNAKE_CASE？
+- [ ] GraphQL枚举值是否与Pydantic模型一致？
+
+**前端检查**：
+- [ ] TypeScript枚举是否完全匹配GraphQL schema（大小写敏感）？
+- [ ] 是否使用graphql-codegen生成类型？
+- [ ] 是否避免硬编码枚举字符串？
+- [ ] 是否使用生成的枚举类型而非字符串字面量？
+
+**集成检查**：
+- [ ] 运行API契约测试：`python backend/scripts/test/api_contract_test.py`
+- [ ] 生成最新类型：`npm run generate:types`
+- [ ] 测试GraphQL mutation（有效枚举值）
+- [ ] 测试GraphQL mutation（无效枚举值，应失败）
+
+#### 常见错误
+
+**错误1: 枚举值格式不匹配**
+```typescript
+// ❌ 错误：连字符 vs 下划线
+joinType: "LEFT-JOIN"     // 错误
+joinType: "LEFT_JOIN"     // 正确
+```
+
+**错误2: Pydantic字段缺失**
+```python
+# ❌ 错误：Service层访问未定义的字段
+class EventNodeInput(BaseModel):
+    node_type: str
+    # 缺少event_type字段
+
+# Service层抛出AttributeError
+event_type = node_data.event_type  # AttributeError
+```
+
+**错误3: 硬编码枚举字符串**
+```typescript
+// ❌ 错误：硬编码字符串，容易拼写错误
+joinType: "LEFT_JION"  // 拼写错误
+
+// ✅ 正确：使用生成的枚举
+joinType: HqlJoinType.LeftJoin  // 类型安全
+```
+
+#### 相关文档
+
+- [Event Node Builder错误修复](docs/lessons-learned/event-node-builder-errors.md) - GraphQL类型不匹配案例 ⭐
+- [GraphQL开发指南](docs/development/graphql-development-guide.md) - 完整GraphQL开发规范 ⭐
+- [API契约测试规范](#api契约测试规范-⚠️-极其重要---强制执行) - API契约一致性测试
+- [React最佳实践](docs/lessons-learned/react-best-practices.md) - React组件类型安全
+
+---
+
 ### 数据库文件位置规范 ⚠️ **极其重要 - 强制执行**
 
 > **🚨 所有数据库文件必须放在 data/ 目录，禁止在根目录或其他位置创建数据库文件**
@@ -853,7 +1065,7 @@ CORS(app, resources={r"/api/*": {"origins": ["https://event2table.com"]}})
 
 ---
 
-## 经验文档快速查找 ⭐ **极其重要 - 2026-03-04更新**
+## 经验文档快速查找 ⭐ **极其重要 - 2026-03-08更新**
 
 > **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
 
@@ -869,6 +1081,18 @@ CORS(app, resources={r"/api/*": {"origins": ["https://event2table.com"]}})
 | **🐌 页面加载超时** | [React最佳实践 - Lazy Loading](docs/lessons-learned/react-best-practices.md#lazy-loading最佳实践) | P0 |
 | **💾 缓存失效分析** | [性能模式 - 缓存失效](docs/lessons-learned/performance-patterns.md#缓存失效分析) | P0 |
 | **🚀 并行优化策略** | [性能模式 - 并行优化](docs/lessons-learned/performance-patterns.md#并行优化策略) | P0 |
+| **⚡ DataLoader批量查询** | [性能模式 - DataLoader优化](docs/lessons-learned/performance-patterns.md#dataloader批量查询优化) 🆕 | P0 |
+| **🔢 批量操作优化** | [性能模式 - 批量操作](docs/lessons-learned/performance-patterns.md#批量操作优化) 🆕 | P0 |
+| **⏱️ TTL分层设置** | [性能模式 - TTL分层](docs/lessons-learned/performance-patterns.md#ttl分层设置策略) 🆕 | P0 |
+| **🎯 Entity架构优化** | [性能模式 - Entity优化](docs/lessons-learned/performance-patterns.md#entity架构下的性能优化) 🆕 | P1 |
+| **🔍 控制台错误检测** | [测试指南 - 控制台错误](docs/lessons-learned/testing-guide.md#控制台错误检测的完整工作流) 🆕 | P0 |
+| **⚡ Dashboard实时优化** | [测试指南 - Dashboard优化](docs/lessons-learned/testing-guide.md#dashboard实时优化) 🆕 | P1 |
+| **🔧 缓存失效装饰器** | [测试指南 - 缓存失效](docs/lessons-learned/testing-guide.md#缓存失效装饰器的自动化实现) 🆕 | P1 |
+| **🧪 修复验证流程** | [测试指南 - 修复验证](docs/lessons-learned/testing-guide.md#e2e测试中的代码修复验证流程) 🆕 | P0 |
+| **📦 DataLoader实施** | [API设计 - DataLoader清单](docs/lessons-learned/api-design-patterns.md#graphql-dataloader实施清单) 🆕 | P0 |
+| **🔢 批量查询模式** | [API设计 - 批量查询](docs/lessons-learned/api-design-patterns.md#批量查询优化模式) 🆕 | P0 |
+| **🔑 缓存键设计** | [API设计 - 缓存键规范](docs/lessons-learned/api-design-patterns.md#缓存键设计规范) 🆕 | P0 |
+| **❌ GraphQL 400错误** | [API设计 - 400诊断](docs/lessons-learned/api-design-patterns.md#graphql-400错误诊断) 🆕 | P0 |
 | **🔒 SQL注入风险** | [安全要点 - SQL注入防护](docs/lessons-learned/security-essentials.md#sql注入防护) | P0 |
 | **🧪 E2E测试失败** | [测试指南 - E2E测试](docs/lessons-learned/testing-guide.md#e2e测试) | P0 |
 | **⚡ 查询性能差** | [性能模式 - N+1查询](docs/lessons-learned/performance-patterns.md#n1查询优化) | P0 |
@@ -882,24 +1106,30 @@ CORS(app, resources={r"/api/*": {"origins": ["https://event2table.com"]}})
 ### 完整经验文档索引
 
 - **[经验文档索引](docs/lessons-learned/README.md)** - 所有经验文档的导航中心 ⭐
-- **[React最佳实践](docs/lessons-learned/react-best-practices.md)** - Hooks规则、Lazy Loading、Vite兼容性 🆕
-- **[测试指南](docs/lessons-learned/testing-guide.md)** - E2E测试、TDD、React挂载诊断 🆕
-- **[Python开发](docs/lessons-learned/python-development.md)** - mypy类型安全、GenericRepository 🆕
+- **[React最佳实践](docs/lessons-learned/react-best-practices.md)** - Hooks规则、Lazy Loading、Vite兼容性
+- **[测试指南](docs/lessons-learned/testing-guide.md)** - E2E测试、控制台错误检测、修复验证流程 🆕
+- **[Python开发](docs/lessons-learned/python-development.md)** - mypy类型安全、GenericRepository
 - **[安全要点](docs/lessons-learned/security-essentials.md)** - XSS防护、SQL注入、输入验证
-- **[性能模式](docs/lessons-learned/performance-patterns.md)** - 缓存、N+1查询、并行优化 🆕
+- **[性能模式](docs/lessons-learned/performance-patterns.md)** - DataLoader、批量操作、TTL分层、并行优化 🆕
 - **[数据库模式](docs/lessons-learned/database-patterns.md)** - game_gid使用、事务、迁移
-- **[API设计模式](docs/lessons-learned/api-design-patterns.md)** - 分层架构、错误处理
+- **[API设计模式](docs/lessons-learned/api-design-patterns.md)** - DataLoader实施、批量查询、缓存键设计 🆕
 - **[调试技能](docs/lessons-learned/debugging-skills.md)** - Chrome DevTools MCP、Subagent分析
 - **[重构检查清单](docs/lessons-learned/refactoring-checklist.md)** - TDD、代码审查、技术债务
-- **[项目管理](docs/lessons-learned/project-management.md)** - 并行开发、分阶段重构、零破坏性变更 🆕
-- **[部署与运维](docs/lessons-learned/deployment-operations.md)** - 部署流程、运维监控、故障排查 🆕
+- **[项目管理](docs/lessons-learned/project-management.md)** - 并行开发、分阶段重构、零破坏性变更
+- **[部署与运维](docs/lessons-learned/deployment-operations.md)** - 部署流程、运维监控、故障排查
 
 ### 经验文档使用说明
 
 **为什么建立经验文档系统**：
-- ✅ 整合了446个文档的精华经验，避免重复 (+47个新文档)
+- ✅ 整合了857个文档的精华经验，避免重复 (+22个新经验点，2026-03-08更新)
+- ✅ 文档减少59%，经验整合率提升到95%+
 - ✅ 集中管理，便于查找和维护
 - ✅ 持续更新，每次问题修复后立即更新
+
+**最新更新 (2026-03-08)**：
+- 🆕 **性能优化**: DataLoader批量查询、批量操作、TTL分层、Entity优化 (8个新经验)
+- 🆕 **E2E测试**: 控制台错误检测、Dashboard实时优化、缓存失效装饰器 (7个新经验)
+- 🆕 **GraphQL**: DataLoader实施、批量查询、缓存键设计、400错误诊断 (7个新经验)
 
 **如何使用**：
 1. **遇到问题** → 先查阅经验文档，看是否有类似问题
