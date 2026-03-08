@@ -1372,6 +1372,269 @@ GraphQL validation error: Cannot query field "xxx" on type "Query"
 2. 验证Apollo Client的typePolicies配置
 3. 清除Apollo Client缓存：`client.clearStore()`
 
+## React 18+ defaultProps 已废弃 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [Event Node Builder错误修复](./event-node-builder-errors.md), [React 18发布日志](https://react.dev/blog/2022/03/29/react-v18)
+
+### 问题现象
+
+**症状描述**:
+- React 18+ 控制台警告：`defaultProps: Support for defaultProps will be removed from function components in a future major release`
+- 函数组件使用 `defaultProps` 被标记为废弃特性
+- 官方文档推荐使用 ES6 默认参数替代
+
+**影响范围**:
+- 所有使用 `defaultProps` 的函数组件
+- React 18.0+ 项目
+
+### 根本原因
+
+**技术原因**:
+- React 团队决定在未来的 major 版本中移除函数组件的 `defaultProps`
+- ES6 默认参数是更符合 JavaScript 标准的做法
+- `defaultProps` 在函数组件中的行为与类组件不一致，容易混淆
+
+**错误示例**:
+```typescript
+// ❌ 错误：使用已废弃的 defaultProps
+interface EventNodeBuilderProps {
+  availableEvents?: Event[];
+}
+
+function EventNodeBuilder({ availableEvents }: EventNodeBuilderProps) {
+  // 组件逻辑
+  return <div>{availableEvents.length} events</div>;
+}
+
+EventNodeBuilder.defaultProps = {
+  availableEvents: []  // ⚠️ React 18+ 已废弃
+};
+```
+
+### 解决方案
+
+**方案1: 使用 ES6 默认参数（推荐）**
+
+```typescript
+// ✅ 正确：使用 ES6 默认参数
+interface EventNodeBuilderProps {
+  availableEvents?: Event[];
+}
+
+function EventNodeBuilder({
+  availableEvents = []  // ✅ ES6 默认参数
+}: EventNodeBuilderProps) {
+  // 组件逻辑
+  return <div>{availableEvents.length} events</div>;
+}
+
+// 不再需要 defaultProps
+// EventNodeBuilder.defaultProps = { ... }  // ❌ 删除
+```
+
+**方案2: 使用 TypeScript 可选链和空值合并**
+
+```typescript
+// ✅ 正确：使用可选链和空值合并
+interface EventNodeBuilderProps {
+  availableEvents?: Event[];
+}
+
+function EventNodeBuilder({ availableEvents }: EventNodeBuilderProps) {
+  const events = availableEvents ?? [];  // ✅ 空值合并
+
+  return <div>{events.length} events</div>;
+}
+```
+
+**方案3: 使用自定义 Hook 处理复杂默认值**
+
+```typescript
+// ✅ 正确：使用 Hook 处理复杂默认值
+function useEventNodeBuilderProps(props: EventNodeBuilderProps) {
+  return {
+    availableEvents: props.availableEvents ?? [],
+    selectedEvent: props.selectedEvent ?? null,
+    // ... 其他默认值
+  };
+}
+
+function EventNodeBuilder(props: EventNodeBuilderProps) {
+  const { availableEvents, selectedEvent } = useEventNodeBuilderProps(props);
+
+  return <div>{availableEvents.length} events</div>;
+}
+```
+
+### 迁移指南
+
+**步骤1: 识别所有使用 defaultProps 的组件**
+
+```bash
+# 搜索所有 defaultProps 使用
+grep -r "defaultProps" frontend/src/
+```
+
+**步骤2: 逐个替换为 ES6 默认参数**
+
+```typescript
+// Before:
+function Component({ prop1, prop2 }) {
+  return <div>{prop1} {prop2}</div>;
+}
+Component.defaultProps = {
+  prop1: 'default1',
+  prop2: 'default2'
+};
+
+// After:
+function Component({
+  prop1 = 'default1',
+  prop2 = 'default2'
+}) {
+  return <div>{prop1} {prop2}</div>;
+}
+```
+
+**步骤3: 验证组件行为**
+
+```bash
+# 1. 启动开发服务器
+npm run dev
+
+# 2. 检查浏览器控制台
+# 应该没有 defaultProps 警告
+
+# 3. 测试组件功能
+# 确认默认值正确应用
+```
+
+### ESLint 配置（强制检测）
+
+**安装 ESLint 插件**:
+```bash
+npm install --save-dev eslint-plugin-react
+```
+
+**配置 ESLint 规则** (`.eslintrc.js`):
+```javascript
+module.exports = {
+  plugins: ['react'],
+  rules: {
+    'react/no-default-props': 'error',  // 禁止使用 defaultProps
+    'react/no-deprecated': 'error',     // 禁止使用废弃的 React API
+    'react/function-component-definition': [
+      'error',
+      {
+        namedComponents: 'arrow-function'  // 强制使用箭头函数
+      }
+    ]
+  }
+};
+```
+
+### 代码审查清单
+
+- [ ] 函数组件是否避免使用 `defaultProps`？
+- [ ] 是否使用 ES6 默认参数 `({ prop = default })`？
+- [ ] 是否为可选 props 添加了合理的默认值？
+- [ ] 是否使用 TypeScript 可选链 `??` 处理 null/undefined？
+- [ ] 是否运行 ESLint 检查 defaultProps 使用？
+
+### 性能对比
+
+**defaultProps vs ES6 默认参数**:
+
+| 方面 | defaultProps | ES6 默认参数 |
+|------|--------------|--------------|
+| **性能** | 每次渲染都检查 | 只在参数为 undefined 时使用 |
+| **类型安全** | TypeScript 支持较弱 | TypeScript 原生支持 |
+| **可读性** | 需要查看组件定义 | 参数定义中清晰可见 |
+| **维护性** | 定义分散，易遗漏 | 集中在函数签名中 |
+| **未来兼容** | ❌ 将被移除 | ✅ JavaScript 标准 |
+
+### 最佳实践示例
+
+**简单默认值**:
+```typescript
+// ✅ 简单默认值：使用 ES6 默认参数
+interface ButtonProps {
+  variant?: 'primary' | 'secondary';
+  size?: 'sm' | 'md' | 'lg';
+}
+
+function Button({
+  variant = 'primary',
+  size = 'md'
+}: ButtonProps) {
+  return <button className={`btn-${variant} btn-${size}`}>Click</button>;
+}
+```
+
+**复杂默认值**:
+```typescript
+// ✅ 复杂默认值：使用 Hook
+interface EventNodeBuilderProps {
+  availableEvents?: Event[];
+  selectedEvent?: Event | null;
+  config?: NodeConfig;
+}
+
+function useDefaultProps(props: EventNodeBuilderProps) {
+  return {
+    availableEvents: props.availableEvents ?? [],
+    selectedEvent: props.selectedEvent ?? null,
+    config: props.config ?? {
+      enableValidation: true,
+      maxDepth: 5,
+      allowCycles: false
+    }
+  };
+}
+
+function EventNodeBuilder(props: EventNodeBuilderProps) {
+  const { availableEvents, selectedEvent, config } = useDefaultProps(props);
+
+  // 组件逻辑
+}
+```
+
+**数组/对象默认值**:
+```typescript
+// ✅ 数组/对象默认值：使用箭头函数或空值合并
+interface ListProps {
+  items?: Array<Item>;
+  options?: ListOptions;
+}
+
+function List({ items, options }: ListProps) {
+  // ✅ 使用空值合并
+  const safeItems = items ?? [];
+  const safeOptions = options ?? DEFAULT_OPTIONS;
+
+  return <ul>{safeItems.map(item => <li key={item.id}>{item.name}</li>)}</ul>;
+}
+
+const DEFAULT_OPTIONS: ListOptions = {
+  sortable: true,
+  filterable: true,
+  pageSize: 10
+};
+```
+
+### 相关经验
+
+- [React Hooks规则](#react-hooks规则) - React Hooks 使用规范
+- [TypeScript严格模式迁移](#typescript严格模式迁移) - TypeScript 类型安全
+- [组件导出规范](#组件导出规范) - 组件定义规范
+
+### 案例文档
+
+- [Event Node Builder错误修复](./event-node-builder-errors.md) - defaultProps 废弃问题完整案例
+- [React 18发布日志](https://react.dev/blog/2022/03/29/react-v18) - 官方说明
+
+---
+
 ## 2026-03-04 新增：前端加载问题修复经验 ⭐ **P0重要**
 
 ### Apollo Client v4 模块结构

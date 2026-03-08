@@ -986,8 +986,512 @@ fetch(`/api/events?game_id=${gameGid}`)
 - Vite日志: `/tmp/vite-restart.log`
 - Chrome DevTools MCP session: `~/Library/Caches/superpowers/browser/2026-03-03/session-*`
 
+### 控制台错误检测的完整工作流 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 3次 | **来源**: [E2E最终综合报告](../reports/2026-03-07/E2E-FINAL-COMPREHENSIVE-REPORT.md), [控制台错误检测报告](../reports/2026-03-07/E2E-CONSOLE-ERROR-DETECTION-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- 在E2E测试中，单纯页面加载成功不代表功能正常
+- 控制台错误（error/warn）可能被忽略，但实际影响用户体验
+- 需要在页面加载、用户交互、API响应等全流程中捕获错误
+
+**影响范围**:
+- 所有E2E测试
+- 前端JavaScript异步执行
+- React组件渲染错误
+- GraphQL API错误
+
+### 根本原因
+
+**技术原因**:
+- 前端JavaScript异步执行可能产生延迟错误
+- React组件渲染错误可能不中断页面加载
+- GraphQL API错误可能在生产环境被错误处理
+- 用户交互可能触发新的错误，需要对比分析
+
+### 解决方案
+
+**完整的E2E测试 + 控制台错误检测流程**:
+```javascript
+// 标准化E2E测试流程
+async function comprehensivePageTest(url) {
+  // 1. 导航到页面
+  await mcp__chrome-devtools__navigate_page({
+    type: "url",
+    url: url
+  })
+
+  // 2. 等待页面稳定
+  await mcp__chrome-devtools__wait_for({
+    selector: "main",
+    timeout: 5000
+  })
+
+  // 3. 获取基线错误
+  const baselineErrors = await mcp__chrome-devtools__list_console_messages({
+    types: ["error", "warn"]
+  })
+
+  // 4. 执行关键交互（如点击按钮）
+  await mcp__chrome-devtools__click({
+    uid: "action-button"
+  })
+
+  // 5. 等待响应
+  await mcp__chrome-devtools__await_text({
+    text: "Loading...",
+    timeout: 3000
+  })
+
+  // 6. 获取交互后的新错误
+  const afterErrors = await mcp__chrome-devtools__list_console_messages({
+    types: ["error"],
+    since: Date.now() - 5000
+  })
+
+  // 7. 对比分析
+  const newErrors = afterErrors.messages.filter(
+    err => !baselineErrors.messages.some(init => init.id === err.id)
+  )
+
+  return {
+    baselineErrors,
+    newErrors,
+    success: newErrors.length === 0
+  }
+}
+```
+
+**Chrome DevTools MCP工作流**:
+```javascript
+// 标准测试步骤
+// 1. 列出所有页面
+mcp__chrome-devtools__list_pages()
+
+// 2. 导航到测试页面
+mcp__chrome-devtools__navigate_page({
+  type: "url",
+  url: "http://localhost:5173/parameter-dashboard?game_gid=10000147"
+})
+
+// 3. 获取页面快照
+mcp__chrome-devtools__take_snapshot()
+
+// 4. 检查控制台错误
+mcp__chrome-devtools__list_console_messages({
+  types: ["error", "warn"]
+})
+
+// 5. 截图记录
+mcp__chrome-devtools__take_screenshot({
+  filePath: "docs/reports/2026-03-08/verification-screenshot.png",
+  fullPage: true
+})
+
+// 6. 点击交互元素
+mcp__chrome-devtools__click({ uid: "clickable-element-uid" })
+```
+
+### 错误分类和优先级
+
+**错误优先级标准**:
+```typescript
+enum ErrorPriority {
+  P0 = 'BLOCKING',      // 阻塞性错误 - 功能完全不可用
+  P1 = 'CRITICAL',      // 严重错误 - 核心功能受影响
+  P2 = 'MAJOR',         // 主要错误 - 用户体验受损
+  P3 = 'MINOR',         // 次要错误 - 可选功能问题
+  P4 = 'INFO'           // 信息提示 - 不影响功能
+}
+
+// 错误分类规则
+function classifyError(error: ConsoleError): ConsoleError {
+  // React错误
+  if (error.message.includes('React') || error.message.includes('hooks')) {
+    error.category = 'REACT';
+    error.priority = error.message.includes('change in the order')
+      ? ErrorPriority.P0
+      : ErrorPriority.P1;
+  }
+
+  // GraphQL错误
+  if (error.message.includes('GraphQL') || error.message.includes('fetch')) {
+    error.category = 'GRAPHQL';
+    error.priority = ErrorPriority.P1;
+  }
+
+  // 网络错误
+  if (error.message.includes('Failed to load') || error.message.includes('network')) {
+    error.category = 'NETWORK';
+    error.priority = ErrorPriority.P1;
+  }
+
+  return error;
+}
+```
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 所有E2E测试必须包含控制台错误检测？
+- [ ] 是否建立错误严重度分级（P0错误必须立即修复）？
+- [ ] 是否使用自动化脚本对比交互前后的错误变化？
+- [ ] 是否记录错误ID用于追踪同一问题的多次出现？
+
+### 业务价值
+
+- 测试覆盖率从"页面加载"提升到"全流程功能验证"
+- 能发现隐藏的功能问题，避免用户遇到异常
+- 减少生产环境故障率（提前发现潜在问题）
+
+### 案例文档
+
+- [E2E最终综合报告](../reports/2026-03-07/E2E-FINAL-COMPREHENSIVE-REPORT.md)
+- [控制台错误检测报告](../reports/2026-03-07/E2E-CONSOLE-ERROR-DETECTION-REPORT.md)
+
+---
+
+## E2E测试中的代码修复验证流程 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 2次 | **来源**: [E2E测试报告](../reports/2026-03-07/E2E-FINAL-COMPREHENSIVE-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- 代码修复完成后，需要验证修复是否真正生效
+- 浏览器缓存可能导致修复效果不体现
+- 需要区分"代码修复"和"功能修复"两个阶段
+
+### 解决方案
+
+**完整的修复验证流程**:
+```bash
+# 完整的修复验证流程
+function verifyFix() {
+  echo "=== 开始修复验证 ==="
+
+  # 1. 停止所有服务器
+  echo "1. 停止前端和后端服务器"
+  kill $(lsof -ti:5173) 2>/dev/null || true
+  kill $(lsof -ti:5001) 2>/dev/null || true
+
+  # 2. 清除缓存
+  echo "2. 清除浏览器缓存"
+  echo "请手动操作: Ctrl+Shift+Delete → 选择'缓存的图像和文件' → '全部时间'"
+  read -p "清除缓存后按回车继续..."
+
+  # 3. 重新启动服务器
+  echo "3. 重新启动服务器"
+  cd frontend && npm run dev &
+  cd backend && nohup python web_app.py > ../logs/backend.log 2>&1 &
+
+  # 4. 等待服务器启动
+  echo "4. 等待服务器启动"
+  sleep 5
+
+  # 5. 验证服务可用性
+  curl -s http://localhost:5173 > /dev/null
+  curl -s http://127.0.0.1:5001/api/health > /dev/null
+
+  # 6. 重新测试修复的功能
+  echo "6. 重新测试修复的功能"
+  echo "请手动测试: 打开浏览器 → 访问 http://localhost:5173 → 测试修复的功能"
+
+  # 7. 检查控制台错误
+  echo "7. 检查浏览器控制台 (F12 → Console)"
+  echo "确保没有出现新的错误信息"
+}
+```
+
+### 预防措施
+
+**验证清单**:
+- [ ] 代码修复后必须执行完整的验证流程？
+- [ ] 浏览器缓存清除是必经步骤？
+- [ ] 需要测试原始问题和新增功能？
+- [ ] 是否记录验证结果，包括截图和错误日志？
+
+### 业务价值
+
+- 确保修复真正生效，避免"假修复"
+- 防止缓存导致的问题被误判
+- 建立可重复的验证标准
+
+---
+
+## 测试数据准备和验证 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 2次 | **来源**: [E2E测试报告](../reports/2026-03-07/E2E-FINAL-COMPREHENSIVE-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- 测试时数据库缺少必要的测试数据
+- 测试数据与生产数据混合，影响测试结果
+- 测试后数据清理不彻底
+
+### 解决方案
+
+**测试数据准备脚本**:
+```bash
+# 测试数据准备脚本
+function prepareTestData() {
+  echo "=== 准备测试数据 ==="
+
+  # 1. 验证测试环境
+  if [ "$FLASK_ENV" != "testing" ]; then
+    echo "❌ 错误: 未在测试环境 (FLASK_ENV=testing)"
+    exit 1
+  fi
+
+  # 2. 检查测试数据库
+  if [ ! -f "data/test_database.db" ]; then
+    echo "❌ 错误: 测试数据库不存在"
+    exit 1
+  fi
+
+  # 3. 验证测试数据范围
+  sqlite3 data/test_database.db "
+    SELECT COUNT(*) FROM games WHERE gid >= 90000000;
+    SELECT COUNT(*) FROM log_events WHERE game_gid >= 90000000;
+    SELECT COUNT(*) FROM event_params WHERE game_gid >= 90000000;
+  "
+
+  # 4. 清理临时测试数据（保留基础数据）
+  echo "4. 清理临时测试数据"
+  # 执行清理脚本
+
+  # 5. 验证数据一致性
+  echo "5. 验证数据一致性"
+  python scripts/test/verify_data_consistency.py
+}
+```
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 必须在测试环境（FLASK_ENV=testing）执行测试？
+- [ ] 测试数据GID必须使用90000000+范围？
+- [ ] 测试前验证数据库存在且数据符合预期？
+- [ ] 是否建立测试数据清理机制？
+
+### 业务价值
+
+- 确保测试环境的独立性和一致性
+- 避免测试数据污染生产环境
+- 提高测试的可重复性和可靠性
+
+---
+
+## Dashboard实时优化（WebSocket替代轮询） ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [Dashboard实时优化报告](../reports/2026-03-07/DASHBOARD-REALTIME-OPTIMIZATION-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- 用户抱怨Dashboard更新延迟（5分钟）
+- 不必要的API调用浪费带宽（页面隐藏时仍在轮询）
+- 缺乏实时性，创建游戏/事件后无法立即看到结果
+
+### 根本原因
+
+**技术原因**:
+- 使用固定轮询间隔（5秒），没有考虑用户实际使用场景
+- 缺少页面可见性检测，导致后台标签页仍频繁请求
+- 缓存失效机制不工作，数据更新后无法及时反映
+
+### 解决方案
+
+**基于页面可见性的智能轮询**:
+```typescript
+// frontend/src/hooks/usePageVisibility.ts (新增)
+export function usePageVisibility(): boolean {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  return isVisible;
+}
+
+// 智能轮询间隔Hook
+export function usePollingInterval(
+  visibleInterval: number = 10000,  // 10秒可见时
+  hiddenInterval: number = 60000    // 60秒隐藏时
+): number {
+  const isVisible = usePageVisibility();
+  return isVisible ? visibleInterval : hiddenInterval;
+}
+```
+
+**在Dashboard中使用**:
+```typescript
+// frontend/src/analytics/pages/DashboardGraphQL.tsx (修改)
+function DashboardGraphQL() {
+  const pollingInterval = usePollingInterval(10000, 60000);
+
+  const { data: gamesData } = useGames(5, 0, {
+    fetchPolicy: 'cache-first',
+    refetchInterval: pollingInterval,  // ⚡ 智能轮询
+    nextFetchPolicy: 'cache-first',
+  });
+}
+```
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 新的轮询策略必须使用Page Visibility API？
+- [ ] 隐藏时轮询间隔至少60秒，减少83%的API调用？
+- [ ] 缓存失效必须与业务操作强关联？
+- [ ] 是否建立性能基准测试，确保优化效果？
+
+### 业务价值
+
+- Dashboard更新延迟从5分钟缩短到10秒（96.7%提升）
+- 用户获得接近实时的工作体验
+- 减少服务器负载和带宽消耗
+
+### 案例文档
+
+- [Dashboard实时优化报告](../reports/2026-03-07/DASHBOARD-REALTIME-OPTIMIZATION-REPORT.md)
+
+---
+
+## 缓存失效装饰器的自动化实现 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [Dashboard实时优化报告](../reports/2026-03-07/DASHBOARD-REALTIME-OPTIMIZATION-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- Dashboard缓存5分钟不更新，用户看到过期数据
+- 代码中手动清理缓存容易遗漏或出错
+- 缓存键格式不统一，导致失效失败
+
+### 解决方案
+
+**自动缓存失效装饰器**:
+```python
+# backend/core/cache/decorators.py (新增)
+def cache_invalidate(func: Callable) -> Callable:
+    """自动缓存失效装饰器 - 根据函数名自动推断缓存键"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+
+        # 根据函数名自动推断需要失效的缓存键
+        func_name = func.__name__
+
+        # 自动失效dashboard_statistics（所有数据变更都影响）
+        try:
+            _cache.delete("dashboard_statistics")
+            logger.info(f"✅ 已失效缓存: dashboard_statistics (由 {func_name} 触发)")
+        except Exception as e:
+            logger.warning(f"⚠️ 失效dashboard_statistics失败: {e}")
+
+        return result
+    return wrapper
+
+# 在Service方法中使用
+class GameService:
+    @cache_invalidate  # 自动失效相关缓存
+    def create_game(self, game_data: GameEntity) -> GameEntity:
+        # 创建游戏逻辑
+        pass
+```
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 所有写操作（create/update/delete）必须添加`@cache_invalidate`？
+- [ ] 是否建立缓存键命名规范（如：`{module}:{function}:statistics`）？
+- [ ] 缓存失效操作必须有错误处理和日志记录？
+- [ ] 是否定期验证缓存是否按预期失效？
+
+### 业务价值
+
+- 确保数据变更后仪表板能立即更新
+- 减少手动缓存清理的工作量和错误
+- 提高系统一致性和用户体验
+
+---
+
+## 模态框集成的完整模式 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [E2E最终综合报告](../reports/2026-03-07/E2E-FINAL-COMPREHENSIVE-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- Dashboard的"管理游戏"按钮点击无响应
+- 模态框组件已导入但未渲染
+- 状态管理不完整，缺少控制状态
+
+### 解决方案
+
+**完整的模态框集成模式**:
+```tsx
+// 1. 正确的导入
+import BaseModal from '@shared/ui/BaseModal/BaseModal';
+import GameManagementModal from '@/features/games/GameManagementModalGraphQL';
+
+// 2. 完整的状态管理
+const {
+  openGameManagementModal,
+  isGameManagementModalOpen,
+  closeGameManagementModal
+} = useGameStore();
+
+// 3. 在JSX中添加模态框
+<BaseModal
+  isOpen={isGameManagementModalOpen}
+  onClose={closeGameManagementModal}
+  title="游戏管理"
+  size="full"
+>
+  <GameManagementModal />
+</BaseModal>
+```
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 模态框集成必须包含完整的导入和状态？
+- [ ] 模态框组件必须放置在正确的位置？
+- [ ] 状态管理需要包含打开、关闭、状态检查？
+- [ ] 是否建立模态框集成检查清单？
+
+### 业务价值
+
+- 确保模态框功能完整可用
+- 避免用户交互功能失效
+- 统一的集成模式提高开发效率
+
+---
+
 ### 相关经验文档
 
 - [React最佳实践 - Hooks规则](./react-best-practices.md#react-hooks-规则) - React组件测试常见问题
 - [调试技能](./debugging-skills.md) - 测试失败后的调试方法
 - [API设计模式 - 错误处理](./api-design-patterns.md#错误处理) - API测试方法
+- [性能模式 - Dashboard实时优化](./performance-patterns.md#dashboard实时优化websocket替代轮询) - Dashboard轮询优化
+
+---
+
+**文档统计**:
+- P0经验点：5个
+- P1经验点：5个
+- 总计：10个测试经验点
+- 最后更新：2026-03-08 ✨ 新增控制台错误检测、修复验证流程、测试数据准备、Dashboard优化、缓存失效、模态框集成经验

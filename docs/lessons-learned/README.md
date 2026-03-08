@@ -12,6 +12,11 @@
 - [React Hooks规则](./react-best-practices.md#react-hooks-规则) - 避免Hooks顺序错误
 - [Lazy Loading最佳实践](./react-best-practices.md#lazy-loading最佳实践) - 避免加载超时
 - [Input组件CSS布局规范](./react-best-practices.md#input组件css布局规范) - 始终使用label prop
+- [React 18+ defaultProps已废弃](./react-best-practices.md#react-18-defaultprops-已废弃) - 使用ES6默认参数 (2026-03-08新增)
+
+### GraphQL类型安全
+- [Event Node Builder错误修复](./event-node-builder-errors.md) - GraphQL枚举不匹配案例 (2026-03-08新增) ⭐
+- [GraphQL类型同步](../../CLAUDE.md#graphql类型同步规范-⚠️-极其重要---2026-03-08新增) - 前后端类型一致性 (2026-03-08新增)
 
 ### 测试指南
 - [E2E测试方法论](./testing-guide.md#e2e测试) - Chrome DevTools MCP测试流程
@@ -111,9 +116,11 @@
 | 🔍 Chrome DevTools调试 | [测试指南](./testing-guide.md) | Chrome MCP调试法 |
 | 📝 mypy类型错误 | [Python开发](./python-development.md) | mypy --strict合规 |
 | ⚡ Vite-Apollo兼容性 | [React最佳实践](./react-best-practices.md) | Vite兼容性 |
+| 🔴 GraphQL 400错误 | [Event Node Builder错误](./event-node-builder-errors.md) | 枚举不匹配案例 (2026-03-08新增) |
 | 💾 缓存失效分析 | [性能模式](./performance-patterns.md) | 缓存失效分析 |
 | 🚀 并行优化策略 | [性能模式](./performance-patterns.md) | 并行优化 |
 | 🚨 React Hooks错误 | [React最佳实践](./react-best-practices.md) | Hooks规则 |
+| ⚠️ React defaultProps警告 | [React最佳实践](./react-best-practices.md) | React 18+ defaultProps已废弃 (2026-03-08新增) |
 | 🐌 页面加载超时 | [React最佳实践](./react-best-practices.md) | Lazy Loading |
 | 🔒 SQL注入风险 | [安全要点](./security-essentials.md) | SQL注入防护 |
 | 🧪 E2E测试失败 | [测试指南](./testing-guide.md) | E2E测试方法论 |

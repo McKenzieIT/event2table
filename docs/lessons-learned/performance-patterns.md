@@ -1006,7 +1006,425 @@ cd ../event2table-phase3  # 迁移模块
 
 ---
 
+## DataLoader批量查询优化 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 3次 | **来源**: [GraphQL DataLoader优化报告](../reports/2026-03-07/GRAPHQL-DATALOADER-OPTIMIZATION-REPORT.md), [性能优化Phase 1-4](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+### 问题现象
+
+**症状描述**:
+- GraphQL N+1查询导致数据库负载过重
+- 查询100个事件需要101次数据库查询
+- API响应时间长（500ms以上）
+- 数据库连接数激增
+
+**影响范围**:
+- GraphQL API的关联查询
+- 事件参数批量加载
+- 游戏统计查询
+
+### 根本原因
+
+**技术原因**:
+- GraphQL resolver中每个关联对象都独立查询
+- 缺乏批量加载机制
+- 子查询导致指数级增长
+
+**错误示例**:
+```python
+# ❌ 错误：N+1查询
+def resolve_parameters_old(root, info, event_id: int):
+    """每个事件独立查询参数 - 错误！"""
+    return fetch_all_as_dict(
+        "SELECT * FROM event_params WHERE event_id = ?",
+        (event_id,)
+    )
+# 对于100个事件，需要100次查询
+```
+
+### 解决方案
+
+**方案1: 增强的DataLoader实现**
+```python
+class EnhancedParameterLoader:
+    """增强的参数批量加载器"""
+
+    def load_by_event(self, event_id: int):
+        """加载单个事件的参数"""
+        return self.load(event_id)
+
+    def load_by_events(self, event_ids: List[int]):
+        """批量加载多个事件的参数"""
+        return self.load_many(event_ids)
+
+    def _batch_load_parameters(self, event_ids: List[int]):
+        """批量加载参数（包含模板信息）"""
+        placeholders = ','.join(['?'] * len(event_ids))
+        return fetch_all_as_dict(f"""
+            SELECT
+                ep.*,
+                pt.name as template_name
+            FROM event_params ep
+            LEFT JOIN param_templates pt ON ep.template_id = pt.id
+            WHERE ep.event_id IN ({placeholders})
+            ORDER BY ep.event_id, ep.id
+        """, event_ids)
+
+# 使用DataLoader的Resolver
+def resolve_param_count(self, info):
+    """使用DataLoader批量加载参数数量"""
+    from backend.gql_api.dataloaders.optimized_loaders import get_parameter_loader
+
+    loader = get_parameter_loader()
+    params = loader.load(self.id)
+    return len(params) if params else 0
+```
+
+**方案2: 双层缓存DataLoader**
+```python
+class CachedDataLoader:
+    def _batch_load_with_cache(
+        self,
+        keys: List[Any],
+        batch_load_fn: callable,
+        ttl_l1: int = 60,   # L1缓存: 60秒
+        ttl_l2: int = 300   # L2缓存: 300秒
+    ):
+        """先从缓存获取，批量加载未缓存数据"""
+        # L1缓存检查
+        cache_results = {}
+        missing_keys = []
+
+        for key in keys:
+            cached = cache_result.get(f"loader:{self.__class__.__name__}:{key}")
+            if cached:
+                cache_results[key] = cached
+            else:
+                missing_keys.append(key)
+
+        # 批量加载缺失的数据
+        if missing_keys:
+            loaded = batch_load_fn(missing_keys)
+            # 写入缓存
+            for key, value in zip(missing_keys, loaded):
+                cache_result.set(
+                    f"loader:{self.__class__.__name__}:{key}",
+                    value,
+                    ttl=ttl_l1
+                )
+                cache_results[key] = value
+
+        return [cache_results.get(key) for key in keys]
+```
+
+### 性能提升
+
+**优化前**:
+- 事件列表查询：101次（100个事件 + 1次主查询）
+- API响应时间：~500ms
+- 数据库负载：高
+
+**优化后**:
+- 事件列表查询：2次（1次主查询 + 1次批量参数查询）
+- API响应时间：~50ms（90%提升）
+- 数据库负载：降低70-90%
+
+**查询减少率**: 70-99%
+
+### 代码审查清单
+
+- [ ] 是否使用DataLoader处理一对多关系？
+- [ ] 是否配置了L1/L2多层缓存？
+- [ ] 是否避免了JOIN优化后的重复查询？
+- [ ] 是否验证了批量加载的性能提升？
+
+### 相关经验
+
+- [N+1查询优化](#n1查询优化) - 通用N+1查询优化
+- [多级缓存架构](#多级缓存架构) - 缓存层级设计
+
+### 案例文档
+
+- [GraphQL DataLoader优化报告](../reports/2026-03-07/GRAPHQL-DATALOADER-OPTIMIZATION-REPORT.md)
+
+---
+
+## 批量操作优化 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [性能优化Phase 1-4](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+### 问题现象
+
+**症状描述**:
+- 循环执行insert/update导致N次数据库往返
+- 事务开销大，性能差
+- 批量插入100条数据需要100次提交
+
+### 根本原因
+
+**技术原因**:
+- 使用循环execute而非executemany
+- 每次操作都单独提交事务
+- 缺乏批量操作意识
+
+### 解决方案
+
+**优化前: 循环execute**
+```python
+# ❌ 错误：循环execute
+def batch_create_parameters_old(parameters: List[dict]):
+    """旧版本：循环执行"""
+    for param in parameters:
+        cursor.execute('''
+            INSERT INTO event_params
+            (event_id, name, type, value, created_at)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (
+            param['event_id'],
+            param['name'],
+            param['type'],
+            param['value'],
+            datetime.now()
+        ))
+        conn.commit()  # N次提交
+
+    return len(parameters)
+```
+
+**优化后: executemany批量执行**
+```python
+# ✅ 正确：executemany批量执行
+def batch_create_parameters_new(parameters: List[dict]):
+    """新版本：批量执行"""
+    # 准备批量数据
+    batch_data = [
+        (
+            param['event_id'],
+            param['name'],
+            param['type'],
+            param['value'],
+            datetime.now()
+        )
+        for param in parameters
+    ]
+
+    # 一次批量插入
+    cursor.executemany('''
+        INSERT INTO event_params
+        (event_id, name, type, value, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    ''', batch_data)
+
+    conn.commit()  # 1次提交
+
+    return len(parameters)
+```
+
+### 性能对比
+
+**性能提升数据**:
+- 旧版本：100次查询 + 100次提交
+- 新版本：1次查询 + 1次提交
+- 提升倍数：100x（对于100个项目）
+- 数据库往返：100→1（99%减少）
+- 事务开销：99%减少
+
+### 代码审查清单
+
+- [ ] 批量操作是否使用executemany而非循环execute？
+- [ ] 事务提交次数是否从N次减少到1次？
+- [ ] 是否考虑了批量大小限制（避免内存溢出）？
+- [ ] 批量操作是否包含错误处理？
+
+### 案例文档
+
+- [性能优化Phase 1-4报告](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+---
+
+## TTL分层设置策略 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [性能优化Phase 1-4](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+### 核心原则
+
+**根据数据变化频率设置TTL**
+
+**问题**:
+- 一刀切的缓存策略导致数据不一致或性能问题
+- 静态数据和动态数据使用相同TTL
+
+### TTL分层策略
+
+**静态数据（TTL: 1800秒 = 30分钟）**:
+```python
+@cached(ttl=1800, key_prefix="games.list")
+def find_all(self) -> List[GameEntity]:
+    """游戏列表 - 很少变化"""
+    return fetch_all_as_dict("SELECT * FROM games")
+```
+
+**半静态数据（TTL: 600秒 = 10分钟）**:
+```python
+@cached(ttl=600, key_prefix="events.by_game")
+def find_by_game(self, game_gid: int) -> List[EventEntity]:
+    """事件列表 - 偶尔更新"""
+    return fetch_all_as_dict("""
+        SELECT * FROM log_events
+        WHERE game_gid = ?
+    """, (game_gid,))
+```
+
+**动态数据（TTL: 120秒 = 2分钟）**:
+```python
+@cached(ttl=120, key_prefix="stats.recent")
+def get_recent_stats(self, hours: int = 24) -> dict:
+    """统计数据 - 较频繁变化"""
+    return fetch_one_as_dict("""
+        SELECT
+            COUNT(*) as total,
+            SUM(created_at > ?) as recent
+        FROM log_events
+    """, (datetime.now() - timedelta(hours=hours),))
+```
+
+**实时数据（TTL: 60秒 = 1分钟）**:
+```python
+@cached(ttl=60, key_prefix="online.users")
+def get_online_users(self) -> int:
+    """在线用户 - 高频变化"""
+    return fetch_one_as_dict("""
+        SELECT COUNT(*) as count
+        FROM user_sessions
+        WHERE last_active > ?
+    """, (datetime.now() - timedelta(minutes=5),))['count']
+```
+
+### TTL策略总结
+
+| 数据类型 | TTL | 场景 | 示例 |
+|---------|-----|------|------|
+| 静态数据 | 1800s (30分钟) | 很少变化 | 游戏列表、分类列表、系统配置 |
+| 半静态 | 600s (10分钟) | 偶尔更新 | 事件列表、参数列表、用户权限 |
+| 动态 | 120s (2分钟) | 较频繁更新 | 批量查询结果、统计数据 |
+| 实时 | 60s (1分钟) | 高频变化 | 在线用户、实时状态、计数器 |
+
+### 代码审查清单
+
+- [ ] 缓存TTL是否根据数据类型设置？
+- [ ] 静态数据是否使用长TTL（30分钟）？
+- [ ] 动态数据是否使用短TTL（1-2分钟）？
+- [ ] 是否有TTL设置文档和标准？
+
+### 相关经验
+
+- [缓存策略](#缓存策略) - 缓存TTL和清理策略
+
+### 案例文档
+
+- [性能优化Phase 1-4报告](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+---
+
+## Entity架构下的性能优化 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [性能优化Phase 1-4](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+### 问题现象
+
+**症状描述**:
+- Entity架构迁移后性能可能下降
+- 类型检查和序列化增加开销
+- 需要保持向后兼容的同时提升性能
+
+### 解决方案
+
+**Entity预加载和缓存**
+```python
+class OptimizedEntityService:
+    def __init__(self):
+        # 预加载Entity映射，避免运行时转换
+        self._entity_cache = {}
+
+    def find_by_gid(self, gid: int) -> Optional[GameEntity]:
+        """使用缓存的Entity查找"""
+        # 1. 先查缓存
+        if gid in self._entity_cache:
+            return self._entity_cache[gid]
+
+        # 2. 数据库查询
+        row = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (gid,))
+        if not row:
+            return None
+
+        # 3. 转换为Entity（避免重复转换）
+        entity = GameEntity(**row)
+        self._entity_cache[gid] = entity
+
+        return entity
+
+    def batch_find_by_gids(self, gids: List[int]) -> List[GameEntity]:
+        """批量查找Entity"""
+        # 先从缓存获取
+        cached_entities = []
+        missing_gids = []
+
+        for gid in gids:
+            if gid in self._entity_cache:
+                cached_entities.append(self._entity_cache[gid])
+            else:
+                missing_gids.append(gid)
+
+        # 批量查询缺失的数据
+        if missing_gids:
+            rows = fetch_all_as_dict("""
+                SELECT * FROM games WHERE gid IN ({})
+            """.format(','.join('?'*len(missing_gids))), missing_gids)
+
+            # 批量转换和缓存
+            for row in rows:
+                entity = GameEntity(**row)
+                self._entity_cache[row['gid']] = entity
+                cached_entities.append(entity)
+
+        return cached_entities
+```
+
+### 性能对比
+
+**性能数据**:
+- 旧版本：每次查询都转换Entity
+- 新版本：预加载Entity，避免重复转换
+- 缓存命中率：>95%（gid不变的场景）
+- 性能提升：2-3x（重复查询场景）
+
+### 代码审查清单
+
+- [ ] 是否使用了Entity预加载机制？
+- [ ] 是否避免了重复的Entity转换？
+- [ ] 是否利用了Entity的缓存特性？
+- [ ] 是否保持了向后兼容性？
+
+### 相关经验
+
+- [API设计模式 - Entity架构](./api-design-patterns.md) - Entity架构设计
+
+### 案例文档
+
+- [性能优化Phase 1-4报告](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+---
+
 ## 相关经验文档
 
 - [数据库模式 - game_gid迁移](./database-patterns.md#game_gid迁移) - 数据库性能优化
 - [API设计模式 - 分层架构](./api-design-patterns.md#分层架构) - 架构性能优化
+- [API设计模式 - GraphQL实施](./api-design-patterns.md#graphql-dataloader实施) - DataLoader详细实施指南
+
+---
+
+**文档统计**:
+- P0经验点：7个
+- P1经验点：6个
+- 总计：13个性能优化经验点
+- 最后更新：2026-03-08 ✨ 新增DataLoader、批量操作、TTL分层、Entity优化经验
