@@ -7,11 +7,13 @@ Tests the migration from direct DB access to Repository pattern
 and fixes N+1 query issues
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from backend.services.events.event_importer import EventImporter
+
 from backend.models.entities import EventEntity
 from backend.models.repositories.events import EventRepository
+from backend.services.events.event_importer import EventImporter
 
 
 @pytest.fixture
@@ -43,9 +45,7 @@ def event_importer(mock_event_service, mock_category_repo):
 class TestEventImporterRepositoryMigration:
     """Test Repository pattern migration and N+1 query fix"""
 
-    def test_get_existing_event_names_uses_batch_query(
-        self, event_importer, test_game_gid
-    ):
+    def test_get_existing_event_names_uses_batch_query(self, event_importer, test_game_gid):
         """
         Test that _get_existing_event_names uses batch query
         instead of fetching all events
@@ -58,9 +58,7 @@ class TestEventImporterRepositoryMigration:
         ]
 
         # Mock the repository's batch_find_by_names method (should exist)
-        with patch.object(
-            EventRepository, 'batch_find_by_names'
-        ) as mock_batch_find:
+        with patch.object(EventRepository, 'batch_find_by_names') as mock_batch_find:
             # Setup mock to return existing events
             mock_batch_find.return_value = [
                 EventEntity(
@@ -69,14 +67,12 @@ class TestEventImporterRepositoryMigration:
                     event_name="login",
                     event_name_cn="Login",
                     source_table="test",
-                    target_table="test"
+                    target_table="test",
                 )
             ]
 
             # Act
-            result = event_importer._get_existing_event_names(
-                test_game_gid, events_data
-            )
+            result = event_importer._get_existing_event_names(test_game_gid, events_data)
 
             # Assert: batch_find_by_names should be called with exact names
             mock_batch_find.assert_called_once()
@@ -89,23 +85,17 @@ class TestEventImporterRepositoryMigration:
             # Verify result contains the existing event name
             assert "login" in result
 
-    def test_get_existing_event_names_empty_list(
-        self, event_importer, test_game_gid
-    ):
+    def test_get_existing_event_names_empty_list(self, event_importer, test_game_gid):
         """
         Test that _get_existing_event_names handles empty list
         """
         # Act
-        result = event_importer._get_existing_event_names(
-            test_game_gid, []
-        )
+        result = event_importer._get_existing_event_names(test_game_gid, [])
 
         # Assert: Should return empty set and not query database
         assert result == set()
 
-    def test_get_existing_event_names_filters_correctly(
-        self, event_importer, test_game_gid
-    ):
+    def test_get_existing_event_names_filters_correctly(self, event_importer, test_game_gid):
         """
         Test that _get_existing_event_names returns only matching names
         """
@@ -116,9 +106,7 @@ class TestEventImporterRepositoryMigration:
             {"event_code": "purchase"},  # This one doesn't exist
         ]
 
-        with patch.object(
-            EventRepository, 'batch_find_by_names'
-        ) as mock_batch_find:
+        with patch.object(EventRepository, 'batch_find_by_names') as mock_batch_find:
             # Mock returns only "login" as existing
             mock_batch_find.return_value = [
                 EventEntity(
@@ -127,14 +115,12 @@ class TestEventImporterRepositoryMigration:
                     event_name="login",
                     event_name_cn="Login",
                     source_table="test",
-                    target_table="test"
+                    target_table="test",
                 )
             ]
 
             # Act
-            result = event_importer._get_existing_event_names(
-                test_game_gid, events_data
-            )
+            result = event_importer._get_existing_event_names(test_game_gid, events_data)
 
             # Assert: Should only contain "login", not "logout" or "purchase"
             assert result == {"login"}
@@ -146,16 +132,14 @@ class TestEventImporterRepositoryMigration:
         Test that import_events validates game exists before importing
         """
         # Arrange: Mock game not found
-        mock_event_service.return_value.get_events_by_game.side_effect = (
-            ValueError("Game not found")
+        mock_event_service.return_value.get_events_by_game.side_effect = ValueError(
+            "Game not found"
         )
 
         events_data = [{"event_code": "login"}]
 
         # Act
-        result = event_importer.import_events(
-            test_game_gid, events_data
-        )
+        result = event_importer.import_events(test_game_gid, events_data)
 
         # Assert
         assert result["imported"] == 0
@@ -172,9 +156,7 @@ class TestEventImporterRepositoryMigration:
         mock_event_service.return_value.get_events_by_game.return_value = []
 
         # Mock that "login" already exists
-        with patch.object(
-            EventImporter, '_get_existing_event_names'
-        ) as mock_existing:
+        with patch.object(EventImporter, '_get_existing_event_names') as mock_existing:
             mock_existing.return_value = {"login"}
 
             events_data = [
@@ -183,18 +165,14 @@ class TestEventImporterRepositoryMigration:
             ]
 
             # Act
-            result = event_importer.import_events(
-                test_game_gid, events_data
-            )
+            result = event_importer.import_events(test_game_gid, events_data)
 
             # Assert
             assert result["failed"] == 1  # login failed
             assert "already exists" in result["errors"][0]
             assert "login" in result["errors"][0]
 
-    def test_convert_to_event_entity_validates_data(
-        self, event_importer, test_game_gid
-    ):
+    def test_convert_to_event_entity_validates_data(self, event_importer, test_game_gid):
         """
         Test that _convert_to_event_entity creates valid EventEntity
         """
@@ -208,17 +186,13 @@ class TestEventImporterRepositoryMigration:
         }
 
         # Mock category repo
-        with patch.object(
-            event_importer.category_repo, 'find_by_name'
-        ) as mock_find_category:
+        with patch.object(event_importer.category_repo, 'find_by_name') as mock_find_category:
             mock_category = Mock()
             mock_category.id = 42
             mock_find_category.return_value = mock_category
 
             # Act
-            entity = event_importer._convert_to_event_entity(
-                test_game_gid, event_data
-            )
+            entity = event_importer._convert_to_event_entity(test_game_gid, event_data)
 
             # Assert: Verify Entity fields
             assert isinstance(entity, EventEntity)
@@ -234,9 +208,7 @@ class TestEventImporterRepositoryMigration:
 class TestEventRepositoryBatchMethods:
     """Test new batch methods in EventRepository"""
 
-    def test_batch_find_by_names_returns_matching_events(
-        self, test_game_gid
-    ):
+    def test_batch_find_by_names_returns_matching_events(self, test_game_gid):
         """
         Test that batch_find_by_names returns only events matching names
         """

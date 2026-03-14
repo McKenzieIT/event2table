@@ -4,9 +4,10 @@ Game GraphQL Type
 Defines the GraphQL type for Game entity with relationships.
 """
 
-import graphene
-from graphene import Field, List, Int, String, Boolean
 import logging
+
+import graphene
+from graphene import Boolean, Field, Int, List, String
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class GameImpactType(graphene.ObjectType):
     def from_dict(cls, data: dict) -> 'GameImpactType':
         """Create GameImpactType instance from dictionary."""
         return cls(
-            # ✅ 映射SQL结果（snake_case）到GraphQL字段（camelCase）
+            # ✅ 映射SQL结果(snake_case)到GraphQL字段(camelCase)
             eventCount=data.get('event_count', 0),
             parameterCount=data.get('parameter_count', 0),
             flowCount=data.get('flow_count', 0),
@@ -59,7 +60,7 @@ class GameStatisticsType(graphene.ObjectType):
     def from_dict(cls, data: dict) -> 'GameStatisticsType':
         """Create GameStatisticsType instance from dictionary."""
         return cls(
-            # ✅ 映射SQL结果（snake_case）到GraphQL字段（camelCase）
+            # ✅ 映射SQL结果(snake_case)到GraphQL字段(camelCase)
             totalEvents=data.get('total_events', 0),
             activeEvents=data.get('active_events', 0),
             totalParameters=data.get('total_parameters', 0),
@@ -70,13 +71,13 @@ class GameStatisticsType(graphene.ObjectType):
 class GameType(graphene.ObjectType):
     """
     Game GraphQL Type
-    
+
     Represents a game entity with its associated events and statistics.
     """
-    
+
     class Meta:
         description = "游戏实体"
-    
+
     # Basic fields
     id = Int(required=True, description="数据库ID")
     gid = Int(required=True, description="游戏业务GID")
@@ -96,7 +97,7 @@ class GameType(graphene.ObjectType):
     isActive = Boolean(description="是否活跃")
     nameCn = String(description="游戏中文名称")
     description = String(description="游戏描述")
-    
+
     # V2 Impact fields
     # impact = Field(lambda: GameImpactType, description="游戏影响分析")
     # Temporarily disabled - GameImpactType not yet implemented
@@ -104,7 +105,7 @@ class GameType(graphene.ObjectType):
     # V2 Statistics fields
     # statistics = Field(lambda: GameStatisticsType, description="游戏统计数据")
     # Temporarily disabled - GameStatisticsType not yet implemented
-    
+
     @classmethod
     def from_dict(cls, data: dict) -> 'GameType':
         """Create GameType instance from dictionary."""
@@ -112,7 +113,7 @@ class GameType(graphene.ObjectType):
             id=data.get('id'),
             gid=data.get('gid'),
             name=data.get('name'),
-            # ✅ 映射SQL结果（snake_case）到GraphQL字段（camelCase）
+            # ✅ 映射SQL结果(snake_case)到GraphQL字段(camelCase)
             odsDb=data.get('ods_db'),
             iconPath=data.get('icon_path'),
             createdAt=str(data.get('created_at')) if data.get('created_at') else None,

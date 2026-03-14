@@ -1,16 +1,16 @@
 """
 统一工具函数模块
 
-提供跨模块复用的工具函数，按功能分类组织。
+提供跨模块复用的工具函数, 按功能分类组织. 
 
 作者: Claude Code
 版本: 1.0.0
 创建日期: 2026-02-10
 
 模块结构:
-- validators: 验证函数（输入验证、安全验证、业务验证）
-- formatters: 格式化函数（表名、字段名、HQL格式化）
-- converters: 数据转换函数（模型转换、类型转换）
+- validators: 验证函数（输入验证, 安全验证, 业务验证）
+- formatters: 格式化函数（表名, 字段名, HQL格式化）
+- converters: 数据转换函数（模型转换, 类型转换）
 
 使用示例:
     >>> # 方式1: 从子模块导入
@@ -40,96 +40,85 @@
 # 从 validators 导入
 # ============================================================================
 
+# 注意: 这里使用相对导入避免循环引用
+# 导入父级目录的 utils.py 模块(不是 __init__.py)
+import importlib.util
+import sys
+
+from .converters import (
+    api_request_to_model,
+    event_to_dict,
+    fetch_all_as_dict,
+    fetch_one_as_dict,
+    game_to_dict,
+    get_event_parameters,
+    get_game_event_count,
+    parameter_to_dict,
+    safe_bool,
+    safe_float,
+    safe_int,
+    safe_int_convert,
+    safe_str,
+)
+from .error_messages import (
+    ErrorMessages,
+    build_error_response,
+    conflict_error,
+    format_api_error,
+    format_validation_error,
+    not_found_error,
+    server_error,
+    validation_error,
+)
+from .formatters import (
+    clean_identifier,
+    format_dwd_table_name,
+    format_error_response,
+    format_field_list,
+    format_field_name,
+    format_hql,
+    format_hql_from,
+    format_hql_group_by,
+    format_hql_join,
+    format_hql_select,
+    format_hql_where,
+    format_ods_table_name,
+    format_table_name,
+)
+from .sanitizers import (
+    IdentifierSanitizer,
+    sanitize_identifier,
+)
 from .validators import (
-    # 输入验证
-    validate_event_name,
-    validate_param_name,
-    validate_game_gid,
-    validate_game_id,
-    validate_required_fields,
-    # 安全验证
-    validate_sql_safe,
-    sanitize_and_validate_string,
-    # 业务验证
-    validate_game_exists,
-    check_games_exist,
-    # 正则模式
     EVENT_NAME_PATTERN,
     PARAM_NAME_PATTERN,
     SQL_INJECTION_PATTERN,
-)
-
-# Error messages
-from .error_messages import (
-    ErrorMessages,
-    format_validation_error,
-    format_api_error,
-    build_error_response,
-    validation_error,
-    not_found_error,
-    conflict_error,
-    server_error,
+    check_games_exist,
+    sanitize_and_validate_string,
+    validate_event_name,
+    validate_game_exists,
+    validate_game_gid,
+    validate_game_id,
+    validate_param_name,
+    validate_required_fields,
+    validate_sql_safe,
 )
 
 # ============================================================================
 # 从 formatters 导入
 # ============================================================================
 
-from .formatters import (
-    # 表名格式化
-    format_table_name,
-    format_dwd_table_name,
-    format_ods_table_name,
-    # 字段名格式化
-    format_field_name,
-    format_field_list,
-    # 错误响应格式化
-    format_error_response,
-    # HQL格式化
-    format_hql_select,
-    format_hql_from,
-    format_hql_join,
-    format_hql_where,
-    format_hql_group_by,
-    format_hql,
-    # 字符串清理
-    clean_identifier,
-)
 
 # ============================================================================
 # 从 converters 导入
 # ============================================================================
 
-from .converters import (
-    # 模型转字典
-    game_to_dict,
-    event_to_dict,
-    parameter_to_dict,
-    # API请求转模型
-    api_request_to_model,
-    # 类型转换
-    safe_int,
-    safe_str,
-    safe_int_convert,
-    safe_bool,
-    safe_float,
-    # 数据库查询转换
-    fetch_all_as_dict,
-    fetch_one_as_dict,
-    # 辅助函数
-    get_game_event_count,
-    get_event_parameters,
-)
 
-# 从旧的 utils.py 导入剩余函数（向后兼容）
+# 从旧的 utils.py 导入剩余函数(向后兼容)
 # ============================================================================
 # 这些函数仍在父模块 backend.core.utils.py 中定义
 # 我们需要直接导入它们以保持向后兼容性
 
-# 注意：这里使用相对导入避免循环引用
-# 导入父级目录的 utils.py 模块（不是 __init__.py）
-import importlib.util
-import sys
 
 # 获取父模块路径
 parent_module_path = "/Users/mckenzie/Documents/event2table/backend/core/utils.py"
@@ -223,6 +212,9 @@ __all__ = [
     "format_hql",
     # 字符串清理
     "clean_identifier",
+    # ========== sanitizers ==========
+    "IdentifierSanitizer",
+    "sanitize_identifier",
     # ========== converters ==========
     # 模型转字典
     "game_to_dict",

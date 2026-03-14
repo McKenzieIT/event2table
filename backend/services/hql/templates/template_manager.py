@@ -1,12 +1,12 @@
 """
 HQL模板管理器
 
-管理HQL生成模板，支持从数据库加载和缓存
+管理HQL生成模板, 支持从数据库加载和缓存
 """
 
 import json
-from typing import List, Dict, Any, Optional
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from backend.models.repositories.hql_template_repository import HQLTemplateRepository
 
@@ -15,7 +15,7 @@ class TemplateManager:
     """
     HQL模板管理器
 
-    从数据库加载模板，提供模板查询和应用功能，支持缓存
+    从数据库加载模板, 提供模板查询和应用功能, 支持缓存
     """
 
     def __init__(self):
@@ -39,7 +39,7 @@ class TemplateManager:
         Returns:
             List[Dict]: 模板列表
         """
-        # 如果有搜索关键词，使用搜索
+        # 如果有搜索关键词, 使用搜索
         if search_keyword:
             templates = self.repo.search_by_name(search_keyword)
         # 按类型过滤
@@ -55,7 +55,7 @@ class TemplateManager:
         else:
             templates = self.repo.find_all()
 
-        # 二次过滤（如果需要组合条件）
+        # 二次过滤(如果需要组合条件)
         if template_type and is_system is not None:
             templates = [t for t in templates if t.get("is_system") == (1 if is_system else 0)]
 
@@ -69,7 +69,7 @@ class TemplateManager:
             template_id: 模板ID
 
         Returns:
-            Dict: 模板配置，如果不存在返回None
+            Dict: 模板配置, 如果不存在返回None
         """
         return self.repo.find_by_id(template_id)
 
@@ -81,7 +81,7 @@ class TemplateManager:
             template_name: 模板名称
 
         Returns:
-            Dict: 模板配置，如果不存在返回None
+            Dict: 模板配置, 如果不存在返回None
         """
         return self.repo.find_by_name(template_name)
 

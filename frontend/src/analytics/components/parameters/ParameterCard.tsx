@@ -26,15 +26,7 @@
 
 import React from 'react';
 import { Badge } from '@shared/ui';
-
-export interface Parameter {
-  id: number;
-  paramName: string;
-  paramNameCn?: string;
-  type: 'base' | 'param' | 'custom';
-  gameGid?: number;
-  eventCount?: number;
-}
+import type { Parameter } from '@shared/types/parameter-types';
 
 interface ParameterCardProps {
   parameter: Parameter;
@@ -67,8 +59,8 @@ const ParameterCard: React.FC<ParameterCardProps> = ({ parameter, onEdit }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <code className="text-cyan-400 font-semibold text-lg">{parameter.paramName}</code>
-            <Badge className={getTypeBadgeColor(parameter.type)} size="sm">
-              {getTypeLabel(parameter.type)}
+            <Badge className={getTypeBadgeColor(parameter.type || parameter.paramType)} size="sm">
+              {getTypeLabel(parameter.type || parameter.paramType)}
             </Badge>
           </div>
 

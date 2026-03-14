@@ -18,16 +18,10 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import './MultiEventConfigV2.css';
+import type { Event } from '@shared/types/event-types';
+import type { Field } from '@shared/types/hql-types';
 
 // ========== 类型定义 ==========
-
-/** 事件对象 */
-export interface Event {
-  id: number;
-  event_name: string;
-  fields?: EventField[];
-  [key: string]: any;
-}
 
 /** 事件字段 */
 export interface EventField {
@@ -127,7 +121,11 @@ export default function MultiEventConfigV2({
   // 获取可用字段
   const getAvailableFields = (eventName: string): EventField[] => {
     const event = availableEvents.find(e => e.event_name === eventName);
-    return event?.fields || [];
+    // Map Field[] to EventField[] (Field.name -> EventField.field_name)
+    return (event?.fields || []).map((field: Field) => ({
+      field_name: field.name,
+      ...field
+    }));
   };
 
   return (

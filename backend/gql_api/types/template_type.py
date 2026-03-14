@@ -4,9 +4,10 @@ Template GraphQL Type
 Defines the GraphQL type for Canvas Flow Template entity.
 """
 
-import graphene
-from graphene import Int, String, Boolean
 import logging
+
+import graphene
+from graphene import Boolean, Int, String
 
 logger = logging.getLogger(__name__)
 

@@ -11,8 +11,9 @@ Architecture:
 """
 
 from flask import Blueprint, request
+
 from backend.core.logging import get_logger
-from backend.core.utils import json_success_response, json_error_response
+from backend.core.utils import json_error_response, json_success_response
 from backend.services.parameters.parameter_service import ParameterService
 
 logger = get_logger(__name__)
@@ -34,7 +35,7 @@ def list_common_params():
 
         # Use ParameterService
         service = ParameterService()
-        common_params = service.get_common_params(game_gid)
+        common_params = service.get_common_parameters_by_game(game_gid)
 
         return json_success_response(data=common_params)
 
@@ -80,9 +81,7 @@ def sync_common_params():
         return json_error_response(str(e), status_code=404)
     except Exception as e:
         logger.error(f"Error syncing common params: {e}", exc_info=True)
-        return json_error_response(
-            f"Failed to sync common parameters: {str(e)}", status_code=500
-        )
+        return json_error_response(f"Failed to sync common parameters: {str(e)}", status_code=500)
 
 
 @common_params_bp.route("/api/common-params/<int:param_id>", methods=["DELETE"])

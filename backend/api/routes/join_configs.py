@@ -14,20 +14,17 @@ Core endpoints:
 Architecture: API Layer → Service Layer → Repository Layer
 """
 
-import logging
 import json
+import logging
+
 from flask import request, session
 
 # Import shared utilities
-from backend.core.utils import (
-    json_error_response,
-    json_success_response,
-    validate_json_request,
-)
+from backend.core.utils import json_error_response, json_success_response, validate_json_request
+from backend.models.entities import JoinConfigEntity
 
 # Import Service Layer
 from backend.services.join_configs.join_config_service import JoinConfigService
-from backend.models.entities import JoinConfigEntity
 
 # Import the parent blueprint
 from .. import api_bp
@@ -151,9 +148,7 @@ def api_create_join_config():
         # Validate join_type
         join_type = data.get("join_type", "join")
         if join_type not in ["union_all", "join", "where_in"]:
-            return json_error_response(
-                f"Invalid join_type: {join_type}", status_code=400
-            )
+            return json_error_response(f"Invalid join_type: {join_type}", status_code=400)
 
         # Create JoinConfigEntity (Pydantic will validate)
         config_data = JoinConfigEntity(
@@ -212,15 +207,20 @@ def api_update_join_config(id):
                 )
 
         # Parse JSON fields if they are strings (service handles dict objects)
-        json_fields = ["source_events", "join_config", "join_condition", "output_fields", "where_conditions", "field_mappings"]
+        json_fields = [
+            "source_events",
+            "join_config",
+            "join_condition",
+            "output_fields",
+            "where_conditions",
+            "field_mappings",
+        ]
         for field in json_fields:
             if field in data and isinstance(data[field], str):
                 try:
                     data[field] = json.loads(data[field])
                 except json.JSONDecodeError:
-                    return json_error_response(
-                        f"Invalid JSON in {field}", status_code=400
-                    )
+                    return json_error_response(f"Invalid JSON in {field}", status_code=400)
 
         # Handle alias: join_condition → join_config
         if "join_condition" in data and "join_config" not in data:
@@ -230,14 +230,15 @@ def api_update_join_config(id):
         updated_config = service.update_join_config(id, data)
 
         return json_success_response(
-            data=updated_config.model_dump(),
-            message="Join configuration updated successfully"
+            data=updated_config.model_dump(), message="Join configuration updated successfully"
         )
 
     except ValueError as e:
         # Validation errors from service
         logger.error(f"Validation error updating join config {id}: {e}")
-        return json_error_response(str(e), status_code=404 if "not found" in str(e).lower() else 400)
+        return json_error_response(
+            str(e), status_code=404 if "not found" in str(e).lower() else 400
+        )
     except Exception as e:
         logger.error(f"Error updating join config {id}: {e}")
         return json_error_response("Failed to update join config", status_code=500)

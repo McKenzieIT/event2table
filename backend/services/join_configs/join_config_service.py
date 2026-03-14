@@ -9,12 +9,13 @@ Join Config Service - 业务逻辑层 (精简架构)
 - 集成缓存防护和失效机制
 """
 
-from typing import List, Optional
 import logging
-from backend.models.entities import JoinConfigEntity
-from backend.models.repositories.join_config_repository import JoinConfigRepository
+from typing import List, Optional
+
 from backend.core.cache.cache_system import CacheInvalidator, cached
 from backend.core.utils.business_helpers import validate_game_gid
+from backend.models.entities import JoinConfigEntity
+from backend.models.repositories.join_config_repository import JoinConfigRepository
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +26,15 @@ class JoinConfigService:
     def __init__(self):
         self.config_repo = JoinConfigRepository()
         from backend.core.cache.cache_system import HierarchicalCache
+
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
         logger.info("✅ JoinConfigService initialized")
 
     @cached("join_configs.list", timeout=120)
-    def list_join_configs(self, game_gid: int, join_type: Optional[str] = None) -> List[JoinConfigEntity]:
+    def list_join_configs(
+        self, game_gid: int, join_type: Optional[str] = None
+    ) -> List[JoinConfigEntity]:
         """
         获取游戏的Join配置列表 (带缓存)
 
@@ -106,7 +110,9 @@ class JoinConfigService:
         # 失效缓存
         self.invalidator.invalidate_pattern("join_configs.list")
 
-        logger.info(f"Join Config创建成功,已失效缓存: name={config_data.name}, game_gid={config_data.game_gid}")
+        logger.info(
+            f"Join Config创建成功,已失效缓存: name={config_data.name}, game_gid={config_data.game_gid}"
+        )
 
         return result
 
@@ -137,12 +143,19 @@ class JoinConfigService:
             if not updates.get('join_config') and not existing.join_config:
                 raise ValueError("join_type 'join' requires join_config to be provided")
 
-        # 序列化JSON字段（Repository期望字典）
-        json_fields = ['source_events', 'join_config', 'output_fields', 'where_conditions', 'field_mappings']
+        # 序列化JSON字段(Repository期望字典)
+        json_fields = [
+            'source_events',
+            'join_config',
+            'output_fields',
+            'where_conditions',
+            'field_mappings',
+        ]
         for field in json_fields:
             if field in updates:
                 # 如果是字符串,尝试解析为JSON
                 import json
+
                 if isinstance(updates[field], str):
                     try:
                         updates[field] = json.loads(updates[field])
@@ -210,7 +223,9 @@ class JoinConfigService:
         # 失效缓存
         if deleted_count > 0:
             self.invalidator.invalidate_pattern("join_configs.list")
-            logger.info(f"批量删除Join Config成功,已失效缓存: game_gid={game_gid}, count={deleted_count}")
+            logger.info(
+                f"批量删除Join Config成功,已失效缓存: game_gid={game_gid}, count={deleted_count}"
+            )
 
         return deleted_count
 

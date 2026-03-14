@@ -12,24 +12,24 @@ This module contains all game-related API endpoints:
 
 架构变更:
 - 使用统一Entity模型 (GameEntity) 进行请求验证和响应序列化
-- 所有操作通过 GameService，无直接数据库访问
+- 所有操作通过 GameService, 无直接数据库访问
 - 支持级联删除和详细统计查询
-- 移除双规制代码，统一架构
+- 移除双规制代码, 统一架构
 
 NOTE: All game queries use business GID (e.g., 10000147), not database ID.
 """
 
 import logging
-from typing import List, Tuple, Dict, Any
-from pydantic import ValidationError
+from typing import Any, Dict, List, Tuple
 
 from flask import request
-
-# 导入统一Entity模型
-from backend.models.entities import GameEntity
+from pydantic import ValidationError
 
 # 导入响应工具
 from backend.core.utils import json_error_response, json_success_response
+
+# 导入统一Entity模型
+from backend.models.entities import GameEntity
 
 # 导入Service层
 from backend.services.games.game_service import GameService
@@ -51,8 +51,8 @@ def list_games():
     获取所有游戏列表
 
     Query Parameters:
-        include_stats (bool): 是否包含详细统计信息（事件数、参数数、节点数等）
-        simple (bool): 如果为 true，返回简单的 Entity 列表（默认 false）
+        include_stats (bool): 是否包含详细统计信息（事件数, 参数数, 节点数等）
+        simple (bool): 如果为 true, 返回简单的 Entity 列表（默认 false）
 
     Returns:
         JSON响应: {"success": true, "data": [...]}
@@ -65,10 +65,10 @@ def list_games():
         simple_mode = request.args.get("simple", "false").lower() == "true"
 
         if include_detailed_stats and not simple_mode:
-            # 使用详细统计查询（LEFT JOIN）
+            # 使用详细统计查询(LEFT JOIN)
             games = service.get_games_with_detailed_stats()
         else:
-            # 使用简单查询（Entity 模型）
+            # 使用简单查询(Entity 模型)
             games = service.get_all_games(include_stats=False)
             games = [game.model_dump() for game in games]
 
@@ -86,8 +86,8 @@ def get_game_by_gid_alias(game_gid: int):
     """
     根据GID获取单个游戏 (前端兼容路由)
 
-    这是一个别名路由，指向与 /api/games/<game_gid> 相同的处理函数。
-    前端代码使用 /api/games/by-gid/<game_gid> 格式。
+    这是一个别名路由, 指向与 /api/games/<game_gid> 相同的处理函数. 
+    前端代码使用 /api/games/by-gid/<game_gid> 格式. 
 
     Args:
         game_gid: 游戏业务GID (如 10000147)
@@ -228,7 +228,7 @@ def delete_game(game_gid: int):
         # 检查删除影响
         impact = service.check_deletion_impact(game_gid)
 
-        # 如果未确认且有关联数据，返回影响统计
+        # 如果未确认且有关联数据, 返回影响统计
         if not force_delete and impact["has_associated_data"]:
             return json_error_response(
                 f"Game has {impact['event_count']} events, "
@@ -247,8 +247,7 @@ def delete_game(game_gid: int):
         result = service.cascade_delete_game(game_gid, force=force_delete)
 
         return json_success_response(
-            message=f"Game GID {game_gid} and all associated data deleted successfully",
-            data=result
+            message=f"Game GID {game_gid} and all associated data deleted successfully", data=result
         )
     except ValueError as e:
         return json_error_response(str(e), status_code=404)

@@ -1,9 +1,8 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Added React.memo, useCallback, useMemo
+// Optimized: Filtered data with useMemo, stable callbacks with useCallback
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput, Skeleton, ErrorState, useToast } from '@shared/ui';
@@ -164,8 +163,8 @@ export default function CategoriesList(): JSX.Element {
     [categories, searchTerm]
   );
 
-  // Selection handlers
-  const toggleSelect = (id: number): void => {
+  // Selection handlers - memoized with useCallback
+  const toggleSelect = useCallback((id: number): void => {
     setSelectedIds(prev => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
@@ -175,17 +174,17 @@ export default function CategoriesList(): JSX.Element {
       }
       return newSet;
     });
-  };
+  }, []);
 
-  const toggleSelectAll = (): void => {
+  const toggleSelectAll = useCallback((): void => {
     if (selectedIds.size === filteredCategories.length) {
       setSelectedIds(new Set());
     } else {
       setSelectedIds(new Set(filteredCategories.map(c => c.id)));
     }
-  };
+  }, [selectedIds.size, filteredCategories]);
 
-  const handleBatchDelete = (): void => {
+  const handleBatchDelete = useCallback((): void => {
     if (selectedIds.size === 0) return;
     setConfirmState({
       open: true,
@@ -196,9 +195,9 @@ export default function CategoriesList(): JSX.Element {
         batchDeleteMutation.mutate(selectedIds);
       }
     });
-  };
+  }, [selectedIds.size, batchDeleteMutation]);
 
-  const handleDelete = (id: number): void => {
+  const handleDelete = useCallback((id: number): void => {
     setConfirmState({
       open: true,
       title: '确认删除',
@@ -208,7 +207,7 @@ export default function CategoriesList(): JSX.Element {
         deleteMutation.mutate(id);
       }
     });
-  };
+  }, [deleteMutation]);
 
   // Show error if game_gid is missing
   if (!gameGid) {
@@ -375,3 +374,5 @@ export default function CategoriesList(): JSX.Element {
     </div>
   );
 }
+
+export default memo(CategoriesList);

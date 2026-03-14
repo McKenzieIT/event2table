@@ -1,12 +1,11 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/PHASE-3-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import React, { memo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import {
   Button,
@@ -422,7 +421,5 @@ function EventsListGraphQL() {
   return renderContent();
 }
 
-// ✅ 添加 React.memo 优化渲染性能
-const EventsListGraphQLMemo = memo(EventsListGraphQL);
-
-export default EventsListGraphQLMemo;
+// ✅ React.memo optimization - Prevent unnecessary re-renders
+export default React.memo(EventsListGraphQL);

@@ -10,7 +10,8 @@ import time
 from functools import wraps
 from typing import Callable, Optional, Tuple
 
-from flask import request, session, jsonify, abort
+from flask import abort, jsonify, request, session
+
 from backend.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -258,7 +259,7 @@ def add_security_headers(response):
     # Enable XSS filter
     response.headers["X-XSS-Protection"] = "1; mode=block"
 
-    # 🆕 开发模式：检测是否为开发环境
+    # 🆕 开发模式: 检测是否为开发环境
     import os
 
     is_dev = (
@@ -267,7 +268,7 @@ def add_security_headers(response):
     )
 
     if is_dev:
-        # 开发模式：放宽CSP，允许Vite开发服务器
+        # 开发模式: 放宽CSP, 允许Vite开发服务器
         vite_dev_url = os.environ.get("VITE_DEV_URL", "http://localhost:5173")
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
@@ -278,7 +279,7 @@ def add_security_headers(response):
             f"connect-src 'self' {vite_dev_url} http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https://cdn.jsdelivr.net"
         )
     else:
-        # 生产模式：严格的CSP策略
+        # 生产模式: 严格的CSP策略
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "

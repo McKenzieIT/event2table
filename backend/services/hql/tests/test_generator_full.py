@@ -1,12 +1,13 @@
 """
 HQLGenerator完整覆盖测试套件
 
-目标：达到100%代码覆盖率
+目标: 达到100%代码覆盖率
 """
 
 import pytest
-from backend.services.hql.core.generator import HQLGenerator, DebuggableHQLGenerator
-from backend.services.hql.models.event import Event, Field, Condition
+
+from backend.services.hql.core.generator import DebuggableHQLGenerator, HQLGenerator
+from backend.services.hql.models.event import Condition, Event, Field
 
 
 class TestHQLGeneratorFullCoverage:
@@ -129,7 +130,7 @@ class TestHQLGeneratorFullCoverage:
             events=[event], fields=fields, conditions=[], sql_mode="PROCEDURE"
         )
 
-        # sql_mode选项被接受（虽然当前实现不使用它）
+        # sql_mode选项被接受(虽然当前实现不使用它)
         assert len(result) > 0
 
     def test_add_comments_content(self):

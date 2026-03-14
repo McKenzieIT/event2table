@@ -30,8 +30,9 @@ Deprecated: 2026-03-03
 """
 
 
-from flask import Blueprint, jsonify, request, session
 import warnings
+
+from flask import Blueprint, jsonify, request, session
 
 from backend.core.cache.cache_system import clear_game_cache
 from backend.core.logging import get_logger
@@ -51,7 +52,7 @@ warnings.warn(
     "Use backend/api/routes/games.py instead. "
     "This file will be removed in Phase 4 cleanup.",
     DeprecationWarning,
-    stacklevel=2
+    stacklevel=2,
 )
 
 games_bp = Blueprint("games_service", __name__)
@@ -77,9 +78,7 @@ def set_game_context():
             return jsonify(error_response("Missing game_gid", status_code=400)[0]), 400
 
         # 查询游戏信息 - 使用 game_gid 而非 id
-        game = fetch_one_as_dict(
-            "SELECT id, gid, name FROM games WHERE gid = ?", (game_gid,)
-        )
+        game = fetch_one_as_dict("SELECT id, gid, name FROM games WHERE gid = ?", (game_gid,))
 
         if not game:
             logger.warning(f"[SetGameContext] Game not found: game_gid={game_gid}")
@@ -88,26 +87,22 @@ def set_game_context():
         session["current_game_gid"] = game["gid"]
 
         logger.info(
-            f"[SetGameContext] Session set: game_gid={game['gid']}, "
-            f"game_name={game['name']}"
+            f"[SetGameContext] Session set: game_gid={game['gid']}, " f"game_name={game['name']}"
         )
 
         return jsonify(
-            success_response(data={"game_gid": game["gid"], "game_name": game["name"]})[
-                0
-            ]
+            success_response(data={"game_gid": game["gid"], "game_name": game["name"]})[0]
         )
 
     except Exception as e:
         logger.error(f"[SetGameContext] Error: {str(e)}", exc_info=True)
-        return jsonify(
-            error_response(f"Server error: {str(e)}", status_code=500)[0]
-        ), 500
+        return jsonify(error_response(f"Server error: {str(e)}", status_code=500)[0]), 500
 
 
 # @games_bp.route('/api/games/<int:id>')  # CONFLICTS with api_bp
 
-@cached(ttl=1800)  # Cache for 30 minutes
+
+@cached(ttl=1800, key_prefix="games:by_id")  # Cache for 30 minutes
 def get_game(id):
     """
     获取单个游戏信息
@@ -119,7 +114,10 @@ def get_game(id):
         JSON: 游戏信息
     """
     try:
-        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?", (id,))
+        game = fetch_one_as_dict(
+            "SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?",
+            (id,),
+        )
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404
@@ -134,8 +132,7 @@ def get_game(id):
 
 
 @games_bp.route("/api/games/by-gid/<gid>")
-
-@cached(ttl=1800)  # Cache for 30 minutes
+@cached(ttl=1800, key_prefix="games:by_gid")  # Cache for 30 minutes
 def get_game_by_gid(gid):
     """
     根据业务GID获取游戏信息（非数据库ID）
@@ -147,7 +144,10 @@ def get_game_by_gid(gid):
         JSON: 游戏信息
     """
     try:
-        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?", (gid,))
+        game = fetch_one_as_dict(
+            "SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?",
+            (gid,),
+        )
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404
@@ -269,7 +269,9 @@ def update_game(id):
             return jsonify(response), 400
 
         # 检查游戏是否存在
-        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (id,))
+        game = fetch_one_as_dict(
+            "SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (id,)
+        )
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404
@@ -293,12 +295,13 @@ def update_game(id):
         clear_game_cache()
 
         # 获取更新后的游戏
-        updated_game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?", (id,))
+        updated_game = fetch_one_as_dict(
+            "SELECT id, gid, name, ods_db, dwd_prefix, description, icon_path, created_at, updated_at FROM games WHERE gid = ?",
+            (id,),
+        )
 
         logger.info(f"[UpdateGame] Game updated: {name} (ID: {id}, ODS: {ods_db})")
-        response, _ = success_response(
-            data=updated_game, message="Game updated successfully"
-        )
+        response, _ = success_response(data=updated_game, message="Game updated successfully")
         return jsonify(response)
 
     except Exception as e:
@@ -320,7 +323,9 @@ def delete_game(id):
     """
     try:
         # 检查游戏是否存在
-        game = fetch_one_as_dict("SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (id,))
+        game = fetch_one_as_dict(
+            "SELECT id, gid, name, ods_db, dwd_prefix FROM games WHERE gid = ?", (id,)
+        )
         if not game:
             response, _ = error_response("Game not found", status_code=404)
             return jsonify(response), 404

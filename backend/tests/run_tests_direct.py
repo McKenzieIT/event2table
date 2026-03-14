@@ -20,10 +20,15 @@ import pytest
 
 if __name__ == '__main__':
     # Run tests
-    sys.exit(pytest.main([
-        'backend/tests/unit/',
-        '-v',
-        '--tb=short',
-        '--no-cov',
-        '-W', 'ignore::DeprecationWarning'
-    ]))
+    sys.exit(
+        pytest.main(
+            [
+                'backend/tests/unit/',
+                '-v',
+                '--tb=short',
+                '--no-cov',
+                '-W',
+                'ignore::DeprecationWarning',
+            ]
+        )
+    )

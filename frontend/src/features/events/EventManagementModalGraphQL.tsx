@@ -6,7 +6,7 @@
  * 利用GraphQL的灵活性优化数据获取
  */
 
-import React, { useState, useMemo, useCallback, memo } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect, memo } from 'react';
 import { BaseModal, Button, Input, Select, useToast, SearchInput, Skeleton } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import {
@@ -59,6 +59,10 @@ const EventManagementModalGraphQL: React.FC<EventManagementModalProps> = ({ isOp
     message: ''
   });
 
+  // Ref to search input (for Chrome MCP compatibility)
+  const searchRef = useRef<HTMLInputElement>(null);
+  const eventNameCnRef = useRef<HTMLInputElement>(null);
+
   // GraphQL Hooks
   const { data: eventsData, loading: isLoading, error } = useEvents(gameGid, 100, 0);
   const { data: searchData, loading: isSearching } = useSearchEvents(searchTerm, gameGid);
@@ -102,6 +106,30 @@ const EventManagementModalGraphQL: React.FC<EventManagementModalProps> = ({ isOp
     } : null);
     setHasChanges(true);
   }, []);
+
+  // Chrome MCP兼容性: 监听DOM值变化并同步到state
+  useEffect(() => {
+    if (!searchRef.current || !editingEvent) {
+      return;
+    }
+
+    const searchDomValue = searchRef.current.value;
+
+    if (searchDomValue !== searchTerm) {
+      setSearchTerm(searchDomValue);
+    }
+
+    if (eventNameCnRef.current && editingEvent) {
+      const eventNameCnDomValue = eventNameCnRef.current.value;
+      if (eventNameCnDomValue !== editingEvent.eventNameCn) {
+        setEditingEvent(prev => prev ? {
+          ...prev,
+          eventNameCn: eventNameCnDomValue
+        } : null);
+        setHasChanges(true);
+      }
+    }
+  }, [searchTerm, editingEvent?.eventNameCn]);
 
   // Handle save event
   const handleSaveEvent = useCallback(async () => {
@@ -184,6 +212,7 @@ const EventManagementModalGraphQL: React.FC<EventManagementModalProps> = ({ isOp
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                 placeholder="搜索事件名称..."
                 loading={isSearching}
+                ref={searchRef}
               />
             </div>
             <div className="header-right">
@@ -255,6 +284,7 @@ const EventManagementModalGraphQL: React.FC<EventManagementModalProps> = ({ isOp
                       label="事件名称（中文）"
                       value={editingEvent.eventNameCn}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditEvent('eventNameCn', e.target.value)}
+                      ref={eventNameCnRef}
                     />
                     <Input
                       label="分类"

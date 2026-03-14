@@ -123,13 +123,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--en-space-md);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .sidebar-section--event {
   flex-shrink: 0;
   max-height: 280px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .sidebar-section--params {

@@ -2,10 +2,11 @@
 UnionBuilder 单元测试
 
 测试多事件UNION HQL生成功能
-遵循TDD原则：先写测试，看测试失败
+遵循TDD原则: 先写测试, 看测试失败
 """
 
 import pytest
+
 from backend.services.hql.builders.union_builder import UnionBuilder
 from backend.services.hql.models.event import Event, Field
 
@@ -45,7 +46,7 @@ class TestUnionBuilder:
 
         union_sql = builder.build_union_all(events, fields)
 
-        # 应该有2个UNION ALL（3个表）
+        # 应该有2个UNION ALL(3个表)
         assert union_sql.count("UNION ALL") == 2
 
     def test_build_union_with_partition_filter(self):
@@ -173,7 +174,7 @@ class TestUnionBuilder:
         union_sql = builder.build_union_all(events, fields)
 
         # 所有SELECT子句应该有相同的字段顺序
-        # 将SQL按UNION分割，检查每个SELECT块
+        # 将SQL按UNION分割, 检查每个SELECT块
         select_blocks = union_sql.split("UNION ALL")
 
         for block in select_blocks:
@@ -181,7 +182,7 @@ class TestUnionBuilder:
             assert "zone_id" in block
             assert "account_id" in block
 
-            # 验证字段顺序（role_id应该在zone_id之前）
+            # 验证字段顺序(role_id应该在zone_id之前)
             role_id_pos = block.find("role_id")
             zone_id_pos = block.find("zone_id")
             account_id_pos = block.find("account_id")
@@ -189,7 +190,7 @@ class TestUnionBuilder:
             assert role_id_pos < zone_id_pos < account_id_pos
 
     def test_param_field_in_union(self):
-        """测试UNION中的参数字段（JSON提取）"""
+        """测试UNION中的参数字段(JSON提取)"""
         builder = UnionBuilder()
 
         events = [

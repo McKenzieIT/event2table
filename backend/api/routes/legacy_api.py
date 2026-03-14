@@ -44,7 +44,10 @@ All endpoints in this module return the X-Deprecated: true header.
 
 import logging
 
-from flask import request, make_response
+from flask import make_response, request
+
+# Import Repository pattern for data access
+from backend.core.data_access import Repositories
 
 # Import shared utilities
 from backend.core.utils import (
@@ -54,9 +57,6 @@ from backend.core.utils import (
     json_error_response,
     json_success_response,
 )
-
-# Import Repository pattern for data access
-from backend.core.data_access import Repositories
 
 # Import the parent blueprint
 from .. import api_bp
@@ -68,7 +68,9 @@ def _add_deprecation_header(response):
     """Add deprecation header to API responses"""
     response = make_response(response)
     response.headers['X-Deprecated'] = 'true'
-    response.headers['X-Deprecation-Notice'] = 'This API is deprecated and will be removed in V10.0.0. See docs for migration guide.'
+    response.headers['X-Deprecation-Notice'] = (
+        'This API is deprecated and will be removed in V10.0.0. See docs for migration guide.'
+    )
     return response
 
 
@@ -233,9 +235,7 @@ def api_batch_get_common_params():
 
         # Parse IDs from comma-separated string
         ids_list = [
-            int(id_str.strip())
-            for id_str in param_ids.split(",")
-            if id_str.strip().isdigit()
+            int(id_str.strip()) for id_str in param_ids.split(",") if id_str.strip().isdigit()
         ]
 
         if not ids_list:
@@ -307,8 +307,9 @@ def api_preview_excel():
     Returns:
         JSON response with preview data and column information
     """
-    import openpyxl
     from io import BytesIO
+
+    import openpyxl
     from werkzeug.utils import secure_filename
 
     try:
@@ -349,9 +350,7 @@ def api_preview_excel():
         # Extract headers
         headers = []
         if 0 <= header_row < len(all_data):
-            headers = [
-                str(cell) if cell is not None else "" for cell in all_data[header_row]
-            ]
+            headers = [str(cell) if cell is not None else "" for cell in all_data[header_row]]
 
         # Extract data rows
         data_rows = []
@@ -366,9 +365,7 @@ def api_preview_excel():
                 data_rows.append(processed_row)
 
         # Get column count
-        column_count = (
-            len(headers) if headers else (len(all_data[0]) if all_data else 0)
-        )
+        column_count = len(headers) if headers else (len(all_data[0]) if all_data else 0)
 
         workbook.close()
 
@@ -396,9 +393,7 @@ def api_preview_excel():
         )
     except Exception as e:
         logger.error(f"Error previewing Excel file: {e}", exc_info=True)
-        return json_error_response(
-            f"Failed to preview Excel file: {str(e)}", status_code=500
-        )
+        return json_error_response(f"Failed to preview Excel file: {str(e)}", status_code=500)
 
 
 # ============================================================================

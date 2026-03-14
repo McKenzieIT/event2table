@@ -12,7 +12,7 @@
  *     { value: 'football', label: 'Football' },
  *     { value: 'basketball', label: 'Basketball' }
  *   ]}
- *   onChange={(value) => console.log(value)}
+ *   onChange={(value) => }
  * />
  *
  * @example

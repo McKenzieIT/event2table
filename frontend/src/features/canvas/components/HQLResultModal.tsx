@@ -38,9 +38,9 @@ import './HQLResultModal.css';
 // ============================================
 
 /**
- * Game data structure
+ * HQL Result Modal-specific game data structure
  */
-export interface GameData {
+export interface HQLResultModalGameData {
   ods_db?: string;
   gid?: string | number;
   name?: string;
@@ -86,7 +86,7 @@ export interface HQLResultModalProps {
   /** Callback to regenerate HQL */
   onRegenerate?: () => void;
   /** Game data for context */
-  gameData?: GameData | null;
+  gameData?: HQLResultModalGameData | null;
   /** Flow name for file download */
   flowName?: string;
   /** Output fields for data preview */

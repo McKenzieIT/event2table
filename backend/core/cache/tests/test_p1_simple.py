@@ -18,30 +18,27 @@ from backend.core.cache.cache_hierarchical import HierarchicalCache
 
 def test_index_optimization():
     """演示索引优化效果"""
-    print("\n" + "="*80)
-    print("P1性能优化演示：模式匹配索引")
-    print("="*80)
+    print("\n" + "=" * 80)
+    print("P1性能优化演示: 模式匹配索引")
+    print("=" * 80)
 
-    # 创建缓存实例（启用索引）
+    # 创建缓存实例(启用索引)
     cache = HierarchicalCache(l1_size=2000)
 
-    # 场景：添加1000个缓存键，game_gid分布在100个不同值
+    # 场景: 添加1000个缓存键, game_gid分布在100个不同值
     print("\n准备测试数据...")
     game_gids = list(range(90000000, 90000100))  # 100个不同的game_gid
 
     for game_gid in game_gids:
         for page in range(10):
             cache.set(
-                'events.list',
-                {"game_gid": game_gid, "page": page},
-                game_gid=game_gid,
-                page=page
+                'events.list', {"game_gid": game_gid, "page": page}, game_gid=game_gid, page=page
             )
 
     print(f"✅ 已添加 {len(game_gids) * 10} 个缓存键")
     print(f"   分布: {len(game_gids)} 个game_gid × 10 个page")
 
-    # 第一次失效某个game_gid（会触发全扫描并建立索引）
+    # 第一次失效某个game_gid(会触发全扫描并建立索引)
     print("\n[第1次失效] game_gid=90000000")
     print("   状态: 索引未命中 → 全扫描 + 建立索引")
 
@@ -57,7 +54,7 @@ def test_index_optimization():
     print(f"     - 索引命中: {stats1.get('index_hits', 0)}次")
     print(f"     - 注册模式: {stats1.get('index_patterns', 0)}个")
 
-    # 第二次失效相同的game_gid（直接使用索引）
+    # 第二次失效相同的game_gid(直接使用索引)
     print("\n[第2次失效] game_gid=90000001")
     print("   状态: 索引命中 → O(1)查找")
 
@@ -73,7 +70,7 @@ def test_index_optimization():
     print(f"     - 索引命中: {stats2.get('index_hits', 0)}次")
     print(f"     - 注册模式: {stats2.get('index_patterns', 0)}个")
 
-    # 第三次失效（应该更快）
+    # 第三次失效(应该更快)
     print("\n[第3次失效] game_gid=90000002")
     print("   状态: 索引命中 → O(1)查找")
 
@@ -89,10 +86,10 @@ def test_index_optimization():
     print(f"     - 索引命中: {stats3.get('index_hits', 0)}次")
     print(f"     - 注册模式: {stats3.get('index_patterns', 0)}个")
 
-    # 对比测试：禁用索引
-    print("\n" + "="*80)
-    print("对比测试：禁用索引优化")
-    print("="*80)
+    # 对比测试: 禁用索引
+    print("\n" + "=" * 80)
+    print("对比测试: 禁用索引优化")
+    print("=" * 80)
 
     cache_no_index = HierarchicalCache(l1_size=2000)
     cache_no_index._index_enabled = False
@@ -101,10 +98,7 @@ def test_index_optimization():
     for game_gid in game_gids:
         for page in range(10):
             cache_no_index.set(
-                'events.list',
-                {"game_gid": game_gid, "page": page},
-                game_gid=game_gid,
-                page=page
+                'events.list', {"game_gid": game_gid, "page": page}, game_gid=game_gid, page=page
             )
 
     print(f"✅ 已添加 {len(game_gids) * 10} 个缓存键")
@@ -119,9 +113,9 @@ def test_index_optimization():
     print(f"   复杂度: O(n) 遍历所有键")
 
     # 性能对比
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("性能对比总结")
-    print("="*80)
+    print("=" * 80)
 
     # 使用第2次和第3次的平均时间作为索引优化后的时间
     indexed_avg = (time2 + time3) / 2
@@ -134,8 +128,8 @@ def test_index_optimization():
     if speedup > 1:
         print(f"   ✅ 索引优化有效！速度提升 {speedup:.1f}x")
     else:
-        print(f"   ⚠️  首次建立索引有开销，但后续操作会更快")
-        print(f"   💡 随着失效次数增加，索引优势会越来越明显")
+        print(f"   ⚠️  首次建立索引有开销, 但后续操作会更快")
+        print(f"   💡 随着失效次数增加, 索引优势会越来越明显")
 
     print("\n💡 关键点:")
     print("   - 首次使用新模式会全扫描并建立索引（一次性成本）")
@@ -150,10 +144,11 @@ if __name__ == '__main__':
         success = test_index_optimization()
         print(f"\n{'='*80}")
         print("✅ P1性能优化演示完成")
-        print("="*80)
+        print("=" * 80)
         sys.exit(0 if success else 1)
     except Exception as e:
         print(f"\n❌ 测试失败: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

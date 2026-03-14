@@ -1,11 +1,12 @@
 """
 HQL服务门面类
 
-提供统一的HQL生成、验证接口
+提供统一的HQL生成, 验证接口
 简化API层对HQL服务的使用
 """
 
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from backend.services.hql.core.generator import HQLGenerator
 from backend.services.hql.validators.performance_analyzer import (
     HQLPerformanceAnalyzer,
@@ -18,7 +19,7 @@ class HQLFacade:
     """
     HQL服务门面
 
-    提供统一的HQL生成、验证接口，封装底层实现细节
+    提供统一的HQL生成, 验证接口, 封装底层实现细节
     """
 
     def __init__(self):

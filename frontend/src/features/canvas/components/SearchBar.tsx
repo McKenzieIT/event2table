@@ -17,7 +17,7 @@ import type { SearchBarProps } from './types';
  * @param props - Component props
  *
  * @example
- * <SearchBar onSearch={(term) => console.log(term)} />
+ * <SearchBar onSearch={(term) => } />
  */
 function SearchBar({ onSearch }: SearchBarProps): React.JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);

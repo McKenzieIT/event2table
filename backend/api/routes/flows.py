@@ -75,11 +75,7 @@ def api_list_flows():
         page_size = request.args.get("page_size", 50, type=int)
 
         # Use FlowService for paginated results
-        result = service.get_flows_paginated(
-            game_gid=game_gid,
-            page=page,
-            page_size=page_size
-        )
+        result = service.get_flows_paginated(game_gid=game_gid, page=page, page_size=page_size)
 
         # Convert FlowEntity objects to dicts
         flows_data = [flow.model_dump() for flow in result["flows"]]
@@ -167,9 +163,7 @@ def api_create_flow():
 
         clear_cache_pattern("flows")
         logger.info(f"Flow created: {flow_name} (ID: {flow_id})")
-        return json_success_response(
-            data={"flow_id": flow_id}, message="Flow created successfully"
-        )
+        return json_success_response(data={"flow_id": flow_id}, message="Flow created successfully")
 
     except Exception as e:
         logger.error(f"Error creating flow: {e}")
@@ -314,13 +308,9 @@ def api_generate_flow():
             return json_error_response("Missing flow_id", status_code=400)
 
         # Generate HQL using HQL generator
-        result = hql_generator.generate_flow_hql(
-            data["flow_id"], data.get("options", {})
-        )
+        result = hql_generator.generate_flow_hql(data["flow_id"], data.get("options", {}))
 
-        return json_success_response(
-            data=result, message="Flow HQL generated successfully"
-        )
+        return json_success_response(data=result, message="Flow HQL generated successfully")
 
     except Exception as e:
         logger.error(f"Error generating flow HQL: {e}", exc_info=True)

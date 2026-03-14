@@ -48,17 +48,14 @@ API端点:
 - POST /api/cache/degradation/switch  - 手动切换降级模式
 """
 
-from flask import Blueprint, jsonify, request
-from datetime import datetime
 import logging
+from datetime import datetime
 
-from backend.core.cache.cache_system import (
-    hierarchical_cache,
-    get_redis_client,
-    CacheKeyBuilder
-)
-from backend.core.cache.protection import cache_protection
+from flask import Blueprint, jsonify, request
+
+from backend.core.cache.cache_system import CacheKeyBuilder, get_redis_client, hierarchical_cache
 from backend.core.cache.invalidator import cache_invalidator_enhanced
+from backend.core.cache.protection import cache_protection
 from backend.core.cache.statistics import cache_statistics
 from backend.core.config.config import CacheConfig
 
@@ -72,13 +69,14 @@ logger = logging.getLogger(__name__)
 # 缓存统计API
 # ============================================================================
 
+
 @api_bp.route('/api/cache/stats', methods=['GET'])
 def get_cache_stats():
     """
     获取缓存统计信息
-    
-    返回L1、L2缓存的统计信息
-    
+
+    返回L1, L2缓存的统计信息
+
     Returns:
         {
             "success": true,
@@ -91,8 +89,8 @@ def get_cache_stats():
     try:
         # 获取L1统计
         l1_stats = hierarchical_cache.get_stats()
-        
-        # 获取L2统计（Redis）
+
+        # 获取L2统计(Redis)
         redis_client = get_redis_client()
         l2_stats = {}
         if redis_client:
@@ -102,7 +100,7 @@ def get_cache_stats():
                 misses = info.get("keyspace_misses", 0)
                 total = hits + misses
                 hit_rate = (hits / total * 100) if total > 0 else 0
-                
+
                 l2_stats = {
                     "total_keys": redis_client.dbsize(),
                     "memory_used": info.get("used_memory_human", "0B"),
@@ -116,11 +114,21 @@ def get_cache_stats():
             except Exception as e:
                 logger.warning(f"获取Redis统计失败: {e}")
                 l2_stats = {"error": str(e)}
-        
+
         # 获取防护统计
         protection_stats = cache_protection.get_stats()
-        
-        return jsonify({
+
+        # 获取增强监控统计
+        monitoring_stats = {}
+        try:
+            from backend.core.cache.monitoring_enhanced import get_cache_monitor
+
+            monitor = get_cache_monitor(hierarchical_cache)
+            monitoring_stats = monitor.get_stats()
+        except Exception as e:
+            logger.debug(f"获取监控统计失败: {e}")
+
+        response_data = {
             "success": True,
             "timestamp": datetime.now().isoformat(),
             "l1_cache": {
@@ -140,27 +148,102 @@ def get_cache_stats():
                 "hit_rate": l1_stats["hit_rate"],
                 "empty_hits": l1_stats.get("empty_hits", 0),
             },
-        })
-    
+        }
+
+        # 添加监控统计(如果可用)
+        if monitoring_stats:
+            response_data["monitoring"] = {
+                "performance_metrics": monitoring_stats.get("performance_metrics", {}),
+                "recent_alerts": monitoring_stats.get("recent_alerts", []),
+                "alert_count": monitoring_stats.get("alert_count", 0),
+            }
+
+        return jsonify(response_data)
+
     except Exception as e:
         logger.error(f"获取缓存统计失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取缓存统计失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取缓存统计失败"}), 500
+
+
+@api_bp.route('/api/cache/monitoring/performance', methods=['GET'])
+def get_monitoring_performance():
+    """
+    获取监控性能指标
+
+    Query Parameters:
+        hours: 查询的小时数（默认24）
+
+    Returns:
+        {
+            "success": true,
+            "performance_summary": {...},
+            "current_metrics": {...}
+        }
+    """
+    try:
+        from backend.core.cache.monitoring_enhanced import get_cache_monitor
+
+        hours = int(request.args.get('hours', 24))
+
+        monitor = get_cache_monitor(hierarchical_cache)
+        performance_summary = monitor.get_performance_summary(hours=hours)
+        current_metrics = monitor.metrics.get_metrics()
+
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "period_hours": hours,
+                "performance_summary": performance_summary,
+                "current_metrics": current_metrics,
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"获取监控性能失败: {e}")
+        return jsonify({"success": False, "error": str(e), "message": "获取监控性能失败"}), 500
+
+
+@api_bp.route('/api/cache/monitoring/snapshot', methods=['POST'])
+def create_monitoring_snapshot():
+    """
+    创建监控快照
+
+    Returns:
+        {
+            "success": true,
+            "message": "快照已创建"
+        }
+    """
+    try:
+        from backend.core.cache.monitoring_enhanced import get_cache_monitor
+
+        monitor = get_cache_monitor(hierarchical_cache)
+        monitor.create_snapshot()
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "✅ 监控快照已创建",
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"创建监控快照失败: {e}")
+        return jsonify({"success": False, "error": str(e), "message": "创建监控快照失败"}), 500
 
 
 @api_bp.route('/api/cache/stats/detailed', methods=['GET'])
 def get_detailed_stats():
     """
     获取详细统计信息
-    
-    包括热点键、性能趋势等
-    
+
+    包括热点键, 性能趋势等
+
     Query Parameters:
         hours: 查询的小时数（默认24）
-    
+
     Returns:
         {
             "success": true,
@@ -173,42 +256,41 @@ def get_detailed_stats():
     """
     try:
         hours = int(request.args.get('hours', 24))
-        
+
         # 获取详细统计
         detailed_stats = cache_statistics.get_detailed_stats()
-        
+
         # 获取性能趋势
         performance_trend = cache_statistics.get_performance_trend(hours=hours)
-        
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            **detailed_stats,
-            "performance_trend": performance_trend,
-        })
-    
+
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                **detailed_stats,
+                "performance_trend": performance_trend,
+            }
+        )
+
     except Exception as e:
         logger.error(f"获取详细统计失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取详细统计失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取详细统计失败"}), 500
 
 
 # ============================================================================
 # 缓存键管理API
 # ============================================================================
 
+
 @api_bp.route('/api/cache/keys', methods=['GET'])
 def list_cache_keys():
     """
     列出所有缓存键
-    
+
     Query Parameters:
-        pattern: 键模式（可选，如 "games:*"）
+        pattern: 键模式（可选, 如 "games:*"）
         limit: 返回数量限制（默认100）
-    
+
     Returns:
         {
             "success": true,
@@ -219,54 +301,51 @@ def list_cache_keys():
     try:
         pattern = request.args.get('pattern', f"{CacheKeyBuilder.PREFIX}*")
         limit = int(request.args.get('limit', 100))
-        
+
         redis_client = get_redis_client()
         if redis_client is None:
-            return jsonify({
-                "success": False,
-                "error": "Redis不可用"
-            }), 503
-        
+            return jsonify({"success": False, "error": "Redis不可用"}), 503
+
         # 获取所有键
         all_keys = redis_client.keys(pattern)
-        
+
         # 移除前缀以便显示
         keys = []
         for key in all_keys[:limit]:
             ttl = redis_client.ttl(key)
             key_str = key.decode() if isinstance(key, bytes) else key
-            keys.append({
-                "key": key_str.replace(CacheKeyBuilder.PREFIX, ""),
-                "full_key": key_str,
-                "ttl_seconds": ttl,
-                "expires_in": f"{ttl}s" if ttl > 0 else "永久",
-            })
-        
-        return jsonify({
-            "success": True,
-            "total_keys": len(all_keys),
-            "returned_keys": len(keys),
-            "keys": sorted(keys, key=lambda x: x["key"]),
-        })
-    
+            keys.append(
+                {
+                    "key": key_str.replace(CacheKeyBuilder.PREFIX, ""),
+                    "full_key": key_str,
+                    "ttl_seconds": ttl,
+                    "expires_in": f"{ttl}s" if ttl > 0 else "永久",
+                }
+            )
+
+        return jsonify(
+            {
+                "success": True,
+                "total_keys": len(all_keys),
+                "returned_keys": len(keys),
+                "keys": sorted(keys, key=lambda x: x["key"]),
+            }
+        )
+
     except Exception as e:
         logger.error(f"列出缓存键失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "列出缓存键失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "列出缓存键失败"}), 500
 
 
 @api_bp.route('/api/cache/keys/search', methods=['GET'])
 def search_cache_keys():
     """
     搜索缓存键
-    
+
     Query Parameters:
         query: 搜索关键词
         limit: 返回数量限制（默认50）
-    
+
     Returns:
         {
             "success": true,
@@ -278,63 +357,57 @@ def search_cache_keys():
     try:
         query = request.args.get('query', '')
         limit = int(request.args.get('limit', 50))
-        
+
         if not query:
-            return jsonify({
-                "success": False,
-                "error": "缺少搜索关键词"
-            }), 400
-        
+            return jsonify({"success": False, "error": "缺少搜索关键词"}), 400
+
         redis_client = get_redis_client()
         if redis_client is None:
-            return jsonify({
-                "success": False,
-                "error": "Redis不可用"
-            }), 503
-        
+            return jsonify({"success": False, "error": "Redis不可用"}), 503
+
         # 获取所有键
         all_keys = redis_client.keys(f"{CacheKeyBuilder.PREFIX}*")
-        
+
         # 过滤匹配的键
         matched_keys = []
         for key in all_keys:
             key_str = key.decode() if isinstance(key, bytes) else key
             if query.lower() in key_str.lower():
                 ttl = redis_client.ttl(key)
-                matched_keys.append({
-                    "key": key_str.replace(CacheKeyBuilder.PREFIX, ""),
-                    "full_key": key_str,
-                    "ttl_seconds": ttl,
-                    "expires_in": f"{ttl}s" if ttl > 0 else "永久",
-                })
-                
+                matched_keys.append(
+                    {
+                        "key": key_str.replace(CacheKeyBuilder.PREFIX, ""),
+                        "full_key": key_str,
+                        "ttl_seconds": ttl,
+                        "expires_in": f"{ttl}s" if ttl > 0 else "永久",
+                    }
+                )
+
                 if len(matched_keys) >= limit:
                     break
-        
-        return jsonify({
-            "success": True,
-            "query": query,
-            "total_matches": len(matched_keys),
-            "keys": matched_keys,
-        })
-    
+
+        return jsonify(
+            {
+                "success": True,
+                "query": query,
+                "total_matches": len(matched_keys),
+                "keys": matched_keys,
+            }
+        )
+
     except Exception as e:
         logger.error(f"搜索缓存键失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "搜索缓存键失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "搜索缓存键失败"}), 500
 
 
 @api_bp.route('/api/cache/keys/<path:key>', methods=['GET'])
 def get_cache_key_detail(key: str):
     """
     获取单个缓存键详情
-    
+
     Args:
         key: 缓存键（不含前缀）
-    
+
     Returns:
         {
             "success": true,
@@ -347,29 +420,29 @@ def get_cache_key_detail(key: str):
     try:
         redis_client = get_redis_client()
         if redis_client is None:
-            return jsonify({
-                "success": False,
-                "error": "Redis不可用"
-            }), 503
-        
+            return jsonify({"success": False, "error": "Redis不可用"}), 503
+
         # 构建完整键
         full_key = f"{CacheKeyBuilder.PREFIX}{key}"
-        
+
         # 检查键是否存在
         if not redis_client.exists(full_key):
-            return jsonify({
-                "success": True,
-                "key": key,
-                "full_key": full_key,
-                "exists": False,
-            })
-        
+            return jsonify(
+                {
+                    "success": True,
+                    "key": key,
+                    "full_key": full_key,
+                    "exists": False,
+                }
+            )
+
         # 获取值和TTL
         value = redis_client.get(full_key)
         ttl = redis_client.ttl(full_key)
-        
+
         # 尝试解析JSON
         import json
+
         parsed_value = None
         if value:
             try:
@@ -377,34 +450,32 @@ def get_cache_key_detail(key: str):
                 parsed_value = json.loads(value_str)
             except (json.JSONDecodeError, UnicodeDecodeError):
                 parsed_value = value_str if 'value_str' in locals() else str(value)
-        
-        return jsonify({
-            "success": True,
-            "key": key,
-            "full_key": full_key,
-            "exists": True,
-            "value": parsed_value,
-            "ttl_seconds": ttl,
-            "expires_in": f"{ttl}s" if ttl > 0 else "永久",
-        })
-    
+
+        return jsonify(
+            {
+                "success": True,
+                "key": key,
+                "full_key": full_key,
+                "exists": True,
+                "value": parsed_value,
+                "ttl_seconds": ttl,
+                "expires_in": f"{ttl}s" if ttl > 0 else "永久",
+            }
+        )
+
     except Exception as e:
         logger.error(f"获取缓存键详情失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取缓存键详情失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取缓存键详情失败"}), 500
 
 
 @api_bp.route('/api/cache/keys/<path:key>', methods=['DELETE'])
 def delete_cache_key(key: str):
     """
     删除单个缓存键
-    
+
     Args:
         key: 缓存键（不含前缀）
-    
+
     Returns:
         {
             "success": true,
@@ -414,45 +485,44 @@ def delete_cache_key(key: str):
     """
     try:
         redis_client = get_redis_client()
-        
+
         # 构建完整键
         full_key = f"{CacheKeyBuilder.PREFIX}{key}"
-        
+
         # 删除L1缓存
         if full_key in hierarchical_cache.l1_cache:
             del hierarchical_cache.l1_cache[full_key]
             del hierarchical_cache.l1_timestamps[full_key]
-        
+
         # 删除L2缓存
         if redis_client:
             redis_client.delete(full_key)
-        
+
         logger.info(f"删除缓存键: {key}")
-        
-        return jsonify({
-            "success": True,
-            "message": "缓存键已删除",
-            "key": key,
-        })
-    
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "缓存键已删除",
+                "key": key,
+            }
+        )
+
     except Exception as e:
         logger.error(f"删除缓存键失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "删除缓存键失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "删除缓存键失败"}), 500
 
 
 # ============================================================================
 # 缓存清理API
 # ============================================================================
 
+
 @api_bp.route('/api/cache/clear', methods=['POST'])
 def clear_all_cache():
     """
     清空所有缓存
-    
+
     Returns:
         {
             "success": true,
@@ -466,40 +536,39 @@ def clear_all_cache():
     try:
         # 清空缓存
         l1_count, l2_count = cache_invalidator_enhanced.clear_all()
-        
+
         logger.info(f"清空所有缓存: L1={l1_count}, L2={l2_count}")
-        
-        return jsonify({
-            "success": True,
-            "message": f"✅ 缓存已清空: L1={l1_count}条, L2={l2_count}个键",
-            "details": {
-                "l1_cleared": l1_count,
-                "l2_cleared": l2_count,
-                "total_cleared": l1_count + l2_count,
-            },
-        })
-    
+
+        return jsonify(
+            {
+                "success": True,
+                "message": f"✅ 缓存已清空: L1={l1_count}条, L2={l2_count}个键",
+                "details": {
+                    "l1_cleared": l1_count,
+                    "l2_cleared": l2_count,
+                    "total_cleared": l1_count + l2_count,
+                },
+            }
+        )
+
     except Exception as e:
         logger.error(f"清空缓存失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "清空缓存失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "清空缓存失败"}), 500
 
 
 # ============================================================================
 # 缓存失效API
 # ============================================================================
 
+
 @api_bp.route('/api/cache/invalidate/game/<int:game_gid>', methods=['POST'])
 def invalidate_game_cache(game_gid: int):
     """
     失效游戏相关的所有缓存
-    
+
     Args:
         game_gid: 游戏业务GID
-    
+
     Returns:
         {
             "success": true,
@@ -511,38 +580,36 @@ def invalidate_game_cache(game_gid: int):
     try:
         # 失效游戏相关缓存
         invalidated_keys = cache_invalidator_enhanced.invalidate_game_related(game_gid)
-        
+
         logger.info(f"失效游戏缓存: game_gid={game_gid}, {len(invalidated_keys)}个键")
-        
-        return jsonify({
-            "success": True,
-            "message": f"✅ 游戏缓存已失效: {len(invalidated_keys)}个键",
-            "game_gid": game_gid,
-            "invalidated_keys": list(invalidated_keys),
-        })
-    
+
+        return jsonify(
+            {
+                "success": True,
+                "message": f"✅ 游戏缓存已失效: {len(invalidated_keys)}个键",
+                "game_gid": game_gid,
+                "invalidated_keys": list(invalidated_keys),
+            }
+        )
+
     except Exception as e:
         logger.error(f"失效游戏缓存失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "失效游戏缓存失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "失效游戏缓存失败"}), 500
 
 
 @api_bp.route('/api/cache/invalidate/event/<int:event_id>', methods=['POST'])
 def invalidate_event_cache(event_id: int):
     """
     失效事件相关的所有缓存
-    
+
     Args:
         event_id: 事件ID
-    
+
     Request Body:
         {
             "game_gid": 10000147
         }
-    
+
     Returns:
         {
             "success": true,
@@ -555,38 +622,36 @@ def invalidate_event_cache(event_id: int):
         # 获取game_gid
         data = request.get_json() or {}
         game_gid = data.get('game_gid')
-        
+
         if not game_gid:
-            return jsonify({
-                "success": False,
-                "error": "缺少game_gid参数"
-            }), 400
-        
+            return jsonify({"success": False, "error": "缺少game_gid参数"}), 400
+
         # 失效事件相关缓存
         invalidated_keys = cache_invalidator_enhanced.invalidate_event_related(event_id, game_gid)
-        
-        logger.info(f"失效事件缓存: event_id={event_id}, game_gid={game_gid}, {len(invalidated_keys)}个键")
-        
-        return jsonify({
-            "success": True,
-            "message": f"✅ 事件缓存已失效: {len(invalidated_keys)}个键",
-            "event_id": event_id,
-            "game_gid": game_gid,
-            "invalidated_keys": list(invalidated_keys),
-        })
-    
+
+        logger.info(
+            f"失效事件缓存: event_id={event_id}, game_gid={game_gid}, {len(invalidated_keys)}个键"
+        )
+
+        return jsonify(
+            {
+                "success": True,
+                "message": f"✅ 事件缓存已失效: {len(invalidated_keys)}个键",
+                "event_id": event_id,
+                "game_gid": game_gid,
+                "invalidated_keys": list(invalidated_keys),
+            }
+        )
+
     except Exception as e:
         logger.error(f"失效事件缓存失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "失效事件缓存失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "失效事件缓存失败"}), 500
 
 
 # ============================================================================
 # 监控和告警API
 # ============================================================================
+
 
 @api_bp.route('/api/cache/monitoring/alerts', methods=['GET'])
 def get_alerts():
@@ -606,20 +671,18 @@ def get_alerts():
         alert_manager = get_cache_alert_manager(hierarchical_cache)
         alerts = alert_manager.get_active_alerts()
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "alerts": alerts,
-            "count": len(alerts),
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "alerts": alerts,
+                "count": len(alerts),
+            }
+        )
 
     except Exception as e:
         logger.error(f"获取告警列表失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取告警列表失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取告警列表失败"}), 500
 
 
 @api_bp.route('/api/cache/monitoring/metrics', methods=['GET'])
@@ -631,7 +694,7 @@ def get_metrics():
         Prometheus格式的文本指标
     """
     try:
-        from backend.core.cache.monitoring import get_cache_alert_manager, export_prometheus_metrics
+        from backend.core.cache.monitoring import export_prometheus_metrics, get_cache_alert_manager
 
         alert_manager = get_cache_alert_manager(hierarchical_cache)
         metrics = export_prometheus_metrics(alert_manager)
@@ -640,11 +703,10 @@ def get_metrics():
 
     except Exception as e:
         logger.error(f"获取Prometheus指标失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取Prometheus指标失败"
-        }), 500
+        return (
+            jsonify({"success": False, "error": str(e), "message": "获取Prometheus指标失败"}),
+            500,
+        )
 
 
 @api_bp.route('/api/cache/monitoring/trends', methods=['GET'])
@@ -669,25 +731,24 @@ def get_trends():
         alert_manager = get_cache_alert_manager(hierarchical_cache)
         summary = alert_manager.get_metrics_summary()
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "hours": hours,
-            "trends": summary,
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "hours": hours,
+                "trends": summary,
+            }
+        )
 
     except Exception as e:
         logger.error(f"获取性能趋势失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取性能趋势失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取性能趋势失败"}), 500
 
 
 # ============================================================================
 # 容量监控API
 # ============================================================================
+
 
 @api_bp.route('/api/cache/capacity/l1', methods=['GET'])
 def get_l1_capacity():
@@ -706,33 +767,33 @@ def get_l1_capacity():
         monitor = get_capacity_monitor()
         if monitor is None:
             # Capacity monitor not initialized (e.g., in test environment)
-            return jsonify({
-                "success": True,
-                "timestamp": datetime.now().isoformat(),
-                "capacity": {
-                    "current_size": 0,
-                    "max_size": 1000,
-                    "usage_percent": 0.0,
-                    "status": "not_initialized"
-                },
-                "message": "Capacity monitor not initialized"
-            })
+            return jsonify(
+                {
+                    "success": True,
+                    "timestamp": datetime.now().isoformat(),
+                    "capacity": {
+                        "current_size": 0,
+                        "max_size": 1000,
+                        "usage_percent": 0.0,
+                        "status": "not_initialized",
+                    },
+                    "message": "Capacity monitor not initialized",
+                }
+            )
 
         stats = monitor.get_capacity_stats()
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "capacity": stats.get('l1', {}),
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "capacity": stats.get('l1', {}),
+            }
+        )
 
     except Exception as e:
         logger.error(f"获取L1容量失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取L1容量失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取L1容量失败"}), 500
 
 
 @api_bp.route('/api/cache/capacity/l2', methods=['GET'])
@@ -752,33 +813,33 @@ def get_l2_capacity():
         monitor = get_capacity_monitor()
         if monitor is None:
             # Capacity monitor not initialized (e.g., in test environment)
-            return jsonify({
-                "success": True,
-                "timestamp": datetime.now().isoformat(),
-                "capacity": {
-                    "current_size": 0,
-                    "max_size": 1000000,
-                    "usage_percent": 0.0,
-                    "status": "not_initialized"
-                },
-                "message": "Capacity monitor not initialized"
-            })
+            return jsonify(
+                {
+                    "success": True,
+                    "timestamp": datetime.now().isoformat(),
+                    "capacity": {
+                        "current_size": 0,
+                        "max_size": 1000000,
+                        "usage_percent": 0.0,
+                        "status": "not_initialized",
+                    },
+                    "message": "Capacity monitor not initialized",
+                }
+            )
 
         stats = monitor.get_capacity_stats()
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "capacity": stats.get('l2', {}),
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "capacity": stats.get('l2', {}),
+            }
+        )
 
     except Exception as e:
         logger.error(f"获取L2容量失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取L2容量失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取L2容量失败"}), 500
 
 
 @api_bp.route('/api/cache/capacity/prediction', methods=['GET'])
@@ -803,39 +864,40 @@ def get_capacity_prediction():
         monitor = get_capacity_monitor()
         if monitor is None:
             # Capacity monitor not initialized (e.g., in test environment)
-            return jsonify({
-                "success": True,
-                "timestamp": datetime.now().isoformat(),
-                "prediction_days": days,
-                "prediction": {
-                    "days_until_exhaustion_l1": -1,
-                    "days_until_exhaustion_l2": -1,
-                    "status": "not_initialized"
-                },
-                "message": "Capacity monitor not initialized"
-            })
+            return jsonify(
+                {
+                    "success": True,
+                    "timestamp": datetime.now().isoformat(),
+                    "prediction_days": days,
+                    "prediction": {
+                        "days_until_exhaustion_l1": -1,
+                        "days_until_exhaustion_l2": -1,
+                        "status": "not_initialized",
+                    },
+                    "message": "Capacity monitor not initialized",
+                }
+            )
 
         prediction = monitor.predict_capacity_limit(days=days)
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "prediction_days": days,
-            "prediction": prediction,
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "prediction_days": days,
+                "prediction": prediction,
+            }
+        )
 
     except Exception as e:
         logger.error(f"获取容量预测失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取容量预测失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取容量预测失败"}), 500
 
 
 # ============================================================================
 # 布隆过滤器API
 # ============================================================================
+
 
 @api_bp.route('/api/cache/bloom-filter/rebuild', methods=['POST'])
 def rebuild_bloom_filter():
@@ -857,20 +919,18 @@ def rebuild_bloom_filter():
 
         logger.info(f"布隆过滤器已重建: {stats}")
 
-        return jsonify({
-            "success": True,
-            "message": "✅ 布隆过滤器已重建",
-            "timestamp": datetime.now().isoformat(),
-            "stats": stats,
-        })
+        return jsonify(
+            {
+                "success": True,
+                "message": "✅ 布隆过滤器已重建",
+                "timestamp": datetime.now().isoformat(),
+                "stats": stats,
+            }
+        )
 
     except Exception as e:
         logger.error(f"重建布隆过滤器失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "重建布隆过滤器失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "重建布隆过滤器失败"}), 500
 
 
 @api_bp.route('/api/cache/bloom-filter/stats', methods=['GET'])
@@ -890,24 +950,26 @@ def get_bloom_filter_stats():
         bloom = get_enhanced_bloom_filter()
         stats = bloom.get_stats()
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "stats": stats,
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "stats": stats,
+            }
+        )
 
     except Exception as e:
         logger.error(f"获取布隆过滤器统计失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取布隆过滤器统计失败"
-        }), 500
+        return (
+            jsonify({"success": False, "error": str(e), "message": "获取布隆过滤器统计失败"}),
+            500,
+        )
 
 
 # ============================================================================
 # 智能预热API
 # ============================================================================
+
 
 @api_bp.route('/api/cache/warm-up/predict', methods=['POST'])
 def predict_hot_keys():
@@ -944,20 +1006,18 @@ def predict_hot_keys():
         warmer = get_intelligent_warmer()
         hot_keys = warmer.predict_hot_keys(minutes=minutes, top_n=top_n, use_decay=use_decay)
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "hot_keys": hot_keys,
-            "count": len(hot_keys),
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "hot_keys": hot_keys,
+                "count": len(hot_keys),
+            }
+        )
 
     except Exception as e:
         logger.error(f"预测热点键失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "预测热点键失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "预测热点键失败"}), 500
 
 
 @api_bp.route('/api/cache/warm-up/execute', methods=['POST'])
@@ -978,8 +1038,9 @@ def execute_warm_up():
         }
     """
     try:
-        from backend.core.cache.intelligent_warmer import get_intelligent_warmer
         import asyncio
+
+        from backend.core.cache.intelligent_warmer import get_intelligent_warmer
 
         # Handle case where Content-Type is not set
         try:
@@ -990,7 +1051,7 @@ def execute_warm_up():
         keys = data.get('keys', [])
 
         if not keys:
-            # 如果没有提供keys，先预测热点键
+            # 如果没有提供keys, 先预测热点键
             warmer = get_intelligent_warmer()
             keys = warmer.predict_hot_keys(minutes=5, top_n=100)
 
@@ -1006,26 +1067,25 @@ def execute_warm_up():
 
         logger.info(f"缓存预热完成: {len(keys)}个键")
 
-        return jsonify({
-            "success": True,
-            "message": f"✅ 预热完成: {len(keys)}个键",
-            "timestamp": datetime.now().isoformat(),
-            "result": result,
-            "count": len(keys),
-        })
+        return jsonify(
+            {
+                "success": True,
+                "message": f"✅ 预热完成: {len(keys)}个键",
+                "timestamp": datetime.now().isoformat(),
+                "result": result,
+                "count": len(keys),
+            }
+        )
 
     except Exception as e:
         logger.error(f"执行预热失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "执行预热失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "执行预热失败"}), 500
 
 
 # ============================================================================
 # 降级管理API
 # ============================================================================
+
 
 @api_bp.route('/api/cache/degradation/status', methods=['GET'])
 def get_degradation_status():
@@ -1044,19 +1104,17 @@ def get_degradation_status():
         manager = get_degradation_manager()
         status = manager.get_status()
 
-        return jsonify({
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
-            "status": status,
-        })
+        return jsonify(
+            {
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+                "status": status,
+            }
+        )
 
     except Exception as e:
         logger.error(f"获取降级状态失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "获取降级状态失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "获取降级状态失败"}), 500
 
 
 @api_bp.route('/api/cache/degradation/switch', methods=['POST'])
@@ -1098,20 +1156,18 @@ def switch_degradation():
 
         logger.info(f"降级模式已切换: {action}")
 
-        return jsonify({
-            "success": True,
-            "message": f"✅ 降级模式已切换: {action}",
-            "timestamp": datetime.now().isoformat(),
-            "degraded": manager.degraded,
-        })
+        return jsonify(
+            {
+                "success": True,
+                "message": f"✅ 降级模式已切换: {action}",
+                "timestamp": datetime.now().isoformat(),
+                "degraded": manager.degraded,
+            }
+        )
 
     except Exception as e:
         logger.error(f"切换降级模式失败: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "message": "切换降级模式失败"
-        }), 500
+        return jsonify({"success": False, "error": str(e), "message": "切换降级模式失败"}), 500
 
 
 logger.info("✅ 缓存管理API路由已加载 (2.0.0) - registered to api_bp")

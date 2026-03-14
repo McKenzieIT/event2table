@@ -1,9 +1,11 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
+// ⚡️ REACT PERF: Component optimized with React.memo + useMemo + useCallback
+// - Added React.memo to prevent unnecessary re-renders
+// - Added useMemo for filteredParameters and categories (already present)
+// - Added useCallback for event handlers to stabilize references
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt, Button, SearchInput, Spinner } from '@shared/ui';
@@ -54,7 +56,7 @@ function ParametersEnhanced() {
     enabled: !!currentGame // Only execute when currentGame exists
   });
 
-  // 客户端过滤（useMemo优化）
+  // ⚡️ useMemo: 客户端过滤（已有优化）
   const filteredParameters = useMemo(() => {
     return parameters.filter(param => {
       const matchesSearch = param.name?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -63,9 +65,20 @@ function ParametersEnhanced() {
     });
   }, [parameters, searchTerm, selectedCategory]);
 
+  // ⚡️ useMemo: 分类列表（已有优化）
   const categories = useMemo(() => {
     return ['all', ...new Set(parameters.map(p => p.category).filter(Boolean))];
   }, [parameters]);
+
+  // ⚡️ useCallback: 稳定搜索处理器
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  // ⚡️ useCallback: 稳定分类选择处理器
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+  }, []);
 
   if (isLoading) {
     return (
@@ -90,12 +103,12 @@ function ParametersEnhanced() {
         <SearchInput
           placeholder="搜索参数..."
           value={searchTerm}
-          onChange={(value: string) => setSearchTerm(value)}
+          onChange={handleSearchChange}
         />
         <select
           className="category-filter"
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={handleCategoryChange}
         >
           {categories.map(cat => (
             <option key={cat} value={cat}>
@@ -132,4 +145,5 @@ function ParametersEnhanced() {
   );
 }
 
-export default ParametersEnhanced;
+// ⚡️ Wrap with React.memo to prevent unnecessary re-renders
+export default React.memo(ParametersEnhanced);

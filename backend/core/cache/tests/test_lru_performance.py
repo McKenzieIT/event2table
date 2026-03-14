@@ -11,11 +11,11 @@ LRU缓存性能测试
 预期提升: 约100倍 (1000项缓存)
 """
 
-from typing import Optional
-import time
-import sys
-import os
 import math
+import os
+import sys
+import time
+from typing import Optional
 
 # 添加项目根目录到path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
@@ -34,6 +34,7 @@ class OldLRU:
     def record_access(self, key: str) -> None:
         """记录键访问"""
         import time
+
         self._key_to_access_time[key] = time.time()
 
     def evict_lru(self) -> Optional[str]:
@@ -41,7 +42,7 @@ class OldLRU:
         if not self._key_to_access_time:
             return None
 
-        # O(n)操作：遍历所有键找最小时间戳
+        # O(n)操作: 遍历所有键找最小时间戳
         oldest_key = min(self._key_to_access_time, key=self._key_to_access_time.get)  # type: ignore[arg-type]
         del self._key_to_access_time[oldest_key]
         self._current_size -= 1
@@ -77,7 +78,7 @@ def test_lru_performance() -> None:
     for i in range(capacity):
         old_lru.record_access(f"key_{i}")
 
-    # 触发淘汰（每次都需要O(n)查找）
+    # 触发淘汰(每次都需要O(n)查找)
     evict_times = []
     for i in range(capacity, capacity + iterations):
         start_evict = time.perf_counter()
@@ -106,7 +107,7 @@ def test_lru_performance() -> None:
     for i in range(capacity):
         new_lru.record_access(f"key_{i}")
 
-    # 触发淘汰（每次O(log n)）
+    # 触发淘汰(每次O(log n))
     evict_times_new = []
     for i in range(capacity, capacity + iterations):
         start_evict = time.perf_counter()
@@ -129,7 +130,9 @@ def test_lru_performance() -> None:
     print("=" * 70)
 
     speedup = old_total_time / new_total_time
-    avg_speedup = (sum(evict_times) / len(evict_times)) / (sum(evict_times_new) / len(evict_times_new))
+    avg_speedup = (sum(evict_times) / len(evict_times)) / (
+        sum(evict_times_new) / len(evict_times_new)
+    )
 
     print(f"总耗时提升: {speedup:.2f}x")
     print(f"  旧实现: {old_total_time:.4f}s")
@@ -140,7 +143,9 @@ def test_lru_performance() -> None:
     print(f"平均淘汰耗时提升: {avg_speedup:.2f}x")
     print(f"  旧实现: {sum(evict_times) / len(evict_times):.2f} μs")
     print(f"  新实现: {sum(evict_times_new) / len(evict_times_new):.2f} μs")
-    print(f"  提升: {(1 - (sum(evict_times_new) / len(evict_times_new)) / (sum(evict_times) / len(evict_times))) * 100:.1f}%")
+    print(
+        f"  提升: {(1 - (sum(evict_times_new) / len(evict_times_new)) / (sum(evict_times) / len(evict_times))) * 100:.1f}%"
+    )
     print()
 
     # ========== 复杂度分析 ==========
@@ -158,7 +163,7 @@ def test_lru_performance() -> None:
 
     if speedup > 10:
         print("✅ 性能优化显著！")
-        print(f"   实际提升 {speedup:.1f}x，远超预期")
+        print(f"   实际提升 {speedup:.1f}x, 远超预期")
     elif speedup > 2:
         print("✅ 性能优化有效")
         print(f"   提升 {speedup:.1f}x")
@@ -169,10 +174,10 @@ def test_lru_performance() -> None:
     print()
     print("建议:")
     if speedup > 10:
-        print("  - 优化已达到目标，可以投入生产使用")
+        print("  - 优化已达到目标, 可以投入生产使用")
         print("  - 建议在生产环境监控LRU淘汰性能")
     elif speedup > 2:
-        print("  - 优化有效，但仍有提升空间")
+        print("  - 优化有效, 但仍有提升空间")
         print("  - 考虑进一步优化堆操作")
     else:
         print("  - 当前优化效果不明显")
@@ -213,7 +218,7 @@ def test_lru_correctness() -> None:
     print("2. 懒删除策略测试")
     print("-" * 70)
 
-    # 重复访问同一个键（会在堆中创建多个时间戳）
+    # 重复访问同一个键(会在堆中创建多个时间戳)
     for _ in range(3):
         lru.record_access("key_1")
         time.sleep(0.001)

@@ -4,11 +4,11 @@
 缓存容量监控系统
 ================
 
-监控L1和L2缓存容量使用情况，提供告警和自动扩容功能。
+监控L1和L2缓存容量使用情况, 提供告警和自动扩容功能. 
 
 核心功能:
-- L1容量监控（85%警告，95%严重）
-- L2 Redis容量监控（80%警告，90%严重）
+- L1容量监控（85%警告, 95%严重）
+- L2 Redis容量监控（80%警告, 90%严重）
 - L1自动扩容（95%时扩容50%）
 - 容量趋势预测（线性回归）
 - Prometheus指标导出
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 class CapacityTrendPredictor:
-    """容量趋势预测器（线性回归）"""
+    """容量趋势预测器(线性回归)"""
 
     def __init__(self, window_size: int = 1440):
         """
@@ -67,37 +67,37 @@ class CapacityTrendPredictor:
             threshold: 容量上限阈值（默认95%）
 
         Returns:
-            预测的耗尽时间戳，如果无法预测则返回None
+            预测的耗尽时间戳, 如果无法预测则返回None
         """
         if len(history) < 10:
-            # 数据不足，无法预测
+            # 数据不足, 无法预测
             return None
 
         try:
             # 提取时间和使用率
-            # 使用相对时间（秒）而不是绝对时间戳，避免数值不稳定
+            # 使用相对时间(秒)而不是绝对时间戳, 避免数值不稳定
             base_timestamp = history[0][0]
             timestamps = [(t - base_timestamp) / 3600 for t, _ in history]  # 转换为小时
             usages = [u for _, u in history]
 
-            # 线性回归：y = ax + b
-            # x = 相对时间（小时）, y = usage
+            # 线性回归: y = ax + b
+            # x = 相对时间(小时), y = usage
             n = len(timestamps)
 
             sum_x = sum(timestamps)
             sum_y = sum(usages)
             sum_xy = sum(t * u for t, u in zip(timestamps, usages))
-            sum_x2 = sum(t ** 2 for t in timestamps)
+            sum_x2 = sum(t**2 for t in timestamps)
 
             # 计算斜率和截距
-            denominator = n * sum_x2 - sum_x ** 2
+            denominator = n * sum_x2 - sum_x**2
             if denominator == 0:
                 return None
 
             slope = (n * sum_xy - sum_x * sum_y) / denominator
             intercept = (sum_y - slope * sum_x) / n
 
-            # 如果斜率<=0，表示容量不会增长
+            # 如果斜率<=0, 表示容量不会增长
             if slope <= 1e-10:  # 使用小的正数阈值而不是0
                 return None
 
@@ -107,7 +107,7 @@ class CapacityTrendPredictor:
             hours_until_exhaustion = (threshold - intercept) / slope
 
             if hours_until_exhaustion > 0:
-                # 转换回绝对时间戳（从base_timestamp开始计算）
+                # 转换回绝对时间戳(从base_timestamp开始计算)
                 exhaustion_time: float = base_timestamp + hours_until_exhaustion * 3600
                 return exhaustion_time
 
@@ -124,7 +124,7 @@ class CapacityTrendPredictor:
             threshold: 容量上限阈值（默认95%）
 
         Returns:
-            预测的耗尽时间，如果无法预测则返回None
+            预测的耗尽时间, 如果无法预测则返回None
         """
         exhaustion_ts = self.predict_exhaustion(self.l1_history, threshold)
         if exhaustion_ts:
@@ -139,7 +139,7 @@ class CapacityTrendPredictor:
             threshold: 容量上限阈值（默认90%）
 
         Returns:
-            预测的耗尽时间，如果无法预测则返回None
+            预测的耗尽时间, 如果无法预测则返回None
         """
         exhaustion_ts = self.predict_exhaustion(self.l2_history, threshold)
         if exhaustion_ts:
@@ -201,7 +201,7 @@ class CacheCapacityMonitor:
             l1_critical_threshold: L1严重阈值（默认95%）
             l2_warning_threshold: L2警告阈值（默认80%）
             l2_critical_threshold: L2严重阈值（默认90%）
-            monitoring_interval: 监控间隔（秒，默认60）
+            monitoring_interval: 监控间隔（秒, 默认60）
             alert_days_advance: 提前告警天数（默认7天）
         """
         self.cache = hierarchical_cache
@@ -228,7 +228,7 @@ class CacheCapacityMonitor:
         self._stop_event = threading.Event()
         self._lock = threading.Lock()
 
-        # 告警状态（防止重复告警）
+        # 告警状态(防止重复告警)
         self._alert_state = {
             "l1_warning_sent": False,
             "l1_critical_sent": False,
@@ -275,7 +275,7 @@ class CacheCapacityMonitor:
             used_memory = info.get("used_memory", 0)
 
             if maxmemory == 0:
-                # Redis未设置maxmemory，检查used_memory_rss
+                # Redis未设置maxmemory, 检查used_memory_rss
                 used_memory_rss = info.get("used_memory_rss", 0)
                 # 假设系统内存限制为2GB
                 maxmemory = 2 * 1024 * 1024 * 1024  # 2GB
@@ -365,9 +365,7 @@ class CacheCapacityMonitor:
         # 检查警告阈值
         elif usage >= self.l1_warning_threshold:
             if not self._alert_state["l1_warning_sent"]:
-                logger.warning(
-                    f"⚠️ L1容量警告: {usage:.1%} >= {self.l1_warning_threshold:.1%}"
-                )
+                logger.warning(f"⚠️ L1容量警告: {usage:.1%} >= {self.l1_warning_threshold:.1%}")
                 self._alert_state["l1_warning_sent"] = True
             return "WARNING"
 
@@ -389,12 +387,8 @@ class CacheCapacityMonitor:
         # 更新Prometheus指标
         redis_stats = self.get_redis_memory_stats()
         if redis_stats:
-            self.prometheus_metrics["cache_capacity_bytes"]["l2"] = redis_stats.get(
-                "maxmemory", 0
-            )
-            self.prometheus_metrics["cache_usage_bytes"]["l2"] = redis_stats.get(
-                "used_memory", 0
-            )
+            self.prometheus_metrics["cache_capacity_bytes"]["l2"] = redis_stats.get("maxmemory", 0)
+            self.prometheus_metrics["cache_usage_bytes"]["l2"] = redis_stats.get("used_memory", 0)
             self.prometheus_metrics["cache_usage_ratio"]["l2"] = usage
 
         # 检查严重阈值
@@ -409,9 +403,7 @@ class CacheCapacityMonitor:
         # 检查警告阈值
         elif usage >= self.l2_warning_threshold:
             if not self._alert_state["l2_warning_sent"]:
-                logger.warning(
-                    f"⚠️ L2容量警告: {usage:.1%} >= {self.l2_warning_threshold:.1%}"
-                )
+                logger.warning(f"⚠️ L2容量警告: {usage:.1%} >= {self.l2_warning_threshold:.1%}")
                 self._alert_state["l2_warning_sent"] = True
             return "WARNING"
 
@@ -452,9 +444,7 @@ class CacheCapacityMonitor:
             days_until = (l1_exhaustion - datetime.now()).total_seconds() / 86400
 
             # 更新Prometheus指标
-            self.prometheus_metrics["cache_capacity_prediction_days"]["l1"] = (
-                days_until
-            )
+            self.prometheus_metrics["cache_capacity_prediction_days"]["l1"] = days_until
 
             if days_until <= self.alert_days_advance:
                 alert = {
@@ -475,9 +465,7 @@ class CacheCapacityMonitor:
             days_until = (l2_exhaustion - datetime.now()).total_seconds() / 86400
 
             # 更新Prometheus指标
-            self.prometheus_metrics["cache_capacity_prediction_days"]["l2"] = (
-                days_until
-            )
+            self.prometheus_metrics["cache_capacity_prediction_days"]["l2"] = days_until
 
             if days_until <= self.alert_days_advance:
                 alert = {
@@ -585,15 +573,11 @@ class CacheCapacityMonitor:
 
         # L1容量指标
         l1_usage = self.get_l1_usage()
-        lines.append(
-            f'cache_capacity_bytes{{level="l1"}} {self.cache.l1_size} {int(time.time())}'
-        )
+        lines.append(f'cache_capacity_bytes{{level="l1"}} {self.cache.l1_size} {int(time.time())}')
         lines.append(
             f'cache_usage_bytes{{level="l1"}} {len(self.cache.l1_cache)} {int(time.time())}'
         )
-        lines.append(
-            f'cache_usage_ratio{{level="l1"}} {l1_usage:.4f} {int(time.time())}'
-        )
+        lines.append(f'cache_usage_ratio{{level="l1"}} {l1_usage:.4f} {int(time.time())}')
 
         # L2容量指标
         redis_stats = self.get_redis_memory_stats()
@@ -620,7 +604,7 @@ class CacheCapacityMonitor:
         return "\n".join(lines)
 
 
-# 全局容量监控器实例（延迟初始化）
+# 全局容量监控器实例(延迟初始化)
 _capacity_monitor: Optional[CacheCapacityMonitor] = None
 
 
@@ -653,7 +637,7 @@ def init_capacity_monitor(
         l1_critical_threshold: L1严重阈值（默认95%）
         l2_warning_threshold: L2警告阈值（默认80%）
         l2_critical_threshold: L2严重阈值（默认90%）
-        monitoring_interval: 监控间隔（秒，默认60）
+        monitoring_interval: 监控间隔（秒, 默认60）
         alert_days_advance: 提前告警天数（默认7天）
         auto_start: 是否自动启动监控（默认True）
 
@@ -681,7 +665,7 @@ def init_capacity_monitor(
     return _capacity_monitor
 
 
-# 公开别名，用于模块导入
+# 公开别名, 用于模块导入
 cache_capacity_monitor = _capacity_monitor
 
 

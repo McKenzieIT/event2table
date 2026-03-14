@@ -7,7 +7,7 @@
 #   Fixed: items_with_data = fetch_all_as_dict('SELECT * FROM items')
 #
 
-from backend.core.cache.decorators import cached
+from backend.core.cache.decorators import cached, invalidate_cache
 
 # ⚠️ PERFORMANCE ISSUE: N+1 query detected in this file
 # TODO: Refactor to use JOIN or prefetch pattern
@@ -28,20 +28,17 @@ ERS架构迁移 (Phase 3 - Task A6):
 """
 
 from flask import Blueprint, request
+
 from backend.core.logging import get_logger
-from backend.core.utils import (
-    json_success_response,
-    json_error_response,
-)
+from backend.core.utils import json_error_response, json_success_response
+
 # ERS架构 - 使用Service层
 from backend.services.events.event_node_service import EventNodeService
 from backend.services.games.game_service import GameService
 
 logger = get_logger(__name__)
 
-event_node_builder_bp = Blueprint(
-    "event_node_builder", __name__, url_prefix="/event_node_builder"
-)
+event_node_builder_bp = Blueprint("event_node_builder", __name__, url_prefix="/event_node_builder")
 
 # 初始化Service实例 (全局单例模式)
 event_node_service = EventNodeService()
@@ -78,22 +75,16 @@ def preview_hql():
         sql_mode = data.get("sql_mode", "view")
 
         if not game_gid or not event_id:
-            logger.error(
-                f"Missing required params: game_gid={game_gid}, event_id={event_id}"
-            )
-            return json_error_response(
-                "game_gid and event_id are required", status_code=400
-            )
+            logger.error(f"Missing required params: game_gid={game_gid}, event_id={event_id}")
+            return json_error_response("game_gid and event_id are required", status_code=400)
 
         # 添加详细日志用于调试
         logger.info(f"Generating HQL for game_gid={game_gid}, event_id={event_id}")
-        logger.info(
-            f"Fields count: {len(fields)}, Filter conditions: {filter_conditions}"
-        )
+        logger.info(f"Fields count: {len(fields)}, Filter conditions: {filter_conditions}")
 
         # 导入 HQL V2 生成器
-        from backend.services.hql.core.generator import HQLGenerator
         from backend.services.hql.adapters.project_adapter import ProjectAdapter
+        from backend.services.hql.core.generator import HQLGenerator
 
         # 创建 HQL 生成器
         generator = HQLGenerator()
@@ -107,7 +98,7 @@ def preview_hql():
 
         events_data = [event_obj]
 
-        # 转换字段格式（使用 adapter）
+        # 转换字段格式(使用 adapter)
         fields_v2 = []
         for idx, field in enumerate(fields):
             try:
@@ -120,7 +111,7 @@ def preview_hql():
                     f"Invalid field at index {idx}: {str(e)}", status_code=400
                 )
 
-        # 转换 WHERE 条件格式（使用 adapter）
+        # 转换 WHERE 条件格式(使用 adapter)
         where_conditions_v2 = []
         if filter_conditions:
             conditions = filter_conditions.get("conditions", [])
@@ -129,9 +120,7 @@ def preview_hql():
                     condition_obj = adapter.condition_from_project(cond)
                     where_conditions_v2.append(condition_obj)
                 except (KeyError, ValueError) as e:
-                    return json_error_response(
-                        f"Invalid condition: {str(e)}", status_code=400
-                    )
+                    return json_error_response(f"Invalid condition: {str(e)}", status_code=400)
 
         # 生成 HQL
         hql_result = generator.generate(
@@ -147,15 +136,17 @@ def preview_hql():
 
     except Exception as e:
         logger.error(f"Error generating HQL preview: {e}", exc_info=True)
-        return json_error_response(
-            f"Failed to generate HQL preview: {str(e)}", status_code=500
-        )
+        return json_error_response(f"Failed to generate HQL preview: {str(e)}", status_code=500)
 
 
 @event_node_builder_bp.route("/api/params", methods=["GET"])
-
-@cached(ttl=1800)  # Cache for 30 minutes
 def get_event_params():
+    """
+    API: 获取事件的参数列表 (ERS架构)
+
+    迁移后使用EventService替代直接数据库访问
+    注意: 不使用缓存装饰器，因为event_id是动态参数，会导致不同事件的缓存冲突
+    """
     """
     API: 获取事件的参数列表 (ERS架构)
 
@@ -171,32 +162,39 @@ def get_event_params():
         from backend.services.events.event_service import EventService
 
         event_service = EventService()
-        params = event_service.get_event_params(event_id)
+        params = event_service.get_event_parameters(event_id)
 
-        # 转换为适合前端的格式（仅包含需要的字段）
+        logger.info(f"EventService返回 {len(params)} 个参数，event_id={event_id}")
+        if params:
+            logger.info(f"第一个参数: {params[0]}")
+
+        # 转换为适合前端的格式(仅包含需要的字段)
+        # 注意: EventService返回的字段名为 description, param_type 等
         params_data = [
             {
-                "id": p.id,
-                "param_name": p.param_name,
-                "param_name_cn": p.param_name_cn,
-                "param_description": p.param_description,
-                "hql_config": p.hql_config,
-                "json_path": p.json_path,
-                "is_active": p.is_active,
+                "id": p.get("id"),
+                "param_name": p.get("param_name"),
+                "param_name_cn": p.get("param_name_cn"),
+                "param_description": p.get("description"),  # EventService返回的是description字段
+                "param_type": p.get("param_type"),  # param_type从template_name获取
+                "is_active": p.get("is_active"),
+                # hql_config和json_path字段不在SQL查询中, 如果需要需要添加到查询中
+                "hql_config": None,
+                "json_path": None,
             }
             for p in params
         ]
 
+        logger.info(f"转换后的params_data包含 {len(params_data)} 个参数")
         return json_success_response(data=params_data, message="Event parameters retrieved")
 
     except Exception as e:
         logger.error(f"Error fetching event params: {e}")
-        return json_error_response(
-            f"Failed to fetch event params: {str(e)}", status_code=500
-        )
+        return json_error_response(f"Failed to fetch event params: {str(e)}", status_code=500)
 
 
 @event_node_builder_bp.route("/api/save", methods=["POST"])
+@invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is created
 def save_config():
     """
     API: 保存事件节点配置 (ERS架构)
@@ -220,9 +218,17 @@ def save_config():
                 "game_gid, name, event_id, and config are required", status_code=400
             )
 
+        # ✅ 新增: 请求入口日志
+        logger.info(
+            f"[SAVE_CONFIG] Request received: game_gid={game_gid}, "
+            f"name='{name}', event_id={event_id}, "
+            f"config_keys={list(config.keys()) if config else 0}"
+        )
+
         # 导入Entity模型
-        from backend.models.entities import EventNodeEntity
         import json
+
+        from backend.models.entities import EventNodeEntity
 
         # 使用EventNodeService创建节点
         try:
@@ -231,28 +237,71 @@ def save_config():
                 name=name,
                 event_id=event_id,
                 config_json=json.dumps(config, ensure_ascii=False),
-                is_active=True
+                is_active=True,
+            )
+
+            # ✅ 新增: 创建节点前的日志
+            logger.debug(
+                f"[SAVE_CONFIG] Creating node entity: "
+                f"game_gid={node_entity.game_gid}, name='{node_entity.name}', "
+                f"event_id={node_entity.event_id}"
             )
 
             created_node = event_node_service.create_node(node_entity)
 
+            # ✅ 新增: 创建成功日志
+            logger.info(
+                f"[SAVE_CONFIG] Node created successfully: "
+                f"node_id={created_node.id}, game_gid={game_gid}, name='{name}'"
+            )
+
+            # ✅ 新增: 验证数据库写入
+            # ✅ BUGFIX #6: 使用get_node_with_details而不是find_by_id
+            verification = event_node_service.get_node_with_details(created_node.id)
+            if not verification:
+                logger.error(
+                    f"[SAVE_CONFIG] CRITICAL: Node {created_node.id} not found in DB after creation!"
+                )
+                return json_error_response(
+                    "Node creation verification failed", status_code=500
+                )
+
+            logger.debug(
+                f"[SAVE_CONFIG] Verification passed: node_id={created_node.id} exists in DB"
+            )
+
             # 获取带详情的节点数据
             node_with_details = event_node_service.get_node_with_details(created_node.id)
+
+            # ✅ 新增: 返回前的日志
+            logger.debug(
+                f"[SAVE_CONFIG] Returning node details: node_id={created_node.id}, "
+                f"details_keys={list(node_with_details.keys()) if node_with_details else 0}"
+            )
 
             return json_success_response(
                 data={"node": node_with_details}, message="Event node created", status_code=201
             )
 
         except ValueError as e:
-            # Service层的验证错误 (游戏不存在、事件不存在、名称重复等)
-            return json_error_response(str(e), status_code=404 if "not found" in str(e).lower() else 400)
+            # Service层的验证错误 (游戏不存在, 事件不存在, 名称重复等)
+            # ✅ 新增: 更详细的错误日志
+            logger.error(
+                f"[SAVE_CONFIG] Validation error: game_gid={game_gid}, name='{name}', "
+                f"error={str(e)}"
+            )
+            return json_error_response(
+                str(e), status_code=404 if "not found" in str(e).lower() else 400
+            )
 
     except Exception as e:
-        logger.error(f"Error saving config: {e}", exc_info=True)
+        # ✅ 新增: 更详细的异常日志
+        logger.error(f"[SAVE_CONFIG] Unexpected error: {str(e)}", exc_info=True)
         return json_error_response(f"Failed to save config: {str(e)}", status_code=500)
 
 
 @event_node_builder_bp.route("/api/update", methods=["POST"])
+@invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is updated
 def update_config():
     """
     API: 更新事件节点配置 (ERS架构)
@@ -271,8 +320,9 @@ def update_config():
             return json_error_response("node_id is required", status_code=400)
 
         # 导入Entity模型
-        from backend.models.entities import EventNodeEntity
         import json
+
+        from backend.models.entities import EventNodeEntity
 
         # 准备更新数据
         update_data = {}
@@ -297,13 +347,13 @@ def update_config():
             )
 
         except ValueError as e:
-            return json_error_response(str(e), status_code=404 if "not found" in str(e).lower() else 400)
+            return json_error_response(
+                str(e), status_code=404 if "not found" in str(e).lower() else 400
+            )
 
     except Exception as e:
         logger.error(f"Error updating config: {e}", exc_info=True)
-        return json_error_response(
-            f"Failed to update config: {str(e)}", status_code=500
-        )
+        return json_error_response(f"Failed to update config: {str(e)}", status_code=500)
 
 
 @event_node_builder_bp.route("/api/load/<int:config_id>", methods=["GET"])
@@ -347,7 +397,7 @@ def list_configs():
         if not game_gid:
             return json_error_response("game_gid is required", status_code=400)
 
-        # 验证游戏存在（使用GameService）
+        # 验证游戏存在(使用GameService)
         game = game_service.get_game_by_gid(int(game_gid))
         if not game:
             return json_error_response("Game not found", status_code=404)
@@ -362,7 +412,9 @@ def list_configs():
         for node in nodes:
             node_dict = node.model_dump()
             node_dict["event_name"] = node.event_name if hasattr(node, "event_name") else None
-            node_dict["event_name_cn"] = node.event_name_cn if hasattr(node, "event_name_cn") else None
+            node_dict["event_name_cn"] = (
+                node.event_name_cn if hasattr(node, "event_name_cn") else None
+            )
 
             # 解析 config_json
             try:
@@ -376,12 +428,11 @@ def list_configs():
 
     except Exception as e:
         logger.error(f"Error fetching config list: {e}", exc_info=True)
-        return json_error_response(
-            f"Failed to fetch config list: {str(e)}", status_code=500
-        )
+        return json_error_response(f"Failed to fetch config list: {str(e)}", status_code=500)
 
 
 @event_node_builder_bp.route("/api/delete/<int:config_id>", methods=["DELETE"])
+@invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is deleted
 def delete_config(config_id):
     """
     API: 删除事件节点配置 (ERS架构)
@@ -399,12 +450,11 @@ def delete_config(config_id):
 
     except Exception as e:
         logger.error(f"Error deleting config: {e}", exc_info=True)
-        return json_error_response(
-            f"Failed to delete config: {str(e)}", status_code=500
-        )
+        return json_error_response(f"Failed to delete config: {str(e)}", status_code=500)
 
 
 @event_node_builder_bp.route("/api/copy/<int:node_id>", methods=["POST"])
+@invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is copied
 def copy_node(node_id):
     """
     API: 复制事件节点 (ERS架构)
@@ -455,9 +505,7 @@ def search_event_nodes():
         # Validate game exists
         game_gid = request.args.get("game_gid", type=int)
         if not game_gid:
-            return json_error_response(
-                "game_gid parameter is required", status_code=400
-            )
+            return json_error_response("game_gid parameter is required", status_code=400)
 
         if not validate_game_exists(game_gid):
             return json_error_response("Game not found", status_code=404)
@@ -481,7 +529,7 @@ def search_event_nodes():
                 field_count_min=field_count_min,
                 field_count_max=field_count_max,
                 limit=limit,
-                offset=offset
+                offset=offset,
             )
         except ValueError as e:
             return json_error_response(str(e), status_code=400)
@@ -507,8 +555,7 @@ def search_event_nodes():
 
 
 @event_node_builder_bp.route("/api/stats", methods=["GET"])
-
-@cached(ttl=1800)  # Cache for 30 minutes
+@cached(ttl=300, key_prefix="event_nodes:stats")  # Cache for 5 minutes (reduced from 30 min)
 def get_event_nodes_stats():
     """
     Get event nodes statistics for a game (ERS架构)
@@ -519,15 +566,11 @@ def get_event_nodes_stats():
         game_gid (int, required): Game GID
     """
     try:
-        logger.info(
-            f"get_event_nodes_stats called with game_gid={request.args.get('game_gid')}"
-        )
+        logger.info(f"get_event_nodes_stats called with game_gid={request.args.get('game_gid')}")
         # Validate game exists
         game_gid = request.args.get("game_gid", type=int)
         if not game_gid:
-            return json_error_response(
-                "game_gid parameter is required", status_code=400
-            )
+            return json_error_response("game_gid parameter is required", status_code=400)
 
         if not validate_game_exists(game_gid):
             return json_error_response("Game not found", status_code=404)
@@ -549,6 +592,4 @@ def get_event_nodes_stats():
 
     except Exception as e:
         logger.error(f"Error getting event nodes stats: {e}")
-        return json_error_response(
-            "Failed to get event nodes statistics", status_code=500
-        )
+        return json_error_response("Failed to get event nodes statistics", status_code=500)

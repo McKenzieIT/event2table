@@ -264,7 +264,7 @@ export default ErrorBoundary;
  * </ErrorBoundary>
  *
  * // 3. 带重置回调
- * <ErrorBoundary onReset={() => console.log('Reset')}>
+ * <ErrorBoundary onReset={() => }>
  *   <MyComponent />
  * </ErrorBoundary>
  *

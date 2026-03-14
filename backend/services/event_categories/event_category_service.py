@@ -7,13 +7,13 @@ Follows Entity-Repository-Service pattern.
 Version: 1.0.0
 """
 
-from typing import List, Optional, Dict
 import logging
+from typing import Dict, List, Optional
 
+from backend.core.cache.cache_system import CacheInvalidator
+from backend.core.cache.decorators import cache_invalidate, cached
 from backend.models.entities_category import EventCategoryEntity
 from backend.models.repositories.category_repository import CategoryRepository
-from backend.core.cache.decorators import cached, cache_invalidate
-from backend.core.cache.cache_system import CacheInvalidator
 
 logger = logging.getLogger(__name__)
 
@@ -121,8 +121,7 @@ class EventCategoryService:
 
         # Check for duplicate name in the same game
         existing = self.category_repo.find_by_name_and_game(
-            category_data.name.strip(),
-            category_data.game_gid
+            category_data.name.strip(), category_data.game_gid
         )
         if existing:
             raise ValueError(
@@ -182,10 +181,7 @@ class EventCategoryService:
                 raise ValueError("Category name cannot be empty")
 
             # Check for duplicate (excluding current category)
-            duplicate = self.category_repo.find_by_name_and_game(
-                new_name,
-                existing['game_gid']
-            )
+            duplicate = self.category_repo.find_by_name_and_game(new_name, existing['game_gid'])
             if duplicate and duplicate['id'] != category_id:
                 raise ValueError(
                     f"Category '{new_name}' already exists for game {existing['game_gid']}"
@@ -447,10 +443,7 @@ class EventCategoryService:
                 if not existing:
                     continue
 
-                duplicate = self.category_repo.find_by_name_and_game(
-                    new_name,
-                    existing['game_gid']
-                )
+                duplicate = self.category_repo.find_by_name_and_game(new_name, existing['game_gid'])
                 if duplicate and duplicate['id'] not in valid_ids:
                     raise ValueError(
                         f"Category '{new_name}' already exists for game {existing['game_gid']}"

@@ -14,7 +14,7 @@ JSON字段序列化辅助函数
 """
 
 import json
-from typing import Dict, List, Any, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
 
 def serialize_json_field(value: Union[Dict, List, str, None]) -> Optional[str]:
@@ -25,7 +25,7 @@ def serialize_json_field(value: Union[Dict, List, str, None]) -> Optional[str]:
         value: 要序列化的值（Dict, List, 或已序列化的字符串）
 
     Returns:
-        JSON字符串，None返回None
+        JSON字符串, None返回None
 
     Examples:
         >>> serialize_json_field({"key": "value"})
@@ -40,11 +40,11 @@ def serialize_json_field(value: Union[Dict, List, str, None]) -> Optional[str]:
     if value is None:
         return None
     if isinstance(value, str):
-        # 已经是字符串，直接返回
+        # 已经是字符串, 直接返回
         return value
     if isinstance(value, (dict, list)):
         return json.dumps(value, ensure_ascii=False)
-    # 其他类型（如int, float）转为字符串
+    # 其他类型(如int, float)转为字符串
     return str(value)
 
 
@@ -56,7 +56,7 @@ def deserialize_json_field(value: Union[str, Dict, List, None]) -> Union[Dict, L
         value: 要反序列化的值（JSON字符串或已反序列化的对象）
 
     Returns:
-        Dict或List对象，None返回None，解析失败返回空Dict
+        Dict或List对象, None返回None, 解析失败返回空Dict
 
     Examples:
         >>> deserialize_json_field('{"key": "value"}')
@@ -74,15 +74,15 @@ def deserialize_json_field(value: Union[str, Dict, List, None]) -> Union[Dict, L
     if value is None:
         return None
     if isinstance(value, (dict, list)):
-        # 已经是反序列化对象，直接返回
+        # 已经是反序列化对象, 直接返回
         return value
     if isinstance(value, str):
         try:
             return json.loads(value)
         except (json.JSONDecodeError, TypeError):
-            # 解析失败，返回空字典
+            # 解析失败, 返回空字典
             return {}
-    # 其他类型，返回空字典
+    # 其他类型, 返回空字典
     return {}
 
 
@@ -95,7 +95,7 @@ def parse_config_json(config_str: Optional[str]) -> Dict[str, Any]:
         config_str: JSON字符串
 
     Returns:
-        解析后的字典，解析失败返回空字典
+        解析后的字典, 解析失败返回空字典
     """
     if not config_str:
         return {}

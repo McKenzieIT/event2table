@@ -1,11 +1,12 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo, parallel loading, early returns
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
+import Table from '@shared/ui/Table';
 import { useGameContext } from '@shared/hooks/useGameContext';
 import './EventDetail.css';
 
@@ -290,24 +291,24 @@ function EventDetail(): React.JSX.Element {
             <div className="card-content">
               {parameters.length > 0 ? (
                 <div className="table-responsive-wrapper">
-                  <table className="oled-table">
-                    <thead>
-                      <tr>
-                        <th>参数名</th>
-                        <th>参数中文名</th>
-                        <th>类型</th>
-                        <th>描述</th>
-                        <th style={{ width: '80px' }}>公参</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <Table variant="bordered" size="md" striped hoverable>
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.Head>参数名</Table.Head>
+                        <Table.Head>参数中文名</Table.Head>
+                        <Table.Head>类型</Table.Head>
+                        <Table.Head>描述</Table.Head>
+                        <Table.Head style={{ width: '80px' }}>公参</Table.Head>
+                      </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
                       {parameters.map(param => (
-                        <tr key={param.id}>
-                          <td><code>{param.param_name}</code></td>
-                          <td>{param.param_name_cn}</td>
-                          <td><span className="badge badge-secondary text-xs">{param.param_type}</span></td>
-                          <td className="text-muted text-sm">{param.param_description || '-'}</td>
-                          <td>
+                        <Table.Row key={param.id}>
+                          <Table.Cell><code>{param.param_name}</code></Table.Cell>
+                          <Table.Cell>{param.param_name_cn}</Table.Cell>
+                          <Table.Cell><span className="badge badge-secondary text-xs">{param.param_type}</span></Table.Cell>
+                          <Table.Cell className="text-muted text-sm">{param.param_description || '-'}</Table.Cell>
+                          <Table.Cell>
                             {param.is_common_param ? (
                               <span className="badge badge-success text-xs">
                                 ✓ 是
@@ -315,11 +316,11 @@ function EventDetail(): React.JSX.Element {
                             ) : (
                               <span className="badge badge-secondary text-xs">否</span>
                             )}
-                          </td>
-                        </tr>
+                          </Table.Cell>
+                        </Table.Row>
                       ))}
-                    </tbody>
-                  </table>
+                    </Table.Body>
+                  </Table>
                 </div>
               ) : (
                 <EmptyState
@@ -335,4 +336,5 @@ function EventDetail(): React.JSX.Element {
   );
 }
 
-export default EventDetail;
+// ⚡️ REACT PERF: Export with React.memo optimization
+export default React.memo(EventDetail);

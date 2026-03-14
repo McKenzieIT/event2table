@@ -4,7 +4,7 @@
 Redis Connection Manager - 防止连接泄露
 ====================================
 
-提供Redis连接池管理和自动连接释放功能。
+提供Redis连接池管理和自动连接释放功能. 
 
 安全特性:
 - 连接池管理（限制最大连接数）
@@ -32,12 +32,13 @@ Version: 1.0.0
 Date: 2026-02-24
 """
 
-import redis
+import contextlib
 import logging
 import threading
 import time
-import contextlib
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
+import redis
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ class RedisConnectionManager:
         socket_timeout: float = 5.0,
         socket_connect_timeout: float = 5.0,
         retry_on_timeout: bool = True,
-        health_check_interval: int = 30
+        health_check_interval: int = 30,
     ):
         """
         初始化Redis连接管理器
@@ -90,7 +91,7 @@ class RedisConnectionManager:
         self.retry_on_timeout = retry_on_timeout
         self.health_check_interval = health_check_interval
 
-        # 连接池（延迟初始化）
+        # 连接池(延迟初始化)
         self._pool: Optional[redis.ConnectionPool] = None
         self._pool_lock = threading.Lock()
 
@@ -127,7 +128,7 @@ class RedisConnectionManager:
                         socket_timeout=self.socket_timeout,
                         socket_connect_timeout=self.socket_connect_timeout,
                         retry_on_timeout=self.retry_on_timeout,
-                        decode_responses=False  # 返回bytes，手动解码
+                        decode_responses=False,  # 返回bytes, 手动解码
                     )
                     logger.info(f"✅ Redis connection pool created: {self._pool}")
 
@@ -138,7 +139,7 @@ class RedisConnectionManager:
         """
         获取Redis连接（上下文管理器）
 
-        使用with语句确保连接自动释放：
+        使用with语句确保连接自动释放: 
 
         >>> with redis_connection_manager.get_connection() as conn:
         >>>     conn.set('key', 'value')
@@ -159,7 +160,7 @@ class RedisConnectionManager:
             with self._connection_lock:
                 self._active_connections[connection_id] = time.time()
 
-            # 执行健康检查（如果需要）
+            # 执行健康检查(如果需要)
             self._check_health_if_needed(conn)
 
             logger.debug(f"Redis connection acquired: {connection_id}")
@@ -167,7 +168,7 @@ class RedisConnectionManager:
 
         except Exception as e:
             logger.error(f"Redis connection error: {e}")
-            # 如果是连接错误，标记健康检查失败
+            # 如果是连接错误, 标记健康检查失败
             if "Connection" in str(e) or "Timeout" in str(e):
                 self._health_check_failed = True
             raise
@@ -181,10 +182,10 @@ class RedisConnectionManager:
                         del self._active_connections[connection_id]
 
                 logger.debug(f"Redis connection released: {connection_id}")
-                # 显式关闭（返回连接池）
+                # 显式关闭(返回连接池)
                 try:
-                    # 注意：不要调用conn.close()，这会关闭整个连接池
-                    # Redis连接由连接池管理，自动返回池中
+                    # 注意: 不要调用conn.close(), 这会关闭整个连接池
+                    # Redis连接由连接池管理, 自动返回池中
                     pass
                 except Exception as e:
                     logger.warning(f"Error releasing Redis connection: {e}")
@@ -193,8 +194,8 @@ class RedisConnectionManager:
         """
         获取Redis客户端（不推荐使用）
 
-        警告：此方法不使用上下文管理器，需要手动管理连接。
-        推荐使用get_connection()上下文管理器。
+        警告: 此方法不使用上下文管理器, 需要手动管理连接. 
+        推荐使用get_connection()上下文管理器. 
 
         Returns:
             Redis客户端
@@ -207,7 +208,7 @@ class RedisConnectionManager:
 
     def _check_health_if_needed(self, conn: redis.Redis) -> None:
         """
-        如果需要，执行健康检查
+        如果需要, 执行健康检查
 
         Args:
             conn: Redis连接
@@ -244,24 +245,22 @@ class RedisConnectionManager:
             for conn_id, timestamp in self._active_connections.items():
                 age = now - timestamp
                 if age > stale_threshold:
-                    stale_connections.append({
-                        'id': conn_id,
-                        'age_seconds': age
-                    })
+                    stale_connections.append({'id': conn_id, 'age_seconds': age})
 
         report = {
             'active_connections': active_count,
             'stale_connections': len(stale_connections),
             'max_connections': self.max_connections,
-            'usage_percent': (active_count / self.max_connections * 100) if self.max_connections > 0 else 0,
-            'stale_details': stale_connections[:10]  # 最多显示10个
+            'usage_percent': (
+                (active_count / self.max_connections * 100) if self.max_connections > 0 else 0
+            ),
+            'stale_details': stale_connections[:10],  # 最多显示10个
         }
 
         stale_conn_count = int(report.get('stale_connections', 0))
         if stale_conn_count > 0:
             logger.warning(
-                f"⚠️ Potential connection leaks detected: "
-                f"{stale_conn_count} stale connections"
+                f"⚠️ Potential connection leaks detected: " f"{stale_conn_count} stale connections"
             )
 
         return report
@@ -296,14 +295,14 @@ class RedisConnectionManager:
             'max_connections': self.max_connections,
             'health_check_failed': self._health_check_failed,
             'pool_stats': pool_stats,
-            'leak_report': leak_report
+            'leak_report': leak_report,
         }
 
     def close(self):
         """
         关闭连接池
 
-        注意：此方法会关闭所有连接，谨慎使用。
+        注意: 此方法会关闭所有连接, 谨慎使用. 
         """
         with self._pool_lock:
             if self._pool is not None:
@@ -350,7 +349,7 @@ def get_redis_connection_manager(
     port: int = 6379,
     db: int = 0,
     password: Optional[str] = None,
-    max_connections: int = 50
+    max_connections: int = 50,
 ) -> RedisConnectionManager:
     """
     获取或创建全局Redis连接管理器实例
@@ -371,11 +370,7 @@ def get_redis_connection_manager(
         if _global_redis_manager is None:
             logger.info("Creating global RedisConnectionManager instance")
             _global_redis_manager = RedisConnectionManager(
-                host=host,
-                port=port,
-                db=db,
-                password=password,
-                max_connections=max_connections
+                host=host, port=port, db=db, password=password, max_connections=max_connections
             )
 
         return _global_redis_manager

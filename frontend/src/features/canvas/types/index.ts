@@ -53,16 +53,17 @@ export interface EventConfig {
   event_id: number;
   name: string;
   name_cn?: string;
-  fields: Field[];
+  fields: CanvasField[];
   config_json?: string;
   created_at?: string;
   updated_at?: string;
 }
 
 /**
- * Field structure within event config
+ * Canvas-specific Field structure within event config
+ * Renamed from Field to CanvasField to avoid conflicts with shared Field type
  */
-export interface Field {
+export interface CanvasField {
   field_name: string;
   field_type: string;
   alias?: string;

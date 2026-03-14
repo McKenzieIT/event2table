@@ -17,7 +17,7 @@
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
-  overflow: hidden;
+  /* Remove overflow: hidden to allow .sidebar-content to handle scrolling */
 }
 
 .sidebar::before {

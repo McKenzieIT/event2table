@@ -13,7 +13,7 @@
 
 版本: 1.0.0
 日期: 2026-01-19
-目的: 优化后端性能，减少数据库查询，实现API缓存
+目的: 优化后端性能, 减少数据库查询, 实现API缓存
 
 功能:
 1. 数据库查询缓存
@@ -25,12 +25,12 @@
 @author: Ralph Loop Iteration 3
 """
 
-from functools import wraps
-from typing import Any, Callable, Dict, Optional, Tuple
-import time
 import hashlib
 import json
+import time
 from datetime import datetime, timedelta
+from functools import wraps
+from typing import Any, Callable, Dict, Optional, Tuple
 
 try:
     from flask import current_app
@@ -61,13 +61,13 @@ class QueryCache:
             if time.time() - timestamp < self._ttl:
                 return value
             else:
-                # 过期，删除
+                # 过期, 删除
                 del self._cache[key]
         return None
 
     def set(self, key: str, value: Any) -> None:
         """设置缓存值"""
-        # 如果缓存已满，删除最旧的条目
+        # 如果缓存已满, 删除最旧的条目
         if len(self._cache) >= self._max_size:
             oldest_key = min(self._cache.keys(), key=lambda k: self._cache[k][1])
             del self._cache[oldest_key]
@@ -272,7 +272,7 @@ class BatchQueryOptimizer:
 
         self._pending_queries[query_key].append(query_params)
 
-        # 达到批处理大小，执行查询
+        # 达到批处理大小, 执行查询
         if len(self._pending_queries[query_key]) >= self._batch_size:
             self.flush_queries(query_key)
 
@@ -294,9 +294,9 @@ class BatchQueryOptimizer:
         return {}
 
     def _execute_batch(self, query_key: str, queries: list) -> Dict[str, Any]:
-        """执行批量查询（需要子类实现）"""
+        """执行批量查询(需要子类实现)"""
         # 这里应该根据实际的数据库类型实现批量查询
-        # 例如：
+        # 例如: 
         # - SQLite: 使用 IN 子句
         # - MySQL: 使用批量查询
         # - PostgreSQL: 使用 ARRAY 参数

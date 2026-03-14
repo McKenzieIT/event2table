@@ -4,10 +4,11 @@ Event Parameter Mutations
 Implements GraphQL mutation resolvers for Event Parameter extended functionality.
 """
 
-import graphene
-from graphene import Field, Int, String, Boolean, List
-import logging
 import json
+import logging
+
+import graphene
+from graphene import Boolean, Field, Int, List, String
 
 logger = logging.getLogger(__name__)
 
@@ -24,15 +25,28 @@ class UpdateEventParameter(graphene.Mutation):
         is_active = Boolean(description="是否活跃")
 
     ok = Boolean(description="操作是否成功")
-    parameter = Field(lambda: __import__('backend.gql_api.types.event_parameter_type', fromlist=['EventParameterExtendedType']).EventParameterExtendedType, description="更新的参数")
+    parameter = Field(
+        lambda: __import__(
+            'backend.gql_api.types.event_parameter_type', fromlist=['EventParameterExtendedType']
+        ).EventParameterExtendedType,
+        description="更新的参数",
+    )
     errors = List(String, description="错误信息")
 
-    def mutate(self, info, id: int, param_name: str = None, param_name_cn: str = None,
-               param_type: str = None, json_path: str = None, is_active: bool = None):
+    def mutate(
+        self,
+        info,
+        id: int,
+        param_name: str = None,
+        param_name_cn: str = None,
+        param_type: str = None,
+        json_path: str = None,
+        is_active: bool = None,
+    ):
         """Execute the mutation"""
         try:
-            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.gql_api.types.event_parameter_type import EventParameterExtendedType
 
             # Check if parameter exists
@@ -77,7 +91,7 @@ class UpdateEventParameter(graphene.Mutation):
                 SELECT id, version, ?, 'graphql'
                 FROM event_params WHERE id = ?
                 """,
-                (json.dumps({"updated_fields": [u.split('=')[0].strip() for u in updates]}), id)
+                (json.dumps({"updated_fields": [u.split('=')[0].strip() for u in updates]}), id),
             )
 
             # Clear cache
@@ -89,7 +103,12 @@ class UpdateEventParameter(graphene.Mutation):
             # Return updated parameter
             updated_param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
 
-            return UpdateEventParameter(ok=True, parameter=EventParameterExtendedType.from_dict(updated_param) if updated_param else None)
+            return UpdateEventParameter(
+                ok=True,
+                parameter=(
+                    EventParameterExtendedType.from_dict(updated_param) if updated_param else None
+                ),
+            )
 
         except Exception as e:
             logger.error(f"Error updating event parameter: {e}", exc_info=True)
@@ -109,8 +128,8 @@ class DeleteEventParameter(graphene.Mutation):
     def mutate(self, info, id: int):
         """Execute the mutation"""
         try:
-            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.utils import execute_write, fetch_one_as_dict
 
             # Check if parameter exists
             param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
@@ -144,19 +163,33 @@ class SetParamConfig(graphene.Mutation):
         output_field_name = String(description="输出字段名")
 
     ok = Boolean(description="操作是否成功")
-    config = Field(lambda: __import__('backend.gql_api.types.event_parameter_type', fromlist=['ParamConfigType']).ParamConfigType, description="配置")
+    config = Field(
+        lambda: __import__(
+            'backend.gql_api.types.event_parameter_type', fromlist=['ParamConfigType']
+        ).ParamConfigType,
+        description="配置",
+    )
     errors = List(String, description="错误信息")
 
-    def mutate(self, info, param_id: int, array_expand: bool = None, map_expand: bool = None,
-               custom_hql_template: str = None, output_field_name: str = None):
+    def mutate(
+        self,
+        info,
+        param_id: int,
+        array_expand: bool = None,
+        map_expand: bool = None,
+        custom_hql_template: str = None,
+        output_field_name: str = None,
+    ):
         """Execute the mutation"""
         try:
-            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.gql_api.types.event_parameter_type import ParamConfigType
 
             # Check if config exists
-            existing = fetch_one_as_dict("SELECT * FROM param_configs WHERE param_id = ?", (param_id,))
+            existing = fetch_one_as_dict(
+                "SELECT * FROM param_configs WHERE param_id = ?", (param_id,)
+            )
 
             if existing:
                 # Update existing config
@@ -187,7 +220,13 @@ class SetParamConfig(graphene.Mutation):
                     INSERT INTO param_configs (param_id, array_expand, map_expand, custom_hql_template, output_field_name)
                     VALUES (?, ?, ?, ?, ?)
                     """,
-                    (param_id, 1 if array_expand else 0, 1 if map_expand else 0, custom_hql_template, output_field_name)
+                    (
+                        param_id,
+                        1 if array_expand else 0,
+                        1 if map_expand else 0,
+                        custom_hql_template,
+                        output_field_name,
+                    ),
                 )
 
             # Clear cache
@@ -196,9 +235,13 @@ class SetParamConfig(graphene.Mutation):
             logger.info(f"Param config set via GraphQL: param_id {param_id}")
 
             # Return config
-            config = fetch_one_as_dict("SELECT * FROM param_configs WHERE param_id = ?", (param_id,))
+            config = fetch_one_as_dict(
+                "SELECT * FROM param_configs WHERE param_id = ?", (param_id,)
+            )
 
-            return SetParamConfig(ok=True, config=ParamConfigType.from_dict(config) if config else None)
+            return SetParamConfig(
+                ok=True, config=ParamConfigType.from_dict(config) if config else None
+            )
 
         except Exception as e:
             logger.error(f"Error setting param config: {e}", exc_info=True)
@@ -213,14 +256,19 @@ class RollbackEventParameter(graphene.Mutation):
         version = Int(required=True, description="目标版本号")
 
     ok = Boolean(description="操作是否成功")
-    parameter = Field(lambda: __import__('backend.gql_api.types.event_parameter_type', fromlist=['EventParameterExtendedType']).EventParameterExtendedType, description="回滚后的参数")
+    parameter = Field(
+        lambda: __import__(
+            'backend.gql_api.types.event_parameter_type', fromlist=['EventParameterExtendedType']
+        ).EventParameterExtendedType,
+        description="回滚后的参数",
+    )
     errors = List(String, description="错误信息")
 
     def mutate(self, info, id: int, version: int):
         """Execute the mutation"""
         try:
-            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.gql_api.types.event_parameter_type import EventParameterExtendedType
 
             # Check if parameter exists
@@ -230,8 +278,7 @@ class RollbackEventParameter(graphene.Mutation):
 
             # Get target version
             target_version = fetch_one_as_dict(
-                "SELECT * FROM param_versions WHERE param_id = ? AND version = ?",
-                (id, version)
+                "SELECT * FROM param_versions WHERE param_id = ? AND version = ?", (id, version)
             )
             if not target_version:
                 return RollbackEventParameter(ok=False, errors=[f"Version {version} not found"])
@@ -240,10 +287,7 @@ class RollbackEventParameter(graphene.Mutation):
             changes = json.loads(target_version.get('changes', '{}'))
 
             # Update parameter with version data
-            execute_write(
-                "UPDATE event_params SET version = ? WHERE id = ?",
-                (version, id)
-            )
+            execute_write("UPDATE event_params SET version = ? WHERE id = ?", (version, id))
 
             # Clear cache
             clear_cache_pattern("dashboard:*")
@@ -254,7 +298,12 @@ class RollbackEventParameter(graphene.Mutation):
             # Return updated parameter
             updated_param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
 
-            return RollbackEventParameter(ok=True, parameter=EventParameterExtendedType.from_dict(updated_param) if updated_param else None)
+            return RollbackEventParameter(
+                ok=True,
+                parameter=(
+                    EventParameterExtendedType.from_dict(updated_param) if updated_param else None
+                ),
+            )
 
         except Exception as e:
             logger.error(f"Error rolling back event parameter: {e}", exc_info=True)
@@ -271,10 +320,22 @@ class CreateValidationRule(graphene.Mutation):
         error_message = String(description="错误消息")
 
     ok = Boolean(description="操作是否成功")
-    rule = Field(lambda: __import__('backend.gql_api.types.event_parameter_type', fromlist=['ValidationRuleType']).ValidationRuleType, description="创建的规则")
+    rule = Field(
+        lambda: __import__(
+            'backend.gql_api.types.event_parameter_type', fromlist=['ValidationRuleType']
+        ).ValidationRuleType,
+        description="创建的规则",
+    )
     errors = List(String, description="错误信息")
 
-    def mutate(self, info, param_id: int, rule_type: str, rule_config: str = None, error_message: str = None):
+    def mutate(
+        self,
+        info,
+        param_id: int,
+        rule_type: str,
+        rule_config: str = None,
+        error_message: str = None,
+    ):
         """Execute the mutation"""
         try:
             from backend.core.utils import execute_write, fetch_one_as_dict
@@ -294,15 +355,19 @@ class CreateValidationRule(graphene.Mutation):
                 VALUES (?, ?, ?, ?)
                 """,
                 (param_id, rule_type, rule_config, error_message),
-                return_last_id=True
+                return_last_id=True,
             )
 
             logger.info(f"Validation rule created via GraphQL: param_id {param_id}")
 
             # Return created rule
-            rule = fetch_one_as_dict("SELECT * FROM param_validation_rules WHERE id = ?", (rule_id,))
+            rule = fetch_one_as_dict(
+                "SELECT * FROM param_validation_rules WHERE id = ?", (rule_id,)
+            )
 
-            return CreateValidationRule(ok=True, rule=ValidationRuleType.from_dict(rule) if rule else None)
+            return CreateValidationRule(
+                ok=True, rule=ValidationRuleType.from_dict(rule) if rule else None
+            )
 
         except Exception as e:
             logger.error(f"Error creating validation rule: {e}", exc_info=True)
@@ -311,6 +376,7 @@ class CreateValidationRule(graphene.Mutation):
 
 class EventParameterMutations:
     """Container for event parameter mutations"""
+
     UpdateEventParameter = UpdateEventParameter
     DeleteEventParameter = DeleteEventParameter
     SetParamConfig = SetParamConfig

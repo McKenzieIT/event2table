@@ -14,27 +14,28 @@ Purpose: Migrate V1 consumers to V2 backend without breaking changes
 """
 
 import logging
-from typing import Dict, Any, List, Optional
-from flask import Blueprint, request, jsonify
+from typing import Any, Dict, List, Optional
 
-# Import core utilities
-from backend.core.utils import (
-    json_success_response,
-    json_error_response,
-    success_response,
-    error_response,
-)
-
-# Import V2 HQL generation service
-from backend.services.hql.core.generator import HQLGenerator, DebuggableHQLGenerator
-from backend.services.hql.adapters.project_adapter import ProjectAdapter
+from flask import Blueprint, jsonify, request
 
 # Import V2 API helpers
 from backend.api.routes._hql_helpers import (
+    handle_hql_generation_error,
     parse_json_request,
     validate_required_fields,
-    handle_hql_generation_error,
 )
+
+# Import core utilities
+from backend.core.utils import (
+    error_response,
+    json_error_response,
+    json_success_response,
+    success_response,
+)
+from backend.services.hql.adapters.project_adapter import ProjectAdapter
+
+# Import V2 HQL generation service
+from backend.services.hql.core.generator import DebuggableHQLGenerator, HQLGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -324,7 +325,9 @@ def preview_hql_v1():
         v2_data = transform_v1_request_to_v2(data)
 
         # 3. Call V2 HQL generation service
-        logger.info(f"V1 Adapter: Calling V2 generator with {len(v2_data['events'])} events, {len(v2_data['fields'])} fields")
+        logger.info(
+            f"V1 Adapter: Calling V2 generator with {len(v2_data['events'])} events, {len(v2_data['fields'])} fields"
+        )
 
         adapter = ProjectAdapter()
         events = adapter.events_from_api_request(v2_data["events"])
@@ -334,20 +337,12 @@ def preview_hql_v1():
         options = v2_data.get("options", {})
 
         generator = HQLGenerator()
-        hql = generator.generate(
-            events=events,
-            fields=fields,
-            conditions=conditions,
-            **options
-        )
+        hql = generator.generate(events=events, fields=fields, conditions=conditions, **options)
 
         # 4. Transform V2 response to V1 format
         v2_response = {
             "success": True,
-            "data": {
-                "hql": hql,
-                "generated_at": "2026-02-17T10:00:00Z"
-            }
+            "data": {"hql": hql, "generated_at": "2026-02-17T10:00:00Z"},
         }
 
         v1_response = transform_v2_response_to_v1(v2_response, view_name)
@@ -365,6 +360,7 @@ def preview_hql_v1():
     except Exception as e:
         logger.error(f"V1 Adapter error in preview_hql_v1: {e}")
         import traceback
+
         traceback.print_exc()
         return handle_hql_generation_error(e, "preview_hql_v1")
 
@@ -440,11 +436,7 @@ def generate_with_debug_v1():
             # Use debuggable generator
             generator = DebuggableHQLGenerator()
             trace = generator.generate(
-                events=events,
-                fields=fields,
-                conditions=conditions,
-                debug=True,
-                **options
+                events=events, fields=fields, conditions=conditions, debug=True, **options
             )
 
             # Extract HQL from trace (supports both final_hql and hql keys)
@@ -462,12 +454,7 @@ def generate_with_debug_v1():
         else:
             # Use standard generator
             generator = HQLGenerator()
-            hql = generator.generate(
-                events=events,
-                fields=fields,
-                conditions=conditions,
-                **options
-            )
+            hql = generator.generate(events=events, fields=fields, conditions=conditions, **options)
 
             debug_info = {
                 "events_transformed": len(events),
@@ -495,6 +482,7 @@ def generate_with_debug_v1():
     except Exception as e:
         logger.error(f"V1 Adapter error in generate_with_debug_v1: {e}")
         import traceback
+
         traceback.print_exc()
         return handle_hql_generation_error(e, "generate_with_debug_v1")
 

@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from backend.core.config import LogConfig, BASE_DIR
+from backend.core.config import BASE_DIR, LogConfig
 
 
 class Logger:

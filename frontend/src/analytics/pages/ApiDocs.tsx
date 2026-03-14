@@ -1,8 +1,8 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
-import React from 'react';
+import React, { memo } from 'react';
 import './ApiDocs.css';
 
 /**
@@ -45,4 +45,6 @@ function ApiDocs(): React.JSX.Element {
   );
 }
 
-export default ApiDocs;
+// ⚡️ REACT PERF: Export with React.memo optimization
+const ApiDocsMemo = memo(ApiDocs);
+export default ApiDocsMemo;

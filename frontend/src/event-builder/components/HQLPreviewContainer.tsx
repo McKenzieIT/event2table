@@ -30,9 +30,9 @@ import HQLPreview from './HQLPreview';
 // ============================================
 
 /**
- * 字段配置接口
+ * HQL预览容器专用的字段配置接口
  */
-export interface Field {
+export interface HQLPreviewContainerField {
   /** 参数ID */
   paramId?: number;
   /** 字段名称 */
@@ -98,6 +98,8 @@ export interface HQLPreviewContainerProps {
   gameGid: number;
   /** 事件对象 */
   event: Event | null;
+  /** 字段列表 */
+  fields: HQLPreviewContainerField[];
   /** 字段数组 */
   fields?: Field[];
   /** WHERE条件数组 */
@@ -169,12 +171,7 @@ export default function HQLPreviewContainer({
     }
 
     // Debug logging
-    console.log('[HQLPreviewContainer] generateHQL called', {
-      hasEvent: !!event,
-      eventId: event?.id,
-      fieldsCount: fields?.length || 0
-    });
-
+    
     setIsLoading(true);
     setError(null);
 
@@ -276,17 +273,6 @@ export default function HQLPreviewContainer({
     />
   );
 }
-
-// ============================================
-// Default Props (for documentation)
-// ============================================
-
-HQLPreviewContainer.defaultProps = {
-  event: null,
-  fields: [],
-  whereConditions: [],
-  onShowDetails: undefined
-};
 
 // ============================================
 // Export Types

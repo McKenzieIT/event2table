@@ -13,12 +13,13 @@ Flow Repository (流程/Canvas模板数据访问层 - 精简架构)
 - 保持GenericRepository继承
 """
 
-from typing import List, Dict, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
 from backend.core.utils import execute_write
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
+from backend.core.utils.json_helpers import deserialize_json_field, serialize_json_field
 from backend.models.entities import FlowEntity
-from backend.core.utils.json_helpers import serialize_json_field, deserialize_json_field
 
 
 class FlowRepository(GenericRepository):
@@ -39,7 +40,7 @@ class FlowRepository(GenericRepository):
             table_name="flow_templates",
             primary_key="id",
             enable_cache=True,
-            cache_timeout=120  # 2分钟缓存
+            cache_timeout=120,  # 2分钟缓存
         )
 
     def find_by_id(self, flow_id: int) -> Optional[FlowEntity]:
@@ -211,7 +212,7 @@ class FlowRepository(GenericRepository):
 
     def delete(self, flow_id: int) -> bool:
         """
-        删除流程（软删除：设置is_active=0）
+        删除流程（软删除: 设置is_active=0）
 
         Args:
             flow_id: 流程ID
@@ -243,7 +244,7 @@ class FlowRepository(GenericRepository):
             是否删除成功
 
         Warning:
-            此操作不可恢复，请谨慎使用
+            此操作不可恢复, 请谨慎使用
         """
         delete_sql = f'DELETE FROM "{self.table_name}" WHERE id = ?'
         result = execute_write(delete_sql, (flow_id,))

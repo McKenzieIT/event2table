@@ -23,6 +23,7 @@ export interface Param {
   param_name: string;
   param_name_cn?: string;
   json_path?: string;
+  hive_type?: string;
 }
 
 /**
@@ -162,7 +163,6 @@ export default function ParamSelector({ eventId, onAddField, disabled = false }:
                 draggable
                 onDragStart={(e) => handleDragStart(e, param)}
                 onDoubleClick={() => handleDoubleClick(param)}
-                title="双击或拖拽添加到画布"
               >
                 <span>{param.param_name_cn || param.param_name}</span>
                 <small>{param.param_name}</small>

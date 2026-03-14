@@ -1,8 +1,9 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡ REACT PERF: Component fully optimized
+// - React.memo: Prevents unnecessary re-renders when props don't change
+// - useMemo: Caches stats grid rendering
+// - useCallback: Stabilizes retry handler
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { SelectGamePrompt, ErrorState } from '@shared/ui';
@@ -29,7 +30,14 @@ interface GameContext {
   } | null;
 }
 
-function ParameterAnalysis() {
+interface StatCard {
+  icon: string;
+  iconClass: string;
+  value: number;
+  label: string;
+}
+
+const ParameterAnalysis: React.FC = () => {
   const { currentGame } = useOutletContext<GameContext>();
 
   // Game context check - show prompt if no game selected
@@ -47,6 +55,54 @@ function ParameterAnalysis() {
     enabled: !!currentGame // Only execute when currentGame exists
   });
 
+  // useCallback: Stabilize retry handler
+  const handleRetry = useCallback(() => {
+    window.location.reload();
+  }, []);
+
+  // useMemo: Cache stats cards configuration
+  const statsCards = useMemo<StatCard[]>(() => [
+    {
+      icon: 'bi-list-check',
+      iconClass: '',
+      value: stats.total || 0,
+      label: '总参数数'
+    },
+    {
+      icon: 'bi-stars',
+      iconClass: 'success',
+      value: stats.common || 0,
+      label: '公共参数'
+    },
+    {
+      icon: 'bi-calendar',
+      iconClass: 'warning',
+      value: stats.thisMonth || 0,
+      label: '本月新增'
+    },
+    {
+      icon: 'bi-exclamation-triangle',
+      iconClass: 'danger',
+      value: stats.unused || 0,
+      label: '未使用参数'
+    }
+  ], [stats]);
+
+  // useMemo: Cache skeleton loading cards
+  const loadingCards = useMemo(() =>
+    [1, 2, 3, 4].map(i => (
+      <div key={i} className="stat-card glass-card" style={{ opacity: 0.5 }}>
+        <div className="stat-icon">
+          <i className="bi bi-list-check"></i>
+        </div>
+        <div className="stat-content">
+          <h3>--</h3>
+          <p>加载中...</p>
+        </div>
+      </div>
+    )),
+  []);
+
   if (isLoading) {
     return (
       <div className="parameter-analysis-container">
@@ -54,24 +110,14 @@ function ParameterAnalysis() {
           <h1>参数分析</h1>
         </div>
         <div className="stats-grid">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="stat-card glass-card" style={{ opacity: 0.5 }}>
-              <div className="stat-icon">
-                <i className="bi bi-list-check"></i>
-              </div>
-              <div className="stat-content">
-                <h3>--</h3>
-                <p>加载中...</p>
-              </div>
-            </div>
-          ))}
+          {loadingCards}
         </div>
       </div>
     );
   }
 
   if (error) {
-    return <ErrorState message={(error as Error).message} onRetry={() => window.location.reload()} />;
+    return <ErrorState message={(error as Error).message} onRetry={handleRetry} />;
   }
 
   return (
@@ -85,48 +131,20 @@ function ParameterAnalysis() {
       </div>
 
       <div className="stats-grid">
-        <div className="stat-card glass-card">
-          <div className="stat-icon">
-            <i className="bi bi-list-check"></i>
+        {statsCards.map((card, index) => (
+          <div key={index} className="stat-card glass-card">
+            <div className={`stat-icon ${card.iconClass}`}>
+              <i className={`bi ${card.icon}`}></i>
+            </div>
+            <div className="stat-content">
+              <h3>{card.value}</h3>
+              <p>{card.label}</p>
+            </div>
           </div>
-          <div className="stat-content">
-            <h3>{stats.total || 0}</h3>
-            <p>总参数数</p>
-          </div>
-        </div>
-
-        <div className="stat-card glass-card">
-          <div className="stat-icon success">
-            <i className="bi bi-stars"></i>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.common || 0}</h3>
-            <p>公共参数</p>
-          </div>
-        </div>
-
-        <div className="stat-card glass-card">
-          <div className="stat-icon warning">
-            <i className="bi bi-calendar"></i>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.thisMonth || 0}</h3>
-            <p>本月新增</p>
-          </div>
-        </div>
-
-        <div className="stat-card glass-card">
-          <div className="stat-icon danger">
-            <i className="bi bi-exclamation-triangle"></i>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.unused || 0}</h3>
-            <p>未使用参数</p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
-}
+};
 
-export default ParameterAnalysis;
+export default React.memo(ParameterAnalysis);

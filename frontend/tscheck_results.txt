@@ -1,0 +1,65 @@
+
+> dwd-generator-app-shell@1.0.0 type-check
+> tsc --noEmit --pretty
+
+[96msrc/graphql/hooks.ts[0m:[93m92[0m:[93m5[0m - [91merror[0m[90m TS2769: [0mNo overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'refetchOnWindowFocus' does not exist in type 'Options<GamesResponse, OperationVariables>'.
+
+[7m92[0m     refetchOnWindowFocus: options?.refetchOnWindowFocus ?? false,  // Disable window focus refetch
+[7m  [0m [91m    ~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96mnode_modules/@apollo/client/react/hooks/useQuery.d.ts[0m:[93m543[0m:[93m25[0m
+    [7m543[0m export declare function useQuery<TData = unknown, TVariables extends OperationVariables = OperationVariables>(query: DocumentNode | TypedDocumentNode<TData, TVariables>, ...[options]: {} extends TVariables ? [
+    [7m   [0m [96m                        ~~~~~~~~[0m
+    The last overload is declared here.
+
+[96msrc/graphql/hooks.ts[0m:[93m384[0m:[93m5[0m - [91merror[0m[90m TS2769: [0mNo overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'refetchOnWindowFocus' does not exist in type 'Options<unknown, OperationVariables>'.
+
+[7m384[0m     refetchOnWindowFocus: options?.refetchOnWindowFocus ?? false,  // Disable window focus refetch
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96mnode_modules/@apollo/client/react/hooks/useQuery.d.ts[0m:[93m543[0m:[93m25[0m
+    [7m543[0m export declare function useQuery<TData = unknown, TVariables extends OperationVariables = OperationVariables>(query: DocumentNode | TypedDocumentNode<TData, TVariables>, ...[options]: {} extends TVariables ? [
+    [7m   [0m [96m                        ~~~~~~~~[0m
+    The last overload is declared here.
+
+[96msrc/shared/types/api-types.ts[0m:[93m68[0m:[93m53[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Field'.
+
+[7m68[0m export interface FieldsResponse extends ApiResponse<Field[]> {}
+[7m  [0m [91m                                                    ~~~~~[0m
+
+[96msrc/shared/types/api-types.ts[0m:[93m73[0m:[93m53[0m - [91merror[0m[90m TS2304: [0mCannot find name 'EventParam'.
+
+[7m73[0m export interface ParamsResponse extends ApiResponse<EventParam[]> {}
+[7m  [0m [91m                                                    ~~~~~~~~~~[0m
+
+[96msrc/shared/types/api-types.ts[0m:[93m78[0m:[93m52[0m - [91merror[0m[90m TS2304: [0mCannot find name 'Game'.
+
+[7m78[0m export interface GamesResponse extends ApiResponse<Game[]> {}
+[7m  [0m [91m                                                   ~~~~[0m
+
+[96msrc/shared/types/index.ts[0m:[93m93[0m:[93m3[0m - [91merror[0m[90m TS2305: [0mModule '"./types-adapter"' has no exported member 'adaptFieldToFrontend'.
+
+[7m93[0m   adaptFieldToFrontend,
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/shared/types/index.ts[0m:[93m94[0m:[93m3[0m - [91merror[0m[90m TS2305: [0mModule '"./types-adapter"' has no exported member 'adaptFieldFromFrontend'.
+
+[7m94[0m   adaptFieldFromFrontend,
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/shared/types/index.ts[0m:[93m100[0m:[93m1[0m - [91merror[0m[90m TS2308: [0mModule './fieldBuilder' has already exported a member named 'WhereCondition'. Consider explicitly re-exporting to resolve the ambiguity.
+
+[7m100[0m export * from './whereBuilder';
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+Found 8 errors in 3 files.
+
+Errors  Files
+     2  src/graphql/hooks.ts[90m:92[0m
+     3  src/shared/types/api-types.ts[90m:68[0m
+     3  src/shared/types/index.ts[90m:93[0m

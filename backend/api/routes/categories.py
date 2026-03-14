@@ -32,12 +32,12 @@ from backend.core.utils import (
     validate_json_request,
 )
 
+# Import Entity for validation
+from backend.models.entities import EventCategoryEntity
+
 # Import Service layer
 from backend.services.event_categories.category_service import CategoryService
 from backend.services.games.game_service import GameService
-
-# Import Entity for validation
-from backend.models.entities import EventCategoryEntity
 
 # Import the parent blueprint
 from .. import api_bp
@@ -80,9 +80,7 @@ def api_list_categories():
         categories = service.get_all_categories(game_gid=game_gid)
 
         # Convert Entity objects to dictionaries for JSON response
-        return json_success_response(
-            data=[category.model_dump() for category in categories]
-        )
+        return json_success_response(data=[category.model_dump() for category in categories])
     except Exception as e:
         logger.error(f"Error fetching categories: {e}")
         return json_error_response("Failed to fetch categories", status_code=500)
@@ -133,8 +131,7 @@ def api_create_category():
 
         logger.info(f"Category created: {name}")
         return json_success_response(
-            message="Category created successfully",
-            data=created_category.model_dump()
+            message="Category created successfully", data=created_category.model_dump()
         )
     except ValueError as e:
         # Handle duplicate name error
@@ -169,8 +166,7 @@ def api_update_category(id):
 
         logger.info(f"Category updated: {name} (ID: {id})")
         return json_success_response(
-            message="Category updated successfully",
-            data=updated_category.model_dump()
+            message="Category updated successfully", data=updated_category.model_dump()
         )
     except ValueError as e:
         # Handle not found or duplicate name errors
@@ -244,9 +240,7 @@ def api_batch_delete_categories():
 
         # 验证数量限制
         if len(category_ids) > 100:
-            return json_error_response(
-                f"Too many IDs: {len(category_ids)} > 100", status_code=400
-            )
+            return json_error_response(f"Too many IDs: {len(category_ids)} > 100", status_code=400)
 
         # 验证所有ID都是正整数
         if not all(isinstance(cid, int) and cid > 0 for cid in category_ids):
@@ -269,7 +263,7 @@ def api_batch_delete_categories():
             data={
                 "deleted_count": result["deleted_count"],
                 "failed_ids": result["failed_ids"],
-                "failed_reasons": result["failed_reasons"]
+                "failed_reasons": result["failed_reasons"],
             },
         )
     except ValueError as e:

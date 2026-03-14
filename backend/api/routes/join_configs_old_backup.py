@@ -195,24 +195,18 @@ def api_create_join_config():
         # Validate join_type
         join_type = data.get("join_type", "join")
         if join_type not in ["union_all", "join", "where_in"]:
-            return json_error_response(
-                f"Invalid join_type: {join_type}", status_code=400
-            )
+            return json_error_response(f"Invalid join_type: {join_type}", status_code=400)
 
         # Prepare join_condition based on type
         join_condition = data.get("join_condition", "{}")
         if join_type == "join" and not join_condition:
-            return json_error_response(
-                "join_condition required for JOIN type", status_code=400
-            )
+            return json_error_response("join_condition required for JOIN type", status_code=400)
 
         # Convert game_gid to game_id for database storage (if needed)
         game_gid = data["game_gid"]
         game = Repositories.GAMES.find_by_field("gid", game_gid)
         if not game:
-            return json_error_response(
-                f"Game with GID {game_gid} not found", status_code=404
-            )
+            return json_error_response(f"Game with GID {game_gid} not found", status_code=404)
 
         # Insert join config (store game_id internally for foreign key)
         config_id = execute_write(
@@ -277,17 +271,13 @@ def api_update_join_config(id):
             try:
                 json.loads(data["source_events"])
             except json.JSONDecodeError:
-                return json_error_response(
-                    "Invalid JSON in source_events", status_code=400
-                )
+                return json_error_response("Invalid JSON in source_events", status_code=400)
 
         if "output_fields" in data:
             try:
                 json.loads(data["output_fields"])
             except json.JSONDecodeError:
-                return json_error_response(
-                    "Invalid JSON in output_fields", status_code=400
-                )
+                return json_error_response("Invalid JSON in output_fields", status_code=400)
 
         # Validate join_type if provided
         if "join_type" in data:
@@ -301,9 +291,7 @@ def api_update_join_config(id):
             game_gid = data["game_gid"]
             game = Repositories.GAMES.find_by_field("gid", game_gid)
             if not game:
-                return json_error_response(
-                    f"Game with GID {game_gid} not found", status_code=404
-                )
+                return json_error_response(f"Game with GID {game_gid} not found", status_code=404)
             # Store game_id internally for foreign key
             data["game_id"] = game["id"]
             # Remove game_gid from data as it's not a database column

@@ -11,9 +11,10 @@ Parameter Library Repository (参数库数据访问层)
 - 保持GenericRepository继承
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 
 
 class ParamLibraryRepository(GenericRepository):
@@ -36,7 +37,6 @@ class ParamLibraryRepository(GenericRepository):
             cache_timeout=600,  # 10分钟缓存（参数库变化较少）
         )
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name(self, param_name: str) -> Optional[Dict[str, Any]]:
         """
@@ -46,7 +46,7 @@ class ParamLibraryRepository(GenericRepository):
             param_name: 参数名
 
         Returns:
-            库参数字典，不存在返回None
+            库参数字典, 不存在返回None
 
         Example:
             >>> repo = ParamLibraryRepository()
@@ -61,7 +61,6 @@ class ParamLibraryRepository(GenericRepository):
         """
         return fetch_one_as_dict(query, (param_name,))
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id_with_template(self, library_id: int) -> Optional[Dict[str, Any]]:
         """
@@ -71,7 +70,7 @@ class ParamLibraryRepository(GenericRepository):
             library_id: 库参数ID
 
         Returns:
-            库参数字典（包含模板信息），不存在返回None
+            库参数字典（包含模板信息）, 不存在返回None
 
         Example:
             >>> repo = ParamLibraryRepository()
@@ -85,7 +84,6 @@ class ParamLibraryRepository(GenericRepository):
             WHERE pl.id = ?
         """
         return fetch_one_as_dict(query, (library_id,))
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_all_parameters(
@@ -141,7 +139,6 @@ class ParamLibraryRepository(GenericRepository):
         query += " ORDER BY pl.usage_count DESC, pl.param_name"
 
         return fetch_all_as_dict(query, tuple(params) if params else ())
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_frequently_used_parameters(
@@ -368,7 +365,6 @@ class ParamLibraryRepository(GenericRepository):
         finally:
             conn.close()
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_categories(self) -> List[str]:
         """
@@ -389,7 +385,6 @@ class ParamLibraryRepository(GenericRepository):
         """
         rows = fetch_all_as_dict(query)
         return [row["category"] for row in rows]
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_parameters_by_category(
@@ -423,7 +418,6 @@ class ParamLibraryRepository(GenericRepository):
 
         return fetch_all_as_dict(query, (category,))
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_statistics(self) -> Dict[str, Any]:
         """
@@ -436,19 +430,16 @@ class ParamLibraryRepository(GenericRepository):
             >>> repo = ParamLibraryRepository()
             >>> stats = repo.get_statistics()
         """
-        stats = fetch_one_as_dict(
-            """
+        stats = fetch_one_as_dict("""
             SELECT
                 COUNT(*) as total_parameters,
                 SUM(CASE WHEN is_standard = 1 THEN 1 ELSE 0 END) as standard_parameters,
                 SUM(usage_count) as total_usage,
                 AVG(usage_count) as avg_usage
             FROM param_library
-        """
-        )
+        """)
 
-        category_stats = fetch_all_as_dict(
-            """
+        category_stats = fetch_all_as_dict("""
             SELECT
                 category,
                 COUNT(*) as count,
@@ -457,8 +448,7 @@ class ParamLibraryRepository(GenericRepository):
             WHERE category IS NOT NULL
             GROUP BY category
             ORDER BY count DESC
-        """
-        )
+        """)
 
         return {
             "total_parameters": stats["total_parameters"] if stats else 0,
@@ -467,7 +457,6 @@ class ParamLibraryRepository(GenericRepository):
             "avg_usage": stats["avg_usage"] if stats else 0,
             "by_category": category_stats,
         }
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, library_id: int) -> Optional[Dict[str, Any]]:
@@ -478,7 +467,7 @@ class ParamLibraryRepository(GenericRepository):
             library_id: 库参数ID
 
         Returns:
-            库参数字典，不存在返回None
+            库参数字典, 不存在返回None
 
         Example:
             >>> repo = ParamLibraryRepository()

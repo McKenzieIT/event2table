@@ -30,19 +30,19 @@ api_bp = Blueprint("api", __name__)
 
 # Import all route modules to register their routes
 # These imports must come after creating the blueprint to avoid circular imports
+from .routes import cache  # Cache management endpoints
+from .routes import graphql  # GraphQL API
+from .routes import health  # Health check endpoint
+from .routes import parameters  # 添加 parameters 模块
 from .routes import (
-    graphql,  # GraphQL API
-    cache,  # Cache management endpoints
     categories,
     event_parameters,
     events,
     field_builder,
     flows,
     games,
-    health,  # Health check endpoint
     hql_generation,
     join_configs,
-    parameters,  # 添加 parameters 模块
 )
 
 # TODO: Add more modules as they are created

@@ -2,10 +2,11 @@
 JoinBuilder 单元测试
 
 测试多事件JOIN HQL生成功能
-遵循TDD原则：先写测试，看测试失败
+遵循TDD原则: 先写测试, 看测试失败
 """
 
 import pytest
+
 from backend.services.hql.builders.join_builder import JoinBuilder
 from backend.services.hql.models.event import Event, Field
 

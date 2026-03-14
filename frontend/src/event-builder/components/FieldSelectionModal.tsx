@@ -28,7 +28,7 @@ import './FieldSelectionModal.css';
 /**
  * 字段类型选项
  */
-type FieldOptionType = 'all' | 'param' | 'non_common' | 'common' | 'base' | null;
+type FieldOptionType = 'all' | 'params' | 'non-common' | 'common' | 'base' | null;
 
 /**
  * 字段选项接口
@@ -62,7 +62,7 @@ const FIELD_OPTIONS: FieldOption[] = [
     description: '基础字段 + 公共字段 + 参数字段',
     icon: '📋',
     color: 'primary',
-    fieldType: 'all'
+    fieldType: 'ALL'
   },
   {
     key: 'params',
@@ -70,7 +70,7 @@ const FIELD_OPTIONS: FieldOption[] = [
     description: '只添加事件参数字段',
     icon: '⚙️',
     color: 'info',
-    fieldType: 'param'
+    fieldType: 'PARAM'
   },
   {
     key: 'non_common',
@@ -78,7 +78,7 @@ const FIELD_OPTIONS: FieldOption[] = [
     description: '基础字段 + 参数字段（不含公共字段）',
     icon: '🔧',
     color: 'warning',
-    fieldType: 'non_common'
+    fieldType: 'NON_COMMON'
   },
   {
     key: 'common',
@@ -86,7 +86,7 @@ const FIELD_OPTIONS: FieldOption[] = [
     description: '只添加公共参数字段',
     icon: '🔗',
     color: 'success',
-    fieldType: 'common'
+    fieldType: 'COMMON'
   },
   {
     key: 'base',
@@ -94,7 +94,7 @@ const FIELD_OPTIONS: FieldOption[] = [
     description: '只添加基础字段（ds, role_id等）',
     icon: '🏗️',
     color: 'secondary',
-    fieldType: 'base'
+    fieldType: 'BASE'
   },
   {
     key: 'skip',
@@ -160,10 +160,14 @@ export default function FieldSelectionModal({
       return;
     }
 
+    // Convert lowercase field type to uppercase GraphQL enum value
+    // GraphQL enums are case-sensitive and must be uppercase (e.g., PARAM, not "param")
+    const graphQLEnumValue = option.fieldType.toUpperCase() as any;
+
     batchAddFields({
       variables: {
         eventId,
-        fieldType: option.fieldType
+        fieldType: graphQLEnumValue
       }
     });
   }, [batchAddFields, eventId, onClose]);

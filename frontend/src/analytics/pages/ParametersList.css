@@ -249,12 +249,7 @@
   overflow-y: auto;
 }
 
-/* Page-specific table styles - generic styles moved to shared Table.css */
-.oled-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
+/* DEPRECATED: oled-table styles removed */
 
 /* Badge Styles */
 .badge {

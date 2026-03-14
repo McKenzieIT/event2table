@@ -1,7 +1,7 @@
 # 安全要点
 
-> **来源**: 整合了3个文档的安全相关经验
-> **最后更新**: 2026-02-24
+> **来源**: 整合了3个文档的安全相关经验 + 2026-03最新安全修复
+> **最后更新**: 2026-03-09
 > **维护**: 每次安全问题修复后立即更新
 
 ---
@@ -95,8 +95,359 @@ query = f"SELECT * FROM {validated_table} WHERE {validated_column} = ?"
 
 ### 相关经验
 
-- [XSS防护](#xss防护) - 另一个重要的安全防护
+- [XSS防护](#xss防护-⚠️-p0极其重要---2026-03-09新增) - 另一个重要的安全防护
 - [输入验证](#输入验证) - Pydantic Schema验证
+- [权限检查完整性](#权限检查完整性-⚠️-p0极其重要---2026-03-09新增) - 认证和授权装饰器
+
+---
+
+## XSS防护 ⚠️ **P0极其重要 - 2026-03-09新增**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [XSS防护修复报告](../reports/2026-03-09/XSS-PROTECTION-FIX-SUMMARY.md), [P0-7权限检查报告](../reports/2026-03-09/P0-7-PERMISSION-CHECK-COMPLETE.md)
+
+### 问题现象
+
+**症状描述**:
+- 事件名称和参数名称未进行HTML转义
+- 允许恶意脚本注入：`<script>alert('xss')</script>`
+- 存储到数据库后，前端显示时执行恶意代码
+
+**攻击示例**:
+```javascript
+// 恶意输入
+event_name = "<script>alert('XSS')</script>"
+
+// 如果未转义，存储到数据库
+// 前端显示时：<script>标签会执行
+```
+
+### 根本原因
+
+**技术原因**:
+1. **Pydantic Schema缺少输入清理步骤** - 未在验证层进行XSS防护
+2. **用户输入直接存储** - 未经过任何HTML转义
+3. **前端未进行输出编码** - 直接渲染未清理的用户输入
+
+### 解决方案
+
+**1. Pydantic Validator集成html.escape()**:
+```python
+# backend/models/schemas.py
+import html
+from pydantic import BaseModel, Field, field_validator
+
+class EventBase(BaseModel):
+    """事件基础Schema"""
+    event_name: str = Field(..., min_length=1, max_length=100)
+
+    @field_validator("event_name", mode="before")
+    @classmethod
+    def sanitize_event_name(cls, v):
+        """验证并清理事件名，防止XSS攻击"""
+        if isinstance(v, str):
+            v = v.strip()
+        if not v:
+            raise ValueError("event_name不能为空")
+        if " " in v:
+            raise ValueError("event_name不能包含空格")
+        # ✅ 转义HTML特殊字符，防止XSS攻击
+        return html.escape(v) if isinstance(v, str) else v
+```
+
+**HTML转义规则**:
+- `<` → `&lt;`
+- `>` → `&gt;`
+- `&` → `&amp;`
+- `"` → `&quot;`
+- `'` → `&#x27;`
+
+**2. 所有用户输入字段添加XSS防护**:
+```python
+# 参数名称也需要XSS防护
+class ParameterBase(BaseModel):
+    param_name: str = Field(..., min_length=1, max_length=50)
+    display_name: Optional[str] = Field(None, max_length=100)
+
+    @field_validator("param_name", mode="before")
+    @classmethod
+    def sanitize_param_name(cls, v):
+        """验证并清理参数名（snake_case），防止XSS攻击"""
+        if isinstance(v, str):
+            v = v.strip()
+        if not v:
+            raise ValueError("param_name不能为空")
+        if " " in v:
+            raise ValueError("param_name不能包含空格，请使用snake_case格式")
+        return html.escape(v) if isinstance(v, str) else v
+```
+
+**3. 测试验证**:
+```python
+# backend/test/unit/security/test_xss_protection.py
+def test_event_name_xss_payload_is_escaped():
+    """测试XSS payload被转义"""
+    from backend.models.schemas import EventCreate
+
+    xss_payload = "<script>alert('xss')</script>"
+    event_data = EventCreate(
+        game_gid=90000001,
+        event_name=xss_payload,
+        event_name_cn="测试事件",
+        source_table="ieu_ods.ods_90000001_all_view",
+        target_table="dwd.v_dwd_90000001_test_di"
+    )
+
+    # 验证：XSS payload应被转义
+    assert "&lt;script&gt;" in event_data.event_name
+    assert "<script>" not in event_data.event_name
+```
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 所有用户输入字段都添加了`html.escape()`转义？
+- [ ] 在Pydantic Schema层进行输入验证（最早防护层）？
+- [ ] 使用`@field_validator(mode="before")`确保转义在其他验证之前执行？
+
+**TDD测试流程**:
+1. RED: 编写失败的测试（XSS payload应被转义）
+2. GREEN: 实现html.escape()验证器
+3. REFACTOR: 重构代码，保持测试通过
+
+### 相关经验
+
+- [输入验证](#输入验证) - Pydantic Schema验证
+- [权限检查完整性](#权限检查完整性-⚠️-p0极其重要---2026-03-09新增) - 认证和授权装饰器
+
+---
+
+## 权限检查完整性 ⚠️ **P0极其重要 - 2026-03-09新增**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [P0-11权限检查报告](../reports/2026-03-09/P0-11-PERMISSION-CHECK-COMPLETE.md), [权限检查设计文档](../../backend/core/security/authentication.py)
+
+### 问题现象
+
+**症状描述**:
+- GraphQL mutations没有身份验证和授权检查
+- 任何人都可以创建、修改、删除数据
+- 存在严重安全风险
+
+### 根本原因
+
+**技术原因**:
+1. **Mutations直接执行业务逻辑** - 没有验证用户身份
+2. **缺少权限检查机制** - 没有认证和授权装饰器
+3. **GraphQL Context未传递用户信息** - 无法进行权限验证
+
+### 解决方案
+
+**1. 认证装饰器（@authenticated）**:
+```python
+# backend/core/security/authentication.py
+from functools import wraps
+
+def authenticated(func):
+    """
+    Authentication decorator - verifies user is logged in
+
+    Checks that the GraphQL context contains a valid user.
+    """
+    @wraps(func)
+    def wrapper(root, info, *args, **kwargs):
+        # Check if context exists
+        if not hasattr(info, 'context'):
+            raise Exception("Authentication required: No context found")
+
+        # Check if user exists in context
+        if info.context.user is None:
+            raise Exception("Authentication required: Please log in")
+
+        return func(root, info, *args, **kwargs)
+    return wrapper
+```
+
+**2. 授权装饰器（@require_permission）**:
+```python
+def require_permission(permission: str):
+    """
+    Authorization decorator - verifies user has specific permission
+
+    Checks that the authenticated user has the required permission.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(root, info, *args, **kwargs):
+            # First check authentication
+            if not hasattr(info, 'context') or info.context.user is None:
+                raise Exception("Authentication required: Please log in")
+
+            user = info.context.user
+
+            # Check if user has permissions attribute
+            if not hasattr(user, 'permissions'):
+                raise Exception(f"Authorization failed: Permission '{permission}' required")
+
+            # Check if user has the required permission
+            if permission not in user.permissions:
+                raise Exception(f"Authorization failed: Missing '{permission}' permission")
+
+            return func(root, info, *args, **kwargs)
+        return wrapper
+    return decorator
+```
+
+**3. Mutation应用示例**:
+```python
+# backend/gql_api/mutations/game_mutations.py
+class CreateGame(graphene.Mutation):
+    """Create a new game"""
+
+    class Arguments:
+        gid = graphene.Int(required=True, description="游戏GID")
+        name = graphene.String(required=True, description="游戏名称")
+        ods_db = graphene.String(required=True, description="ODS数据库名称")
+
+    ok = graphene.Boolean(description="操作是否成功")
+    game = Field(GameType, description="创建的游戏")
+    errors = graphene.List(graphene.String, description="错误信息")
+
+    @authenticated
+    @require_permission('game:write')
+    def mutate(self, info, gid: int, name: str, ods_db: str):
+        """Execute the mutation"""
+        # Mutation logic here
+        pass
+```
+
+**4. 权限体系设计**:
+
+采用 `资源:操作` 格式的权限字符串：
+
+- **事件权限**: `event:write`, `event:delete`
+- **游戏权限**: `game:write`, `game:delete`
+- **参数权限**: `parameter:write`, `parameter:delete`
+- **批量操作权限**: `batch:create`, `batch:update`, `batch:delete`
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 所有mutations必须添加`@authenticated`装饰器？
+- [ ] 所有写操作必须添加`@require_permission`装饰器？
+- [ ] 架构验证：自动化检查所有mutations都有认证装饰器？
+- [ ] 每个mutation都有认证和授权测试？
+
+**测试验证**:
+```python
+def test_create_event_requires_authentication():
+    """未登录用户应无法创建事件"""
+    # 模拟未登录用户
+    info = Mock()
+    info.context = Mock(user=None)
+
+    mutation = CreateEvent()
+
+    with pytest.raises(Exception) as exc_info:
+        mutation.mutate(info, game_gid=90000001, event_name="Test")
+
+    error_msg = str(exc_info.value).lower()
+    assert any(keyword in error_msg for keyword in [
+        "authentication", "unauthorized", "login"
+    ]), f"Expected auth error, got: {exc_info.value}"
+```
+
+### 相关经验
+
+- [XSS防护](#xss防护-⚠️-p0极其重要---2026-03-09新增) - XSS防护实施
+- [输入验证](#输入验证) - Pydantic Schema验证
+
+---
+
+## 输入验证层次 ⚠️ **P0极其重要 - 2026-03-09新增**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [P0-8验证器执行顺序报告](../reports/2026-03-09/P0-8-VALIDATOR-EXECUTION-ORDER-FIX.md)
+
+### 问题现象
+
+**症状描述**:
+- 自定义验证器的错误消息不显示
+- 输入`param_name=""`时期望错误：`"param_name不能为空"`
+- 实际错误：`"String should have at least 1 character"` ❌
+
+### 根本原因
+
+**技术原因**:
+1. **Field验证先执行** - Pydantic的Field验证（`min_length=1`）在自定义验证器之前执行
+2. **自定义验证器没有机会执行** - Field验证失败后，自定义验证器被跳过
+
+### 解决方案
+
+**1. 使用mode="before"确保验证顺序**:
+```python
+# ❌ 错误：Field验证先执行
+@validator("param_name")  # 默认mode="after"
+def sanitize_param_name(cls, v):
+    v = v.strip()
+    if not v:
+        raise ValueError("param_name不能为空")  # 永远不会执行
+    return html.escape(v)
+
+# ✅ 正确：自定义验证器先执行
+@field_validator("param_name", mode="before")
+@classmethod
+def sanitize_param_name(cls, v):
+    """验证并清理参数名（snake_case），防止XSS攻击"""
+    if isinstance(v, str):
+        v = v.strip()
+    if not v:
+        raise ValueError("param_name不能为空")  # ✅ 会执行
+    if " " in v:
+        raise ValueError("param_name不能包含空格，请使用snake_case格式")
+    return html.escape(v) if isinstance(v, str) else v
+```
+
+**2. 验证器模式对比**:
+
+| 模式 | 执行顺序 | 用途 | 示例 |
+|------|---------|------|------|
+| `mode="after"` (默认) | Field → 自定义验证器 | 对已验证的值进行后处理 | 数据转换、格式化 |
+| `mode="before"` | 自定义验证器 → Field | 自定义验证逻辑优先执行 | XSS防护、空值检查 |
+
+**3. Pydantic V1 vs V2迁移**:
+
+```python
+# Pydantic V1 (已废弃)
+@validator("field_name", pre=True)
+def validate_field(cls, v):
+    return v
+
+# Pydantic V2 (推荐)
+@field_validator("field_name", mode="before")
+@classmethod
+def validate_field(cls, v):
+    return v
+```
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 需要自定义验证逻辑时，优先使用`mode="before"`？
+- [ ] 测试验证顺序，确保自定义验证器有机会执行？
+- [ ] 从V1迁移到V2时，将`@validator(pre=True)`替换为`@field_validator(mode="before")`？
+- [ ] 添加`@classmethod`装饰器（Pydantic V2规范）？
+
+**测试验证**:
+```python
+def test_validator_execution_order():
+    """测试验证器执行顺序"""
+    # 测试mode="before"的验证器先执行
+    # 测试自定义错误消息显示
+    # 测试Field验证不会阻止自定义验证器
+```
+
+### 相关经验
+
+- [XSS防护](#xss防护-⚠️-p0极其重要---2026-03-09新增) - XSS防护需要`mode="before"`
+- [权限检查完整性](#权限检查完整性-⚠️-p0极其重要---2026-03-09新增) - 认证和授权装饰器
 
 ### 案例文档
 

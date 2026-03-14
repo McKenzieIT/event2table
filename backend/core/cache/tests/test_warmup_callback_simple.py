@@ -10,8 +10,10 @@
 日期: 2026-02-27
 """
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
+
 from backend.core.cache.monitoring import CacheAlertManager
 
 
@@ -30,7 +32,7 @@ class MockCache:
             'total_requests': 125,
             'l1_usage': '50%',
             'l1_size': self.l1_size,
-            'l1_capacity': 2000
+            'l1_capacity': 2000,
         }
 
     def _get_redis_client(self):
@@ -51,11 +53,8 @@ def test_warmup_callback_direct_call():
         callback_called["result"] = {"warmed": 100, "failed": 0, "skipped": 0}
         return callback_called["result"]
 
-    # 创建告警管理器（带回调）
-    alert_manager = CacheAlertManager(
-        mock_cache,
-        warmup_callback=warmup_callback
-    )
+    # 创建告警管理器(带回调)
+    alert_manager = CacheAlertManager(mock_cache, warmup_callback=warmup_callback)
 
     # 直接调用预热方法
     alert_manager._trigger_warm_up()
@@ -106,7 +105,7 @@ def test_warmup_callback_with_async_function():
 
     alert_manager = CacheAlertManager(mock_cache, warmup_callback=async_callback)
 
-    # 直接调用（应自动处理异步）
+    # 直接调用(应自动处理异步)
     alert_manager._trigger_warm_up()
 
     # 验证结果
@@ -128,7 +127,7 @@ def test_warmup_callback_exception_handling():
 
     alert_manager = CacheAlertManager(mock_cache, warmup_callback=failing_callback)
 
-    # 直接调用（不应抛出异常）
+    # 直接调用(不应抛出异常)
     alert_manager._trigger_warm_up()
 
     # 验证错误被捕获
@@ -147,7 +146,7 @@ def test_warmup_callback_none():
 
     alert_manager = CacheAlertManager(mock_cache, warmup_callback=None)
 
-    # 直接调用（不应抛出异常）
+    # 直接调用(不应抛出异常)
     alert_manager._trigger_warm_up()
 
     # 验证无结果

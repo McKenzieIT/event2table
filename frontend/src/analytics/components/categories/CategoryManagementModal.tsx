@@ -19,7 +19,7 @@
  * - Preserve game_gid URL parameter
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { BaseModal, Button, Input, Spinner, useToast } from '@shared/ui';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
@@ -55,6 +55,10 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [formData, setFormData] = useState<CategoryFormData>({ name: '', description: '' });
+
+  // Refs to input elements (for Chrome MCP compatibility)
+  const nameRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLInputElement>(null);
 
   // Promise-based confirm dialog
   const { confirm, ConfirmDialogComponent } = usePromiseConfirm();
@@ -182,6 +186,29 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
     setFormData({ name: '', description: '' });
   }, []);
 
+  // Chrome MCP兼容性: 监听DOM值变化并同步到state
+  useEffect(() => {
+    if (!nameRef.current || !descRef.current) {
+      return;
+    }
+
+    const nameDomValue = nameRef.current.value;
+    const descDomValue = descRef.current.value;
+
+    const updates: Partial<CategoryFormData> = {};
+
+    if (nameDomValue !== formData.name) {
+      updates.name = nameDomValue;
+    }
+    if (descDomValue !== formData.description) {
+      updates.description = descDomValue;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+  }, [formData.name, formData.description]);
+
   if (!isOpen) return null;
 
   return (
@@ -240,6 +267,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="分类名称"
                   required
+                  ref={nameRef}
                 />
 
                 <Input
@@ -248,6 +276,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="分类描述（可选）"
+                  ref={descRef}
                 />
 
                 <div className="form-actions">

@@ -7,6 +7,7 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #6405 | 11:15 PM | 🔵 | TypeScript migration UI/UX regression investigation completed | ~244 |
 | #6395 | 12:30 AM | 🔵 | Investigation of TypeScript migration UI/UX regression paused | ~237 |
 | #6390 | 12:29 AM | 🔵 | MainLayout uses performance hooks and CSS custom properties for sidebar | ~251 |
 </claude-mem-context>

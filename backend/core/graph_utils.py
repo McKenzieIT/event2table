@@ -1,7 +1,7 @@
 """
 图处理通用工具函数模块
 
-提供图遍历、节点检测等通用算法。
+提供图遍历, 节点检测等通用算法. 
 
 作者: Claude Code
 版本: 1.0.0
@@ -10,7 +10,7 @@
 功能分类:
 - 图构建工具
 - 图遍历算法（BFS/DFS）
-- 节点检测（孤立节点、环检测）
+- 节点检测（孤立节点, 环检测）
 
 使用示例:
     >>> from backend.core.graph_utils import (
@@ -29,8 +29,8 @@
     >>> cycles = detect_cycles_dfs(graph)
 """
 
-from typing import Dict, List, Set, Tuple, Any
 from collections import deque
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # ============================================================================
 # 图构建工具
@@ -42,8 +42,8 @@ def build_graph_from_edges(nodes: List[Dict], edges: List[Dict]) -> Dict[str, Li
     从节点和边列表构建邻接表
 
     Args:
-        nodes: 节点列表，每个节点至少包含 'id' 字段
-        edges: 边列表，每条边包含 'source' 和 'target' 字段
+        nodes: 节点列表, 每个节点至少包含 'id' 字段
+        edges: 边列表, 每条边包含 'source' 和 'target' 字段
 
     Returns:
         邻接表 {node_id: [neighbor_ids]}
@@ -158,7 +158,7 @@ def find_isolated_nodes(
         ignore_types: 忽略的节点类型列表（如['output']）
 
     Returns:
-        孤立节点列表，每个节点包含 id, type, label
+        孤立节点列表, 每个节点包含 id, type, label
 
     Example:
         >>> isolated = find_isolated_nodes(nodes, edges, ignore_types=['output'])
@@ -173,7 +173,7 @@ def find_isolated_nodes(
     # 构建图
     graph = build_graph_from_edges(nodes, edges)
 
-    # 找出起始节点（没有输入的节点，除ignore_types外）
+    # 找出起始节点(没有输入的节点, 除ignore_types外)
     start_nodes = [
         node["id"]
         for node in nodes
@@ -181,7 +181,7 @@ def find_isolated_nodes(
         and not any(e.get("target") == node["id"] for e in edges)
     ]
 
-    # 如果没有起始节点，使用第一个节点
+    # 如果没有起始节点, 使用第一个节点
     if not start_nodes:
         start_nodes = [nodes[0]["id"]]
 
@@ -212,7 +212,7 @@ def detect_cycles_dfs(graph: Dict[str, List[str]]) -> List[List[str]]:
         graph: 邻接表 {node_id: [neighbor_ids]}
 
     Returns:
-        环路径列表，每个环是一组节点ID
+        环路径列表, 每个环是一组节点ID
 
     Example:
         >>> graph = {'A': ['B'], 'B': ['C'], 'C': ['A']}

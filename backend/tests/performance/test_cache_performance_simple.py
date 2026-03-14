@@ -6,9 +6,11 @@ Requirements:
 - Cache hit rate > 80%
 - Cache provides at least 2x speedup
 """
-import pytest
+
 import time
+
 import numpy as np
+import pytest
 
 
 class TestCachePerformanceSimple:
@@ -62,6 +64,7 @@ class TestCachePerformanceSimple:
 
         # Simulate realistic access pattern (80% hits, 20% misses)
         import random
+
         times = []
         hits = 0
         misses = 0
@@ -168,6 +171,7 @@ class TestCachePerformanceSimple:
         def cache_operation():
             """Perform cache get/set operations"""
             import random
+
             start = time.perf_counter()
 
             # Mix of reads and writes

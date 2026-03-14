@@ -5,18 +5,11 @@
  * @module parameters
  */
 
+import type { Parameter } from '@shared/types/parameter-types';
+
 // ============================================
 // Type Definitions
 // ============================================
-
-export interface Parameter {
-  id: number;
-  param_name: string;
-  param_name_cn: string;
-  param_type: 'string' | 'int' | 'float' | 'boolean' | 'json';
-  game_gid: number | null;
-  description?: string;
-}
 
 export interface ParameterResponse {
   data: {

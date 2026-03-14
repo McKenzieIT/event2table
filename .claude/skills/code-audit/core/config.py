@@ -26,6 +26,18 @@ class AuditConfig:
     enable_architecture_checks: bool = True
     enable_testing_checks: bool = True
 
+    # NEW: Performance optimization detectors
+    enable_cache_decorator_check: bool = True  # 85 known issues
+    enable_n_plus_one_check: bool = True  # 530 known issues
+    enable_react_hooks_check: bool = True  # 213 known issues
+    enable_react_performance_check: bool = True  # Part of 213 issues
+
+    # NEW: GraphQL and Architecture detectors
+    enable_graphql_type_sync_check: bool = True  # GraphQL schema synchronization
+    enable_pydantic_completeness_check: bool = True  # Pydantic model completeness
+    enable_entity_architecture_check: bool = True  # Entity architecture patterns
+    enable_completeness_check: bool = True  # Complete implementation principle
+
     # Quality thresholds
     max_complexity: int = 10
     max_duplication_lines: int = 100

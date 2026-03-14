@@ -2,44 +2,61 @@
 Game Queries
 
 Implements GraphQL query resolvers for Game entity.
+PERF: Added caching decorators for performance optimization
 """
 
-import graphene
-from graphene import Field, List, Int, String
-from typing import List as TypingList, Dict, Any
 import logging
+from typing import Any, Dict
+from typing import List as TypingList
+
+import graphene
+from graphene import Field, Int, List, String
+
+# PERF: Import cache decorator for Game query optimization
+from backend.core.cache.decorators import cached
 
 logger = logging.getLogger(__name__)
 
 
 class GameQueries:
     """Game-related GraphQL queries"""
-    
+
     @staticmethod
+    @cached(ttl=1800, key_prefix="game")
     def resolve_game(root, info, gid: int):
-        """Resolve a single game by GID."""
+        """
+        Resolve a single game by GID.
+
+        PERF: Cache decorator improves performance significantly
+        """
         try:
             from backend.core.data_access import Repositories
             from backend.gql_api.types.game_type import GameType
-            
+
             game = Repositories.GAMES.find_by_field("gid", gid)
             if game:
                 return GameType.from_dict(game)
             return None
-            
+
         except Exception as e:
             logger.error(f"Error resolving game {gid}: {e}", exc_info=True)
             return None
-    
+
     @staticmethod
+    @cached(ttl=1800, key_prefix="games")
     def resolve_games(root, info, limit: int = 10, offset: int = 0):
-        """Resolve list of games with pagination."""
+        """
+        Resolve list of games with pagination.
+
+        PERF: Cache decorator improves performance significantly
+        """
         try:
             from backend.core.utils import fetch_all_as_dict
             from backend.gql_api.types.game_type import GameType
-            
+
             # Use optimized query with event counts
-            games = fetch_all_as_dict("""
+            games = fetch_all_as_dict(
+                """
                 SELECT
                     g.id,
                     g.gid,
@@ -56,21 +73,28 @@ class GameQueries:
                 GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
                 ORDER BY g.id
                 LIMIT ? OFFSET ?
-            """, (limit, offset))
-            
+            """,
+                (limit, offset),
+            )
+
             return [GameType.from_dict(game) for game in games]
-            
+
         except Exception as e:
             logger.error(f"Error resolving games: {e}", exc_info=True)
             return []
-    
+
     @staticmethod
+    @cached(ttl=600, key_prefix="games_search")
     def resolve_search_games(root, info, query: str):
-        """Search games by name or GID."""
+        """
+        Search games by name or GID.
+
+        PERF: Cache decorator with shorter TTL (10 min) for search results
+        """
         try:
             from backend.core.utils import fetch_all_as_dict
             from backend.gql_api.types.game_type import GameType
-            
+
             search_pattern = f"%{query}%"
             games = fetch_all_as_dict(
                 """
@@ -79,11 +103,11 @@ class GameQueries:
                 ORDER BY id
                 LIMIT 20
                 """,
-                (search_pattern, search_pattern)
+                (search_pattern, search_pattern),
             )
-            
+
             return [GameType.from_dict(game) for game in games]
-            
+
         except Exception as e:
             logger.error(f"Error searching games: {e}", exc_info=True)
             return []

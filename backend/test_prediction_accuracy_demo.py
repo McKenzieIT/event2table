@@ -10,6 +10,7 @@
 """
 
 import time
+
 from backend.core.cache.intelligent_warmer import IntelligentCacheWarmer
 
 
@@ -47,10 +48,7 @@ def demo_prediction_accuracy():
     print("\n🎯 场景2: 完美预测（100%准确率）")
     print("-" * 60)
 
-    perfect_predictions = [
-        "events:game_10000147",
-        "events:game_10000148"
-    ]
+    perfect_predictions = ["events:game_10000147", "events:game_10000148"]
 
     accuracy_stats = warmer.calculate_prediction_accuracy(perfect_predictions)
 
@@ -67,7 +65,7 @@ def demo_prediction_accuracy():
     partial_predictions = [
         "events:game_10000147",
         "events:game_10000148",
-        "events:game_99999999"  # 不存在的游戏
+        "events:game_99999999",  # 不存在的游戏
     ]
 
     accuracy_stats = warmer.calculate_prediction_accuracy(partial_predictions)
@@ -82,11 +80,7 @@ def demo_prediction_accuracy():
     print("\n❌ 场景4: 零预测（0%准确率）")
     print("-" * 60)
 
-    wrong_predictions = [
-        "events:game_11111111",
-        "events:game_22222222",
-        "events:game_33333333"
-    ]
+    wrong_predictions = ["events:game_11111111", "events:game_22222222", "events:game_33333333"]
 
     accuracy_stats = warmer.calculate_prediction_accuracy(wrong_predictions)
 
@@ -102,16 +96,14 @@ def demo_prediction_accuracy():
 
     # 添加一个旧访问
     current_time = time.time()
-    warmer.access_log.append({
-        'key': 'events:game_old',
-        'timestamp': current_time - 400  # 400秒前（超过默认5分钟窗口）
-    })
+    warmer.access_log.append(
+        {'key': 'events:game_old', 'timestamp': current_time - 400}  # 400秒前（超过默认5分钟窗口）
+    )
 
     # 添加一个新访问
-    warmer.access_log.append({
-        'key': 'events:game_new',
-        'timestamp': current_time - 100  # 100秒前（在5分钟窗口内）
-    })
+    warmer.access_log.append(
+        {'key': 'events:game_new', 'timestamp': current_time - 100}  # 100秒前（在5分钟窗口内）
+    )
 
     print("✅ 已添加旧访问（events:game_old, 400秒前）")
     print("✅ 已添加新访问（events:game_new, 100秒前）")
@@ -120,8 +112,7 @@ def demo_prediction_accuracy():
     time_window_predictions = ["events:game_old", "events:game_new"]
 
     accuracy_stats = warmer.calculate_prediction_accuracy(
-        time_window_predictions,
-        actual_access_window_seconds=300  # 5分钟窗口
+        time_window_predictions, actual_access_window_seconds=300  # 5分钟窗口
     )
 
     print(f"\n预测键: {time_window_predictions}")
@@ -129,7 +120,7 @@ def demo_prediction_accuracy():
     print(f"准确率: {accuracy_stats['accuracy']:.2f}%")
     print(f"预测数: {accuracy_stats['predicted_count']:.0f}")
     print(f"命中数: {accuracy_stats['actual_hits']:.0f}")
-    print(f"说明: events:game_old在窗口外，不算命中")
+    print(f"说明: events:game_old在窗口外, 不算命中")
 
     # 场景6: 查看统计信息
     print("\n📈 场景6: 查看统计信息")
@@ -153,7 +144,7 @@ def demo_prediction_accuracy():
     print(f"准确率: {accuracy_stats['accuracy']:.2f}%")
     print(f"预测数: {accuracy_stats['predicted_count']:.0f}")
     print(f"命中数: {accuracy_stats['actual_hits']:.0f}")
-    print(f"✅ 正确处理空列表，返回0%而不报错")
+    print(f"✅ 正确处理空列表, 返回0%而不报错")
 
     print("\n" + "=" * 60)
     print("✅ 演示完成！")

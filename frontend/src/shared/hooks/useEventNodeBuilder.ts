@@ -122,25 +122,44 @@ export function useEventNodeBuilder(gameGid?: number): UseEventNodeBuilderReturn
     fieldName: string,
     displayName: string,
     paramId: number | null = null,
-    jsonPath: string | null = null
+    jsonPath: string | null = null,
+    hive_type?: string  // ✅ 新增：Hive数据类型参数
   ) => {
     setCanvasFields(prev => {
+      // Support both lowercase (internal) and uppercase (GraphQL enum) values
       const typeMapping: Record<string, string> = {
+        // Internal format (lowercase)
         'base': 'basic',
         'param': 'parameter',
         'custom': 'custom',
-        'fixed': 'fixed'
+        'fixed': 'fixed',
+        // GraphQL enum format (uppercase)
+        'BASE': 'basic',
+        'PARAM': 'parameter',
+        'CUSTOM': 'custom',
+        'FIXED': 'fixed',
+        // GraphQL schema field_type values
+        'basic': 'basic',
+        'parameter': 'parameter',
       };
 
+      // Normalize fieldType to lowercase for internal checks
+      const normalizedFieldType = fieldType.toLowerCase();
+      const mappedType = typeMapping[fieldType] || typeMapping[normalizedFieldType] || normalizedFieldType;
+
+      // ✅ BUGFIX #1: 生成唯一ID，避免重复键导致组件崩溃
+      // 使用组合字段生成唯一ID：timestamp + random + field hash
+      const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${fieldName}`;
+
       const newField: CanvasField = {
-        id: String(Date.now()),
-        type: (typeMapping[fieldType] || fieldType) as CanvasField['type'],
+        id: uniqueId,
+        type: mappedType as CanvasField['type'],
         name: fieldName,
         displayName,
         alias: fieldName,
-        dataType: fieldType === 'param' ? 'STRING' : 'UNKNOWN',
+        dataType: hive_type || 'STRING',  // ✅ 修复：使用传入的hive_type，fallback到'STRING'
         isEditable: true,
-        fieldType,
+        fieldType: normalizedFieldType, // Store normalized value
         fieldName,
         order: prev.length + 1,
         paramId,

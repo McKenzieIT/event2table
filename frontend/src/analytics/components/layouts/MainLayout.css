@@ -14,8 +14,11 @@
 
 .app-content {
   flex: 1;
+  height: calc(100vh - var(--header-height, 64px)); /* Fixed height for proper scrolling */
   padding: var(--space-6);
   overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth; /* Smooth scrolling experience */
 }
 
 .breadcrumb-container {

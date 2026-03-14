@@ -3,11 +3,12 @@ HQL性能分析器单元测试
 """
 
 import pytest
+
 from .performance_analyzer import (
     HQLPerformanceAnalyzer,
+    IssueType,
     analyze_hql_performance,
     format_report_for_api,
-    IssueType,
 )
 
 

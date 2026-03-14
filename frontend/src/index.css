@@ -12,7 +12,7 @@
 
 html, body {
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden; /* Only prevent horizontal scroll, allow vertical scroll */
 }
 
 body {
@@ -27,7 +27,7 @@ body {
 #app-root {
   width: 100%;
   height: 100vh;
-  overflow: hidden;
+  /* Remove overflow: hidden to allow scrolling within the app */
 }
 
 /* Cyberpunk App Shell */
@@ -50,7 +50,8 @@ body {
 .app-body {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .app-content {

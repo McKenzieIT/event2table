@@ -75,7 +75,7 @@ export type { PaginationProps } from './Pagination/Pagination';
 // Special components
 export { default as SelectGamePrompt } from './SelectGamePrompt';
 export type { SelectGamePromptProps } from './SelectGamePrompt';
-export { ConfirmDialog } from './BaseModal/ConfirmDialog';
+export { default as ConfirmDialog } from './ConfirmDialog/ConfirmDialog';
 export { default as SearchInput } from './SearchInput/SearchInput';
 export { default as Loading } from './Loading';
 export { default as CanvasErrorBoundary } from './CanvasErrorBoundary';

@@ -1,9 +1,8 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Added React.memo, enhanced useCallback, kept useMemo
+// Optimized: Filtered games, stats calculations, and stable event handlers
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { Link } from 'react-router-dom';
 import { GET_GAMES } from '@/graphql/queries';
@@ -48,6 +47,11 @@ function GamesListGraphQL() {
 
   const [searchTerm, setSearchTerm] = useState('');
 
+  // 稳定的搜索处理函数
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, []);
+
   // 使用GraphQL查询游戏列表
   const { data: gamesData, loading: isLoading, error, refetch } = useQuery(GET_GAMES, {
     variables: {
@@ -73,8 +77,8 @@ function GamesListGraphQL() {
   // 统计数据
   const stats = useMemo(() => {
     const totalGames = games.length;
-    const totalEvents = games.reduce((sum, game: GameType) => sum + (game.eventCount || 0), 0);
-    const totalParams = games.reduce((sum, game: GameType) => sum + (game.parameterCount || 0), 0);
+    const totalEvents = games.reduce((sum, game) => sum + (game?.eventCount || 0), 0);
+    const totalParams = games.reduce((sum, game) => sum + (game?.parameterCount || 0), 0);
     const avgEventsPerGame = totalGames > 0 ? (totalEvents / totalGames).toFixed(1) : 0;
 
     return {
@@ -101,6 +105,12 @@ function GamesListGraphQL() {
     openGameManagementModal();
   }, [openGameManagementModal]);
 
+  // 稳定的重试处理函数
+  const handleRetry = useCallback(() => {
+    refetch();
+    success('正在重新加载...');
+  }, [refetch, success]);
+
   // 错误状态
   if (error) {
     return (
@@ -109,10 +119,7 @@ function GamesListGraphQL() {
           <i className="bi bi-exclamation-triangle text-warning"></i>
           <h3>加载游戏失败</h3>
           <p>{error.message}</p>
-          <button className="btn btn-primary" onClick={() => {
-            refetch();
-            success('正在重新加载...');
-          }}>
+          <button className="btn btn-primary" onClick={handleRetry}>
             重试
           </button>
         </div>
@@ -197,7 +204,7 @@ function GamesListGraphQL() {
           <SearchInput
             placeholder="搜索游戏名称或GID..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             className="search-input"
           />
         </div>
@@ -283,4 +290,4 @@ function GamesListGraphQL() {
   );
 }
 
-export default GamesListGraphQL;
+export default memo(GamesListGraphQL);

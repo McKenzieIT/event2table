@@ -518,19 +518,249 @@ mcp__chrome-devtools__drag({
 })
 ```
 
-### 3. 控制台监控
+### 3. 控制台监控 ⭐ 重点功能
+
+**⚠️ 2026-03-07更新**: 完整的控制台日志捕获功能现已可用！
+
+#### 基础使用
 
 ```javascript
-// 检查错误
+// 检查所有错误
+mcp__chrome-devtools__list_console_messages({
+  types: ["error"]
+})
+
+// 检查错误和警告
 mcp__chrome-devtools__list_console_messages({
   types: ["error", "warn"]
 })
 
-// 获取错误详情
-mcp__chrome-devtools__get_console_message({
-  msgid: error_id
+// 检查所有类型的消息
+mcp__chrome-devtools__list_console_messages({})
+
+// 获取最近的消息（使用时间戳）
+mcp__chrome-devtools__list_console_messages({
+  types: ["error"],
+  since: Date.now() - 5000  // 最近5秒
 })
 ```
+
+#### 获取错误详情
+
+```javascript
+// 从list_console_messages获取msgid
+const errors = mcp__chrome-devtools__list_console_messages({
+  types: ["error"]
+})
+
+// 获取第一个错误的详细信息
+if (errors.messages && errors.messages.length > 0) {
+  const firstErrorId = errors.messages[0].id
+  const details = mcp__chrome-devtools__get_console_message({
+    msgid: firstErrorId
+  })
+  console.log("Error Details:", details)
+}
+```
+
+#### 完整测试流程（页面 + 控制台）
+
+```javascript
+// 1. 导航到页面
+mcp__chrome-devtools__navigate_page({
+  type: "url",
+  url: "http://localhost:5173/#/events"
+})
+
+// 2. 等待页面加载
+mcp__chrome-devtools__wait_for({
+  selector: "main",
+  timeout: 5000
+})
+
+// 3. 获取页面加载时的错误
+const initialErrors = mcp__chrome-devtools__list_console_messages({
+  types: ["error", "warn"]
+})
+
+// 4. 执行交互（如点击按钮）
+mcp__chrome-devtools__click({ uid: "button-uid" })
+
+// 5. 等待响应
+mcp__chrome-devtools__await_text({
+  text: "操作成功",
+  timeout: 3000
+})
+
+// 6. 获取交互后的新错误
+const afterClickErrors = mcp__chrome-devtools__list_console_messages({
+  types: ["error"],
+  since: Date.now() - 3000  // 最近3秒
+})
+
+// 7. 对比并识别新错误
+const initialErrorIds = new Set((initialErrors.messages || []).map(e => e.id))
+const newErrors = (afterClickErrors.messages || []).filter(
+  err => !initialErrorIds.has(err.id)
+)
+
+// 8. 记录新错误
+if (newErrors.length > 0) {
+  console.log(`⚠️ Interaction caused ${newErrors.length} new errors:`)
+  newErrors.forEach(err => {
+    console.log(`  - ${err.text}`)
+  })
+}
+```
+
+#### 11页面控制台测试脚本
+
+```javascript
+const pages = [
+  { name: "Dashboard", url: "http://localhost:5173/" },
+  { name: "Events List", url: "http://localhost:5173/#/events" },
+  { name: "Events Create", url: "http://localhost:5173/#/events/create" },
+  { name: "Parameters List", url: "http://localhost:5173/#/parameters" },
+  { name: "Parameter Dashboard", url: "http://localhost:5173/#/parameter-dashboard" },
+  { name: "Event Node Builder", url: "http://localhost:5173/#/event-node-builder" },
+  { name: "Event Nodes Management", url: "http://localhost:5173/#/event-nodes" },
+  { name: "Canvas", url: "http://localhost:5173/#/canvas" },
+  { name: "Flows Management", url: "http://localhost:5173/#/flows" },
+  { name: "Categories Management", url: "http://localhost:5173/#/categories" },
+  { name: "Common Parameters", url: "http://localhost:5173/#/common-params" }
+]
+
+const allErrors = {}
+
+for (const page of pages) {
+  // 导航
+  mcp__chrome-devtools__navigate_page({
+    type: "url",
+    url: page.url
+  })
+
+  // 等待加载
+  mcp__chrome-devtools__wait_for({
+    selector: "main",
+    timeout: 5000
+  })
+
+  // 获取控制台错误
+  const errors = mcp__chrome-devtools__list_console_messages({
+    types: ["error", "warn"]
+  })
+
+  // 记录
+  allErrors[page.name] = {
+    url: page.url,
+    errorCount: (errors.messages || []).length,
+    errors: errors.messages || []
+  }
+
+  // 如果有错误，获取详情
+  if (errors.messages && errors.messages.length > 0) {
+    allErrors[page.name].details = []
+    for (const error of errors.messages.slice(0, 5)) {  // 最多获取5个错误的详情
+      const details = mcp__chrome-devtools__get_console_message({
+        msgid: error.id
+      })
+      allErrors[page.name].details.push(details)
+    }
+  }
+}
+
+// 生成报告
+console.log("=== Console Errors Report ===")
+for (const [pageName, pageData] of Object.entries(allErrors)) {
+  console.log(`\n${pageName}:`)
+  console.log(`  Errors: ${pageData.errorCount}`)
+
+  if (pageData.errorCount > 0) {
+    pageData.details.forEach((detail, index) => {
+      console.log(`  Error ${index + 1}:`)
+      console.log(`    Type: ${detail.type}`)
+      console.log(`    Text: ${detail.text}`)
+      console.log(`    URL: ${detail.url}`)
+      console.log(`    Line: ${detail.line}`)
+    })
+  }
+}
+```
+
+#### 错误分类
+
+**常见错误类型**:
+- **React Errors**: Hooks错误、渲染错误
+- **GraphQL Errors**: 查询失败、400/500错误
+- **Network Errors**: API失败、超时
+- **TypeScript Warnings**: 类型错误、未使用变量
+
+**错误严重程度**:
+- **P0**: error类型 - 导致功能失效
+- **P1**: warn类型 - 可能导致问题
+- **P2**: info/log类型 - 信息性提示
+
+#### 最佳实践
+
+**1. 总是等待页面加载完成**:
+```javascript
+// ✅ 正确
+mcp__chrome-devtools__navigate_page({ type: "url", url: "..." })
+mcp__chrome-devtools__wait_for({ selector: "main", timeout: 5000 })
+const errors = mcp__chrome-devtools__list_console_messages({ types: ["error"] })
+
+// ❌ 错误：不等待可能错过异步错误
+mcp__chrome-devtools__navigate_page({ type: "url", url: "..." })
+const errors = mcp__chrome-devtools__list_console_messages({ types: ["error"] })
+```
+
+**2. 使用时间戳过滤识别新错误**:
+```javascript
+// 记录交互前的错误基线
+const baseline = mcp__chrome-devtools__list_console_messages({ types: ["error"] })
+const baselineIds = new Set((baseline.messages || []).map(e => e.id))
+
+// 执行交互
+// ...
+
+// 获取交互后的新错误
+const afterErrors = mcp__chrome-devtools__list_console_messages({
+  types: ["error"],
+  since: Date.now() - 5000  // 最近5秒
+})
+
+// 识别新错误
+const newErrors = (afterErrors.messages || []).filter(
+  err => !baselineIds.has(err.id)
+)
+```
+
+**3. 限制错误详情获取数量**:
+```javascript
+// ✅ 正确：只获取前5个错误的详情（避免过多API调用）
+for (const error of errors.messages.slice(0, 5)) {
+  const details = mcp__chrome-devtools__get_console_message({ msgid: error.id })
+  console.log(details)
+}
+
+// ❌ 错误：获取所有错误的详情（可能很慢）
+for (const error of errors.messages) {
+  const details = mcp__chrome-devtools__get_console_message({ msgid: error.id })
+  console.log(details)
+}
+```
+
+#### 详见完整指南
+
+**完整文档**: `docs/development/CHROME-DEVTOOLS-MCP-CONSOLE-GUIDE.md`
+
+**包含内容**:
+- 工具参数详解
+- 返回格式说明
+- 完整测试脚本示例
+- 错误分类和分析
+- 报告生成模板
+- 常见问题排查
 
 ### 4. 网络监控
 

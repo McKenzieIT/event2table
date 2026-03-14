@@ -24,19 +24,18 @@ import re
 
 from flask import request
 
-# Import shared utilities
-from backend.core.utils import (
-    json_error_response,
-    json_success_response,
-    validate_json_request,
-)
+# Import SQL injection protection
+from backend.core.security.sql_validator import SQLValidator
 
-# Import HQL services
-from backend.services.hql.hql_service_cached import HQLServiceCached
-from backend.services.hql.hql_facade import HQLFacade
+# Import shared utilities
+from backend.core.utils import json_error_response, json_success_response, validate_json_request
 
 # Import HQLStatementRepository
 from backend.models.repositories.hql_statement_repository import HQLStatementRepository
+from backend.services.hql.hql_facade import HQLFacade
+
+# Import HQL services
+from backend.services.hql.hql_service_cached import HQLServiceCached
 
 # Import the parent blueprint
 from .. import api_bp
@@ -87,23 +86,16 @@ def api_generate_hql():
         hql_facade = HQLFacade()
 
         # Convert input to HQL models
-        from backend.services.hql.models.event import Event, Field, Condition
+        from backend.services.hql.models.event import Condition, Event, Field
 
         events = [
-            Event(
-                name=e.get("event_name"),
-                table_name=e.get("table_name")
-            )
-            for e in selected_events
+            Event(name=e.get("event_name"), table_name=e.get("table_name")) for e in selected_events
         ]
 
         fields = []
         if selected_fields:
             for f in selected_fields:
-                field_kwargs = {
-                    "name": f.get("param_name"),
-                    "type": f.get("param_type", "param")
-                }
+                field_kwargs = {"name": f.get("param_name"), "type": f.get("param_type", "param")}
                 if f.get("json_path"):
                     field_kwargs["json_path"] = f.get("json_path")
                 fields.append(Field(**field_kwargs))
@@ -113,24 +105,18 @@ def api_generate_hql():
             for c in selected_conditions:
                 conditions.append(
                     Condition(
-                        field=c.get("field"),
-                        operator=c.get("operator", "="),
-                        value=c.get("value")
+                        field=c.get("field"), operator=c.get("operator", "="), value=c.get("value")
                     )
                 )
 
         # Generate HQL using HQLFacade
         result = hql_facade.generate_hql(
-            events=events,
-            fields=fields,
-            conditions=conditions,
-            mode=mode,
-            date_str=date_str
+            events=events, fields=fields, conditions=conditions, mode=mode, date_str=date_str
         )
 
         return json_success_response(
             data={"hql": result["hql"], "tables": result.get("tables", [])},
-            message="Generated HQL successfully"
+            message="Generated HQL successfully",
         )
     except Exception as e:
         logger.error(f"Error generating HQL: {e}", exc_info=True)
@@ -189,7 +175,7 @@ def api_validate_hql():
     try:
         # 使用缓存增强版服务验证HQL
         validation_result = hql_service.validate_hql(hql_content, use_cache=use_cache)
-        
+
         # 转换为API响应格式
         result = {
             "is_valid": validation_result.get("valid", False),
@@ -217,9 +203,7 @@ def api_validate_hql():
             )
 
         # 2. Check for CREATE VIEW syntax
-        if not re.search(
-            r"CREATE\s+(OR\s+REPLACE\s+)?VIEW", hql_content, re.IGNORECASE
-        ):
+        if not re.search(r"CREATE\s+(OR\s+REPLACE\s+)?VIEW", hql_content, re.IGNORECASE):
             result["errors"].append("Missing CREATE VIEW statement")
             result["is_valid"] = False
             result["error_count"] += 1
@@ -238,13 +222,9 @@ def api_validate_hql():
 
         # 5. Check for common SQL keywords
         required_keywords = ["SELECT", "FROM"]
-        missing_keywords = [
-            kw for kw in required_keywords if kw not in hql_content.upper()
-        ]
+        missing_keywords = [kw for kw in required_keywords if kw not in hql_content.upper()]
         if missing_keywords:
-            result["errors"].append(
-                f"Missing required keywords: {', '.join(missing_keywords)}"
-            )
+            result["errors"].append(f"Missing required keywords: {', '.join(missing_keywords)}")
             result["is_valid"] = False
             result["error_count"] += len(missing_keywords)
 

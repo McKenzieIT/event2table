@@ -1,3 +1,14 @@
+/**
+ * Field Builder Types
+ *
+ * Type definitions for the field builder module
+ * These types extend the base types with field-builder-specific properties
+ */
+
+import { Event as BaseEvent } from './event-types';
+import { Parameter as BaseParameter } from './parameter-types';
+import { Field as BaseField, FieldType as BaseFieldType } from './hql-types';
+
 // 字段类型枚举
 export enum FieldType {
   PARAMETER = 'param',
@@ -16,33 +27,24 @@ export enum DataType {
   BOOLEAN = 'boolean'
 }
 
-// 事件接口
-export interface Event {
-  id: number;
-  gid: number;
-  name: string;
-  description: string;
-  category: string;
+// 事件接口 - Extends base Event with field-builder-specific properties
+export interface Event extends BaseEvent {
   parameters: Parameter[];
+  category?: string;
 }
 
-// 参数接口
-export interface Parameter {
-  id: number;
-  name: string;
-  alias: string;
+// 参数接口 - Extends base Parameter with field-builder-specific properties
+export interface Parameter extends BaseParameter {
+  alias?: string;
   dataType: DataType;
-  description: string;
-  isRequired: boolean;
+  isRequired?: boolean;
 }
 
-// 字段接口
-export interface Field {
+// 字段接口 - Extends base Field with field-builder-specific properties
+export interface Field extends Omit<BaseField, 'type'> {
   id: string; // UUID
   type: FieldType;
   sourceId?: number; // 参数ID（如果是参数类型）
-  name: string;
-  alias: string;
   dataType: DataType;
   fixedValue?: string; // 固定值
   mapping?: string; // 映射表达式
@@ -64,14 +66,8 @@ export interface FieldConfig {
 // SQL输出模式
 export type SQLMode = 'view' | 'procedure' | 'custom';
 
-// WHERE条件接口
-export interface WhereCondition {
-  id: string;
-  field: string;
-  operator: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'IN' | 'NOT IN' | 'IS NULL' | 'IS NOT NULL';
-  value?: string | number | boolean;
-  logic?: 'AND' | 'OR';
-}
+// WHERE条件接口 - Import from whereBuilder to avoid duplication
+export type { WhereCondition } from './whereBuilder';
 
 // HQL预览选项接口
 export interface HQLPreviewOptions {

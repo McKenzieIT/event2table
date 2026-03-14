@@ -14,8 +14,9 @@ Migration Status: Repository Pattern Implementation (2026-03-03)
 """
 
 import json
-from typing import Dict, List, Optional, Any
 from functools import lru_cache
+from typing import Any, Dict, List, Optional
+
 from backend.core.logging import get_logger
 from backend.models.repositories.param_template_repository import ParamTemplateRepository
 
@@ -37,15 +38,15 @@ class ParamTypeManager:
         logger.debug("ParamTypeManager initialized with ParamTemplateRepository")
 
     def get_all_templates(self, include_system: bool = True) -> List[Dict[str, Any]]:
-        """获取所有类型模板（带缓存）"""
+        """获取所有类型模板(带缓存)"""
         return self.template_repo.get_all_templates(include_system)
 
     def get_template_by_name(self, template_name: str) -> Optional[Dict[str, Any]]:
-        """根据名称获取类型模板（带缓存）"""
+        """根据名称获取类型模板(带缓存)"""
         return self.template_repo.find_by_name(template_name)
 
     def get_template_by_id(self, template_id: int) -> Optional[Dict[str, Any]]:
-        """根据ID获取类型模板（带缓存）"""
+        """根据ID获取类型模板(带缓存)"""
         return self.template_repo.find_by_id(template_id)
 
     def create_template(self, template_data: Dict[str, Any]) -> int:
@@ -100,7 +101,7 @@ class ParamTypeManager:
         """解析类型字符串 (如 'array<string>', 'map<string,int>')
 
         Args:
-            type_str: 类型字符串，如 'array<string>', 'map<string,int>', 'array<map<string,int>>'
+            type_str: 类型字符串, 如 'array<string>', 'map<string,int>', 'array<map<string,int>>'
 
         Returns:
             类型定义字典
@@ -165,7 +166,7 @@ class ParamTypeManager:
         return False, f"未知类型: {type_name}"
 
     def get_available_types(self) -> Dict[str, List[Dict[str, Any]]]:
-        """获取可用的类型列表（分组）
+        """获取可用的类型列表(分组)
 
         Returns:
             分组的类型列表
@@ -176,7 +177,7 @@ class ParamTypeManager:
         """获取参数对应的CAST类型
 
         Args:
-            param_type: 参数类型，如 'int', 'bigint', 'float'
+            param_type: 参数类型, 如 'int', 'bigint', 'float'
 
         Returns:
             SQL CAST类型字符串
@@ -226,13 +227,13 @@ class ParamTypeManager:
             return f"get_json_object(params, '$.{param_name}') AS {param_name} COMMENT '{comment}'"
 
     def create_complex_type_template(self, type_str: str) -> Optional[int]:
-        """创建复杂类型模板（如 array<map<string,int>>）
+        """创建复杂类型模板(如 array<map<string,int>>)
 
         Args:
-            type_str: 类型字符串，如 'array<map<string,int>>'
+            type_str: 类型字符串, 如 'array<map<string,int>>'
 
         Returns:
-            创建的模板ID，失败返回None
+            创建的模板ID, 失败返回None
         """
         # 解析类型定义
         type_def = self.parse_type_string(type_str)
@@ -273,21 +274,21 @@ class ParamTypeManager:
             return None
 
     def parse_complex_type(self, type_str: str) -> Dict[str, Any]:
-        """解析复杂类型字符串，返回完整结构
+        """解析复杂类型字符串, 返回完整结构
 
         Args:
-            type_str: 类型字符串，如 'array<map<string,int>>'
+            type_str: 类型字符串, 如 'array<map<string,int>>'
 
         Returns:
             完整的类型定义字典
         """
         result = self.parse_type_string(type_str)
 
-        # 对于嵌套类型，递归解析内部类型
+        # 对于嵌套类型, 递归解析内部类型
         if result.get("type") == "array":
             element_type = result.get("element_type", "")
             if "<" in element_type and ">" in element_type:
-                # 嵌套类型，如 array<map<string,int>>
+                # 嵌套类型, 如 array<map<string,int>>
                 inner_def = self.parse_complex_type(element_type)
                 result["element_definition"] = inner_def
 

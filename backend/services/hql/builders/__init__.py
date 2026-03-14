@@ -1,7 +1,7 @@
 """
 HQL V2 - SQL构建器模块
 
-包含各种SQL构建器：
+包含各种SQL构建器: 
 - FieldBuilder: 字段SQL构建
 - JoinBuilder: 多事件JOIN构建
 - UnionBuilder: 多事件UNION构建

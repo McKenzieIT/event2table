@@ -5,9 +5,9 @@ HQL性能分析器
 提供HQL性能评分和优化建议
 """
 
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class IssueType(Enum):
@@ -117,7 +117,7 @@ class HQLPerformanceAnalyzer:
 
         hql_upper = hql.upper()
 
-        # 检查分区过滤（改进检测逻辑）
+        # 检查分区过滤(改进检测逻辑)
         has_partition_filter = "DS" in hql_upper and (
             "= ${DS}" in hql_upper
             or "= '${DS}'" in hql_upper
@@ -129,7 +129,7 @@ class HQLPerformanceAnalyzer:
             or " DS=" in hql_upper
         )
 
-        # 检查SELECT *（改进检测）
+        # 检查SELECT *(改进检测)
         has_select_star = (
             "SELECT *" in hql_upper
             or "SELECT\n*" in hql_upper
@@ -208,7 +208,7 @@ class HQLPerformanceAnalyzer:
             "VIEW",
         }
         udf_count = 0
-        # 只检测函数调用模式（word followed by parenthesis）
+        # 只检测函数调用模式(word followed by parenthesis)
         function_pattern = r"\b([A-Z_][A-Z0-9_]*)\s*\("
         for match in re.finditer(function_pattern, hql_upper):
             func_name = match.group(1)
@@ -230,7 +230,7 @@ class HQLPerformanceAnalyzer:
 
     def _calculate_complexity(self, hql: str) -> str:
         """计算SQL复杂度"""
-        # 简化版本：基于SQL语句长度
+        # 简化版本: 基于SQL语句长度
         tokens = len(hql.split())
 
         if tokens <= self.COMPLEXITY_THRESHOLDS["low"]:

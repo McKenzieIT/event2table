@@ -1415,11 +1415,588 @@ class OptimizedEntityService:
 
 ---
 
+## 并行优化策略 ⚠️ **P0极其重要 - 2026-03-05新增**
+
+**优先级**: P0 | **出现次数**: 1次 | **来源**: [并行优化最终报告](../reports/2026-03-05/PARALLEL-OPTIMIZATION-FINAL-REPORT.md), [性能优化详细报告](../reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md)
+
+### 问题现象
+
+**症状描述**:
+- 828个性能问题需要修复
+- 串行执行需要40+小时
+- 无法快速获得性能优化收益
+
+### 根本原因
+
+**技术原因**:
+1. **缺乏并行处理机制** - 任务可以并行执行但被串行化
+2. **缺少任务包设计模式** - 无法充分利用Agent并行能力
+3. **无状态管理** - 无法追踪并行任务进度
+
+### 解决方案
+
+**1. Worker任务包设计**:
+
+```python
+# 任务包结构
+{
+  "worker_1_n_plus_1_p0": {
+    "name": "P0 N+1 Query Fixes",
+    "issues": 27,
+    "priority": "P0",
+    "strategy": "JOIN_PREFETCH"
+  },
+  "worker_2_n_plus_1_p1": {
+    "name": "P1 N+1 Query Fixes",
+    "issues": 503,
+    "priority": "P1",
+    "strategy": "BATCH_PROCESSING"
+  },
+  "worker_3_react": {
+    "name": "React Optimization",
+    "issues": 213,
+    "priority": "P1",
+    "strategy": "MEMO_WRAPPER"
+  }
+}
+```
+
+**2. 并行执行流程**:
+
+```python
+# Phase 2: 并行执行
+# 1. 启动3个并行Agent
+#    - Agent 1: Worker 1 (P0 N+1查询)
+#    - Agent 2: Worker 2 (P1 N+1查询)
+#    - Agent 3: Worker 3 (React优化)
+# 2. 每个Agent独立执行，零冲突
+# 3. 实时追踪进度和错误
+
+# Phase 3: 结果汇总
+# 1. 收集所有Worker结果
+# 2. 合并到main分支
+# 3. 生成执行报告
+```
+
+### 性能对比
+
+| 执行方式 | 时间 | 问题处理 | 错误率 |
+|---------|------|---------|--------|
+| **串行执行** | 40+小时 | 828个 | 5-10% |
+| **并行执行** | 13小时 | 828个 | 0% |
+| **时间节省** | **67%** | - | - |
+
+### 关键成功因素
+
+1. **任务独立性** - Worker之间不共享状态
+2. **分批处理机制** - BATCH_SIZE=50，降低风险
+3. **可重复执行设计** - 自动跳过已处理文件
+4. **错误隔离** - 单个文件错误不影响其他文件
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 任务是否真正独立（无共享状态）？
+- [ ] 是否有明确的依赖关系？
+- [ ] 并行任务是否有冲突的文件修改？
+
+### 相关经验
+
+- [N+1查询优化](#n1查询优化) - N+1查询优化策略
+- [批量操作优化](#批量操作优化) - 批量操作性能优化
+
+---
+
+## 缓存失效装饰器的自动化实现 ⚠️ **P1重要 - 2026-03-07新增**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [Dashboard实时优化报告](../reports/2026-03-07/DASHBOARD-REALTIME-OPTIMIZATION-REPORT.md), [完整性能优化报告](../reports/2026-03-07/COMPLETE-PERFORMANCE-OPTIMIZATION-REPORT-PHASE-1-4.md)
+
+### 问题现象
+
+**症状描述**:
+- Dashboard更新延迟5分钟，缓存失效完全失效
+- 新建游戏后，Dashboard仍显示旧数据
+- 用户需要手动刷新才能看到最新数据
+
+### 根本原因
+
+**技术原因**:
+1. **缓存失效机制缺失** - 修改数据后未清理缓存
+2. **无自动刷新机制** - 前端依赖手动刷新
+3. **缓存TTL设置过长** - 1小时TTL导致数据不新鲜
+
+### 解决方案
+
+**1. @cache_invalidate装饰器**:
+
+```python
+from backend.core.cache.decorators import cache_invalidate
+
+# ✅ 写操作清理缓存
+@cache_invalidate
+def create_game(game_data: GameEntity) -> GameEntity:
+    """创建游戏后自动清理相关缓存"""
+    # 创建游戏
+    game_id = self.game_repo.create(game_data)
+    return self.game_repo.find_by_id(game_id)
+
+@cache_invalidate
+def update_game(game_id: int, game_data: GameEntity) -> GameEntity:
+    """更新游戏后自动清理相关缓存"""
+    # 更新游戏
+    self.game_repo.update(game_id, game_data.model_dump())
+    return self.game_repo.find_by_id(game_id)
+
+@cache_invalidate
+def delete_game(game_id: int) -> bool:
+    """删除游戏后自动清理相关缓存"""
+    # 删除游戏
+    return self.game_repo.delete(game_id)
+```
+
+**2. 智能轮询Hook**:
+
+```typescript
+// frontend/src/hooks/useRealtimeUpdates.ts
+import { useEffect, useState } from 'react';
+
+export function useRealtimeUpdates(gameGid: number, interval: number = 10000) {
+  const [data, setData] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+
+  useEffect(() => {
+    // 首次加载
+    fetchData();
+
+    // 智能轮询
+    const timer = setInterval(() => {
+      // 检查上次更新时间
+      fetch(`/api/games/${gameGid}/last-update`)
+        .then(res => res.json())
+        .then(lastUpdateTimestamp => {
+          const serverUpdate = new Date(lastUpdateTimestamp);
+
+          // 如果服务器数据更新时间晚于本地，刷新数据
+          if (serverUpdate > lastUpdate) {
+            fetchData();
+            setLastUpdate(serverUpdate);
+          }
+        });
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [gameGid, interval]);
+
+  return data;
+}
+```
+
+### 性能对比
+
+| 指标 | 优化前 | 优化后 | 提升 |
+|------|--------|--------|------|
+| **更新延迟** | 300秒 | 10秒 | **96.7%** ↓ |
+| **API调用数** | 100% | 17% | **83%** ↓ |
+| **缓存命中率** | <50% | 85%+ | **70%** ↑ |
+| **用户体验** | 需手动刷新 | 自动更新 | 显著提升 |
+
+### 预防措施
+
+**代码审查清单**:
+- [ ] 所有写操作都使用`@cache_invalidate`装饰器？
+- [ ] 前端是否实现智能轮询？
+- [ ] 是否定期验证缓存一致性？
+
+### 相关经验
+
+- [缓存策略 - TTL分层设置](#缓存策略) - TTL分层策略
+- [缓存策略 - 缓存清理策略](#缓存清理策略) - 缓存清理时机
+
+---
+
+## Dashboard实时优化 ⚠️ **P1重要 - 2026-03-07新增**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [Dashboard实时优化报告](../reports/2026-03-07/DASHBOARD-REALTIME-OPTIMIZATION-REPORT.md), [All 17组件优化完成](../reports/2026-03-07/ALL-17-COMPONENTS-OPTIMIZATION-COMPLETE.md)
+
+### 问题现象
+
+**症状描述**:
+- Dashboard统计数据不准确
+- 新建游戏后，Dashboard不显示新游戏
+- 删除游戏后，Dashboard仍显示已删除游戏
+
+### 根本原因
+
+**技术原因**:
+1. **Apollo Client缓存** - 前端Apollo Client缓存了旧数据
+2. **后端缓存失效** - 后端缓存失效后前端未清理Apollo缓存
+3. **缺少实时更新机制** - 前端依赖手动刷新
+
+### 解决方案
+
+**1. 双层缓存失效机制**:
+
+```python
+# 后端：@cache_invalidate装饰器
+@cache_invalidate
+def create_game(game_data: GameEntity) -> GameEntity:
+    """创建游戏"""
+    game_id = self.game_repo.create(game_data)
+    # ✅ 后端缓存自动清理
+    return self.game_repo.find_by_id(game_id)
+```
+
+```typescript
+// 前端：refetchQueries清理Apollo缓存
+import { useMutation, useQuery } from '@apollo/client';
+
+export function Dashboard() {
+  const { refetch } = useQuery(GET_GAMES);
+
+  const [createGame] = useMutation(CREATE_GAME, {
+    refetchQueries: true  // ✅ 自动清理Apollo缓存并重新获取
+  });
+
+  const handleCreateGame = async (gameData) => {
+    await createGame({ variables: gameData });
+    // ✅ Apollo自动清理缓存并重新获取数据
+  };
+}
+```
+
+**2. WebSocket实时更新** (高级方案):
+
+```python
+# backend/websocket/dashboard_updates.py
+from flask_socketio import emit
+
+@app.route('/api/games', methods=['POST'])
+def create_game():
+    game = game_service.create_game(...)
+
+    # ✅ 通过WebSocket推送更新通知
+    emit('game_created', {
+        'game_gid': game.gid,
+        'name': game.name
+    }, room='dashboard')
+```
+
+```typescript
+// 前端：监听WebSocket更新
+import { useEffect } from 'react';
+import { io } from 'socket.io-client';
+
+const socket = io('http://127.0.0.1:5001');
+
+useEffect(() => {
+  // 监听游戏创建事件
+  socket.on('game_created', (data) => {
+    console.log('新游戏创建:', data);
+    // 自动刷新Dashboard数据
+    refetch();
+  });
+
+  return () => {
+    socket.off('game_created');
+  };
+}, []);
+```
+
+### 性能对比
+
+| 方案 | 延迟 | 复杂度 | 推荐度 |
+|------|------|--------|--------|
+| **refetchQueries** | 1-2秒 | 低 | ⭐⭐⭐ 简单场景 |
+| **智能轮询** | 10秒轮询 | 中 | ⭐⭐⭐⭐ 平衡方案 |
+| **WebSocket** | <1秒 | 高 | ⭐⭐⭐⭐ 高频更新 |
+
+### 预防措施
+
+**选择建议**:
+- ✅ **简单场景**（低频更新）：使用refetchQueries
+- ✅ **中等场景**（中频更新）：使用智能轮询
+- ✅ **高频场景**（实时更新）：使用WebSocket
+
+**代码审查清单**:
+- [ ] 数据修改后是否清理了相关缓存？
+- [ ] 前端是否使用了refetchQueries？
+- [ ] 是否实现了智能轮询或WebSocket？
+
+### 相关经验
+
+- [缓存失效装饰器的自动化实现](#缓存失效装饰器的自动化实现-2026-03-07新增) - 缓存失效自动化
+- [API设计模式 - GraphQL类型同步](./api-design-patterns.md#graphql类型同步规范-⚠️-p0极其重要---2026-03-09新增) - GraphQL类型同步
+
+---
+
+## 缓存失效诊断与修复 ⚠️ **P0极其重要 - 2026-03-13新增**
+
+> **来源**: 4个缓存失效修复报告（2026-03-08至2026-03-13）
+> **核心成果**: Systematic Debugging方法论，2分钟定位并修复3个独立根因
+> **优先级**: P0
+
+### Systematic Debugging方法论 ⭐
+
+**核心洞察**: 缓存失效问题往往是多个独立问题叠加
+
+**5阶段诊断流程**:
+- **Phase 1**: 3个并行Subagent调查（根因分析）
+- **Phase 2**: 修复设计与实施
+- **Phase 3**: 代码验证
+- **Phase 4**: E2E测试
+- **Phase 5**: 文档更新
+
+**成果**:
+- ✅ 2分钟定位并修复3个独立根因
+- ✅ 总修复时间: 80秒（P0-1: 30秒，P0-2: 30秒，P1-3: 20秒）
+
+### 三个独立的缓存失效根因
+
+**P0-1: 数据未保存到数据库（30秒修复）**
+```python
+# 问题代码
+def save_config(config_id, config_data):
+    # ❌ 只更新了缓存，未保存到数据库
+    cache.set(f"config:{config_id}", config_data)
+    return {"success": True}
+
+# 修复代码
+def save_config(config_id, config_data):
+    # ✅ 先保存到数据库
+    db.execute(
+        "UPDATE configs SET data = ? WHERE id = ?",
+        (json.dumps(config_data), config_id)
+    )
+
+    # ✅ 再更新缓存
+    cache.set(f"config:{config_id}", config_data)
+
+    return {"success": True}
+```
+
+**P0-2: 缓存键不匹配（30秒修复）**
+```python
+# 问题代码
+@cached(ttl=1800, key_prefix="configs")
+def get_stats(config_id):
+    return {"count": 100}
+
+@cache_invalidate  # ❌ 自动推断失效"configs"
+def save_config(config_id, config_data):
+    pass
+
+# 问题: 实际缓存键是"event_nodes:stats:*"
+# 修复: 显式指定失效键
+@invalidate_cache("event_nodes:stats:*")  # ✅ 显式指定
+def save_config(config_id, config_data):
+    pass
+```
+
+**P1-3: SQL使用错误game_gid（20秒修复）**
+```python
+# 问题代码
+def get_nodes(game_id):  # ❌ 使用game_id
+    return fetch_all(
+        "SELECT * FROM event_nodes WHERE game_id = ?",
+        (game_id,)
+    )
+
+# 修复代码
+def get_nodes(game_gid):  # ✅ 使用game_gid
+    return fetch_all(
+        "SELECT * FROM event_nodes WHERE game_gid = ?",
+        (game_gid,)
+    )
+```
+
+### 显式缓存失效装饰器 ⭐
+
+**核心原则**: 避免自动推断，使用显式缓存失效
+
+```python
+# backend/core/cache/decorators.py
+
+def invalidate_cache(*patterns):
+    """
+    显式缓存失效装饰器
+
+    Args:
+        *patterns: 缓存键模式（支持通配符）
+
+    Example:
+        @invalidate_cache("event_nodes:stats:*")
+        @invalidate_cache("configs:*", "user:*")
+        def save_config(config_id, config_data):
+            pass
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # 执行原函数
+            result = func(*args, **kwargs)
+
+            # 显式失效指定缓存
+            for pattern in patterns:
+                cache_result.delete_many(pattern)
+
+            return result
+        return wrapper
+    return decorator
+```
+
+**使用示例**:
+```python
+from backend.core.cache.decorators import invalidate_cache
+
+@invalidate_cache("event_nodes:stats:*")
+def save_config(config_id, config_data):
+    """保存配置 - 失效stats缓存"""
+    pass
+
+@invalidate_cache("event_nodes:*", "configs:*")
+def update_multiple_entities(data):
+    """批量更新 - 失效多个缓存"""
+    pass
+```
+
+**影响函数**:
+- save_config
+- update_config
+- delete_config
+- copy_node
+
+### 缓存失效验证最佳实践
+
+**添加完整日志和数据库验证防止静默失败**
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+def save_config(config_id, config_data):
+    """保存配置 - 带完整验证日志"""
+
+    # 1. 请求入口日志
+    logger.info(f"[save_config] START: config_id={config_id}")
+
+    # 2. 创建前日志
+    logger.info(f"[save_config] Creating config: {config_data}")
+
+    # 3. 执行创建
+    try:
+        db.execute(
+            "INSERT INTO configs (id, data) VALUES (?, ?)",
+            (config_id, json.dumps(config_data))
+        )
+
+        # 4. 数据库验证逻辑（关键）
+        saved = db.execute(
+            "SELECT * FROM configs WHERE id = ?",
+            (config_id,)
+        ).fetchone()
+
+        if not saved:
+            # 数据库验证失败 - 记录严重错误
+            logger.error(f"[save_config] VALIDATION FAILED: config_id={config_id} not found in DB after insert")
+            raise ValueError(f"Config {config_id} was not saved to database")
+
+        logger.info(f"[save_config] VALIDATION PASSED: config_id={config_id} exists in DB")
+
+    except Exception as e:
+        # 增强的错误日志
+        logger.error(f"[save_config] ERROR: config_id={config_id}, error={str(e)}", exc_info=True)
+        raise
+
+    # 5. 创建成功日志
+    logger.info(f"[save_config] SUCCESS: config_id={config_id}")
+
+    # 6. 返回前日志
+    logger.info(f"[save_config] END: config_id={config_id}, returning success")
+
+    return {"success": True, "config_id": config_id}
+```
+
+**日志完整性检查清单**:
+- [ ] 请求入口日志（参数记录）
+- [ ] 创建前日志（数据记录）
+- [ ] 创建成功日志（确认记录）
+- [ ] **数据库验证逻辑**（防止静默失败）⭐
+- [ ] 返回前日志（返回值记录）
+- [ ] 增强的错误日志（异常堆栈）
+
+### 缓存失效诊断流程
+
+**步骤1: 确认缓存状态**
+```bash
+# 检查Redis缓存键
+redis-cli KEYS "event_nodes:*"
+
+# 检查特定缓存值
+redis-cli GET "event_nodes:stats:10000147"
+```
+
+**步骤2: 验证数据库状态**
+```python
+# 验证数据库记录是否存在
+def verify_cache_consistency(cache_key, db_query):
+    """验证缓存与数据库一致性"""
+    # 从缓存读取
+    cached_data = cache_result.get(cache_key)
+
+    # 从数据库读取
+    db_data = fetch_one(db_query)
+
+    # 对比
+    if cached_data != db_data:
+        logger.error(f"Cache inconsistency: cache={cached_data}, db={db_data}")
+        return False
+
+    return True
+```
+
+**步骤3: 监控缓存失效**
+```python
+# backend/core/cache/monitoring.py
+
+class CacheInvalidationMonitor:
+    """缓存失效监控"""
+
+    def track_invalidation(self, pattern, count):
+        """记录缓存失效"""
+        logger.info(f"Cache invalidation: pattern={pattern}, count={count}")
+        self.metrics.record({
+            'pattern': pattern,
+            'count': count,
+            'timestamp': datetime.now()
+        })
+
+    def verify_invalidation(self, pattern):
+        """验证缓存是否已失效"""
+        keys = cache_result.keys(pattern)
+        if keys:
+            logger.error(f"Cache not invalidated: pattern={pattern}, keys={keys}")
+            return False
+
+        logger.info(f"Cache invalidated successfully: pattern={pattern}")
+        return True
+```
+
+### 相关经验
+
+- [缓存失效装饰器的自动化实现](#缓存失效装饰器的自动化实现-2026-03-07新增) - 自动化失效
+- [显式缓存失效装饰器](#显式缓存失效装饰器-⭐-2026-03-13新增) - 显式失效
+- [缓存验证最佳实践](#缓存失效验证最佳实践-⭐-2026-03-13新增) - 验证方法
+
+---
+
 ## 相关经验文档
 
 - [数据库模式 - game_gid迁移](./database-patterns.md#game_gid迁移) - 数据库性能优化
 - [API设计模式 - 分层架构](./api-design-patterns.md#分层架构) - 架构性能优化
 - [API设计模式 - GraphQL实施](./api-design-patterns.md#graphql-dataloader实施) - DataLoader详细实施指南
+- [API设计模式 - GraphQL类型同步规范](./api-design-patterns.md#graphql类型同步规范-⚠️-p0极其重要---2026-03-09新增) - GraphQL类型同步
+- [测试指南 - TDD Red阶段经验](./testing-guide.md#tdd-red阶段经验-2026-03-09新增) - TDD实施经验
 
 ---
 
@@ -1427,4 +2004,4 @@ class OptimizedEntityService:
 - P0经验点：7个
 - P1经验点：6个
 - 总计：13个性能优化经验点
-- 最后更新：2026-03-08 ✨ 新增DataLoader、批量操作、TTL分层、Entity优化经验
+- 最后更新：2026-03-09 🆕 新增并行优化策略、缓存失效装饰器、Dashboard实时优化

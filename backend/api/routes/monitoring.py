@@ -4,13 +4,15 @@
 
 import logging
 from typing import Any, Dict, Tuple
-from flask import request, Blueprint
-from backend.core.utils import json_success_response, json_error_response
+
+from flask import Blueprint, request
+
 from backend.core.monitoring.performance_monitor import (
-    PerformanceMonitor,
     PerformanceAlerts,
-    performance_monitor
+    PerformanceMonitor,
+    performance_monitor,
 )
+from backend.core.utils import json_error_response, json_success_response
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ monitoring_bp = Blueprint('monitoring', __name__)
 def api_get_metrics() -> Tuple[Dict[str, Any], int]:
     """
     API: 获取性能指标
-    
+
     Returns:
         性能指标数据
     """
@@ -37,7 +39,7 @@ def api_get_metrics() -> Tuple[Dict[str, Any], int]:
 def api_get_cache_stats() -> Tuple[Dict[str, Any], int]:
     """
     API: 获取缓存统计
-    
+
     Returns:
         缓存统计数据
     """
@@ -45,7 +47,7 @@ def api_get_cache_stats() -> Tuple[Dict[str, Any], int]:
         stats = {
             'cache_hit_ratio': performance_monitor.get_cache_hit_ratio(),
             'cache_hits': performance_monitor.metrics['cache_hits'],
-            'cache_misses': performance_monitor.metrics['cache_misses']
+            'cache_misses': performance_monitor.metrics['cache_misses'],
         }
         return json_success_response(data=stats)
     except Exception as e:
@@ -57,16 +59,16 @@ def api_get_cache_stats() -> Tuple[Dict[str, Any], int]:
 def api_get_api_stats() -> Tuple[Dict[str, Any], int]:
     """
     API: 获取API统计
-    
+
     Query Parameters:
         endpoint: 特定API端点（可选）
-    
+
     Returns:
         API统计数据
     """
     try:
         endpoint = request.args.get('endpoint')
-        
+
         if endpoint:
             stats = performance_monitor.get_api_stats(endpoint)
         else:
@@ -74,7 +76,7 @@ def api_get_api_stats() -> Tuple[Dict[str, Any], int]:
             stats = {}
             for ep in performance_monitor.metrics['api_calls'].keys():
                 stats[ep] = performance_monitor.get_api_stats(ep)
-        
+
         return json_success_response(data=stats)
     except Exception as e:
         logger.error(f"Error getting API stats: {e}")
@@ -85,7 +87,7 @@ def api_get_api_stats() -> Tuple[Dict[str, Any], int]:
 def api_get_alerts() -> Tuple[Dict[str, Any], int]:
     """
     API: 获取性能告警
-    
+
     Returns:
         告警状态
     """
@@ -101,7 +103,7 @@ def api_get_alerts() -> Tuple[Dict[str, Any], int]:
 def api_reset_metrics() -> Tuple[Dict[str, Any], int]:
     """
     API: 重置性能指标
-    
+
     Returns:
         重置结果
     """

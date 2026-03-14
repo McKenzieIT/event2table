@@ -19,11 +19,12 @@ Field Builder Service - 业务逻辑层 (精简架构)
 - 支持HQL预览生成
 """
 
-from typing import List, Optional, Dict, Any
-import logging
 import json
-from backend.models.repositories.join_config_repository import JoinConfigRepository
+import logging
+from typing import Any, Dict, List, Optional
+
 from backend.core.cache.cache_system import CacheInvalidator, cached
+from backend.models.repositories.join_config_repository import JoinConfigRepository
 
 logger = logging.getLogger(__name__)
 
@@ -34,16 +35,13 @@ class FieldBuilderService:
     def __init__(self):
         self.config_repo = JoinConfigRepository()
         from backend.core.cache.cache_system import HierarchicalCache
+
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
         logger.info("✅ FieldBuilderService initialized")
 
     @cached("field_builder.list", timeout=120)
-    def list_configs(
-        self,
-        limit: int = 50,
-        search: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+    def list_configs(self, limit: int = 50, search: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         获取Field Builder配置列表 (带缓存)
 
@@ -82,6 +80,7 @@ class FieldBuilderService:
         params.append(limit)
 
         from backend.core.utils.converters import fetch_all_as_dict
+
         configs = fetch_all_as_dict(query, tuple(params))
 
         return configs
@@ -105,13 +104,14 @@ class FieldBuilderService:
 
         # 从数据库获取原始数据
         from backend.core.utils.converters import fetch_one_as_dict
+
         config = fetch_one_as_dict(
             """
             SELECT id, field_mapping_v2, output_table, display_name
             FROM join_configs
             WHERE id = ?
         """,
-            (config_id,)
+            (config_id,),
         )
 
         if not config:
@@ -138,7 +138,7 @@ class FieldBuilderService:
         config: Dict[str, Any],
         view_name: str,
         display_name: str,
-        config_id: Optional[int] = None
+        config_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
         保存Field Builder配置 (自动失效缓存)
@@ -170,6 +170,7 @@ class FieldBuilderService:
 
         # 重试逻辑 (处理数据库锁)
         import time
+
         max_retries = 3
         delay = 0.1  # 100ms
 
@@ -187,7 +188,7 @@ class FieldBuilderService:
                             display_name = ?
                         WHERE id = ?
                     """,
-                        (config_json, view_name, display_name, config_id)
+                        (config_json, view_name, display_name, config_id),
                     )
 
                     if affected == 0:
@@ -214,7 +215,7 @@ class FieldBuilderService:
                         ) VALUES (?, '[]', ?, ?, ?, '[]', CURRENT_TIMESTAMP)
                     """,
                         (name, config_json, view_name, display_name),
-                        return_last_id=True
+                        return_last_id=True,
                     )
 
                     logger.info(f"Field builder config created: {config_id}")
@@ -222,10 +223,7 @@ class FieldBuilderService:
                 # 清理缓存
                 self.invalidator.invalidate_pattern("field_builder")
 
-                return {
-                    "id": config_id,
-                    "view_name": view_name
-                }
+                return {"id": config_id, "view_name": view_name}
 
             except Exception as e:
                 error_str = str(e).lower()
@@ -256,20 +254,16 @@ class FieldBuilderService:
         """
         # 检查配置是否存在 (使用原始查询避免Entity验证问题)
         from backend.core.utils.converters import fetch_one_as_dict
-        config = fetch_one_as_dict(
-            "SELECT id FROM join_configs WHERE id = ?",
-            (config_id,)
-        )
+
+        config = fetch_one_as_dict("SELECT id FROM join_configs WHERE id = ?", (config_id,))
 
         if not config:
             raise ValueError(f"Configuration {config_id} not found")
 
         # 删除配置
         from backend.core.utils import execute_write
-        deleted = execute_write(
-            "DELETE FROM join_configs WHERE id = ?",
-            (config_id,)
-        )
+
+        deleted = execute_write("DELETE FROM join_configs WHERE id = ?", (config_id,))
 
         # 清理缓存
         self.invalidator.invalidate_pattern("field_builder")
@@ -277,14 +271,11 @@ class FieldBuilderService:
         logger.info(f"Field builder config deleted: {config_id}")
         return deleted > 0
 
-    def get_configs_batch(
-        self,
-        config_ids: List[int]
-    ) -> Dict[int, Optional[Dict[str, Any]]]:
+    def get_configs_batch(self, config_ids: List[int]) -> Dict[int, Optional[Dict[str, Any]]]:
         """
         批量获取Field Builder配置 (避免N+1查询)
 
-        使用IN clause批量查询，避免循环查询导致的N+1问题。
+        使用IN clause批量查询, 避免循环查询导致的N+1问题. 
 
         Args:
             config_ids: 配置ID列表
@@ -336,10 +327,7 @@ class FieldBuilderService:
         result = {}
         for config_id in config_ids:
             # Find config in results (or None if not found)
-            config = next(
-                (c for c in configs_data if c["id"] == config_id),
-                None
-            )
+            config = next((c for c in configs_data if c["id"] == config_id), None)
 
             if config:
                 # Parse field_mapping_v2
@@ -348,7 +336,9 @@ class FieldBuilderService:
                     try:
                         field_mapping_v2 = json.loads(config["field_mapping_v2"])
                     except json.JSONDecodeError as e:
-                        logger.error(f"Failed to parse field_mapping_v2 for config {config_id}: {e}")
+                        logger.error(
+                            f"Failed to parse field_mapping_v2 for config {config_id}: {e}"
+                        )
                         field_mapping_v2 = None
 
                 result[config_id] = {
@@ -367,7 +357,7 @@ class FieldBuilderService:
         config: Dict[str, Any],
         source_events: List[int],
         view_name: str,
-        date_var: str = "${bizdate}"
+        date_var: str = "${bizdate}",
     ) -> str:
         """
         预览HQL (从Field Builder配置生成)

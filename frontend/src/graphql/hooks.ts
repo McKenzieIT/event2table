@@ -81,7 +81,6 @@ export function useGames(
   options?: {
     fetchPolicy?: 'cache-first' | 'network-only' | 'cache-only' | 'no-cache';
     nextFetchPolicy?: any;
-    refetchOnWindowFocus?: boolean;
   }
 ) {
   return useQuery<GamesResponse>(GET_GAMES as any, {
@@ -89,7 +88,6 @@ export function useGames(
     // ⚡ PERF: Default caching strategy for optimal Dashboard performance
     fetchPolicy: options?.fetchPolicy || 'cache-first',
     nextFetchPolicy: options?.nextFetchPolicy || 'cache-first',
-    refetchOnWindowFocus: options?.refetchOnWindowFocus ?? false,  // Disable window focus refetch
   });
 }
 
@@ -373,7 +371,6 @@ export function useFlows(
   options?: {
     fetchPolicy?: 'cache-first' | 'network-only' | 'cache-only' | 'no-cache';
     nextFetchPolicy?: any;
-    refetchOnWindowFocus?: boolean;
   }
 ) {
   return useQuery(GET_FLOWS, {
@@ -381,7 +378,6 @@ export function useFlows(
     // ⚡ PERF: Default caching strategy for optimal Dashboard performance
     fetchPolicy: options?.fetchPolicy || 'cache-first',
     nextFetchPolicy: options?.nextFetchPolicy || 'cache-first',
-    refetchOnWindowFocus: options?.refetchOnWindowFocus ?? false,  // Disable window focus refetch
   });
 }
 

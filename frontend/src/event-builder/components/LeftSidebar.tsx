@@ -13,7 +13,7 @@
 import React from 'react';
 import EventSelector from './EventSelector';
 import ParamSelector from './ParamSelector';
-import { Event } from './EventSelector';
+import type { Event } from '@/shared/types/event-types';
 
 /**
  * 组件Props接口

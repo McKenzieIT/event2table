@@ -1,10 +1,10 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Added React.memo, useCallback
+// Optimized: Low-frequency page, memoized to prevent unnecessary re-renders
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import Table from '@shared/ui/Table';
 import './AlterSql.css';
 
 /**
@@ -86,7 +86,7 @@ function AlterSqlBuilder(): React.JSX.Element {
     fetchAlterSql();
   }, [paramId]);
 
-  const handleCopy = (): void => {
+  const handleCopy = useCallback((): void => {
     navigator.clipboard
       .writeText(alterSql)
       .then(() => {
@@ -95,7 +95,7 @@ function AlterSqlBuilder(): React.JSX.Element {
       .catch(() => {
         toast.error('复制失败，请手动复制');
       });
-  };
+  }, [alterSql]);
 
   return (
     <div className="alter-sql-container">
@@ -150,11 +150,11 @@ function AlterSqlBuilder(): React.JSX.Element {
             <h5 className="mb-3" style={{ color: 'var(--color-primary)' }}>
               表信息
             </h5>
-            <table className="oled-table">
-              <tbody>
-                <tr>
-                  <th style={{ width: '30%', color: 'var(--text-primary)' }}>表名</th>
-                  <td style={{ color: 'var(--text-secondary)' }}>
+            <Table variant="bordered" size="md" striped hoverable>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell style={{ width: '30%', color: 'var(--text-primary)', fontWeight: 'bold' }}>表名</Table.Cell>
+                  <Table.Cell style={{ color: 'var(--text-secondary)' }}>
                     <code
                       style={{
                         background: 'rgba(0, 0, 0, 0.5)',
@@ -164,21 +164,21 @@ function AlterSqlBuilder(): React.JSX.Element {
                     >
                       {param?.table_name}
                     </code>
-                  </td>
-                </tr>
-                <tr>
-                  <th style={{ color: 'var(--text-primary)' }}>参数名</th>
-                  <td style={{ color: 'var(--text-secondary)', fontWeight: 'bold' }}>
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>参数名</Table.Cell>
+                  <Table.Cell style={{ color: 'var(--text-secondary)', fontWeight: 'bold' }}>
                     {param?.param_name}
-                  </td>
-                </tr>
-                <tr>
-                  <th style={{ color: 'var(--text-primary)' }}>参数中文名</th>
-                  <td style={{ color: 'var(--text-secondary)' }}>{param?.param_name_cn}</td>
-                </tr>
-                <tr>
-                  <th style={{ color: 'var(--text-primary)' }}>参数类型</th>
-                  <td style={{ color: 'var(--text-secondary)' }}>
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>参数中文名</Table.Cell>
+                  <Table.Cell style={{ color: 'var(--text-secondary)' }}>{param?.param_name_cn}</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>参数类型</Table.Cell>
+                  <Table.Cell style={{ color: 'var(--text-secondary)' }}>
                     <code
                       style={{
                         background: 'rgba(0, 0, 0, 0.5)',
@@ -188,16 +188,16 @@ function AlterSqlBuilder(): React.JSX.Element {
                     >
                       {param?.param_type}
                     </code>
-                  </td>
-                </tr>
-                <tr>
-                  <th style={{ color: 'var(--text-primary)' }}>所属游戏</th>
-                  <td style={{ color: 'var(--text-secondary)' }}>
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>所属游戏</Table.Cell>
+                  <Table.Cell style={{ color: 'var(--text-secondary)' }}>
                     {param?.game_name} ({param?.gid})
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
           </div>
 
           {/* ALTER TABLE Statement */}
@@ -271,4 +271,4 @@ function AlterSqlBuilder(): React.JSX.Element {
   );
 }
 
-export default AlterSqlBuilder;
+export default memo(AlterSqlBuilder);

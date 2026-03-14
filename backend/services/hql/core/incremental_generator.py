@@ -5,16 +5,16 @@
 """
 增量HQL生成器
 
-核心思想：只重新生成变化的部分，而不是从头生成整个HQL
-性能提升：3-5x（特别是在频繁修改配置时）
+核心思想: 只重新生成变化的部分, 而不是从头生成整个HQL
+性能提升: 3-5x（特别是在频繁修改配置时）
 """
 
 import re
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
+from ..models.event import Condition, Event, Field
 from .generator import HQLGenerator
-from ..models.event import Event, Field, Condition
 
 
 @dataclass
@@ -47,7 +47,7 @@ class IncrementalHQLGenerator:
     """
     增量HQL生成器
 
-    通过缓存和差异分析，只重新生成变化的部分
+    通过缓存和差异分析, 只重新生成变化的部分
     """
 
     def __init__(self):
@@ -93,7 +93,7 @@ class IncrementalHQLGenerator:
 
         # 检查是否有previous_hql
         if not previous_hql:
-            # 首次生成，使用完整生成
+            # 首次生成, 使用完整生成
             hql = self.generator.generate(events, fields, conditions, **options)
 
             # 更新缓存
@@ -143,13 +143,13 @@ class IncrementalHQLGenerator:
                 "generation_time": time() - start_time,
             }
 
-        # 增量生成：只重新生成变化的部分
+        # 增量生成: 只重新生成变化的部分
         hql = self._generate_incremental_hql(events, fields, conditions, previous_hql, diff)
 
         generation_time = time() - start_time
 
         # 估算性能提升
-        # 假设完整生成需要100%时间，增量生成只需要30%时间
+        # 假设完整生成需要100%时间, 增量生成只需要30%时间
         performance_gain = 3.3  # 约3.3x加速
 
         return {
@@ -198,11 +198,11 @@ class IncrementalHQLGenerator:
         # 检查字段变化 - 比较哈希
         current_fields_hash = self._compute_fields_hash(fields)
         if current_fields_hash != self.cache.fields_hash:
-            # 字段整体发生变化，检测具体变化
+            # 字段整体发生变化, 检测具体变化
             current_fields = {f.name: f for f in fields}
             previous_fields = {}
 
-            # 从previous_hql解析字段（简化版本）
+            # 从previous_hql解析字段(简化版本)
             if self.cache.hql:
                 previous_fields = self._parse_fields_from_hql(self.cache.hql)
 
@@ -218,11 +218,11 @@ class IncrementalHQLGenerator:
         # 检查条件变化 - 比较哈希
         current_conditions_hash = self._compute_conditions_hash(conditions)
         if current_conditions_hash != self.cache.conditions_hash:
-            # 条件整体发生变化，检测具体变化
+            # 条件整体发生变化, 检测具体变化
             current_conditions = {c.field: c for c in conditions}
             previous_conditions = {}
 
-            # 从previous_hql解析条件（简化版本）
+            # 从previous_hql解析条件(简化版本)
             if self.cache.hql:
                 previous_conditions = self._parse_conditions_from_hql(self.cache.hql)
 
@@ -238,8 +238,8 @@ class IncrementalHQLGenerator:
         return diff
 
     def _parse_fields_from_hql(self, hql: str) -> Dict[str, Any]:
-        """从HQL解析字段（简化版本）"""
-        # 简化实现：使用正则提取SELECT字段
+        """从HQL解析字段(简化版本)"""
+        # 简化实现: 使用正则提取SELECT字段
         # 格式: SELECT field1, field2, ... FROM ...
         match = re.search(r"SELECT\s+(.*?)\s+FROM", hql, re.IGNORECASE | re.DOTALL)
         if not match:
@@ -248,7 +248,7 @@ class IncrementalHQLGenerator:
         fields_str = match.group(1).strip()
         field_names = []
 
-        # 简化：假设字段用逗号分隔
+        # 简化: 假设字段用逗号分隔
         for field_part in fields_str.split(","):
             field_part = field_part.strip()
             # 去除AS别名
@@ -267,8 +267,8 @@ class IncrementalHQLGenerator:
         return {name: True for name in field_names}
 
     def _parse_conditions_from_hql(self, hql: str) -> Dict[str, Any]:
-        """从HQL解析条件（简化版本）"""
-        # 简化实现：使用正则提取WHERE字段
+        """从HQL解析条件(简化版本)"""
+        # 简化实现: 使用正则提取WHERE字段
         match = re.search(
             r"WHERE\s+(.*?)(?:\s+GROUP\s+BY|\s+ORDER\s+BY|\s+LIMIT|$)",
             hql,
@@ -280,7 +280,7 @@ class IncrementalHQLGenerator:
         where_str = match.group(1).strip()
         condition_fields = []
 
-        # 提取条件中的字段名（简化版本）
+        # 提取条件中的字段名(简化版本)
         # 匹配: field = value, field IN (...), field LIKE ...
         for match in re.finditer(r"(\w+)\s*[=LIKEIN]+", where_str, re.IGNORECASE):
             field_name = match.group(1)
@@ -303,24 +303,24 @@ class IncrementalHQLGenerator:
         stable_parts = self._extract_stable_parts(previous_hql, diff)
 
         # 2. 重新生成变化的部分
-        # 如果只有字段修改（没有增删），重新生成字段部分
+        # 如果只有字段修改(没有增删), 重新生成字段部分
         if diff.modified_fields and not diff.added_fields and not diff.removed_fields:
-            # 只字段被修改，重新生成字段SQL
+            # 只字段被修改, 重新生成字段SQL
             field_sqls = self.generator.field_builder.build_fields(fields)
             fields_clause = ",\n  ".join(field_sqls)
         else:
-            # 字段有增删或事件变化，完整重新生成
+            # 字段有增删或事件变化, 完整重新生成
             field_sqls = self.generator.field_builder.build_fields(fields)
             fields_clause = ",\n  ".join(field_sqls)
 
-        # 3. 重新生成WHERE条件（如果有变化）
+        # 3. 重新生成WHERE条件(如果有变化)
         if diff.added_conditions or diff.removed_conditions or diff.modified_conditions:
             where_clause = self.generator.where_builder.build(conditions, {"event": events[0]})
         else:
-            # 条件无变化，尝试重用
+            # 条件无变化, 尝试重用
             where_clause = stable_parts.get("where_clause", "")
             if not where_clause:
-                # 稳定部分没有WHERE或条件已变化，重新生成
+                # 稳定部分没有WHERE或条件已变化, 重新生成
                 where_clause = self.generator.where_builder.build(conditions, {"event": events[0]})
 
         # 4. 组装HQL
@@ -340,12 +340,12 @@ WHERE
         if not hql:
             return stable
 
-        # 提取FROM子句（通常稳定）
+        # 提取FROM子句(通常稳定)
         from_match = re.search(r"FROM\s+(\S+)", hql, re.IGNORECASE)
         if from_match and not diff.events_changed:
             stable["table_name"] = from_match.group(1)
 
-        # 提取WHERE子句（如果没有变化）
+        # 提取WHERE子句(如果没有变化)
         if not (diff.added_conditions or diff.removed_conditions or diff.modified_conditions):
             where_match = re.search(
                 r"WHERE\s+(.*?)(?:\s+GROUP\s+BY|\s+ORDER\s+BY|\s+LIMIT|$)",
@@ -355,7 +355,7 @@ WHERE
             if where_match:
                 stable["where_clause"] = where_match.group(1).strip()
 
-        # 提取基础字段（如果字段只修改没有增删）
+        # 提取基础字段(如果字段只修改没有增删)
         if diff.modified_fields and not diff.added_fields and not diff.removed_fields:
             select_match = re.search(r"SELECT\s+(.*?)\s+FROM", hql, re.IGNORECASE | re.DOTALL)
             if select_match:

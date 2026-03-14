@@ -1,11 +1,11 @@
 """
 HQL生成缓存模块
 
-提供LRU缓存支持，提升重复请求的性能
+提供LRU缓存支持, 提升重复请求的性能
 """
 
 import json
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 
 def compute_hash(obj: Any) -> str:
@@ -24,7 +24,7 @@ def compute_hash(obj: Any) -> str:
     """
     from backend.core.crypto import SecureHasher
 
-    # 序列化为JSON字符串（确保顺序一致）
+    # 序列化为JSON字符串(确保顺序一致)
     serialized = json.dumps(obj, sort_keys=True)
     # 使用SHA-256替代MD5
     return SecureHasher.hash_string(serialized)
@@ -82,7 +82,7 @@ class HQLCacheManager:
             cache_key: 缓存键
 
         Returns:
-            Optional[str]: 缓存的HQL，如果不存在则返回None
+            Optional[str]: 缓存的HQL, 如果不存在则返回None
         """
         if cache_key in self._cache:
             self._hits += 1
@@ -103,9 +103,9 @@ class HQLCacheManager:
             cache_key: 缓存键
             hql: HQL语句
         """
-        # 如果缓存已满，删除最旧的条目
+        # 如果缓存已满, 删除最旧的条目
         if len(self._cache) >= self.maxsize:
-            # 删除第一个条目（最旧的）
+            # 删除第一个条目(最旧的)
             oldest_key = next(iter(self._cache))
             del self._cache[oldest_key]
 

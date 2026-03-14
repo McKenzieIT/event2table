@@ -3,7 +3,7 @@
 
 基于业务规则和历史数据推荐字段
 
-推荐策略：
+推荐策略: 
 1. 历史频率统计 - 从hql_history表统计字段使用频率
 2. 事件特定推荐 - 基于事件类型的业务规则
 3. 协同过滤 - 相似事件组合的字段推荐
@@ -11,8 +11,8 @@
 """
 
 import json
-from typing import List, Dict, Any, Optional
 from collections import Counter
+from typing import Any, Dict, List, Optional
 
 from backend.models.repositories.field_recommendation_repository import (
     FieldRecommendationRepository,
@@ -36,7 +36,7 @@ class FieldRecommender:
         self.db_path = db_path  # 保留以兼容旧API
         self.repository = FieldRecommendationRepository()
 
-    # 常用字段库（按类型分类）
+    # 常用字段库(按类型分类)
     COMMON_FIELDS = {
         "identity": [
             {"name": "ds", "type": "base", "description": "Partition field (日期分区)"},
@@ -97,7 +97,7 @@ class FieldRecommender:
         ],
     }
 
-    # 事件特定推荐（业务规则）
+    # 事件特定推荐(业务规则)
     EVENT_SPECIFIC_FIELDS = {
         "login": {
             "recommended": ["role_id", "account_id", "zone_id", "level", "ip"],
@@ -143,7 +143,7 @@ class FieldRecommender:
         recommendations = []
         weights = []
 
-        # 策略1: 历史统计（权重最高）
+        # 策略1: 历史统计(权重最高)
         if use_history:
             history_recs = self._get_history_based_recommendations(event_name)
             for rec in history_recs:
@@ -158,7 +158,7 @@ class FieldRecommender:
                     recommendations.append(rec)
                     weights.append(3.0)  # 事件特定权重3.0
 
-        # 策略3: 协同过滤（相似事件组合）
+        # 策略3: 协同过滤(相似事件组合)
         if event_name and use_history:
             collaborative_recs = self._get_collaborative_recommendations(event_name)
             for rec in collaborative_recs:
@@ -174,7 +174,7 @@ class FieldRecommender:
                     recommendations.append(rec)
                     weights.append(1.5)  # 模糊匹配权重1.5
 
-        # 策略5: 常用字段（兜底）
+        # 策略5: 常用字段(兜底)
         if not recommendations:
             recommendations = self._get_common_fields()
             weights = [1.0] * len(recommendations)
@@ -203,7 +203,7 @@ class FieldRecommender:
         从历史数据获取推荐（基于hql_history表）
 
         Args:
-            event_name: 事件名称（可选，当前未使用）
+            event_name: 事件名称（可选, 当前未使用）
 
         Returns:
             List[Dict]: 推荐字段列表
@@ -212,7 +212,7 @@ class FieldRecommender:
             # 使用Repository查询历史数据
             return self.repository.get_history_recommendations(days=30, limit=1000)
         except Exception as e:
-            # 数据库查询失败，返回空列表
+            # 数据库查询失败, 返回空列表
             print(f"Warning: Failed to fetch history data: {e}")
             return []
 
@@ -261,7 +261,7 @@ class FieldRecommender:
 
     def _get_common_fields(self) -> List[Dict[str, Any]]:
         """获取常用字段"""
-        # 返回所有identity字段（最常用）
+        # 返回所有identity字段(最常用)
         return self.COMMON_FIELDS["identity"] + self.COMMON_FIELDS["params"][:3]
 
     def _build_field_recommendations(self, field_names: List[str]) -> List[Dict[str, Any]]:
@@ -280,7 +280,7 @@ class FieldRecommender:
                 if found:
                     break
 
-            # 如果没找到，创建基础推荐
+            # 如果没找到, 创建基础推荐
             if not found:
                 recommendations.append(
                     {"name": field_name, "type": "base", "description": f"{field_name} field"}

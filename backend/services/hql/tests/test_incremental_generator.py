@@ -10,13 +10,14 @@
 """
 
 import pytest
+
 from backend.services.hql.core.incremental_generator import (
-    IncrementalHQLGenerator,
-    HQLDiff,
     HQLCache,
+    HQLDiff,
+    IncrementalHQLGenerator,
     generate_hql_incremental,
 )
-from backend.services.hql.models.event import Event, Field, Condition
+from backend.services.hql.models.event import Condition, Event, Field
 
 
 class TestIncrementalHQLGenerator:
@@ -54,7 +55,7 @@ class TestIncrementalHQLGenerator:
     def test_first_generation_no_cache(
         self, generator, sample_events, sample_fields, sample_conditions
     ):
-        """测试首次生成（无缓存）"""
+        """测试首次生成(无缓存)"""
         result = generator.generate_incremental(
             events=sample_events,
             fields=sample_fields,
@@ -212,7 +213,7 @@ class TestIncrementalHQLGenerator:
             previous_hql=None,
         )
 
-        # 相同配置，使用上次的HQL
+        # 相同配置, 使用上次的HQL
         result2 = generator.generate_incremental(
             events=sample_events,
             fields=sample_fields,
@@ -327,7 +328,7 @@ class TestIncrementalHQLGenerator:
 
         fields = generator._parse_fields_from_hql(hql)
 
-        # 验证解析出的字段（简化版本）
+        # 验证解析出的字段(简化版本)
         assert "ds" in fields or len(fields) > 0
 
     def test_parse_conditions_from_hql(self, generator):
@@ -341,7 +342,7 @@ class TestIncrementalHQLGenerator:
 
         conditions = generator._parse_conditions_from_hql(hql)
 
-        # 验证解析出的条件（简化版本）
+        # 验证解析出的条件(简化版本)
         assert len(conditions) > 0
 
     def test_convenience_function(self, sample_events, sample_fields, sample_conditions):

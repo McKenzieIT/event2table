@@ -322,67 +322,7 @@
   backdrop-filter: blur(8px);
 }
 
-.oled-table {
-  margin-bottom: 0;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.oled-table thead th {
-  background: var(--bg-elevated);
-  border-bottom: 2px solid var(--border-accent);
-  font-family: var(--font-display);
-  font-weight: var(--font-semibold);
-  text-transform: uppercase;
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  color: var(--text-primary);
-  padding: var(--space-5) var(--space-4);
-  position: relative;
-}
-
-.oled-table thead th::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: var(--space-4);
-  right: var(--space-4);
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--cyan-500) 50%,
-    transparent
-  );
-  opacity: 0.3;
-}
-
-.oled-table tbody tr {
-  transition: all var(--transition-base);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.oled-table tbody tr:hover {
-  background: rgba(6, 182, 212, 0.08);
-  box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.15);
-  transform: translateY(-1px);
-}
-
-.oled-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.oled-table td {
-  padding: var(--space-5) var(--space-4);
-  vertical-align: middle;
-  border-bottom: 1px solid var(--border-subtle);
-  font-size: var(--text-sm);
-}
-
-.oled-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
+/* DEPRECATED: oled-table styles removed - all components migrated to cyber-table */
 /* Pagination - Elegant Layout */
 .table-pagination {
   display: flex;

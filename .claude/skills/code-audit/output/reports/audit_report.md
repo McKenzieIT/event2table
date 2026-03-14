@@ -1,194 +1,711 @@
-# Event2Table Code Audit Report
+# Code Audit Report
 
-**Date**: 2026-02-11
-**Mode**: Quick Audit
-**Target**: backend/
-**Files Scanned**: 103 Python files
-**Tool**: Quick Code Audit Script
+**Date**: 2026-03-14 09:35:30
+**Duration**: 9.26 seconds
+**Total Issues**: 53
 
----
+## Executive Summary
 
-## 📊 Executive Summary
+- **Critical**: 2
+- **High**: 39
+- **Medium**: 0
+- **Low**: 12
+- **Info**: 0
 
-| Metric | Count |
-|--------|-------|
-| **Total Issues** | 243 |
-| **🔴 CRITICAL** | 2 |
-| **🟠 HIGH** | 47 |
-| **🟡 MEDIUM** | 100 |
-| **🟢/🔵 LOW/INFO** | 94 |
+## Issues by Category
 
----
+### quality
 
-## 🚨 Critical Issues (2)
+#### 5 - N+1 query problem: Database query 'fetchone' inside loop
 
-### 1. SQL Injection Risk in Database Module
-**File**: `backend/core/database/database.py:1436`
-**Severity**: 🔴 CRITICAL
-**Issue**: f-string in SQL query (PRAGMA statement)
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:523`
+
+**Suggestion**: Refactor to use JOIN or batch query with IN (...) to avoid N+1 performance issue
+
+**Code**:
 ```python
-cursor.execute(f"PRAGMA user_version = {version}")
-```
-**Recommendation**: Use parameterized query
-```python
-cursor.execute("PRAGMA user_version = ?", (version,))
-```
-
-### 2. SQL Injection Risk in Database Module
-**File**: `backend/core/database/database.py:2734`
-**Severity**: 🔴 CRITICAL
-**Issue**: f-string in SQL query (PRAGMA statement)
-```python
-cursor.execute(f"PRAGMA user_version = {target_version}")
-```
-**Recommendation**: Use parameterized query
-```python
-cursor.execute("PRAGMA user_version = ?", (target_version,))
+for item in items:
+    fetchone(...)  # ← N+1 query
 ```
 
 ---
 
-## 🟠 High Priority Issues (47)
+#### 5 - N+1 query problem: Database query 'fetchone' inside loop
 
-### Game GID Compliance (47 issues)
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:691`
 
-**Summary**: Found 47 instances where `game_id` is used instead of `game_gid` for data associations.
+**Suggestion**: Refactor to use JOIN or batch query with IN (...) to avoid N+1 performance issue
 
-**Rule**:
-- ✅ `game_gid` (business GID): For all data associations
-- ❌ `game_id` (database auto-increment): Only for games table primary key
-
-**Top Affected Files**:
-1. `backend/core/database/database.py` - Multiple SQL constraints
-2. `backend/core/performance.py:213` - Function parameter `get_events_api(game_id, page)`
-3. `backend/api/routes/*.py` - Various API endpoints
-
-**Example Issues**:
+**Code**:
 ```python
-# ❌ WRONG - Using game_id in WHERE clause
-WHERE game_id = ?
-
-# ❌ WRONG - Function parameter
-def get_events_api(game_id, page):
-
-# ❌ WRONG - SQL constraint
-UNIQUE(game_id, param_id, alias)
-
-# ✅ CORRECT - Use game_gid
-WHERE game_gid = ?
-def get_events_api(game_gid, page):
-UNIQUE(game_gid, param_id, alias)
+for item in items:
+    fetchone(...)  # ← N+1 query
 ```
 
 ---
 
-## 🟡 Medium Priority Issues (100)
+#### 4 - Query method missing @cached decorator: GameService._get_event_count
 
-### 1. Code Complexity (12 issues)
+**File**: `/Users/mckenzie/Documents/event2table/backend/services/games/game_service.py:304`
 
-High cyclomatic complexity detected in:
+**Suggestion**: Add @cached(ttl=300-1800) decorator to cache query results and reduce database load
 
-| File | Complexity | Functions | Action |
-|------|-----------|-----------|--------|
-| `backend/core/database/database.py` | 210 | 29 | 🔴 Refactor needed |
-| `backend/core/utils.py` | 136 | 53 | 🟡 Consider splitting |
-| `backend/models/events.py` | 109 | 39 | 🟡 Extract services |
-| `backend/api/routes/parameters.py` | 88 | 12 | 🟡 Simplify logic |
-| `backend/api/routes/hql_preview_v2.py` | 81 | 15 | 🟡 Extract helpers |
-
-**Recommendations**:
-- Refactor `database.py` into smaller modules
-- Extract business logic from route handlers
-- Split complex functions into smaller, testable units
-
-### 2. Testing Coverage (94 issues - INFO level)
-
-**Summary**: 94 implementation files lack corresponding test files.
-
-**Missing Test Coverage**:
-- Core utilities: `backend/core/*.py`
-- API routes: `backend/api/routes/*.py`
-- Services: `backend/services/**/*.py`
-
-**Recommendation**:
-- Aim for 80% test coverage
-- Prioritize tests for:
-  - Security-critical functions
-  - Data access layer
-  - API endpoints
+**Code**:
+```python
+def _get_event_count(...):
+```
 
 ---
 
-## 📈 Detailed Statistics by Category
+#### 4 - Query method missing @cached decorator: GameService._get_flow_count
 
-| Category | Issues | Severity Breakdown |
-|----------|--------|-------------------|
-| **GAME_GID** | 135 | MEDIUM: 135 |
-| **SECURITY** | 2 | CRITICAL: 2 |
-| **COMPLEXITY** | 12 | MEDIUM: 12 |
-| **TESTING** | 94 | INFO: 94 |
+**File**: `/Users/mckenzie/Documents/event2table/backend/services/games/game_service.py:314`
 
----
+**Suggestion**: Add @cached(ttl=300-1800) decorator to cache query results and reduce database load
 
-## 🎯 Priority Action Items
-
-### Immediate (P0 - This Week)
-1. ✅ **Fix SQL Injection Issues** (2 issues)
-   - Replace f-strings with parameterized queries
-   - Estimated effort: 15 minutes
-
-### High Priority (P1 - This Month)
-2. ✅ **Fix Game GID Compliance** (47 issues)
-   - Replace `game_id` with `game_gid` in all data associations
-   - Update API contracts and documentation
-   - Estimated effort: 4-6 hours
-
-### Medium Priority (P2 - Next Quarter)
-3. ✅ **Refactor High Complexity Files** (5 files)
-   - `database.py` (210 complexity) - Split into modules
-   - `utils.py` (136 complexity) - Group related functions
-   - `events.py` (109 complexity) - Extract services
-   - Route handlers - Simplify logic
-   - Estimated effort: 2-3 weeks
-
-4. ✅ **Improve Test Coverage** (94 files)
-   - Start with critical paths (security, data access)
-   - Add integration tests for API endpoints
-   - Set up coverage tracking
-   - Estimated effort: Ongoing
+**Code**:
+```python
+def _get_flow_count(...):
+```
 
 ---
 
-## 📝 Notes
+#### 4 - Potential N+1 pattern: fetch_one_as_dict() called 3 times in function
 
-### False Positives
-The audit may flag some legitimate `game_id` uses:
-- Games table primary key references
-- Database schema definitions
-- Variable names that contain "game_id" but aren't used for data associations
+**File**: `/Users/mckenzie/Documents/event2table/backend/services/games/game_service.py:419`
 
-### Exclusions
-- Test files are excluded from game_gid checks
-- Comments are excluded from all checks
-- Games table operations are excluded
+**Suggestion**: Consider refactoring to use a single JOIN query or batch operation with IN (...)
+
+**Code**:
+```python
+# fetch_one_as_dict() called 3 times
+```
 
 ---
 
-## 🔄 Continuous Improvement
+#### 4 - Function batch_delete_games() returns empty/default value instead of implementing logic
 
-### Recommendations
-1. **Pre-commit Hooks**: Run quick audit before commits
-2. **CI/CD Integration**: Add audit to build pipeline
-3. **Code Review Checklist**: Include game_gid compliance
-4. **Documentation**: Update CLAUDE.md with examples
+**File**: `/Users/mckenzie/Documents/event2table/backend/services/games/game_service.py:284`
 
-### Tools
-- Use `/code-audit --quick` for daily development
-- Use `/code-audit --deep` for comprehensive analysis
-- Review reports in `.claude/skills/code-audit/output/reports/`
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return 0
+```
 
 ---
 
-**Generated by**: Event2Table Code Audit Skill
-**Report Location**: `.claude/skills/code-audit/output/reports/audit_report.md`
-**Next Audit**: Run after addressing P0/P1 issues
+#### 4 - Function batch_update_games() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/services/games/game_service.py:578`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return 0
+```
+
+---
+
+#### 4 - Function get_event_by_id() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/services/events/event_service.py:152`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return None
+```
+
+---
+
+#### 4 - Function batch_delete() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:179`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return 0
+```
+
+---
+
+#### 4 - Function update() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:210`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return None
+```
+
+---
+
+#### 4 - Function batch_update_by_gid() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:270`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return 0
+```
+
+---
+
+#### 4 - Function get_gids_by_list() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:399`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return [] or {} or ()
+```
+
+---
+
+#### 4 - Function get_by_ids() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:422`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return [] or {} or ()
+```
+
+---
+
+#### 4 - Function delete_batch() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:444`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return 0
+```
+
+---
+
+#### 4 - Function create_batch() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:484`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return [] or {} or ()
+```
+
+---
+
+#### 4 - Function get_with_parameters() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:222`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return None
+```
+
+---
+
+#### 4 - Function update() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:527`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return None
+```
+
+---
+
+#### 4 - Function get_by_ids() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:617`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return [] or {} or ()
+```
+
+---
+
+#### 4 - Function create_batch() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:649`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return [] or {} or ()
+```
+
+---
+
+#### 4 - Function delete_batch() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:719`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return 0
+```
+
+---
+
+#### 4 - Function batch_find_by_names() returns empty/default value instead of implementing logic
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:846`
+
+**Suggestion**: Implement the actual logic. Return meaningful values or raise appropriate exceptions.
+
+**Code**:
+```python
+return [] or {} or ()
+```
+
+---
+
+#### 4 - React Hook 'useState' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:40`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const [searchTerm, setSearchTerm] = useState('');
+```
+
+---
+
+#### 4 - React Hook 'useState' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:41`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const [selectedCategory, setSelectedCategory] = useState('all');
+```
+
+---
+
+#### 4 - React Hook 'useState' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:42`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const [selectedEvents, setSelectedEvents] = useState([]);
+```
+
+---
+
+#### 4 - React Hook 'useState' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:43`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const [currentPage, setCurrentPage] = useState(1);
+```
+
+---
+
+#### 4 - React Hook 'useState' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:44`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
+```
+
+---
+
+#### 4 - React Hook 'useState' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:45`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const [pageSize, setPageSize] = useState(10);
+```
+
+---
+
+#### 4 - React Hook 'useQuery' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:51`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const { data, loading: isLoading, error: fetchError, refetch } = useQuery(GET_EVENTS, {
+```
+
+---
+
+#### 4 - React Hook 'useState' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/GamesListGraphQL.tsx:48`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const [searchTerm, setSearchTerm] = useState('');
+```
+
+---
+
+#### 4 - React Hook 'useCallback' called inside nested structure (if/for/while)
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/GamesListGraphQL.tsx:51`
+
+**Suggestion**: Move all Hook calls to the top level of the component
+
+**Code**:
+```python
+const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:90`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+return ['all', ...cats.map(c => c.name).filter(Boolean)];
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:97`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+return events.filter(event => {
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:129`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+return prev.filter(id => id !== eventId);
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:141`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+return filteredEvents.map(e => e.id);
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:252`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+{events.filter(e => e.categoryName).length}
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:260`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+{events.filter(e => !e.categoryName).length}
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:283`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+options={categories.map(cat => ({
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'EventsListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/EventsListGraphQL.tsx:328`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+{filteredEvents.map(event => (
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'GamesListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/GamesListGraphQL.tsx:71`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+return games.filter((game: GameType) =>
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'GamesListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/GamesListGraphQL.tsx:80`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+const totalEvents = games.reduce((sum, game) => sum + (game?.eventCount || 0), 0);
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'GamesListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/GamesListGraphQL.tsx:81`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+const totalParams = games.reduce((sum, game) => sum + (game?.parameterCount || 0), 0);
+```
+
+---
+
+#### 2 - Expensive operation may benefit from useMemo in component 'GamesListGraphQL'
+
+**File**: `/Users/mckenzie/Documents/event2table/frontend/src/analytics/pages/GamesListGraphQL.tsx:241`
+
+**Suggestion**: Wrap expensive operations with useMemo to cache results and prevent re-computation on every render
+
+**Code**:
+```python
+filteredGames.map((game: GameType) => (
+```
+
+---
+
+### architecture
+
+#### 4 - Repository method GameRepository.find_by_ods_db() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:288`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def find_by_ods_db(self, ods_db...)
+```
+
+---
+
+#### 4 - Repository method GameRepository.search_by_name() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:305`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def search_by_name(self, name_pattern...)
+```
+
+---
+
+#### 4 - Repository method GameRepository.get_game_categories_summary() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:322`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_game_categories_summary(self, game_gid...)
+```
+
+---
+
+#### 4 - Repository method GameRepository.get_game_for_update() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:367`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_game_for_update(self, game_id...)
+```
+
+---
+
+#### 4 - Repository method GameRepository.get_by_ids() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/games.py:407`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_by_ids(self, game_ids...)
+```
+
+---
+
+#### 4 - Repository method EventRepository.get_with_parameters() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:190`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_with_parameters(self, event_id...)
+```
+
+---
+
+#### 4 - Repository method EventRepository.get_event_statistics() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:415`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_event_statistics(self, event_id...)
+```
+
+---
+
+#### 4 - Repository method EventRepository.get_by_ids() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:602`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_by_ids(self, event_ids...)
+```
+
+---
+
+#### 4 - Repository method EventRepository.get_paginated() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:868`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_paginated(self, game_gid, page...)
+```
+
+---
+
+#### 4 - Repository method EventRepository.find_detail_with_game() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:943`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def find_detail_with_game(self, event_id, game_gid...)
+```
+
+---
+
+#### 4 - Repository method EventRepository.get_event_parameters() returns Dict instead of Entity
+
+**File**: `/Users/mckenzie/Documents/event2table/backend/models/repositories/events.py:968`
+
+**Suggestion**: Return Entity object instead of Dict. Use Entity(**data) to convert dict to Entity.
+
+**Code**:
+```python
+def get_event_parameters(self, event_id...)
+```
+
+---
+

@@ -1,5 +1,8 @@
+// ⚡️ REACT PERF: Already optimized with React.memo, useCallback
+// Verified: All event handlers use useCallback, component wrapped with React.memo
+
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React from 'react';
+import React, { memo } from 'react';
 import { useNavigate, useParams, useSearchParams, useOutletContext } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client/react';
 import {
@@ -91,6 +94,11 @@ function EventForm() {
   const [errors, setErrors] = React.useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
+  // Refs to input elements (for Chrome MCP compatibility)
+  const eventNameRef = React.useRef<HTMLInputElement>(null);
+  const eventNameCnRef = React.useRef<HTMLInputElement>(null);
+  const gameGidRef = React.useRef<HTMLInputElement>(null);
+
   // Fetch categories for dropdown using GraphQL
   const { data: categoriesData } = useQuery(GET_CATEGORIES, {
     variables: { limit: 100, offset: 0 },
@@ -117,6 +125,33 @@ function EventForm() {
       });
     }
   }, [eventData, isEdit]);
+
+  // Chrome MCP兼容性: 监听DOM值变化并同步到state
+  React.useEffect(() => {
+    if (!eventNameRef.current || !eventNameCnRef.current || !gameGidRef.current) {
+      return;
+    }
+
+    const eventNameDomValue = eventNameRef.current.value;
+    const eventNameCnDomValue = eventNameCnRef.current.value;
+    const gameGidDomValue = gameGidRef.current.value;
+
+    const updates: Partial<EventFormData> = {};
+
+    if (eventNameDomValue !== formData.event_name) {
+      updates.event_name = eventNameDomValue;
+    }
+    if (eventNameCnDomValue !== formData.event_name_cn) {
+      updates.event_name_cn = eventNameCnDomValue;
+    }
+    if (gameGidDomValue !== formData.game_gid) {
+      updates.game_gid = gameGidDomValue;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+  }, [formData.event_name, formData.event_name_cn, formData.game_gid]);
 
   // Handle form input changes
   const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,6 +310,7 @@ function EventForm() {
             error={errors.game_gid}
             helperText={`事件所属游戏的业务GID，${isEdit ? '编辑时不可修改' : '创建后不可修改，请谨慎填写'}`}
             icon="bi-hash"
+            ref={gameGidRef}
           />
 
           {/* Event Name Field */}
@@ -291,6 +327,7 @@ function EventForm() {
             error={errors.event_name}
             helperText="事件的英文名称，通常使用点号分隔的命名方式"
             icon="bi-code-slash"
+            ref={eventNameRef}
           />
 
           {/* Event Name Chinese Field */}
@@ -306,6 +343,7 @@ function EventForm() {
             required
             error={errors.event_name_cn}
             icon="bi-translate"
+            ref={eventNameCnRef}
           />
 
           {/* Category Field */}
@@ -367,5 +405,5 @@ function EventForm() {
   );
 }
 
-// Export with React.memo for performance optimization
-export default React.memo(EventForm);
+// Export with React.memo for performance optimization (previously applied)
+export default memo(EventForm);

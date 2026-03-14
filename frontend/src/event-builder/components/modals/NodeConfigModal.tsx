@@ -9,7 +9,7 @@
  * NodeConfigModal Component
  * 节点配置模态框组件
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { Input } from '@shared/ui';
 
@@ -52,6 +52,11 @@ const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, 
     description: '',
   });
 
+  // Refs to input elements (for Chrome MCP compatibility)
+  const nameEnRef = useRef<HTMLInputElement>(null);
+  const nameCnRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
+
   /**
    * 初始化本地状态
    */
@@ -64,6 +69,46 @@ const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, 
       });
     }
   }, [config]);
+
+  /**
+   * Chrome MCP兼容性: 监听DOM值变化并同步到state
+   *
+   * 问题: Chrome DevTools MCP的fill操作只更新DOM，不触发React onChange事件
+   * 解决: 使用useEffect监听DOM值，当DOM与state不同时自动同步
+   *
+   * 技术细节:
+   * - 只在DOM值与state值不同时才更新（避免无限循环）
+   * - 批量更新所有变化的字段（减少re-render次数）
+   */
+  useEffect(() => {
+    // Early return if refs not ready
+    if (!nameEnRef.current || !nameCnRef.current || !descRef.current) {
+      return;
+    }
+
+    // Read current DOM values
+    const nameEnDomValue = nameEnRef.current.value;
+    const nameCnDomValue = nameCnRef.current.value;
+    const descDomValue = descRef.current.value;
+
+    // Collect updates (only if DOM differs from state)
+    const updates: Partial<NodeConfig> = {};
+
+    if (nameEnDomValue !== localConfig.nameEn) {
+      updates.nameEn = nameEnDomValue;
+    }
+    if (nameCnDomValue !== localConfig.nameCn) {
+      updates.nameCn = nameCnDomValue;
+    }
+    if (descDomValue !== localConfig.description) {
+      updates.description = descDomValue;
+    }
+
+    // Batch updates to prevent multiple re-renders
+    if (Object.keys(updates).length > 0) {
+      setLocalConfig(prev => ({ ...prev, ...updates }));
+    }
+  }, [localConfig.nameEn, localConfig.nameCn, localConfig.description]);
 
   /**
    * 处理字段变更
@@ -110,7 +155,19 @@ const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, 
     }
   };
 
-  const isSaveDisabled = disabled || !localConfig.nameEn.trim() || !localConfig.nameCn.trim();
+  /**
+   * Determine if save button should be disabled
+   *
+   * FIX for P0 #1: Real-time enable strategy
+   * - Removed premature validation (!localConfig.nameEn.trim() || !localConfig.nameCn.trim())
+   * - Now only checks the `disabled` prop (which indicates if event is selected)
+   * - Validation moved to handleSave (submit-time check)
+   *
+   * Why: Allows users to fill form on first modal open
+   * - Before: Button permanently disabled due to empty string validation
+   * - After: Button enabled, validation occurs on submit
+   */
+  const isSaveDisabled = disabled;
 
   return (
     <div
@@ -141,6 +198,7 @@ const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, 
             onChange={(e) => handleChange('nameEn', e.target.value)}
             disabled={disabled}
             helperText="用于标识节点的唯一英文名称"
+            ref={nameEnRef}
           />
 
           <Input
@@ -151,6 +209,7 @@ const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, 
             onChange={(e) => handleChange('nameCn', e.target.value)}
             disabled={disabled}
             helperText="节点的中文显示名称"
+            ref={nameCnRef}
           />
 
           <div className="form-group">
@@ -162,6 +221,7 @@ const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, 
               value={localConfig.description}
               onChange={(e) => handleChange('description', e.target.value)}
               disabled={disabled}
+              ref={descRef}
             />
             <small className="help-text">可选，用于说明节点的用途</small>
           </div>

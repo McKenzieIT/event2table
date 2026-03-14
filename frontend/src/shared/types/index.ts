@@ -1,19 +1,70 @@
-// @ts-nocheck - TypeScript检查暂禁用
 /**
- * 前端类型定义 - 统一导出
+ * Shared Types - 统一类型导出
+ * Centralized Type Exports
  *
- * 此文件提供统一的类型导出，支持渐进式迁移到共享类型
+ * This file provides unified type exports with progressive migration support
  *
- * @version 2.2
- * @updated 2026-02-17
+ * @version 3.0
+ * @updated 2026-03-10
  *
- * 迁移指南:
- * 1. 新组件使用 'from @shared/types/hql-types' (共享类型)
- * 2. 现有组件使用 'from @shared/types' (自动适配)
- * 3. 逐步替换为共享类型
+ * Migration Guide:
+ * 1. New components: import from '@/shared/types/event-types', '@/shared/types/game-types', etc.
+ * 2. Existing components: import from '@/shared/types' (auto-adapted)
+ * 3. Gradually migrate to unified types
  */
 
-// ========== 共享类型 (HQL生成相关) - 按需导出避免冲突 ==========
+// ========== Core Entity Types - 统一实体类型 ==========
+export type {
+  Event,
+  EventCreateRequest,
+  EventUpdateRequest,
+  EventListOptions,
+  EventListResponse,
+  EventDetailsResponse
+} from './event-types';
+
+export type {
+  Game,
+  GameCreateRequest,
+  GameUpdateRequest,
+  GameListOptions,
+  GameListResponse,
+  GameDetailsResponse,
+  GameContext,
+  GameStatus
+} from './game-types';
+
+export type {
+  Parameter,
+  ParameterCreateRequest,
+  ParameterUpdateRequest,
+  ParameterListOptions,
+  ParameterListResponse,
+  ParameterDetailsResponse,
+  ParameterUsage,
+  ParameterDetails,
+  ParameterType
+} from './parameter-types';
+
+// ========== HQL Types - HQL类型 ==========
+export type {
+  Event as HqlEvent,
+  Field,
+  FieldConfig,
+  Condition,
+  JoinConfig,
+  GenerationOptions,
+  HQLContext,
+  GenerateRequest,
+  GenerateResponse,
+  DebugTrace,
+  DebugStep,
+  PerformanceIssue,
+  PerformanceMetrics,
+  PerformanceReport,
+} from './hql-types';
+
+// Export enums as values
 export {
   FieldType,
   AggregateFunction,
@@ -21,17 +72,21 @@ export {
   LogicalOperator,
   GenerationMode,
   SQLMode,
-  Event,
-  Field,
-  Condition,
-  JoinConfig,
-  GenerationOptions,
-  HQLContext,
-  GenerateRequest,
-  GenerateResponse,
 } from './hql-types';
 
-// ========== 类型适配器 (向后兼容) - 仅导出独有类型 ==========
+// ========== API Types - API通用类型 ==========
+export type {
+  ApiResponse,
+  Pagination,
+  PaginatedResponse,
+  ConditionValue,
+  HQLGenerateData,
+  HQLGenerateResponse,
+  EventParam,
+  ApiError
+} from './api-types';
+
+// ========== Type Adapters - 类型适配器 (向后兼容) ==========
 export {
   isSharedField,
   isFrontendField,
@@ -39,26 +94,11 @@ export {
   adaptFieldFromFrontend,
 } from './types-adapter';
 
-// ========== 前端原有类型 (保留) ==========
+// ========== Frontend Specific Types - 前端特定类型 ==========
 export * from './eventNodes';
 export * from './fieldBuilder';
 export * from './whereBuilder';
 
-// ========== API类型 (从API客户端导出) ==========
-export type { GenerateRequest, GenerateResponse, DebugTraceResponse } from '../api/hqlApiV2';
-
-// ========== API通用类型 ==========
-export type { 
-  ApiResponse, 
-  Pagination, 
-  PaginatedResponse, 
-  ConditionValue,
-  HQLGenerateData,
-  HQLGenerateResponse,
-  Event as ApiEvent,
-  Field as ApiField,
-  EventParam,
-  Game,
-  ApiError
-} from './api-types';
+// ========== API Client Types - API客户端类型 ==========
+export type { GenerateRequest as ApiGenerateRequest, GenerateResponse as ApiGenerateResponse, DebugTraceResponse } from '../api/hqlApiV2';
 

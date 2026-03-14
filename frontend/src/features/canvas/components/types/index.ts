@@ -7,15 +7,20 @@
  */
 
 import { Node, Edge } from 'reactflow';
+import type { Field } from '@/shared/types/hql-types';
+import type { Game as GameData } from '@/shared/types/game-types';
+
+// Re-export types for use in other canvas components
+export type { Field, GameData };
 
 // ============================================================================
 // Base Types
 // ============================================================================
 
 /**
- * Game data structure
+ * Canvas component-specific game data structure
  */
-export interface GameData {
+export interface CanvasGameData {
   id: number;
   gid: number;
   name: string;
@@ -33,7 +38,7 @@ export interface EventConfig {
   event_name?: string;
   event_name_cn?: string;
   name_cn?: string;
-  base_fields?: Field[];
+  base_fields?: CanvasComponentField[];
   field_count?: number;
   description?: string;
   created_at?: string;
@@ -41,9 +46,10 @@ export interface EventConfig {
 }
 
 /**
- * Field structure
+ * Canvas component-specific Field structure
+ * Renamed from Field to CanvasComponentField to avoid conflicts with shared Field type
  */
-export interface Field {
+export interface CanvasComponentField {
   field_name: string;
   field_type: 'base' | 'param' | 'custom';
   alias?: string;
@@ -71,7 +77,7 @@ export interface CustomNodeData {
   eventName?: string;
   fieldCount?: number;
   description?: string;
-  baseFields?: Field[];
+  baseFields?: CanvasComponentField[];
   configId?: number;
   config?: JoinConfig;
   eventConfig?: EventConfig;

@@ -399,3 +399,9 @@ git commit -m "feat: add new feature and update docs"
 - [调试技能 - 并行开发](./debugging-skills.md#并行开发策略) - 并行开发具体方法
 - [重构检查清单 - 技术债务管理](./refactoring-checklist.md#技术债务管理流程) - 技术债务管理
 - [API设计模式 - API版本管理](./api-design-patterns.md) - API兼容性设计
+
+### GraphQL API 文档
+
+**更新时间**: 2026-03-12
+
+---

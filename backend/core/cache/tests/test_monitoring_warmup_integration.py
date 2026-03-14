@@ -17,10 +17,12 @@
 日期: 2026-02-27
 """
 
-import pytest
 import time
-from unittest.mock import Mock, AsyncMock, patch
-from backend.core.cache.monitoring import CacheAlertManager, AlertLevel
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+
+from backend.core.cache.monitoring import AlertLevel, CacheAlertManager
 
 
 class MockCache:
@@ -38,12 +40,12 @@ class MockCache:
             'total_requests': 125,
             'l1_usage': '50%',
             'l1_size': self.l1_size,
-            'l1_capacity': 2000
+            'l1_capacity': 2000,
         }
 
     def _get_redis_client(self):
-        """模拟Redis客户端（用于monitoring.py的_get_redis_memory_usage）"""
-        return None  # 返回None会触发异常处理，使用默认值0.0
+        """模拟Redis客户端(用于monitoring.py的_get_redis_memory_usage)"""
+        return None  # 返回None会触发异常处理, 使用默认值0.0
 
 
 class TestWarmupIntegration:
@@ -56,24 +58,18 @@ class TestWarmupIntegration:
 
         # 创建同步预热回调
         def sync_warmup_callback():
-            return {
-                "warmed": 50,
-                "failed": 0,
-                "skipped": 10
-            }
+            return {"warmed": 50, "failed": 0, "skipped": 10}
 
-        # 创建告警管理器（带回调）
-        alert_manager = CacheAlertManager(
-            mock_cache,
-            warmup_callback=sync_warmup_callback
-        )
+        # 创建告警管理器(带回调)
+        alert_manager = CacheAlertManager(mock_cache, warmup_callback=sync_warmup_callback)
 
-        # 模拟低命中率场景（连续收集足够多的指标以触发告警）
-        # 总体命中率告警需要持续300秒，我们模拟多次采集
+        # 模拟低命中率场景(连续收集足够多的指标以触发告警)
+        # 总体命中率告警需要持续300秒, 我们模拟多次采集
         import time
+
         base_time = time.time() - 400  # 从400秒前开始
 
-        for i in range(350):  # 350次采集，覆盖350秒
+        for i in range(350):  # 350次采集, 覆盖350秒
             # 修改timestamp使历史记录跨越300秒
             snapshot = alert_manager.collect_metrics()
             # 手动调整snapshot时间
@@ -107,19 +103,12 @@ class TestWarmupIntegration:
         # 创建异步预热回调
         async def async_warmup_callback():
             await asyncio.sleep(0.1)  # 模拟异步操作
-            return {
-                "warmed": 30,
-                "failed": 2,
-                "skipped": 5
-            }
+            return {"warmed": 30, "failed": 2, "skipped": 5}
 
-        # 创建告警管理器（带异步回调）
-        alert_manager = CacheAlertManager(
-            mock_cache,
-            warmup_callback=async_warmup_callback
-        )
+        # 创建告警管理器(带异步回调)
+        alert_manager = CacheAlertManager(mock_cache, warmup_callback=async_warmup_callback)
 
-        # 模拟低命中率场景（持续300秒）
+        # 模拟低命中率场景(持续300秒)
         base_time = time.time() - 400
         for i in range(350):
             snapshot = alert_manager.collect_metrics()
@@ -151,19 +140,16 @@ class TestWarmupIntegration:
             raise RuntimeError("Warmup service unavailable")
 
         # 创建告警管理器
-        alert_manager = CacheAlertManager(
-            mock_cache,
-            warmup_callback=failing_callback
-        )
+        alert_manager = CacheAlertManager(mock_cache, warmup_callback=failing_callback)
 
-        # 模拟低命中率场景（持续300秒）
+        # 模拟低命中率场景(持续300秒)
         base_time = time.time() - 400
         for i in range(350):
             snapshot = alert_manager.collect_metrics()
             alert_manager.metrics_history.history[-1].timestamp = base_time + i
             time.sleep(0.001)
 
-        # 触发告警检查（不应抛出异常）
+        # 触发告警检查(不应抛出异常)
         alerts = alert_manager.check_alerts()
 
         # 验证预热被触发但失败
@@ -181,17 +167,17 @@ class TestWarmupIntegration:
         # 创建模拟缓存
         mock_cache = MockCache()
 
-        # 创建告警管理器（无回调）
+        # 创建告警管理器(无回调)
         alert_manager = CacheAlertManager(mock_cache, warmup_callback=None)
 
-        # 模拟低命中率场景（持续300秒）
+        # 模拟低命中率场景(持续300秒)
         base_time = time.time() - 400
         for i in range(350):
             snapshot = alert_manager.collect_metrics()
             alert_manager.metrics_history.history[-1].timestamp = base_time + i
             time.sleep(0.001)
 
-        # 触发告警检查（不应抛出异常）
+        # 触发告警检查(不应抛出异常)
         alerts = alert_manager.check_alerts()
 
         # 验证告警被触发但无预热结果
@@ -211,10 +197,7 @@ class TestWarmupIntegration:
             return {"warmed": 100, "failed": 0, "skipped": 0}
 
         # 创建告警管理器
-        alert_manager = CacheAlertManager(
-            mock_cache,
-            warmup_callback=warmup_callback
-        )
+        alert_manager = CacheAlertManager(mock_cache, warmup_callback=warmup_callback)
 
         # 收集指标
         alert_manager.collect_metrics()
@@ -245,12 +228,9 @@ class TestWarmupIntegration:
             return {"warmed": 50, "failed": 0, "skipped": 0}
 
         # 创建告警管理器
-        alert_manager = CacheAlertManager(
-            mock_cache,
-            warmup_callback=warmup_callback
-        )
+        alert_manager = CacheAlertManager(mock_cache, warmup_callback=warmup_callback)
 
-        # 模拟低命中率场景（持续300秒以触发告警）
+        # 模拟低命中率场景(持续300秒以触发告警)
         base_time = time.time() - 400
         for i in range(350):
             snapshot = alert_manager.collect_metrics()
@@ -260,17 +240,17 @@ class TestWarmupIntegration:
             if i % 50 == 0:
                 alert_manager.check_alerts()
 
-        # 验证回调被调用（去重机制不会在短时间阻止首次触发）
+        # 验证回调被调用(去重机制不会在短时间阻止首次触发)
         assert call_count["count"] >= 1, "回调应至少被调用一次"
 
         print("✅ 防止重复告警测试通过")
 
 
 def test_real_cache_warmer_integration():
-    """测试真实的CacheWarmer集成（需要数据库）"""
-    pytest.skip("需要真实数据库，跳过集成测试")
+    """测试真实的CacheWarmer集成(需要数据库)"""
+    pytest.skip("需要真实数据库, 跳过集成测试")
 
-    # 示例代码（仅供参考）
+    # 示例代码(仅供参考)
     """
     from backend.services.cache.cache_warmup import CacheWarmer
     from backend.core.cache.cache_system import get_cache
@@ -279,7 +259,7 @@ def test_real_cache_warmer_integration():
     warmer = CacheWarmer()
     cache = get_cache()
 
-    # 创建告警管理器（注入预热回调）
+    # 创建告警管理器(注入预热回调)
     alert_manager = CacheAlertManager(
         cache,
         warmup_callback=warmer.warmup_all

@@ -15,18 +15,18 @@
 日期: 2026-02-24
 """
 
-import pytest
 import time
-from unittest.mock import Mock, MagicMock, patch
 from datetime import datetime
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 from backend.core.cache.capacity_monitor import (
-    CapacityTrendPredictor,
     CacheCapacityMonitor,
-    init_capacity_monitor,
+    CapacityTrendPredictor,
     get_capacity_monitor,
+    init_capacity_monitor,
 )
-
 
 # ============================================================================
 # CapacityTrendPredictor 测试
@@ -74,7 +74,7 @@ class TestCapacityTrendPredictor:
         for i in range(5):
             predictor.add_sample(i / 100, i / 100)
 
-        # 数据不足，应返回None
+        # 数据不足, 应返回None
         result = predictor.predict_exhaustion(predictor.l1_history, 0.95)
         assert result is None
 
@@ -82,13 +82,13 @@ class TestCapacityTrendPredictor:
         """测试容量不增长时的预测"""
         predictor = CapacityTrendPredictor()
 
-        # 添加稳定样本（无增长）
+        # 添加稳定样本(无增长)
         now = time.time()
         for i in range(20):
             timestamp = now + i * 60  # 每分钟一个样本
             predictor.l1_history.append((timestamp, 0.5))  # 稳定在50%
 
-        # 容量不增长，应返回None
+        # 容量不增长, 应返回None
         result = predictor.predict_exhaustion(predictor.l1_history, 0.95)
         assert result is None
 
@@ -96,19 +96,19 @@ class TestCapacityTrendPredictor:
         """测试容量增长时的预测"""
         predictor = CapacityTrendPredictor()
 
-        # 模拟容量增长（每小时增长1%）
+        # 模拟容量增长(每小时增长1%)
         now = time.time()
         for i in range(24):  # 24小时
             timestamp = now + i * 3600
-            usage = 0.5 + (i * 0.01)  # 从50%开始，每小时增长1%
+            usage = 0.5 + (i * 0.01)  # 从50%开始, 每小时增长1%
             predictor.add_sample(usage, 0.6)
 
         # 预测应该在45小时后达到95% (50% + 45*1% = 95%)
         result = predictor.predict_exhaustion(predictor.l1_history, 0.95)
         assert result is not None
 
-        # 验证预测时间合理（应该在20-70小时之间）
-        # 注意：由于线性回归是基于24小时数据预测，可能会有偏差
+        # 验证预测时间合理(应该在20-70小时之间)
+        # 注意: 由于线性回归是基于24小时数据预测, 可能会有偏差
         # 我们只验证预测是否在未来且合理
         time_diff_hours = (result - now) / 3600
         assert time_diff_hours > 0  # 应该在未来
@@ -121,7 +121,7 @@ class TestCapacityTrendPredictor:
         # 添加导致除零错误的数据
         now = time.time()
         for i in range(10):
-            # 所有时间戳相同（会导致除零）
+            # 所有时间戳相同(会导致除零)
             predictor.l1_history.append((now, 0.5))
 
         # 应该返回None而不是抛出异常
@@ -129,7 +129,7 @@ class TestCapacityTrendPredictor:
         assert result is None
 
     def test_predict_exhaustion_negative_slope(self):
-        """测试负斜率趋势（容量下降）"""
+        """测试负斜率趋势(容量下降)"""
         predictor = CapacityTrendPredictor()
 
         # 添加容量下降的样本
@@ -139,7 +139,7 @@ class TestCapacityTrendPredictor:
             usage = 0.9 - (i * 0.01)  # 从90%开始下降
             predictor.add_sample(usage, 0.6)
 
-        # 容量下降，应该返回None
+        # 容量下降, 应该返回None
         result = predictor.predict_exhaustion(predictor.l1_history, 0.95)
         assert result is None
 
@@ -151,7 +151,7 @@ class TestCapacityTrendPredictor:
         now = time.time()
         predictor.add_sample(0.5, 0.6, timestamp=now)
 
-        # 数据不足，返回None
+        # 数据不足, 返回None
         result = predictor.predict_exhaustion(predictor.l1_history, 0.95)
         assert result is None
 
@@ -174,7 +174,7 @@ class TestCapacityTrendPredictor:
                     usage = float('inf')
                 predictor.add_sample(usage, 0.6, timestamp=timestamp)
             except:
-                # 如果添加失败，跳过
+                # 如果添加失败, 跳过
                 pass
 
         # 应该能处理异常并返回None
@@ -306,7 +306,7 @@ class TestCacheCapacityMonitor:
 
     def test_get_l2_usage_with_redis_no_maxmemory(self, monitor, mock_cache):
         """测试Redis未设置maxmemory时的L2使用率"""
-        # Mock Redis客户端（无maxmemory设置）
+        # Mock Redis客户端(无maxmemory设置)
         mock_redis = Mock()
         mock_redis.info.return_value = {
             "maxmemory": 0,  # 未设置maxmemory
@@ -393,7 +393,7 @@ class TestCacheCapacityMonitor:
     @patch.object(CacheCapacityMonitor, "get_redis_memory_stats")
     def test_monitor_l1_capacity_normal(self, mock_get_stats, monitor, mock_cache):
         """测试L1正常容量监控"""
-        # L1使用率50%（正常）
+        # L1使用率50%(正常)
         for i in range(500):
             mock_cache.l1_cache[f"key_{i}"] = f"value_{i}"
 
@@ -403,7 +403,7 @@ class TestCacheCapacityMonitor:
     @patch.object(CacheCapacityMonitor, "get_redis_memory_stats")
     def test_monitor_l1_capacity_warning(self, mock_get_stats, monitor, mock_cache):
         """测试L1警告级别监控"""
-        # L1使用率87%（超过警告阈值85%）
+        # L1使用率87%(超过警告阈值85%)
         for i in range(870):
             mock_cache.l1_cache[f"key_{i}"] = f"value_{i}"
 
@@ -413,7 +413,7 @@ class TestCacheCapacityMonitor:
     @patch.object(CacheCapacityMonitor, "get_redis_memory_stats")
     def test_monitor_l1_capacity_critical(self, mock_get_stats, monitor, mock_cache):
         """测试L1严重级别监控"""
-        # L1使用率96%（超过严重阈值95%）
+        # L1使用率96%(超过严重阈值95%)
         for i in range(960):
             mock_cache.l1_cache[f"key_{i}"] = f"value_{i}"
 
@@ -426,14 +426,14 @@ class TestCacheCapacityMonitor:
         # 记录初始容量
         old_size = mock_cache.l1_size
 
-        # 触发严重阈值（95%）
+        # 触发严重阈值(95%)
         for i in range(960):
             mock_cache.l1_cache[f"key_{i}"] = f"value_{i}"
 
         # 监控应该触发自动扩容
         monitor.monitor_l1_capacity()
 
-        # 验证扩容（应该增加50%）
+        # 验证扩容(应该增加50%)
         new_size = mock_cache.l1_size
         assert new_size == int(old_size * 1.5)
 
@@ -491,19 +491,19 @@ class TestCacheCapacityMonitor:
 
     def test_check_capacity_predictions_with_alert(self, monitor):
         """测试预测告警"""
-        # 添加快速增长样本（模拟即将在7天内耗尽）
+        # 添加快速增长样本(模拟即将在7天内耗尽)
         now = time.time()
         for i in range(24):  # 24小时
             timestamp = now + i * 3600
-            # 非常快速增长，模拟在3天内达到95%
-            # 从50%开始，每小时增长2%，24小时后为98%
+            # 非常快速增长, 模拟在3天内达到95%
+            # 从50%开始, 每小时增长2%, 24小时后为98%
             usage = 0.50 + (i * 0.02)
             monitor.predictor.add_sample(usage, usage)
 
         alerts = monitor.check_capacity_predictions()
 
-        # 验证预测存在（可能需要更多数据点才能触发告警）
-        # 如果告警被触发，验证其内容
+        # 验证预测存在(可能需要更多数据点才能触发告警)
+        # 如果告警被触发, 验证其内容
         if len(alerts) > 0:
             assert "level" in alerts[0]
             assert "predicted_exhaustion" in alerts[0]
@@ -566,7 +566,7 @@ class TestCacheCapacityMonitor:
         for i in range(500):
             mock_cache.l1_cache[f"key_{i}"] = f"value_{i}"
 
-        # 添加预测数据（快速增长）
+        # 添加预测数据(快速增长)
         now = time.time()
         for i in range(30):  # 增加到30个样本
             timestamp = now + i * 3600
@@ -576,14 +576,14 @@ class TestCacheCapacityMonitor:
 
         metrics = monitor.get_prometheus_metrics()
 
-        # 检查是否有预测指标（预测可能需要更多数据或特定条件）
-        # 如果有足够的增长趋势，应该有预测指标
+        # 检查是否有预测指标(预测可能需要更多数据或特定条件)
+        # 如果有足够的增长趋势, 应该有预测指标
         trend_stats = monitor.predictor.get_trend_stats()
         if trend_stats.get("days_until_exhaustion_l1"):
-            # 如果有预测，Prometheus指标应该包含它
+            # 如果有预测, Prometheus指标应该包含它
             assert 'cache_capacity_prediction_days' in metrics
         else:
-            # 如果没有预测，至少应该有基础指标
+            # 如果没有预测, 至少应该有基础指标
             assert 'cache_capacity_bytes' in metrics
 
     def test_monitoring_thread_start_stop(self, monitor):
@@ -627,10 +627,10 @@ class TestCacheCapacityMonitor:
             # 等待一次监控循环
             time.sleep(1.5)
 
-            # 停止监控（不应该抛出异常）
+            # 停止监控(不应该抛出异常)
             monitor.stop()
 
-            # 监控应该继续运行（异常被捕获）
+            # 监控应该继续运行(异常被捕获)
             assert monitor._monitoring_thread is not None
 
     def test_l1_usage_zero_capacity(self, monitor, mock_cache):
@@ -723,6 +723,7 @@ class TestGlobalFunctions:
         """测试自动启动监控"""
         # 保存原始全局变量
         import backend.core.cache.capacity_monitor as cm
+
         original_monitor = cm._capacity_monitor
 
         try:
@@ -738,7 +739,7 @@ class TestGlobalFunctions:
             mock_cache._lock.__exit__ = Mock(return_value=None)
             mock_cache._get_redis_client = Mock(return_value=None)
 
-            # 初始化监控器（自动启动）
+            # 初始化监控器(自动启动)
             monitor = init_capacity_monitor(
                 hierarchical_cache=mock_cache,
                 auto_start=True,

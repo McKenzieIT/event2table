@@ -14,10 +14,11 @@ Migration Status: Repository Pattern Implementation (2026-03-03)
 """
 
 from flask import Blueprint, request
+
 from backend.core.logging import get_logger
-from backend.core.utils import json_success_response, json_error_response
-from backend.models.repositories.parameter_alias_repository import ParameterAliasRepository
+from backend.core.utils import json_error_response, json_success_response
 from backend.models.repositories.games import GameRepository
+from backend.models.repositories.parameter_alias_repository import ParameterAliasRepository
 from backend.models.repositories.parameters import ParameterRepository
 
 logger = get_logger(__name__)
@@ -81,9 +82,7 @@ def create_parameter_alias():
     existing = alias_repo.find_by_alias_and_game(alias, game_gid)
 
     if existing:
-        return json_error_response(
-            "Alias already exists for this parameter", status_code=400
-        )
+        return json_error_response("Alias already exists for this parameter", status_code=400)
 
     # Create alias
     alias_id = alias_repo.create_alias(
@@ -128,9 +127,7 @@ def update_parameter_alias(alias_id):
     return json_success_response(data=updated_alias, message="Parameter alias updated")
 
 
-@parameter_aliases_bp.route(
-    "/api/parameter-aliases/<int:alias_id>/prefer", methods=["PUT"]
-)
+@parameter_aliases_bp.route("/api/parameter-aliases/<int:alias_id>/prefer", methods=["PUT"])
 def set_preferred_alias(alias_id):
     """API: Set an alias as preferred"""
     # Use Repository
@@ -150,9 +147,7 @@ def set_preferred_alias(alias_id):
     return json_success_response(data=updated_alias, message="Preferred alias set")
 
 
-@parameter_aliases_bp.route(
-    "/api/parameters/<int:param_id>/display-name", methods=["PUT"]
-)
+@parameter_aliases_bp.route("/api/parameters/<int:param_id>/display-name", methods=["PUT"])
 def update_parameter_display_name(param_id):
     """API: Update parameter's display name
 
@@ -179,7 +174,7 @@ def update_parameter_display_name(param_id):
         return json_error_response("Failed to update parameter", status_code=500)
 
     # Convert to dict for response
-    param_dict = updated_param.model_dump() if hasattr(updated_param, 'model_dump') else updated_param
-    return json_success_response(
-        data=param_dict, message="Parameter display name updated"
+    param_dict = (
+        updated_param.model_dump() if hasattr(updated_param, 'model_dump') else updated_param
     )
+    return json_success_response(data=param_dict, message="Parameter display name updated")

@@ -1,9 +1,21 @@
 /**
  * API类型定义
  * API Type Definitions
- * 
+ *
  * 统一管理API响应类型和数据模型
+ *
+ * ⚠️ IMPORTANT: Event, Game, Field, and Parameter interfaces are now imported from their respective type files
+ * Do not redefine them here - use the unified definitions
  */
+
+// Import unified type definitions
+import type { Event } from './event-types';
+import type { Game } from './game-types';
+import type { Field } from './hql-types';
+import type { Parameter, EventParam } from './parameter-types';
+
+// Re-export types for external use
+export type { Event, Game, Field, Parameter, EventParam };
 
 // ========== 基础类型 ==========
 
@@ -50,73 +62,20 @@ export interface HQLGenerateResponse extends ApiResponse<HQLGenerateData> {}
 
 // ========== 事件相关类型 ==========
 
-/** 事件基本信息 */
-export interface Event {
-  id: number;
-  name: string;
-  event_name: string;
-  event_name_cn: string;
-  game_id: number;
-  game_gid: number;
-  source_table: string;
-  target_table: string;
-  category_id?: number;
-  include_in_common_params?: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
 /** 事件列表响应 */
 export interface EventsResponse extends PaginatedResponse<Event> {}
 
 // ========== 字段相关类型 ==========
-
-/** 字段基本信息 */
-export interface Field {
-  id: number;
-  name: string;
-  type: string;
-  param_name?: string;
-  param_name_cn?: string;
-  json_path?: string;
-  template_id?: number;
-  is_active?: boolean;
-  version?: number;
-}
 
 /** 字段列表响应 */
 export interface FieldsResponse extends ApiResponse<Field[]> {}
 
 // ========== 参数相关类型 ==========
 
-/** 事件参数 */
-export interface EventParam {
-  id: number;
-  event_id: number;
-  param_name: string;
-  param_name_cn: string;
-  param_type?: string;
-  template_id?: number;
-  param_description?: string;
-  is_active?: boolean;
-  version?: number;
-}
-
 /** 参数列表响应 */
 export interface ParamsResponse extends ApiResponse<EventParam[]> {}
 
 // ========== 游戏相关类型 ==========
-
-/** 游戏基本信息 */
-export interface Game {
-  id: number;
-  gid: number;
-  name: string;
-  ods_db: string;
-  description?: string;
-  created_at?: string;
-  updated_at?: string;
-}
 
 /** 游戏列表响应 */
 export interface GamesResponse extends ApiResponse<Game[]> {}

@@ -1,3 +1,7 @@
+// ⚡️ REACT PERF: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, Spinner, useToast, EmptyState } from "@shared/ui";

@@ -6,10 +6,11 @@ Game Entity Module
 游戏相关的Entity定义
 """
 
-from typing import Optional
-from datetime import datetime
-from pydantic import BaseModel, Field, field_validator, ConfigDict
 import html
+from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class GameEntity(BaseModel):
@@ -61,7 +62,4 @@ class GameEntity(BaseModel):
             return html.escape(v.strip())
         return v
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True
-    )
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)

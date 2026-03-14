@@ -8,16 +8,18 @@ JoinBuilder - 多事件JOIN HQL构建器
 支持INNER JOIN, LEFT JOIN, RIGHT JOIN, CROSS JOIN
 """
 
-from typing import List, Dict, Any
-from ..models.event import Event, Field
+from typing import Any, Dict, List
+
 from backend.core.security.sql_validator import SQLValidator
+
+from ..models.event import Event, Field
 
 
 class JoinBuilder:
     """
     多事件JOIN HQL构建器
 
-    功能：
+    功能: 
     - 支持INNER/LEFT/RIGHT/CROSS JOIN
     - 支持多条件JOIN
     - 支持事件别名
@@ -25,7 +27,21 @@ class JoinBuilder:
     """
 
     VALID_JOIN_TYPES = ["INNER", "LEFT", "RIGHT", "CROSS"]
-    VALID_OPERATORS = ["=", "!=", "<>", "<", ">", "<=", ">=", "LIKE", "NOT LIKE", "IN", "NOT IN", "IS NULL", "IS NOT NULL"]
+    VALID_OPERATORS = [
+        "=",
+        "!=",
+        "<>",
+        "<",
+        ">",
+        "<=",
+        ">=",
+        "LIKE",
+        "NOT LIKE",
+        "IN",
+        "NOT IN",
+        "IS NULL",
+        "IS NOT NULL",
+    ]
 
     def __init__(self):
         """初始化JoinBuilder"""
@@ -44,9 +60,24 @@ class JoinBuilder:
         if "field" not in cond:
             raise ValueError("WHERE condition must have 'field'")
 
-        # 验证字段名（SQL标识符）
+        # 验证字段名(SQL标识符或带表前缀的标识符)
         field = cond["field"]
-        SQLValidator.validate_identifier(field, "field")
+
+        # 支持带表前缀的字段名 (如: login.zone_id)
+        if '.' in field:
+            # 分割并验证每个部分
+            parts = field.split('.')
+            if len(parts) != 2:
+                raise ValueError(
+                    f"Invalid field format: '{field}'. "
+                    f"Must be 'table_name.column_name' or 'column_name'"
+                )
+            table_name, column_name = parts
+            SQLValidator.validate_identifier(table_name, "table_name")
+            SQLValidator.validate_identifier(column_name, "column_name")
+        else:
+            # 单一字段名
+            SQLValidator.validate_identifier(field, "field")
 
         # 验证操作符
         operator = cond.get("operator", "=")
@@ -56,8 +87,8 @@ class JoinBuilder:
                 f"Must be one of: {', '.join(self.VALID_OPERATORS)}"
             )
 
-        # 值可以是任意字符串（由调用者确保安全）
-        # 这是HQL生成器，value可能包含占位符如'${bizdate}'
+        # 值可以是任意字符串(由调用者确保安全)
+        # 这是HQL生成器, value可能包含占位符如'${bizdate}'
 
     def build_join(
         self,
@@ -122,9 +153,18 @@ class JoinBuilder:
         join_type: str,
         use_aliases: bool,
     ) -> str:
-        """构建单个JOIN语句"""
+        """
+        构建单个JOIN语句
+
+        Security:
+        - 验证事件名（表别名）为有效的SQL标识符
+        - 验证字段名为有效的SQL标识符
+        - 验证操作符在白名单中
+        """
         # 表名和别名
         if use_aliases:
+            # 安全: 验证事件别名（用作表别名）为有效的SQL标识符
+            SQLValidator.validate_identifier(join_event.name, "event_alias")
             table_clause = f"{join_event.table_name} AS {join_event.name}"
         else:
             table_clause = join_event.table_name
@@ -145,17 +185,33 @@ class JoinBuilder:
         ]
 
         if not relevant_conditions:
-            # 如果没有找到相关条件，使用所有条件
+            # 如果没有找到相关条件, 使用所有条件
             relevant_conditions = join_conditions
 
         on_conditions = []
         for cond in relevant_conditions:
-            # 安全：这些字段来自join_conditions配置，已通过_validate_where_condition()验证
-            left_field = f"{cond['left_event']}.{cond['left_field']}"
-            right_field = f"{cond['right_event']}.{cond['right_field']}"
+            # 验证JOIN条件操作符
             operator = cond.get("operator", "=")
+            if operator not in self.VALID_OPERATORS:
+                raise ValueError(
+                    f"Invalid operator in JOIN condition: '{operator}'. "
+                    f"Must be one of: {', '.join(self.VALID_OPERATORS)}"
+                )
+
+            # 安全: 验证事件名（用作表别名）为有效的SQL标识符
+            left_event = cond.get('left_event', '')
+            right_event = cond.get('right_event', '')
+            SQLValidator.validate_identifier(left_event, "left_event")
+            SQLValidator.validate_identifier(right_event, "right_event")
+
+            # 安全: 验证字段名为有效的SQL标识符
+            left_field = cond.get('left_field', '')
+            right_field = cond.get('right_field', '')
+            SQLValidator.validate_identifier(left_field, "left_field")
+            SQLValidator.validate_identifier(right_field, "right_field")
+
             # operator已在VALID_OPERATORS白名单中验证
-            on_conditions.append(f"{left_field} {operator} {right_field}")
+            on_conditions.append(f"{left_event}.{left_field} {operator} {right_event}.{right_field}")
 
         on_clause = " AND ".join(on_conditions)
         return f"{join_clause} ON {on_clause}"
@@ -184,7 +240,7 @@ class JoinBuilder:
         # 构建JOIN部分
         join_sql = self.build_join(events, join_conditions, join_type, use_aliases)
 
-        # 构建WHERE条件（带安全验证）
+        # 构建WHERE条件(带安全验证)
         where_parts = []
         for cond in where_conditions:
             # 验证条件安全性
@@ -194,16 +250,16 @@ class JoinBuilder:
             operator = cond["operator"]
             value = cond.get("value", "")
 
-            # 安全：这是HQL生成器，用于构建Hive查询字符串
+            # 安全: 这是HQL生成器, 用于构建Hive查询字符串
             # field已通过SQLValidator.validate_identifier()验证
             # operator已在VALID_OPERATORS白名单中验证
-            # value是调用者提供的值（可能包含HQL占位符如'${bizdate}'）
+            # value是调用者提供的值(可能包含HQL占位符如'${bizdate}')
             where_parts.append(f"{field} {operator} {value}")
 
         where_clause = " AND ".join(where_parts)
 
         # 组装完整SQL
-        # 安全：这是HQL生成器，用于构建Hive查询字符串
+        # 安全: 这是HQL生成器, 用于构建Hive查询字符串
         # 所有字段标识符已通过SQLValidator验证
         # 操作符已通过白名单验证
         full_sql = f"SELECT *\n{join_sql}\nWHERE {where_clause}"
@@ -245,7 +301,7 @@ class JoinBuilder:
                     }
                 )
             else:
-                # 需要推断表别名，暂时使用事件名
+                # 需要推断表别名, 暂时使用事件名
                 where_conditions.append(
                     {
                         "field": f"{event.name}.{partition_field}",

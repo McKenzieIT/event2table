@@ -13,10 +13,11 @@
 日期: 2026-02-24
 """
 
-import pytest
 import asyncio
 import time
 from unittest.mock import patch
+
+import pytest
 
 # 导入被测试模块
 from backend.core.cache.intelligent_warmer import (
@@ -24,13 +25,13 @@ from backend.core.cache.intelligent_warmer import (
     FrequencyPredictor,
     IntelligentCacheWarmer,
     intelligent_cache_warmer,
-    start_warm_up_scheduler
+    start_warm_up_scheduler,
 )
-
 
 # ============================================================================
 # 测试1: CircularBuffer 循环缓冲区
 # ============================================================================
+
 
 class TestCircularBuffer:
     """测试循环缓冲区"""
@@ -55,10 +56,10 @@ class TestCircularBuffer:
         assert len(buffer) == 3
 
     def test_circular_buffer_overflow(self):
-        """测试缓冲区溢出（循环覆盖）"""
+        """测试缓冲区溢出(循环覆盖)"""
         buffer = CircularBuffer(size=3)
 
-        # 添加5个项（超过容量）
+        # 添加5个项(超过容量)
         buffer.append(1)
         buffer.append(2)
         buffer.append(3)
@@ -115,6 +116,7 @@ class TestCircularBuffer:
 # 测试2: FrequencyPredictor 频率预测器
 # ============================================================================
 
+
 class TestFrequencyPredictor:
     """测试频率预测器"""
 
@@ -129,12 +131,7 @@ class TestFrequencyPredictor:
         predictor = FrequencyPredictor()
 
         # 构造频率数据
-        key_frequency = {
-            'key1': 100,
-            'key2': 50,
-            'key3': 10,
-            'key4': 5
-        }
+        key_frequency = {'key1': 100, 'key2': 50, 'key3': 10, 'key4': 5}
 
         # 预测Top 3
         hot_keys = predictor.predict(key_frequency, top_n=3)
@@ -164,11 +161,7 @@ class TestFrequencyPredictor:
         ]
 
         # 使用时间衰减预测
-        hot_keys = predictor.predict_with_decay(
-            access_log,
-            top_n=10,
-            decay_factor=0.95
-        )
+        hot_keys = predictor.predict_with_decay(access_log, top_n=10, decay_factor=0.95)
 
         # 最近访问的键应该排在前面
         assert hot_keys[0] == 'very_recent_key'
@@ -189,8 +182,8 @@ class TestFrequencyPredictor:
 
         current_time = time.time()
 
-        # old_key: 100次访问，但都是2小时前
-        # new_key: 10次访问，但都是最近1分钟
+        # old_key: 100次访问, 但都是2小时前
+        # new_key: 10次访问, 但都是最近1分钟
         access_log = []
 
         for _ in range(100):
@@ -200,14 +193,10 @@ class TestFrequencyPredictor:
             access_log.append({'key': 'new_key', 'timestamp': current_time - 60})
 
         # 使用时间衰减预测
-        hot_keys = predictor.predict_with_decay(
-            access_log,
-            top_n=10,
-            decay_factor=0.95
-        )
+        hot_keys = predictor.predict_with_decay(access_log, top_n=10, decay_factor=0.95)
 
-        # 由于衰减因子0.95 ^ 2 = 0.9025，old_key的权重仍然很高
-        # 即使有衰减，100次访问仍然比10次访问权重大
+        # 由于衰减因子0.95 ^ 2 = 0.9025, old_key的权重仍然很高
+        # 即使有衰减, 100次访问仍然比10次访问权重大
         # 验证两个键都在结果中
         assert 'old_key' in hot_keys
         assert 'new_key' in hot_keys
@@ -217,15 +206,13 @@ class TestFrequencyPredictor:
 # 测试3: IntelligentCacheWarmer 智能预热器
 # ============================================================================
 
+
 class TestIntelligentCacheWarmer:
     """测试智能缓存预热器"""
 
     def test_warmer_init(self):
         """测试预热器初始化"""
-        warmer = IntelligentCacheWarmer(
-            access_log_size=1000,
-            warm_up_interval=300
-        )
+        warmer = IntelligentCacheWarmer(access_log_size=1000, warm_up_interval=300)
 
         assert warmer is not None
         assert warmer.access_log.buffer.maxlen == 1000
@@ -267,14 +254,14 @@ class TestIntelligentCacheWarmer:
         """测试基于频率的热点键预测"""
         warmer = IntelligentCacheWarmer()
 
-        # 模拟访问：key1访问10次，key2访问5次，key3访问1次
+        # 模拟访问: key1访问10次, key2访问5次, key3访问1次
         for _ in range(10):
             warmer.record_access("key_1")
         for _ in range(5):
             warmer.record_access("key_2")
         warmer.record_access("key_3")
 
-        # 预测热点键（不使用衰减）
+        # 预测热点键(不使用衰减)
         hot_keys = warmer.predict_hot_keys(use_decay=False)
 
         # key1应该排在最前面
@@ -297,10 +284,10 @@ class TestIntelligentCacheWarmer:
         for _ in range(10):
             warmer.record_access("new_key")
 
-        # 预测热点键（使用时间衰减）
+        # 预测热点键(使用时间衰减)
         hot_keys = warmer.predict_hot_keys(use_decay=True)
 
-        # new_key应该有更高的优先级（因为recent访问）
+        # new_key应该有更高的优先级(因为recent访问)
         assert "new_key" in hot_keys
         assert "old_key" in hot_keys
 
@@ -357,8 +344,7 @@ class TestIntelligentCacheWarmer:
                 mock_cache.l1_cache = {}
 
                 result = await warmer.warm_up_cache(
-                    keys=['key1', 'key2'],
-                    fetch_callback=mock_fetch
+                    keys=['key1', 'key2'], fetch_callback=mock_fetch
                 )
 
                 assert result['warmed'] == 2
@@ -379,8 +365,7 @@ class TestIntelligentCacheWarmer:
                     return f"data_{key}"
 
                 result = await warmer.warm_up_cache(
-                    keys=['key1', 'key2'],
-                    fetch_callback=mock_fetch
+                    keys=['key1', 'key2'], fetch_callback=mock_fetch
                 )
 
                 assert result['skipped'] == 1
@@ -397,10 +382,7 @@ class TestIntelligentCacheWarmer:
             async def failing_fetch(key):
                 raise Exception("Database error")
 
-            result = await warmer.warm_up_cache(
-                keys=['key1', 'key2'],
-                fetch_callback=failing_fetch
-            )
+            result = await warmer.warm_up_cache(keys=['key1', 'key2'], fetch_callback=failing_fetch)
 
             assert result['failed'] == 2
             assert result['warmed'] == 0
@@ -419,10 +401,7 @@ class TestIntelligentCacheWarmer:
                 mock_cache.l1_cache = {}
 
                 # 执行预热
-                await warmer.warm_up_cache(
-                    keys=['key1', 'key2'],
-                    fetch_callback=mock_fetch
-                )
+                await warmer.warm_up_cache(keys=['key1', 'key2'], fetch_callback=mock_fetch)
 
                 # 检查统计
                 stats = warmer.get_stats()
@@ -484,7 +463,7 @@ class TestIntelligentCacheWarmer:
         assert 'buffer_usage' in stats
 
     def test_calculate_prediction_accuracy_perfect(self):
-        """测试完美预测准确率（100%）"""
+        """测试完美预测准确率(100%)"""
         warmer = IntelligentCacheWarmer()
 
         # 记录一些访问
@@ -511,7 +490,7 @@ class TestIntelligentCacheWarmer:
         assert stats['actual_hits'] == 2.0
 
     def test_calculate_prediction_accuracy_partial(self):
-        """测试部分准确率（50%）"""
+        """测试部分准确率(50%)"""
         warmer = IntelligentCacheWarmer()
 
         # 记录访问
@@ -531,7 +510,7 @@ class TestIntelligentCacheWarmer:
         assert accuracy_stats['actual_hits'] == 2.0
 
     def test_calculate_prediction_accuracy_zero(self):
-        """测试零准确率（0%）"""
+        """测试零准确率(0%)"""
         warmer = IntelligentCacheWarmer()
 
         # 记录访问
@@ -549,7 +528,7 @@ class TestIntelligentCacheWarmer:
         assert accuracy_stats['actual_hits'] == 0.0
 
     def test_calculate_prediction_accuracy_empty_predictions(self):
-        """测试空预测列表（避免除零）"""
+        """测试空预测列表(避免除零)"""
         warmer = IntelligentCacheWarmer()
 
         # 记录访问
@@ -572,28 +551,25 @@ class TestIntelligentCacheWarmer:
 
         current_time = time.time()
 
-        # 添加旧访问（在时间窗口外）
-        warmer.access_log.append({
-            'key': 'old_key',
-            'timestamp': current_time - 400  # 超过默认的5分钟窗口
-        })
+        # 添加旧访问(在时间窗口外)
+        warmer.access_log.append(
+            {'key': 'old_key', 'timestamp': current_time - 400}  # 超过默认的5分钟窗口
+        )
 
-        # 添加新访问（在时间窗口内）
-        warmer.access_log.append({
-            'key': 'new_key',
-            'timestamp': current_time - 100  # 在5分钟窗口内
-        })
+        # 添加新访问(在时间窗口内)
+        warmer.access_log.append(
+            {'key': 'new_key', 'timestamp': current_time - 100}  # 在5分钟窗口内
+        )
 
         # 预测的键
         predicted_keys = ["old_key", "new_key"]
 
-        # 计算准确率（只有new_key应该算命中）
+        # 计算准确率(只有new_key应该算命中)
         accuracy_stats = warmer.calculate_prediction_accuracy(
-            predicted_keys,
-            actual_access_window_seconds=300  # 5分钟窗口
+            predicted_keys, actual_access_window_seconds=300  # 5分钟窗口
         )
 
-        # old_key在窗口外，不应该算命中
+        # old_key在窗口外, 不应该算命中
         assert accuracy_stats['predicted_count'] == 2.0
         assert accuracy_stats['actual_hits'] == 1.0
         assert accuracy_stats['accuracy'] == 50.0
@@ -617,8 +593,7 @@ class TestIntelligentCacheWarmer:
 
                 # 执行预热
                 result = await warmer.warm_up_cache(
-                    keys=["hot_key_1", "hot_key_2", "cold_key"],
-                    fetch_callback=mock_fetch
+                    keys=["hot_key_1", "hot_key_2", "cold_key"], fetch_callback=mock_fetch
                 )
 
                 # 验证返回包含准确率
@@ -640,7 +615,7 @@ class TestIntelligentCacheWarmer:
         accuracy_stats1 = warmer.calculate_prediction_accuracy(["key_1"])
         assert accuracy_stats1['predicted_count'] == 1.0
 
-        # 第二次计算（应该覆盖之前的值）
+        # 第二次计算(应该覆盖之前的值)
         accuracy_stats2 = warmer.calculate_prediction_accuracy(["key_1", "key_2"])
         assert accuracy_stats2['predicted_count'] == 2.0
 
@@ -685,15 +660,14 @@ class TestIntelligentCacheWarmer:
                 return f"data_{key}"
 
             async def warm_up_task(keys):
-                with patch('backend.core.cache.intelligent_warmer.hierarchical_cache') as mock_cache:
+                with patch(
+                    'backend.core.cache.intelligent_warmer.hierarchical_cache'
+                ) as mock_cache:
                     mock_cache.l1_cache = {}
                     await warmer.warm_up_cache(keys, fetch_callback=mock_fetch)
 
             # 并发执行多个预热任务
-            tasks = [
-                warm_up_task([f'key_{i}'])
-                for i in range(10)
-            ]
+            tasks = [warm_up_task([f'key_{i}']) for i in range(10)]
 
             await asyncio.gather(*tasks)
 
@@ -707,6 +681,7 @@ class TestIntelligentCacheWarmer:
 # ============================================================================
 # 测试4: 全局实例和调度器
 # ============================================================================
+
 
 class TestGlobalWarmer:
     """测试全局预热器实例"""
@@ -736,7 +711,7 @@ class TestGlobalWarmer:
         async def mock_fetch(key):
             return f"data_{key}"
 
-        # 启动调度器（短间隔用于测试）
+        # 启动调度器(短间隔用于测试)
         thread = start_warm_up_scheduler(interval_seconds=1, fetch_callback=mock_fetch)
 
         assert thread is not None
@@ -751,45 +726,41 @@ class TestGlobalWarmer:
 # 测试5: 边界条件和错误处理
 # ============================================================================
 
+
 class TestEdgeCases:
     """测试边界条件"""
 
     def test_import_error_handling(self):
-        """测试导入错误处理（模拟hierarchical_cache不可用）"""
+        """测试导入错误处理(模拟hierarchical_cache不可用)"""
         # 这个测试验证当hierarchical_cache为None时的行为
         warmer = IntelligentCacheWarmer()
 
         async def test_without_hierarchical_cache():
             with patch('backend.core.cache.intelligent_warmer.hierarchical_cache', None):
+
                 async def mock_fetch(key):
                     return f"data_{key}"
 
-                # 即使hierarchical_cache为None，也应该能工作
-                result = await warmer.warm_up_cache(
-                    keys=['key1'],
-                    fetch_callback=mock_fetch
-                )
+                # 即使hierarchical_cache为None, 也应该能工作
+                result = await warmer.warm_up_cache(keys=['key1'], fetch_callback=mock_fetch)
 
-                # 应该成功预热（只是跳过L1缓存检查）
+                # 应该成功预热(只是跳过L1缓存检查)
                 assert result['warmed'] == 1
 
         asyncio.run(test_without_hierarchical_cache())
 
     def test_warm_up_without_callback(self):
-        """测试没有回调函数的预热（测试data=None分支）"""
+        """测试没有回调函数的预热(测试data=None分支)"""
         warmer = IntelligentCacheWarmer()
 
         async def test_no_callback():
             with patch('backend.core.cache.intelligent_warmer.hierarchical_cache') as mock_cache:
                 mock_cache.l1_cache = {}
 
-                # 不提供fetch_callback，data会是None
-                result = await warmer.warm_up_cache(
-                    keys=['key1'],
-                    fetch_callback=None
-                )
+                # 不提供fetch_callback, data会是None
+                result = await warmer.warm_up_cache(keys=['key1'], fetch_callback=None)
 
-                # data为None，应该计入failed
+                # data为None, 应该计入failed
                 assert result['failed'] == 1
                 assert result['warmed'] == 0
 
@@ -801,7 +772,9 @@ class TestEdgeCases:
 
         async def test_exception_in_auto_warmup():
             # Mock predict_hot_keys抛出异常
-            with patch.object(warmer, 'predict_hot_keys', side_effect=Exception("Prediction error")):
+            with patch.object(
+                warmer, 'predict_hot_keys', side_effect=Exception("Prediction error")
+            ):
                 # 应该捕获异常而不崩溃
                 await warmer.auto_warm_up()
 
@@ -812,16 +785,17 @@ class TestEdgeCases:
         asyncio.run(test_exception_in_auto_warmup())
 
     def test_auto_warm_up_with_no_hot_keys(self):
-        """测试没有热点键时的自动预热（测试早期返回）"""
+        """测试没有热点键时的自动预热(测试早期返回)"""
         warmer = IntelligentCacheWarmer()
 
         async def test_no_hot_keys():
             # Mock predict_hot_keys返回空列表
             with patch.object(warmer, 'predict_hot_keys', return_value=[]):
+
                 async def mock_fetch(key):
                     return f"data_{key}"
 
-                # 应该提前返回，不执行预热
+                # 应该提前返回, 不执行预热
                 await warmer.auto_warm_up(fetch_callback=mock_fetch)
 
                 # 验证不会增加预热计数
@@ -843,11 +817,10 @@ class TestEdgeCases:
                     return None
 
                 result = await warmer.warm_up_cache(
-                    keys=['key1', 'key2'],
-                    fetch_callback=mock_fetch_none
+                    keys=['key1', 'key2'], fetch_callback=mock_fetch_none
                 )
 
-                # data为None，应该计入failed
+                # data为None, 应该计入failed
                 assert result['failed'] == 2
                 assert result['warmed'] == 0
 
@@ -860,12 +833,11 @@ class TestEdgeCases:
         current_time = time.time()
 
         # 添加一个很久以前的访问
-        warmer.access_log.append({
-            'key': 'ancient_key',
-            'timestamp': current_time - 100000  # 超过1天
-        })
+        warmer.access_log.append(
+            {'key': 'ancient_key', 'timestamp': current_time - 100000}  # 超过1天
+        )
 
-        # 预测热点键（只看最近1小时）
+        # 预测热点键(只看最近1小时)
         hot_keys = warmer.predict_hot_keys()
 
         # 旧访问应该被忽略
@@ -886,10 +858,10 @@ class TestEdgeCases:
         # 使用衰减预测
         hot_keys = warmer.predict_hot_keys(use_decay=True)
 
-        # key1应该排前面（最近且多次访问）
+        # key1应该排前面(最近且多次访问)
         assert hot_keys[0] == 'key1'
         assert 'key3' in hot_keys
-        # key2太旧，可能不在列表中
+        # key2太旧, 可能不在列表中
 
     def test_buffer_overflow_with_timing(self):
         """测试缓冲区溢出时的时间顺序"""
@@ -934,15 +906,11 @@ class TestEdgeCases:
 
         access_log = [
             {'key': 'old', 'timestamp': current_time - 3600},
-            {'key': 'new', 'timestamp': current_time - 60}
+            {'key': 'new', 'timestamp': current_time - 60},
         ]
 
-        # 衰减因子为0（不考虑时间）
-        hot_keys = predictor.predict_with_decay(
-            access_log,
-            top_n=10,
-            decay_factor=0.0
-        )
+        # 衰减因子为0(不考虑时间)
+        hot_keys = predictor.predict_with_decay(access_log, top_n=10, decay_factor=0.0)
 
         # 应该只返回空的或不可预测
         assert isinstance(hot_keys, list)
@@ -964,16 +932,14 @@ class TestEdgeCases:
                 return warmer.predict_hot_keys()
 
             async def warmup_task():
-                with patch('backend.core.cache.intelligent_warmer.hierarchical_cache') as mock_cache:
+                with patch(
+                    'backend.core.cache.intelligent_warmer.hierarchical_cache'
+                ) as mock_cache:
                     mock_cache.l1_cache = {}
                     await warmer.warm_up_cache(['key1'], fetch_callback=mock_fetch)
 
             # 并发执行
-            results = await asyncio.gather(
-                predict_task(),
-                warmup_task(),
-                return_exceptions=True
-            )
+            results = await asyncio.gather(predict_task(), warmup_task(), return_exceptions=True)
 
             # 验证两个任务都完成
             assert len(results) == 2
@@ -984,6 +950,7 @@ class TestEdgeCases:
 # ============================================================================
 # 测试6: 调度器异常处理
 # ============================================================================
+
 
 class TestSchedulerExceptionHandling:
     """测试调度器异常处理"""

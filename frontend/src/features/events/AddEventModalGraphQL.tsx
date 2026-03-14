@@ -9,7 +9,7 @@
  * 使用GraphQL Mutation替代REST API
  */
 
-import React, { useState, ChangeEvent, FormEvent, useCallback, memo } from 'react';
+import React, { useState, useRef, useEffect, ChangeEvent, FormEvent, useCallback, memo } from 'react';
 import { BaseModal, Button, Input, Select, useToast } from '@shared/ui';
 import { useCreateEvent } from '../../graphql/hooks';
 import './AddEventModal.css';
@@ -44,6 +44,10 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
     includeInCommonParams: false
   });
   const [errors, setErrors] = useState<FormErrors>({});
+
+  // Refs to input elements (for Chrome MCP compatibility)
+  const eventNameRef = useRef<HTMLInputElement>(null);
+  const eventNameCnRef = useRef<HTMLInputElement>(null);
 
   // GraphQL Mutation
   const [createEvent, { loading: isSubmitting }] = useCreateEvent();
@@ -135,6 +139,29 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
     onClose();
   }, [onClose]);
 
+  // Chrome MCP兼容性: 监听DOM值变化并同步到state
+  useEffect(() => {
+    if (!eventNameRef.current || !eventNameCnRef.current) {
+      return;
+    }
+
+    const eventNameDomValue = eventNameRef.current.value;
+    const eventNameCnDomValue = eventNameCnRef.current.value;
+
+    const updates: Partial<FormData> = {};
+
+    if (eventNameDomValue !== formData.eventName) {
+      updates.eventName = eventNameDomValue;
+    }
+    if (eventNameCnDomValue !== formData.eventNameCn) {
+      updates.eventNameCn = eventNameCnDomValue;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+  }, [formData.eventName, formData.eventNameCn]);
+
   return (
     <BaseModal isOpen={isOpen} onClose={handleClose} title="添加事件" size="md">
       <form onSubmit={handleSubmit} className="add-event-form">
@@ -147,6 +174,7 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange('eventName', e.target.value)}
           placeholder="例如: user_login"
           error={errors.eventName}
+          ref={eventNameRef}
         />
         {errors.eventName && <span className="error-message">{errors.eventName}</span>}
         <span className="hint">只能包含小写字母和下划线</span>
@@ -160,6 +188,7 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange('eventNameCn', e.target.value)}
           placeholder="例如: 用户登录"
           error={errors.eventNameCn}
+          ref={eventNameCnRef}
         />
         {errors.eventNameCn && <span className="error-message">{errors.eventNameCn}</span>}
 

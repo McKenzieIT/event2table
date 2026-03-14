@@ -1,0 +1,47 @@
+#!/usr/bin/expect -f
+
+set timeout 600
+set project_dir "/Users/mckenzie/Documents/event2table"
+set log_file "$project_dir/logs/update-docs-scheduled.log"
+set wrapper "$project_dir/scripts/scheduled/run-claude.sh"
+
+# Initialize log
+set timestamp [clock format [clock seconds]]
+set fp [open $log_file a]
+puts $fp "\[LOG\] Starting Claude doc update task at $timestamp"
+close $fp
+
+# Change to project directory
+cd $project_dir
+
+# Spawn Claude via wrapper
+spawn $wrapper
+
+# Wait for Claude to be ready
+expect {
+    timeout {
+        puts "Timeout waiting for Claude"
+        exit 1
+    }
+    -re {How|What|Claude|ready|Welcome|>} {
+        puts "Claude is ready"
+    }
+}
+
+# Send the command
+send "/update-docs 更新文档，并整合docs/目录下的文档，将重复的文档提取经验到新或已有经验文档中，过程中不能因为token和时间去忽略重要的经验，完成后将旧的文档进行归档，并在开发文档中更新经验和索引\r"
+
+puts "Command sent, waiting for completion..."
+
+# Wait for completion or timeout
+expect {
+    timeout { puts "Timeout - task may still be running" }
+    eof { puts "Claude session ended" }
+}
+
+# Send exit
+send "exit\r"
+expect eof
+
+puts "Task complete"
+exit 0

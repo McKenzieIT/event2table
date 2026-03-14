@@ -6,22 +6,25 @@
 
 import re
 from typing import Optional
-from ..models.event import Field, FieldType
+
 from backend.core.security.sql_validator import SQLValidator
+from backend.core.utils import IdentifierSanitizer
+
+from ..models.event import Field, FieldType
 
 
 class FieldBuilder:
     """
     字段SQL构建器
 
-    支持4种字段类型：
+    支持4种字段类型: 
     - base: 基础字段（如: role_id）
     - param: JSON参数字段（如: get_json_object(params, '$.zone_id')）
     - custom: 自定义表达式
     - fixed: 固定常量值
     """
 
-    # 危险的SQL关键字（用于custom_expression验证）
+    # 危险的SQL关键字(用于custom_expression验证)
     DANGEROUS_KEYWORDS = [
         "DROP",
         "DELETE",
@@ -41,11 +44,54 @@ class FieldBuilder:
         "sp_",
     ]
 
+    def _sanitize_identifier(self, identifier: str) -> str:
+        """
+        清理无效标识符，使其符合SQL命名规范
+
+        处理游戏数据中常见的特殊字符：
+        - 点号(.): result.size → result_size
+        - 连字符(-): user-level → user_level
+        - 空格: item count → item_count
+
+        Args:
+            identifier: 原始标识符
+
+        Returns:
+            str: 清理后的标识符
+
+        Examples:
+            >>> builder._sanitize_identifier("result.size")
+            'result_size'
+            >>> builder._sanitize_identifier("user-level")
+            'user_level'
+            >>> builder._sanitize_identifier("item count")
+            'item_count'
+        """
+        # 替换常见的特殊字符为下划线
+        sanitized = identifier.replace('.', '_').replace('-', '_').replace(' ', '_')
+
+        # 移除任何剩余的非字母数字下划线字符
+        sanitized = re.sub(r'[^a-zA-Z0-9_]', '_', sanitized)
+
+        # 如果只包含下划线（没有字母或数字），返回默认值
+        if sanitized and all(c == '_' for c in sanitized):
+            sanitized = 'field_unknown'
+
+        # 确保不以数字开头（SQL标识符规则）
+        elif sanitized and sanitized[0].isdigit():
+            sanitized = f'field_{sanitized}'
+
+        # 确保不为空
+        elif not sanitized:
+            sanitized = 'field_unknown'
+
+        return sanitized
+
     def _validate_identifier(self, identifier: str) -> bool:
         """
         验证标识符是否安全
 
-        只允许字母、数字、下划线和$
+        只允许字母, 数字, 下划线和$
         使用SQLValidator进行验证
         """
         try:
@@ -58,13 +104,31 @@ class FieldBuilder:
         """
         转义SQL标识符（使用反引号）
 
-        防止SQL注入
+        防止SQL注入，并自动清理无效标识符
+
+        Args:
+            identifier: 原始标识符（可能包含特殊字符）
+
+        Returns:
+            str: 转义后的安全SQL标识符
+
+        Examples:
+            >>> builder._escape_identifier("result.size")
+            '`result_size`'
+            >>> builder._escape_identifier("role_id")
+            '`role_id`'
         """
-        if not self._validate_identifier(identifier):
-            raise ValueError(f"Invalid identifier: {identifier}")
+        # 先清理标识符（处理特殊字符）
+        sanitized = self._sanitize_identifier(identifier)
+
+        # 然后验证（清理后的标识符应该总是通过）
+        if not self._validate_identifier(sanitized):
+            raise ValueError(
+                f"Invalid identifier (even after sanitization): {identifier} → {sanitized}"
+            )
 
         # 转义反引号
-        escaped = identifier.replace("`", "``")
+        escaped = sanitized.replace("`", "``")
         return f"`{escaped}`"
 
     def _validate_custom_expression(self, expression: str) -> bool:
@@ -87,7 +151,7 @@ class FieldBuilder:
                     f"This could be a SQL injection attempt."
                 )
 
-        # 检查多个语句（分号）
+        # 检查多个语句(分号)
         if ";" in expression:
             raise ValueError(
                 "Multiple statements detected in custom expression. "
@@ -143,14 +207,14 @@ class FieldBuilder:
             role_id AS role
             COUNT(role_id) AS role_count
         """
-        # 转义字段名（防止SQL注入）
+        # 转义字段名(防止SQL注入)
         sql = self._escape_identifier(field.name)
 
         # 聚合函数
         if field.aggregate_func:
             sql = f"{field.aggregate_func}({sql})"
 
-        # 别名（转义）
+        # 别名(转义)
         if field.alias:
             alias = self._escape_identifier(field.alias)
             sql = f"{sql} AS {alias}"
@@ -177,7 +241,7 @@ class FieldBuilder:
             sql = f"CAST({sql} AS STRING)"
             sql = f"{field.aggregate_func}({sql})"
 
-        # 别名（必需，因为提取表达式很长）
+        # 别名(必需, 因为提取表达式很长)
         alias = field.alias or field.name
         alias_escaped = self._escape_identifier(alias)
         sql = f"{sql} AS {alias_escaped}"
@@ -193,12 +257,12 @@ class FieldBuilder:
         if not field.custom_expression:
             raise ValueError("custom field must have custom_expression")
 
-        # 验证自定义表达式（防止SQL注入）
+        # 验证自定义表达式(防止SQL注入)
         self._validate_custom_expression(field.custom_expression)
 
         sql = field.custom_expression
 
-        # 别名（转义）
+        # 别名(转义)
         if field.alias:
             alias = self._escape_identifier(field.alias)
             sql = f"{sql} AS {alias}"
@@ -226,7 +290,7 @@ class FieldBuilder:
         else:
             sql = str(field.fixed_value)
 
-        # 别名（必需，转义）
+        # 别名(必需, 转义)
         alias = field.alias or field.name
         alias_escaped = self._escape_identifier(alias)
         sql = f"{sql} AS {alias_escaped}"

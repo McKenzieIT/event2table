@@ -4,19 +4,20 @@
 完全无框架依赖的HQL生成器
 """
 
-from typing import List, Union, Dict, Any
-from ..models.event import Event, Field, Condition
+from typing import Any, Dict, List, Union
+
 from ..builders.field_builder import FieldBuilder
-from ..builders.where_builder import WhereBuilder
 from ..builders.join_builder import JoinBuilder
 from ..builders.union_builder import UnionBuilder
+from ..builders.where_builder import WhereBuilder
+from ..models.event import Condition, Event, Field
 
 
 class HQLGenerator:
     """
     核心HQL生成器
 
-    这是完全独立的、无业务依赖的HQL生成器
+    这是完全独立的, 无业务依赖的HQL生成器
     可以作为独立Python包使用
 
     Examples:
@@ -141,7 +142,7 @@ WHERE
         # 构建JOIN部分
         join_sql = self.join_builder.build_join(events, join_conditions, join_type, use_aliases)
 
-        # 构建WHERE条件（包含分区过滤）
+        # 构建WHERE条件(包含分区过滤)
         context = {"event": events[0]} if events else None
         where_clause = self.where_builder.build(conditions, context)
 
@@ -174,10 +175,10 @@ WHERE
             # 普通UNION
             union_sql = self.union_builder.build_union_all(events, fields, use_aliases=use_aliases)
 
-        # 添加额外的WHERE条件（如果有）
+        # 添加额外的WHERE条件(如果有)
         if conditions:
             # TODO: 支持复杂的WHERE条件
-            # 目前暂时不支持，因为UNION每个子查询的WHERE可能不同
+            # 目前暂时不支持, 因为UNION每个子查询的WHERE可能不同
             pass  # pragma: no cover
 
         return union_sql
@@ -228,10 +229,10 @@ class DebuggableHQLGenerator(HQLGenerator):
         debug = options.get("debug", False)
 
         if not debug:
-            # 普通模式：调用父类方法
+            # 普通模式: 调用父类方法
             return super().generate(events, fields, conditions, **options)
 
-        # 调试模式：返回详细跟踪
+        # 调试模式: 返回详细跟踪
         trace: Dict[str, Any] = {
             "steps": [],
             "events": [e.__dict__ for e in events],

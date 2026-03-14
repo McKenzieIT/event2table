@@ -10,8 +10,8 @@ from pathlib import Path
 # 添加hql_v2到路径
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from backend.services.hql.models.event import Event, Field, Condition
 from backend.services.hql.core.generator import HQLGenerator
+from backend.services.hql.models.event import Condition, Event, Field
 
 
 def example_1_simple_hql():

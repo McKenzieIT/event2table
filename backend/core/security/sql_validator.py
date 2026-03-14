@@ -4,21 +4,30 @@
 SQL标识符验证器
 防止SQL注入攻击
 """
+
 import re
 from typing import Set, Union
 
 
 class SQLValidator:
-    """SQL标识符验证器，防止SQL注入攻击"""
+    """SQL标识符验证器, 防止SQL注入攻击"""
 
     IDENTIFIER_PATTERN = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
 
     # 允许的PRAGMA键白名单
     ALLOWED_PRAGMAS: Set[str] = {
-        'user_version', 'journal_mode', 'synchronous',
-        'cache_size', 'foreign_keys', 'table_info',
-        'index_info', 'index_list', 'temp_store',
-        'locking_mode', 'page_size', 'encoding'
+        'user_version',
+        'journal_mode',
+        'synchronous',
+        'cache_size',
+        'foreign_keys',
+        'table_info',
+        'index_info',
+        'index_list',
+        'temp_store',
+        'locking_mode',
+        'page_size',
+        'encoding',
     }
 
     @classmethod
@@ -212,7 +221,7 @@ class SQLValidator:
             valid_values = {
                 'journal_mode': {'DELETE', 'TRUNCATE', 'PERSIST', 'MEMORY', 'WAL', 'OFF'},
                 'temp_store': {'DEFAULT', 'FILE', 'MEMORY'},
-                'locking_mode': {'NORMAL', 'EXCLUSIVE'}
+                'locking_mode': {'NORMAL', 'EXCLUSIVE'},
             }
             if key in valid_values and str(value).upper() not in valid_values[key]:
                 raise ValueError(
@@ -254,10 +263,7 @@ class SQLValidator:
                 elif lower_val in ['false', '0', 'no', 'off']:
                     return 0
 
-            raise ValueError(
-                f"Invalid value for {key}: '{value}'. "
-                f"Must be a boolean or 0/1"
-            )
+            raise ValueError(f"Invalid value for {key}: '{value}'. " f"Must be a boolean or 0/1")
 
         elif key == 'encoding':
             # 编码必须是有效的字符串

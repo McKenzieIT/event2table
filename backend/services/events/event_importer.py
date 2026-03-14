@@ -9,12 +9,12 @@ Event Importer Service (Refactored to use EventService)
 - 集成缓存失效和Bloom Filter
 """
 
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from backend.core.logging import get_logger
 from backend.models.entities import EventEntity
-from backend.models.repositories.events import EventRepository
 from backend.models.repositories.category_repository import CategoryRepository
+from backend.models.repositories.events import EventRepository
 from backend.services.events.event_service import EventService
 
 logger = get_logger(__name__)
@@ -24,13 +24,13 @@ class EventImporter:
     """
     事件导入器 (重构版 - 使用EventService)
 
-    职责：
+    职责: 
     - 批量导入事件的业务流程编排
     - 使用EventService处理单个事件创建
     - 使用CategoryRepository处理分类管理
     - 返回导入结果统计
 
-    不再直接访问数据库，所有数据访问通过Service/Repository层
+    不再直接访问数据库, 所有数据访问通过Service/Repository层
     """
 
     def __init__(self):
@@ -40,9 +40,7 @@ class EventImporter:
         self.category_repo = CategoryRepository()
         logger.info("✅ EventImporter initialized (using EventService)")
 
-    def import_events(
-        self, game_gid: int, events_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    def import_events(self, game_gid: int, events_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         批量导入事件 (使用EventService)
 
@@ -93,24 +91,20 @@ class EventImporter:
                     continue
 
                 # 转换为EventEntity并创建
-                event_entity = self._convert_to_event_entity(
-                    game_gid, event_data
-                )
+                event_entity = self._convert_to_event_entity(game_gid, event_data)
 
                 # 使用EventService创建事件 (自动处理缓存失效和Bloom Filter)
                 created_event = self.event_service.create_event(event_entity)
 
                 if created_event:
                     imported += 1
-                    logger.info(
-                        f"✅ Imported event: {event_code} (ID: {created_event.id})"
-                    )
+                    logger.info(f"✅ Imported event: {event_code} (ID: {created_event.id})")
                 else:
                     errors.append(f"Row {idx}: Failed to create event {event_code}")
                     failed += 1
 
             except ValueError as e:
-                # 业务逻辑错误 (如游戏不存在、事件已存在)
+                # 业务逻辑错误 (如游戏不存在, 事件已存在)
                 errors.append(f"Row {idx}: {str(e)}")
                 failed += 1
                 logger.warning(f"Validation error at row {idx}: {e}")
@@ -128,15 +122,12 @@ class EventImporter:
         }
 
         logger.info(
-            f"📊 Import completed: {imported}/{len(events_data)} imported, "
-            f"{failed} failed"
+            f"📊 Import completed: {imported}/{len(events_data)} imported, " f"{failed} failed"
         )
 
         return result
 
-    def _get_existing_event_names(
-        self, game_gid: int, events_data: List[Dict[str, Any]]
-    ) -> set:
+    def _get_existing_event_names(self, game_gid: int, events_data: List[Dict[str, Any]]) -> set:
         """
         批量获取已存在的事件名 (优化性能 - 使用批量查询)
 
@@ -156,9 +147,7 @@ class EventImporter:
         existing_events = self.event_repo.batch_find_by_names(event_names, game_gid)
         return {event.event_name for event in existing_events}
 
-    def _convert_to_event_entity(
-        self, game_gid: int, event_data: Dict[str, Any]
-    ) -> EventEntity:
+    def _convert_to_event_entity(self, game_gid: int, event_data: Dict[str, Any]) -> EventEntity:
         """
         转换导入数据为EventEntity
 
@@ -180,12 +169,8 @@ class EventImporter:
         category_id = self._get_or_create_category(category_name)
 
         # 生成表名
-        source_table = event_data.get(
-            "source_table", f"ieu_ods.ods_{game_gid}_all_view"
-        )
-        target_table = event_data.get(
-            "target_table", f"dwd.v_dwd_{game_gid}_{event_code}_di"
-        )
+        source_table = event_data.get("source_table", f"ieu_ods.ods_{game_gid}_all_view")
+        target_table = event_data.get("target_table", f"dwd.v_dwd_{game_gid}_{event_code}_di")
 
         # 构建EventEntity (Pydantic会自动验证)
         entity_data = {
@@ -225,14 +210,10 @@ class EventImporter:
         new_category = self.category_repo.create(category_data)
 
         if new_category:
-            logger.info(
-                f"✅ Created new category: {category_name} (ID: {new_category.id})"
-            )
+            logger.info(f"✅ Created new category: {category_name} (ID: {new_category.id})")
             return new_category.id
         else:
-            # 如果创建失败，返回默认分类ID
-            logger.warning(
-                f"⚠️ Failed to create category {category_name}, using default"
-            )
+            # 如果创建失败, 返回默认分类ID
+            logger.warning(f"⚠️ Failed to create category {category_name}, using default")
             default_category = self.category_repo.find_by_name("默认分类")
             return default_category.id if default_category else 1

@@ -5,11 +5,14 @@ Mutation resolvers for field builder configuration management.
 This module provides GraphQL mutations as a replacement for REST API endpoints.
 """
 
-import graphene
-from graphene import Mutation, String, Int, Boolean, Field, List, ObjectType
-import logging
 import json
+import logging
 import time
+
+import graphene
+from graphene import Boolean, Field, Int, List, Mutation, ObjectType, String
+
+from backend.core.security.authentication import authenticated, require_permission
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +27,7 @@ class SaveFieldBuilderConfig(Mutation):
     - POST /api/field-builder/config
     - POST /api/field-builder/configs
     """
+
     class Arguments:
         config = String(required=True, description="Field mapping configuration as JSON string")
         viewName = String(required=True, description="View/table name")
@@ -35,11 +39,15 @@ class SaveFieldBuilderConfig(Mutation):
     errors = List(String)
     message = String()
 
+    @authenticated
+    @require_permission("write")
+    @authenticated
+    @require_permission("write")
     def mutate(self, info, config, viewName, displayName=None, id=None):
         """Save field builder configuration"""
         try:
-            from backend.core.data_access import Repositories
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.data_access import Repositories
             from backend.core.utils import execute_write
 
             # Parse config JSON
@@ -50,7 +58,7 @@ class SaveFieldBuilderConfig(Mutation):
                     ok=False,
                     fieldBuilderConfig=None,
                     errors=[f"Invalid JSON in config: {str(e)}"],
-                    message="Failed to parse configuration"
+                    message="Failed to parse configuration",
                 )
 
             # Convert config to JSON string for storage
@@ -80,7 +88,7 @@ class SaveFieldBuilderConfig(Mutation):
                                 ok=False,
                                 fieldBuilderConfig=None,
                                 errors=["Configuration not found"],
-                                message="Update failed"
+                                message="Update failed",
                             )
                     else:
                         # Create new configuration
@@ -114,13 +122,13 @@ class SaveFieldBuilderConfig(Mutation):
                         ok=True,
                         fieldBuilderConfig=saved_config,
                         errors=[],
-                        message="Field builder configuration saved successfully"
+                        message="Field builder configuration saved successfully",
                     )
 
                 except Exception as e:
                     error_str = str(e).lower()
                     if "database is locked" in error_str and attempt < max_retries - 1:
-                        wait_time = delay * (2 ** attempt)
+                        wait_time = delay * (2**attempt)
                         logger.warning(
                             f"Database locked, retry {attempt + 1}/{max_retries} after {wait_time}s"
                         )
@@ -135,7 +143,7 @@ class SaveFieldBuilderConfig(Mutation):
                 ok=False,
                 fieldBuilderConfig=None,
                 errors=[str(e)],
-                message="An internal error occurred"
+                message="An internal error occurred",
             )
 
 
@@ -146,6 +154,7 @@ class DeleteFieldBuilderConfig(Mutation):
     GraphQL equivalent of:
     - DELETE /api/field-builder/config/<id>
     """
+
     class Arguments:
         id = Int(required=True, description="Configuration ID to delete")
 
@@ -153,11 +162,15 @@ class DeleteFieldBuilderConfig(Mutation):
     message = String()
     errors = List(String)
 
+    @authenticated
+    @require_permission("write")
+    @authenticated
+    @require_permission("write")
     def mutate(self, info, id):
         """Delete field builder configuration"""
         try:
-            from backend.core.data_access import Repositories
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.data_access import Repositories
 
             repo = Repositories.join_configs()
 
@@ -165,9 +178,7 @@ class DeleteFieldBuilderConfig(Mutation):
             config = repo.get_by_id(id)
             if not config:
                 return DeleteFieldBuilderConfig(
-                    ok=False,
-                    message="Configuration not found",
-                    errors=["Configuration not found"]
+                    ok=False, message="Configuration not found", errors=["Configuration not found"]
                 )
 
             # Delete
@@ -179,17 +190,13 @@ class DeleteFieldBuilderConfig(Mutation):
             logger.info(f"Field builder config deleted: {id}")
 
             return DeleteFieldBuilderConfig(
-                ok=True,
-                message="Configuration deleted successfully",
-                errors=[]
+                ok=True, message="Configuration deleted successfully", errors=[]
             )
 
         except Exception as e:
             logger.error(f"Error deleting field builder config {id}: {e}", exc_info=True)
             return DeleteFieldBuilderConfig(
-                ok=False,
-                message="An internal error occurred",
-                errors=[str(e)]
+                ok=False, message="An internal error occurred", errors=[str(e)]
             )
 
 
@@ -202,6 +209,7 @@ class PreviewFieldBuilderHQL(Mutation):
     GraphQL equivalent of:
     - POST /api/field-builder/preview
     """
+
     class Arguments:
         config = String(required=True, description="Field mapping configuration as JSON string")
         sourceEvents = String(required=True, description="Source event IDs as JSON array")
@@ -213,19 +221,25 @@ class PreviewFieldBuilderHQL(Mutation):
     errors = List(String)
     message = String()
 
+    @authenticated
+    @require_permission("write")
+    @authenticated
+    @require_permission("write")
     def mutate(self, info, config, sourceEvents, viewName="v_dwd_preview", dateVar="${bizdate}"):
         """Preview HQL from field builder configuration"""
         try:
             # Parse JSON inputs
             try:
                 config_data = json.loads(config) if isinstance(config, str) else config
-                source_events = json.loads(sourceEvents) if isinstance(sourceEvents, str) else sourceEvents
+                source_events = (
+                    json.loads(sourceEvents) if isinstance(sourceEvents, str) else sourceEvents
+                )
             except json.JSONDecodeError as e:
                 return PreviewFieldBuilderHQL(
                     ok=False,
                     hql=None,
                     errors=[f"Invalid JSON: {str(e)}"],
-                    message="Failed to parse input"
+                    message="Failed to parse input",
                 )
 
             if not config_data:
@@ -233,15 +247,12 @@ class PreviewFieldBuilderHQL(Mutation):
                     ok=False,
                     hql=None,
                     errors=["Missing configuration data"],
-                    message="Preview failed"
+                    message="Preview failed",
                 )
 
             if not source_events:
                 return PreviewFieldBuilderHQL(
-                    ok=False,
-                    hql=None,
-                    errors=["Missing source_events"],
-                    message="Preview failed"
+                    ok=False, hql=None, errors=["Missing source_events"], message="Preview failed"
                 )
 
             # Build join_config for v3 generator
@@ -258,19 +269,13 @@ class PreviewFieldBuilderHQL(Mutation):
             hql = hql_generator_v3.generate_from_field_mapping_v2(join_config, dateVar)
 
             return PreviewFieldBuilderHQL(
-                ok=True,
-                hql=hql,
-                errors=[],
-                message="HQL preview generated successfully"
+                ok=True, hql=hql, errors=[], message="HQL preview generated successfully"
             )
 
         except Exception as e:
             logger.error(f"Error previewing HQL: {e}", exc_info=True)
             return PreviewFieldBuilderHQL(
-                ok=False,
-                hql=None,
-                errors=[str(e)],
-                message="An internal error occurred"
+                ok=False, hql=None, errors=[str(e)], message="An internal error occurred"
             )
 
 
@@ -281,6 +286,7 @@ class FieldBuilderMutations(ObjectType):
     GraphQL mutations for field builder configuration management.
     These mutations replace the legacy REST API endpoints.
     """
+
     save_field_builder_config = SaveFieldBuilderConfig.Field(
         description="Save field builder configuration (create or update)"
     )

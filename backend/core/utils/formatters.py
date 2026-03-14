@@ -5,7 +5,7 @@
 """
 格式化函数模块
 
-提供统一的字符串、表名、字段名格式化功能。
+提供统一的字符串, 表名, 字段名格式化功能. 
 
 作者: Claude Code
 版本: 1.0.0
@@ -35,7 +35,8 @@
 """
 
 import re
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
+
 from backend.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -93,7 +94,7 @@ def format_table_name(
     # 用下划线连接所有部分
     table_name = "_".join(parts)
 
-    # 清理特殊字符（点号替换为下划线）
+    # 清理特殊字符(点号替换为下划线)
     table_name = table_name.replace(".", "_")
 
     return table_name
@@ -115,7 +116,7 @@ def format_dwd_table_name(game_gid: int, event_name: str, dwd_prefix: str = "ieu
         >>> table = format_dwd_table_name(10000147, "login")
         >>> print(table)  # 'ieu_cdm.v_dwd_10000147_login_di'
     """
-    # 清理事件名中的特殊字符（点号替换为下划线）
+    # 清理事件名中的特殊字符(点号替换为下划线)
     clean_name = event_name.replace(".", "_")
 
     # 目标表名: {prefix}.v_dwd_{game_gid}_{event}_di
@@ -154,7 +155,7 @@ def format_field_name(
     Args:
         field_name: 字段名
         field_alias: 字段别名（可选）
-        aggregate_func: 聚合函数（可选，如COUNT, SUM等）
+        aggregate_func: 聚合函数（可选, 如COUNT, SUM等）
 
     Returns:
         格式化后的字段表达式
@@ -190,7 +191,7 @@ def format_field_list(
     批量格式化字段列表
 
     Args:
-        fields: 字段字典列表，每个字典包含:
+        fields: 字段字典列表, 每个字典包含:
             - name: 字段名
             - alias: 字段别名（可选）
         aggregate_func: 聚合函数（可选）
@@ -428,7 +429,7 @@ def format_hql(
 
 def clean_identifier(name: str) -> str:
     """
-    清理标识符（表名、字段名等）
+    清理标识符（表名, 字段名等）
 
     - 转换为小写
     - 替换空格和特殊字符为下划线

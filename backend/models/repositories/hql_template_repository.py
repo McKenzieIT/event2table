@@ -8,10 +8,11 @@ HQL Template Repository (HQL模板仓储层)
 提供HQL生成模板的数据访问操作
 """
 
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
 from backend.core.utils import execute_write
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 
 
 class HQLTemplateRepository(GenericRepository):
@@ -33,7 +34,7 @@ class HQLTemplateRepository(GenericRepository):
             template_name: 模板名称
 
         Returns:
-            模板字典，不存在返回None
+            模板字典, 不存在返回None
         """
         query = f"""
             SELECT * FROM {self.table_name}
@@ -58,7 +59,6 @@ class HQLTemplateRepository(GenericRepository):
         """
         return fetch_all_as_dict(query, (template_type,))
 
-
     @cached(ttl=1800)
     def find_system_templates(self) -> List[Dict[str, Any]]:
         """
@@ -73,7 +73,6 @@ class HQLTemplateRepository(GenericRepository):
             ORDER BY template_type, display_name
         """
         return fetch_all_as_dict(query)
-
 
     @cached(ttl=1800)
     def find_user_templates(self) -> List[Dict[str, Any]]:
@@ -109,7 +108,6 @@ class HQLTemplateRepository(GenericRepository):
         """
         pattern = f"%{keyword}%"
         return fetch_all_as_dict(query, (pattern, pattern, pattern))
-
 
     @cached(ttl=1800)
     def get_types(self) -> List[str]:
@@ -161,7 +159,9 @@ class HQLTemplateRepository(GenericRepository):
             "description": description,
             "is_system": 1 if is_system else 0,
         }
-        return self.create(data)
+        # create_batch returns a list of IDs
+        record_ids = self.create_batch([data])
+        return record_ids[0] if record_ids else None
 
     def update_template(
         self,
@@ -197,9 +197,8 @@ class HQLTemplateRepository(GenericRepository):
         if not updates:
             return False
 
-        updates["updated_at"] = "CURRENT_TIMESTAMP"
-
-        return self.update(template_id, updates)
+        result = self.update(template_id, updates)
+        return result is not None
 
     def delete_template(self, template_id: int) -> bool:
         """

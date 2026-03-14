@@ -1,0 +1,61 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.11, pytest-7.4.3, pluggy-1.6.0 -- /Users/mckenzie/Documents/event2table/backend/venv/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /Users/mckenzie/Documents/event2table/backend/test
+configfile: pytest.ini
+plugins: cov-4.1.0
+collecting ... /Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/coverage/inorout.py:561: CoverageWarning: Module ../api was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.4/messages.html#warning-module-not-imported
+  self.warn(f"Module {pkg} was never imported.", slug="module-not-imported")
+/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/coverage/inorout.py:561: CoverageWarning: Module ../models was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.4/messages.html#warning-module-not-imported
+  self.warn(f"Module {pkg} was never imported.", slug="module-not-imported")
+/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/coverage/control.py:958: CoverageWarning: No data was collected. (no-data-collected); see https://coverage.readthedocs.io/en/7.13.4/messages.html#warning-no-data-collected
+  self._warn("No data was collected.", slug="no-data-collected")
+/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/pytest_cov/plugin.py:312: CovReportWarning: Failed to generate report: No data to report.
+
+  warnings.warn(CovReportWarning(message))
+collected 202 items / 1 error
+WARNING: Failed to generate report: No data to report.
+
+
+==================================== ERRORS ====================================
+____ ERROR collecting integration/security/test_sql_injection_prevention.py ____
+venv/lib/python3.13/site-packages/_pytest/python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+venv/lib/python3.13/site-packages/_pytest/pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+/usr/local/Cellar/python@3.13/3.13.11_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+venv/lib/python3.13/site-packages/_pytest/assertion/rewrite.py:186: in exec_module
+    exec(co, module.__dict__)
+test/integration/security/test_sql_injection_prevention.py:10: in <module>
+    from backend.models.schemas import GameCreate, EventCreate
+E     File "/Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py", line 35
+E       定义所有数据传输对象（DTO）和验证模型
+E                 ^
+E   SyntaxError: invalid character '（' (U+FF08)
+=============================== warnings summary ===============================
+venv/lib/python3.13/site-packages/_pytest/config/__init__.py:1373
+  /Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/_pytest/config/__init__.py:1373: PytestConfigWarning: Unknown config option: env
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+services/games/__init__.py:7
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/services/games/__init__.py:7: DeprecationWarning: backend/services/games/games.py is deprecated. Use backend/api/routes/games.py instead. This file will be removed in Phase 4 cleanup.
+    from .games import games_bp
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------- coverage: platform darwin, python 3.13.11-final-0 ----------
+
+=========================== short test summary info ============================
+ERROR test/integration/security/test_sql_injection_prevention.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+======================== 2 warnings, 1 error in 11.25s =========================

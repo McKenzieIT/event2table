@@ -4,10 +4,13 @@ Template Mutations
 Implements GraphQL mutation resolvers for Template entity.
 """
 
-import graphene
-from graphene import Field, Int, String, Boolean, List
-import logging
 import json
+import logging
+
+import graphene
+from graphene import Boolean, Field, Int, List, String
+
+from backend.core.security.authentication import authenticated, require_permission
 
 logger = logging.getLogger(__name__)
 
@@ -23,15 +26,29 @@ class CreateTemplate(graphene.Mutation):
         config = String(description="模板配置JSON")
 
     ok = Boolean(description="操作是否成功")
-    template = Field(lambda: __import__('backend.gql_api.types.template_type', fromlist=['TemplateType']).TemplateType, description="创建的模板")
+    template = Field(
+        lambda: __import__(
+            'backend.gql_api.types.template_type', fromlist=['TemplateType']
+        ).TemplateType,
+        description="创建的模板",
+    )
     errors = List(String, description="错误信息")
 
-    def mutate(self, info, name: str, description: str = None, category: str = None,
-               game_gid: int = None, config: str = None):
+    @authenticated
+    @require_permission("write")
+    def mutate(
+        self,
+        info,
+        name: str,
+        description: str = None,
+        category: str = None,
+        game_gid: int = None,
+        config: str = None,
+    ):
         """Execute the mutation"""
         try:
-            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.gql_api.types.template_type import TemplateType
 
             # Validate config JSON if provided
@@ -48,7 +65,7 @@ class CreateTemplate(graphene.Mutation):
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (name, description, category, game_gid, config),
-                return_last_id=True
+                return_last_id=True,
             )
 
             # Clear cache
@@ -58,11 +75,12 @@ class CreateTemplate(graphene.Mutation):
 
             # Return created template
             template = fetch_one_as_dict(
-                "SELECT * FROM canvas_templates WHERE id = ?",
-                (template_id,)
+                "SELECT * FROM canvas_templates WHERE id = ?", (template_id,)
             )
 
-            return CreateTemplate(ok=True, template=TemplateType.from_dict(template) if template else None)
+            return CreateTemplate(
+                ok=True, template=TemplateType.from_dict(template) if template else None
+            )
 
         except Exception as e:
             logger.error(f"Error creating template: {e}", exc_info=True)
@@ -82,16 +100,31 @@ class UpdateTemplate(graphene.Mutation):
         is_active = Boolean(description="是否活跃")
 
     ok = Boolean(description="操作是否成功")
-    template = Field(lambda: __import__('backend.gql_api.types.template_type', fromlist=['TemplateType']).TemplateType, description="更新的模板")
+    template = Field(
+        lambda: __import__(
+            'backend.gql_api.types.template_type', fromlist=['TemplateType']
+        ).TemplateType,
+        description="更新的模板",
+    )
     errors = List(String, description="错误信息")
 
-    def mutate(self, info, id: int, name: str = None, description: str = None,
-               category: str = None, game_gid: int = None, config: str = None,
-               is_active: bool = None):
+    @authenticated
+    @require_permission("write")
+    def mutate(
+        self,
+        info,
+        id: int,
+        name: str = None,
+        description: str = None,
+        category: str = None,
+        game_gid: int = None,
+        config: str = None,
+        is_active: bool = None,
+    ):
         """Execute the mutation"""
         try:
-            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.gql_api.types.template_type import TemplateType
 
             # Check if template exists
@@ -143,11 +176,13 @@ class UpdateTemplate(graphene.Mutation):
 
             # Return updated template
             updated_template = fetch_one_as_dict(
-                "SELECT * FROM canvas_templates WHERE id = ?",
-                (id,)
+                "SELECT * FROM canvas_templates WHERE id = ?", (id,)
             )
 
-            return UpdateTemplate(ok=True, template=TemplateType.from_dict(updated_template) if updated_template else None)
+            return UpdateTemplate(
+                ok=True,
+                template=TemplateType.from_dict(updated_template) if updated_template else None,
+            )
 
         except Exception as e:
             logger.error(f"Error updating template: {e}", exc_info=True)
@@ -164,11 +199,13 @@ class DeleteTemplate(graphene.Mutation):
     message = String(description="操作消息")
     errors = List(String, description="错误信息")
 
+    @authenticated
+    @require_permission("write")
     def mutate(self, info, id: int):
         """Execute the mutation"""
         try:
-            from backend.core.utils import execute_write, fetch_one_as_dict
             from backend.core.cache.cache_system import clear_cache_pattern
+            from backend.core.utils import execute_write, fetch_one_as_dict
 
             # Check if template exists
             template = fetch_one_as_dict("SELECT * FROM canvas_templates WHERE id = ?", (id,))
@@ -192,6 +229,7 @@ class DeleteTemplate(graphene.Mutation):
 
 class TemplateMutations:
     """Container for template mutations"""
+
     CreateTemplate = CreateTemplate
     UpdateTemplate = UpdateTemplate
     DeleteTemplate = DeleteTemplate

@@ -84,9 +84,7 @@ def api_list_events() -> Tuple[Dict[str, Any], int]:
     game_gid_str = request.args.get("game_gid")
     game_gid = safe_int_convert(game_gid_str) if game_gid_str else None
 
-    logger.info(
-        f"API: game_gid_str={game_gid_str}, game_gid={game_gid}, type={type(game_gid)}"
-    )
+    logger.info(f"API: game_gid_str={game_gid_str}, game_gid={game_gid}, type={type(game_gid)}")
 
     page = safe_int_convert(request.args.get("page"), 1, 1)
     per_page = safe_int_convert(request.args.get("per_page"), 20, 1)
@@ -103,10 +101,7 @@ def api_list_events() -> Tuple[Dict[str, Any], int]:
     try:
         # Use EventService for paginated list with caching
         result = event_service.get_events_paginated(
-            game_gid=game_gid,
-            page=page,
-            per_page=per_page,
-            search=search if search else None
+            game_gid=game_gid, page=page, per_page=per_page, search=search if search else None
         )
 
         return json_success_response(data=result)
@@ -122,9 +117,7 @@ def api_list_events() -> Tuple[Dict[str, Any], int]:
 def api_create_event():
     """API: Create a new event"""
     try:
-        is_valid, data, error = validate_json_request(
-            ["game_gid", "event_name", "event_name_cn"]
-        )
+        is_valid, data, error = validate_json_request(["game_gid", "event_name", "event_name_cn"])
         if not is_valid:
             return json_error_response(error, status_code=400)
 
@@ -176,21 +169,26 @@ def api_create_event():
         parameters = []
         for i, name in enumerate(param_names):
             if name:
-                parameters.append({
-                    "param_name": name,
-                    "param_name_cn": param_names_cn[i] if i < len(param_names_cn) else "",
-                    "template_id": param_types[i] if i < len(param_types) else 1,
-                    "param_description": param_descriptions[i] if i < len(param_descriptions) else "",
-                })
+                parameters.append(
+                    {
+                        "param_name": name,
+                        "param_name_cn": param_names_cn[i] if i < len(param_names_cn) else "",
+                        "template_id": param_types[i] if i < len(param_types) else 1,
+                        "param_description": (
+                            param_descriptions[i] if i < len(param_descriptions) else ""
+                        ),
+                    }
+                )
 
         # Create EventEntity
         from backend.models.entities import EventEntity
+
         event_data = EventEntity(
             game_gid=data["game_gid"],
             name=event_name,
             name_cn=event_name_cn,
             category_id=category_id,
-            include_in_common_params=data.get("include_in_common_params", 1)
+            include_in_common_params=data.get("include_in_common_params", 1),
         )
 
         # Use EventService to create event with parameters
@@ -245,9 +243,7 @@ def api_get_event_detail(id):
 @api_bp.route("/api/events/<int:id>", methods=["PUT", "PATCH"])
 def api_update_event(id):
     """API: Update an existing event"""
-    is_valid, data, error = validate_json_request(
-        ["event_name", "event_name_cn", "category_id"]
-    )
+    is_valid, data, error = validate_json_request(["event_name", "event_name_cn", "category_id"])
     if not is_valid:
         return json_error_response(error, status_code=400)
 
@@ -277,7 +273,7 @@ def api_update_event(id):
             event_name=event_name,
             event_name_cn=event_name_cn,
             category_id=data.get("category_id"),
-            include_in_common_params=data.get("include_in_common_params", 1)
+            include_in_common_params=data.get("include_in_common_params", 1),
         )
 
         if not event:
@@ -393,10 +389,7 @@ def api_get_events_count():
         search = request.args.get("search", "").strip()
 
         # Get events count from service
-        total = event_service.get_events_count(
-            game_gid=game_gid,
-            search=search if search else None
-        )
+        total = event_service.get_events_count(game_gid=game_gid, search=search if search else None)
 
         return json_success_response(data={"total": total})
 
@@ -430,9 +423,7 @@ def api_batch_update_events():
         if "event_name" in updates:
             event_name = updates["event_name"].strip()
             if len(event_name) == 0:
-                return json_error_response(
-                    "event_name cannot be empty", status_code=400
-                )
+                return json_error_response("event_name cannot be empty", status_code=400)
             if len(event_name) > 200:
                 return json_error_response(
                     "event_name exceeds maximum length of 200 characters",

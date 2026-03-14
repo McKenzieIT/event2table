@@ -11,8 +11,9 @@
 日期: 2026-02-25
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 from backend.services.cache.cache_warmup import CacheWarmer, warmup_cache_on_startup
 
@@ -88,8 +89,8 @@ class TestCacheWarmer:
             # 模拟不同的查询返回不同数据
             mock_fetch.side_effect = [
                 [{'gid': 10000147, 'name': 'STAR001'}],  # games
-                [{'id': 1, 'name': 'login'}],            # events
-                [{'id': 1, 'name': 'role_id'}],           # params
+                [{'id': 1, 'name': 'login'}],  # events
+                [{'id': 1, 'name': 'role_id'}],  # params
                 100,  # total_keys (Redis dbsize)
             ]
 
@@ -100,7 +101,7 @@ class TestCacheWarmer:
             assert stats['games_warmed'] == 1
             assert stats['events_warmed'] == 1
             assert stats['params_warmed'] == 1
-            # total_keys是动态的，不固定为100
+            # total_keys是动态的, 不固定为100
             assert stats['total_keys'] >= 0
 
     def test_warmup_empty_database(self, cache_warmer):
@@ -129,7 +130,7 @@ class TestWarmupFunction:
             'games_warmed': 100,
             'events_warmed': 100,
             'params_warmed': 50,
-            'total_keys': 250
+            'total_keys': 250,
         }
         mock_warmer_class.return_value = mock_warmer
 
@@ -148,13 +149,13 @@ class TestWarmupFunction:
 
 @pytest.mark.integration
 class TestCacheWarmupIntegration:
-    """缓存预热集成测试（需要真实数据库和缓存）"""
+    """缓存预热集成测试(需要真实数据库和缓存)"""
 
     def test_warmup_with_real_database(self):
         """测试使用真实数据库的预热"""
         warmer = CacheWarmer()
 
-        # 执行预热（使用真实数据库）
+        # 执行预热(使用真实数据库)
         stats = warmer.warmup_all(games_limit=10, events_limit=10)
 
         # 验证预热成功
@@ -182,10 +183,10 @@ class TestCacheWarmupErrorHandling:
             # 执行预热应该不抛出异常
             try:
                 count = cache_warmer.warmup_popular_games()
-                # 如果有错误处理，可能返回0
+                # 如果有错误处理, 可能返回0
                 assert count >= 0
             except Exception as e:
-                # 如果没有错误处理，应该抛出异常
+                # 如果没有错误处理, 应该抛出异常
                 assert "Database error" in str(e)
 
     def test_warmup_cache_error_handling(self, cache_warmer):
@@ -200,10 +201,10 @@ class TestCacheWarmupErrorHandling:
             # 执行预热应该处理缓存错误
             try:
                 count = cache_warmer.warmup_popular_games()
-                # 如果有错误处理，可能返回0或部分成功
+                # 如果有错误处理, 可能返回0或部分成功
                 assert count >= 0
             except Exception as e:
-                # 如果没有错误处理，应该抛出异常
+                # 如果没有错误处理, 应该抛出异常
                 assert "Cache error" in str(e)
 
 

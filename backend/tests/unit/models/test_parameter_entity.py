@@ -11,9 +11,11 @@ Tests for Pydantic Entity model including:
 - Serialization/Deserialization
 """
 
-import pytest
 from datetime import datetime
+
+import pytest
 from pydantic import ValidationError
+
 from backend.models.entities import ParameterEntity
 
 
@@ -22,12 +24,7 @@ class TestParameterEntityValidation:
 
     def test_valid_parameter_creation_minimal(self):
         """Test valid parameter creation with minimal fields"""
-        param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='guild_id',
-            param_type='base'
-        )
+        param = ParameterEntity(event_id=1, game_gid=90000001, name='guild_id', param_type='base')
         assert param.name == 'guild_id'
         assert param.param_type == 'base'
         assert param.event_id == 1
@@ -50,7 +47,7 @@ class TestParameterEntityValidation:
             description='Zone ID parameter',
             is_common=True,
             created_at=now,
-            updated_at=now
+            updated_at=now,
         )
         assert param.id == 1
         assert param.name == 'zone_id'
@@ -66,7 +63,7 @@ class TestParameterEntityValidation:
             event_id=1,
             game_gid=90000001,
             name='<script>alert("xss")</script>guild_id',
-            param_type='base'
+            param_type='base',
         )
         # HTML should be escaped
         assert '<script>' not in param.name
@@ -82,27 +79,18 @@ class TestParameterEntityValidation:
             game_gid=90000001,
             name='test',
             param_type='base',
-            description='<img src=x onerror=alert(1)> test'
+            description='<img src=x onerror=alert(1)> test',
         )
         # Currently no XSS protection on description field
         assert '<img' in param.description
 
     def test_json_path_validation_valid(self):
         """Test valid JSON paths are accepted"""
-        valid_paths = [
-            '$.zoneId',
-            '$.data.zone_id',
-            '$.items[0].id',
-            '$.user.profile.name'
-        ]
+        valid_paths = ['$.zoneId', '$.data.zone_id', '$.items[0].id', '$.user.profile.name']
 
         for path in valid_paths:
             param = ParameterEntity(
-                event_id=1,
-                game_gid=90000001,
-                name='test',
-                param_type='param',
-                json_path=path
+                event_id=1, game_gid=90000001, name='test', param_type='param', json_path=path
             )
             assert param.json_path == path
 
@@ -111,28 +99,20 @@ class TestParameterEntityValidation:
         invalid_paths = [
             'invalid',  # Missing $.
             '.zoneId',  # Missing $
-            'zoneId',   # Missing $.
-            '$zoneId'   # Missing .
+            'zoneId',  # Missing $.
+            '$zoneId',  # Missing .
         ]
 
         for path in invalid_paths:
             with pytest.raises(ValidationError, match="JSON路径必须以"):
                 ParameterEntity(
-                    event_id=1,
-                    game_gid=90000001,
-                    name='test',
-                    param_type='param',
-                    json_path=path
+                    event_id=1, game_gid=90000001, name='test', param_type='param', json_path=path
                 )
 
     def test_json_path_none_allowed(self):
         """Test None is allowed for json_path (base fields)"""
         param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='role_id',
-            param_type='base',
-            json_path=None
+            event_id=1, game_gid=90000001, name='role_id', param_type='base', json_path=None
         )
         assert param.json_path is None
 
@@ -142,60 +122,36 @@ class TestParameterEntityValidation:
 
         for param_type in valid_types:
             param = ParameterEntity(
-                event_id=1,
-                game_gid=90000001,
-                name='test',
-                param_type=param_type
+                event_id=1, game_gid=90000001, name='test', param_type=param_type
             )
             assert param.param_type == param_type
 
     def test_param_type_invalid_value(self):
         """Test invalid param_type is rejected"""
         with pytest.raises(ValidationError):
-            ParameterEntity(
-                event_id=1,
-                game_gid=90000001,
-                name='test',
-                param_type='invalid_type'
-            )
+            ParameterEntity(event_id=1, game_gid=90000001, name='test', param_type='invalid_type')
 
     def test_event_id_must_be_positive(self):
         """Test event_id must be positive"""
         with pytest.raises(ValidationError):
             ParameterEntity(
-                event_id=0,  # Invalid
-                game_gid=90000001,
-                name='test',
-                param_type='base'
+                event_id=0, game_gid=90000001, name='test', param_type='base'  # Invalid
             )
 
         with pytest.raises(ValidationError):
             ParameterEntity(
-                event_id=-1,  # Invalid
-                game_gid=90000001,
-                name='test',
-                param_type='base'
+                event_id=-1, game_gid=90000001, name='test', param_type='base'  # Invalid
             )
 
     def test_game_gid_must_be_non_negative(self):
         """Test game_gid must be non-negative"""
         with pytest.raises(ValidationError):
-            ParameterEntity(
-                event_id=1,
-                game_gid=-1,  # Invalid
-                name='test',
-                param_type='base'
-            )
+            ParameterEntity(event_id=1, game_gid=-1, name='test', param_type='base')  # Invalid
 
     def test_name_min_length(self):
         """Test name minimum length validation"""
         with pytest.raises(ValidationError):
-            ParameterEntity(
-                event_id=1,
-                game_gid=90000001,
-                name='',  # Too short
-                param_type='base'
-            )
+            ParameterEntity(event_id=1, game_gid=90000001, name='', param_type='base')  # Too short
 
     def test_name_max_length(self):
         """Test name maximum length validation"""
@@ -204,7 +160,7 @@ class TestParameterEntityValidation:
                 event_id=1,
                 game_gid=90000001,
                 name='x' * 101,  # Too long (max 100)
-                param_type='base'
+                param_type='base',
             )
 
 
@@ -214,11 +170,7 @@ class TestParameterEntitySerialization:
     def test_model_dump_returns_dict(self):
         """Test model_dump() returns dict"""
         param = ParameterEntity(
-            id=1,
-            event_id=1,
-            game_gid=90000001,
-            name='guild_id',
-            param_type='base'
+            id=1, event_id=1, game_gid=90000001, name='guild_id', param_type='base'
         )
         data = param.model_dump()
 
@@ -229,12 +181,7 @@ class TestParameterEntitySerialization:
 
     def test_model_dump_exclude_unset(self):
         """Test model_dump(exclude_unset=True) excludes unset fields"""
-        param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='guild_id',
-            param_type='base'
-        )
+        param = ParameterEntity(event_id=1, game_gid=90000001, name='guild_id', param_type='base')
         data = param.model_dump(exclude_unset=True)
 
         # Unset optional fields should be excluded
@@ -248,11 +195,7 @@ class TestParameterEntitySerialization:
     def test_model_dump_json(self):
         """Test model_dump_json() returns JSON string"""
         param = ParameterEntity(
-            id=1,
-            event_id=1,
-            game_gid=90000001,
-            name='guild_id',
-            param_type='base'
+            id=1, event_id=1, game_gid=90000001, name='guild_id', param_type='base'
         )
         json_str = param.model_dump_json()
 
@@ -269,7 +212,7 @@ class TestParameterEntitySerialization:
             name='guild_id',
             param_type='param',
             json_path='$.guildId',
-            is_common=True
+            is_common=True,
         )
 
         # Serialize
@@ -294,7 +237,7 @@ class TestParameterEntitySerialization:
             'name': 'guild_id',
             'param_type': 'base',
             'json_path': '$.guildId',
-            'is_common': True
+            'is_common': True,
         }
 
         param = ParameterEntity(**data)
@@ -314,7 +257,7 @@ class TestParameterEntitySerialization:
             name='test',
             param_type='base',
             created_at=now,
-            updated_at=now
+            updated_at=now,
         )
 
         # model_dump should serialize datetime to ISO format
@@ -375,10 +318,7 @@ class TestParameterEntityFieldValidation:
     def test_name_whitespace_trimmed(self):
         """Test name has whitespace trimmed"""
         param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='  guild_id  ',  # Whitespace
-            param_type='base'
+            event_id=1, game_gid=90000001, name='  guild_id  ', param_type='base'  # Whitespace
         )
         assert param.name == 'guild_id'  # Trimmed
 
@@ -390,7 +330,7 @@ class TestParameterEntityFieldValidation:
             game_gid=90000001,
             name='test',
             param_type='base',
-            description='  Test description  '  # Whitespace
+            description='  Test description  ',  # Whitespace
         )
         # Currently no trimming on description field
         assert param.description == '  Test description  '
@@ -398,10 +338,7 @@ class TestParameterEntityFieldValidation:
     def test_game_gid_accepts_string(self):
         """Test game_gid accepts string and converts to int"""
         param = ParameterEntity(
-            event_id=1,
-            game_gid="90000001",  # String
-            name='test',
-            param_type='base'
+            event_id=1, game_gid="90000001", name='test', param_type='base'  # String
         )
         assert isinstance(param.game_gid, int)
         assert param.game_gid == 90000001
@@ -410,41 +347,22 @@ class TestParameterEntityFieldValidation:
         """Test game_gid rejects non-numeric string"""
         # Pydantic v2 error message format
         with pytest.raises(ValidationError):
-            ParameterEntity(
-                event_id=1,
-                game_gid="not_a_number",
-                name='test',
-                param_type='base'
-            )
+            ParameterEntity(event_id=1, game_gid="not_a_number", name='test', param_type='base')
 
     def test_hive_type_default(self):
         """Test hive_type defaults to STRING"""
-        param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='test',
-            param_type='base'
-        )
+        param = ParameterEntity(event_id=1, game_gid=90000001, name='test', param_type='base')
         assert param.hive_type == 'STRING'
 
     def test_is_common_default(self):
         """Test is_common defaults to False"""
-        param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='test',
-            param_type='base'
-        )
+        param = ParameterEntity(event_id=1, game_gid=90000001, name='test', param_type='base')
         assert param.is_common is False
 
     def test_id_can_be_none(self):
         """Test id can be None (for new entities)"""
         param = ParameterEntity(
-            id=None,  # Explicit None
-            event_id=1,
-            game_gid=90000001,
-            name='test',
-            param_type='base'
+            id=None, event_id=1, game_gid=90000001, name='test', param_type='base'  # Explicit None
         )
         assert param.id is None
 
@@ -454,12 +372,7 @@ class TestParameterEntityEdgeCases:
 
     def test_all_fields_none_except_required(self):
         """Test entity with only required fields"""
-        param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='test',
-            param_type='base'
-        )
+        param = ParameterEntity(event_id=1, game_gid=90000001, name='test', param_type='base')
         assert param.id is None
         assert param.json_path is None
         assert param.description is None
@@ -471,39 +384,33 @@ class TestParameterEntityEdgeCases:
         special_names = [
             '<script>alert("xss")</script>',
             '"><img src=x onerror=alert(1)>',
-            '\' OR 1=1 --'
+            '\' OR 1=1 --',
         ]
 
         for name in special_names:
-            param = ParameterEntity(
-                event_id=1,
-                game_gid=90000001,
-                name=name,
-                param_type='base'
-            )
+            param = ParameterEntity(event_id=1, game_gid=90000001, name=name, param_type='base')
             # Should be HTML-escaped
             assert '<script>' not in param.name
             assert '<img' not in param.name
             # Check that some HTML escaping occurred
-            assert '&lt;' in param.name or '&gt;' in param.name or '&quot;' in param.name or '&#x27;' in param.name
+            assert (
+                '&lt;' in param.name
+                or '&gt;' in param.name
+                or '&quot;' in param.name
+                or '&#x27;' in param.name
+            )
 
     def test_unicode_in_name(self):
         """Test unicode characters in name"""
         param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='公会ID',  # Chinese characters
-            param_type='base'
+            event_id=1, game_gid=90000001, name='公会ID', param_type='base'  # Chinese characters
         )
         assert param.name == '公会ID'
 
     def test_very_long_valid_name(self):
         """Test maximum length name is accepted"""
         param = ParameterEntity(
-            event_id=1,
-            game_gid=90000001,
-            name='x' * 100,  # Max length
-            param_type='base'
+            event_id=1, game_gid=90000001, name='x' * 100, param_type='base'  # Max length
         )
         assert len(param.name) == 100
 
@@ -512,15 +419,11 @@ class TestParameterEntityEdgeCases:
         complex_paths = [
             '$.data.items[0].id',
             '$.users[*].profile.name',
-            '$.result[?(@.active)].id'
+            '$.result[?(@.active)].id',
         ]
 
         for path in complex_paths:
             param = ParameterEntity(
-                event_id=1,
-                game_gid=90000001,
-                name='test',
-                param_type='param',
-                json_path=path
+                event_id=1, game_gid=90000001, name='test', param_type='param', json_path=path
             )
             assert param.json_path == path

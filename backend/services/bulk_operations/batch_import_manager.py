@@ -1,12 +1,12 @@
 """
 Batch Import Manager - 占位实现
 
-注意：此模块在DDD清理中被移除，保留占位以满足测试导入。
-批量导入功能应通过Service层实现，而非单独的Manager类。
+注意: 此模块在DDD清理中被移除, 保留占位以满足测试导入. 
+批量导入功能应通过Service层实现, 而非单独的Manager类. 
 """
 
-from typing import Dict, List, Any, Optional
 import logging
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class BatchImportManager:
     """
     批量导入管理器 (占位实现)
 
-    注意：完整的批量导入功能已迁移到各模块的Service层
+    注意: 完整的批量导入功能已迁移到各模块的Service层
     """
 
     def __init__(self):
@@ -23,10 +23,7 @@ class BatchImportManager:
         logger.warning("BatchImportManager is deprecated, use Service layer instead")
 
     def _prepare_event_record(
-        self,
-        event_data: Dict[str, Any],
-        game_gid: int,
-        category_id: Optional[int] = None
+        self, event_data: Dict[str, Any], game_gid: int, category_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """
         准备事件记录 (占位实现)
@@ -44,9 +41,7 @@ class BatchImportManager:
         return event_data
 
     def import_events(
-        self,
-        events_data: List[Dict[str, Any]],
-        game_gid: int
+        self, events_data: List[Dict[str, Any]], game_gid: int
     ) -> List[Dict[str, Any]]:
         """
         批量导入事件 (占位实现)
@@ -62,9 +57,7 @@ class BatchImportManager:
         return []
 
     def import_parameters(
-        self,
-        parameters_data: List[Dict[str, Any]],
-        event_id: int
+        self, parameters_data: List[Dict[str, Any]], event_id: int
     ) -> List[Dict[str, Any]]:
         """
         批量导入参数 (占位实现)

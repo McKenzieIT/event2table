@@ -295,16 +295,16 @@ export const DELETE_HQL_TEMPLATE = gql`
 export const BATCH_ADD_FIELDS_TO_CANVAS = gql`
   mutation BatchAddFieldsToCanvas($eventId: Int!, $fieldType: FieldTypeEnum!) {
     batchAddFieldsToCanvas(eventId: $eventId, fieldType: $fieldType) {
-      success
-      message
-      result {
-        success
-        message
-        totalCount
-        successCount
-        failedCount
-        errors
+      ok
+      fields {
+        name
+        type
+        displayName
+        description
+        jsonPath
       }
+      count
+      message
     }
   }
 `;

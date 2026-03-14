@@ -32,14 +32,14 @@ For new code, use ParameterService directly.
 """
 
 import json
-from typing import Dict, List, Optional, Any
-from functools import lru_cache
 import logging
+from functools import lru_cache
+from typing import Any, Dict, List, Optional
 
-from backend.services.parameters.parameter_service import ParameterService
-from backend.services.parameters.param_type_manager import param_type_manager
-from backend.services.parameters.param_library_manager import param_library_manager
 from backend.core.utils import fetch_one_as_dict
+from backend.services.parameters.param_library_manager import param_library_manager
+from backend.services.parameters.param_type_manager import param_type_manager
+from backend.services.parameters.parameter_service import ParameterService
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +66,7 @@ class EventParamManager:
 
     # ========== Delegated Methods (use ParameterService) ==========
 
-
-    @cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800, key_prefix="event_params:by_event")  # Cache for 30 minutes
     def get_event_parameters(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:
@@ -81,8 +80,7 @@ class EventParamManager:
         # Convert ParameterEntity to dict for backward compatibility
         return [p.model_dump() for p in params]
 
-
-    @cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800, key_prefix="event_params:by_id")  # Cache for 30 minutes
     def get_parameter_by_id(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         根据ID获取参数（带缓存）
@@ -156,8 +154,9 @@ class EventParamManager:
         )
 
         if existing:
-            # 创建新版本（停用旧版本）
+            # 创建新版本(停用旧版本)
             from backend.core.utils import execute_write
+
             execute_write("UPDATE event_params SET is_active = 0 WHERE id = ?", (existing["id"],))
             new_version = existing["version"] + 1
         else:
@@ -287,8 +286,7 @@ class EventParamManager:
             logger.info(f"Updated parameter {event_param_id} to version {new_version}")
             return True
 
-
-    @cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800, key_prefix="event_params:history")  # Cache for 30 minutes
     def get_parameter_history(self, event_param_id: int) -> List[Dict[str, Any]]:
         """
         获取参数变更历史
@@ -390,16 +388,15 @@ class EventParamManager:
             logger.info(f"Updated config for parameter {event_param_id}")
             return True
 
-
-    @cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800, key_prefix="event_params:config")  # Cache for 30 minutes
     def get_parameter_config(self, event_param_id: int) -> Optional[Dict[str, Any]]:
         """
         获取参数配置
 
         Note: This is unique functionality not yet in ParameterService.
         """
-        from backend.core.database import get_db
         from backend.core.cache.cache_system import parse_json_cached
+        from backend.core.database import get_db
 
         with get_db() as conn:
             config = conn.execute(
@@ -416,14 +413,13 @@ class EventParamManager:
                 }
 
             result = dict(config)
-            # 解析JSON字段（使用缓存）
+            # 解析JSON字段(使用缓存)
             if result.get("explode_config"):
                 result["explode_config"] = parse_json_cached(result["explode_config"])
 
             return result
 
-
-    @cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800, key_prefix="event_params:rollback")  # Cache for 30 minutes
     def rollback_to_version(self, event_param_id: int, target_version: int) -> bool:
         """
         回滚参数到指定版本
@@ -463,7 +459,7 @@ class EventParamManager:
             # 停用当前版本
             cursor.execute("UPDATE event_params SET is_active = 0 WHERE id = ?", (event_param_id,))
 
-            # 创建新版本（使用目标版本的数据）
+            # 创建新版本(使用目标版本的数据)
             new_version = current["version"] + 1
             cursor.execute(
                 """
@@ -491,8 +487,7 @@ class EventParamManager:
             )
             return True
 
-
-    @cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800, key_prefix="event_params:with_children")  # Cache for 30 minutes
     def get_parameter_with_children(self, param_id: int) -> Optional[Dict[str, Any]]:
         """
         获取参数及其子参数（用于array类型）
@@ -522,8 +517,7 @@ class EventParamManager:
 
         return param
 
-
-    @cached(ttl=1800)  # Cache for 30 minutes
+    @cached(ttl=1800, key_prefix="event_params:hierarchy")  # Cache for 30 minutes
     def get_event_parameters_hierarchy(
         self, event_id: int, include_inactive: bool = False
     ) -> List[Dict[str, Any]]:
@@ -676,9 +670,9 @@ class EventParamManager:
 
 # ========== Module-level cached functions (deprecated, kept for compatibility) ==========
 
-@lru_cache(maxsize=128)
 
-@cached(ttl=1800)  # Cache for 30 minutes
+@lru_cache(maxsize=128)
+@cached(ttl=1800, key_prefix="event_params:cached")  # Cache for 30 minutes
 def _get_event_parameters_cached(
     event_id: int, include_inactive: bool = False
 ) -> List[Dict[str, Any]]:
@@ -695,8 +689,7 @@ def _get_event_parameters_cached(
 
 
 @lru_cache(maxsize=256)
-
-@cached(ttl=1800)  # Cache for 30 minutes
+@cached(ttl=1800, key_prefix="event_params:by_id_cached")  # Cache for 30 minutes
 def _get_parameter_by_id_cached(param_id: int) -> Optional[Dict[str, Any]]:
     """
     根据ID获取参数（缓存层）

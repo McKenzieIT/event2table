@@ -7,15 +7,12 @@ This module provides reusable functions for handling common operations
 in HQL preview endpoints, reducing code duplication.
 """
 
-from typing import Tuple, Any, Dict
-from werkzeug.exceptions import BadRequest
 import logging
+from typing import Any, Dict, Tuple
 
-from backend.core.utils import (
-    json_success_response,
-    json_error_response,
-    success_response,
-)
+from werkzeug.exceptions import BadRequest
+
+from backend.core.utils import json_error_response, json_success_response, success_response
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +35,7 @@ def parse_json_request() -> Tuple[bool, Any, str]:
         return False, None, "Invalid JSON format"
 
 
-def validate_required_fields(
-    data: Dict[str, Any], required_fields: list
-) -> Tuple[bool, str]:
+def validate_required_fields(data: Dict[str, Any], required_fields: list) -> Tuple[bool, str]:
     """
     Validate that required fields are present in data
 
@@ -57,9 +52,7 @@ def validate_required_fields(
     return True, ""
 
 
-def handle_hql_generation_error(
-    e: Exception, endpoint_name: str = ""
-) -> Tuple[Any, int]:
+def handle_hql_generation_error(e: Exception, endpoint_name: str = "") -> Tuple[Any, int]:
     """
     Standardized error handling for HQL generation endpoints
 
@@ -96,9 +89,7 @@ def format_timestamp() -> str:
     return datetime.utcnow().isoformat() + "Z"
 
 
-def build_success_response(
-    data: Dict[str, Any], include_timestamp: bool = True
-) -> Dict[str, Any]:
+def build_success_response(data: Dict[str, Any], include_timestamp: bool = True) -> Dict[str, Any]:
     """
     Build a standardized success response
 

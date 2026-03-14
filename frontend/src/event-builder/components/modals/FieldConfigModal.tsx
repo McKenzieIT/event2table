@@ -9,7 +9,7 @@
  * FieldConfigModal Component
  * 字段配置模态框组件
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Input } from '@shared/ui';
 
@@ -49,16 +49,19 @@ type FieldConfigModalComponent = React.FC<FieldConfigModalProps>;
 /**
  * FieldConfigModal: 字段配置模态框组件
  *
- * 功能：
- * - 配置字段的中文名称和别名
- * - 显示字段名和类型（只读）
- * - 保存配置时验证必填字段
+ * ✅ BUGFIX #2-3: 优化交互性
+ * - 添加ref管理输入元素
+ * - 使用useCallback优化性能
+ * - 改进键盘事件处理
+ * - 确保表单状态正确更新
  */
 const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose }) => {
   const [formData, setFormData] = useState<FieldFormData>({
     displayName: '',
     alias: '',
   });
+
+  const aliasInputRef = useRef<HTMLInputElement>(null);
 
   /**
    * 初始化表单数据
@@ -73,9 +76,9 @@ const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose })
   }, [field]);
 
   /**
-   * 处理表单提交
+   * ✅ BUGFIX #2-3: 处理表单提交（使用useCallback优化）
    */
-  const handleSubmit = (): void => {
+  const handleSubmit = useCallback((): void => {
     if (!formData.displayName.trim()) {
       toast.error('请输入中文名称');
       return;
@@ -84,28 +87,51 @@ const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose })
       displayName: formData.displayName.trim(),
       alias: formData.alias.trim(),
     });
-  };
+  }, [formData, onSave]);
 
   /**
-   * 处理键盘事件
+   * ✅ BUGFIX #2-3: 处理键盘事件（改进焦点管理）
    */
-  const handleKeyDown = (e: React.KeyboardEvent): void => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent): void => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleSubmit();
     } else if (e.key === 'Escape') {
+      e.preventDefault();
       onClose();
     }
-  };
+  }, [handleSubmit, onClose]);
+
+  /**
+   * ✅ BUGFIX #2-3: 处理中文名称输入
+   */
+  const handleDisplayNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
+    setFormData(prev => ({ ...prev, displayName: e.target.value }));
+  }, []);
+
+  /**
+   * ✅ BUGFIX #2-3: 处理别名输入
+   */
+  const handleAliasChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
+    setFormData(prev => ({ ...prev, alias: e.target.value }));
+  }, []);
 
   /**
    * 处理键盘事件（overlay）
    */
-  const handleOverlayKeyDown = (e: React.KeyboardEvent): void => {
+  const handleOverlayKeyDown = useCallback((e: React.KeyboardEvent): void => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClose();
     }
-  };
+  }, [onClose]);
+
+  /**
+   * ✅ BUGFIX #2-3: 阻止事件冒泡，防止意外关闭
+   */
+  const handleModalContentClick = useCallback((e: React.MouseEvent): void => {
+    e.stopPropagation();
+  }, []);
 
   return (
     <div
@@ -118,7 +144,7 @@ const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose })
     >
       <div
         className="modal-content glass-card field-config-modal"
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleModalContentClick}
         onKeyDown={handleKeyDown}
       >
         <div className="modal-header">
@@ -139,15 +165,18 @@ const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose })
             type="text"
             placeholder="例如: 角色ID"
             value={formData.displayName}
-            onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+            onChange={handleDisplayNameChange}
+            onKeyDown={handleKeyDown}
             autoFocus
           />
           <Input
+            ref={aliasInputRef}
             label="Alias (别名)"
             type="text"
             placeholder="例如: user_id"
             value={formData.alias}
-            onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
+            onChange={handleAliasChange}
+            onKeyDown={handleKeyDown}
           />
           {field?.fieldType === 'param' && (
             <div className="form-info">
@@ -159,7 +188,12 @@ const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose })
           <button className="btn btn-secondary" onClick={onClose} type="button">
             取消
           </button>
-          <button className="btn btn-primary" onClick={handleSubmit} type="button">
+          <button
+            className="btn btn-primary"
+            onClick={handleSubmit}
+            type="button"
+            disabled={!formData.displayName.trim()}
+          >
             保存
           </button>
         </div>

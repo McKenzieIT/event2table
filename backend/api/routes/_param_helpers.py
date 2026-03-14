@@ -13,9 +13,10 @@ Architecture (V9.0.0):
 - No direct database access
 """
 
-from typing import Tuple, Optional, Dict, Any
-from flask import request, session
 import logging
+from typing import Any, Dict, Optional, Tuple
+
+from flask import request, session
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,6 @@ def resolve_game_context() -> Tuple[Optional[int], Optional[str], Optional[str]]
         return None, None, f"Game not found: gid={game_gid}"
     game_id = game.id
     return game_id, game_gid, None
-
 
 
 @cached(ttl=1800)  # Cache for 30 minutes

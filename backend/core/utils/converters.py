@@ -7,7 +7,7 @@ from backend.core.cache.decorators import cached
 """
 数据转换函数模块
 
-提供统一的数据模型转换、字典转换、类型转换功能。
+提供统一的数据模型转换, 字典转换, 类型转换功能. 
 
 作者: Claude Code
 版本: 1.0.0
@@ -34,8 +34,9 @@ from backend.core.cache.decorators import cached
     >>> value = safe_int("123", default=0)
 """
 
-from typing import Any, Optional, Dict, List, Tuple, Union
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 from backend.core.database import get_db_connection
 from backend.core.logging import get_logger
 
@@ -52,7 +53,7 @@ def game_to_dict(game: Any, include_counts: bool = False) -> Dict[str, Any]:
     将游戏对象转换为字典
 
     Args:
-        game: 游戏对象（可以是字典、Row对象或其他）
+        game: 游戏对象（可以是字典, Row对象或其他）
         include_counts: 是否包含事件计数等统计信息
 
     Returns:
@@ -63,7 +64,7 @@ def game_to_dict(game: Any, include_counts: bool = False) -> Dict[str, Any]:
         >>> game_dict = game_to_dict(game)
         >>> print(game_dict['name'])  # 'Test Game'
     """
-    # 如果已经是字典，直接返回
+    # 如果已经是字典, 直接返回
     if isinstance(game, dict):
         result = game.copy()
     else:
@@ -83,7 +84,7 @@ def game_to_dict(game: Any, include_counts: bool = False) -> Dict[str, Any]:
             # Fallback: 尝试转换为字典
             result = dict(game)
 
-    # 可选：包含统计信息
+    # 可选: 包含统计信息
     if include_counts:
         try:
             result["event_count"] = get_game_event_count(result.get("gid"))
@@ -98,7 +99,7 @@ def event_to_dict(event: Any, include_parameters: bool = False) -> Dict[str, Any
     将事件对象转换为字典
 
     Args:
-        event: 事件对象（可以是字典、Row对象或其他）
+        event: 事件对象（可以是字典, Row对象或其他）
         include_parameters: 是否包含参数信息
 
     Returns:
@@ -109,7 +110,7 @@ def event_to_dict(event: Any, include_parameters: bool = False) -> Dict[str, Any
         >>> event_dict = event_to_dict(event)
         >>> print(event_dict['event_name'])  # 'user_login'
     """
-    # 如果已经是字典，直接返回
+    # 如果已经是字典, 直接返回
     if isinstance(event, dict):
         result = event.copy()
     else:
@@ -130,7 +131,7 @@ def event_to_dict(event: Any, include_parameters: bool = False) -> Dict[str, Any
             # Fallback: 尝试转换为字典
             result = dict(event)
 
-    # 可选：包含参数信息
+    # 可选: 包含参数信息
     if include_parameters and result.get("id"):
         try:
             result["parameters"] = get_event_parameters(result["id"])
@@ -237,7 +238,7 @@ def api_request_to_model(
             "order_index": int,
         }
     else:
-        # 默认：保留所有字段
+        # 默认: 保留所有字段
         field_mapping = None
 
     result = {}
@@ -246,7 +247,7 @@ def api_request_to_model(
         if key in all_excludes:
             continue
 
-        # 类型转换（如果有字段映射）
+        # 类型转换(如果有字段映射)
         if field_mapping and key in field_mapping:
             try:
                 target_type = field_mapping[key]
@@ -407,10 +408,10 @@ def ensure_game_gid_int(value: Any) -> int:
     """
     确保game_gid是整数类型
 
-    用于类型一致性验证，确保game_gid在整个应用中保持为INTEGER类型。
+    用于类型一致性验证, 确保game_gid在整个应用中保持为INTEGER类型. 
 
     Args:
-        value: game_gid值（可以是int、str或其他类型）
+        value: game_gid值（可以是int, str或其他类型）
 
     Returns:
         game_gid作为整数
@@ -452,7 +453,6 @@ def ensure_game_gid_int(value: Any) -> int:
 # ============================================================================
 
 
-
 @cached(ttl=1800)
 def fetch_all_as_dict(query: str, params: Optional[Tuple] = None) -> List[Dict[str, Any]]:
     """
@@ -485,7 +485,6 @@ def fetch_all_as_dict(query: str, params: Optional[Tuple] = None) -> List[Dict[s
     except Exception as e:
         logger.error(f"Error fetching all as dict: {e}")
         return []
-
 
 
 @cached(ttl=1800)

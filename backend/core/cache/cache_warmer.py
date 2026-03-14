@@ -9,17 +9,18 @@ from backend.core.cache.decorators import cached
 """
 缓存预热系统
 ===========
-应用启动时和定时自动预热热点数据，确保缓存命中率高
+应用启动时和定时自动预热热点数据, 确保缓存命中率高
 
 版本: 1.0.0
 日期: 2026-01-20
 """
 
-from backend.core.cache.cache_hierarchical import hierarchical_cache
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict
 import logging
 import threading
 import time
+
+from backend.core.cache.cache_hierarchical import hierarchical_cache
+from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class CacheWarmer:
     功能:
     - 应用启动时预热热点数据
     - 定时自动预热（默认每小时）
-    - 支持选择性预热（游戏、事件、参数模板）
+    - 支持选择性预热（游戏, 事件, 参数模板）
     """
 
     def __init__(self):
@@ -41,7 +42,7 @@ class CacheWarmer:
         self._stop_event = threading.Event()
 
     def warmup_games(self):
-        """预热游戏列表（所有游戏）"""
+        """预热游戏列表(所有游戏)"""
         logger.info("🔥 预热游戏列表...")
         try:
             games = fetch_all_as_dict("SELECT * FROM games ORDER BY id")
@@ -55,7 +56,7 @@ class CacheWarmer:
             logger.error(f"❌ 预热游戏列表失败: {e}")
 
     def warmup_games_list(self):
-        """预热游戏列表API（带统计信息）"""
+        """预热游戏列表API(带统计信息)"""
         logger.info("🔥 预热游戏列表API（带统计信息）...")
         try:
             from backend.core.config.config import CacheConfig
@@ -95,7 +96,7 @@ class CacheWarmer:
         预热热门事件（Top N）
 
         Args:
-            limit: 预热事件数量，默认100
+            limit: 预热事件数量, 默认100
         """
         logger.info(f"🔥 预热热门事件(Top {limit})...")
         try:
@@ -110,7 +111,7 @@ class CacheWarmer:
             logger.error(f"❌ 预热热门事件失败: {e}")
 
     def warmup_param_templates(self):
-        """预热参数模板（系统模板）"""
+        """预热参数模板(系统模板)"""
         logger.info("🔥 预热参数模板...")
         try:
             templates = fetch_all_as_dict("SELECT * FROM param_templates WHERE is_system = 1")
@@ -135,7 +136,7 @@ class CacheWarmer:
         except Exception as e:
             # Table might not exist - log warning but continue
             if "no such table" in str(e):
-                logger.warning(f"⚠️ categories表不存在，跳过分类预热")
+                logger.warning(f"⚠️ categories表不存在, 跳过分类预热")
             else:
                 logger.error(f"❌ 预热分类列表失败: {e}")
 
@@ -145,7 +146,7 @@ class CacheWarmer:
 
         Args:
             game_gid: 游戏业务GID
-            limit: 预热事件数量，默认50
+            limit: 预热事件数量, 默认50
         """
         logger.info(f"🔥 预热游戏{game_gid}的事件列表...")
         try:
@@ -177,7 +178,7 @@ class CacheWarmer:
         logger.info("=" * 60)
 
         try:
-            # 预热游戏列表（带统计信息 - 优先预热，这是最常用的API）
+            # 预热游戏列表(带统计信息 - 优先预热, 这是最常用的API)
             self.warmup_games_list()
 
             # 预热游戏详情
@@ -197,7 +198,7 @@ class CacheWarmer:
             # 预热参数模板
             self.warmup_param_templates()
 
-            # 预热分类（如果表存在）
+            # 预热分类(如果表存在)
             self.warmup_categories()
 
             logger.info("=" * 60)
@@ -218,7 +219,7 @@ class CacheWarmer:
         启动定时预热（使用后台线程）
 
         Args:
-            interval_hours: 预热间隔（小时），默认1小时
+            interval_hours: 预热间隔（小时）, 默认1小时
         """
         if self._warming_thread is not None and self._warming_thread.is_alive():
             logger.warning("⚠️ 定时预热已在运行中")
@@ -235,7 +236,7 @@ class CacheWarmer:
                 # 等待指定间隔或停止信号
                 self._stop_event.wait(interval_seconds)
 
-                # 如果收到停止信号，退出循环
+                # 如果收到停止信号, 退出循环
                 if self._stop_event.is_set():
                     break
 
@@ -262,14 +263,13 @@ class CacheWarmer:
         # 发送停止信号
         self._stop_event.set()
 
-        # 等待线程结束（最多等待5秒）
+        # 等待线程结束(最多等待5秒)
         self._warming_thread.join(timeout=5)
 
         if self._warming_thread.is_alive():
             logger.warning("⚠️ 定时预热线程未能及时停止")
         else:
             logger.info("⏹️ 定时预热已停止")
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_warmup_stats(self) -> dict:

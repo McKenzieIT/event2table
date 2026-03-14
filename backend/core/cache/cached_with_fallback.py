@@ -4,7 +4,7 @@
 缓存降级装饰器
 ==============
 
-提供简单的缓存降级装饰器，自动处理Redis故障
+提供简单的缓存降级装饰器, 自动处理Redis故障
 
 使用示例:
     @cached_with_fallback(ttl=3600)
@@ -57,11 +57,11 @@ def cached_with_fallback(ttl: int = 3600, key_prefix: Optional[str] = None):
             except Exception as e:
                 logger.warning(f"⚠️  Cache read failed: {e}, falling back to database")
 
-            # 缓存未命中，执行函数
+            # 缓存未命中, 执行函数
             logger.debug(f"❌ Cache MISS: {cache_key}")
             result = func(*args, **kwargs)
 
-            # 尝试写入缓存（可能失败，但不影响主流程）
+            # 尝试写入缓存(可能失败, 但不影响主流程)
             try:
                 cache.set(cache_key, result, ttl=ttl)
             except Exception as e:
@@ -70,6 +70,7 @@ def cached_with_fallback(ttl: int = 3600, key_prefix: Optional[str] = None):
             return result
 
         return wrapper
+
     return decorator
 
 
@@ -95,6 +96,7 @@ class CacheWithFallback:
 
     def __init__(self):
         from backend.core.cache.cache_hierarchical import HierarchicalCache
+
         self._cache = HierarchicalCache()
         self._degraded = False
         self._failure_count = 0
@@ -121,7 +123,7 @@ class CacheWithFallback:
             self._increment_failure_count()
             logger.warning(f"Cache get failed: {e}")
 
-        # 缓存未命中，执行查询函数
+        # 缓存未命中, 执行查询函数
         if query_fn:
             return query_fn()
 

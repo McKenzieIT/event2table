@@ -17,6 +17,7 @@ All endpoints use the GenericRepository pattern for batch operations.
 
 import logging
 
+from backend.core.data_access import Repositories
 from backend.core.utils import (
     execute_write,
     fetch_all_as_dict,
@@ -25,7 +26,6 @@ from backend.core.utils import (
     json_success_response,
     validate_json_request,
 )
-from backend.core.data_access import Repositories
 
 # Import the blueprint
 from . import bulk_bp
@@ -66,8 +66,7 @@ def api_bulk_delete_events():
         # Delete event parameters first (foreign key constraint)
         placeholders = ",".join(["?" for _ in event_ids])
         execute_write(
-            f"DELETE FROM event_params WHERE event_id IN ({placeholders})",
-            tuple(event_ids)
+            f"DELETE FROM event_params WHERE event_id IN ({placeholders})", tuple(event_ids)
         )
 
         # Delete events
@@ -76,6 +75,7 @@ def api_bulk_delete_events():
         # Clear cache
         try:
             from backend.core.cache.cache_system import clear_cache_pattern
+
             clear_cache_pattern("events:*")
             clear_cache_pattern("dashboard_statistics")
         except ImportError:
@@ -84,7 +84,7 @@ def api_bulk_delete_events():
         logger.info(f"Bulk deleted {deleted_count} events: {event_ids}")
         return json_success_response(
             message=f"Deleted {deleted_count} events successfully",
-            data={"deleted_count": deleted_count, "event_ids": event_ids}
+            data={"deleted_count": deleted_count, "event_ids": event_ids},
         )
 
     except Exception as e:
@@ -129,10 +129,7 @@ def api_bulk_update_category():
             return json_error_response("category_id must be a positive integer", status_code=400)
 
         # Verify category exists
-        category = fetch_one_as_dict(
-            "SELECT id FROM event_categories WHERE id = ?",
-            (category_id,)
-        )
+        category = fetch_one_as_dict("SELECT id FROM event_categories WHERE id = ?", (category_id,))
         if not category:
             return json_error_response(f"Category with id {category_id} not found", status_code=404)
 
@@ -143,6 +140,7 @@ def api_bulk_update_category():
         # Clear cache
         try:
             from backend.core.cache.cache_system import clear_cache_pattern
+
             clear_cache_pattern("events:*")
         except ImportError:
             pass
@@ -150,7 +148,11 @@ def api_bulk_update_category():
         logger.info(f"Bulk updated category for {updated_count} events to category {category_id}")
         return json_success_response(
             message=f"Updated {updated_count} events to category {category_id}",
-            data={"updated_count": updated_count, "category_id": category_id, "event_ids": event_ids}
+            data={
+                "updated_count": updated_count,
+                "category_id": category_id,
+                "event_ids": event_ids,
+            },
         )
 
     except Exception as e:
@@ -201,6 +203,7 @@ def api_bulk_toggle_common_params():
         # Clear cache
         try:
             from backend.core.cache.cache_system import clear_cache_pattern
+
             clear_cache_pattern("events:*")
             clear_cache_pattern("common_params:*")
         except ImportError:
@@ -210,7 +213,7 @@ def api_bulk_toggle_common_params():
         logger.info(f"Bulk toggled common params: {updated_count} events {action} common params")
         return json_success_response(
             message=f"Updated {updated_count} events - {action} common params",
-            data={"updated_count": updated_count, "include": include, "event_ids": event_ids}
+            data={"updated_count": updated_count, "include": include, "event_ids": event_ids},
         )
 
     except Exception as e:
@@ -273,7 +276,7 @@ def api_bulk_export_events():
             WHERE le.id IN ({placeholders})
             ORDER BY le.id
             """,
-            tuple(event_ids)
+            tuple(event_ids),
         )
 
         if not events:
@@ -297,7 +300,7 @@ def api_bulk_export_events():
             WHERE ep.event_id IN ({placeholders}) AND ep.is_active = 1
             ORDER BY ep.event_id, ep.id
             """,
-            tuple(event_ids)
+            tuple(event_ids),
         )
 
         # Group parameters by event_id
@@ -317,11 +320,7 @@ def api_bulk_export_events():
         logger.info(f"Bulk exported {len(events)} events with {len(all_params)} total parameters")
         return json_success_response(
             message=f"Exported {len(events)} events successfully",
-            data={
-                "events": events,
-                "count": len(events),
-                "format": format_type
-            }
+            data={"events": events, "count": len(events), "format": format_type},
         )
 
     except Exception as e:
@@ -384,11 +383,9 @@ def api_bulk_validate_parameters():
             event = Repositories.LOG_EVENTS.find_by_id(event_id)
 
             if not event:
-                results.append({
-                    "event_id": event_id,
-                    "is_valid": False,
-                    "errors": ["Event not found"]
-                })
+                results.append(
+                    {"event_id": event_id, "is_valid": False, "errors": ["Event not found"]}
+                )
                 continue
 
             # Fetch event parameters
@@ -405,7 +402,7 @@ def api_bulk_validate_parameters():
                 LEFT JOIN param_templates pt ON ep.template_id = pt.id
                 WHERE ep.event_id = ? AND ep.is_active = 1
                 """,
-                (event_id,)
+                (event_id,),
             )
 
             # Perform validation checks
@@ -443,15 +440,17 @@ def api_bulk_validate_parameters():
             # Overall validation status
             is_valid = len(errors) == 0
 
-            results.append({
-                "event_id": event_id,
-                "event_name": event.get("event_name", ""),
-                "event_name_cn": event.get("event_name_cn", ""),
-                "is_valid": is_valid,
-                "param_count": len(params),
-                "errors": errors,
-                "warnings": warnings
-            })
+            results.append(
+                {
+                    "event_id": event_id,
+                    "event_name": event.get("event_name", ""),
+                    "event_name_cn": event.get("event_name_cn", ""),
+                    "is_valid": is_valid,
+                    "param_count": len(params),
+                    "errors": errors,
+                    "warnings": warnings,
+                }
+            )
 
         logger.info(f"Bulk validated parameters for {len(event_ids)} events")
         return json_success_response(
@@ -460,8 +459,8 @@ def api_bulk_validate_parameters():
                 "results": results,
                 "total_events": len(event_ids),
                 "valid_events": sum(1 for r in results if r["is_valid"]),
-                "invalid_events": sum(1 for r in results if not r["is_valid"])
-            }
+                "invalid_events": sum(1 for r in results if not r["is_valid"]),
+            },
         )
 
     except Exception as e:

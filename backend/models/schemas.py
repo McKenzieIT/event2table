@@ -1,25 +1,10 @@
-# ⚠️ PERFORMANCE: N+1 query detected - needs refactor
-# TODO: Replace loop queries with JOIN or prefetch
+    # 
 
-# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
-# TODO: Replace loop queries with single JOIN query
-# See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
-
-# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
-# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Pydantic Data Models (Schema Layer)
-
-定义所有数据传输对象（DTO）和验证模型
-提供输入验证、序列化和文档化功能
-"""
-
-from typing import Optional, List, Dict, Any, Literal
-from datetime import datetime
-from pydantic import BaseModel, Field, validator
 import html
+from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import BaseModel, Field, field_validator, validator
 
 # ============================================================================
 # Game 相关 Schema
@@ -27,7 +12,7 @@ import html
 
 
 class GameBase(BaseModel):
-    """游戏基础模型"""
+        # 游戏基础模型
 
     gid: int = Field(..., ge=0, description="游戏业务ID (INTEGER)")
     name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
@@ -35,14 +20,14 @@ class GameBase(BaseModel):
 
     @validator("name")
     def sanitize_name(cls, v):
-        """防止XSS攻击：转义HTML字符"""
+            # 防止XSS攻击: 转义HTML字符
         if v:
             return html.escape(v.strip())
         return v
 
     @validator("gid")
     def validate_gid(cls, v):
-        """验证gid格式 - 必须是正整数"""
+            # 验证gid格式 - 必须是正整数
         if not isinstance(v, int):
             raise ValueError("gid必须是整数类型")
         if v < 0:
@@ -51,27 +36,27 @@ class GameBase(BaseModel):
 
 
 class GameCreate(GameBase):
-    """游戏创建模型"""
+        # 游戏创建模型
 
     pass
 
 
 class GameUpdate(BaseModel):
-    """游戏更新模型"""
+        # 游戏更新模型
 
     name: Optional[str] = Field(None, min_length=1, max_length=100)
     ods_db: Optional[Literal["ieu_ods", "overseas_ods"]] = None
 
     @validator("name")
     def sanitize_name(cls, v):
-        """防止XSS攻击：转义HTML字符"""
+            # 防止XSS攻击: 转义HTML字符
         if v:
             return html.escape(v.strip())
         return v
 
 
 class GameResponse(GameBase):
-    """游戏响应模型"""
+        # 游戏响应模型
 
     id: int
     created_at: Optional[datetime] = None
@@ -87,7 +72,7 @@ class GameResponse(GameBase):
 
 
 class EventParameterBase(BaseModel):
-    """事件参数基础模型"""
+        # 事件参数基础模型
 
     param_name: str = Field(..., min_length=1, max_length=100, description="参数英文名")
     param_name_cn: Optional[str] = Field(None, max_length=100, description="参数中文名")
@@ -96,52 +81,55 @@ class EventParameterBase(BaseModel):
         None, max_length=500, description="参数描述"
     )
     json_path: Optional[str] = Field(
-        None, max_length=200, description="JSON路径，用于从事件JSON中提取参数值"
+        None, max_length=200, description="JSON路径, 用于从事件JSON中提取参数值"
     )
 
-    @validator("param_name")
+    @validator("param_name", pre=True)
+    # 
     def sanitize_param_name(cls, v):
-        """验证并清理参数名（snake_case）"""
-        v = v.strip()
+            # 验证并清理参数名(snake_case), 防止XSS攻击
+        if isinstance(v, str):
+            v = v.strip()
         if not v:
             raise ValueError("param_name不能为空")
         if " " in v:
-            raise ValueError("param_name不能包含空格，请使用snake_case格式")
-        return v
+            raise ValueError("param_name不能包含空格, 请使用snake_case格式")
+        # 转义HTML特殊字符, 防止XSS攻击
+        return html.escape(v) if isinstance(v, str) else v
 
     @validator("param_name_cn")
     def sanitize_param_name_cn(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
     @validator("param_description")
     def sanitize_description(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
     @validator("json_path")
     def validate_json_path(cls, v):
-        """验证JSON路径格式"""
+            # 验证JSON路径格式
         if v:
             v = v.strip()
             # JSON路径应该以$.开头
             if not v.startswith("$."):
-                raise ValueError("json_path必须以'$.'开头（例如：'$.zoneId'）")
+                raise ValueError("json_path必须以'$.'开头（例如: '$.zoneId'）")
         return v
 
 
 class EventParameterCreate(EventParameterBase):
-    """事件参数创建模型"""
+        # 事件参数创建模型
 
     pass
 
 
 class EventParameterResponse(EventParameterBase):
-    """事件参数响应模型"""
+        # 事件参数响应模型
 
     id: int
     event_id: int
@@ -160,7 +148,7 @@ class EventParameterResponse(EventParameterBase):
 
 
 class EventBase(BaseModel):
-    """事件基础模型"""
+        # 事件基础模型
 
     game_gid: int = Field(..., description="游戏GID")
     event_name: str = Field(..., min_length=1, max_length=100, description="事件英文名")
@@ -172,33 +160,36 @@ class EventBase(BaseModel):
     target_table: Optional[str] = Field(None, max_length=200, description="目标表名")
     include_in_common_params: bool = False
 
-    @validator("event_name")
+    @validator("event_name", pre=True)
+    # 
     def sanitize_event_name(cls, v):
-        """验证并清理事件名"""
-        v = v.strip()
+            # 验证并清理事件名, 防止XSS攻击
+        if isinstance(v, str):
+            v = v.strip()
         if not v:
             raise ValueError("event_name不能为空")
         if " " in v:
             raise ValueError("event_name不能包含空格")
-        return v
+        # 转义HTML特殊字符, 防止XSS攻击
+        return html.escape(v) if isinstance(v, str) else v
 
     @validator("event_name_cn")
     def sanitize_event_name_cn(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
     @validator("source_table", "target_table", pre=True)
     def sanitize_table_names(cls, v):
-        """防止XSS攻击：转义HTML字符"""
+            # 防止XSS攻击: 转义HTML字符
         if v:
             return html.escape(str(v).strip())
         return v
 
 
 class EventCreate(EventBase):
-    """事件创建模型"""
+        # 事件创建模型
 
     parameters: List[EventParameterCreate] = Field(
         default_factory=list, description="事件参数列表"
@@ -206,14 +197,14 @@ class EventCreate(EventBase):
 
     @validator("parameters")
     def validate_parameters(cls, v):
-        """验证至少有一个参数"""
+            # 验证至少有一个参数
         if not v or len(v) == 0:
             raise ValueError("至少需要一个参数")
         return v
 
 
 class EventUpdate(BaseModel):
-    """事件更新模型"""
+        # 事件更新模型
 
     event_name_cn: Optional[str] = Field(None, min_length=1, max_length=100)
     category_id: Optional[int] = None
@@ -221,14 +212,14 @@ class EventUpdate(BaseModel):
 
     @validator("event_name_cn")
     def sanitize_event_name_cn(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
 
 class EventResponse(EventBase):
-    """事件响应模型"""
+        # 事件响应模型
 
     id: int
     created_at: Optional[datetime] = None
@@ -243,7 +234,7 @@ class EventResponse(EventBase):
 
 
 class EventDetailResponse(EventResponse):
-    """事件详情响应模型（包含参数列表）"""
+        # 事件详情响应模型(包含参数列表)
 
     parameters: List[EventParameterResponse] = Field(default_factory=list)
 
@@ -254,7 +245,7 @@ class EventDetailResponse(EventResponse):
 
 
 class FieldDefinition(BaseModel):
-    """字段定义模型"""
+        # 字段定义模型
 
     field_name: str = Field(..., description="字段名称")
     field_alias: Optional[str] = Field(None, description="字段别名")
@@ -264,7 +255,7 @@ class FieldDefinition(BaseModel):
 
     @validator("field_name")
     def sanitize_field_name(cls, v):
-        """验证字段名并防止XSS攻击"""
+            # 验证字段名并防止XSS攻击
         v = v.strip()
         if not v:
             raise ValueError("field_name不能为空")
@@ -272,14 +263,14 @@ class FieldDefinition(BaseModel):
 
     @validator("field_alias")
     def sanitize_field_alias(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
 
 class ConditionDefinition(BaseModel):
-    """条件定义模型"""
+        # 条件定义模型
 
     field: str = Field(..., description="条件字段")
     operator: Literal[
@@ -290,14 +281,14 @@ class ConditionDefinition(BaseModel):
 
     @validator("field")
     def sanitize_field(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(str(v).strip())
         return v
 
 
 class HQLGenerationRequest(BaseModel):
-    """HQL生成请求模型"""
+        # HQL生成请求模型
 
     event_ids: List[int] = Field(..., min_length=1, description="事件ID列表")
     fields: List[FieldDefinition] = Field(..., min_length=1, description="字段定义列表")
@@ -312,14 +303,14 @@ class HQLGenerationRequest(BaseModel):
 
     @validator("event_ids")
     def validate_event_ids(cls, v):
-        """验证事件ID列表"""
+            # 验证事件ID列表
         if not v or len(v) == 0:
             raise ValueError("至少需要一个事件ID")
         return v
 
 
 class HQLGenerationResponse(BaseModel):
-    """HQL生成响应模型"""
+        # HQL生成响应模型
 
     hql: str = Field(..., description="生成的HQL语句")
     estimated_rows: Optional[int] = Field(None, description="预估行数")
@@ -334,14 +325,14 @@ class HQLGenerationResponse(BaseModel):
 
 
 class PaginationParams(BaseModel):
-    """分页参数模型"""
+        # 分页参数模型
 
     page: int = Field(default=1, ge=1, description="页码（从1开始）")
     per_page: int = Field(default=20, ge=1, le=100, description="每页数量")
 
 
 class ApiResponse(BaseModel):
-    """通用API响应模型"""
+        # 通用API响应模型
 
     success: bool = Field(..., description="是否成功")
     message: str = Field(default="", description="响应消息")
@@ -350,7 +341,7 @@ class ApiResponse(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    """错误响应模型"""
+        # 错误响应模型
 
     success: bool = Field(default=False, description="是否成功")
     error: str = Field(..., description="错误类型")
@@ -366,20 +357,20 @@ class ErrorResponse(BaseModel):
 
 
 class BatchDeleteRequest(BaseModel):
-    """批量删除请求模型"""
+        # 批量删除请求模型
 
     ids: List[int] = Field(..., min_length=1, description="要删除的ID列表")
 
 
 class BatchUpdateRequest(BaseModel):
-    """批量更新请求模型"""
+        # 批量更新请求模型
 
     ids: List[int] = Field(..., min_length=1, description="要更新的ID列表")
     updates: Dict[str, Any] = Field(..., description="要更新的字段字典")
 
 
 class BatchOperationResponse(BaseModel):
-    """批量操作响应模型"""
+        # 批量操作响应模型
 
     success_count: int = Field(..., description="成功数量")
     failed_count: int = Field(..., description="失败数量")
@@ -392,7 +383,7 @@ class BatchOperationResponse(BaseModel):
 
 
 class GameStatsResponse(BaseModel):
-    """游戏统计响应模型"""
+        # 游戏统计响应模型
 
     game_gid: int
     game_name: str
@@ -402,7 +393,7 @@ class GameStatsResponse(BaseModel):
 
 
 class ParameterUsageStats(BaseModel):
-    """参数使用统计模型"""
+        # 参数使用统计模型
 
     param_name: str
     usage_count: int
@@ -417,7 +408,7 @@ class ParameterUsageStats(BaseModel):
 
 
 class ExportRequest(BaseModel):
-    """导出请求模型"""
+        # 导出请求模型
 
     game_gid: Optional[int] = Field(None, description="游戏GID（可选）")
     category_id: Optional[int] = Field(None, description="分类ID（可选）")
@@ -427,7 +418,7 @@ class ExportRequest(BaseModel):
 
 
 class ExportResponse(BaseModel):
-    """导出响应模型"""
+        # 导出响应模型
 
     file_path: str = Field(..., description="文件路径")
     file_name: str = Field(..., description="文件名")
@@ -442,7 +433,7 @@ class ExportResponse(BaseModel):
 
 
 class HQLHistorySaveRequest(BaseModel):
-    """HQL历史保存请求模型"""
+        # HQL历史保存请求模型
 
     events: List[Dict[str, Any]] = Field(..., description="事件列表")
     fields: List[Dict[str, Any]] = Field(..., description="字段列表")
@@ -464,21 +455,21 @@ class HQLHistorySaveRequest(BaseModel):
 
     @validator("name_en")
     def sanitize_name_en(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
     @validator("name_cn")
     def sanitize_name_cn(cls, v):
-        """防止XSS攻击"""
+            # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
     @validator("hql_type")
     def validate_hql_for_canvas(cls, v, values):
-        """验证canvas类型时hql格式"""
+            # 验证canvas类型时hql格式
         if v == "canvas":
             hql = values.get("hql")
             if hql:
@@ -496,14 +487,14 @@ class HQLHistorySaveRequest(BaseModel):
 
 
 class HQLHistorySaveResponse(BaseModel):
-    """HQL历史保存响应模型"""
+        # HQL历史保存响应模型
 
     history_id: int = Field(..., description="历史记录ID")
     created_at: str = Field(..., description="创建时间")
 
 
 class HQLHistorySearchRequest(BaseModel):
-    """HQL历史搜索请求模型"""
+        # HQL历史搜索请求模型
 
     keyword: Optional[str] = Field(None, max_length=100, description="搜索关键词")
     hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(
@@ -518,19 +509,19 @@ class HQLHistorySearchRequest(BaseModel):
 
     @validator("date_from", "date_to")
     def validate_iso_date(cls, v):
-        """验证ISO 8601日期格式"""
+            # 验证ISO 8601日期格式
         if v:
             try:
                 datetime.fromisoformat(v.replace("Z", "+00:00"))
             except ValueError:
                 raise ValueError(
-                    f"日期格式必须为ISO 8601格式，如: 2026-02-17T10:00:00Z"
+                    f"日期格式必须为ISO 8601格式, 如: 2026-02-17T10:00:00Z"
                 )
         return v
 
 
 class HQLHistorySearchResponse(BaseModel):
-    """HQL历史搜索响应模型"""
+        # HQL历史搜索响应模型
 
     history: List[Dict[str, Any]] = Field(..., description="历史记录列表")
     count: int = Field(..., description="记录数量")
@@ -539,7 +530,7 @@ class HQLHistorySearchResponse(BaseModel):
 
 
 class HQLHistoryGlobalQueryRequest(BaseModel):
-    """HQL历史全局查询请求模型"""
+        # HQL历史全局查询请求模型
 
     keyword: Optional[str] = Field(None, max_length=100, description="搜索关键词")
     hql_type: Optional[Literal["select", "ddl", "dml", "canvas"]] = Field(
@@ -550,15 +541,15 @@ class HQLHistoryGlobalQueryRequest(BaseModel):
 
 
 class HQLHistoryGlobalQueryResponse(BaseModel):
-    """HQL历史全局查询响应模型"""
+    # HQL history global query response model
 
-    history: List[Dict[str, Any]] = Field(..., description="历史记录列表")
-    count: int = Field(..., description="记录数量")
-    limit: int = Field(..., description="查询限制")
-    offset: int = Field(..., description="查询偏移量")
+    history: List[Dict[str, Any]] = Field(..., description="History records list")
+    count: int = Field(..., description="Record count")
+    limit: int = Field(..., description="Query limit")
+    offset: int = Field(..., description="Query offset")
     note: str = Field(
         "Global query requires authentication. This is a development preview.",
-        description="提示信息",
+        description="Notice message",
     )
 
 

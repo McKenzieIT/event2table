@@ -15,12 +15,13 @@ Event Node Repository (事件节点数据访问层 - 精简架构)
 - 保持GenericRepository继承
 """
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
 from backend.core.utils import execute_write
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
+from backend.core.utils.json_helpers import deserialize_json_field, serialize_json_field
 from backend.models.entities import EventNodeEntity
-from backend.core.utils.json_helpers import serialize_json_field, deserialize_json_field
 
 
 class EventNodeRepository(GenericRepository):
@@ -41,9 +42,8 @@ class EventNodeRepository(GenericRepository):
             table_name="event_nodes",
             primary_key="id",
             enable_cache=True,
-            cache_timeout=120  # 2分钟缓存
+            cache_timeout=120,  # 2分钟缓存
         )
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, node_id: int) -> Optional[EventNodeEntity]:
@@ -69,7 +69,6 @@ class EventNodeRepository(GenericRepository):
             row["config_json"] = deserialize_json_field(row.get("config_json"))
 
         return EventNodeEntity(**row) if row else None
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_game_gid(self, game_gid: int) -> List[EventNodeEntity]:
@@ -102,7 +101,6 @@ class EventNodeRepository(GenericRepository):
             entities.append(EventNodeEntity(**row))
 
         return entities
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_event_id(self, event_id: int) -> List[EventNodeEntity]:
@@ -215,7 +213,7 @@ class EventNodeRepository(GenericRepository):
 
     def delete(self, node_id: int) -> bool:
         """
-        删除事件节点（软删除：设置is_active=0）
+        删除事件节点（软删除: 设置is_active=0）
 
         Args:
             node_id: 节点ID
@@ -247,7 +245,7 @@ class EventNodeRepository(GenericRepository):
             是否删除成功
 
         Warning:
-            此操作不可恢复，请谨慎使用
+            此操作不可恢复, 请谨慎使用
         """
         delete_sql = f'DELETE FROM "{self.table_name}" WHERE id = ?'
         result = execute_write(delete_sql, (node_id,))
@@ -339,7 +337,7 @@ class EventNodeRepository(GenericRepository):
         field_count_min: Optional[int] = None,
         field_count_max: Optional[int] = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[EventNodeEntity]:
         """
         搜索事件节点
@@ -356,27 +354,33 @@ class EventNodeRepository(GenericRepository):
         Returns:
             EventNodeEntity列表
         """
+        # Validate integer parameters (defense in depth)
+        from backend.core.security.sql_validator import SQLValidator
+
+        limit = SQLValidator.validate_integer(limit, "limit")
+        offset = SQLValidator.validate_integer(offset, "offset")
+
         # 构建查询
         query = '''
             SELECT
                 en.*,
-                e.name as event_name
+                e.event_name as event_name
             FROM event_nodes en
             INNER JOIN log_events e ON en.event_id = e.id
-            WHERE e.game_gid = ? AND en.is_active = 1
+            WHERE en.game_gid = ? AND en.is_active = 1
         '''
         params = [game_gid]
 
         # 应用过滤条件
         if keyword:
-            query += " AND e.name LIKE ?"
+            query += " AND e.event_name LIKE ?"
             params.append(f"%{keyword}%")
 
         if event_id:
             query += " AND en.event_id = ?"
             params.append(event_id)
 
-        # 分组（用于字段数过滤）
+        # 分组(用于字段数过滤)
         query += " GROUP BY en.id"
 
         # 应用字段数过滤
@@ -397,16 +401,11 @@ class EventNodeRepository(GenericRepository):
         entities = []
         for row in rows:
             row["config_json"] = deserialize_json_field(row.get("config_json"))
-            # 移除event_name字段（用于显示，不属于Entity）
-            event_name = row.pop("event_name", None)
+            # event_name字段现在是Entity的一部分，无需特殊处理
             entity = EventNodeEntity(**row)
-            # 动态添加event_name属性（仅用于显示）
-            if event_name:
-                setattr(entity, "event_name", event_name)
             entities.append(entity)
 
         return entities
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_nodes_stats(self, game_gid: int) -> Dict:
@@ -417,7 +416,7 @@ class EventNodeRepository(GenericRepository):
             game_gid: 游戏GID
 
         Returns:
-            统计信息字典，包含:
+            统计信息字典, 包含:
             - total_nodes: 总节点数
             - unique_events: 唯一事件数
             - total_fields: 总字段数
@@ -429,7 +428,7 @@ class EventNodeRepository(GenericRepository):
                 SUM(json_array_length(config_json)) as total_fields
             FROM event_nodes en
             INNER JOIN log_events e ON en.event_id = e.id
-            WHERE e.game_gid = ? AND en.is_active = 1
+            WHERE en.game_gid = ? AND en.is_active = 1
         '''
 
         result = fetch_one_as_dict(query, (game_gid,))

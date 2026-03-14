@@ -34,33 +34,89 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// Error handling link
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  // GraphQL errors
+// Error handling link with detailed logging
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward, response }) => {
+  // GraphQL errors with detailed context
   if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path, extensions }) => {
-      console.error(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-        extensions
-      );
+    console.group('❌ GraphQL Errors');
+    console.error('Query:', operation.operationName);
+    console.error('Variables:', JSON.stringify(operation.variables, null, 2));
+    console.error('Error Count:', graphQLErrors.length);
+
+    graphQLErrors.forEach((error, index) => {
+      console.group(`Error #${index + 1}`);
+      console.error('Message:', error.message);
+      console.error('Path:', error.path);
+      console.error('Locations:', error.locations);
+      console.error('Extensions:', error.extensions);
+
+      // Log validation errors with details
+      if (error.extensions?.code === 'GRAPHQL_VALIDATION_FAILED') {
+        console.error('Validation Failed - Check query syntax');
+      }
 
       // Handle specific error codes
-      if (extensions?.code === 'UNAUTHENTICATED') {
+      if (error.extensions?.code === 'UNAUTHENTICATED') {
+        console.warn('User is not authenticated - Redirecting to login');
         // Redirect to login or refresh token
-        console.log('User is not authenticated');
       }
+
+      if (error.extensions?.code === 'FORBIDDEN') {
+        console.warn('Access forbidden - Insufficient permissions');
+      }
+
+      console.groupEnd();
     });
+
+    console.groupEnd();
   }
 
-  // Network errors
+  // Network errors with detailed context
   if (networkError) {
-    console.error(`[Network error]: ${networkError}`);
+    console.group('❌ Network Error');
+    console.error('Query:', operation.operationName);
+    console.error('Variables:', JSON.stringify(operation.variables, null, 2));
+    console.error('Error:', networkError);
+    console.error('Error Message:', networkError.message);
 
-    // Handle network error (e.g., server is down)
-    if ('statusCode' in networkError && networkError.statusCode === 401) {
-      // Unauthorized - clear token and redirect to login
-      localStorage.removeItem('authToken');
+    // Extract status code if available
+    const statusCode = (networkError as any).statusCode;
+    if (statusCode) {
+      console.error('Status Code:', statusCode);
+
+      // Handle specific status codes
+      if (statusCode === 401) {
+        console.warn('Unauthorized - Clearing auth token');
+        localStorage.removeItem('authToken');
+      } else if (statusCode === 403) {
+        console.warn('Forbidden - Insufficient permissions');
+      } else if (statusCode === 400) {
+        console.warn('Bad Request - Check query syntax and variables');
+      } else if (statusCode === 500) {
+        console.error('Internal Server Error - Server-side problem');
+      } else if (statusCode === 502) {
+        console.error('Bad Gateway - Server may be down or unreachable');
+      } else if (statusCode === 503) {
+        console.error('Service Unavailable - Server overloaded or maintenance');
+      }
     }
+
+    // Log response body if available
+    const result = (networkError as any).result;
+    if (result) {
+      console.error('Response Body:', result);
+    }
+
+    console.groupEnd();
+  }
+
+  // Log partial responses (when errorPolicy: 'all')
+  if (response && response.errors && response.data) {
+    console.group('⚠️ Partial Response');
+    console.warn('Query:', operation.operationName);
+    console.warn('Partial Data:', response.data);
+    console.warn('Errors:', response.errors);
+    console.groupEnd();
   }
 
   return forward(operation);

@@ -4,7 +4,7 @@
 Path Validator - 防止路径遍历攻击
 =============================
 
-提供安全的文件路径验证功能，防止路径遍历攻击。
+提供安全的文件路径验证功能, 防止路径遍历攻击. 
 
 安全特性:
 - 防止../路径遍历
@@ -27,11 +27,11 @@ Version: 1.0.0
 Date: 2026-02-24
 """
 
+import logging
 import os
 import re
-import logging
 from pathlib import Path
-from typing import Optional, List
+from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -47,23 +47,59 @@ class PathValidator:
     4. 限制路径长度
     """
 
-    # 允许的文件扩展名（可根据需要扩展）
+    # 允许的文件扩展名(可根据需要扩展)
     ALLOWED_EXTENSIONS = {
-        '.txt', '.log', '.json', '.csv', '.xlsx', '.xls',
-        '.db', '.sqlite', '.sql', '.hql', '.py', '.md',
-        '.pem', '.key', '.crt', '.pkl'  # 注意：.pkl文件需要额外验证
+        '.txt',
+        '.log',
+        '.json',
+        '.csv',
+        '.xlsx',
+        '.xls',
+        '.db',
+        '.sqlite',
+        '.sql',
+        '.hql',
+        '.py',
+        '.md',
+        '.pem',
+        '.key',
+        '.crt',
+        '.pkl',  # 注意: .pkl文件需要额外验证
     }
 
     # 危险文件名黑名单
     BLACKLISTED_NAMES = {
-        'CON', 'PRN', 'AUX', 'NUL',  # Windows保留名
-        'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
-        'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9',
-        '.htaccess', '.env', '.git',  # 敏感配置文件
-        'etc', 'proc', 'sys'  # Unix系统目录
+        'CON',
+        'PRN',
+        'AUX',
+        'NUL',  # Windows保留名
+        'COM1',
+        'COM2',
+        'COM3',
+        'COM4',
+        'COM5',
+        'COM6',
+        'COM7',
+        'COM8',
+        'COM9',
+        'LPT1',
+        'LPT2',
+        'LPT3',
+        'LPT4',
+        'LPT5',
+        'LPT6',
+        'LPT7',
+        'LPT8',
+        'LPT9',
+        '.htaccess',
+        '.env',
+        '.git',  # 敏感配置文件
+        'etc',
+        'proc',
+        'sys',  # Unix系统目录
     }
 
-    # 最大路径长度（防止缓冲区溢出）
+    # 最大路径长度(防止缓冲区溢出)
     MAX_PATH_LENGTH = 4096
 
     # 最大文件名长度
@@ -93,9 +129,7 @@ class PathValidator:
         """
         # 检查路径长度
         if len(file_path) > PathValidator.MAX_PATH_LENGTH:
-            raise ValueError(
-                f"Path too long: {len(file_path)} > {PathValidator.MAX_PATH_LENGTH}"
-            )
+            raise ValueError(f"Path too long: {len(file_path)} > {PathValidator.MAX_PATH_LENGTH}")
 
         # 转换为绝对路径并解析所有符号链接和相对路径
         try:
@@ -113,9 +147,7 @@ class PathValidator:
                 f"Path traversal detected: {file_path} "
                 f"(resolved to {path}, outside base {base})"
             )
-            raise ValueError(
-                f"Path traversal detected: {file_path} is outside {base_dir}"
-            )
+            raise ValueError(f"Path traversal detected: {file_path} is outside {base_dir}")
 
         # 验证路径中的每个组件
         try:
@@ -143,7 +175,7 @@ class PathValidator:
             if part in PathValidator.BLACKLISTED_NAMES:
                 raise ValueError(f"Blacklisted path component: {part}")
 
-            # 检查危险字符（Windows）
+            # 检查危险字符(Windows)
             if re.search(r'[<>:"|?*]', part):
                 raise ValueError(f"Invalid characters in path component: {part}")
 
@@ -177,7 +209,7 @@ class PathValidator:
         # 移除前导和尾随的下划线
         safe = safe.strip('_')
 
-        # 如果为空，生成默认名称
+        # 如果为空, 生成默认名称
         if not safe:
             safe = "unnamed_file"
 
@@ -185,7 +217,7 @@ class PathValidator:
         if len(safe) > max_length:
             # 保留扩展名
             name, ext = os.path.splitext(safe)
-            safe = name[:max_length - len(ext)] + ext
+            safe = name[: max_length - len(ext)] + ext
 
         logger.debug(f"Safe filename generated: {filename} -> {safe}")
         return safe
@@ -259,17 +291,17 @@ class PathValidator:
 
 # 快捷函数
 def validate_path(file_path: str, base_dir: str) -> str:
-    """快捷函数：验证文件路径"""
+    """快捷函数: 验证文件路径"""
     return PathValidator.validate_path(file_path, base_dir)
 
 
 def safe_filename(filename: str, max_length: Optional[int] = None) -> str:
-    """快捷函数：生成安全文件名"""
+    """快捷函数: 生成安全文件名"""
     return PathValidator.safe_filename(filename, max_length)
 
 
 def safe_join(base_dir: str, *paths: str) -> str:
-    """快捷函数：安全连接路径"""
+    """快捷函数: 安全连接路径"""
     return PathValidator.safe_join(base_dir, *paths)
 
 

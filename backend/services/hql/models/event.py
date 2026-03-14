@@ -5,8 +5,8 @@
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Optional, List
 from enum import Enum
+from typing import Any, List, Optional
 
 
 class FieldType(str, Enum):
@@ -65,12 +65,12 @@ class Event:
     """
     抽象事件模型
 
-    完全脱离项目业务，只包含HQL生成所需的最少信息
+    完全脱离项目业务, 只包含HQL生成所需的最少信息
 
     Attributes:
         name: 事件名称（如: login, purchase）
         table_name: 完整表名（如: ieu_ods.ods_10000147_all_view）
-        alias: 表别名（可选，用于JOIN/UNION操作）
+        alias: 表别名（可选, 用于JOIN/UNION操作）
         partition_field: 分区字段名（默认: ds）
     """
 
@@ -93,7 +93,7 @@ class Field:
     """
     抽象字段模型
 
-    支持4种字段类型：
+    支持4种字段类型: 
     - base: 直接从表查询的基础字段（role_id, account_id等）
     - param: 从JSON params字段提取的参数（get_json_object(params, '$.zone_id')）
     - custom: 自定义HQL表达式
@@ -143,13 +143,13 @@ class Condition:
     """
     抽象条件模型
 
-    支持WHERE条件构建，支持AND/OR逻辑组合
+    支持WHERE条件构建, 支持AND/OR逻辑组合
 
     Attributes:
         field: 字段名
         operator: 操作符（=, !=, >, <, LIKE, IN等）
-        value: 条件值（可选，IS NULL等操作符不需要值）
-        logical_op: 逻辑操作符（AND/OR，默认AND）
+        value: 条件值（可选, IS NULL等操作符不需要值）
+        logical_op: 逻辑操作符（AND/OR, 默认AND）
     """
 
     field: str

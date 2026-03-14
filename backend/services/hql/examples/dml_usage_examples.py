@@ -5,9 +5,9 @@ DML Generator 使用示例
 """
 
 from backend.services.hql.core.dml_generator import (
-    DMLGenerator,
     DMLBuilderFactory,
-    generate_insert_overwrite
+    DMLGenerator,
+    generate_insert_overwrite,
 )
 from backend.services.hql.core.generator import HQLGenerator
 from backend.services.hql.models.event import Event, Field, FieldType
@@ -24,7 +24,7 @@ def example_1_basic_insert_overwrite():
     dml = generator.generate_insert_overwrite(
         target_table="dwd.v_dwd_10000147_login_di",
         source_query="SELECT role_id, account_id FROM ods_table",
-        partition_ds="20260217"
+        partition_ds="20260217",
     )
 
     print(dml)
@@ -40,10 +40,7 @@ def example_2_with_hql_generator():
     # 1. 使用HQL生成器创建SELECT查询
     hql_generator = HQLGenerator()
 
-    event = Event(
-        name="login",
-        table_name="ieu_ods.ods_10000147_all_view"
-    )
+    event = Event(name="login", table_name="ieu_ods.ods_10000147_all_view")
 
     fields = [
         Field(name="ds", type=FieldType.BASE),
@@ -52,11 +49,7 @@ def example_2_with_hql_generator():
         Field(name="zone_id", type=FieldType.PARAM, json_path="$.zoneId"),
     ]
 
-    select_query = hql_generator.generate(
-        events=[event],
-        fields=fields,
-        conditions=[]
-    )
+    select_query = hql_generator.generate(events=[event], fields=fields, conditions=[])
 
     print("步骤1: 生成的SELECT查询")
     print("-" * 80)
@@ -70,7 +63,7 @@ def example_2_with_hql_generator():
         target_table="dwd.v_dwd_10000147_login_di",
         source_query=select_query,
         partition_ds="${bizdate}",
-        include_comments=True
+        include_comments=True,
     )
 
     print("步骤2: 生成的INSERT OVERWRITE语句")
@@ -91,7 +84,7 @@ def example_3_factory_pattern():
         game_gid=10000147,
         event_name="purchase",
         source_query="SELECT role_id, amount FROM ods_purchase",
-        partition_ds="20260217"
+        partition_ds="20260217",
     )
 
     print(dml)
@@ -110,7 +103,7 @@ def example_4_export_to_directory():
         target_directory="hdfs:///data/export/20260217/login_events",
         source_query="SELECT * FROM dwd.v_dwd_10000147_login_di",
         file_format="PARQUET",
-        field_delim=","
+        field_delim=",",
     )
 
     print(dml)
@@ -118,7 +111,7 @@ def example_4_export_to_directory():
 
 
 def example_5_batch_insert():
-    """示例5: 批量插入（UNION ALL）"""
+    """示例5: 批量插入(UNION ALL)"""
     print("=" * 80)
     print("示例5: 批量插入多个事件（UNION ALL）")
     print("=" * 80)
@@ -126,13 +119,13 @@ def example_5_batch_insert():
     queries = [
         "SELECT role_id, 'login' AS event_type FROM ods_login WHERE ds = '${bizdate}'",
         "SELECT role_id, 'logout' AS event_type FROM ods_logout WHERE ds = '${bizdate}'",
-        "SELECT role_id, 'purchase' AS event_type FROM ods_purchase WHERE ds = '${bizdate}'"
+        "SELECT role_id, 'purchase' AS event_type FROM ods_purchase WHERE ds = '${bizdate}'",
     ]
 
     dml = DMLBuilderFactory.create_batch_insert(
         target_table="dwd.v_dwd_10000147_all_events_di",
         source_queries=queries,
-        partition_ds="20260217"
+        partition_ds="20260217",
     )
 
     print(dml)
@@ -145,12 +138,12 @@ def example_6_convenience_function():
     print("示例6: 使用便捷函数")
     print("=" * 80)
 
-    # 直接使用便捷函数，无需创建生成器实例
+    # 直接使用便捷函数, 无需创建生成器实例
     dml = generate_insert_overwrite(
         target_table="dwd.v_dwd_10000147_custom_di",
         source_query="SELECT * FROM staging_table",
         partition_ds="${ds}",
-        include_comments=False
+        include_comments=False,
     )
 
     print(dml)
@@ -186,10 +179,7 @@ def example_7_real_world_scenario():
     ]
 
     select_query = hql_generator.generate(
-        events=[event],
-        fields=fields,
-        conditions=[],
-        mode="single"
+        events=[event], fields=fields, conditions=[], mode="single"
     )
 
     # 3. 生成DML语句
@@ -199,7 +189,7 @@ def example_7_real_world_scenario():
         target_table=target_table,
         source_query=select_query,
         partition_ds="${bizdate}",
-        include_comments=True
+        include_comments=True,
     )
 
     print("完整ETL流程: 从ODS层抽取数据到DWD层")

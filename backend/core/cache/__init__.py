@@ -3,7 +3,7 @@
 """
 缓存系统包初始化
 
-此模块提供缓存系统的统一入口。
+此模块提供缓存系统的统一入口. 
 
 版本: 3.2.0
 日期: 2026-02-24
@@ -14,45 +14,40 @@
 - 所有新代码应使用: from backend.core.cache import HierarchicalCache
 
 两个模块的分工:
-- cache_hierarchical.py: 核心HierarchicalCache类（含读写锁、布隆过滤器、降级策略）
-- cache_system.py: 快捷方法、兼容性函数、特定业务逻辑方法
+- cache_hierarchical.py: 核心HierarchicalCache类（含读写锁, 布隆过滤器, 降级策略）
+- cache_system.py: 快捷方法, 兼容性函数, 特定业务逻辑方法
 """
 
 # ============================================================================
-# 基础类和接口（避免循环依赖）
+# 基础类和接口(避免循环依赖)
 # ============================================================================
 from .base import (
-    CacheInterface,
     BaseCache,
+    CacheConnectionError,
     CacheException,
+    CacheInterface,
+    CacheKeyBuilder,
     CacheKeyError,
     CacheValueError,
-    CacheConnectionError,
-    CacheKeyBuilder,
     get_cache,
 )
 
 # ============================================================================
-# 核心缓存实现（主要实现）
+# 核心缓存实现(主要实现)
 # ============================================================================
-from .cache_hierarchical import (
-    HierarchicalCache,
-    hierarchical_cache,
-    cached_hierarchical,
-)
+from .cache_hierarchical import HierarchicalCache, cached_hierarchical, hierarchical_cache
 
 # ============================================================================
 # 快捷方法和兼容性函数
 # ============================================================================
 from .cache_system import (
     CacheInvalidator,
-    cached,
     cache_invalidator,
-    # 兼容性函数
     cache_result,
-    clear_game_cache,
-    clear_event_cache,
+    cached,  # 兼容性函数
     clear_cache_pattern,
+    clear_event_cache,
+    clear_game_cache,
     get_redis_client,
     parse_json_cached,
 )
@@ -71,7 +66,7 @@ __all__ = [
     'CacheConnectionError',
     'CacheKeyBuilder',
     'get_cache',
-    # 核心缓存系统（推荐使用）
+    # 核心缓存系统(推荐使用)
     'HierarchicalCache',
     'CacheInvalidator',
     'cached',

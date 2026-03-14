@@ -13,7 +13,7 @@
  *     { param_name: 'accountId', template_id: 1, libraryParam: {...} },
  *     { param_name: 'customField', template_id: 1, libraryParam: null }
  *   ]}
- *   onConfirm={(selected) => console.log('Importing', selected)}
+ *   onConfirm={(selected) => }
  *   onCancel={() => setShowModal(false)}
  * />
  *

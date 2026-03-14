@@ -5,19 +5,21 @@
 """
 UnionBuilder - 多事件UNION HQL构建器
 
-支持UNION ALL操作，合并多个事件的相同字段
+支持UNION ALL操作, 合并多个事件的相同字段
 """
 
-from typing import List, Dict, Any
-from ..models.event import Event, Field, FieldType
+from typing import Any, Dict, List, Optional
+
 from backend.core.security.sql_validator import SQLValidator
+
+from ..models.event import Event, Field, FieldType
 
 
 class UnionBuilder:
     """
     多事件UNION HQL构建器
 
-    功能：
+    功能: 
     - 支持UNION ALL合并多个事件
     - 支持分区过滤
     - 支持自定义WHERE条件
@@ -25,7 +27,21 @@ class UnionBuilder:
     """
 
     # 允许的SQL操作符白名单
-    VALID_OPERATORS = ["=", "!=", "<>", "<", ">", "<=", ">=", "LIKE", "NOT LIKE", "IN", "NOT IN", "IS NULL", "IS NOT NULL"]
+    VALID_OPERATORS = [
+        "=",
+        "!=",
+        "<>",
+        "<",
+        ">",
+        "<=",
+        ">=",
+        "LIKE",
+        "NOT LIKE",
+        "IN",
+        "NOT IN",
+        "IS NULL",
+        "IS NOT NULL",
+    ]
 
     def __init__(self):
         """初始化UnionBuilder"""
@@ -43,7 +59,7 @@ class UnionBuilder:
         if "field" not in cond:
             raise ValueError("WHERE condition must have 'field'")
 
-        # 验证字段名（SQL标识符）
+        # 验证字段名(SQL标识符)
         field = cond["field"]
         SQLValidator.validate_identifier(field, "field")
 
@@ -55,8 +71,8 @@ class UnionBuilder:
                 f"Must be one of: {', '.join(self.VALID_OPERATORS)}"
             )
 
-        # 值可以是任意字符串（由调用者确保安全）
-        # 这是HQL生成器，value可能包含占位符如'${bizdate}'
+        # 值可以是任意字符串(由调用者确保安全)
+        # 这是HQL生成器, value可能包含占位符如'${bizdate}'
 
     def build_union_all(
         self, events: List[Event], fields: List[Field], use_aliases: bool = False
@@ -119,7 +135,7 @@ class UnionBuilder:
             return field.name
 
         elif field.type == FieldType.PARAM.value:
-            # 参数字段（JSON提取）
+            # 参数字段(JSON提取)
             if use_alias:
                 base_field = f"{event.name}.params"
             else:
@@ -166,7 +182,7 @@ class UnionBuilder:
         if not fields:
             raise ValueError("Fields cannot be empty")
 
-        # 为每个事件构建SELECT子句（带分区过滤）
+        # 为每个事件构建SELECT子句(带分区过滤)
         select_parts = []
         for event in events:
             select_sql = self._build_select_with_partition(
@@ -199,13 +215,13 @@ class UnionBuilder:
         from_clause = event.table_name
         if use_alias:
             from_clause += f" AS {event.name}"
-            # 安全：这是HQL生成器，用于构建Hive查询字符串
+            # 安全: 这是HQL生成器, 用于构建Hive查询字符串
             # event.name和partition_field已通过Event模型验证
-            # partition_value是调用者的占位符（如'${bizdate}'）
+            # partition_value是调用者的占位符(如'${bizdate}')
             where_clause = f"{event.name}.{partition_field} = {partition_value}"
         else:
             # 使用事件名作为前缀
-            # 安全：同上，这是HQL字符串构建，不是直接SQL执行
+            # 安全: 同上, 这是HQL字符串构建, 不是直接SQL执行
             where_clause = f"{event.name}.{partition_field} = {partition_value}"
 
         return f"SELECT\n  {fields_str}\nFROM {from_clause}\nWHERE {where_clause}"
@@ -271,7 +287,7 @@ class UnionBuilder:
         if use_alias:
             from_clause += f" AS {event.name}"
 
-        # 构建WHERE（带安全验证）
+        # 构建WHERE(带安全验证)
         if where_conditions:
             where_parts = []
             for cond in where_conditions:
@@ -282,10 +298,10 @@ class UnionBuilder:
                 operator = cond["operator"]
                 value = cond.get("value", "")
 
-                # 安全：这是HQL生成器，用于构建Hive查询字符串
+                # 安全: 这是HQL生成器, 用于构建Hive查询字符串
                 # field已通过SQLValidator.validate_identifier()验证
                 # operator已在VALID_OPERATORS白名单中验证
-                # value是调用者提供的值（可能包含HQL占位符如'${bizdate}'）
+                # value是调用者提供的值(可能包含HQL占位符如'${bizdate}')
                 where_parts.append(f"{field} {operator} {value}")
 
             where_clause = " AND ".join(where_parts)
@@ -345,3 +361,72 @@ class UnionBuilder:
         """
         union_sql = self.build_union_all(events, fields, use_aliases)
         return f"(\n{union_sql}\n) AS {alias}"
+
+    def build_union(
+        self,
+        events: List[Event],
+        fields: List[Field],
+        partition_filter: Optional[str] = None,
+        use_aliases: bool = False,
+    ) -> str:
+        """
+        构建UNION SQL（通用方法，支持分区过滤）
+
+        Args:
+            events: 事件列表（至少2个）
+            fields: 要查询的字段列表
+            partition_filter: 可选的分区过滤条件（将验证安全性）
+            use_aliases: 是否使用表别名
+
+        Returns:
+            UNION SQL字符串
+
+        Raises:
+            ValueError: 事件少于2个、字段为空、或partition_filter包含恶意内容
+
+        Security:
+        - 验证partition_filter不包含SQL注入模式
+        - 验证partition_filter不包含XSS攻击模式
+        """
+        # 如果没有partition_filter，使用基础方法
+        if not partition_filter:
+            return self.build_union_all(events, fields, use_aliases)
+
+        # ✅ 验证partition_filter安全性
+        dangerous_patterns = [
+            ';',  # SQL注入
+            '--',  # SQL注释
+            'DROP',  # SQL注入
+            'DELETE',  # SQL注入
+            '<script',  # XSS
+            '</script>',  # XSS
+            'javascript:',  # XSS
+            'OR \'1\'=\'1\'',  # SQL注入
+            'UNION SELECT',  # SQL注入
+        ]
+
+        filter_upper = partition_filter.upper()
+        for pattern in dangerous_patterns:
+            if pattern.upper() in filter_upper or pattern in partition_filter.lower():
+                raise ValueError(
+                    f"Potentially malicious partition_filter detected. "
+                    f"Pattern '{pattern}' is not allowed for security reasons."
+                )
+
+        # 安全的partition_filter，使用现有方法
+        # 解析partition_field和partition_value
+        # 格式: "ds = '${bizdate}'"
+        if '=' in partition_filter:
+            parts = partition_filter.split('=', 1)
+            partition_field = parts[0].strip()
+            partition_value = parts[1].strip() if len(parts) > 1 else "'${bizdate}'"
+
+            # 验证partition_field为SQL标识符
+            SQLValidator.validate_identifier(partition_field, "partition_field")
+
+            return self.build_union_with_partition_filter(
+                events, fields, partition_field, partition_value, use_aliases
+            )
+        else:
+            # 简单的partition_filter，直接使用build_union_all
+            return self.build_union_all(events, fields, use_aliases)

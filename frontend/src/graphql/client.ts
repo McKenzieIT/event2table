@@ -27,12 +27,26 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// Error handling link
+// Error handling link with detailed logging
 const errorLink = new ApolloLink((operation, forward) => {
   return forward(operation).map(response => {
-    // Check for errors
+    // Check for errors with detailed logging
     if (response.errors) {
-      console.error('GraphQL Errors:', response.errors);
+      console.group('❌ GraphQL Errors');
+      console.error('Query:', operation.operationName);
+      console.error('Variables:', JSON.stringify(operation.variables, null, 2));
+      console.error('Error Count:', response.errors.length);
+
+      response.errors.forEach((error, index) => {
+        console.group(`Error #${index + 1}`);
+        console.error('Message:', error.message);
+        console.error('Path:', error.path);
+        console.error('Locations:', error.locations);
+        console.error('Extensions:', error.extensions);
+        console.groupEnd();
+      });
+
+      console.groupEnd();
     }
     return response;
   });
@@ -69,9 +83,14 @@ export const client = new ApolloClient({
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'cache-and-network',
+      errorPolicy: 'all',
     },
     query: {
       fetchPolicy: 'cache-first',
+      errorPolicy: 'all',
+    },
+    mutate: {
+      errorPolicy: 'all',
     },
   },
 });

@@ -1,10 +1,11 @@
 """
 WhereBuilder完整覆盖测试套件
 
-目标：达到100%代码覆盖率
+目标: 达到100%代码覆盖率
 """
 
 import pytest
+
 from backend.services.hql.builders.where_builder import WhereBuilder
 from backend.services.hql.models.event import Condition, Operator
 
@@ -104,10 +105,10 @@ class TestWhereBuilderFullCoverage:
         assert builder._format_value(-10) == "-10"
 
     def test_format_value_other_types(self):
-        """测试格式化其他类型（转为字符串）"""
+        """测试格式化其他类型(转为字符串)"""
         builder = WhereBuilder()
 
-        # 字典转字符串（注意：Python的字典表示会使用单引号，_format_value会转义它们）
+        # 字典转字符串(注意: Python的字典表示会使用单引号, _format_value会转义它们)
         result = builder._format_value({"key": "value"})
         # 字符串表示会有额外的转义单引号
         assert "key" in result and "value" in result
@@ -285,7 +286,7 @@ class TestWhereBuilderFullCoverage:
         assert result == "ds = '${ds}'"
 
     def test_build_complex_conditions_single_group_returns_part(self):
-        """测试构建复杂条件 - 单组时直接返回该部分（不添加额外AND）"""
+        """测试构建复杂条件 - 单组时直接返回该部分(不添加额外AND)"""
         builder = WhereBuilder()
         conditions = [Condition(field="role_id", operator="=", value=123, logical_op="AND")]
 
@@ -294,25 +295,25 @@ class TestWhereBuilderFullCoverage:
 
         # 验证结果包含条件
         assert "role_id = 123" in result
-        # 验证不包含分组的括号（因为只有单个条件）
-        # 行204应该被执行（len(all_parts) == 1的情况）
+        # 验证不包含分组的括号(因为只有单个条件)
+        # 行204应该被执行(len(all_parts) == 1的情况)
 
     def test_build_complex_conditions_single_part_triggers_204(self):
-        """测试build_complex_conditions - 触发行204（单部分直接返回）"""
+        """测试build_complex_conditions - 触发行204(单部分直接返回)"""
         builder = WhereBuilder()
 
-        # 创建1个AND条件，配合空上下文（会添加默认分区过滤）
+        # 创建1个AND条件, 配合空上下文(会添加默认分区过滤)
         conditions = [Condition(field="role_id", operator="=", value=123, logical_op="AND")]
 
-        # 使用None上下文，会添加默认分区过滤"ds = '${ds}'"
-        # 这样all_parts = [partition_filter_part]（只有1个元素）
+        # 使用None上下文, 会添加默认分区过滤"ds = '${ds}'"
+        # 这样all_parts = [partition_filter_part](只有1个元素)
         result = builder.build_complex_conditions(conditions, context=None)
 
         # 验证结果
         assert "role_id = 123" in result
         assert "ds = '${ds}'" in result
 
-        # 行204应该被执行（len(all_parts) == 1的情况）
+        # 行204应该被执行(len(all_parts) == 1的情况)
         # 这确保测试覆盖了该代码路径
 
     def test_build_single_condition_in_operator(self):
@@ -342,11 +343,11 @@ class TestWhereBuilderFullCoverage:
         """测试build_complex_conditions只有分区过滤 - 触发行204"""
         builder = WhereBuilder()
 
-        # 空条件列表，只有分区过滤
-        # 这样all_parts = [(partition_filter)]，len=1，触发行204
+        # 空条件列表, 只有分区过滤
+        # 这样all_parts = [(partition_filter)], len=1, 触发行204
         result = builder.build_complex_conditions([], context=None)
 
-        # 验证只有分区过滤，没有额外AND连接
+        # 验证只有分区过滤, 没有额外AND连接
         assert "ds = '${ds}'" in result
         # 确保不包含 " AND\n  "
         assert " AND\n  " not in result
@@ -359,7 +360,7 @@ class TestWhereBuilderFullCoverage:
         # 使用None context避免分区过滤提前返回
         conditions = [Condition(field="field1", operator="=", value=1, logical_op="AND")]
 
-        # 使用None作为context，不会提前返回
+        # 使用None作为context, 不会提前返回
         result = builder.build_complex_conditions(conditions, context=None)
 
         # 验证结果

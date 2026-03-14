@@ -95,7 +95,9 @@ function SearchInput({
     }
 
     if (onChange && internalValue !== value) {
+      console.log('[SearchInput] Scheduling onChange with debounce:', internalValue, 'debounceMs:', debounceMs);
       timeoutRef.current = setTimeout(() => {
+        console.log('[SearchInput] Triggering onChange with value:', internalValue);
         onChange(internalValue);
       }, debounceMs);
     }
@@ -109,6 +111,7 @@ function SearchInput({
 
   // 处理输入变化
   const handleChange = useCallback((newValue: string) => {
+    console.log('[SearchInput] handleChange called with newValue:', newValue);
     setInternalValue(newValue);
     setShowClearButton(newValue.length > 0);
   }, []);

@@ -5,14 +5,15 @@ GraphQL type definitions for field builder configuration management.
 This module provides comprehensive types for the Field Builder API migration to GraphQL.
 """
 
-import graphene
-from graphene import ObjectType, Int, String, List, Boolean, Field, InputObjectType, JSONString
 from datetime import datetime
 
+import graphene
+from graphene import Boolean, Field, InputObjectType, Int, JSONString, List, ObjectType, String
 
 # ============================================
 # Input Types
 # ============================================
+
 
 class ViewConfigInput(InputObjectType):
     """
@@ -20,6 +21,7 @@ class ViewConfigInput(InputObjectType):
 
     Defines the view-level settings for field builder configuration.
     """
+
     gameGid = Int(required=True, description="Game GID")
     dateVar = String(default_value="${bizdate}", description="Date variable for partitioning")
     outputTable = String(description="Output table name")
@@ -31,6 +33,7 @@ class BaseFieldInput(InputObjectType):
 
     Represents a base field from source events.
     """
+
     eventId = Int(required=True, description="Source event ID")
     eventName = String(required=True, description="Event name for alias")
     fieldName = String(required=True, description="Field name in the event")
@@ -44,6 +47,7 @@ class ParamFieldInput(InputObjectType):
 
     Represents a parameter field with JSON path extraction.
     """
+
     eventId = Int(required=True, description="Source event ID")
     eventName = String(required=True, description="Event name for alias")
     paramName = String(required=True, description="Parameter name")
@@ -58,6 +62,7 @@ class CustomFieldInput(InputObjectType):
 
     Represents a custom HQL expression field.
     """
+
     name = String(required=True, description="Field name")
     expression = String(required=True, description="HQL expression")
     alias = String(description="Output field alias")
@@ -70,6 +75,7 @@ class FixedFieldInput(InputObjectType):
 
     Represents a fixed value field.
     """
+
     name = String(required=True, description="Field name")
     value = String(required=True, description="Fixed value")
     alias = String(description="Output field alias")
@@ -82,6 +88,7 @@ class FieldMappingV2Input(InputObjectType):
 
     Complete field mapping configuration for field builder.
     """
+
     viewConfig = Field(ViewConfigInput, description="View configuration")
     baseFields = List(BaseFieldInput, description="List of base fields")
     paramFields = List(ParamFieldInput, description="List of parameter fields")
@@ -95,6 +102,7 @@ class FieldBuilderConfigInput(InputObjectType):
 
     Complete configuration for saving a field builder config.
     """
+
     config = Field(FieldMappingV2Input, required=True, description="Field mapping configuration")
     viewName = String(required=True, description="View/table name")
     displayName = String(description="Display name for the configuration")
@@ -104,10 +112,12 @@ class FieldBuilderConfigInput(InputObjectType):
 # Output Types
 # ============================================
 
+
 class ViewConfigType(ObjectType):
     """
     View configuration output type
     """
+
     gameGid = Int(required=True, description="Game GID")
     dateVar = String(description="Date variable for partitioning")
     outputTable = String(description="Output table name")
@@ -120,6 +130,7 @@ class BaseFieldType(ObjectType):
     """
     Base field output type
     """
+
     eventId = Int(required=True, description="Source event ID")
     eventName = String(required=True, description="Event name for alias")
     fieldName = String(required=True, description="Field name in the event")
@@ -134,6 +145,7 @@ class ParamFieldType(ObjectType):
     """
     Parameter field output type
     """
+
     eventId = Int(required=True, description="Source event ID")
     eventName = String(required=True, description="Event name for alias")
     paramName = String(required=True, description="Parameter name")
@@ -149,6 +161,7 @@ class CustomFieldType(ObjectType):
     """
     Custom field output type
     """
+
     name = String(required=True, description="Field name")
     expression = String(required=True, description="HQL expression")
     alias = String(description="Output field alias")
@@ -162,6 +175,7 @@ class FixedFieldType(ObjectType):
     """
     Fixed field output type
     """
+
     name = String(required=True, description="Field name")
     value = String(required=True, description="Fixed value")
     alias = String(description="Output field alias")
@@ -175,6 +189,7 @@ class FieldMappingV2Type(ObjectType):
     """
     Field mapping v2 output type
     """
+
     viewConfig = Field(ViewConfigType, description="View configuration")
     baseFields = List(BaseFieldType, description="List of base fields")
     paramFields = List(ParamFieldType, description="List of parameter fields")
@@ -191,6 +206,7 @@ class FieldBuilderConfigType(ObjectType):
 
     Represents a saved field builder configuration.
     """
+
     id = Int(required=True, description="Configuration ID")
     config = Field(FieldMappingV2Type, description="Field mapping configuration")
     viewName = String(required=True, description="View/table name")
@@ -203,11 +219,15 @@ class FieldBuilderConfigType(ObjectType):
 
     def resolve_createdAt(self, info):
         """Resolve created_at timestamp"""
-        return self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
+        return (
+            self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
+        )
 
     def resolve_updatedAt(self, info):
         """Resolve updated_at timestamp"""
-        return self.updated_at.isoformat() if hasattr(self, 'updated_at') and self.updated_at else None
+        return (
+            self.updated_at.isoformat() if hasattr(self, 'updated_at') and self.updated_at else None
+        )
 
 
 class FieldBuilderConfigSummaryType(ObjectType):
@@ -216,6 +236,7 @@ class FieldBuilderConfigSummaryType(ObjectType):
 
     Lightweight type for listing configurations.
     """
+
     id = Int(required=True, description="Configuration ID")
     name = String(description="Configuration name")
     viewName = String(required=True, description="View/table name")
@@ -231,13 +252,16 @@ class FieldBuilderConfigSummaryType(ObjectType):
 
     def resolve_createdAt(self, info):
         """Resolve created_at timestamp"""
-        return self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
+        return (
+            self.created_at.isoformat() if hasattr(self, 'created_at') and self.created_at else None
+        )
 
 
 class HQLPreviewType(ObjectType):
     """
     HQL preview output type
     """
+
     hql = String(required=True, description="Generated HQL script")
 
     class Meta:
@@ -248,10 +272,12 @@ class HQLPreviewType(ObjectType):
 # Mutation Response Types
 # ============================================
 
+
 class SaveFieldBuilderConfigPayload(ObjectType):
     """
     Save field builder configuration mutation payload
     """
+
     ok = Boolean(required=True, description="Operation success status")
     fieldBuilderConfig = Field(FieldBuilderConfigType, description="Saved configuration")
     errors = List(String, description="List of errors")
@@ -265,6 +291,7 @@ class DeleteFieldBuilderConfigPayload(ObjectType):
     """
     Delete field builder configuration mutation payload
     """
+
     ok = Boolean(required=True, description="Operation success status")
     message = String(description="Success/error message")
     errors = List(String, description="List of errors")

@@ -380,7 +380,7 @@ export const GET_FLOWS = gql`
     flows(gameGid: $gameGid, flowType: $flowType, limit: $limit, offset: $offset) {
       id
       gameGid
-      flowName
+      name
       flowType
       config
       createdAt
@@ -410,7 +410,7 @@ export const GET_FLOW = gql`
     flow(id: $id) {
       id
       gameGid
-      flowName
+      name
       flowType
       config
       createdAt

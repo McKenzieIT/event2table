@@ -1,15 +1,17 @@
 """
 GraphQL性能监控中间件
 
-监控查询性能、DataLoader命中率、缓存效率等指标
+监控查询性能, DataLoader命中率, 缓存效率等指标
 """
 
-import time
-import logging
-from graphene import Middleware
-from backend.core.cache.cache_system import HierarchicalCache
-from collections import defaultdict
 import json
+import logging
+import time
+from collections import defaultdict
+
+from graphene import Middleware
+
+from backend.core.cache.cache_system import HierarchicalCache
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,7 @@ class PerformanceMonitorMiddleware:
     """
     性能监控中间件
 
-    记录每个查询的执行时间、复杂度等指标
+    记录每个查询的执行时间, 复杂度等指标
     """
 
     def __init__(self):
@@ -47,31 +49,25 @@ class PerformanceMonitorMiddleware:
             try:
                 self.cache.redis_client.lpush(
                     f'graphql:performance:{metric_key}',
-                    json.dumps({
-                        'duration': duration,
-                        'timestamp': time.time(),
-                        'args': str(args)[:100]  # 限制长度
-                    })
+                    json.dumps(
+                        {
+                            'duration': duration,
+                            'timestamp': time.time(),
+                            'args': str(args)[:100],  # 限制长度
+                        }
+                    ),
                 )
 
                 # 只保留最近1000条记录
-                self.cache.redis_client.ltrim(
-                    f'graphql:performance:{metric_key}',
-                    0,
-                    999
-                )
+                self.cache.redis_client.ltrim(f'graphql:performance:{metric_key}', 0, 999)
             except Exception as e:
                 logger.error(f"Failed to store performance metric: {e}")
 
             # 记录慢查询
             if duration > 1.0:  # 超过1秒
-                logger.warning(
-                    f"Slow GraphQL query: {metric_key} took {duration:.2f}s"
-                )
+                logger.warning(f"Slow GraphQL query: {metric_key} took {duration:.2f}s")
             elif duration > 0.5:  # 超过0.5秒
-                logger.info(
-                    f"Moderate GraphQL query: {metric_key} took {duration:.2f}s"
-                )
+                logger.info(f"Moderate GraphQL query: {metric_key} took {duration:.2f}s")
 
     def get_metrics(self):
         """获取性能指标统计"""
@@ -83,7 +79,7 @@ class PerformanceMonitorMiddleware:
                     'avg': sum(durations) / len(durations),
                     'min': min(durations),
                     'max': max(durations),
-                    'total': sum(durations)
+                    'total': sum(durations),
                 }
         return stats
 
@@ -93,11 +89,9 @@ class PerformanceMonitorMiddleware:
         for key, durations in self.metrics.items():
             slow_count = sum(1 for d in durations if d > threshold)
             if slow_count > 0:
-                slow_queries.append({
-                    'query': key,
-                    'slow_count': slow_count,
-                    'total_count': len(durations)
-                })
+                slow_queries.append(
+                    {'query': key, 'slow_count': slow_count, 'total_count': len(durations)}
+                )
         return slow_queries
 
 
@@ -105,20 +99,17 @@ class DataLoaderMonitorMiddleware:
     """
     DataLoader监控中间件
 
-    监控DataLoader的命中率、批量加载效率
+    监控DataLoader的命中率, 批量加载效率
     """
 
     def __init__(self):
-        self.dataloader_stats = defaultdict(lambda: {
-            'total_requests': 0,
-            'cache_hits': 0,
-            'batch_loads': 0,
-            'total_keys': 0
-        })
+        self.dataloader_stats = defaultdict(
+            lambda: {'total_requests': 0, 'cache_hits': 0, 'batch_loads': 0, 'total_keys': 0}
+        )
 
     def resolve(self, next, root, info, **args):
         # 在这里可以拦截DataLoader的调用
-        # 实际实现中，需要在DataLoader中添加监控逻辑
+        # 实际实现中, 需要在DataLoader中添加监控逻辑
         return next(root, info, **args)
 
     def record_dataloader_call(self, loader_name: str, keys_count: int, cache_hits: int):
@@ -141,7 +132,7 @@ class DataLoaderMonitorMiddleware:
             stats[loader_name] = {
                 **data,
                 'hit_rate': hit_rate,
-                'avg_keys_per_batch': data['total_keys'] / max(data['batch_loads'], 1)
+                'avg_keys_per_batch': data['total_keys'] / max(data['batch_loads'], 1),
             }
         return stats
 
@@ -150,17 +141,12 @@ class CacheMonitorMiddleware:
     """
     缓存监控中间件
 
-    监控缓存命中率、缓存大小、失效频率
+    监控缓存命中率, 缓存大小, 失效频率
     """
 
     def __init__(self):
         self.cache = HierarchicalCache()
-        self.cache_stats = {
-            'hits': 0,
-            'misses': 0,
-            'sets': 0,
-            'deletes': 0
-        }
+        self.cache_stats = {'hits': 0, 'misses': 0, 'sets': 0, 'deletes': 0}
 
     def resolve(self, next, root, info, **args):
         # 监控缓存使用情况
@@ -187,18 +173,14 @@ class CacheMonitorMiddleware:
         total_requests = self.cache_stats['hits'] + self.cache_stats['misses']
         hit_rate = self.cache_stats['hits'] / max(total_requests, 1)
 
-        return {
-            **self.cache_stats,
-            'hit_rate': hit_rate,
-            'total_requests': total_requests
-        }
+        return {**self.cache_stats, 'hit_rate': hit_rate, 'total_requests': total_requests}
 
 
 class QueryComplexityMonitorMiddleware:
     """
     查询复杂度监控中间件
 
-    分析查询复杂度，防止过度复杂的查询
+    分析查询复杂度, 防止过度复杂的查询
     """
 
     def __init__(self, max_complexity=1000):
@@ -218,8 +200,7 @@ class QueryComplexityMonitorMiddleware:
         # 检查是否超过限制
         if complexity > self.max_complexity:
             logger.warning(
-                f"Query complexity {complexity} exceeds limit {self.max_complexity} "
-                f"for {key}"
+                f"Query complexity {complexity} exceeds limit {self.max_complexity} " f"for {key}"
             )
 
         return next(root, info, **args)
@@ -247,7 +228,7 @@ class MetricsCollector:
     """
     指标收集器
 
-    收集所有中间件的指标，提供统一的接口
+    收集所有中间件的指标, 提供统一的接口
     """
 
     def __init__(self):
@@ -264,7 +245,7 @@ class MetricsCollector:
             'dataloader': self.dataloader_monitor.get_dataloader_stats(),
             'cache': self.cache_monitor.get_cache_stats(),
             'complexity': self.complexity_monitor.get_complexity_stats(),
-            'timestamp': time.time()
+            'timestamp': time.time(),
         }
 
     def get_dashboard_data(self):
@@ -272,14 +253,10 @@ class MetricsCollector:
         metrics = self.get_all_metrics()
 
         # 计算总体统计
-        total_queries = sum(
-            stats['count']
-            for stats in metrics['performance'].values()
-        )
+        total_queries = sum(stats['count'] for stats in metrics['performance'].values())
 
         avg_response_time = sum(
-            stats['avg'] * stats['count']
-            for stats in metrics['performance'].values()
+            stats['avg'] * stats['count'] for stats in metrics['performance'].values()
         ) / max(total_queries, 1)
 
         return {
@@ -289,11 +266,11 @@ class MetricsCollector:
                 'slow_query_count': len(metrics['slow_queries']),
                 'cache_hit_rate': metrics['cache']['hit_rate'],
                 'dataloader_hit_rate': sum(
-                    stats['hit_rate']
-                    for stats in metrics['dataloader'].values()
-                ) / max(len(metrics['dataloader']), 1)
+                    stats['hit_rate'] for stats in metrics['dataloader'].values()
+                )
+                / max(len(metrics['dataloader']), 1),
             },
-            'details': metrics
+            'details': metrics,
         }
 
 

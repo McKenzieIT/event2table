@@ -13,10 +13,11 @@ Game DataLoader
 Implements batch loading for games to prevent N+1 queries.
 """
 
-from promise.dataloader import DataLoader
-from promise import Promise
-from typing import List, Dict, Any
 import logging
+from typing import Any, Dict, List
+
+from promise import Promise
+from promise.dataloader import DataLoader
 
 logger = logging.getLogger(__name__)
 
@@ -69,9 +70,7 @@ class GameLoader(DataLoader):
             games = fetch_all_as_dict(query, tuple(gids))
 
             # Create a map for quick lookup
-            games_by_gid: Dict[int, Dict[str, Any]] = {
-                game['gid']: game for game in games
-            }
+            games_by_gid: Dict[int, Dict[str, Any]] = {game['gid']: game for game in games}
 
             # Return games in the same order as requested gids
             result = [games_by_gid.get(gid) for gid in gids]
@@ -106,8 +105,9 @@ class GamesByFilterLoader(DataLoader):
         logger.debug(f"GamesByFilterLoader: batch loading for {len(keys)} filters")
 
         try:
-            from backend.core.utils import fetch_all_as_dict
             import json
+
+            from backend.core.utils import fetch_all_as_dict
 
             results = []
             for key in keys:
@@ -120,7 +120,8 @@ class GamesByFilterLoader(DataLoader):
                     limit, offset = 10, 0
 
                 # Query games with pagination
-                games = fetch_all_as_dict("""
+                games = fetch_all_as_dict(
+                    """
                     SELECT
                         g.id,
                         g.gid,
@@ -137,7 +138,9 @@ class GamesByFilterLoader(DataLoader):
                     GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
                     ORDER BY g.id
                     LIMIT ? OFFSET ?
-                """, (limit, offset))
+                """,
+                    (limit, offset),
+                )
 
                 results.append(games)
 

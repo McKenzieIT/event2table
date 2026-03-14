@@ -12,18 +12,18 @@ Repository Layer (数据访问层)
 - 添加 FlowRepository, JoinConfigRepository, CategoryRepository 等
 """
 
-from backend.models.repositories.games import GameRepository
-from backend.models.repositories.events import EventRepository
-from backend.models.repositories.parameters import ParameterRepository
-from backend.models.repositories.parameter_alias_repository import ParameterAliasRepository
-from backend.models.repositories.param_library_repository import ParamLibraryRepository
-from backend.models.repositories.param_template_repository import ParamTemplateRepository
-from backend.models.repositories.flow_repository import FlowRepository
-from backend.models.repositories.join_config_repository import JoinConfigRepository
 from backend.models.repositories.category_repository import CategoryRepository
 from backend.models.repositories.event_node_repository import EventNodeRepository
+from backend.models.repositories.events import EventRepository
+from backend.models.repositories.flow_repository import FlowRepository
+from backend.models.repositories.games import GameRepository
 from backend.models.repositories.hql_history_repository import HQLHistoryRepository
 from backend.models.repositories.hql_template_repository import HQLTemplateRepository
+from backend.models.repositories.join_config_repository import JoinConfigRepository
+from backend.models.repositories.param_library_repository import ParamLibraryRepository
+from backend.models.repositories.param_template_repository import ParamTemplateRepository
+from backend.models.repositories.parameter_alias_repository import ParameterAliasRepository
+from backend.models.repositories.parameters import ParameterRepository
 
 # 预定义的仓储实例字典
 # 便于通过字符串名称访问仓储

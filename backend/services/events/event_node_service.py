@@ -8,13 +8,14 @@ This service provides business logic for event node management:
 - Simplifies business logic by removing DDD abstractions
 """
 
-from typing import List, Optional, Dict, Any
-from backend.services.base_service import BaseService
+from typing import Any, Dict, List, Optional
+
+from backend.core.cache.cache_system import cached
 from backend.models.entities import EventNodeEntity
 from backend.models.repositories.event_node_repository import EventNodeRepository
-from backend.models.repositories.games import GameRepository
 from backend.models.repositories.events import EventRepository
-from backend.core.cache.cache_system import cached
+from backend.models.repositories.games import GameRepository
+from backend.services.base_service import BaseService
 
 
 class EventNodeService(BaseService):
@@ -113,9 +114,7 @@ class EventNodeService(BaseService):
 
         # 验证事件属于指定游戏
         if event.game_gid != node.game_gid:
-            raise ValueError(
-                f"Event {node.event_id} does not belong to game {node.game_gid}"
-            )
+            raise ValueError(f"Event {node.event_id} does not belong to game {node.game_gid}")
 
         # 创建节点
         node_id = self.node_repo.create(node)
@@ -148,7 +147,7 @@ class EventNodeService(BaseService):
         if not existing:
             raise ValueError(f"Event node {node_id} not found")
 
-        # 如果更新game_gid或event_id，需要验证
+        # 如果更新game_gid或event_id, 需要验证
         if node.game_gid != existing.game_gid or node.event_id != existing.event_id:
             # 验证游戏存在
             game = self.game_repo.find_by_gid(node.game_gid)
@@ -162,9 +161,7 @@ class EventNodeService(BaseService):
 
             # 验证事件属于指定游戏
             if event.game_gid != node.game_gid:
-                raise ValueError(
-                    f"Event {node.event_id} does not belong to game {node.game_gid}"
-                )
+                raise ValueError(f"Event {node.event_id} does not belong to game {node.game_gid}")
 
         # 更新节点
         self.node_repo.update(node_id, node)
@@ -218,7 +215,7 @@ class EventNodeService(BaseService):
             是否删除成功
 
         Warning:
-            此操作不可恢复，请谨慎使用
+            此操作不可恢复, 请谨慎使用
         """
         # 验证节点存在
         node = self.node_repo.find_by_id(node_id)
@@ -257,7 +254,7 @@ class EventNodeService(BaseService):
             node_id: 节点ID
 
         Returns:
-            包含节点、游戏、事件信息的字典，不存在返回None
+            包含节点, 游戏, 事件信息的字典, 不存在返回None
         """
         node = self.node_repo.find_by_id(node_id)
         if not node:
@@ -296,7 +293,7 @@ class EventNodeService(BaseService):
         if not existing:
             raise ValueError(f"Event node {node_id} not found")
 
-        # 如果更新game_gid或event_id，需要验证
+        # 如果更新game_gid或event_id, 需要验证
         if "game_gid" in updates and updates["game_gid"] != existing.game_gid:
             game = self.game_repo.find_by_gid(updates["game_gid"])
             if not game:
@@ -310,9 +307,7 @@ class EventNodeService(BaseService):
             # 验证事件属于指定游戏
             game_gid = updates.get("game_gid", existing.game_gid)
             if event.game_gid != game_gid:
-                raise ValueError(
-                    f"Event {updates['event_id']} does not belong to game {game_gid}"
-                )
+                raise ValueError(f"Event {updates['event_id']} does not belong to game {game_gid}")
 
         # 更新节点
         # Cast to suppress type error since repository has overloaded update method
@@ -374,7 +369,7 @@ class EventNodeService(BaseService):
         if not original:
             raise ValueError(f"Event node {node_id} not found")
 
-        # 创建新节点（修改名称）
+        # 创建新节点(修改名称)
         new_name = f"{original.name} (Copy)"
         new_node = EventNodeEntity(
             game_gid=original.game_gid,
@@ -384,7 +379,7 @@ class EventNodeService(BaseService):
             is_active=True,
             id=None,  # Will be auto-generated
             created_at=None,  # Will be auto-generated
-            updated_at=None  # Will be auto-generated
+            updated_at=None,  # Will be auto-generated
         )
 
         # 创建节点
@@ -407,7 +402,7 @@ class EventNodeService(BaseService):
         field_count_min: Optional[int] = None,
         field_count_max: Optional[int] = None,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[EventNodeEntity]:
         """
         搜索事件节点
@@ -431,7 +426,7 @@ class EventNodeService(BaseService):
             field_count_min=field_count_min,
             field_count_max=field_count_max,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
 
     def get_nodes_stats(self, game_gid: int) -> Dict[str, Any]:
@@ -442,7 +437,7 @@ class EventNodeService(BaseService):
             game_gid: 游戏GID
 
         Returns:
-            统计信息字典，包含:
+            统计信息字典, 包含:
             - total_nodes: 总节点数
             - unique_events: 唯一事件数
             - avg_fields: 平均字段数

@@ -154,7 +154,6 @@ function EventsList() {
         params.append('search', searchTerm);
       }
 
-      console.log('[EventsList] Fetching events with params:', params.toString());
       const response = await fetch(`/api/events?${params.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch events');
       const result = await response.json();
@@ -222,8 +221,7 @@ function EventsList() {
       return matchesCategory;
     });
 
-    console.log('[EventsList] Filtered events count:', filtered.length, 'Total events:', events.length);
-    return filtered;
+        return filtered;
   }, [effectiveData, selectedCategory]);
 
   /**
@@ -270,8 +268,7 @@ function EventsList() {
    * 使用useCallback优化性能
    */
   const handleSearchChange = useCallback((value: string) => {
-    console.log('[EventsList] Search term changed:', value);
-    setSearchTerm(value);
+        setSearchTerm(value);
     setCurrentPage(1); // 搜索时重置到第一页
   }, []);
 

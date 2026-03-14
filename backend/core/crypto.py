@@ -1,7 +1,7 @@
 """
 加密和哈希工具函数模块
 
-提供安全的哈希算法，避免使用弱加密算法（如MD5）。
+提供安全的哈希算法, 避免使用弱加密算法（如MD5）. 
 
 作者: Claude Code
 版本: 1.0.0
@@ -29,16 +29,16 @@ class SecureHasher:
     """
     安全哈希计算器
 
-    提供统一的哈希计算接口，使用强加密算法（SHA-256等）。
+    提供统一的哈希计算接口, 使用强加密算法（SHA-256等）. 
 
     支持的算法:
-    - sha256: 默认，安全且性能好
-    - sha512: 更安全，但性能稍差
-    - blake2b: 现代哈希算法，性能优秀
+    - sha256: 默认, 安全且性能好
+    - sha512: 更安全, 但性能稍差
+    - blake2b: 现代哈希算法, 性能优秀
     - blake2s: blake2b的轻量级版本
     """
 
-    # 默认哈希算法（SHA-256）
+    # 默认哈希算法(SHA-256)
     DEFAULT_ALGORITHM = "sha256"
 
     # 支持的哈希算法
@@ -76,7 +76,7 @@ class SecureHasher:
         """
         计算Python对象的安全哈希值
 
-        对象会先序列化为JSON字符串，再计算哈希值。
+        对象会先序列化为JSON字符串, 再计算哈希值. 
 
         Args:
             obj: Python对象（dict, list, tuple等）
@@ -91,7 +91,7 @@ class SecureHasher:
             >>> hash_value = SecureHasher.hash_object(data)
             >>> print(len(hash_value))  # 64 (SHA-256输出长度)
         """
-        # 序列化为JSON（确保顺序一致）
+        # 序列化为JSON(确保顺序一致)
         serialized = json.dumps(obj, sort_keys=sort_keys, default=str)
 
         # 计算哈希
@@ -161,7 +161,7 @@ class SecureHasher:
         )
 
 
-# 便捷函数（向后兼容）
+# 便捷函数(向后兼容)
 def compute_hash(data: Any, algorithm: str = "sha256") -> str:
     """
     计算数据的安全哈希值（便捷函数）
@@ -190,7 +190,7 @@ def compute_cache_key(obj: Any, algorithm: str = "sha256") -> str:
     """
     计算缓存键的安全哈希值（专用函数）
 
-    用于缓存系统，确保相同对象产生相同的哈希值。
+    用于缓存系统, 确保相同对象产生相同的哈希值. 
 
     Args:
         obj: 要计算哈希的对象

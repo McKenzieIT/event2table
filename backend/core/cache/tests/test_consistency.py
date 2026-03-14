@@ -10,9 +10,11 @@
 日期: 2026-02-24
 """
 
-import pytest
-import time
 import threading
+import time
+
+import pytest
+
 from backend.core.cache.consistency import CacheReadWriteLock
 
 
@@ -23,16 +25,16 @@ class TestCacheReadWriteLock:
         """测试1: 读锁的获取和释放"""
         rw_lock = CacheReadWriteLock()
 
-        # 初始状态：没有锁
+        # 初始状态: 没有锁
         assert "test_key" not in rw_lock._locks
 
         # 获取读锁
         with rw_lock.read_lock("test_key"):
-            # 读锁范围内，读者计数应该 > 0
+            # 读锁范围内, 读者计数应该 > 0
             assert rw_lock._locks["test_key"][0] > 0  # 读者计数>0
             assert rw_lock._locks["test_key"][0] == 1  # 第一个读者
 
-        # 锁释放后，读者计数应该 = 0
+        # 锁释放后, 读者计数应该 = 0
         assert rw_lock._locks["test_key"][0] == 0  # 读者计数=0
 
     def test_write_lock_exclusivity(self):
@@ -59,7 +61,7 @@ class TestCacheReadWriteLock:
         t1.join()
         t2.join()
 
-        # 验证写锁独占：read应该在write之后
+        # 验证写锁独占: read应该在write之后
         assert write_happened == ["write", "read"]
 
     def test_concurrent_readers(self):
@@ -104,7 +106,7 @@ class TestCacheReadWriteLock:
         t1.join()
         t2.join()
 
-        # 验证写锁的独占性：write2应该在write1结束后
+        # 验证写锁的独占性: write2应该在write1结束后
         assert execution_order[0] == "write1_start"
         assert execution_order[1] == "write1_end"
         assert execution_order[2] == "write2"
@@ -133,7 +135,7 @@ class TestCacheReadWriteLock:
         # 清理不存在的锁
         rw_lock.cleanup_lock("nonexistent_key")
 
-        # 应该正常执行，不抛出异常
+        # 应该正常执行, 不抛出异常
         assert "nonexistent_key" not in rw_lock._locks
 
     def test_get_lock_stats(self):
@@ -196,12 +198,12 @@ class TestCacheReadWriteLock:
         # 获取写锁应该自动初始化
         with rw_lock.write_lock("new_key"):
             assert "new_key" in rw_lock._locks
-            # 检查写锁对象（使用 hasattr 而不是 isinstance）
+            # 检查写锁对象(使用 hasattr 而不是 isinstance)
             assert hasattr(rw_lock._locks["new_key"][1], 'acquire')
             assert hasattr(rw_lock._locks["new_key"][1], 'release')
 
     def test_read_lock_reentrancy(self):
-        """测试10: 读锁的可重入性（同一读者多次获取）"""
+        """测试10: 读锁的可重入性(同一读者多次获取)"""
         rw_lock = CacheReadWriteLock()
 
         # 同一线程可以多次获取读锁
@@ -257,8 +259,8 @@ class TestCacheReadWriteLock:
         # 清理日志处理器
         logger.removeHandler(handler)
 
-        # 验证警告被记录（可选，取决于并发时机）
-        # 由于并发不确定性，我们只验证功能正常工作
+        # 验证警告被记录(可选, 取决于并发时机)
+        # 由于并发不确定性, 我们只验证功能正常工作
         assert True  # 如果没有崩溃就是成功
 
 

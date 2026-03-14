@@ -8,10 +8,15 @@ Middleware for GraphQL operations including:
 - Cache integration
 """
 
+from .cache_middleware import (
+    CacheInvalidationMiddleware,
+    CacheMiddleware,
+    cache_invalidation_middleware,
+    cache_middleware,
+)
 from .complexity_limit import ComplexityLimitMiddleware
 from .depth_limit import DepthLimitMiddleware
 from .error_handling import ErrorHandlingMiddleware
-from .cache_middleware import CacheMiddleware, CacheInvalidationMiddleware, cache_middleware, cache_invalidation_middleware
 
 __all__ = [
     'ComplexityLimitMiddleware',

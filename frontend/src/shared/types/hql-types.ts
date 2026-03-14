@@ -11,6 +11,59 @@
 
 import { ConditionValue } from './api-types';
 
+// ========== 统一Field接口定义 ==========
+// ⚠️ IMPORTANT: This is the ONLY place where the Field interface should be defined
+// All other files should import from here
+
+/**
+ * Field - 字段实体（HQL生成器使用）
+ * Unified Field interface for HQL generation
+ */
+export interface Field {
+  /** Field name */
+  name: string;
+  fieldName?: string; // Deprecated: use name
+
+  /** Field type */
+  type: FieldType;
+  fieldType?: FieldType; // Deprecated: use type
+
+  /** Display name for UI */
+  displayName?: string;
+
+  /** Field alias in output */
+  alias?: string;
+
+  /** Aggregate function */
+  aggregateFunc?: AggregateFunction;
+  aggregate_func?: string; // Deprecated: use aggregateFunc
+
+  /** JSON path for parameter fields */
+  jsonPath?: string;
+  json_path?: string; // Deprecated: use jsonPath
+
+  /** Custom expression for custom fields */
+  customExpression?: string;
+  custom_expression?: string; // Deprecated: use customExpression
+
+  /** Fixed value for fixed fields */
+  fixedValue?: ConditionValue;
+  fixed_value?: ConditionValue; // Deprecated: use fixedValue
+}
+
+/**
+ * Field configuration for event node builder
+ */
+export interface FieldConfig {
+  name: string;
+  type: FieldType;
+  alias?: string;
+  jsonPath?: string;
+  customExpression?: string;
+  fixedValue?: ConditionValue;
+  aggregateFunc?: AggregateFunction;
+}
+
 // ========== 枚举类型 ==========
 
 /** 字段类型枚举 */
@@ -44,17 +97,17 @@ export enum AggregateFunction {
 /** 操作符枚举 */
 export enum Operator {
   /** 等于 */
-  EQUAL = '=',
+  EQ = '=',
   /** 不等于 */
-  NOT_EQUAL = '!=',
+  NE = '!=',
   /** 大于 */
-  GREATER_THAN = '>',
+  GT = '>',
   /** 小于 */
-  LESS_THAN = '<',
+  LT = '<',
   /** 大于等于 */
-  GREATER_EQUAL = '>=',
+  GTE = '>=',
   /** 小于等于 */
-  LESS_EQUAL = '<=',
+  LTE = '<=',
   /** 模糊匹配 */
   LIKE = 'LIKE',
   /** 在列表中 */
@@ -97,23 +150,18 @@ export enum SQLMode {
 
 // ========== 数据模型 ==========
 
-/** 事件模型 */
-export interface Event {
+/** 事件模型 - 用于HQL生成器内部 */
+export interface HQLEvent {
   name: string
   table_name: string
   partition_field?: string; // default: ds
 }
 
-/** 字段模型 */
-export interface Field {
-  name: string
-  type: FieldType
-  alias?: string
-  aggregate_func?: AggregateFunction
-  json_path?: string
-  custom_expression?: string
-  fixed_value?: ConditionValue
-}
+// 向后兼容的别名
+export type Event = HQLEvent;
+
+/** 字段模型 - 使用上面定义的统一Field接口 */
+// Field interface is defined above
 
 /** WHERE条件模型 */
 export interface Condition {
@@ -127,8 +175,8 @@ export interface Condition {
 export interface JoinConfig {
   join_type: string
   join_condition: string
-  left_event: Event
-  right_event: Event
+  left_event: HQLEvent
+  right_event: HQLEvent
 }
 
 /** HQL生成选项 */
@@ -140,7 +188,7 @@ export interface GenerationOptions {
 
 /** HQL生成上下文 */
 export interface HQLContext {
-  event?: Event
+  event?: HQLEvent
   partition_value?: string; // default: ${ds}
 }
 
@@ -148,7 +196,7 @@ export interface HQLContext {
 
 /** HQL生成请求 */
 export interface GenerateRequest {
-  events: Event[]
+  events: HQLEvent[]
   fields: Field[]
   where_conditions?: Condition[]
   options?: GenerationOptions
@@ -165,7 +213,7 @@ export interface GenerateResponse {
 export interface DebugTrace {
   hql: string
   steps: DebugStep[]
-  events: Event[]
+  events: HQLEvent[]
   fields: Field[]
 }
 

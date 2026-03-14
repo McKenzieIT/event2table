@@ -12,12 +12,13 @@ Author: Event2Table Development Team
 Version: 1.0.0
 """
 
-from typing import Optional
-import pytest
 import os
 import tempfile
 import threading
 import time
+from typing import Optional
+
+import pytest
 
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 from backend.core.cache.validators.cache_key_validator import CacheKeyValidator
@@ -33,6 +34,7 @@ class TestBloomFilterBasicOperations:
     def teardown_method(self):
         """每个测试后恢复严格验证"""
         CacheKeyValidator.set_strict_mode(True)
+
     """Test basic bloom filter operations."""
 
     def test_add_to_bloom_filter(self):
@@ -40,7 +42,7 @@ class TestBloomFilterBasicOperations:
         bloom = EnhancedBloomFilter(capacity=1000, strict_validation=False)
         result = bloom.add("test_key")
 
-        # 验证添加成功（返回True或False都可以，因为布隆过滤器可能有假阳性）
+        # 验证添加成功(返回True或False都可以, 因为布隆过滤器可能有假阳性)
         # 重要的是元素应该存在
         assert "test_key" in bloom, "添加的元素应该存在于过滤器中"
 
@@ -65,7 +67,7 @@ class TestBloomFilterBasicOperations:
         keys = {"key1", "key2", "key3"}
         added_count = bloom.add_many(keys)
 
-        assert added_count == 3, f"应添加3个元素，实际添加{added_count}个"
+        assert added_count == 3, f"应添加3个元素, 实际添加{added_count}个"
 
         # 验证所有元素都存在
         for key in keys:
@@ -84,7 +86,7 @@ class TestBloomFilterBasicOperations:
         added_count = bloom.add_many(keys2)
 
         # 只有key4是新元素
-        assert added_count == 1, f"应只添加1个新元素，实际添加{added_count}个"
+        assert added_count == 1, f"应只添加1个新元素, 实际添加{added_count}个"
 
         # 验证所有元素都存在
         assert "key1" in bloom
@@ -100,15 +102,15 @@ class TestBloomFilterBasicOperations:
         for i in range(50):
             bloom.add(f"key_{i}")
 
-        # 检查不存在的元素（可能误判为存在）
-        # 这是布隆过滤器的特性，我们不能完全避免
+        # 检查不存在的元素(可能误判为存在)
+        # 这是布隆过滤器的特性, 我们不能完全避免
         false_positives = 0
         for i in range(50, 100):
             if f"key_{i}" in bloom:
                 false_positives += 1
 
-        # 假阳性率应低于1%（初始容量100，错误率0.001）
-        # 但实际上可能会高一些，因为我们只添加了50个元素
+        # 假阳性率应低于1%(初始容量100, 错误率0.001)
+        # 但实际上可能会高一些, 因为我们只添加了50个元素
         print(f"假阳性数量: {false_positives}/50")
 
         # 真正不存在的元素应该不在
@@ -139,9 +141,7 @@ class TestBloomFilterPersistence:
         try:
             # 创建布隆过滤器并添加数据
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                strict_validation=False
+                capacity=1000, persistence_path=temp_path, strict_validation=False
             )
             self.bloom.add("persist_key_1")
             self.bloom.add("persist_key_2")
@@ -152,9 +152,7 @@ class TestBloomFilterPersistence:
 
             # 创建新实例并加载
             self.new_bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                strict_validation=False
+                capacity=1000, persistence_path=temp_path, strict_validation=False
             )
 
             # 验证数据已加载
@@ -174,9 +172,7 @@ class TestBloomFilterPersistence:
             temp_path = os.path.join(tmpdir, "subdir", "bloom.pkl")
 
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                strict_validation=False
+                capacity=1000, persistence_path=temp_path, strict_validation=False
             )
             self.bloom.add("test_key")
 
@@ -197,14 +193,12 @@ class TestBloomFilterPersistence:
         try:
             # 应该优雅地处理损坏的文件
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                strict_validation=False
+                capacity=1000, persistence_path=temp_path, strict_validation=False
             )
 
             # 布隆过滤器仍应可用
             self.bloom.add("test_key")
-            assert "test_key" in self.bloom, "即使加载失败，布隆过滤器应可用"
+            assert "test_key" in self.bloom, "即使加载失败, 布隆过滤器应可用"
 
         finally:
             if os.path.exists(temp_path):
@@ -216,15 +210,13 @@ class TestBloomFilterPersistence:
             temp_path = tmp.name
 
         try:
-            # 删除文件（确保不存在）
+            # 删除文件(确保不存在)
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
 
-            # 创建布隆过滤器（应创建新的，不加载）
+            # 创建布隆过滤器(应创建新的, 不加载)
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                strict_validation=False
+                capacity=1000, persistence_path=temp_path, strict_validation=False
             )
 
             # 添加数据
@@ -253,7 +245,7 @@ class TestBloomFilterCapacity:
 
         # 初始状态
         stats = bloom.get_stats()
-        # 注意：由于后台线程可能已经添加了一些元素，我们只验证类型
+        # 注意: 由于后台线程可能已经添加了一些元素, 我们只验证类型
         assert isinstance(stats['total_items'], (int, float)), "元素数应为数字"
         assert isinstance(stats['estimated_capacity_used'], float), "容量使用应为浮点数"
         assert stats['false_positive_rate'] is not None, "应有错误率"
@@ -267,15 +259,15 @@ class TestBloomFilterCapacity:
             bloom.add(f"key_{i}")
 
         stats = bloom.get_stats()
-        # 允许一些误差，因为布隆过滤器的len()可能包含假阳性
-        assert 45 <= stats['total_items'] <= 55, f"应有约50个元素，实际{stats['total_items']}"
+        # 允许一些误差, 因为布隆过滤器的len()可能包含假阳性
+        assert 45 <= stats['total_items'] <= 55, f"应有约50个元素, 实际{stats['total_items']}"
         assert 0.4 <= stats['estimated_capacity_used'] <= 0.6, "容量使用应约为50%"
 
     def test_capacity_alert_threshold(self):
         """测试容量告警阈值"""
         bloom = EnhancedBloomFilter(capacity=100, strict_validation=False)
 
-        # 添加95个元素（超过90%阈值）
+        # 添加95个元素(超过90%阈值)
         for i in range(95):
             bloom.add(f"key_{i}")
 
@@ -348,17 +340,17 @@ class TestBloomFilterThreadSafety:
         for t in threads:
             t.join()
 
-        # 验证数据一致性（允许假阳性导致的偏差）
+        # 验证数据一致性(允许假阳性导致的偏差)
         stats = bloom.get_stats()
         expected = num_threads * items_per_thread
-        assert expected - 10 <= stats['total_items'] <= expected + 10, \
-            f"应有约{expected}个元素，实际{stats['total_items']}"
+        assert (
+            expected - 10 <= stats['total_items'] <= expected + 10
+        ), f"应有约{expected}个元素, 实际{stats['total_items']}"
 
         # 验证每个线程的元素都存在
         for i in range(num_threads):
             for j in range(items_per_thread):
-                assert f"thread_{i}_key_{j}" in bloom, \
-                    f"元素thread_{i}_key_{j}应存在"
+                assert f"thread_{i}_key_{j}" in bloom, f"元素thread_{i}_key_{j}应存在"
 
     def test_concurrent_contains(self):
         """测试并发查询操作"""
@@ -388,7 +380,7 @@ class TestBloomFilterThreadSafety:
         for t in threads:
             t.join()
 
-        # 验证没有崩溃（元素数量可能因假阳性而略有增加）
+        # 验证没有崩溃(元素数量可能因假阳性而略有增加)
         final_count = bloom.get_stats()['total_items']
         assert final_count >= initial_count, "元素数量应保持不变或略有增加"
 
@@ -418,12 +410,12 @@ class TestBloomFilterThreadSafety:
             t.join()
 
         # 验证数据完整性
-        # 注意：由于并发添加重复key，实际元素数可能少于250
-        # 并且由于假阳性，可能略多于50
+        # 注意: 由于并发添加重复key, 实际元素数可能少于250
+        # 并且由于假阳性, 可能略多于50
         stats = bloom.get_stats()
-        # 每个add_thread添加50个key，但5个线程添加相同的50个key
-        # 所以实际只有50个唯一元素（允许假阳性导致的偏差）
-        assert 48 <= stats['total_items'] <= 55, f"应有约50个唯一元素，实际{stats['total_items']}"
+        # 每个add_thread添加50个key, 但5个线程添加相同的50个key
+        # 所以实际只有50个唯一元素(允许假阳性导致的偏差)
+        assert 48 <= stats['total_items'] <= 55, f"应有约50个唯一元素, 实际{stats['total_items']}"
 
 
 class TestBloomFilterEdgeCases:
@@ -502,7 +494,7 @@ class TestBloomFilterEdgeCases:
         # 获取repr
         repr_str = repr(bloom)
 
-        # 验证包含关键信息（不检查精确数量，因为可能有假阳性）
+        # 验证包含关键信息(不检查精确数量, 因为可能有假阳性)
         assert "EnhancedBloomFilter" in repr_str
         assert "items=" in repr_str
         assert "capacity_used=" in repr_str
@@ -515,13 +507,17 @@ class TestBloomFilterEdgeCases:
 
         try:
             # 使用上下文管理器
-            with EnhancedBloomFilter(capacity=100, persistence_path=temp_path, strict_validation=False) as bloom:
+            with EnhancedBloomFilter(
+                capacity=100, persistence_path=temp_path, strict_validation=False
+            ) as bloom:
                 bloom.add("context_key")
                 assert "context_key" in bloom
 
             # 退出后应自动保存
             # 创建新实例验证
-            self.new_bloom = EnhancedBloomFilter(capacity=100, persistence_path=temp_path, strict_validation=False)
+            self.new_bloom = EnhancedBloomFilter(
+                capacity=100, persistence_path=temp_path, strict_validation=False
+            )
             assert "context_key" in self.new_bloom, "上下文管理器应自动保存"
 
         finally:
@@ -537,7 +533,7 @@ class TestBloomFilterEdgeCases:
         success = bloom.force_save()
         assert success is True, "force_save应成功"
 
-        # force_rebuild（即使没有Redis也会执行）
+        # force_rebuild(即使没有Redis也会执行)
         rebuild_stats = bloom.force_rebuild()
         assert 'success' in rebuild_stats, "force_rebuild应返回统计信息"
         assert 'duration_seconds' in rebuild_stats
@@ -575,7 +571,7 @@ class TestBloomFilterStatistics:
         bloom.force_rebuild()
 
         new_count = bloom.get_stats()['rebuild_count']
-        # 注意：rebuild可能因为Redis连接问题而失败
+        # 注意: rebuild可能因为Redis连接问题而失败
         # 但计数应该增加或保持不变
         assert new_count >= initial_count, "重建计数应增加或保持"
 
@@ -605,14 +601,12 @@ class TestBloomFilterErrorHandling:
 
         with tempfile.NamedTemporaryFile(delete=False, suffix='.pkl') as tmp:
             temp_path = tmp.name
-            # 写入无效类型（字符串而不是bloom filter）
+            # 写入无效类型(字符串而不是bloom filter)
             pickle.dump("not a bloom filter", tmp)
 
         try:
             bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                strict_validation=False
+                capacity=1000, persistence_path=temp_path, strict_validation=False
             )
 
             # 应创建新的bloom filter
@@ -630,23 +624,21 @@ class TestBloomFilterErrorHandling:
             readonly_path = os.path.join(tmpdir, "readonly", "bloom.pkl")
 
             bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=readonly_path,
-                strict_validation=False
+                capacity=1000, persistence_path=readonly_path, strict_validation=False
             )
 
             # 添加数据
             bloom.add("test_key")
 
             # 尝试保存到不存在的嵌套目录
-            # 注意：这在macOS上可能不会失败，所以只验证bloom filter仍能工作
+            # 注意: 这在macOS上可能不会失败, 所以只验证bloom filter仍能工作
             try:
                 success = bloom.force_save()
-                # 不管成功与否，bloom filter应仍能工作
+                # 不管成功与否, bloom filter应仍能工作
             except Exception:
                 pass  # 忽略异常
 
-            assert "test_key" in bloom, "即使保存失败，bloom filter应正常工作"
+            assert "test_key" in bloom, "即使保存失败, bloom filter应正常工作"
 
     def test_add_exception_handling(self):
         """测试add方法的异常处理"""
@@ -665,7 +657,7 @@ class TestBloomFilterErrorHandling:
 
         # 正常查询应该工作
         result = bloom.contains("test_key")
-        # 注意：由于可能有假阳性，结果可能是True或False
+        # 注意: 由于可能有假阳性, 结果可能是True或False
         assert isinstance(result, bool), "查询结果应为布尔值"
 
         # 添加后查询
@@ -705,7 +697,7 @@ class TestBloomFilterRebuild:
         # 添加一些数据
         bloom.add("existing_key")
 
-        # 强制重建（如果Redis没有key，会返回warning）
+        # 强制重建(如果Redis没有key, 会返回warning)
         rebuild_stats = bloom.force_rebuild()
 
         # 应返回统计信息
@@ -720,13 +712,7 @@ class TestBloomFilterRebuild:
         rebuild_stats = bloom.force_rebuild()
 
         # 验证所有必需字段
-        required_fields = [
-            'success',
-            'keys_found',
-            'keys_added',
-            'duration_seconds',
-            'error'
-        ]
+        required_fields = ['success', 'keys_found', 'keys_added', 'duration_seconds', 'error']
 
         for field in required_fields:
             assert field in rebuild_stats, f"统计信息应包含{field}字段"
@@ -741,8 +727,8 @@ class TestBloomFilterRebuild:
         # 强制重建
         bloom.force_rebuild()
 
-        # 重建后应有时间戳（即使失败）
-        # 注意：可能因为Redis连接问题导致重建失败
+        # 重建后应有时间戳(即使失败)
+        # 注意: 可能因为Redis连接问题导致重建失败
         # 所以时间戳可能仍为None
 
 
@@ -764,9 +750,7 @@ class TestBloomFilterPersistenceWorker:
         try:
             # 使用较短的persistence间隔
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                persistence_interval=1  # 1秒
+                capacity=1000, persistence_path=temp_path, persistence_interval=1  # 1秒
             )
 
             # 添加数据
@@ -779,12 +763,9 @@ class TestBloomFilterPersistenceWorker:
             assert os.path.exists(temp_path), "持久化文件应存在"
 
             # 创建新实例并验证数据
-            self.new_bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path
-            )
+            self.new_bloom = EnhancedBloomFilter(capacity=1000, persistence_path=temp_path)
 
-            # 注意：后台线程可能在加载后继续运行
+            # 注意: 后台线程可能在加载后继续运行
             # 所以我们只验证基本功能
             assert self.new_bloom.contains("test_key") or True, "新实例应正常工作"
 
@@ -799,9 +780,7 @@ class TestBloomFilterPersistenceWorker:
 
         try:
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                persistence_interval=1
+                capacity=1000, persistence_path=temp_path, persistence_interval=1
             )
 
             # 初始可能为None
@@ -841,7 +820,7 @@ class TestBloomFilterGlobalInstance:
         """测试关闭全局bloom filter"""
         from backend.core.cache.bloom_filter_enhanced import (
             get_enhanced_bloom_filter,
-            shutdown_global_bloom_filter
+            shutdown_global_bloom_filter,
         )
 
         # 获取实例
@@ -871,9 +850,9 @@ class TestBloomFilterScalability:
         for i in range(500):
             bloom.add(f"key_{i}")
 
-        # 验证所有元素都存在（可能有一些假阳性）
+        # 验证所有元素都存在(可能有一些假阳性)
         found_count = sum(1 for i in range(500) if f"key_{i}" in bloom)
-        assert found_count >= 500, f"所有添加的元素应存在，实际{found_count}/500"
+        assert found_count >= 500, f"所有添加的元素应存在, 实际{found_count}/500"
 
     def test_large_capacity(self):
         """测试大容量"""
@@ -886,8 +865,10 @@ class TestBloomFilterScalability:
             bloom.add(f"large_key_{i}")
 
         stats = bloom.get_stats()
-        # 允许一些误差（假阳性可能导致统计偏高）
-        assert 9000 <= stats['total_items'] <= 11000, f"应有约10000个元素，实际{stats['total_items']}"
+        # 允许一些误差(假阳性可能导致统计偏高)
+        assert (
+            9000 <= stats['total_items'] <= 11000
+        ), f"应有约10000个元素, 实际{stats['total_items']}"
         assert 0.08 <= stats['estimated_capacity_used'] <= 0.12, "容量使用应约为10%"
 
 
@@ -896,7 +877,7 @@ class TestBloomFilterConfiguration:
 
     def test_custom_error_rate(self):
         """测试自定义错误率"""
-        # 使用较高的错误率（1%）
+        # 使用较高的错误率(1%)
         bloom = EnhancedBloomFilter(capacity=1000, error_rate=0.01)
 
         stats = bloom.get_stats()
@@ -905,20 +886,14 @@ class TestBloomFilterConfiguration:
     def test_custom_rebuild_interval(self):
         """测试自定义重建间隔"""
         # 使用较短的重建间隔
-        bloom = EnhancedBloomFilter(
-            capacity=1000,
-            rebuild_interval=60  # 1分钟
-        )
+        bloom = EnhancedBloomFilter(capacity=1000, rebuild_interval=60)  # 1分钟
 
         # 验证配置已保存
         assert bloom.rebuild_interval == 60
 
     def test_custom_persistence_interval(self):
         """测试自定义持久化间隔"""
-        bloom = EnhancedBloomFilter(
-            capacity=1000,
-            persistence_interval=10  # 10秒
-        )
+        bloom = EnhancedBloomFilter(capacity=1000, persistence_interval=10)  # 10秒
 
         # 验证配置已保存
         assert bloom.persistence_interval == 10
@@ -947,7 +922,7 @@ class TestBloomFilterRebuildEdgeCases:
 
     def test_rebuild_updates_filter(self):
         """测试重建后更新bloom filter"""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
 
         bloom = EnhancedBloomFilter(capacity=100)
 
@@ -973,17 +948,13 @@ class TestBloomFilterRebuildEdgeCases:
 
     def test_rebuild_with_unicode_keys(self):
         """测试重建包含Unicode keys"""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
 
         bloom = EnhancedBloomFilter(capacity=1000)
 
         # Mock cache to return unicode keys
         mock_cache_instance = MagicMock()
-        mock_cache_instance.keys.return_value = [
-            '中文key',
-            'emoji🔥key',
-            'café'
-        ]
+        mock_cache_instance.keys.return_value = ['中文key', 'emoji🔥key', 'café']
 
         with patch('backend.core.cache.bloom_filter_enhanced.get_cache') as mock_cache:
             mock_cache.return_value = mock_cache_instance
@@ -1013,7 +984,7 @@ class TestBloomFilterAddManyEdgeCases:
         with patch.object(bloom.bloom_filter, 'add', side_effect=Exception("Add failed")):
             # add_many应处理异常并返回0
             result = bloom.add_many({'key1', 'key2', 'key3'})
-            # 异常被捕获，返回0
+            # 异常被捕获, 返回0
             assert result == 0
 
 
@@ -1033,9 +1004,9 @@ class TestBloomFilterCoverageEdgeCases:
             raise Exception("Contains failed")
 
         with patch.object(type(bloom.bloom_filter), '__contains__', mock_contains):
-            # contains应返回True（fail-safe）
+            # contains应返回True(fail-safe)
             result = bloom.contains("error_key")
-            assert result is True  # Fail-safe返回True，避免缓存miss
+            assert result is True  # Fail-safe返回True, 避免缓存miss
 
     def test_get_stats_with_exception(self):
         """测试get_stats的异常处理"""
@@ -1071,8 +1042,10 @@ class TestBloomFilterCoverageEdgeCases:
         bloom.add("test_key")
 
         # Mock ScalableBloomFilter to raise exception
-        with patch('backend.core.cache.bloom_filter_enhanced.ScalableBloomFilter',
-                   side_effect=Exception("Create failed")):
+        with patch(
+            'backend.core.cache.bloom_filter_enhanced.ScalableBloomFilter',
+            side_effect=Exception("Create failed"),
+        ):
             # clear应返回False
             result = bloom.clear()
             assert result is False
@@ -1096,9 +1069,7 @@ class TestBloomFilterCoverageEdgeCases:
         try:
             # Mock _save_to_disk to raise exception
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                persistence_interval=1
+                capacity=1000, persistence_path=temp_path, persistence_interval=1
             )
 
             original_save = self.bloom._save_to_disk
@@ -1112,7 +1083,7 @@ class TestBloomFilterCoverageEdgeCases:
                 # 等待后台线程执行
                 time.sleep(3)
 
-                # 验证bloom filter仍能工作（即使后台保存失败）
+                # 验证bloom filter仍能工作(即使后台保存失败)
                 self.bloom.add("test_key")
                 assert "test_key" in self.bloom
 
@@ -1130,9 +1101,7 @@ class TestBloomFilterCoverageEdgeCases:
         try:
             # Mock rebuild_from_cache to raise exception
             self.bloom = EnhancedBloomFilter(
-                capacity=1000,
-                persistence_path=temp_path,
-                rebuild_interval=1
+                capacity=1000, persistence_path=temp_path, rebuild_interval=1
             )
 
             original_rebuild = self.bloom.rebuild_from_cache

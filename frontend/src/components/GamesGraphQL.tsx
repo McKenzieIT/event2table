@@ -34,8 +34,7 @@ export const GamesGraphQL: React.FC<GamesGraphQLProps> = ({ limit = 10 }) => {
       });
 
       if (result.data?.deleteGame?.ok) {
-        console.log('Game deleted successfully');
-      } else {
+              } else {
         console.warn(result.data?.deleteGame?.errors?.join(', ') || 'Failed to delete game');
       }
     } catch (err) {

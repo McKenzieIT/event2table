@@ -15,9 +15,10 @@ Category Repository (事件类别数据访问层 - 精简架构)
 - 保持GenericRepository继承
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 from backend.models.entities import EventCategoryEntity
 
 
@@ -39,7 +40,7 @@ class CategoryRepository(GenericRepository):
             table_name="event_categories",
             primary_key="id",
             enable_cache=True,
-            cache_timeout=120  # 2分钟缓存
+            cache_timeout=120,  # 2分钟缓存
         )
 
     def find_by_id(self, category_id: int) -> Optional[EventCategoryEntity]:
@@ -70,7 +71,6 @@ class CategoryRepository(GenericRepository):
         row = fetch_one_as_dict(query, (name,))
         return EventCategoryEntity(**row) if row else None
 
-
     @cached(ttl=1800)
     def find_all(self) -> List[EventCategoryEntity]:
         """
@@ -83,12 +83,14 @@ class CategoryRepository(GenericRepository):
         rows = fetch_all_as_dict(query)
         return [EventCategoryEntity(**row) for row in rows]
 
-    def find_all_with_event_count(self, game_gid: Optional[int] = None) -> List[EventCategoryEntity]:
+    def find_all_with_event_count(
+        self, game_gid: Optional[int] = None
+    ) -> List[EventCategoryEntity]:
         """
         获取所有类别及其事件数量
 
         Args:
-            game_gid: 可选的游戏GID，用于过滤特定游戏的事件
+            game_gid: 可选的游戏GID, 用于过滤特定游戏的事件
 
         Returns:
             EventCategoryEntity列表, 包含事件数量统计
@@ -175,12 +177,19 @@ class CategoryRepository(GenericRepository):
         if not data:
             return None
 
+        # Validate field names to prevent SQL injection
+        from backend.core.security.sql_validator import SQLValidator
+
+        for key in data.keys():
+            SQLValidator.validate_column_name(key)
+
         # 构建UPDATE语句
         set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
         query = f"UPDATE event_categories SET {set_clause} WHERE id = ?"
         values = list(data.values()) + [category_id]
 
         from backend.core.utils.converters import get_db_connection
+
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(query, values)
@@ -203,6 +212,7 @@ class CategoryRepository(GenericRepository):
         query = "DELETE FROM event_categories WHERE id = ?"
 
         from backend.core.utils.converters import get_db_connection
+
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(query, (category_id,))
@@ -219,7 +229,7 @@ class CategoryRepository(GenericRepository):
             category_ids: 类别ID列表
 
         Returns:
-            包含删除结果的字典：
+            包含删除结果的字典: 
             - deleted_count: 成功删除的数量
             - failed_ids: 删除失败的ID列表
             - failed_reasons: 失败原因字典 {id: reason}
@@ -227,17 +237,9 @@ class CategoryRepository(GenericRepository):
         from backend.core.utils.converters import get_db_connection
 
         if not category_ids:
-            return {
-                "deleted_count": 0,
-                "failed_ids": [],
-                "failed_reasons": {}
-            }
+            return {"deleted_count": 0, "failed_ids": [], "failed_reasons": {}}
 
-        result = {
-            "deleted_count": 0,
-            "failed_ids": [],
-            "failed_reasons": {}
-        }
+        result = {"deleted_count": 0, "failed_ids": [], "failed_reasons": {}}
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -254,14 +256,15 @@ class CategoryRepository(GenericRepository):
 
                 # 检查是否有事件引用此类别
                 cursor.execute(
-                    "SELECT COUNT(*) FROM log_events WHERE category_id = ?",
-                    (category_id,)
+                    "SELECT COUNT(*) FROM log_events WHERE category_id = ?", (category_id,)
                 )
                 event_count = cursor.fetchone()[0]
 
                 if event_count > 0:
                     result["failed_ids"].append(category_id)
-                    result["failed_reasons"][category_id] = f"Category has {event_count} associated events"
+                    result["failed_reasons"][
+                        category_id
+                    ] = f"Category has {event_count} associated events"
                     continue
 
                 # 可以删除
@@ -300,6 +303,7 @@ class CategoryRepository(GenericRepository):
         values = list(updates.values()) + category_ids
 
         from backend.core.utils.converters import get_db_connection
+
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(query, values)
@@ -399,19 +403,21 @@ class CategoryRepository(GenericRepository):
         # 构建详细分类统计列表
         category_breakdown = []
         for row in breakdown:
-            category_breakdown.append({
-                "id": row["id"],
-                "name": row["name"],
-                "name_cn": row.get("name_cn"),
-                "description": row.get("description"),
-                "color": row.get("color"),
-                "icon": row.get("icon"),
-                "is_active": bool(row.get("is_active")),
-                "display_order": row.get("display_order"),
-                "event_count": row.get("event_count") or 0,
-                "created_at": row.get("created_at"),
-                "updated_at": row.get("updated_at"),
-            })
+            category_breakdown.append(
+                {
+                    "id": row["id"],
+                    "name": row["name"],
+                    "name_cn": row.get("name_cn"),
+                    "description": row.get("description"),
+                    "color": row.get("color"),
+                    "icon": row.get("icon"),
+                    "is_active": bool(row.get("is_active")),
+                    "display_order": row.get("display_order"),
+                    "event_count": row.get("event_count") or 0,
+                    "created_at": row.get("created_at"),
+                    "updated_at": row.get("updated_at"),
+                }
+            )
 
         stats["category_breakdown"] = category_breakdown
         return stats
@@ -470,19 +476,21 @@ class CategoryRepository(GenericRepository):
         # 构建详细分类统计列表
         category_breakdown = []
         for row in breakdown:
-            category_breakdown.append({
-                "id": row["id"],
-                "name": row["name"],
-                "name_cn": row.get("name_cn"),
-                "description": row.get("description"),
-                "color": row.get("color"),
-                "icon": row.get("icon"),
-                "is_active": bool(row.get("is_active")),
-                "display_order": row.get("display_order"),
-                "event_count": row.get("event_count") or 0,
-                "created_at": row.get("created_at"),
-                "updated_at": row.get("updated_at"),
-            })
+            category_breakdown.append(
+                {
+                    "id": row["id"],
+                    "name": row["name"],
+                    "name_cn": row.get("name_cn"),
+                    "description": row.get("description"),
+                    "color": row.get("color"),
+                    "icon": row.get("icon"),
+                    "is_active": bool(row.get("is_active")),
+                    "display_order": row.get("display_order"),
+                    "event_count": row.get("event_count") or 0,
+                    "created_at": row.get("created_at"),
+                    "updated_at": row.get("updated_at"),
+                }
+            )
 
         stats["category_breakdown"] = category_breakdown
         return stats

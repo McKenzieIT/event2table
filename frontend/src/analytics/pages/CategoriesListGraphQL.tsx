@@ -1,6 +1,6 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
@@ -70,8 +70,7 @@ export default function CategoriesListGraphQL() {
     if (gameGid && (!currentGame || currentGame.gid !== parseInt(gameGid))) {
       // In GraphQL version, we would use useGame hook
       // For now, we'll skip this as it's not critical
-      console.log('[CategoriesListGraphQL] Game GID from URL:', gameGid);
-    }
+          }
   }, [gameGid, currentGame, setCurrentGame]);
 
   // GraphQL queries

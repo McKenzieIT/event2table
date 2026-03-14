@@ -5,6 +5,7 @@ Tests for Events module GraphQL operations.
 """
 
 import pytest
+
 from backend.gql_api.schema import schema
 
 
@@ -26,7 +27,7 @@ class TestEventsQueries:
         '''
 
         result = schema.execute(query, variables={'gameGid': 10000147, 'limit': 10, 'offset': 0})
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'events' in result.data
@@ -59,11 +60,11 @@ class TestEventsQueries:
         }
         '''
         list_result = schema.execute(list_query, variables={'gameGid': 10000147})
-        
+
         if list_result.data and list_result.data['events'] and len(list_result.data['events']) > 0:
             event_id = list_result.data['events'][0]['id']
             result = schema.execute(query, variables={'id': event_id})
-            
+
             assert result.errors is None or len(result.errors) == 0
             assert result.data is not None
             assert 'event' in result.data
@@ -82,7 +83,7 @@ class TestEventsQueries:
         '''
 
         result = schema.execute(query, variables={'query': 'event', 'gameGid': 10000147})
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'searchEvents' in result.data
@@ -101,7 +102,7 @@ class TestEventsQueries:
         '''
 
         result = schema.execute(query, variables={'gameGid': 10000147, 'category': '埋点'})
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'events' in result.data
@@ -136,10 +137,10 @@ class TestEventsMutations:
                 'eventName': 'test_event_graphql',
                 'eventNameCn': '测试事件GraphQL',
                 'categoryId': 1,
-                'includeInCommonParams': False
-            }
+                'includeInCommonParams': False,
+            },
         )
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'createEvent' in result.data
@@ -169,17 +170,13 @@ class TestEventsMutations:
         }
         '''
         list_result = schema.execute(list_query, variables={'gameGid': 10000147})
-        
+
         if list_result.data and list_result.data['events'] and len(list_result.data['events']) > 0:
             event_id = list_result.data['events'][0]['id']
             result = schema.execute(
-                query,
-                variables={
-                    'id': event_id,
-                    'eventNameCn': 'Updated Event Name'
-                }
+                query, variables={'id': event_id, 'eventNameCn': 'Updated Event Name'}
             )
-            
+
             assert result.errors is None or len(result.errors) == 0
             assert result.data is not None
             assert 'updateEvent' in result.data
@@ -198,7 +195,7 @@ class TestEventsMutations:
 
         # Test with a non-existent event
         result = schema.execute(query, variables={'id': 99999999})
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'deleteEvent' in result.data
@@ -226,13 +223,13 @@ class TestEventsPerformance:
         start = time.time()
         result = schema.execute(query, variables={'gameGid': 10000147})
         end = time.time()
-        
+
         execution_time = end - start
-        
+
         assert result.errors is None or len(result.errors) == 0
         # Should complete within 1 second
         assert execution_time < 1.0, f"Query took {execution_time:.2f}s"
-        
+
         print(f"\nEvents query execution time: {execution_time:.3f}s")
 
     def test_event_search_performance(self):
@@ -252,13 +249,13 @@ class TestEventsPerformance:
         start = time.time()
         result = schema.execute(query, variables={'query': 'event'})
         end = time.time()
-        
+
         execution_time = end - start
-        
+
         assert result.errors is None or len(result.errors) == 0
         # Should complete within 0.5 seconds
         assert execution_time < 0.5, f"Query took {execution_time:.2f}s"
-        
+
         print(f"\nEvent search execution time: {execution_time:.3f}s")
 
 

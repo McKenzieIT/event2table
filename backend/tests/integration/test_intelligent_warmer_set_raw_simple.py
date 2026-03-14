@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-集成测试：IntelligentCacheWarmer使用set_raw()方法
+集成测试: IntelligentCacheWarmer使用set_raw()方法
 ==================================================
 
 测试IntelligentCacheWarmer与HierarchicalCache.set_raw()的集成
@@ -10,9 +10,11 @@
 日期: 2026-02-27
 """
 
-import pytest
 import time
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+
 from backend.core.cache.intelligent_warmer import IntelligentCacheWarmer
 
 
@@ -21,13 +23,11 @@ class TestIntelligentWarmerSetRawIntegration:
 
     def setup_method(self):
         """每个测试前创建新的预热器实例"""
-        self.warmer = IntelligentCacheWarmer(
-            access_log_size=1000,
-            warm_up_interval=300
-        )
+        self.warmer = IntelligentCacheWarmer(access_log_size=1000, warm_up_interval=300)
 
     def test_warm_up_cache_uses_set_raw_sync(self):
-        """测试warm_up_cache使用set_raw()方法（同步包装）"""
+        """测试warm_up_cache使用set_raw()方法(同步包装)"""
+
         # Mock fetch_callback
         async def fetch_callback(key):
             return {"data": f"test_data_for_{key}"}
@@ -39,6 +39,7 @@ class TestIntelligentWarmerSetRawIntegration:
 
             # 使用同步包装运行异步方法
             import asyncio
+
             keys = ['dwd_gen:v3:test:key1', 'dwd_gen:v3:test:key2']
             result = asyncio.run(self.warmer.warm_up_cache(keys, fetch_callback))
 
@@ -48,6 +49,7 @@ class TestIntelligentWarmerSetRawIntegration:
 
     def test_warm_up_cache_with_existing_keys(self):
         """测试预热时跳过已存在的键"""
+
         # Mock fetch_callback
         async def fetch_callback(key):
             return {"data": f"test_data_for_{key}"}
@@ -58,18 +60,19 @@ class TestIntelligentWarmerSetRawIntegration:
 
             # 使用同步包装运行异步方法
             import asyncio
+
             keys = ['dwd_gen:v3:test:key1', 'dwd_gen:v3:test:key2']
             result = asyncio.run(self.warmer.warm_up_cache(keys, fetch_callback))
 
-            # 验证key1被跳过，key2被预热
+            # 验证key1被跳过, key2被预热
             assert result['warmed'] == 1
             assert result['skipped'] == 1
-
 
     @cached(ttl=1800)
     def test_warm_up_cache_handles_fetch_failure(self):
         """测试预热时处理数据获取失败"""
-        # Mock fetch_callback返回None（模拟失败）
+
+        # Mock fetch_callback返回None(模拟失败)
         async def fetch_callback(key):
             return None
 
@@ -79,6 +82,7 @@ class TestIntelligentWarmerSetRawIntegration:
 
             # 使用同步包装运行异步方法
             import asyncio
+
             keys = ['dwd_gen:v3:test:key1', 'dwd_gen:v3:test:key2']
             result = asyncio.run(self.warmer.warm_up_cache(keys, fetch_callback))
 
@@ -88,6 +92,7 @@ class TestIntelligentWarmerSetRawIntegration:
 
     def test_warm_up_cache_updates_stats(self):
         """测试预热更新统计信息"""
+
         # Mock fetch_callback
         async def fetch_callback(key):
             return {"data": f"test_data_for_{key}"}
@@ -103,6 +108,7 @@ class TestIntelligentWarmerSetRawIntegration:
 
             # 使用同步包装运行异步方法
             import asyncio
+
             keys = ['dwd_gen:v3:test:key1', 'dwd_gen:v3:test:key2']
             asyncio.run(self.warmer.warm_up_cache(keys, fetch_callback))
 
@@ -116,9 +122,9 @@ class TestIntelligentWarmerSetRawIntegration:
         """测试不使用时间衰减的预测"""
         # 添加访问记录
         for i in range(100):
-            self.warmer.record_access(f'dwd_gen:v3:test:key{i % 10}')  # 10个键，不同频率
+            self.warmer.record_access(f'dwd_gen:v3:test:key{i % 10}')  # 10个键, 不同频率
 
-        # 预测热点键（不使用衰减）
+        # 预测热点键(不使用衰减)
         hot_keys = self.warmer.predict_hot_keys(top_n=5, use_decay=False)
 
         # 验证返回热点键
@@ -132,12 +138,14 @@ class TestIntelligentWarmerSetRawIntegration:
 
         # 添加最近的访问
         for i in range(10):
-            self.warmer.access_log.append({
-                'key': f'dwd_gen:v3:test:recent_key{i}',
-                'timestamp': current_time - 100  # 100秒前
-            })
+            self.warmer.access_log.append(
+                {
+                    'key': f'dwd_gen:v3:test:recent_key{i}',
+                    'timestamp': current_time - 100,  # 100秒前
+                }
+            )
 
-        # 预测热点键（使用衰减）
+        # 预测热点键(使用衰减)
         hot_keys = self.warmer.predict_hot_keys(top_n=5, use_decay=True)
 
         # 验证返回热点键
@@ -205,11 +213,13 @@ class TestIntelligentWarmerSetRawIntegration:
 
     def test_warm_up_cache_with_empty_keys(self):
         """测试空键列表的预热"""
+
         async def fetch_callback(key):
             return {"data": "test"}
 
         # 使用同步包装运行异步方法
         import asyncio
+
         result = asyncio.run(self.warmer.warm_up_cache([], fetch_callback))
 
         # 验证结果

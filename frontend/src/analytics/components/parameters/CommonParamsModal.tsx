@@ -20,7 +20,7 @@
  * />
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { BaseModal, Button, Badge, Spinner, Input } from '@shared/ui';
 import { GET_COMMON_PARAMETERS } from '@/graphql/queries';
@@ -42,6 +42,9 @@ interface CommonParamsModalProps {
 const CommonParamsModal: React.FC<CommonParamsModalProps> = ({ isOpen, onClose, gameGid }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  // Ref to input element (for Chrome MCP compatibility)
+  const searchRef = useRef<HTMLInputElement>(null);
+
   // Fetch common parameters
   const { data, loading, error, refetch } = useQuery(GET_COMMON_PARAMETERS, {
     variables: { gameGid },
@@ -56,6 +59,19 @@ const CommonParamsModal: React.FC<CommonParamsModalProps> = ({ isOpen, onClose, 
     param.paramName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (param.paramNameCn && param.paramNameCn.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Chrome MCP兼容性: 监听DOM值变化并同步到state
+  useEffect(() => {
+    if (!searchRef.current) {
+      return;
+    }
+
+    const searchDomValue = searchRef.current.value;
+
+    if (searchDomValue !== searchTerm) {
+      setSearchTerm(searchDomValue);
+    }
+  }, [searchTerm]);
 
   const handleRefresh = (): void => {
     refetch();
@@ -116,6 +132,7 @@ const CommonParamsModal: React.FC<CommonParamsModalProps> = ({ isOpen, onClose, 
             placeholder="搜索参数名称..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            ref={searchRef}
           />
         </div>
 

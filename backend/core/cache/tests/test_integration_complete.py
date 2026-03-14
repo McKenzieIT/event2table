@@ -4,7 +4,7 @@
 缓存系统完整集成测试
 ==================
 
-测试缓存系统的完整集成，包括：
+测试缓存系统的完整集成, 包括: 
 - Bloom Filter
 - 智能预热
 - 层级缓存
@@ -15,16 +15,17 @@
 日期: 2026-02-25
 """
 
-import pytest
-import time
-import tempfile
 import os
+import tempfile
+import time
 
-from backend.services.games.game_service import GameService
-from backend.services.events.event_service import EventService
-from backend.services.cache.cache_warmup import CacheWarmer
-from backend.core.cache.cache_system import get_cache
+import pytest
+
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
+from backend.core.cache.cache_system import get_cache
+from backend.services.cache.cache_warmup import CacheWarmer
+from backend.services.events.event_service import EventService
+from backend.services.games.game_service import GameService
 
 
 @pytest.fixture
@@ -51,9 +52,7 @@ class TestBloomFilterIntegration:
         # 创建GameService并替换Bloom Filter文件
         service = GameService()
         service.bloom_filter = EnhancedBloomFilter(
-            capacity=1000,
-            error_rate=0.001,
-            persistence_path=temp_files[0]
+            capacity=1000, error_rate=0.001, persistence_path=temp_files[0]
         )
 
         # 查询存在的游戏
@@ -71,13 +70,12 @@ class TestBloomFilterIntegration:
         """测试EventService中Bloom Filter的端到端流程"""
         service = EventService()
         service.bloom_filter = EnhancedBloomFilter(
-            capacity=1000,
-            error_rate=0.001,
-            persistence_path=temp_files[1]
+            capacity=1000, error_rate=0.001, persistence_path=temp_files[1]
         )
 
         # 查询第一个事件
         from backend.core.utils.converters import fetch_all_as_dict
+
         events = fetch_all_as_dict('SELECT * FROM log_events LIMIT 1')
 
         if events:
@@ -99,16 +97,14 @@ class TestBloomFilterIntegration:
 
         # 应该快速返回None
         assert result is None
-        # Bloom Filter应该让查询很快（即使查询数据库）
-        # 注意：这里我们主要验证逻辑，性能测试在单元测试中
+        # Bloom Filter应该让查询很快(即使查询数据库)
+        # 注意: 这里我们主要验证逻辑, 性能测试在单元测试中
 
     def test_bloom_filter_rebuild(self, temp_files):
         """测试Bloom Filter重建功能"""
         service = GameService()
         service.bloom_filter = EnhancedBloomFilter(
-            capacity=1000,
-            error_rate=0.001,
-            persistence_path=temp_files[2]
+            capacity=1000, error_rate=0.001, persistence_path=temp_files[2]
         )
 
         # 添加一些数据
@@ -150,7 +146,7 @@ class TestCacheWarmupIntegration:
         warmer = CacheWarmer()
         cache = get_cache()
 
-        # 预热前：查询游戏（冷启动）
+        # 预热前: 查询游戏(冷启动)
         start = time.time()
         game1 = cache.get("games:10000147")
         cold_duration = time.time() - start
@@ -158,13 +154,13 @@ class TestCacheWarmupIntegration:
         # 执行预热
         warmer.warmup_popular_games(limit=100)
 
-        # 预热后：查询游戏（热启动）
+        # 预热后: 查询游戏(热启动)
         start = time.time()
         game2 = cache.get("games:10000147")
         warm_duration = time.time() - start
 
-        # 预热后应该更快（或者至少不会更慢）
-        # 注意：这个测试可能会因为缓存状态而不同
+        # 预热后应该更快(或者至少不会更慢)
+        # 注意: 这个测试可能会因为缓存状态而不同
         print(f"Cold: {cold_duration:.4f}s, Warm: {warm_duration:.4f}s")
 
 
@@ -218,7 +214,7 @@ class TestCacheSystemEndToEnd:
         warmer = CacheWarmer(cache=hierarchical_cache)
         warmup_stats = warmer.warmup_all(games_limit=10)
 
-        # 2. 查询游戏（应该从缓存读取）
+        # 2. 查询游戏(应该从缓存读取)
         service = GameService()
         game = service.get_game_by_gid(10000147)
 
@@ -269,12 +265,12 @@ class TestCacheDegradation:
 
         cache = DegradationStrategy()
 
-        # 模拟Redis故障，降级到L1
+        # 模拟Redis故障, 降级到L1
         try:
-            # 尝试写入L2（可能失败）
+            # 尝试写入L2(可能失败)
             cache.set_l2("test_key", {"data": "value"}, ttl=3600)
         except Exception:
-            # Redis不可用，降级到L1
+            # Redis不可用, 降级到L1
             cache.set_l1("test_key", {"data": "value"}, ttl=600)
 
         # 从L1读取应该成功
@@ -293,7 +289,7 @@ class TestCacheConsistency:
         # 第一次查询
         game1 = service.get_game_by_gid(10000147)
 
-        # 第二次查询（应该从缓存读取）
+        # 第二次查询(应该从缓存读取)
         game2 = service.get_game_by_gid(10000147)
 
         # 数据应该一致
@@ -305,13 +301,13 @@ class TestCacheConsistency:
         """测试更新时缓存失效"""
         service = GameService()
 
-        # 先查询，缓存数据
+        # 先查询, 缓存数据
         game = service.get_game_by_gid(10000147)
 
         if game:
             original_name = game.name
 
-            # 更新游戏（会自动清理缓存）
+            # 更新游戏(会自动清理缓存)
             try:
                 service.update_game(10000147, {"name": "Test Update"})
 
@@ -325,7 +321,7 @@ class TestCacheConsistency:
                 # 恢复原始名称
                 service.update_game(10000147, {"name": original_name})
             except Exception as e:
-                # 更新可能失败（例如游戏不存在）
+                # 更新可能失败(例如游戏不存在)
                 print(f"Update test skipped: {e}")
 
 

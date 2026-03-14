@@ -10,9 +10,10 @@ Event Category Repository (事件类别数据访问层)
 - 保持GenericRepository继承
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict, get_db_connection
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict, get_db_connection
 
 
 class EventCategoryRepository(GenericRepository):
@@ -36,7 +37,6 @@ class EventCategoryRepository(GenericRepository):
             cache_timeout=1800,  # 30分钟缓存（类别很少变化）
         )
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """
@@ -46,7 +46,7 @@ class EventCategoryRepository(GenericRepository):
             name: 类别名称
 
         Returns:
-            类别字典，不存在返回None
+            类别字典, 不存在返回None
 
         Example:
             >>> repo = EventCategoryRepository()
@@ -54,7 +54,6 @@ class EventCategoryRepository(GenericRepository):
         """
         query = "SELECT * FROM event_categories WHERE name = ?"
         return fetch_one_as_dict(query, (name,))
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_or_create_default(self) -> int:
@@ -76,10 +75,7 @@ class EventCategoryRepository(GenericRepository):
         # 创建"未分类"类别
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO event_categories (name) VALUES (?)",
-            ("未分类",)
-        )
+        cursor.execute("INSERT INTO event_categories (name) VALUES (?)", ("未分类",))
         category_id = cursor.lastrowid
         conn.commit()
         conn.close()
@@ -103,7 +99,6 @@ class EventCategoryRepository(GenericRepository):
         query = "SELECT id FROM event_categories WHERE id = ?"
         result = fetch_one_as_dict(query, (category_id,))
         return result is not None
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_all(self) -> List[Dict[str, Any]]:

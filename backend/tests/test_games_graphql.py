@@ -5,6 +5,7 @@ Tests for Games module GraphQL operations.
 """
 
 import pytest
+
 from backend.gql_api.schema import schema
 
 
@@ -26,7 +27,7 @@ class TestGamesQueries:
         '''
 
         result = schema.execute(query, variables={'limit': 10, 'offset': 0})
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'games' in result.data
@@ -47,7 +48,7 @@ class TestGamesQueries:
         '''
 
         result = schema.execute(query, variables={'gid': 10000147})
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'game' in result.data
@@ -65,7 +66,7 @@ class TestGamesQueries:
         '''
 
         result = schema.execute(query, variables={'query': 'game'})
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'searchGames' in result.data
@@ -93,14 +94,9 @@ class TestGamesMutations:
 
         # Use a unique GID for testing
         result = schema.execute(
-            query, 
-            variables={
-                'gid': 99999999,
-                'name': 'Test Game GraphQL',
-                'odsDb': 'ieu_ods'
-            }
+            query, variables={'gid': 99999999, 'name': 'Test Game GraphQL', 'odsDb': 'ieu_ods'}
         )
-        
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'createGame' in result.data
@@ -122,14 +118,8 @@ class TestGamesMutations:
         '''
 
         # This will fail if game doesn't exist, but structure is correct
-        result = schema.execute(
-            query,
-            variables={
-                'gid': 10000147,
-                'name': 'Updated Game Name'
-            }
-        )
-        
+        result = schema.execute(query, variables={'gid': 10000147, 'name': 'Updated Game Name'})
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'updateGame' in result.data
@@ -147,14 +137,8 @@ class TestGamesMutations:
         '''
 
         # Test with a non-existent game
-        result = schema.execute(
-            query,
-            variables={
-                'gid': 99999998,
-                'confirm': False
-            }
-        )
-        
+        result = schema.execute(query, variables={'gid': 99999998, 'confirm': False})
+
         assert result.errors is None or len(result.errors) == 0
         assert result.data is not None
         assert 'deleteGame' in result.data
@@ -166,10 +150,10 @@ class TestDataLoaderIntegration:
     def test_game_loader_batch_loading(self):
         """Test that GameLoader batches requests"""
         from backend.gql_api.dataloaders import game_loader
-        
+
         # Clear loader cache
         game_loader.clear_all()
-        
+
         # Load multiple games
         query = '''
         query GetMultipleGames {
@@ -185,7 +169,7 @@ class TestDataLoaderIntegration:
         '''
 
         result = schema.execute(query)
-        
+
         # Should not have errors (even if games don't exist)
         assert result.errors is None or len(result.errors) == 0
 
@@ -206,13 +190,13 @@ class TestCacheIntegration:
 
         # First query
         result1 = schema.execute(query)
-        
+
         # Second query (should hit cache)
         result2 = schema.execute(query)
-        
+
         assert result1.errors is None or len(result1.errors) == 0
         assert result2.errors is None or len(result2.errors) == 0
-        
+
         # Both should return data
         assert result1.data is not None
         assert result2.data is not None
@@ -240,13 +224,13 @@ class TestPerformance:
         start = time.time()
         result = schema.execute(query)
         end = time.time()
-        
+
         execution_time = end - start
-        
+
         assert result.errors is None or len(result.errors) == 0
         # Should complete within 1 second
         assert execution_time < 1.0, f"Query took {execution_time:.2f}s"
-        
+
         print(f"\nGames query execution time: {execution_time:.3f}s")
 
     def test_nested_query_performance(self):
@@ -267,13 +251,13 @@ class TestPerformance:
         start = time.time()
         result = schema.execute(query)
         end = time.time()
-        
+
         execution_time = end - start
-        
+
         assert result.errors is None or len(result.errors) == 0
         # Should complete within 2 seconds even with nested data
         assert execution_time < 2.0, f"Query took {execution_time:.2f}s"
-        
+
         print(f"\nNested query execution time: {execution_time:.3f}s")
 
 

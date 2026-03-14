@@ -4,46 +4,53 @@ GraphQL Schema
 Main GraphQL schema definition for Event2Table API.
 """
 
-import graphene
-from graphene import ObjectType, Field, List, Int, String, Boolean
 import logging
 
-from backend.gql_api.types.game_type import GameType
-from backend.gql_api.types.event_type import EventType
-from backend.gql_api.types.parameter_type import ParameterType
-from backend.gql_api.types.category_type import CategoryType
-from backend.gql_api.types.dashboard_type import DashboardStatsType, GameStatsType
-from backend.gql_api.types.template_type import TemplateType
-from backend.gql_api.types.node_type import NodeType, FlowType
-from backend.gql_api.types.event_parameter_type import EventParameterExtendedType, ParamVersionType, ParamConfigType, ValidationRuleType
-from backend.gql_api.types.join_config_type import JoinConfigType
-from backend.gql_api.queries.game_queries import GameQueries
-from backend.gql_api.queries.event_queries import EventQueries
-from backend.gql_api.queries.category_queries import CategoryQueries
-from backend.gql_api.queries.parameter_queries import ParameterQueries
-from backend.gql_api.queries.dashboard_queries import DashboardQueries
-from backend.gql_api.queries.template_queries import TemplateQueries
-from backend.gql_api.queries.node_queries import NodeQueries, FlowQueries
-from backend.gql_api.queries.event_parameter_queries import EventParameterQueries
-from backend.gql_api.queries.join_config_queries import JoinConfigQueries
-from backend.gql_api.mutations.game_mutations import GameMutations
-from backend.gql_api.mutations.event_mutations import EventMutations
-from backend.gql_api.mutations.parameter_mutations import ParameterMutations
+import graphene
+from graphene import Boolean, Field, Int, List, ObjectType, String
+
+from backend.gql_api.mutations.batch_mutations import BatchMutations
 from backend.gql_api.mutations.category_mutations import CategoryMutations
-from backend.gql_api.mutations.template_mutations import TemplateMutations
-from backend.gql_api.mutations.node_mutations import NodeMutations, FlowMutations
+from backend.gql_api.mutations.event_mutations import EventMutations
 from backend.gql_api.mutations.event_parameter_mutations import EventParameterMutations
-from backend.gql_api.mutations.join_config_mutations import JoinConfigMutations
+from backend.gql_api.mutations.game_mutations import GameMutations
 from backend.gql_api.mutations.hql_mutations import HQLMutations
+from backend.gql_api.mutations.join_config_mutations import JoinConfigMutations
+from backend.gql_api.mutations.node_mutations import FlowMutations, NodeMutations
+from backend.gql_api.mutations.parameter_mutations import ParameterMutations
+from backend.gql_api.mutations.template_mutations import TemplateMutations
+from backend.gql_api.queries.category_queries import CategoryQueries
+from backend.gql_api.queries.dashboard_queries import DashboardQueries
+from backend.gql_api.queries.event_parameter_queries import EventParameterQueries
+from backend.gql_api.queries.event_queries import EventQueries
+from backend.gql_api.queries.game_queries import GameQueries
+from backend.gql_api.queries.join_config_queries import JoinConfigQueries
+from backend.gql_api.queries.node_queries import FlowQueries, NodeQueries
+from backend.gql_api.queries.parameter_queries import ParameterQueries
+from backend.gql_api.queries.template_queries import TemplateQueries
 
 # Parameter Management Schema imports
 from backend.gql_api.schema_parameter_management import (
-    ParameterManagementQueries,
-    ParameterManagementMutations,
-    ParameterTypeEnum,
+    FieldTypeEnum,
     ParameterFilterModeEnum,
-    FieldTypeEnum
+    ParameterManagementMutations,
+    ParameterManagementQueries,
+    ParameterTypeEnum,
 )
+from backend.gql_api.types.category_type import CategoryType
+from backend.gql_api.types.dashboard_type import DashboardStatsType, GameStatsType
+from backend.gql_api.types.event_parameter_type import (
+    EventParameterExtendedType,
+    ParamConfigType,
+    ParamVersionType,
+    ValidationRuleType,
+)
+from backend.gql_api.types.event_type import EventType
+from backend.gql_api.types.game_type import GameType
+from backend.gql_api.types.join_config_type import JoinConfigType
+from backend.gql_api.types.node_type import FlowType, NodeType
+from backend.gql_api.types.parameter_type import ParameterType
+from backend.gql_api.types.template_type import TemplateType
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +65,7 @@ class Query(
     FlowQueries,
     NodeQueries,
     TemplateQueries,
-    JoinConfigQueries
+    JoinConfigQueries,
 ):
     """
     GraphQL Query Root Type
@@ -67,31 +74,19 @@ class Query(
     """
 
     # Game queries
-    game = Field(
-        GameType,
-        gid=Int(required=True),
-        description="根据GID查询单个游戏"
-    )
+    game = Field(GameType, gid=Int(required=True), description="根据GID查询单个游戏")
 
     games = List(
         GameType,
         limit=Int(default_value=10),
         offset=Int(default_value=0),
-        description="查询游戏列表（支持分页）"
+        description="查询游戏列表（支持分页）",
     )
 
-    search_games = List(
-        GameType,
-        query=String(required=True),
-        description="搜索游戏"
-    )
+    search_games = List(GameType, query=String(required=True), description="搜索游戏")
 
     # Event queries
-    event = Field(
-        EventType,
-        id=Int(required=True),
-        description="根据ID查询单个事件"
-    )
+    event = Field(EventType, id=Int(required=True), description="根据ID查询单个事件")
 
     events = List(
         EventType,
@@ -99,81 +94,52 @@ class Query(
         category=String(),
         limit=Int(default_value=50),
         offset=Int(default_value=0),
-        description="查询游戏的事件列表（支持过滤和分页）"
+        description="查询游戏的事件列表（支持过滤和分页）",
     )
 
     search_events = List(
-        EventType,
-        query=String(required=True),
-        game_gid=Int(),
-        description="搜索事件"
+        EventType, query=String(required=True), game_gid=Int(), description="搜索事件"
     )
 
     # Category queries
-    category = Field(
-        CategoryType,
-        id=Int(required=True),
-        description="根据ID查询单个分类"
-    )
+    category = Field(CategoryType, id=Int(required=True), description="根据ID查询单个分类")
 
     categories = List(
         CategoryType,
         limit=Int(default_value=50),
         offset=Int(default_value=0),
-        description="查询分类列表（支持分页）"
+        description="查询分类列表（支持分页）",
     )
 
-    search_categories = List(
-        CategoryType,
-        query=String(required=True),
-        description="搜索分类"
-    )
+    search_categories = List(CategoryType, query=String(required=True), description="搜索分类")
 
     # Parameter queries
-    parameter = Field(
-        ParameterType,
-        id=Int(required=True),
-        description="根据ID查询单个参数"
-    )
+    parameter = Field(ParameterType, id=Int(required=True), description="根据ID查询单个参数")
 
     parameters = List(
         ParameterType,
         event_id=Int(required=True),
         activeOnly=Boolean(default_value=True),
-        description="查询事件的参数列表"
+        description="查询事件的参数列表",
     )
 
     search_parameters = List(
-        ParameterType,
-        query=String(required=True),
-        event_id=Int(),
-        description="搜索参数"
+        ParameterType, query=String(required=True), event_id=Int(), description="搜索参数"
     )
 
     # Dashboard queries
-    dashboard_stats = Field(
-        DashboardStatsType,
-        description="获取仪表盘统计数据"
-    )
+    dashboard_stats = Field(DashboardStatsType, description="获取仪表盘统计数据")
 
     game_stats = Field(
-        GameStatsType,
-        game_gid=Int(required=True),
-        description="获取指定游戏的统计数据"
+        GameStatsType, game_gid=Int(required=True), description="获取指定游戏的统计数据"
     )
 
     all_game_stats = List(
-        GameStatsType,
-        limit=Int(default_value=20),
-        description="获取所有游戏的统计数据"
+        GameStatsType, limit=Int(default_value=20), description="获取所有游戏的统计数据"
     )
 
     # Template queries
-    template = Field(
-        TemplateType,
-        id=Int(required=True),
-        description="根据ID查询单个模板"
-    )
+    template = Field(TemplateType, id=Int(required=True), description="根据ID查询单个模板")
 
     templates = List(
         TemplateType,
@@ -182,22 +148,15 @@ class Query(
         search=String(),
         limit=Int(default_value=20),
         offset=Int(default_value=0),
-        description="查询模板列表"
+        description="查询模板列表",
     )
 
     search_templates = List(
-        TemplateType,
-        query=String(required=True),
-        game_gid=Int(),
-        description="搜索模板"
+        TemplateType, query=String(required=True), game_gid=Int(), description="搜索模板"
     )
 
     # Node queries
-    node = Field(
-        NodeType,
-        id=Int(required=True),
-        description="根据ID查询单个节点"
-    )
+    node = Field(NodeType, id=Int(required=True), description="根据ID查询单个节点")
 
     nodes = List(
         NodeType,
@@ -205,15 +164,11 @@ class Query(
         node_type=String(),
         limit=Int(default_value=50),
         offset=Int(default_value=0),
-        description="查询节点列表"
+        description="查询节点列表",
     )
 
     # Flow queries
-    flow = Field(
-        FlowType,
-        id=Int(required=True),
-        description="根据ID查询单个流程"
-    )
+    flow = Field(FlowType, id=Int(required=True), description="根据ID查询单个流程")
 
     flows = List(
         FlowType,
@@ -221,41 +176,29 @@ class Query(
         flow_type=String(),
         limit=Int(default_value=50),
         offset=Int(default_value=0),
-        description="查询流程列表"
+        description="查询流程列表",
     )
 
     # Event Parameter extended queries
     event_parameter_extended = Field(
-        EventParameterExtendedType,
-        id=Int(required=True),
-        description="查询扩展事件参数"
+        EventParameterExtendedType, id=Int(required=True), description="查询扩展事件参数"
     )
 
     param_history = List(
         ParamVersionType,
         param_id=Int(required=True),
         limit=Int(default_value=10),
-        description="查询参数版本历史"
+        description="查询参数版本历史",
     )
 
-    param_config = Field(
-        ParamConfigType,
-        param_id=Int(required=True),
-        description="查询参数配置"
-    )
+    param_config = Field(ParamConfigType, param_id=Int(required=True), description="查询参数配置")
 
     validation_rules = List(
-        ValidationRuleType,
-        param_id=Int(required=True),
-        description="查询参数验证规则"
+        ValidationRuleType, param_id=Int(required=True), description="查询参数验证规则"
     )
 
     # Join Config queries
-    join_config = Field(
-        JoinConfigType,
-        id=Int(required=True),
-        description="根据ID查询单个Join配置"
-    )
+    join_config = Field(JoinConfigType, id=Int(required=True), description="根据ID查询单个Join配置")
 
     join_configs = List(
         JoinConfigType,
@@ -263,7 +206,7 @@ class Query(
         join_type=String(),
         limit=Int(default_value=50),
         offset=Int(default_value=0),
-        description="查询Join配置列表"
+        description="查询Join配置列表",
     )
 
     # Resolvers
@@ -331,9 +274,13 @@ class Query(
         """Resolve single template"""
         return TemplateQueries.resolve_template(self, info, id)
 
-    def resolve_templates(self, info, game_gid=None, category=None, search=None, limit=20, offset=0):
+    def resolve_templates(
+        self, info, game_gid=None, category=None, search=None, limit=20, offset=0
+    ):
         """Resolve templates list"""
-        return TemplateQueries.resolve_templates(self, info, game_gid, category, search, limit, offset)
+        return TemplateQueries.resolve_templates(
+            self, info, game_gid, category, search, limit, offset
+        )
 
     def resolve_search_templates(self, info, query, game_gid=None):
         """Resolve template search"""
@@ -386,21 +333,25 @@ class Query(
     def resolve_parameters_management(self, info, game_gid, mode='all', event_id=None):
         """Resolve parameters management query"""
         from backend.gql_api.resolvers.parameter_resolvers import resolve_parameters_management
+
         return resolve_parameters_management(info, game_gid, mode, event_id)
 
     def resolve_common_parameters(self, info, game_gid, threshold=0.5):
         """Resolve common parameters query"""
         from backend.gql_api.resolvers.parameter_resolvers import resolve_common_parameters
+
         return resolve_common_parameters(info, game_gid, threshold)
 
     def resolve_parameter_changes(self, info, game_gid, parameter_id=None, limit=50):
         """Resolve parameter changes query"""
         from backend.gql_api.resolvers.parameter_resolvers import resolve_parameter_changes
+
         return resolve_parameter_changes(info, game_gid, parameter_id, limit)
 
     def resolve_event_fields(self, info, event_id, field_type='all'):
         """Resolve event fields query"""
         from backend.gql_api.resolvers.parameter_resolvers import resolve_event_fields
+
         return resolve_event_fields(info, event_id, field_type)
 
 
@@ -415,7 +366,8 @@ class Mutation(
     FlowMutations,
     EventParameterMutations,
     JoinConfigMutations,
-    HQLMutations
+    HQLMutations,
+    BatchMutations,  # ✅ 批量操作Mutations (batch_create_games, batch_update_games, batch_delete_games)
 ):
     """
     GraphQL Mutation Root Type
@@ -469,11 +421,16 @@ class Mutation(
     create_join_config = JoinConfigMutations.create_join_config
     update_join_config = JoinConfigMutations.update_join_config
     delete_join_config = JoinConfigMutations.delete_join_config
-    
+
     # HQL mutations
     generate_hql = HQLMutations.GenerateHQL.Field()
     save_hql_template = HQLMutations.SaveHQLTemplate.Field()
     delete_hql_template = HQLMutations.DeleteHQLTemplate.Field()
+
+    # ✅ Batch mutations - 批量操作 (P2优先级)
+    batch_create_games = BatchMutations.batch_create_games
+    batch_update_games = BatchMutations.batch_update_games
+    batch_delete_games = BatchMutations.batch_delete_games
 
     # Parameter Management mutations
     change_parameter_type = ParameterManagementMutations.change_parameter_type

@@ -35,14 +35,13 @@ Flows Service Routes
 """
 
 import logging
+
 from flask import request
-from backend.services.flows import flows_bp
-from backend.core.utils import (
-    json_success_response,
-    json_error_response,
-)
+
+from backend.core.utils import json_error_response, json_success_response
 from backend.models.repositories.flow_repository import FlowRepository
 from backend.models.schemas import FlowTemplateCreate, FlowTemplateUpdate
+from backend.services.flows import flows_bp
 
 logger = logging.getLogger(__name__)
 
@@ -72,14 +71,10 @@ def list_flows():
         repo = FlowRepository()
         flows = repo.find_by_game_gid(game_gid)
 
-        return json_success_response(
-            data=flows, message=f"Retrieved {len(flows)} flows"
-        )
+        return json_success_response(data=flows, message=f"Retrieved {len(flows)} flows")
 
     except Exception as e:
-        logger.error(
-            f"Failed to list flows for game_gid={game_gid}: {e}", exc_info=True
-        )
+        logger.error(f"Failed to list flows for game_gid={game_gid}: {e}", exc_info=True)
         return json_error_response("An internal error occurred", status_code=500)
 
 
@@ -181,9 +176,7 @@ def update_flow(flow_id):
         update_data = data.dict(exclude_unset=True)
         if update_data:
             repo.update(flow_id, update_data)
-            logger.info(
-                f"Flow updated: id={flow_id}, fields={list(update_data.keys())}"
-            )
+            logger.info(f"Flow updated: id={flow_id}, fields={list(update_data.keys())}")
 
         # 获取更新后的流程
         flow = repo.find_by_id(flow_id)
@@ -207,7 +200,7 @@ def delete_flow(flow_id):
         JSON响应确认删除成功
 
     Note:
-        此操作为软删除，流程将被标记为is_active=0
+        此操作为软删除, 流程将被标记为is_active=0
     """
     try:
         repo = FlowRepository()
@@ -220,9 +213,7 @@ def delete_flow(flow_id):
         # 软删除
         repo.delete(flow_id)
 
-        logger.info(
-            f"Flow deleted (soft): id={flow_id}, name={existing.get('flow_name')}"
-        )
+        logger.info(f"Flow deleted (soft): id={flow_id}, name={existing.get('flow_name')}")
 
         return json_success_response(message="Flow deleted successfully")
 
@@ -240,7 +231,7 @@ def hard_delete_flow(flow_id):
         flow_id: int (path parameter) - 流程ID
 
     Warning:
-        此操作不可恢复，请谨慎使用
+        此操作不可恢复, 请谨慎使用
     """
     try:
         repo = FlowRepository()
@@ -253,9 +244,7 @@ def hard_delete_flow(flow_id):
         # 硬删除
         repo.hard_delete(flow_id)
 
-        logger.warning(
-            f"Flow hard deleted: id={flow_id}, name={existing.get('flow_name')}"
-        )
+        logger.warning(f"Flow hard deleted: id={flow_id}, name={existing.get('flow_name')}")
 
         return json_success_response(message="Flow permanently deleted")
 
@@ -289,9 +278,7 @@ def count_flows():
         )
 
     except Exception as e:
-        logger.error(
-            f"Failed to count flows for game_gid={game_gid}: {e}", exc_info=True
-        )
+        logger.error(f"Failed to count flows for game_gid={game_gid}: {e}", exc_info=True)
         return json_error_response("An internal error occurred", status_code=500)
 
 
@@ -305,7 +292,7 @@ def canvas_save_flow():
     """
     Canvas API: 保存流程（兼容性别名）
 
-    与 POST /api/flows 功能相同，但路径不同，用于前端兼容
+    与 POST /api/flows 功能相同, 但路径不同, 用于前端兼容
     """
     return create_flow()
 
@@ -315,7 +302,7 @@ def canvas_get_flow(flowId):
     """
     Canvas API: 获取流程详情（兼容性别名）
 
-    与 GET /api/flows/<id> 功能相同，但路径不同，用于前端兼容
+    与 GET /api/flows/<id> 功能相同, 但路径不同, 用于前端兼容
     """
     return get_flow(flowId)
 

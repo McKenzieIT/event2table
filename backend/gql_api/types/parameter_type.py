@@ -4,9 +4,10 @@ Parameter GraphQL Type
 Defines the GraphQL type for Event Parameter entity.
 """
 
-import graphene
-from graphene import Field, Int, String, Boolean
 import logging
+
+import graphene
+from graphene import Boolean, Field, Int, String
 
 logger = logging.getLogger(__name__)
 
@@ -14,13 +15,13 @@ logger = logging.getLogger(__name__)
 class ParameterType(graphene.ObjectType):
     """
     Parameter GraphQL Type
-    
+
     Represents an event parameter with its metadata.
     """
-    
+
     class Meta:
         description = "事件参数"
-    
+
     # Basic fields
     id = Int(required=True, description="参数ID")
     event_id = Int(required=True, description="事件ID")
@@ -34,7 +35,7 @@ class ParameterType(graphene.ObjectType):
     version = Int(description="版本号")
     created_at = String(description="创建时间")
     updated_at = String(description="更新时间")
-    
+
     @classmethod
     def from_dict(cls, data: dict) -> 'ParameterType':
         """Create ParameterType instance from dictionary."""

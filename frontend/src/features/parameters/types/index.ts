@@ -2,27 +2,16 @@
  * Parameters Module Types
  *
  * Type definitions for parameter-related data structures
+ *
+ * ⚠️ IMPORTANT: Parameter interface is now imported from @/shared/types/parameter-types
+ * Do not define Parameter interface here - use the unified definition
  */
 
-/**
- * Parameter type enum
- */
-export type ParameterType = 'string' | 'int' | 'float' | 'boolean' | 'json';
+// Import Parameter type from shared types
+import type { Parameter, ParameterType } from '@/shared/types/parameter-types';
 
-/**
- * Parameter structure
- */
-export interface Parameter {
-  id: number;
-  param_name: string;
-  param_name_cn: string;
-  param_type: ParameterType;
-  game_gid: number | null; // null means public parameter
-  description?: string;
-  default_value?: unknown;
-  created_at?: string;
-  updated_at?: string;
-}
+// Re-export for convenience
+export type { Parameter, ParameterType } from '@/shared/types/parameter-types';
 
 /**
  * Parameter usage in events

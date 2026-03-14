@@ -144,10 +144,14 @@ export default function QuickActionButtons({
    * Handle action selection
    */
   const handleSelectAction = useCallback((action: QuickAction) => {
+    // Convert lowercase field type to uppercase GraphQL enum value
+    // GraphQL enums are case-sensitive and must be uppercase (e.g., PARAM, not "param")
+    const graphQLEnumValue = action.fieldType.toUpperCase() as any;
+
     batchAddFields({
       variables: {
         eventId,
-        fieldType: action.fieldType
+        fieldType: graphQLEnumValue
       }
     });
   }, [batchAddFields, eventId]);

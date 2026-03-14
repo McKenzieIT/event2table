@@ -79,7 +79,7 @@ class BaseService:
         """
         清理所有缓存
 
-        警告: 此操作会清理所有缓存，应谨慎使用
+        警告: 此操作会清理所有缓存, 应谨慎使用
 
         Examples:
             >>> service = BaseService()

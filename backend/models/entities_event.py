@@ -6,10 +6,11 @@ Event Entity Module
 事件相关的Entity定义
 """
 
-from typing import Optional, List, Dict, Any
-from datetime import datetime
-from pydantic import BaseModel, Field, field_validator, ConfigDict, field_serializer
 import html
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 
 
 class EventEntity(BaseModel):
@@ -46,7 +47,7 @@ class EventEntity(BaseModel):
     created_at: Optional[datetime] = Field(None, description="创建时间")
     updated_at: Optional[datetime] = Field(None, description="更新时间")
 
-    # 统计字段（不持久化）
+    # 统计字段(不持久化)
     param_count: Optional[int] = Field(default=0, description="参数数量", exclude=True)
 
     @field_validator("name", "name_cn")
@@ -57,7 +58,4 @@ class EventEntity(BaseModel):
             return html.escape(v.strip())
         return v
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True
-    )
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)

@@ -3,16 +3,17 @@
 """
 缓存系统基础类和接口
 
-此模块提供缓存系统的抽象基类和接口，用于打破循环依赖。
+此模块提供缓存系统的抽象基类和接口, 用于打破循环依赖. 
 
 版本: 1.0.0
 日期: 2026-02-24
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Optional, Dict
-from flask import current_app
 import logging
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional
+
+from flask import current_app
 
 logger = logging.getLogger(__name__)
 

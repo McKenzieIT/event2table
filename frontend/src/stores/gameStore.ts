@@ -1,17 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { Game } from '@shared/types/game-types';
 
 /**
- * 游戏信息接口
- * Game Information Interface
+ * Re-exporting Game type for backward compatibility
+ * @deprecated Import from @shared/types/game-types instead
  */
-export interface Game {
-  id: number;
-  gid: number;
-  name: string;
-  ods_db: string;
-  dwd_prefix?: string;
-}
+export type { Game };
 
 /**
  * 游戏状态管理Store (Zustand)

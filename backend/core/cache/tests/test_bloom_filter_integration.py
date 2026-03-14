@@ -11,25 +11,27 @@ Bloom Filter集成单元测试
 日期: 2026-02-25
 """
 
-import pytest
 import os
 import tempfile
 from pathlib import Path
 
-from backend.services.games.game_service import GameService
-from backend.services.events.event_service import EventService
-from backend.models.entities import GameEntity, EventEntity
+import pytest
+
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
+from backend.models.entities import EventEntity, GameEntity
+from backend.services.events.event_service import EventService
+from backend.services.games.game_service import GameService
 
 
 @pytest.fixture
 def temp_bloom_file():
-    """创建临时Bloom Filter文件（在项目data目录内）"""
-    # 在项目data目录内创建临时文件，避免路径验证问题
+    """创建临时Bloom Filter文件(在项目data目录内)"""
+    # 在项目data目录内创建临时文件, 避免路径验证问题
     temp_dir = Path(__file__).parent.parent.parent.parent.parent / "backend" / "data"
     temp_dir.mkdir(parents=True, exist_ok=True)
 
     import uuid
+
     unique_id = str(uuid.uuid4())[:8]
     path = temp_dir / f"test_bloom_{unique_id}.pkl"
 
@@ -44,12 +46,12 @@ def temp_bloom_file():
 def game_service(temp_bloom_file):
     """创建测试用GameService"""
     service = GameService()
-    # 替换为临时文件，禁用验证以允许测试键
+    # 替换为临时文件, 禁用验证以允许测试键
     service.bloom_filter = EnhancedBloomFilter(
         capacity=1000,
         error_rate=0.001,
         persistence_path=temp_bloom_file,
-        strict_validation=False  # 禁用验证以允许测试键
+        strict_validation=False,  # 禁用验证以允许测试键
     )
     return service
 
@@ -58,12 +60,12 @@ def game_service(temp_bloom_file):
 def event_service(temp_bloom_file):
     """创建测试用EventService"""
     service = EventService()
-    # 替换为临时文件，禁用验证以允许测试键
+    # 替换为临时文件, 禁用验证以允许测试键
     service.bloom_filter = EnhancedBloomFilter(
         capacity=1000,
         error_rate=0.001,
         persistence_path=temp_bloom_file,
-        strict_validation=False  # 禁用验证以允许测试键
+        strict_validation=False,  # 禁用验证以允许测试键
     )
     return service
 
@@ -85,16 +87,16 @@ class TestBloomFilterIntegration:
         """测试Bloom Filter快速拒绝不存在的游戏"""
         game_gid = 99999999  # 不存在的游戏
 
-        # 先添加到Bloom Filter（模拟之前查询过）
+        # 先添加到Bloom Filter(模拟之前查询过)
         cache_key = f"games:{game_gid}"
         game_service.bloom_filter.add(cache_key)
 
         # 查询不存在的游戏
-        # 注意: 由于我们使用真实的GameService，它会查询数据库
+        # 注意: 由于我们使用真实的GameService, 它会查询数据库
         # 这里我们主要测试Bloom Filter的逻辑
         result = game_service.get_game_by_gid(game_gid)
 
-        # 应该返回None（游戏不存在）
+        # 应该返回None(游戏不存在)
         assert result is None
 
     def test_bloom_filter_stats(self, game_service):
@@ -104,7 +106,7 @@ class TestBloomFilterIntegration:
         assert isinstance(stats, dict)
         assert 'total_items' in stats
         assert 'false_positive_rate' in stats
-        # capacity字段可能不存在，我们检查total_items即可
+        # capacity字段可能不存在, 我们检查total_items即可
         assert 'total_items' in stats or 'item_count' in stats
 
     def test_bloom_filter_rebuild(self, game_service):
@@ -113,7 +115,7 @@ class TestBloomFilterIntegration:
         game_service.bloom_filter.add("games:10000147")
         game_service.bloom_filter.add("games:10000148")
 
-        # 重建Bloom Filter（会清空现有数据）
+        # 重建Bloom Filter(会清空现有数据)
         stats = game_service.rebuild_bloom_filter()
 
         assert isinstance(stats, dict)
@@ -141,8 +143,8 @@ class TestBloomFilterPerformance:
             game_service.bloom_filter.contains(cache_key)
         duration = time.time() - start
 
-        # 1000次查询应该<100ms（每次<0.1ms）
-        # 考虑到测试环境的波动，设置更宽松的阈值
+        # 1000次查询应该<100ms(每次<0.1ms)
+        # 考虑到测试环境的波动, 设置更宽松的阈值
         assert duration < 0.1, f"Bloom Filter too slow: {duration}ms for 1000 queries"
 
     def test_bloom_filter_memory_efficiency(self, temp_bloom_file):
@@ -152,7 +154,7 @@ class TestBloomFilterPerformance:
             capacity=100000,
             error_rate=0.001,
             persistence_path=temp_bloom_file,
-            strict_validation=False
+            strict_validation=False,
         )
 
         # 添加10万个键
@@ -164,8 +166,8 @@ class TestBloomFilterPerformance:
         # Bloom Filter应该仍然有效
         assert stats['total_items'] == 100000
 
-        # 内存占用应该相对较小（<1MB）
-        # 实际测试: 10万个键，0.1%误判率，约200KB
+        # 内存占用应该相对较小(<1MB)
+        # 实际测试: 10万个键, 0.1%误判率, 约200KB
         file_size = os.path.getsize(temp_bloom_file)
         assert file_size < 1024 * 1024, f"Bloom Filter too large: {file_size} bytes"
 
@@ -174,8 +176,8 @@ class TestBloomFilterErrorCases:
     """Bloom Filter错误场景测试"""
 
     def test_bloom_filter_false_positive(self, game_service):
-        """测试Bloom Filter误判（假阳性）"""
-        # Bloom Filter可能说存在，但实际不存在
+        """测试Bloom Filter误判(假阳性)"""
+        # Bloom Filter可能说存在, 但实际不存在
         cache_key = "games:99999999"
 
         # 需要禁用验证才能添加测试键
@@ -197,20 +199,20 @@ class TestBloomFilterErrorCases:
             capacity=1000,
             error_rate=0.001,
             persistence_path=temp_bloom_file,
-            strict_validation=False  # 禁用验证以允许测试键
+            strict_validation=False,  # 禁用验证以允许测试键
         )
         bloom1.add("test_key_1")
         bloom1.add("test_key_2")
 
-        # 强制保存（使用正确的方法名）
+        # 强制保存(使用正确的方法名)
         bloom1.force_save()
 
-        # 创建新的Bloom Filter实例，应该从文件加载
+        # 创建新的Bloom Filter实例, 应该从文件加载
         bloom2 = EnhancedBloomFilter(
             capacity=1000,
             error_rate=0.001,
             persistence_path=temp_bloom_file,
-            strict_validation=False  # 禁用验证以允许测试键
+            strict_validation=False,  # 禁用验证以允许测试键
         )
 
         # 验证数据已恢复
@@ -233,7 +235,7 @@ class TestEventServiceBloomFilter:
         # 查询不存在的游戏
         result = event_service.get_event_by_id(event_id)
 
-        # 应该返回None（事件不存在）
+        # 应该返回None(事件不存在)
         assert result is None
 
     def test_event_service_bloom_filter_stats(self, event_service):
@@ -247,21 +249,21 @@ class TestEventServiceBloomFilter:
 
 @pytest.mark.integration
 class TestBloomFilterIntegrationReal:
-    """Bloom Filter集成测试（需要真实数据库）"""
+    """Bloom Filter集成测试(需要真实数据库)"""
 
     def test_bloom_filter_with_real_game_query(self, game_service):
         """测试Bloom Filter与真实游戏查询的集成"""
-        # 查询存在的游戏（STAR001）
+        # 查询存在的游戏(STAR001)
         game = game_service.get_game_by_gid(10000147)
 
-        # 第一次查询：Bloom Filter不包含，会查询数据库
-        # 如果游戏存在，会添加到Bloom Filter
+        # 第一次查询: Bloom Filter不包含, 会查询数据库
+        # 如果游戏存在, 会添加到Bloom Filter
         if game:
             assert game_service.bloom_filter.contains(f"games:10000147") is True
 
     def test_bloom_filter_with_real_event_query(self, event_service):
         """测试Bloom Filter与真实事件查询的集成"""
-        # 查询第一个事件（如果存在）
+        # 查询第一个事件(如果存在)
         from backend.core.utils.converters import fetch_all_as_dict
 
         events = fetch_all_as_dict('SELECT * FROM log_events LIMIT 1')
@@ -269,7 +271,7 @@ class TestBloomFilterIntegrationReal:
             event_id = events[0]['id']
             event = event_service.get_event_by_id(event_id)
 
-            # 如果事件存在，应该添加到Bloom Filter
+            # 如果事件存在, 应该添加到Bloom Filter
             if event:
                 assert event_service.bloom_filter.contains(f"events:{event_id}") is True
 

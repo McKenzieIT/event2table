@@ -1,9 +1,9 @@
 """
 HQL 服务模块
 
-统一的HQL生成服务，支持多种生成模式（single/join/union）
+统一的HQL生成服务, 支持多种生成模式（single/join/union）
 
-此模块是完全独立、无业务依赖的HQL生成器，可以作为独立Python包使用
+此模块是完全独立, 无业务依赖的HQL生成器, 可以作为独立Python包使用
 
 Examples:
     >>> from . HQLServiceFactory, Event, Field
@@ -44,6 +44,15 @@ Models:
 
 __version__ = "2.0.0"
 
+# 导出构建器
+from .builders.field_builder import FieldBuilder
+from .builders.join_builder import JoinBuilder
+from .builders.union_builder import UnionBuilder
+from .builders.where_builder import WhereBuilder
+
+# 导出核心生成器
+from .core.generator import DebuggableHQLGenerator, HQLGenerator
+
 # 导出核心Facade
 from .hql_facade import HQLFacade
 
@@ -52,37 +61,28 @@ from .hql_service_cached import HQLServiceCached
 
 # 导出核心模型
 from .models.event import (
+    AggregateFunction,
+    Condition,
     Event,
     Field,
-    Condition,
-    JoinConfig,
-    HQLContext,
     FieldType,
-    AggregateFunction,
-    Operator,
-    LogicalOperator,
+    HQLContext,
+    JoinConfig,
     JoinType,
+    LogicalOperator,
+    Operator,
 )
-
-# 导出核心生成器
-from .core.generator import HQLGenerator, DebuggableHQLGenerator
-
-# 导出构建器
-from .builders.field_builder import FieldBuilder
-from .builders.where_builder import WhereBuilder
-from .builders.join_builder import JoinBuilder
-from .builders.union_builder import UnionBuilder
 
 # 导出验证器
 from .validators.syntax_validator import (
-    SyntaxValidator,
     SyntaxError,
+    SyntaxValidator,
     ValidationResult,
-    validate_hql,
     quick_validate_hql,
+    validate_hql,
 )
 
-# 导出适配器（可选，因为依赖项目业务逻辑）
+# 导出适配器(可选, 因为依赖项目业务逻辑)
 try:
     pass
 
@@ -124,6 +124,6 @@ __all__ = [
     "quick_validate_hql",
 ]
 
-# 如果适配器可用，添加到导出列表
+# 如果适配器可用, 添加到导出列表
 if _project_adapter_available:
     __all__.append("ProjectAdapter")

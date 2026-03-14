@@ -9,17 +9,18 @@ This service provides business logic for event management:
 - Integrates Bloom Filter to prevent cache penetration (2026-02-25)
 """
 
-from typing import List, Optional, Dict, Any
 import logging
-import threading
 import os
-from backend.models.entities import EventEntity
-from backend.models.repositories.events import EventRepository
-from backend.models.repositories.games import GameRepository
-from backend.models.repositories.event_categories import EventCategoryRepository
+import threading
+from typing import Any, Dict, List, Optional
+
+from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 from backend.core.cache.cache_system import cached
 from backend.core.cache.decorators import cache_invalidate  # ⚡ PERF: Phase 1.3
-from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
+from backend.models.entities import EventEntity
+from backend.models.repositories.event_categories import EventCategoryRepository
+from backend.models.repositories.events import EventRepository
+from backend.models.repositories.games import GameRepository
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ class EventService:
 
     def __init__(self) -> None:
         """Initialize the EventService with required repositories and cache."""
-        from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
+        from backend.core.cache.cache_system import CacheInvalidator, HierarchicalCache
 
         self.event_repo = EventRepository()
         self.game_repo = GameRepository()
@@ -41,7 +42,7 @@ class EventService:
         self.cache: HierarchicalCache = HierarchicalCache()
         self.invalidator: CacheInvalidator = CacheInvalidator(self.cache)
 
-        # Bloom Filter延迟初始化（lazy loading）
+        # Bloom Filter延迟初始化(lazy loading)
         self._bloom_filter: Optional[EnhancedBloomFilter] = None
         self._bloom_filter_lock = threading.Lock()
         logger.info("✅ EventService initialized (Bloom Filter lazy)")
@@ -64,11 +65,13 @@ class EventService:
                         capacity=500000,  # 50万容量（事件数量通常比游戏多）
                         error_rate=0.001,  # 0.1%误判率
                         persistence_path="data/events_bloom_filter.pkl",
-                        strict_validation=self._is_test_mode()
+                        strict_validation=self._is_test_mode(),
                     )
                     logger.info("✅ EventService Bloom Filter initialized")
         # Assert non-None for type checker (property always returns non-None after initialization)
-        assert self._bloom_filter is not None, "Bloom Filter should be initialized after property access"
+        assert (
+            self._bloom_filter is not None
+        ), "Bloom Filter should be initialized after property access"
         return self._bloom_filter
 
     def _is_test_mode(self) -> bool:
@@ -78,8 +81,7 @@ class EventService:
             bool: True if in test mode, False otherwise.
         """
         return (
-            os.environ.get("TESTING") == "true" or
-            os.environ.get("PYTEST_CURRENT_TEST") is not None
+            os.environ.get("TESTING") == "true" or os.environ.get("PYTEST_CURRENT_TEST") is not None
         )
 
     @cached("events.list", timeout=120)
@@ -149,15 +151,15 @@ class EventService:
             logger.debug(f"⚡ Bloom Filter: event {event_id} does not exist (fast reject)")
             return None
 
-        # Bloom Filter说可能存在，查询数据库
+        # Bloom Filter说可能存在, 查询数据库
         event = self.event_repo.find_by_id(event_id)
 
-        # 如果存在，添加到Bloom Filter
+        # 如果存在, 添加到Bloom Filter
         if event:
             self.bloom_filter.add(cache_key)
             logger.debug(f"✅ Bloom Filter: event {event_id} exists, added to filter")
         else:
-            # 不存在（Bloom Filter误判），也添加到Filter防止重复查询
+            # 不存在(Bloom Filter误判), 也添加到Filter防止重复查询
             self.bloom_filter.add(cache_key)
             logger.debug(f"⚠️ Bloom Filter: event {event_id} false positive, added to filter")
 
@@ -237,9 +239,7 @@ class EventService:
         return result
 
     @cache_invalidate  # ⚡ PERF: Phase 1.3 - Auto-invalidate dashboard_statistics
-    def update_event(
-        self, event_id: int, updates: Dict[str, Any]
-    ) -> EventEntity:
+    def update_event(self, event_id: int, updates: Dict[str, Any]) -> EventEntity:
         """Update event with automatic cache invalidation.
 
         Args:
@@ -297,14 +297,10 @@ class EventService:
         # 失效事件相关缓存
         self.invalidator.invalidate_pattern("events.list")
         self.invalidator.invalidate_pattern(f"events.detail:{event_id}")
-        logger.info(
-            f"事件删除成功,已失效缓存: event_id={event_id}, game_gid={game_gid}"
-        )
+        logger.info(f"事件删除成功,已失效缓存: event_id={event_id}, game_gid={game_gid}")
 
     @cached("events.search", timeout=120)
-    def search_events(
-        self, keyword: str, game_gid: Optional[int] = None
-    ) -> List[EventEntity]:
+    def search_events(self, keyword: str, game_gid: Optional[int] = None) -> List[EventEntity]:
         """Search events by keyword with caching.
 
         Args:
@@ -339,9 +335,15 @@ class EventService:
         """
         return self.event_repo.get_recent_events(game_gid, limit)
 
-    @cached("events.statistics", timeout=300)
+    @cached("events.statistics", timeout=600)  # ⚡ TTL优化: 300秒→600秒 (10分钟)
     def get_event_statistics(self, event_id: int) -> Optional[Dict[str, Any]]:
-        """Get event statistics with caching.
+        """
+        Get event statistics with caching.
+
+        ⚡ TTL设置理由: 事件统计数据变化较慢
+        - 事件统计（参数数量, 使用频率等）相对稳定
+        - 10分钟TTL减少数据库查询, 提升性能
+        - 缓存失效会在事件/参数变更时自动清理
 
         Args:
             event_id: Event ID.
@@ -408,7 +410,7 @@ class EventService:
         game_gid: Optional[int] = None,
         page: int = 1,
         per_page: int = 20,
-        search: Optional[str] = None
+        search: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         获取分页事件列表（支持搜索和游戏过滤）
@@ -422,12 +424,9 @@ class EventService:
         Returns:
             包含事件列表和分页信息的字典
         """
-        # 使用Repository方法（修复架构违规）
+        # 使用Repository方法(修复架构违规)
         return self.event_repo.get_paginated(
-            game_gid=game_gid,
-            page=page,
-            per_page=per_page,
-            search=search
+            game_gid=game_gid, page=page, per_page=per_page, search=search
         )
 
     @cached("events.detail.with_game", timeout=300)
@@ -440,9 +439,9 @@ class EventService:
             game_gid: 游戏GID
 
         Returns:
-            事件详情字典，不存在返回None
+            事件详情字典, 不存在返回None
         """
-        # 使用Repository方法（修复架构违规）
+        # 使用Repository方法(修复架构违规)
         return self.event_repo.find_detail_with_game(event_id, game_gid)
 
     @cached("event_params.list", timeout=300)
@@ -456,13 +455,11 @@ class EventService:
         Returns:
             参数列表
         """
-        # 使用Repository方法（修复架构违规）
+        # 使用Repository方法(修复架构违规)
         return self.event_repo.get_event_parameters(event_id)
 
     def create_event_with_parameters(
-        self,
-        event_data: EventEntity,
-        parameters: List[Dict[str, Any]]
+        self, event_data: EventEntity, parameters: List[Dict[str, Any]]
     ) -> EventEntity:
         """
         创建事件及其参数
@@ -489,7 +486,7 @@ class EventService:
                 f"Event '{event_data.name}' already exists for game {event_data.game_gid}"
             )
 
-        # 使用Repository方法创建事件和参数（修复架构违规）
+        # 使用Repository方法创建事件和参数(修复架构违规)
         event_dict = event_data.model_dump()
         event_dict['ods_db'] = game.ods_db  # 添加ods_db字段用于生成表名
 
@@ -497,9 +494,7 @@ class EventService:
         game_id: int = game.id if hasattr(game, 'id') and game.id is not None else 0
 
         result: Optional[EventEntity] = self.event_repo.create_with_parameters(
-            event_data=event_dict,
-            game_id=game_id,
-            parameters=parameters
+            event_data=event_dict, game_id=game_id, parameters=parameters
         )
 
         if result is None:
@@ -557,7 +552,7 @@ class EventService:
         event_name: str,
         event_name_cn: str,
         category_id: Optional[int] = None,
-        include_in_common_params: int = 1
+        include_in_common_params: int = 1,
     ) -> Optional[EventEntity]:
         """
         更新事件并失效缓存
@@ -570,7 +565,7 @@ class EventService:
             include_in_common_params: 是否包含在公共参数中
 
         Returns:
-            更新后的EventEntity，不存在返回None
+            更新后的EventEntity, 不存在返回None
 
         Raises:
             ValueError: 事件不存在
@@ -579,12 +574,12 @@ class EventService:
         if not event:
             raise ValueError(f"Event not found: id={event_id}")
 
-        # 使用Repository更新方法（修复架构违规）
+        # 使用Repository更新方法(修复架构违规)
         updates = {
             "event_name": event_name,
             "event_name_cn": event_name_cn,
             "category_id": category_id,
-            "include_in_common_params": include_in_common_params
+            "include_in_common_params": include_in_common_params,
         }
 
         self.event_repo.update(event_id, updates)
@@ -607,7 +602,7 @@ class EventService:
         Returns:
             删除的事件数量
         """
-        # 使用Repository的批量删除方法（修复架构违规）
+        # 使用Repository的批量删除方法(修复架构违规)
         deleted_count = self.event_repo.delete_batch(event_ids)
 
         # 失效缓存
@@ -616,11 +611,7 @@ class EventService:
 
         return deleted_count
 
-    def batch_update_events(
-        self,
-        event_ids: List[int],
-        updates: Dict[str, Any]
-    ) -> int:
+    def batch_update_events(self, event_ids: List[int], updates: Dict[str, Any]) -> int:
         """
         批量更新事件
 
@@ -631,7 +622,7 @@ class EventService:
         Returns:
             更新的事件数量
         """
-        # 使用Repository的批量更新方法（修复架构违规）
+        # 使用Repository的批量更新方法(修复架构违规)
         updated_count = self.event_repo.update_batch(event_ids, updates)
 
         # 失效缓存
@@ -641,11 +632,7 @@ class EventService:
         return updated_count
 
     @cached("events.count", timeout=120)
-    def get_events_count(
-        self,
-        game_gid: Optional[int] = None,
-        search: Optional[str] = None
-    ) -> int:
+    def get_events_count(self, game_gid: Optional[int] = None, search: Optional[str] = None) -> int:
         """
         获取事件数量（带缓存）
 
@@ -656,5 +643,5 @@ class EventService:
         Returns:
             事件数量
         """
-        # 使用Repository方法（修复架构违规）
+        # 使用Repository方法(修复架构违规)
         return self.event_repo.count_by_filters(game_gid, search)

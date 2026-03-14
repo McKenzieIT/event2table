@@ -13,9 +13,10 @@ Join Config Repository (Join配置数据访问层 - 精简架构)
 - 保持GenericRepository继承
 """
 
-from typing import Optional, List
+from typing import List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 from backend.models.entities import JoinConfigEntity
 
 
@@ -37,7 +38,7 @@ class JoinConfigRepository(GenericRepository):
             table_name="join_configs",
             primary_key="id",
             enable_cache=True,
-            cache_timeout=120  # 2分钟缓存
+            cache_timeout=120,  # 2分钟缓存
         )
 
     def find_by_id(self, config_id: int) -> Optional[JoinConfigEntity]:
@@ -56,6 +57,7 @@ class JoinConfigRepository(GenericRepository):
             >>> print(config.name) if config else None
         """
         import json
+
         query = "SELECT * FROM join_configs WHERE id = ?"
         row = fetch_one_as_dict(query, (config_id,))
 
@@ -87,7 +89,9 @@ class JoinConfigRepository(GenericRepository):
 
         return JoinConfigEntity(**row)
 
-    def find_by_game_gid(self, game_gid: int, join_type: Optional[str] = None) -> List[JoinConfigEntity]:
+    def find_by_game_gid(
+        self, game_gid: int, join_type: Optional[str] = None
+    ) -> List[JoinConfigEntity]:
         """
         根据游戏GID查询Join配置列表
 
@@ -105,6 +109,7 @@ class JoinConfigRepository(GenericRepository):
             ...     print(config.name)
         """
         import json
+
         query = "SELECT * FROM join_configs WHERE game_gid = ?"
         params = [game_gid]
 
@@ -116,7 +121,7 @@ class JoinConfigRepository(GenericRepository):
 
         rows = fetch_all_as_dict(query, tuple(params))
 
-        # 处理每一行：字段映射和JSON反序列化
+        # 处理每一行: 字段映射和JSON反序列化
         entities = []
         for row in rows:
             # 映射 join_conditions → join_config
@@ -185,35 +190,40 @@ class JoinConfigRepository(GenericRepository):
         """
         # 序列化JSON字段
         import json
+
         data_to_insert = data.copy()
 
         # 序列化JSON字段为字符串
         if 'source_events' in data_to_insert and isinstance(data_to_insert['source_events'], list):
             data_to_insert['source_events'] = json.dumps(data_to_insert['source_events'])
 
-        # 注意：Entity字段名为 join_config，数据库字段名为 join_conditions（复数）
+        # 注意: Entity字段名为 join_config, 数据库字段名为 join_conditions(复数)
         if 'join_config' in data_to_insert and isinstance(data_to_insert['join_config'], dict):
             data_to_insert['join_conditions'] = json.dumps(data_to_insert.pop('join_config'))
 
         if 'output_fields' in data_to_insert and isinstance(data_to_insert['output_fields'], list):
             data_to_insert['output_fields'] = json.dumps(data_to_insert['output_fields'])
 
-        if 'where_conditions' in data_to_insert and isinstance(data_to_insert['where_conditions'], dict):
+        if 'where_conditions' in data_to_insert and isinstance(
+            data_to_insert['where_conditions'], dict
+        ):
             data_to_insert['where_conditions'] = json.dumps(data_to_insert['where_conditions'])
 
-        if 'field_mappings' in data_to_insert and isinstance(data_to_insert['field_mappings'], dict):
+        if 'field_mappings' in data_to_insert and isinstance(
+            data_to_insert['field_mappings'], dict
+        ):
             data_to_insert['field_mappings'] = json.dumps(data_to_insert['field_mappings'])
 
-        # 调用父类创建方法（返回字典而非ID）
+        # 调用父类创建方法(返回字典而非ID)
         created_dict = super().create(data_to_insert)
 
-        # 由于JoinConfigRepository重写了find_by_id()返回Entity，
+        # 由于JoinConfigRepository重写了find_by_id()返回Entity, 
         # super().create()实际返回的是Entity对象而非字典
         if created_dict is not None:
-            # 如果是Entity对象，直接返回
+            # 如果是Entity对象, 直接返回
             if hasattr(created_dict, 'id'):
                 return created_dict
-            # 如果是字典，通过find_by_id获取Entity
+            # 如果是字典, 通过find_by_id获取Entity
             elif 'id' in created_dict:
                 return self.find_by_id(created_dict['id'])
 
@@ -234,23 +244,28 @@ class JoinConfigRepository(GenericRepository):
         """
         # 序列化JSON字段
         import json
+
         data_to_update = data.copy()
 
         # 序列化JSON字段为字符串
         if 'source_events' in data_to_update and isinstance(data_to_update['source_events'], list):
             data_to_update['source_events'] = json.dumps(data_to_update['source_events'])
 
-        # 注意：Entity字段名为 join_config，数据库字段名为 join_conditions（复数）
+        # 注意: Entity字段名为 join_config, 数据库字段名为 join_conditions(复数)
         if 'join_config' in data_to_update and isinstance(data_to_update['join_config'], dict):
             data_to_update['join_conditions'] = json.dumps(data_to_update.pop('join_config'))
 
         if 'output_fields' in data_to_update and isinstance(data_to_update['output_fields'], list):
             data_to_update['output_fields'] = json.dumps(data_to_update['output_fields'])
 
-        if 'where_conditions' in data_to_update and isinstance(data_to_update['where_conditions'], dict):
+        if 'where_conditions' in data_to_update and isinstance(
+            data_to_update['where_conditions'], dict
+        ):
             data_to_update['where_conditions'] = json.dumps(data_to_update['where_conditions'])
 
-        if 'field_mappings' in data_to_update and isinstance(data_to_update['field_mappings'], dict):
+        if 'field_mappings' in data_to_update and isinstance(
+            data_to_update['field_mappings'], dict
+        ):
             data_to_update['field_mappings'] = json.dumps(data_to_update['field_mappings'])
 
         # 调用父类更新方法
@@ -267,6 +282,7 @@ class JoinConfigRepository(GenericRepository):
             删除的配置数量
         """
         from backend.core.utils.converters import get_db_connection
+
         conn = get_db_connection()
         cursor = conn.cursor()
 

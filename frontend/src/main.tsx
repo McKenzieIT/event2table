@@ -22,22 +22,44 @@ import { queryClient } from "@analytics/components/lib/queryClient";
 
 // ✅ E2E Testing: Add diagnostic logging
 console.log('[main.tsx] 🔵 Starting React app mount...');
+console.log('[main.tsx] 🔵 Document ready state:', document.readyState);
+console.log('[main.tsx] 🔵 Looking for #app-root element...');
 
-const rootElement = document.getElementById("app-root");
-console.log('[main.tsx] 🔵 Root element found:', !!rootElement);
+// Find or create root element with fallback
+let rootElement = document.getElementById("app-root");
 
 if (!rootElement) {
-  console.error('[main.tsx] ❌ Root element not found!');
-  throw new Error('Failed to find the root element with id "app-root"');
+  console.error('[main.tsx] ❌ #app-root not found, creating fallback element');
+  console.log('[main.tsx] 🔵 Creating fallback #app-root element...');
+
+  const fallback = document.createElement('div');
+  fallback.id = 'app-root';
+  document.body.appendChild(fallback);
+
+  rootElement = fallback;
+  console.log('[main.tsx] ✅ Fallback #app-root created and appended to body');
 }
+
+console.log('[main.tsx] ✅ Root element found:', {
+  exists: !!rootElement,
+  tagName: rootElement.tagName,
+  id: rootElement.id,
+  hasChildren: rootElement.children.length > 0
+});
 
 console.log('[main.tsx] 🔵 Creating React root...');
 const root = ReactDOM.createRoot(rootElement);
+console.log('[main.tsx] ✅ React root created successfully');
 
 console.log('[main.tsx] 🔵 Rendering app with providers...');
+console.log('[main.tsx] 🔵 Providers: ErrorBoundary > HashRouter > ApolloProvider > QueryClientProvider > ToastProvider');
+
 root.render(
   <ErrorBoundary>
-    <HashRouter>
+    <HashRouter future={{
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    }}>
       <ApolloProvider client={client}>
         <QueryClientProvider client={queryClient}>
           <ToastProvider>
@@ -50,30 +72,63 @@ root.render(
   </ErrorBoundary>
 );
 
-console.log('[main.tsx] ✅ React app render initiated');
+console.log('[main.tsx] ✅ React app render initiated successfully');
 
-// ✅ E2E Testing: Manually hide initial loader after React mounts
-// This fixes the CSS selector issue where `+` sibling selector doesn't work
+// ✅ E2E Testing: Properly verify React mounting and clean up initial loader
+// Using requestAnimationFrame + setTimeout to ensure React has completed rendering
 requestAnimationFrame(() => {
-  console.log('[main.tsx] 🔵 Hiding initial loader...');
-  const loader = document.getElementById('initial-loader');
-  if (loader) {
-    loader.style.display = 'none';
-    console.log('[main.tsx] ✅ Initial loader hidden successfully');
-  } else {
-    console.warn('[main.tsx] ⚠️ Loader element not found');
-  }
+  // Schedule verification after current paint + React render cycle
+  setTimeout(() => {
+    console.log('[main.tsx] 🔵 Verifying React mount...');
 
-  // Verify React mounted
-  const appRoot = document.getElementById('app-root');
-  const hasChildren = appRoot && appRoot.children.length > 0;
-  console.log('[main.tsx] 🔵 React mount verification:', {
-    hasChildren,
-    childrenCount: appRoot?.children.length || 0,
-    innerHTMLLength: appRoot?.innerHTML?.length || 0
-  });
+    const appRoot = document.getElementById('app-root');
+    const loader = document.getElementById('initial-loader');
 
-  if (!hasChildren) {
-    console.error('[main.tsx] ❌ WARNING: React may not have mounted correctly!');
-  }
+    // Proper verification: Check if root has any children (React renders at least one div)
+    const hasChildren = appRoot && appRoot.children.length > 0;
+
+    // Additional check: root is not empty
+    const hasContent = appRoot && appRoot.innerHTML.trim().length > 0;
+
+    console.log('[main.tsx] 🔵 React mount verification:', {
+      rootExists: !!appRoot,
+      hasChildren,
+      childrenCount: appRoot?.children.length || 0,
+      hasContent,
+      innerHTMLLength: appRoot?.innerHTML.length || 0,
+      readyState: document.readyState
+    });
+
+    if (hasChildren && hasContent) {
+      console.log('[main.tsx] ✅ React mounted successfully!');
+
+      // Only remove loader if React has mounted successfully
+      if (loader) {
+        console.log('[main.tsx] 🔵 Removing initial loader...');
+        loader.remove();
+        console.log('[main.tsx] ✅ Initial loader removed successfully');
+      }
+    } else {
+      // If mounting failed, wait a bit longer and check once more
+      console.warn('[main.tsx] ⚠️ React not yet mounted, scheduling delayed verification...');
+
+      setTimeout(() => {
+        const finalCheck = document.getElementById('app-root');
+        const finalHasChildren = finalCheck && finalCheck.children.length > 0;
+
+        if (finalHasChildren) {
+          console.log('[main.tsx] ✅ React mounted successfully (delayed check)!');
+
+          if (loader) {
+            loader.remove();
+            console.log('[main.tsx] ✅ Initial loader removed successfully');
+          }
+        } else {
+          console.error('[main.tsx] ❌ WARNING: React may not have mounted correctly!');
+          console.error('[main.tsx] ❌ This may indicate a JavaScript error during rendering');
+          console.error('[main.tsx] ❌ Check browser console for React errors');
+        }
+      }, 1000);
+    }
+  }, 0);
 });

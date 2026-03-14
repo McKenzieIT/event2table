@@ -155,10 +155,39 @@ export default function EventNodeBuilder(): React.JSX.Element {
   const [useV2API, setUseV2API] = useState<boolean>(true);
 
   // 保存配置 mutation
+  // ✅ BUGFIX #5: ConfigData → SaveConfigRequest转换
   const saveMutation = useMutation({
-    mutationFn: (configData: ConfigData) => saveConfig(configData),
-    onSuccess: (result: { data: { name_en: string } }) => {
-      success(`配置 "${result.data.name_en}" 保存成功！`);
+    mutationFn: async (configData: ConfigData) => {
+      // 解析filter_conditions JSON字符串
+      let whereConditions: WhereCondition[] = [];
+      try {
+        const filterObj = JSON.parse(configData.filter_conditions);
+        whereConditions = filterObj.conditions || [];
+      } catch (e) {
+        console.warn('Failed to parse filter_conditions:', e);
+      }
+
+      // 转换为后端期望的SaveConfigRequest格式
+      const requestData = {
+        game_gid: configData.game_gid,
+        event_id: configData.event_id,
+        name: configData.name_en,  // ✅ 使用name_en作为name
+        config: {
+          fields: configData.base_fields.map(f => ({
+            field_name: f.field_name,
+            display_name: f.display_name,
+            data_type: 'string',  // TODO: 从field_type映射
+            is_required: false,
+          })),
+          where_conditions: whereConditions,
+          name_cn: configData.name_cn,
+          description: configData.description,
+        },
+      };
+      return saveConfig(requestData as any);
+    },
+    onSuccess: (result: EventConfig) => {
+      success(`配置 "${result.name_en}" 保存成功！`);
     },
     onError: (err: Error) => {
       error('保存失败: ' + (err.message || '未知错误'));
@@ -233,7 +262,7 @@ export default function EventNodeBuilder(): React.JSX.Element {
               paramId: f.param_id,
               type: f.field_type === 'param' ? 'parameter' : f.field_type,
               name: f.field_name,
-              dataType: f.field_type === 'param' ? 'STRING' : 'UNKNOWN',
+              dataType: f.hive_type || 'STRING',
               isEditable: true,
             })));
           }
@@ -278,6 +307,7 @@ export default function EventNodeBuilder(): React.JSX.Element {
       return;
     }
 
+    // ✅ BUGFIX #5: 保留ConfigData格式，在mutationFn中转换
     const configData: ConfigData = {
       game_gid: gameData!.gid,
       event_id: (selectedEvent as Event).id,
@@ -292,7 +322,6 @@ export default function EventNodeBuilder(): React.JSX.Element {
         order: f.order,
         param_id: f.paramId,
       })),
-      // 将 whereConditions 数组转换为后端期望的字典格式
       filter_conditions: JSON.stringify({
         custom_where: whereConditions.length > 0
           ? whereConditions.map(c => `${c.field || ''} ${c.operator || '='} '${c.value || ''}'`).join(' AND ')
@@ -362,20 +391,29 @@ export default function EventNodeBuilder(): React.JSX.Element {
    * Handle batch fields added from FieldSelectionModal or QuickActionButtons
    */
   const handleFieldsAdded = useCallback((fields: Array<{
-    fieldType: string;
-    fieldName: string;
-    displayName: string;
+    fieldType?: string;
+    type?: string;  // GraphQL enum value (PARAM, BASE, etc.)
+    fieldName?: string;
+    name?: string;  // GraphQL field name
+    displayName?: string;
     paramId?: number | null;
+    jsonPath?: string | null;  // ← FIX: Include jsonPath from GraphQL response
   }>) => {
     if (!Array.isArray(fields)) return;
 
     // Add all fields to canvas
     fields.forEach((field) => {
+      // Handle both GraphQL response format (type, name) and internal format (fieldType, fieldName)
+      const fieldType = field.fieldType || field.type || 'param';
+      const fieldName = field.fieldName || field.name || '';
+      const displayName = field.displayName || fieldName;
+
       addFieldToCanvas(
-        field.fieldType,
-        field.fieldName,
-        field.displayName,
-        field.paramId
+        fieldType,
+        fieldName,
+        displayName,
+        field.paramId,
+        field.jsonPath  // ← FIX: Pass jsonPath to addFieldToCanvas
       );
     });
 
@@ -456,11 +494,13 @@ export default function EventNodeBuilder(): React.JSX.Element {
             onAddField={(field: DragDropField) => {
               // Handle drag-drop from canvas
               if (field.fieldType) {
-                addFieldToCanvas(field.fieldType, field.fieldName!, field.displayName!, field.paramId);
+                // FieldSelectorPanel passes dataType, but drag-drop uses hive_type
+                const hiveType = (field as any).dataType || field.hive_type;
+                addFieldToCanvas(field.fieldType, field.fieldName!, field.displayName!, field.paramId, undefined, hiveType);
               } else if (field.type) {
                 // Handle from @dnd-kit system
                 const fieldType = field.type === 'parameter' ? 'param' : field.type;
-                addFieldToCanvas(fieldType, field.name!, field.alias || field.name!, field.sourceId);
+                addFieldToCanvas(fieldType, field.name!, field.alias || field.name!, field.sourceId, field.hive_type);
               }
             }}
           />

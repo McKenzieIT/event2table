@@ -5,10 +5,11 @@ Database helper functions for common operations
 """
 
 import sqlite3
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 from backend.core.logging import get_logger
+
 from ._constants import PRAGMA_SETTINGS
 
 logger = get_logger(__name__)
@@ -51,18 +52,11 @@ def _table_exists(conn: sqlite3.Connection, table_name: str) -> bool:
         True if table exists, False otherwise
     """
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-        (table_name,)
-    )
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
     return cursor.fetchone() is not None
 
 
-def _create_table_if_not_exists(
-    conn: sqlite3.Connection,
-    table_name: str,
-    table_sql: str
-) -> bool:
+def _create_table_if_not_exists(conn: sqlite3.Connection, table_name: str, table_sql: str) -> bool:
     """
     Create a table if it doesn't exist
 
@@ -85,10 +79,7 @@ def _create_table_if_not_exists(
     return True
 
 
-def _create_index_if_not_exists(
-    conn: sqlite3.Connection,
-    index_sql: str
-) -> None:
+def _create_index_if_not_exists(conn: sqlite3.Connection, index_sql: str) -> None:
     """
     Create an index if it doesn't exist
 
@@ -115,6 +106,11 @@ def _get_table_count(conn: sqlite3.Connection, table_name: str) -> int:
     Returns:
         Number of rows in the table
     """
+    from backend.core.security.sql_validator import SQLValidator
+
+    # Validate table name to prevent SQL injection
+    SQLValidator.validate_table_name(table_name)
+
     try:
         cursor = conn.cursor()
         cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
@@ -125,9 +121,7 @@ def _get_table_count(conn: sqlite3.Connection, table_name: str) -> int:
 
 
 def _validate_table_structure(
-    conn: sqlite3.Connection,
-    table_name: str,
-    required_columns: list
+    conn: sqlite3.Connection, table_name: str, required_columns: list
 ) -> bool:
     """
     Validate that a table has all required columns
@@ -140,15 +134,18 @@ def _validate_table_structure(
     Returns:
         True if all columns exist, False otherwise
     """
+    from backend.core.security.sql_validator import SQLValidator
+
+    # Validate table name to prevent SQL injection
+    SQLValidator.validate_table_name(table_name)
+
     cursor = conn.cursor()
     cursor.execute(f"PRAGMA table_info({table_name})")
     existing_columns = {row[1] for row in cursor.fetchall()}
 
     missing_columns = set(required_columns) - existing_columns
     if missing_columns:
-        logger.warning(
-            f"Table {table_name} missing columns: {missing_columns}"
-        )
+        logger.warning(f"Table {table_name} missing columns: {missing_columns}")
         return False
 
     return True

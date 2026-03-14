@@ -8,6 +8,12 @@
 
 ## P0 核心经验 ⚠️ **必须掌握**
 
+### 综合性能优化 (2026-03-09新增)
+- [DataLoader批量查询优化](./2026-03-07-comprehensive-optimization-experience.md#经验-1-dataloader-批量查询优化-⭐⭐⭐) - N+1查询解决方案，查询数减少70-99% ⭐
+- [Dashboard实时优化](./2026-03-07-comprehensive-optimization-experience.md#经验-2-dashboard-实时优化---缓存失效装饰器-⭐⭐⭐) - 缓存失效装饰器，更新延迟从300s降至10s ⭐
+- [React组件优化](./2026-03-07-comprehensive-optimization-experience.md#经验-3-react-组件优化---usecallbackusememoreactmemo-⭐⭐) - 17个组件优化案例，重渲染减少50-70% ⭐
+- [N+1查询修复](./2026-03-07-comprehensive-optimization-experience.md#经验-4-n1-查询修复---join-vs-循环查询-⭐⭐⭐) - JOIN优化，API响应提升2326x ⭐
+
 ### React最佳实践
 - [React Hooks规则](./react-best-practices.md#react-hooks-规则) - 避免Hooks顺序错误
 - [Lazy Loading最佳实践](./react-best-practices.md#lazy-loading最佳实践) - 避免加载超时
@@ -15,8 +21,21 @@
 - [React 18+ defaultProps已废弃](./react-best-practices.md#react-18-defaultprops-已废弃) - 使用ES6默认参数 (2026-03-08新增)
 
 ### GraphQL类型安全
-- [Event Node Builder错误修复](./event-node-builder-errors.md) - GraphQL枚举不匹配案例 (2026-03-08新增) ⭐
+- [Event Node Builder错误修复](./event-node-builder-errors.md) - GraphQL枚举不匹配案例 ⭐
+- [GraphQL字段完整性](./graphql-field-completeness.md) - hive_type字段4层修复策略 ⭐ (2026-03-13新增)
 - [GraphQL类型同步](../../CLAUDE.md#graphql类型同步规范-⚠️-极其重要---2026-03-08新增) - 前后端类型一致性 (2026-03-08新增)
+
+### TypeScript迁移 (2026-03-11新增) ⭐
+- [TypeScript迁移经验](./typescript-migration.md) - Apollo Client 3.x兼容性、类型重复定义解决方案、Template Literal语法错误修复 ⭐⭐⭐
+
+### Security Integration测试 (2026-03-11新增) ⭐
+- [Security Integration Testing](./security-integration-testing.md) - SQL注入防护、XSS攻击检测、白名单验证策略、测试通过率从20%提升到85% ⭐⭐⭐
+
+### Mutation业务逻辑 (2026-03-11新增) ⭐
+- [Mutation Business Logic](./mutation-business-logic.md) - 5层验证架构、完整实现原则、安全加固、缓存失效策略 ⭐⭐⭐
+
+### 测试修复迭代 (2026-03-11新增) ⭐
+- [Test-Fix Iteration](./test-fix-iteration.md) - 4轮迭代模式、TDD + 并行执行策略、自动化验证流程、从20%提升到100% ⭐⭐⭐
 
 ### 测试指南
 - [E2E测试方法论](./testing-guide.md#e2e测试) - Chrome DevTools MCP测试流程
@@ -33,6 +52,9 @@
 - [缓存策略](./performance-patterns.md#缓存策略) - Redis缓存TTL 5-10分钟
 - [N+1查询优化](./performance-patterns.md#n1查询优化) - 使用JOIN、合并统计查询
 - [分页支持](./performance-patterns.md#分页支持) - LIMIT/OFFSET分页
+- [DataLoader批量查询优化](./2026-03-07-comprehensive-optimization-experience.md#经验-1-dataloader-批量查询优化-⭐⭐⭐) - GraphQL DataLoader批量加载 (2026-03-09新增)
+- [TTL分层设置策略](./2026-03-07-comprehensive-optimization-experience.md#经验-5-缓存策略---ttl-分层设置-⭐⭐) - 双层缓存架构，命中率85%+ (2026-03-09新增)
+- [Dashboard实时优化](./2026-03-07-comprehensive-optimization-experience.md#经验-2-dashboard-实时优化---缓存失效装饰器-⭐⭐⭐) - 智能轮询，API调用减少83% (2026-03-09新增)
 
 ### 数据库模式
 - [game_gid迁移经验](./database-patterns.md#game_gid迁移经验) - game_gid vs game_id区别、表名生成规范
@@ -49,6 +71,7 @@
 
 ### React最佳实践
 - [React性能优化](./react-best-practices.md#性能优化技巧) - React.memo、useCallback
+- [React组件优化模式](./2026-03-07-comprehensive-optimization-experience.md#经验-3-react-组件优化---usecallbackusememoreactmemo-⭐⭐) - 17个组件优化案例，4种优化模式 (2026-03-09新增)
 - [React子组件定义顺序](./react-best-practices.md#react子组件定义顺序) - 组件定义顺序
 - [useEffect依赖数组最佳实践](./react-best-practices.md#useeffect依赖数组最佳实践) - 避免useCallback+useEffect组合
 - [组件导出规范](./react-best-practices.md#组件导出规范) - 导出原始组件名和别名
@@ -112,13 +135,18 @@
 
 | 场景 | 经验文档 | 章节 |
 |-----|---------|-----|
+| ⚡ DataLoader批量查询 | [综合性能优化](./2026-03-07-comprehensive-optimization-experience.md) | DataLoader批量查询优化 (2026-03-09新增) |
+| 💾 Dashboard缓存失效 | [综合性能优化](./2026-03-07-comprehensive-optimization-experience.md) | Dashboard实时优化 (2026-03-09新增) |
+| 🔄 React组件优化 | [综合性能优化](./2026-03-07-comprehensive-optimization-experience.md) | React组件优化模式 (2026-03-09新增) |
+| ⚡ N+1查询修复 | [综合性能优化](./2026-03-07-comprehensive-optimization-experience.md) | N+1查询修复 (2026-03-09新增) |
 | 🚨 React应用挂载 | [测试指南](./testing-guide.md) | React挂载问题诊断 |
 | 🔍 Chrome DevTools调试 | [测试指南](./testing-guide.md) | Chrome MCP调试法 |
 | 📝 mypy类型错误 | [Python开发](./python-development.md) | mypy --strict合规 |
 | ⚡ Vite-Apollo兼容性 | [React最佳实践](./react-best-practices.md) | Vite兼容性 |
 | 🔴 GraphQL 400错误 | [Event Node Builder错误](./event-node-builder-errors.md) | 枚举不匹配案例 (2026-03-08新增) |
+| 🔒 GraphQL字段完整性 | [GraphQL字段完整性](./graphql-field-completeness.md) | hive_type字段4层修复 (2026-03-13新增) |
 | 💾 缓存失效分析 | [性能模式](./performance-patterns.md) | 缓存失效分析 |
-| 🚀 并行优化策略 | [性能模式](./performance-patterns.md) | 并行优化 |
+| 🚀 并行优化策略 | [综合性能优化](./2026-03-07-comprehensive-optimization-experience.md) | 并行执行策略 (2026-03-09新增) |
 | 🚨 React Hooks错误 | [React最佳实践](./react-best-practices.md) | Hooks规则 |
 | ⚠️ React defaultProps警告 | [React最佳实践](./react-best-practices.md) | React 18+ defaultProps已废弃 (2026-03-08新增) |
 | 🐌 页面加载超时 | [React最佳实践](./react-best-practices.md) | Lazy Loading |
@@ -130,10 +158,21 @@
 | 🐛 Bug调试方法 | [调试技能](./debugging-skills.md) | Chrome DevTools MCP |
 | 🚀 生产部署 | [部署与运维](./deployment-operations.md) | 部署流程规范 |
 | 📋 项目管理 | [项目管理](./project-management.md) | 需求管理流程 |
+| 🔧 TypeScript迁移 | [TypeScript迁移](./typescript-migration.md) | Apollo Client 3.x兼容性 (2026-03-11新增) |
+| 🔒 Security Integration | [Security Integration Testing](./security-integration-testing.md) | SQL注入防护、XSS检测 (2026-03-11新增) |
+| 🎯 Mutation业务逻辑 | [Mutation Business Logic](./mutation-business-logic.md) | 5层验证架构 (2026-03-11新增) |
+| 🔄 测试修复迭代 | [Test-Fix Iteration](./test-fix-iteration.md) | TDD方法论 (2026-03-11新增) |
 
 ---
 
 ## 经验贡献
+
+**最新贡献 (2026-03-13)**：
+- ✅ **GraphQL字段完整性经验** - hive_type字段4层修复策略、GraphQL Schema → DataLoader → TypeScript → UI组件完整性检查、避免字段遗漏（基于EventParameter字段丢失修复）
+- ✅ **TypeScript迁移经验** - Apollo Client 3.x兼容性处理、类型重复定义解决方案、Template Literal语法错误修复（基于61个TypeScript错误修复）
+- ✅ **Security Integration Testing** - SQL注入防护验证、XSS攻击检测、白名单验证策略、测试通过率从20%提升到85%（基于4轮测试修复迭代）
+- ✅ **Mutation Business Logic** - 5层验证架构、完整实现原则、安全加固、缓存失效策略（基于3个Event Mutations业务逻辑实现）
+- ✅ **Test-Fix Iteration Methodology** - 4轮迭代模式、TDD + 并行执行策略、自动化验证流程、从20%提升到100%测试通过率（基于4轮测试修复迭代）
 
 **如何贡献经验**：
 1. 修复问题后，提取经验点

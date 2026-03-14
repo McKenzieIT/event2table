@@ -4,12 +4,13 @@ HQL服务缓存增强版
 为HQLService添加多级缓存支持,提升性能
 """
 
-from typing import List, Dict, Any, Optional, Union
-import json
 import hashlib
-from backend.services.hql.hql_facade import HQLFacade
-from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
+import json
 import logging
+from typing import Any, Dict, List, Optional, Union
+
+from backend.core.cache.cache_system import CacheInvalidator, HierarchicalCache
+from backend.services.hql.hql_facade import HQLFacade
 
 logger = logging.getLogger(__name__)
 
@@ -17,43 +18,43 @@ logger = logging.getLogger(__name__)
 class HQLServiceCached:
     """
     HQL服务缓存增强版
-    
+
     特点:
     - 使用多级缓存存储HQL生成结果
     - 自动缓存失效
     - 支持模板缓存
     - 支持历史记录缓存
     """
-    
+
     def __init__(self):
         self.facade = HQLFacade()
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
-    
+
     def generate_hql(
         self,
         events: List[Dict[str, Any]],
         fields: List[Dict[str, Any]],
         conditions: List[Dict[str, Any]],
         mode: str = "single",
-        use_cache: bool = True
+        use_cache: bool = True,
     ) -> str:
         """
         生成HQL(带缓存)
-        
+
         Args:
             events: 事件列表
             fields: 字段列表
             conditions: 条件列表
             mode: 生成模式
             use_cache: 是否使用缓存
-            
+
         Returns:
             str: 生成的HQL语句
         """
         # 构建缓存键
         cache_key = self._build_cache_key(events, fields, conditions, mode)
-        
+
         if use_cache:
             # 尝试从缓存获取
             cached_hql = self.cache.get(cache_key)
@@ -62,17 +63,17 @@ class HQLServiceCached:
                 if not isinstance(cached_hql, str):
                     raise TypeError(f"Cached HQL must be a string, got {type(cached_hql)}")
                 return cached_hql
-        
+
         # 生成HQL
         hql = self.facade.generate_hql(events, fields, conditions, mode)
-        
+
         if use_cache:
             # 写入缓存
             self.cache.set(cache_key, hql, ttl_l2=3600)  # 1小时缓存
             logger.debug(f"HQL已缓存: {cache_key}")
-        
+
         return hql
-    
+
     def validate_hql(self, hql: str, use_cache: bool = True) -> Dict[str, Any]:
         """
         验证HQL(带缓存)
@@ -105,14 +106,14 @@ class HQLServiceCached:
             logger.debug(f"验证结果已缓存: {cache_key}")
 
         return result
-    
+
     def preview_hql(
         self,
         events: List[Dict[str, Any]],
         fields: List[Dict[str, Any]],
         conditions: List[Dict[str, Any]],
         mode: str = "single",
-        use_cache: bool = True
+        use_cache: bool = True,
     ) -> Dict[str, Any]:
         """
         预览HQL(带缓存)
@@ -148,21 +149,21 @@ class HQLServiceCached:
             logger.debug(f"预览结果已缓存: {cache_key}")
 
         return result
-    
+
     def analyze_performance(self, hql: str, use_cache: bool = True) -> Dict[str, Any]:
         """
         分析HQL性能(带缓存)
-        
+
         Args:
             hql: HQL语句
             use_cache: 是否使用缓存
-            
+
         Returns:
             PerformanceReport: 性能报告
         """
         # 构建缓存键
         cache_key = f"hql:performance:{hashlib.md5(hql.encode()).hexdigest()}"
-        
+
         if use_cache:
             # 尝试从缓存获取
             cached_result = self.cache.get(cache_key)
@@ -171,7 +172,7 @@ class HQLServiceCached:
                 if not isinstance(cached_result, dict):
                     raise TypeError(f"Cached result must be a dict, got {type(cached_result)}")
                 return cached_result
-        
+
         # 分析性能
         result = self.facade.analyze_performance(hql)
 
@@ -184,7 +185,7 @@ class HQLServiceCached:
                     {
                         'type': issue.type.value,
                         'message': issue.message,
-                        'suggestion': issue.suggestion
+                        'suggestion': issue.suggestion,
                     }
                     for issue in result.issues
                 ],
@@ -192,39 +193,33 @@ class HQLServiceCached:
                     'has_partition_filter': result.metrics.has_partition_filter,
                     'has_select_star': result.metrics.has_select_star,
                     'join_count': result.metrics.join_count,
-                    'complexity': result.metrics.complexity
-                }
+                    'complexity': result.metrics.complexity,
+                },
             }
             self.cache.set(cache_key, result_dict, ttl_l2=1800)
             logger.debug(f"性能分析已缓存: {cache_key}")
 
-        # 返回字典格式的结果（与缓存格式一致）
+        # 返回字典格式的结果(与缓存格式一致)
         return {
             'score': result.score,
             'issues': [
-                {
-                    'type': issue.type.value,
-                    'message': issue.message,
-                    'suggestion': issue.suggestion
-                }
+                {'type': issue.type.value, 'message': issue.message, 'suggestion': issue.suggestion}
                 for issue in result.issues
             ],
             'metrics': {
                 'has_partition_filter': result.metrics.has_partition_filter,
                 'has_select_star': result.metrics.has_select_star,
                 'join_count': result.metrics.join_count,
-                'complexity': result.metrics.complexity
-            }
+                'complexity': result.metrics.complexity,
+            },
         }
-    
+
     def invalidate_cache(
-        self,
-        event_ids: Optional[List[int]] = None,
-        game_gid: Optional[int] = None
+        self, event_ids: Optional[List[int]] = None, game_gid: Optional[int] = None
     ) -> None:
         """
         失效HQL相关缓存
-        
+
         Args:
             event_ids: 事件ID列表
             game_gid: 游戏GID
@@ -239,25 +234,25 @@ class HQLServiceCached:
             for event_id in event_ids:
                 self.invalidator.invalidate_pattern("hql:*", event_id=event_id)
             logger.info(f"已失效事件 {event_ids} 的HQL缓存")
-    
+
     def _build_cache_key(
         self,
         events: List[Dict[str, Any]],
         fields: List[Dict[str, Any]],
         conditions: List[Dict[str, Any]],
         mode: str,
-        prefix: str = "generate"
+        prefix: str = "generate",
     ) -> str:
         """
         构建缓存键
-        
+
         Args:
             events: 事件列表
             fields: 字段列表
             conditions: 条件列表
             mode: 生成模式
             prefix: 缓存键前缀
-            
+
         Returns:
             str: 缓存键
         """
@@ -266,18 +261,18 @@ class HQLServiceCached:
             'events': sorted(events, key=lambda x: x.get('name', '')),
             'fields': sorted(fields, key=lambda x: x.get('name', '')),
             'conditions': sorted(conditions, key=lambda x: x.get('field', '')),
-            'mode': mode
+            'mode': mode,
         }
-        
+
         params_json = json.dumps(params, sort_keys=True)
         params_hash = hashlib.md5(params_json.encode()).hexdigest()[:12]
-        
+
         return f"hql:{prefix}:{mode}:{params_hash}"
-    
+
     def get_cache_stats(self) -> Dict[str, Any]:
         """
         获取缓存统计信息
-        
+
         Returns:
             Dict: 缓存统计
         """

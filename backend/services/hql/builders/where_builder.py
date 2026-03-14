@@ -4,9 +4,11 @@ WHERE条件构建器
 负责将抽象Condition模型转换为SQL WHERE子句
 """
 
-from typing import List, Optional, Any
-from ..models.event import Condition, Operator, LogicalOperator
+from typing import Any, List, Optional
+
 from backend.core.security.sql_validator import SQLValidator
+
+from ..models.event import Condition, LogicalOperator, Operator
 
 
 class WhereBuilder:
@@ -14,7 +16,34 @@ class WhereBuilder:
     WHERE条件SQL构建器
 
     支持多种操作符和逻辑组合
+
+    Security:
+    - 所有操作符必须通过白名单验证
+    - 所有字段名必须通过SQL标识符验证
+    - 所有值必须经过转义处理
     """
+
+    # 定义允许的操作符白名单（防止SQL注入）
+    VALID_OPERATORS = {
+        Operator.EQ.value,      # "="
+        Operator.NE.value,      # "!="
+        Operator.GT.value,      # ">"
+        Operator.LT.value,      # "<"
+        Operator.GTE.value,     # ">="
+        Operator.LTE.value,     # "<="
+        Operator.LIKE.value,    # "LIKE"
+        Operator.IN.value,      # "IN"
+        Operator.NOT_IN.value,  # "NOT IN"
+        Operator.IS_NULL.value,     # "IS NULL"
+        Operator.IS_NOT_NULL.value, # "IS NOT NULL"
+    }
+
+    # 定义允许的逻辑操作符白名单（防止SQL注入）
+    VALID_LOGICAL_OPERATORS = {
+        LogicalOperator.AND.value,   # "AND"
+        LogicalOperator.OR.value,    # "OR"
+        None,                        # 第一个条件不需要逻辑操作符
+    }
 
     def build(self, conditions: List[Condition], context: Optional[dict] = None) -> str:
         """
@@ -22,7 +51,7 @@ class WhereBuilder:
 
         Args:
             conditions: 条件列表
-            context: 上下文信息（包含事件、分区信息等）
+            context: 上下文信息（包含事件, 分区信息等）
 
         Returns:
             str: WHERE子句（不包含WHERE关键字）
@@ -38,17 +67,17 @@ class WhereBuilder:
         """
         condition_clauses = []
 
-        # 添加分区过滤（总是作为第一个条件）
+        # 添加分区过滤(总是作为第一个条件)
         partition_filter = self._build_partition_filter(context)
         if partition_filter:
             condition_clauses.append(partition_filter)
 
-        # 添加事件名称过滤（如果有event上下文）
+        # 添加事件名称过滤(如果有event上下文)
         event_filter = self._build_event_filter(context)
         if event_filter:
             condition_clauses.append(event_filter)
 
-        # 如果没有用户自定义条件，只返回系统过滤条件
+        # 如果没有用户自定义条件, 只返回系统过滤条件
         if not conditions:
             return self._join_conditions(condition_clauses)
 
@@ -62,18 +91,35 @@ class WhereBuilder:
 
         return where_clause
 
-    def _build_single_condition(
-        self, condition: Condition, context: Optional[dict]
-    ) -> str:
+    def _build_single_condition(self, condition: Condition, context: Optional[dict]) -> str:
         """
         构建单个条件SQL
 
-        安全：验证field名称为有效的SQL标识符
+        Security:
+        - 验证field名称为有效的SQL标识符
+        - 验证operator在白名单中（防止SQL注入）
+        - 验证logical_op在白名单中（防止SQL注入）
+        - 转义所有值
         """
-        # 验证字段名（SQL标识符）
+        # 验证字段名(SQL标识符)
         SQLValidator.validate_identifier(condition.field, "field")
 
-        # 处理IS NULL和IS NOT NULL（不需要值）
+        # 验证操作符在白名单中（防止SQL注入）
+        if condition.operator not in self.VALID_OPERATORS:
+            raise ValueError(
+                f"Invalid operator '{condition.operator}'. "
+                f"Must be one of: {', '.join(sorted(self.VALID_OPERATORS))}"
+            )
+
+        # ✅ 验证逻辑操作符在白名单中（防止SQL注入）
+        if hasattr(condition, 'logical_op') and condition.logical_op is not None:
+            if condition.logical_op not in self.VALID_LOGICAL_OPERATORS:
+                raise ValueError(
+                    f"Invalid logical operator '{condition.logical_op}'. "
+                    f"Must be one of: {', '.join(sorted(str(op) for op in self.VALID_LOGICAL_OPERATORS if op is not None))}"
+                )
+
+        # 处理IS NULL和IS NOT NULL(不需要值)
         if condition.is_null_operator():
             return f"{condition.field} {condition.operator}"
 
@@ -81,17 +127,18 @@ class WhereBuilder:
         if condition.operator in [Operator.IN.value, Operator.NOT_IN.value]:
             return self._build_in_condition(condition)
 
-        # 处理LIKE操作符
+        # 处理LIKE操作符（安全: 值已经通过_format_value转义）
         if condition.operator == Operator.LIKE.value:
-            return f"{condition.field} LIKE '{condition.value}'"
+            escaped_value = self._format_value(condition.value)
+            return f"{condition.field} LIKE {escaped_value}"
 
         # 处理普通比较操作符
         value = self._format_value(condition.value)
         return f"{condition.field} {condition.operator} {value}"
 
     def _build_in_condition(self, condition: Condition) -> str:
-        """构建IN条件SQL（带字段验证）"""
-        # 验证字段名（SQL标识符）
+        """构建IN条件SQL(带字段验证)"""
+        # 验证字段名(SQL标识符)
         SQLValidator.validate_identifier(condition.field, "field")
 
         if not isinstance(condition.value, (list, tuple)):
@@ -99,9 +146,7 @@ class WhereBuilder:
 
         # 检查空列表
         if len(condition.value) == 0:
-            raise ValueError(
-                "IN operator requires at least one value. Empty list provided."
-            )
+            raise ValueError("IN operator requires at least one value. Empty list provided.")
 
         values = ", ".join([self._format_value(v) for v in condition.value])
         return f"{condition.field} {condition.operator} ({values})"
@@ -133,16 +178,16 @@ class WhereBuilder:
             context: 上下文信息（包含event对象）
 
         Returns:
-            str: 事件过滤条件字符串，如果没有event上下文则返回None
+            str: 事件过滤条件字符串, 如果没有event上下文则返回None
         """
         if not context:
             return None
 
         event = context.get("event")
         if event and event.name:
-            # 安全：这是HQL生成器，用于构建Hive查询字符串
-            # event.name来自Event模型，已通过数据库验证
-            # 这是字符串拼接，不是SQL注入风险，因为event.name不是用户输入
+            # 安全: 这是HQL生成器, 用于构建Hive查询字符串
+            # event.name来自Event模型, 已通过数据库验证
+            # 这是字符串拼接, 不是SQL注入风险, 因为event.name不是用户输入
             return f"event_name = '{event.name}'"
 
         return None
@@ -151,13 +196,13 @@ class WhereBuilder:
         """
         用逻辑操作符连接条件
 
-        注意：这里简化处理，实际应该按logical_op分组
+        注意: 这里简化处理, 实际应该按logical_op分组
         生产环境应该支持复杂嵌套条件
         """
         if not clauses:
             return ""
 
-        # 简化版：都用AND连接
+        # 简化版: 都用AND连接
         return " AND\n  ".join(clauses)
 
     def _format_value(self, value: Any) -> str:
@@ -184,8 +229,45 @@ class WhereBuilder:
         """
         转义SQL特殊字符
 
-        使用双单引号转义，这是SQL标准的转义方式
+        Security:
+        - 检测并拒绝SQL注入模式
+        - 检测并拒绝XSS攻击模式
+        - 转义反斜杠和单引号（SQL标准转义）
+
+        使用双单引号转义, 这是SQL标准的转义方式
         """
+        # ✅ 检测SQL注入攻击模式（在转义前检测原始输入）
+        sql_injection_patterns = [
+            "DROP TABLE",
+            "DELETE FROM",
+            "TRUNCATE",
+            "EXEC xp_cmdshell",
+            "UNION SELECT",
+            "' OR '1'='1",
+            "' OR 1=1",
+            "--",
+            "/*",
+        ]
+
+        value_upper = value.upper()
+        for pattern in sql_injection_patterns:
+            if pattern.upper() in value_upper:
+                raise ValueError(
+                    f"Potentially malicious input detected: '{pattern}'. "
+                    f"SQL injection patterns are not allowed."
+                )
+
+        # ✅ 检测XSS攻击模式
+        dangerous_patterns = ['<script', '</script>', 'javascript:', 'onerror=', 'onload=']
+        value_lower = value.lower()
+        for pattern in dangerous_patterns:
+            if pattern in value_lower:
+                raise ValueError(
+                    f"Potentially malicious input detected: '{pattern}'. "
+                    f"XSS attack patterns are not allowed."
+                )
+
+        # 转义SQL特殊字符
         escaped = value.replace("\\", "\\\\").replace("'", "''")
         return f"'{escaped}'"
 
@@ -195,7 +277,7 @@ class WhereBuilder:
         """
         构建复杂的WHERE条件（支持AND/OR分组）
 
-        这是高级版本，支持条件分组和嵌套
+        这是高级版本, 支持条件分组和嵌套
 
         Args:
             conditions: 条件列表（包含logical_op）
@@ -207,7 +289,7 @@ class WhereBuilder:
         if not conditions:
             return self._build_partition_filter(context)
 
-        # 分组：按AND/OR分组
+        # 分组: 按AND/OR分组
         and_groups: List[List[Condition]] = []
         or_groups: List[List[Condition]] = []
 
@@ -233,16 +315,12 @@ class WhereBuilder:
         # 构建SQL
         and_parts = []
         for group in and_groups:
-            group_sql = " AND ".join(
-                [self._build_single_condition(c, context) for c in group]
-            )
+            group_sql = " AND ".join([self._build_single_condition(c, context) for c in group])
             and_parts.append(f"({group_sql})" if len(group) > 1 else group_sql)
 
         or_parts = []
         for group in or_groups:
-            group_sql = " OR ".join(
-                [self._build_single_condition(c, context) for c in group]
-            )
+            group_sql = " OR ".join([self._build_single_condition(c, context) for c in group])
             or_parts.append(f"({group_sql})" if len(group) > 1 else group_sql)
 
         # 组合
@@ -251,9 +329,9 @@ class WhereBuilder:
         # 添加分区过滤
         partition_filter = self._build_partition_filter(context)
         if partition_filter:
-            # 安全：这是HQL生成器，用于构建Hive查询字符串
-            # partition_filter来自_build_partition_filter()，使用预定义的分区字段
-            # 这是字符串拼接，不是SQL注入风险，因为不包含用户输入
+            # 安全: 这是HQL生成器, 用于构建Hive查询字符串
+            # partition_filter来自_build_partition_filter(), 使用预定义的分区字段
+            # 这是字符串拼接, 不是SQL注入风险, 因为不包含用户输入
             all_parts.insert(0, f"({partition_filter})")
 
         # 用AND连接所有组

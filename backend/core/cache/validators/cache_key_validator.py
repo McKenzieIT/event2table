@@ -10,15 +10,15 @@
 日期: 2026-02-24
 
 功能:
-- 白名单验证：只允许安全的字符模式
-- 长度限制：防止键过长导致Redis内存问题
-- 清理功能：自动移除危险字符
+- 白名单验证: 只允许安全的字符模式
+- 长度限制: 防止键过长导致Redis内存问题
+- 清理功能: 自动移除危险字符
 - 17个预定义白名单模式
 
 安全威胁:
-- Redis命令注入：恶意用户通过缓存键注入Redis命令
-- 缓存投毒：恶意用户操纵缓存键覆盖其他用户的缓存
-- 拒绝服务：超长键导致Redis内存耗尽
+- Redis命令注入: 恶意用户通过缓存键注入Redis命令
+- 缓存投毒: 恶意用户操纵缓存键覆盖其他用户的缓存
+- 拒绝服务: 超长键导致Redis内存耗尽
 
 CVSS评分: 8.5 (High)
 攻击向量: Network
@@ -28,10 +28,10 @@ CVSS评分: 8.5 (High)
 影响范围: High
 """
 
-import re
 import logging
-from typing import Set, Pattern
+import re
 from contextlib import contextmanager
+from typing import Pattern, Set
 
 logger = logging.getLogger(__name__)
 
@@ -41,10 +41,10 @@ class CacheKeyValidator:
     缓存键验证器 - 防止缓存键注入攻击
 
     安全特性:
-    1. 白名单验证：只允许符合预定义模式的键
-    2. 长度限制：最大256字符
-    3. 字符过滤：移除危险字符（\n\r\t等）
-    4. 模式匹配：17个预定义安全模式
+    1. 白名单验证: 只允许符合预定义模式的键
+    2. 长度限制: 最大256字符
+    3. 字符过滤: 移除危险字符（\n\r\t等）
+    4. 模式匹配: 17个预定义安全模式
 
     Example:
         >>> validator = CacheKeyValidator()
@@ -66,65 +66,50 @@ class CacheKeyValidator:
 
     # 白名单模式 - 只允许符合这些模式的键
     ALLOWED_PATTERNS: Set[Pattern] = {
-        # 1. 前缀模式：dwd_gen:v3: 开头 + 小写字母、数字、下划线、点、冒号
+        # 1. 前缀模式: dwd_gen:v3: 开头 + 小写字母, 数字, 下划线, 点, 冒号
         re.compile(r'^dwd_gen:v3:[a-z0-9_.:]+$'),
-
         # 2. 游戏键模式
         re.compile(r'^dwd_gen:v3:games\.(list|detail)(:[a-z_]+:\d+)*$'),
-
         # 3. 事件键模式
         re.compile(r'^dwd_gen:v3:events\.(list|detail)(:[a-z_]+:\d+)*$'),
-
         # 4. 参数键模式
         re.compile(r'^dwd_gen:v3:(params|parameters)\.(list|detail)(:[a-z_]+:\d+)*$'),
-
         # 5. 分类键模式
         re.compile(r'^dwd_gen:v3:categories\.(list|detail)(:[a-z_]+:\d+)*$'),
-
         # 6. HQL键模式
         re.compile(r'^dwd_gen:v3:hql\.(history|preview|result)(:[a-z_]+:\d+)*$'),
-
         # 7. 节点键模式
         re.compile(r'^dwd_gen:v3:nodes\.(list|detail|config)(:[a-z_]+:\d+)*$'),
-
         # 8. 流程键模式
         re.compile(r'^dwd_gen:v3:flows\.(list|detail|templates)(:[a-z_]+:\d+)*$'),
-
         # 9. 连接配置键模式
         re.compile(r'^dwd_gen:v3:join_configs\.(list|detail)(:[a-z_]+:\d+)*$'),
-
         # 10. 模板键模式
         re.compile(r'^dwd_gen:v3:templates\.(list|detail)(:[a-z_]+:\d+)*$'),
-
         # 11. 字段构建器键模式
         re.compile(r'^dwd_gen:v3:field_builder\.(config|state)(:[a-z_]+:\d+)*$'),
-
         # 12. 统计键模式
         re.compile(r'^dwd_gen:v3:stats\.(dashboard|performance)(:[a-z_]+:\d+)*$'),
-
         # 13. 监控键模式
         re.compile(r'^dwd_gen:v3:monitor\.(health|metrics)(:[a-z_]+:\d+)*$'),
-
-        # 14. 通配符模式（用于失效操作）
+        # 14. 通配符模式(用于失效操作)
         re.compile(r'^dwd_gen:v3:[a-z_]+(\.[a-z]+)*(:[a-z_]+:\*)*$'),
-
         # 15. 纯数字值模式
         re.compile(r'^dwd_gen:v3:[a-z._]+(:[a-z_]+:\d+)*$'),
-
-        # 16. 空值模式（用于空值缓存）
+        # 16. 空值模式(用于空值缓存)
         re.compile(r'^dwd_gen:v3:[a-z._]+(:[a-z_]+:(null|none|\*))*$'),
     }
 
-    # 危险字符列表（可能导致Redis命令注入）
+    # 危险字符列表(可能导致Redis命令注入)
     DANGEROUS_CHARS = ['\n', '\r', '\t', '\x00', '\\', "'", '"', '`', '$', ';']
 
-    # 最大键长度（Redis推荐最大512字节，我们使用256更安全）
+    # 最大键长度(Redis推荐最大512字节, 我们使用256更安全)
     MAX_KEY_LENGTH = 256
 
     # 最小键长度
     MIN_KEY_LENGTH = 3
 
-    # 类级别的严格模式标志（用于测试）
+    # 类级别的严格模式标志(用于测试)
     _strict_mode = True
 
     @classmethod
@@ -133,7 +118,7 @@ class CacheKeyValidator:
         设置严格模式（主要用于测试）
 
         Args:
-            strict: True为严格模式（生产环境），False为宽松模式（测试环境）
+            strict: True为严格模式（生产环境）, False为宽松模式（测试环境）
 
         Example:
             >>> CacheKeyValidator.set_strict_mode(False)  # 测试模式
@@ -147,12 +132,12 @@ class CacheKeyValidator:
     @contextmanager
     def allow_test_keys(cls):
         """
-        上下文管理器：临时允许测试键
+        上下文管理器: 临时允许测试键
 
         Example:
             >>> with CacheKeyValidator.allow_test_keys():
             ...     validator.validate("test_key")  # 返回True
-            >>> validator.validate("test_key")  # 恢复严格模式，返回False
+            >>> validator.validate("test_key")  # 恢复严格模式, 返回False
         """
         old_strict = cls._strict_mode
         cls._strict_mode = False
@@ -167,15 +152,15 @@ class CacheKeyValidator:
         验证缓存键是否安全
 
         检查项:
-        1. 长度限制：3-256字符
-        2. 危险字符：不包含\n\r\t等
-        3. 白名单模式：符合至少一个预定义模式
+        1. 长度限制: 3-256字符
+        2. 危险字符: 不包含\n\r\t等
+        3. 白名单模式: 符合至少一个预定义模式
 
         Args:
             key: 要验证的缓存键
 
         Returns:
-            True如果键安全，False否则
+            True如果键安全, False否则
 
         Example:
             >>> CacheKeyValidator.validate("dwd_gen:v3:games.list:page:1")
@@ -197,24 +182,20 @@ class CacheKeyValidator:
 
         # 3. 危险字符检查
         if any(char in key for char in cls.DANGEROUS_CHARS):
-            logger.error(
-                f"缓存键包含危险字符: {repr(key[:100])}"
-            )
+            logger.error(f"缓存键包含危险字符: {repr(key[:100])}")
             return False
 
-        # 4. 白名单模式检查（仅在严格模式下）
+        # 4. 白名单模式检查(仅在严格模式下)
         if cls._strict_mode:
             is_valid = any(pattern.match(key) for pattern in cls.ALLOWED_PATTERNS)
 
             if not is_valid:
-                logger.warning(
-                    f"缓存键不符合白名单模式: {key[:100]}"
-                )
+                logger.warning(f"缓存键不符合白名单模式: {key[:100]}")
 
             return is_valid
         else:
-            # 测试模式：只做基础检查
-            logger.debug(f"测试模式：跳过白名单检查 - {key[:100]}")
+            # 测试模式: 只做基础检查
+            logger.debug(f"测试模式: 跳过白名单检查 - {key[:100]}")
             return True
 
     @classmethod
@@ -248,7 +229,7 @@ class CacheKeyValidator:
 
         # 3. 截断过长键
         if len(safe_key) > cls.MAX_KEY_LENGTH:
-            safe_key = safe_key[:cls.MAX_KEY_LENGTH]
+            safe_key = safe_key[: cls.MAX_KEY_LENGTH]
             logger.debug(f"缓存键被截断: {len(key)} -> {cls.MAX_KEY_LENGTH}")
 
         # 4. 去除首尾下划线
@@ -318,7 +299,7 @@ class CacheKeyValidator:
         """
         检查pattern是否安全
 
-        只允许: 小写字母、数字、点、下划线
+        只允许: 小写字母, 数字, 点, 下划线
         """
         return bool(re.match(r'^[a-z0-9._]+$', pattern))
 
@@ -327,7 +308,7 @@ class CacheKeyValidator:
         """
         检查参数名是否安全
 
-        只允许: 小写字母、数字、下划线
+        只允许: 小写字母, 数字, 下划线
         """
         return bool(re.match(r'^[a-z0-9_]+$', param_name))
 
@@ -336,7 +317,7 @@ class CacheKeyValidator:
         """
         验证通配符模式是否安全（用于失效操作）
 
-        允许使用*作为通配符，但位置必须正确
+        允许使用*作为通配符, 但位置必须正确
 
         Args:
             pattern: 通配符模式
@@ -358,17 +339,17 @@ class CacheKeyValidator:
         if any(char in pattern for char in cls.DANGEROUS_CHARS):
             return False
 
-        # 检查通配符位置（只允许在值的位置）
+        # 检查通配符位置(只允许在值的位置)
         # 格式: dwd_gen:v3:pattern:param1:value1:param2:*
         parts = pattern.split(':')
 
         for i, part in enumerate(parts):
-            # 通配符只能在值的位置（偶数索引，从4开始）
+            # 通配符只能在值的位置(偶数索引, 从4开始)
             # dwd_gen:v3:games.list:param:value
             # 索引:    0,  1,     2,      3,    4
             if part == '*':
                 # 必须至少有前缀:dwd_gen:v3:pattern
-                # 通配符必须在值的位置（索引>=4且为偶数）
+                # 通配符必须在值的位置(索引>=4且为偶数)
                 if i < 4 or i % 2 == 1:
                     return False
 

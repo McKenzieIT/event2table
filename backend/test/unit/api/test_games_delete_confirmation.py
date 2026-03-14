@@ -16,7 +16,7 @@ from flask import Flask
 
 # TODO: Import functions after implementation
 # from backend.api.routes.games import check_deletion_impact_TODO, execute_cascade_delete
-from backend.core.utils import json_success_response, json_error_response
+from backend.core.utils import json_error_response, json_success_response
 
 
 class TestGameDeleteConfirmation:
@@ -119,10 +119,7 @@ class TestGameDeleteConfirmation:
         assert response2.status_code == 200
         data2 = response2.json
         assert data2["success"] is True
-        assert (
-            "deleted" in data2["message"].lower()
-            or "success" in data2["message"].lower()
-        )
+        assert "deleted" in data2["message"].lower() or "success" in data2["message"].lower()
 
         # Verify deletion counts in response
         assert "data" in data2
@@ -151,9 +148,7 @@ class TestCheckDeletionImpact:
     how many events, params, and node configs would be deleted.
     """
 
-    def test_check_impact_with_no_data_should_return_zero_counts(
-        self, sample_game_no_events
-    ):
+    def test_check_impact_with_no_data_should_return_zero_counts(self, sample_game_no_events):
         """
         Test: Impact check for game with no data should return zero counts
 

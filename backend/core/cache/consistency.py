@@ -16,10 +16,10 @@
 - 防止读写并发导致的数据不一致
 """
 
+import logging
+import threading
 from contextlib import contextmanager
 from typing import Dict
-import threading
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class CacheReadWriteLock:
 
     设计原理:
     - 读操作: 允许多个读者并发访问
-    - 写操作: 独占访问，阻塞所有读者和写者
+    - 写操作: 独占访问, 阻塞所有读者和写者
     - 锁粒度: 每个缓存键一个读写锁
 
     实现:
@@ -78,7 +78,7 @@ class CacheReadWriteLock:
                 self._locks[key][0] -= 1
                 logger.debug(f"📕 释放读锁: {key} (剩余读者: {self._locks[key][0]})")
 
-                # 如果没有读者且锁不再需要，清理
+                # 如果没有读者且锁不再需要, 清理
                 if self._locks[key][0] == 0 and key in self._locks:
                     # 可选: 清理未使用的锁以节省内存
                     # del self._locks[key]
@@ -111,9 +111,7 @@ class CacheReadWriteLock:
         with self._global_lock:
             readers_count = self._locks[key][0]
             if readers_count > 0:
-                logger.warning(
-                    f"⚠️ 获取写锁时仍有{readers_count}个读者: {key}"
-                )
+                logger.warning(f"⚠️ 获取写锁时仍有{readers_count}个读者: {key}")
 
         logger.debug(f"✅ 获取写锁: {key}")
 

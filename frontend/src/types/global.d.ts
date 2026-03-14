@@ -52,38 +52,22 @@ export interface PaginatedResponse<T> extends APIResponse<T[]> {
 }
 
 /**
- * 游戏对象
+ * 游戏对象 - Import from @/shared/types/game-types
+ * Re-exporting for global availability
  */
-export interface Game {
-  id: number;
-  gid: number;
-  name: string;
-  ods_db: string;
-  created_at: string;
-}
+export type { Game } from '../shared/types/game-types';
 
 /**
- * 事件对象
+ * 事件对象 - Import from @/shared/types/event-types
+ * Re-exporting for global availability
  */
-export interface Event {
-  id: number;
-  event_name: string;
-  display_name: string;
-  game_gid: number;
-  event_type: 'user' | 'system' | 'auto';
-  created_at: string;
-}
+export type { Event } from '../shared/types/event-types';
 
 /**
- * 参数对象
+ * 参数对象 - Import from @/shared/types/parameter-types
+ * Re-exporting for global availability
  */
-export interface Parameter {
-  id: number;
-  param_name: string;
-  param_name_cn: string;
-  param_type: 'string' | 'int' | 'float' | 'boolean' | 'json';
-  game_gid: number | null;
-}
+export type { Parameter } from '../shared/types/parameter-types';
 
 /**
  * Canvas节点对象

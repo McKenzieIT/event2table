@@ -18,15 +18,17 @@ from backend.core.cache.decorators import cached
 - Entity层 (FlowEntity, EventNodeEntity)
 """
 
-from flask import Blueprint, render_template, request, jsonify, session
+from flask import Blueprint, jsonify, render_template, request, session
+
 from backend.core.logging import get_logger
 from backend.core.utils import (
-    success_response,
     error_response,
-    json_success_response,
     json_error_response,
+    json_success_response,
+    success_response,
 )
 from backend.services.games.game_service import GameService
+
 from . import node_canvas_flows
 from .canvas_service import get_canvas_service
 
@@ -46,7 +48,7 @@ def node_canvas():
     节点画布页面
 
     Query Params:
-        game_gid (int): 游戏GID，必需
+        game_gid (int): 游戏GID, 必需
         react (bool): 是否使用React应用壳版本（默认false）
 
     Returns:
@@ -73,9 +75,7 @@ def node_canvas():
     session["current_game_gid"] = game_gid
     session["current_game_gid"] = game.gid
 
-    logger.info(
-        f"Accessed node_canvas: game_gid={game_gid}, gid={game.gid}, react={use_react}"
-    )
+    logger.info(f"Accessed node_canvas: game_gid={game_gid}, gid={game.gid}, react={use_react}")
 
     # 根据react参数选择模板
     template = "node_canvas_react.html" if use_react else "node_canvas.html"
@@ -88,7 +88,7 @@ def node_canvas_react():
     节点画布页面 - React应用壳版本（Phase 2集成）
 
     Query Params:
-        game_gid (int): 游戏GID，必需
+        game_gid (int): 游戏GID, 必需
 
     Returns:
         render_template: 渲染node_canvas_react.html模板（使用React应用壳）
@@ -113,9 +113,7 @@ def node_canvas_react():
     session["current_game_gid"] = game_gid
     session["current_game_gid"] = game.gid
 
-    logger.info(
-        f"Accessed node_canvas_react: game_gid={game_gid}, gid={game.gid}"
-    )
+    logger.info(f"Accessed node_canvas_react: game_gid={game_gid}, gid={game.gid}")
 
     return render_template("node_canvas_react.html", game=game)
 
@@ -128,9 +126,7 @@ def health_check():
     Returns:
         JSON: 健康状态
     """
-    return json_success_response(
-        data={"status": "healthy"}, message="Canvas module is working"
-    )
+    return json_success_response(data={"status": "healthy"}, message="Canvas module is working")
 
 
 @canvas_bp.route("/api/canvas/validate", methods=["POST"])
@@ -168,15 +164,11 @@ def validate_flow():
                 )[0]
             )
         else:
-            return jsonify(
-                error_response("; ".join(validation["errors"]), status_code=400)[0]
-            ), 400
+            return jsonify(error_response("; ".join(validation["errors"]), status_code=400)[0]), 400
 
     except Exception as e:
         logger.exception(f"Error validating flow: {e}")
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 @canvas_bp.route("/api/canvas/prepare", methods=["POST"])
@@ -203,17 +195,13 @@ def prepare_generation():
         result = node_canvas_flows.prepare_flow_for_generation(graph_data)
 
         if result["success"]:
-            return json_success_response(
-                data=result, message="Flow prepared successfully"
-            )
+            return json_success_response(data=result, message="Flow prepared successfully")
         else:
             return json_error_response(result["error"], status_code=400)
 
     except Exception as e:
         logger.exception(f"Error preparing flow: {e}")
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 @canvas_bp.route("/api/canvas/preview-results", methods=["POST"])
@@ -265,9 +253,7 @@ def preview_sql_results():
 
     except Exception as e:
         logger.exception(f"Error generating preview results: {e}")
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 def generate_mock_results(output_fields, limit=5):
@@ -332,11 +318,7 @@ def generate_mock_results(output_fields, limit=5):
 
             elif "ts" in field_name.lower():
                 # Timestamp
-                ts = int(
-                    (
-                        base_date - timedelta(seconds=random.randint(0, 86400))
-                    ).timestamp()
-                )
+                ts = int((base_date - timedelta(seconds=random.randint(0, 86400))).timestamp())
                 row.append(str(ts))
 
             elif data_type == "int":
@@ -383,7 +365,7 @@ def list_flows():
 
         return json_success_response(
             data={"flows": [flow.model_dump() for flow in flows]},
-            message=f"Retrieved {len(flows)} flows"
+            message=f"Retrieved {len(flows)} flows",
         )
 
     except Exception as e:
@@ -392,8 +374,7 @@ def list_flows():
 
 
 @canvas_bp.route("/api/canvas/flows/<int:flow_id>", methods=["GET"])
-
-@cached(ttl=1800)  # Cache for 30 minutes
+@cached(ttl=1800, key_prefix="canvas:flow")  # Cache for 30 minutes
 def get_flow(flow_id: int):
     """
     获取单个Flow模板
@@ -410,10 +391,7 @@ def get_flow(flow_id: int):
         if not flow:
             return json_error_response("Flow not found", status_code=404)
 
-        return json_success_response(
-            data=flow.model_dump(),
-            message="Flow retrieved successfully"
-        )
+        return json_success_response(data=flow.model_dump(), message="Flow retrieved successfully")
 
     except Exception as e:
         logger.exception(f"Error getting flow: {e}")
@@ -451,13 +429,10 @@ def create_flow():
             flow_graph=data.get("flow_graph", {}),
             variables=data.get("variables"),
             description=data.get("description"),
-            created_by=data.get("created_by")
+            created_by=data.get("created_by"),
         )
 
-        return json_success_response(
-            data=flow.model_dump(),
-            message="Flow created successfully"
-        )
+        return json_success_response(data=flow.model_dump(), message="Flow created successfully")
 
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
@@ -501,7 +476,7 @@ def update_flow(flow_id: int):
             flow_graph=data.get("flow_graph"),
             variables=data.get("variables"),
             description=data.get("description"),
-            is_active=data.get("is_active")
+            is_active=data.get("is_active"),
         )
 
         if success:
@@ -575,8 +550,7 @@ def export_flow(flow_id: int):
             return json_error_response("Flow not found", status_code=404)
 
         return json_success_response(
-            data=result,
-            message=f"Flow exported successfully ({export_format})"
+            data=result, message=f"Flow exported successfully ({export_format})"
         )
 
     except Exception as e:

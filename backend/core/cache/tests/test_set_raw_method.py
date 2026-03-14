@@ -19,10 +19,11 @@ HierarchicalCache set_raw() Method Unit Tests
 日期: 2026-02-27
 """
 
-import pytest
 import sys
 import time
 from pathlib import Path
+
+import pytest
 
 # 添加backend目录到Python路径
 backend_dir = Path(__file__).parent.parent.parent.parent
@@ -45,8 +46,8 @@ class TestSetRawBasicFunctionality:
         assert 'dwd_gen:v3:test:key1' in cache.l1_cache
         assert cache.l1_cache['dwd_gen:v3:test:key1'] == 'value1'
 
-        # 验证 L2 无数据（需要 Redis 环境，这里只验证不报错）
-        # 注意：如果 Redis 未启动，L2 写入会静默失败，这是预期行为
+        # 验证 L2 无数据(需要 Redis 环境, 这里只验证不报错)
+        # 注意: 如果 Redis 未启动, L2 写入会静默失败, 这是预期行为
 
     def test_set_raw_l2_only(self):
         """测试 set_raw 仅写入 L2 缓存"""
@@ -58,7 +59,7 @@ class TestSetRawBasicFunctionality:
         # 验证 L1 无数据
         assert 'dwd_gen:v3:test:key2' not in cache.l1_cache
 
-        # L2 数据需要 Redis 环境，这里只验证不报错
+        # L2 数据需要 Redis 环境, 这里只验证不报错
 
     def test_set_raw_both_levels(self):
         """测试 set_raw 同时写入 L1 和 L2 缓存"""
@@ -77,10 +78,10 @@ class TestSetRawBasicFunctionality:
         """测试 set_raw 默认 level='both'"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=60, l2_ttl=3600)
 
-        # 不指定 level，应该默认为 'both'
+        # 不指定 level, 应该默认为 'both'
         cache.set_raw('dwd_gen:v3:test:key4', 'value4')
 
-        # 验证 L1 有数据（说明写入了 both）
+        # 验证 L1 有数据(说明写入了 both)
         assert 'dwd_gen:v3:test:key4' in cache.l1_cache
         assert cache.l1_cache['dwd_gen:v3:test:key4'] == 'value4'
 
@@ -95,10 +96,10 @@ class TestSetRawTTLFunctionality:
         # 使用自定义 TTL = 2 秒
         cache.set_raw('dwd_gen:v3:test:ttl_key', 'value', ttl=2, level='l1')
 
-        # 立即查询，应该命中
+        # 立即查询, 应该命中
         assert cache.get('test:ttl_key') == 'value'
 
-        # 等待 3 秒后查询，应该过期
+        # 等待 3 秒后查询, 应该过期
         time.sleep(3)
         result = cache.get('test:ttl_key')
         assert result is None, "L1 缓存应该已过期"
@@ -110,33 +111,33 @@ class TestSetRawTTLFunctionality:
         # 使用自定义 TTL = 2 秒
         cache.set_raw('dwd_gen:v3:test:ttl_both', 'value', ttl=2, level='both')
 
-        # 立即查询，应该命中 L1
+        # 立即查询, 应该命中 L1
         assert cache.get('test:ttl_both') == 'value'
 
         # 等待 3 秒后查询
         time.sleep(3)
         result = cache.get('test:ttl_both')
-        # L1 已过期，L2 可能还有数据（取决于 Redis 环境）
+        # L1 已过期, L2 可能还有数据(取决于 Redis 环境)
         # 这里只验证不报错
 
     def test_set_raw_without_ttl_uses_default(self):
         """测试 set_raw 不指定 TTL 时使用默认值"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=1, l2_ttl=3600)
 
-        # 不指定 TTL，应该使用默认的 l1_ttl=1 秒
+        # 不指定 TTL, 应该使用默认的 l1_ttl=1 秒
         cache.set_raw('dwd_gen:v3:test:default_ttl', 'value', level='l1')
 
-        # 立即查询，应该命中
+        # 立即查询, 应该命中
         assert cache.get('test:default_ttl') == 'value'
 
-        # 等待 2 秒后查询，应该过期（默认 TTL=1 秒）
+        # 等待 2 秒后查询, 应该过期(默认 TTL=1 秒)
         time.sleep(2)
         result = cache.get('test:default_ttl')
         assert result is None, "L1 缓存应该已过期（使用默认 TTL）"
 
 
 class TestSetRawInvalidLevel:
-    """测试 set_raw() 无效 level 参数（异常处理）"""
+    """测试 set_raw() 无效 level 参数(异常处理)"""
 
     def test_set_raw_invalid_level_string(self):
         """测试 set_raw 使用无效的 level 字符串"""
@@ -164,13 +165,13 @@ class TestSetRawInvalidLevel:
         """测试 set_raw level 参数区分大小写"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=60, l2_ttl=3600)
 
-        # 'L1' 不是 'l1'，应该抛出 ValueError
+        # 'L1' 不是 'l1', 应该抛出 ValueError
         with pytest.raises(ValueError) as exc_info:
             cache.set_raw('dwd_gen:v3:test:key', 'value', level='L1')
 
         assert 'Invalid level' in str(exc_info.value)
 
-        # 'BOTH' 不是 'both'，应该抛出 ValueError
+        # 'BOTH' 不是 'both', 应该抛出 ValueError
         with pytest.raises(ValueError) as exc_info:
             cache.set_raw('dwd_gen:v3:test:key', 'value', level='BOTH')
 
@@ -180,7 +181,7 @@ class TestSetRawInvalidLevel:
         """测试 set_raw level=None 应该使用默认值 'both'"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=60, l2_ttl=3600)
 
-        # level=None 应该默认使用 'both'（不抛出异常）
+        # level=None 应该默认使用 'both'(不抛出异常)
         cache.set_raw('dwd_gen:v3:test:key', 'value', level=None)
 
         # 验证 L1 有数据
@@ -198,7 +199,7 @@ class TestSetRawIntegrationWithGet:
         # 使用 set_raw 写入 L1
         cache.set_raw('dwd_gen:v3:test:integration_key', 'test_value', level='l1')
 
-        # 使用 get 获取（应该命中 L1）
+        # 使用 get 获取(应该命中 L1)
         result = cache.get('test:integration_key')
 
         assert result == 'test_value'
@@ -211,7 +212,7 @@ class TestSetRawIntegrationWithGet:
         # 使用 set_raw 写入 both
         cache.set_raw('dwd_gen:v3:test:integration_both', 'test_value', level='both')
 
-        # 使用 get 获取（应该命中 L1）
+        # 使用 get 获取(应该命中 L1)
         result = cache.get('test:integration_both')
 
         assert result == 'test_value'
@@ -227,7 +228,7 @@ class TestSetRawIntegrationWithGet:
             'dict': {'nested': 'value'},
             'string': 'test',
             'number': 42,
-            'boolean': True
+            'boolean': True,
         }
 
         # 写入
@@ -244,7 +245,7 @@ class TestSetRawIntegrationWithGet:
         """测试 set_raw 写入 bytes 数据"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=60, l2_ttl=3600)
 
-        # bytes 数据（模拟序列化后的数据）
+        # bytes 数据(模拟序列化后的数据)
         bytes_data = b'serialized_data'
 
         # 写入
@@ -293,7 +294,7 @@ class TestSetRawIntegrationWithInvalidate:
         # 验证 L1 数据已删除
         assert 'dwd_gen:v3:test:invalidate_both' not in cache.l1_cache
 
-        # L2 失效需要 Redis 环境，这里只验证不报错
+        # L2 失效需要 Redis 环境, 这里只验证不报错
 
     def test_set_raw_multiple_keys_then_invalidate_pattern(self):
         """测试 set_raw 写入多个键后使用模式失效"""
@@ -304,7 +305,7 @@ class TestSetRawIntegrationWithInvalidate:
         cache.set_raw('dwd_gen:v3:test:pattern:key2', 'value2', level='l1')
         cache.set_raw('dwd_gen:v3:test:other:key3', 'value3', level='l1')
 
-        # 使用模式失效（只失效 test:pattern:*）
+        # 使用模式失效(只失效 test:pattern:*)
         count = cache.invalidate_pattern('test:pattern', game_id=0)
 
         # 验证失效了 2 个键
@@ -325,7 +326,7 @@ class TestSetRawEdgeCases:
         """测试 set_raw 使用空键"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=60, l2_ttl=3600)
 
-        # 空键应该正常工作（虽然不推荐）
+        # 空键应该正常工作(虽然不推荐)
         cache.set_raw('', 'value', level='l1')
 
         # 验证
@@ -366,7 +367,7 @@ class TestSetRawEdgeCases:
         assert len(cache.l1_cache) == 3
         assert cache.stats['l1_evictions'] == 0
 
-        # 添加第 4 个键，应该淘汰最旧的
+        # 添加第 4 个键, 应该淘汰最旧的
         cache.set_raw('dwd_gen:v3:test:key4', 'value4', level='l1')
 
         assert len(cache.l1_cache) == 3
@@ -381,21 +382,21 @@ class TestSetRawEdgeCases:
         assert cache.get('test:key4') == 'value4'
 
     def test_set_raw_zero_ttl(self):
-        """测试 set_raw 使用 TTL=0（立即过期）"""
+        """测试 set_raw 使用 TTL=0(立即过期)"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=60, l2_ttl=3600)
 
         # TTL=0 应该立即过期
         cache.set_raw('dwd_gen:v3:test:zero_ttl', 'value', ttl=0, level='l1')
 
-        # 立即查询，可能已过期（取决于时间精度）
+        # 立即查询, 可能已过期(取决于时间精度)
         # 这里只验证写入不报错
         assert 'dwd_gen:v3:test:zero_ttl' in cache.l1_cache
 
     def test_set_raw_negative_ttl(self):
-        """测试 set_raw 使用负数 TTL（应该当作正数处理）"""
+        """测试 set_raw 使用负数 TTL(应该当作正数处理)"""
         cache = HierarchicalCache(l1_size=100, l1_ttl=60, l2_ttl=3600)
 
-        # 负数 TTL 应该被当作正数（虽然不推荐）
+        # 负数 TTL 应该被当作正数(虽然不推荐)
         cache.set_raw('dwd_gen:v3:test:negative_ttl', 'value', ttl=-10, level='l1')
 
         # 验证写入成功

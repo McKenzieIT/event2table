@@ -1,3 +1,22 @@
+"""
+Common Utilities and Helpers
+
+Provides shared utility functions for form validation, cache management,
+and common operations across multiple modules.
+
+Key Features:
+- Form validation helpers
+- Cache invalidation utilities
+- Common data transformation functions
+
+Example:
+    >>> from backend.core.common import validate_form_data
+
+Author: Event2Table Development Team
+Created: 2026-02-10
+Modified: 2026-03-10
+"
+
 # ⚠️ PERFORMANCE: N+1 query detected - needs refactor
 # TODO: Replace loop queries with JOIN or prefetch
 
@@ -12,7 +31,7 @@ from backend.core.cache.decorators import cached
 """
 通用业务逻辑函数模块
 
-包含跨多个模块复用的业务逻辑函数。
+包含跨多个模块复用的业务逻辑函数. 
 
 作者: Claude Code
 版本: 1.0.0
@@ -38,9 +57,10 @@ from backend.core.cache.decorators import cached
     >>> clear_entity_caches('event', event_id, game_gid=123)
 """
 
-from typing import Dict, List, Any, Optional, Tuple
-from flask import request, flash
 import logging
+from typing import Any, Dict, List, Optional, Tuple
+
+from flask import flash, request
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +77,7 @@ def validate_form_fields(
     通用表单字段验证函数
 
     Args:
-        field_definitions: 字段定义列表，每个元素包含:
+        field_definitions: 字段定义列表, 每个元素包含:
             - name: 字段名（对应request.form的key）
             - required: 是否必填（默认True）
             - strip: 是否去除空白（默认True）
@@ -155,7 +175,7 @@ def clear_entity_caches(entity_type: str, entity_id: int, game_gid: Optional[int
         >>> clear_entity_caches('game', game_id)
     """
     try:
-        # 导入缓存函数（延迟导入避免循环依赖）
+        # 导入缓存函数(延迟导入避免循环依赖)
         try:
             from backend.core.cache.cache_system import clear_cache_pattern
         except ImportError:
@@ -192,10 +212,10 @@ def get_reference_data(data_types: List[str]) -> Dict[str, List[Dict]]:
     """
     通用的参考数据获取函数
 
-    用于获取games、categories等参考表数据，支持缓存。
+    用于获取games, categories等参考表数据, 支持缓存. 
 
     Args:
-        data_types: 数据类型列表，支持:
+        data_types: 数据类型列表, 支持:
             - 'games': 游戏列表
             - 'event_categories': 事件分类
             - 'param_types': 参数类型
@@ -220,7 +240,7 @@ def get_reference_data(data_types: List[str]) -> Dict[str, List[Dict]]:
 
     for data_type in data_types:
         if data_type in queries:
-            # 尝试使用缓存查询（如果可用）
+            # 尝试使用缓存查询(如果可用)
             try:
                 from backend.core.cache.cache_system import cached_fetch
 
@@ -230,7 +250,7 @@ def get_reference_data(data_types: List[str]) -> Dict[str, List[Dict]]:
                 try:
                     result[data_type] = fetch_all_as_dict(queries[data_type])
                 except Exception:
-                    # 表不存在或其他错误，返回空列表
+                    # 表不存在或其他错误, 返回空列表
                     logger.warning(f"Failed to fetch reference data for {data_type}")
                     result[data_type] = []
 
@@ -249,7 +269,7 @@ def generate_dwd_table_names(
     生成DWD层表的源表名和目标表名
 
     Args:
-        game: 游戏字典，需包含:
+        game: 游戏字典, 需包含:
             - gid: 游戏业务GID
             - ods_db: ODS数据库名
         event_name: 事件名称
@@ -275,10 +295,10 @@ def generate_dwd_table_names(
     source_table = f'{ods_db}.ods_{game["gid"]}_all_view'
 
     # 确定DWD库前缀
-    # 国内游戏(ieu_ods)使用ieu_cdm，海外游戏使用原ods_db
+    # 国内游戏(ieu_ods)使用ieu_cdm, 海外游戏使用原ods_db
     dwd_prefix = "ieu_cdm" if ods_db == "ieu_ods" else ods_db
 
-    # 清理事件名中的特殊字符（点号替换为下划线）
+    # 清理事件名中的特殊字符(点号替换为下划线)
     clean_name = event_name.replace(".", "_")
 
     # 目标表名: {prefix}.v_dwd_{game_gid}_{event}_di

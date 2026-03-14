@@ -17,46 +17,33 @@ Handles all event-related operations including Excel import
 import os
 import sqlite3
 import time
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-from flask import (
-    Blueprint,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash,
-    jsonify,
-    session,
-)
-from werkzeug.utils import secure_filename
 import pandas as pd
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
+from werkzeug.utils import secure_filename
 
-from backend.core.database import get_db_connection, DB_PATH
-from backend.core.config import UPLOAD_DIR
+from backend.core.cache.cache_system import clear_event_cache, clear_game_cache
+from backend.core.cache.decorators import cached
+from backend.core.config import UPLOAD_DIR, CacheConfig
+from backend.core.database import DB_PATH, get_db_connection
+from backend.core.exceptions import DatabaseError, NotFoundError, ValidationError
 from backend.core.logging import get_logger
 from backend.core.utils import (
+    db_transaction,
+    error_response,
+    execute_write,
     fetch_all_as_dict,
     fetch_one_as_dict,
-    execute_write,
-    success_response,
-    error_response,
-    validate_json_request,
-    validate_game_exists,
     find_column_by_keywords,
-    get_event_with_game_info,
     get_active_parameters,
-    json_success_response,
+    get_event_with_game_info,
     json_error_response,
-    db_transaction,
+    json_success_response,
+    success_response,
+    validate_game_exists,
+    validate_json_request,
 )
-from backend.core.cache.cache_system import (
-    clear_event_cache,
-    clear_game_cache,
-)
-from backend.core.cache.decorators import cached
-from backend.core.config import CacheConfig
-from backend.core.exceptions import DatabaseError, ValidationError, NotFoundError
 
 logger = get_logger(__name__)
 
@@ -87,7 +74,7 @@ class EventBuilder:
     """
     事件建造者类
 
-    使用建造者模式构建事件数据，降低复杂度，提高可读性
+    使用建造者模式构建事件数据, 降低复杂度, 提高可读性
     """
 
     def __init__(self):
@@ -243,9 +230,7 @@ def _parse_event_parameters(request_data) -> List[Dict[str, Any]]:
                         if i < len(param_types) and param_types[i].isdigit()
                         else 1
                     ),
-                    "description": param_descriptions[i]
-                    if i < len(param_descriptions)
-                    else "",
+                    "description": param_descriptions[i] if i < len(param_descriptions) else "",
                 }
             )
 
@@ -311,9 +296,7 @@ def _build_event_from_form(request_data) -> EventData:
 
 
 @cached(ttl=1800)
-def get_events_paginated_cached(
-    game_gid: int, page: int, per_page: int
-) -> List[Dict[str, Any]]:
+def get_events_paginated_cached(game_gid: int, page: int, per_page: int) -> List[Dict[str, Any]]:
     """
     **性能优化**: Cached function to get paginated events with parameter counts
 
@@ -443,9 +426,7 @@ def list_events():
     events = get_events_paginated_cached(game_gid, page, per_page)
 
     # Get current game info
-    current_game = fetch_one_as_dict(
-        "SELECT id, name, gid FROM games WHERE id = ?", (game_gid,)
-    )
+    current_game = fetch_one_as_dict("SELECT id, name, gid FROM games WHERE id = ?", (game_gid,))
 
     return render_template(
         "events.html",
@@ -463,19 +444,19 @@ def list_events():
 def new_event():
     """Create a new log event"""
     from backend.core.common import (
-        get_reference_data,
-        validate_form_fields,
-        parse_form_list_fields,
-        generate_dwd_table_names,
         clear_entity_caches,
+        generate_dwd_table_names,
+        get_reference_data,
+        parse_form_list_fields,
+        validate_form_fields,
     )
 
-    # GET请求：获取参考数据
+    # GET请求: 获取参考数据
     ref_data = get_reference_data(["games", "event_categories"])
     games, categories = ref_data["games"], ref_data["event_categories"]
 
     if request.method == "POST":
-        # 1. 表单验证（使用通用函数）
+        # 1. 表单验证(使用通用函数)
         field_defs = [
             {"name": "game_gid", "required": True, "alias": "游戏ID"},
             {"name": "event_name", "required": True, "alias": "事件名"},
@@ -486,9 +467,7 @@ def new_event():
         is_valid, form_data, error = validate_form_fields(field_defs)
         if not is_valid:
             flash(error, "error")
-            return render_template(
-                "event_form.html", games=games, categories=categories
-            )
+            return render_template("event_form.html", games=games, categories=categories)
 
         game_gid, event_name, event_name_cn, category_id = (
             form_data["game_gid"],
@@ -501,15 +480,13 @@ def new_event():
         game = fetch_one_as_dict("SELECT * FROM games WHERE id = ?", (game_gid,))
         if not game:
             flash("游戏不存在", "error")
-            return render_template(
-                "event_form.html", games=games, categories=categories
-            )
+            return render_template("event_form.html", games=games, categories=categories)
 
-        # 3. 生成表名（使用通用函数）
+        # 3. 生成表名(使用通用函数)
         tables = generate_dwd_table_names(game, event_name)
         source_table, target_table = tables["source_table"], tables["target_table"]
 
-        # 4. 解析参数（使用通用函数）
+        # 4. 解析参数(使用通用函数)
         param_fields = parse_form_list_fields(
             ["param_name", "param_name_cn", "param_type", "param_description"]
         )
@@ -518,11 +495,9 @@ def new_event():
         valid_params = [name for name in param_fields["param_name"] if name.strip()]
         if not valid_params:
             flash("请至少添加一个参数", "error")
-            return render_template(
-                "event_form.html", games=games, categories=categories
-            )
+            return render_template("event_form.html", games=games, categories=categories)
 
-        # 5. 事务处理：创建事件和参数
+        # 5. 事务处理: 创建事件和参数
         try:
             include_in_common = 1 if request.form.get("include_in_common_params") else 0
 
@@ -573,7 +548,7 @@ def new_event():
                             ),
                         )
 
-            # 6. 清理缓存（使用通用函数）
+            # 6. 清理缓存(使用通用函数)
             clear_entity_caches("event", event_id, game_gid=game_gid)
 
             logger.info(
@@ -585,21 +560,15 @@ def new_event():
         except sqlite3.IntegrityError as e:
             logger.error(f"Integrity error creating event: {e}")
             flash("创建失败: 数据完整性错误（可能是重复的事件名）", "error")
-            return render_template(
-                "event_form.html", games=games, categories=categories
-            )
+            return render_template("event_form.html", games=games, categories=categories)
         except sqlite3.Error as e:
             logger.error(f"Database error creating event: {e}", exc_info=True)
-            flash("创建失败: 数据库错误，请稍后重试", "error")
-            return render_template(
-                "event_form.html", games=games, categories=categories
-            )
+            flash("创建失败: 数据库错误, 请稍后重试", "error")
+            return render_template("event_form.html", games=games, categories=categories)
         except Exception as e:
             logger.error(f"Unexpected error creating event: {e}", exc_info=True)
-            flash("创建失败: 系统错误，请联系管理员", "error")
-            return render_template(
-                "event_form.html", games=games, categories=categories
-            )
+            flash("创建失败: 系统错误, 请联系管理员", "error")
+            return render_template("event_form.html", games=games, categories=categories)
 
     return render_template("event_form.html", games=games, categories=categories)
 
@@ -623,16 +592,12 @@ def view_event(id):
 @events_bp.route("/events/<int:id>/edit", methods=["GET", "POST"])
 def edit_event(id):
     """Edit an existing log event"""
-    from backend.core.common import (
-        get_reference_data,
-        validate_form_fields,
-        clear_entity_caches,
-    )
+    from backend.core.common import clear_entity_caches, get_reference_data, validate_form_fields
 
     # Use helper function to get event with game and category info
     event = get_event_with_game_info(id)
 
-    # GET请求：获取参考数据
+    # GET请求: 获取参考数据
     ref_data = get_reference_data(["games", "event_categories"])
     games, categories = ref_data["games"], ref_data["event_categories"]
     parameters = get_active_parameters(id)
@@ -642,7 +607,7 @@ def edit_event(id):
         return redirect(url_for("events.list_events"))
 
     if request.method == "POST":
-        # 表单验证（使用通用函数）
+        # 表单验证(使用通用函数)
         field_defs = [
             {"name": "event_name_cn", "required": True, "alias": "中文名"},
             {"name": "category_id", "required": True, "alias": "分类"},
@@ -673,7 +638,7 @@ def edit_event(id):
             (event_name_cn, category_id, include_in_common, id),
         )
 
-        # 清理缓存（使用通用函数）
+        # 清理缓存(使用通用函数)
         clear_entity_caches("event", id, game_gid=event["game_gid"])
 
         flash(f"日志事件 {event_name_cn} 更新成功", "success")
@@ -703,7 +668,7 @@ def delete_event(id):
         execute_write("DELETE FROM event_category_relations WHERE event_id = ?", (id,))
         execute_write("DELETE FROM log_events WHERE id = ?", (id,))
 
-        # 清理缓存（使用通用函数）
+        # 清理缓存(使用通用函数)
         clear_entity_caches("event", id, game_gid=event["game_gid"])
 
         flash(f"日志事件 {event['event_name_cn']} 已删除", "success")
@@ -713,9 +678,7 @@ def delete_event(id):
     return redirect(url_for("events.list_events"))
 
 
-def compare_event_with_existing(
-    event_data: Dict[str, Any], game_gid: int
-) -> Dict[str, Any]:
+def compare_event_with_existing(event_data: Dict[str, Any], game_gid: int) -> Dict[str, Any]:
     """比较导入的事件与已存在的事件是否有差异
 
     Args:
@@ -811,7 +774,7 @@ def compare_event_with_existing(
                     }
                 )
 
-    # 检查删除的参数（导入文件中缺少但数据库中存在的参数）
+    # 检查删除的参数(导入文件中缺少但数据库中存在的参数)
     for param_name in existing_params_dict:
         if param_name not in imported_params_dict:
             differences.append(
@@ -838,10 +801,10 @@ def compare_event_with_existing(
 
 
 class ExcelImporter:
-    """Excel事件导入器（简化版）
+    """Excel事件导入器(简化版)
 
-    将Excel文件解析、验证、导入逻辑封装在一个类中，
-    提高可测试性和可维护性。
+    将Excel文件解析, 验证, 导入逻辑封装在一个类中, 
+    提高可测试性和可维护性. 
     """
 
     def __init__(self, file, game_gid, form_data):
@@ -944,7 +907,7 @@ class ExcelImporter:
             "param_description": self.form_data.get("param_description_col"),
         }
 
-        # 如果表头行存在，尝试自动检测
+        # 如果表头行存在, 尝试自动检测
         if header_row < len(df):
             headers = [str(cell).strip() for cell in df.iloc[header_row].values]
 
@@ -984,11 +947,9 @@ class ExcelImporter:
                     headers, ["参数描述", "描述", "description", "备注"]
                 )
 
-        # 转换为整数（如果找到）
+        # 转换为整数(如果找到)
         for key in columns:
-            columns[key] = (
-                int(columns[key]) if columns[key] and columns[key] != "" else None
-            )
+            columns[key] = int(columns[key]) if columns[key] and columns[key] != "" else None
 
         return columns
 
@@ -1014,9 +975,7 @@ class ExcelImporter:
                 continue
 
             # 提取事件中文名
-            event_name_cn = (
-                self._get_cell_value(row, columns["event_name_cn"]) or event_name
-            )
+            event_name_cn = self._get_cell_value(row, columns["event_name_cn"]) or event_name
 
             # 初始化事件数据
             if event_name not in events_data:
@@ -1031,15 +990,9 @@ class ExcelImporter:
                 events_data[event_name]["parameters"].append(
                     {
                         "param_name": param_name,
-                        "param_name_cn": self._get_cell_value(
-                            row, columns["param_name_cn"]
-                        )
-                        or "",
-                        "param_type": self._get_cell_value(row, columns["param_type"])
-                        or "string",
-                        "param_description": self._get_cell_value(
-                            row, columns["param_description"]
-                        )
+                        "param_name_cn": self._get_cell_value(row, columns["param_name_cn"]) or "",
+                        "param_type": self._get_cell_value(row, columns["param_type"]) or "string",
+                        "param_description": self._get_cell_value(row, columns["param_description"])
                         or "",
                     }
                 )
@@ -1185,7 +1138,7 @@ def import_events_from_excel():
         is associated with the correct game. All imported events will
         have their game_gid set automatically.
     """
-    # GET请求：显示导入表单
+    # GET请求: 显示导入表单
     if request.method == "GET":
         games = fetch_all_as_dict("SELECT * FROM games ORDER BY name")
         categories = fetch_all_as_dict("SELECT * FROM event_categories ORDER BY name")
@@ -1199,7 +1152,7 @@ def import_events_from_excel():
             selected_game_id=selected_game_id,
         )
 
-    # POST请求：处理文件上传
+    # POST请求: 处理文件上传
     try:
         # 验证文件存在
         if "file" not in request.files:
@@ -1316,9 +1269,7 @@ def manage_parameters_enhanced():
     try:
         games = fetch_all_as_dict("SELECT * FROM games ORDER BY name")
         categories = fetch_all_as_dict("SELECT * FROM event_categories ORDER BY name")
-        return render_template(
-            "parameters_enhanced.html", games=games, categories=categories
-        )
+        return render_template("parameters_enhanced.html", games=games, categories=categories)
     except Exception as e:
         logger.error(f"Enhanced parameter management page error: {e}")
         flash(f"加载页面失败: {str(e)}", "error")
@@ -1331,9 +1282,7 @@ def validation_rules():
     try:
         games = fetch_all_as_dict("SELECT * FROM games ORDER BY name")
         categories = fetch_all_as_dict("SELECT * FROM event_categories ORDER BY name")
-        return render_template(
-            "validation_rules.html", games=games, categories=categories
-        )
+        return render_template("validation_rules.html", games=games, categories=categories)
     except Exception as e:
         logger.error(f"Validation rules page error: {e}")
         flash(f"加载页面失败: {str(e)}", "error")

@@ -46,6 +46,15 @@ export default defineConfig(({ mode }) => {
     port: 5173,
     host: '0.0.0.0', // 🆕 监听所有网络接口（localhost, 127.0.0.1, 局域网IP）
     strictPort: true, // 如果端口被占用则失败
+    // 🆕 HMR配置：确保模块更改立即生效
+    hmr: {
+      overlay: true,
+    },
+    // 🆕 强式重新构建：禁用文件缓存
+    fs: {
+      strict: false,
+      allow: ['..'],
+    },
     // 🆕 API代理：将 /api、/event_node_builder 和 /common-params 请求转发到Flask后端
     proxy: {
       '/api': {

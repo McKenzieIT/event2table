@@ -1,0 +1,174 @@
+#!/usr/bin/expect -f
+# Claude Code Documentation Update - Automated Interaction Script
+
+# Configuration
+set timeout 600
+set project_dir "/Users/mckenzie/Documents/event2table"
+set claude_wrapper "$project_dir/scripts/scheduled/run-claude.sh"
+set log_file "$project_dir/logs/update-docs-scheduled.log"
+set error_file "$project_dir/logs/update-docs-scheduled-error.log"
+
+# Full prompt to execute
+set full_prompt "/update-docs 更新文档，并整合docs/目录下的文档，将重复的文档提取经验到新或已有经验文档中，过程中不能因为token和时间去忽略重要的经验，完成后将旧的文档进行归档，并在开发文档中更新经验和索引"
+
+# 初始化日志
+proc log_message {message} {
+    set timestamp [clock format [clock seconds] -format "%Y-%m-%d %H:%M:%S"]
+    set fp [open "::log_file" a]
+    puts $fp "\[$timestamp\] $message"
+    close $fp
+    puts "\[$timestamp\] $message"
+}
+
+proc log_error {message} {
+    set timestamp [clock format [clock seconds] -format "%Y-%m-%d %H:%M:%S"]
+    set fp [open "::error_file" a]
+    puts $fp "\[$timestamp\] $message"
+    close $fp
+    puts "\[ERROR\] $message"
+}
+
+# 开始执行
+log_message "========================================="
+log_message "启动Claude Code文档整合任务"
+log_message "========================================="
+
+# 切换到项目目录
+cd $project_dir
+if {[catch {cd $project_dir} err]} {
+    log_error "无法切换到项目目录: $err"
+    exit 1
+}
+
+# 设置环境
+set env(PATH) "/Users/mckenzie/.nvm/versions/node/v20.20.0/bin:/usr/local/bin:/usr/bin:/bin"
+set env(HOME) "/Users/mckenzie"
+
+# 验证wrapper存在
+if {[file executable $claude_wrapper]} {
+    log_message "✅ Claude wrapper已找到: $claude_wrapper"
+} else {
+    log_error "❌ Claude wrapper未找到或不可执行"
+    exit 1
+}
+
+# 启动Claude Code via wrapper
+log_message "启动Claude Code CLI..."
+if {[catch {spawn $claude_wrapper} spawn_err]} {
+    log_error "无法启动Claude: $spawn_err"
+    exit 1
+}
+
+# 保存spawn ID用于后续控制
+set spawn_id $spawn_id
+
+# 等待Claude启动并准备好
+log_message "等待Claude准备就绪..."
+set ready 0
+array set prompts_seen {}
+
+# 等待多个可能的提示符
+expect {
+    timeout {
+        log_error "启动超时（30秒）"
+        if {[info exists spawn_id]} {
+            exp_close -f $spawn_id
+        }
+        exit 1
+    }
+    eof {
+        log_error "Claude意外退出"
+        exit 1
+    }
+    -re {How can I help|What can I do|Claude>|ready|Welcome} {
+        log_message "✅ Claude已就绪"
+        set ready 1
+    }
+    -re {>.+} {
+        # 捕获提示符
+        set prompt_text $expect_out(0,string)
+        log_message "检测到提示符: $prompt_text"
+        set ready 1
+    }
+}
+
+if {!$ready} {
+    log_error "Claude未能正确启动"
+    exit 1
+}
+
+# 发送skill命令
+log_message "发送命令: /update-docs"
+log_message "完整任务: 整合docs/目录，提取经验，归档旧文档"
+
+# 发送完整的prompt（使用send --避免特殊字符问题）
+send -- "$full_prompt\r"
+log_message "命令已发送"
+
+# 等待命令执行
+log_message "等待Claude处理文档..."
+set completed 0
+set line_count 0
+set max_lines 1000  ; 防止无限循环
+
+# 监控输出
+expect {
+    timeout {
+        log_message "⚠️  执行超时（10分钟），但可能仍在处理"
+        set completed 1
+    }
+    eof {
+        log_message "Claude会话结束"
+        set completed 1
+    }
+    -re {[\r\n]+} {
+        # 每收到一行输出
+        incr line_count
+
+        # 每100行记录一次进度
+        if {$line_count % 100 == 0} {
+            log_message "处理中... 已收到 $line_count 行输出"
+        }
+
+        # 检查是否达到最大行数（防止无限循环）
+        if {$line_count >= $max_lines} {
+            log_message "⚠️  已接收 $max_lines 行输出，准备结束会话"
+            set completed 1
+        }
+
+        exp_continue
+    }
+    -re {(Done|完成|✓|finished|complete|已保存|success)} {
+        log_message "✅ 检测到完成标志: $expect_out(1,string)"
+        set completed 1
+    }
+    -re {(Error|错误|失败|×|Failed|error:|ERROR:)} {
+        log_error "❌ 检测到错误: $expect_out(0,string)"
+        # 继续等待，可能只是部分错误
+        exp_continue
+    }
+}
+
+# 发送退出命令
+log_message "发送退出命令..."
+send -- "exit\r"
+
+# 等待会话结束
+expect {
+    timeout { log_message "退出超时" }
+    eof { log_message "✅ 会话已正常结束" }
+}
+
+# 关闭spawned进程
+if {[info exists spawn_id]} {
+    exp_close -f $spawn_id
+}
+
+# 最终日志
+log_message "========================================="
+log_message "文档整合任务完成"
+log_message "========================================="
+log_message "总输出行数: $line_count"
+
+puts "\n✅ 文档整合任务执行完成"
+exit 0

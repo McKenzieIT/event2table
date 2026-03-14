@@ -4,10 +4,12 @@ Node and Flow Queries
 Implements GraphQL query resolvers for Node and Flow entities.
 """
 
-import graphene
-from graphene import Field, List, Int, String
-from typing import List as TypingList, Dict, Any
 import logging
+from typing import Any, Dict
+from typing import List as TypingList
+
+import graphene
+from graphene import Field, Int, List, String
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +24,7 @@ class NodeQueries:
             from backend.core.utils import fetch_one_as_dict
             from backend.gql_api.types.node_type import NodeType
 
-            node = fetch_one_as_dict(
-                "SELECT * FROM canvas_nodes WHERE id = ?",
-                (id,)
-            )
+            node = fetch_one_as_dict("SELECT * FROM canvas_nodes WHERE id = ?", (id,))
 
             return NodeType.from_dict(node) if node else None
 
@@ -34,8 +33,9 @@ class NodeQueries:
             return None
 
     @staticmethod
-    def resolve_nodes(root, info, game_gid: int = None, node_type: str = None,
-                      limit: int = 50, offset: int = 0):
+    def resolve_nodes(
+        root, info, game_gid: int = None, node_type: str = None, limit: int = 50, offset: int = 0
+    ):
         """Resolve list of nodes with optional filtering."""
         try:
             from backend.core.utils import fetch_all_as_dict
@@ -74,10 +74,7 @@ class FlowQueries:
             from backend.core.utils import fetch_one_as_dict
             from backend.gql_api.types.node_type import FlowType
 
-            flow = fetch_one_as_dict(
-                "SELECT * FROM canvas_flows WHERE id = ?",
-                (id,)
-            )
+            flow = fetch_one_as_dict("SELECT * FROM canvas_flows WHERE id = ?", (id,))
 
             return FlowType.from_dict(flow) if flow else None
 
@@ -86,8 +83,9 @@ class FlowQueries:
             return None
 
     @staticmethod
-    def resolve_flows(root, info, game_gid: int = None, flow_type: str = None,
-                      limit: int = 50, offset: int = 0):
+    def resolve_flows(
+        root, info, game_gid: int = None, flow_type: str = None, limit: int = 50, offset: int = 0
+    ):
         """Resolve list of flows with optional filtering."""
         try:
             from backend.core.utils import fetch_all_as_dict

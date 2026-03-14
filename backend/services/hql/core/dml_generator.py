@@ -6,12 +6,12 @@
 DML生成器 - Data Manipulation Language Generator
 
 负责生成INSERT OVERWRITE等DML语句
-完全独立、无业务依赖的DML生成器
+完全独立, 无业务依赖的DML生成器
 """
 
 import re
-from typing import List
 from datetime import datetime
+from typing import List
 
 
 class DMLGenerator:
@@ -19,7 +19,7 @@ class DMLGenerator:
     DML生成器
 
     专门负责生成INSERT OVERWRITE TABLE等DML语句
-    与DDL生成器配合使用，完成完整的ETL流程
+    与DDL生成器配合使用, 完成完整的ETL流程
 
     Examples:
         >>> from backend.services.hql.core.dml_generator import DMLGenerator
@@ -35,7 +35,7 @@ class DMLGenerator:
         >>> print(dml)
     """
 
-    # 危险的SQL关键字（用于表名验证）
+    # 危险的SQL关键字(用于表名验证)
     DANGEROUS_KEYWORDS = [
         "DROP",
         "DELETE",
@@ -58,16 +58,12 @@ class DMLGenerator:
         """初始化DML生成器"""
 
     def generate_insert_overwrite(
-        self,
-        target_table: str,
-        source_query: str,
-        partition_ds: str,
-        **options
+        self, target_table: str, source_query: str, partition_ds: str, **options
     ) -> str:
         """
         生成INSERT OVERWRITE语句
 
-        这是Hive数据仓库中最常用的DML操作，用于覆盖写入分区数据
+        这是Hive数据仓库中最常用的DML操作, 用于覆盖写入分区数据
 
         Args:
             target_table: 目标表名（格式: database.table）
@@ -80,7 +76,7 @@ class DMLGenerator:
             **options: 额外选项
                 - include_if_not_exist: 是否添加IF NOT EXISTS（默认False）
                 - include_comments: 是否包含注释（默认True）
-                - overwrite_table: 是否覆盖整个表（默认False，仅覆盖分区）
+                - overwrite_table: 是否覆盖整个表（默认False, 仅覆盖分区）
 
         Returns:
             str: 完整的INSERT OVERWRITE语句
@@ -128,17 +124,14 @@ class DMLGenerator:
             target_table=target_table,
             source_query=source_query,
             partition_ds=partition_ds,
-            **options
+            **options,
         )
         dml_parts.append(insert_statement)
 
         return "\n".join(dml_parts)
 
     def generate_insert_overwrite_directory(
-        self,
-        target_directory: str,
-        source_query: str,
-        **options
+        self, target_directory: str, source_query: str, **options
     ) -> str:
         """
         生成INSERT OVERWRITE DIRECTORY语句（导出到文件系统）
@@ -193,11 +186,7 @@ class DMLGenerator:
         return "\n".join(dml_parts)
 
     def _build_insert_overwrite(
-        self,
-        target_table: str,
-        source_query: str,
-        partition_ds: str,
-        **options
+        self, target_table: str, source_query: str, partition_ds: str, **options
     ) -> str:
         """
         构建INSERT OVERWRITE核心语句
@@ -211,7 +200,7 @@ class DMLGenerator:
         Returns:
             str: INSERT OVERWRITE语句
         """
-        # 格式化源查询（去除多余的空白行）
+        # 格式化源查询(去除多余的空白行)
         formatted_query = self._format_query(source_query)
 
         # 构建语句
@@ -239,7 +228,7 @@ PARTITION (ds='{partition_ds}')
             f"-- Timestamp: {timestamp}",
             f"-- Target Table: {target_table}",
             f"-- Partition: ds='{partition_ds}'",
-            f"-- Description: INSERT OVERWRITE for partition loading"
+            f"-- Description: INSERT OVERWRITE for partition loading",
         ]
 
         return "\n".join(comments)
@@ -248,7 +237,7 @@ PARTITION (ds='{partition_ds}')
         """
         格式化查询语句
 
-        去除多余的空白行，保持基本格式
+        去除多余的空白行, 保持基本格式
 
         Args:
             query: 原始查询
@@ -277,11 +266,9 @@ PARTITION (ds='{partition_ds}')
         if not table_name or not table_name.strip():
             raise ValueError("target_table cannot be empty")
 
-        # 基本格式验证（应该包含database.table）
+        # 基本格式验证(应该包含database.table)
         if "." not in table_name:
-            raise ValueError(
-                f"target_table must be in format 'database.table', got: {table_name}"
-            )
+            raise ValueError(f"target_table must be in format 'database.table', got: {table_name}")
 
         # 检查危险关键字
         table_upper = table_name.upper()
@@ -324,12 +311,10 @@ PARTITION (ds='{partition_ds}')
                     f"source_query should be a SELECT statement only."
                 )
 
-        # 检查是否以SELECT开头（允许注释）
+        # 检查是否以SELECT开头(允许注释)
         stripped = query.lstrip()
         if not stripped.upper().startswith("SELECT") and not stripped.startswith("--"):
-            raise ValueError(
-                f"source_query must be a SELECT statement, got: {stripped[:50]}..."
-            )
+            raise ValueError(f"source_query must be a SELECT statement, got: {stripped[:50]}...")
 
     def _validate_partition_ds(self, partition_ds: str) -> None:
         """
@@ -344,24 +329,21 @@ PARTITION (ds='{partition_ds}')
         if not partition_ds or not partition_ds.strip():
             raise ValueError("partition_ds cannot be empty")
 
-        # 支持动态变量（Hive变量）
+        # 支持动态变量(Hive变量)
         if partition_ds.startswith("${") and partition_ds.endswith("}"):
             return
 
-        # 验证日期格式：YYYYMMDD
+        # 验证日期格式: YYYYMMDD
         if not re.match(r'^\d{8}$', partition_ds):
             raise ValueError(
-                f"partition_ds must be in format YYYYMMDD (e.g., 20260217), "
-                f"got: {partition_ds}"
+                f"partition_ds must be in format YYYYMMDD (e.g., 20260217), " f"got: {partition_ds}"
             )
 
         # 验证日期有效性
         try:
             datetime.strptime(partition_ds, "%Y%m%d")
         except ValueError:
-            raise ValueError(
-                f"partition_ds contains invalid date: {partition_ds}"
-            )
+            raise ValueError(f"partition_ds contains invalid date: {partition_ds}")
 
 
 class DMLBuilderFactory:
@@ -373,11 +355,7 @@ class DMLBuilderFactory:
 
     @staticmethod
     def create_etl_dml(
-        dwd_prefix: str,
-        game_gid: int,
-        event_name: str,
-        source_query: str,
-        partition_ds: str
+        dwd_prefix: str, game_gid: int, event_name: str, source_query: str, partition_ds: str
     ) -> str:
         """
         创建标准ETL DML语句
@@ -409,17 +387,11 @@ class DMLBuilderFactory:
         target_table = f"{dwd_prefix}.v_dwd_{game_gid}_{event_name}_di"
 
         return generator.generate_insert_overwrite(
-            target_table=target_table,
-            source_query=source_query,
-            partition_ds=partition_ds
+            target_table=target_table, source_query=source_query, partition_ds=partition_ds
         )
 
     @staticmethod
-    def create_batch_insert(
-        target_table: str,
-        source_queries: List[str],
-        partition_ds: str
-    ) -> str:
+    def create_batch_insert(target_table: str, source_queries: List[str], partition_ds: str) -> str:
         """
         创建批量插入语句（使用UNION ALL）
 
@@ -437,9 +409,7 @@ class DMLBuilderFactory:
         if len(source_queries) == 1:
             generator = DMLGenerator()
             return generator.generate_insert_overwrite(
-                target_table=target_table,
-                source_query=source_queries[0],
-                partition_ds=partition_ds
+                target_table=target_table, source_query=source_queries[0], partition_ds=partition_ds
             )
 
         # 多个查询使用UNION ALL合并
@@ -447,18 +417,13 @@ class DMLBuilderFactory:
 
         generator = DMLGenerator()
         return generator.generate_insert_overwrite(
-            target_table=target_table,
-            source_query=union_query,
-            partition_ds=partition_ds
+            target_table=target_table, source_query=union_query, partition_ds=partition_ds
         )
 
 
 # 便捷函数
 def generate_insert_overwrite(
-    target_table: str,
-    source_query: str,
-    partition_ds: str,
-    **options
+    target_table: str, source_query: str, partition_ds: str, **options
 ) -> str:
     """
     生成INSERT OVERWRITE语句（便捷函数）
@@ -481,8 +446,5 @@ def generate_insert_overwrite(
     """
     generator = DMLGenerator()
     return generator.generate_insert_overwrite(
-        target_table=target_table,
-        source_query=source_query,
-        partition_ds=partition_ds,
-        **options
+        target_table=target_table, source_query=source_query, partition_ds=partition_ds, **options
     )

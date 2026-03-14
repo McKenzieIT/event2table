@@ -16,18 +16,18 @@
 - RTO < 1秒
 """
 
-from typing import Any, Optional, Dict, TYPE_CHECKING
+import logging
 import threading
 import time
-import logging
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 if TYPE_CHECKING:
     from .cache_hierarchical import HierarchicalCache
 
 try:
-    from .cache_system import hierarchical_cache
-    from .cache_system import CacheKeyBuilder, get_cache
     from redis.exceptions import RedisError
+
+    from .cache_system import CacheKeyBuilder, get_cache, hierarchical_cache
 except ImportError:
     hierarchical_cache = None  # type: ignore
     CacheKeyBuilder = None  # type: ignore
@@ -99,12 +99,12 @@ class CacheDegradationManager:
                 if result is not None:
                     return result
             except RedisError as e:
-                logger.warning(f"⚠️ Redis不可用，切换到降级模式: {e}")
+                logger.warning(f"⚠️ Redis不可用, 切换到降级模式: {e}")
                 self._enter_degraded_mode()
             except Exception as e:
                 logger.debug(f"缓存读取失败 (非Redis错误): {e}")
 
-        # 降级模式：只使用L1
+        # 降级模式: 只使用L1
         key = CacheKeyBuilder.build(pattern, **kwargs)
         return self._get_l1_only(key)
 
@@ -133,15 +133,12 @@ class CacheDegradationManager:
 
             # 检查响应时间
             if response_time > 100:
-                logger.warning(
-                    f"⚠️ Redis响应过慢: {response_time:.1f}ms "
-                    f"(阈值: 100ms)"
-                )
-                # 响应慢但不一定降级，继续使用
+                logger.warning(f"⚠️ Redis响应过慢: {response_time:.1f}ms " f"(阈值: 100ms)")
+                # 响应慢但不一定降级, 继续使用
 
-            # Redis健康，如果处于降级模式则恢复
+            # Redis健康, 如果处于降级模式则恢复
             if self.degraded:
-                logger.info("✅ Redis已恢复，切换回正常模式")
+                logger.info("✅ Redis已恢复, 切换回正常模式")
                 self._exit_degraded_mode()
 
         except RedisError as e:
@@ -197,7 +194,7 @@ class CacheDegradationManager:
                 self.degraded = False
                 self.stats['recovery_count'] += 1
                 self.stats['last_recovery_time'] = time.time()
-                logger.info("✅ 退出缓存降级模式，恢复正常 (L1 → L2 → L3)")
+                logger.info("✅ 退出缓存降级模式, 恢复正常 (L1 → L2 → L3)")
 
     def set_with_fallback(self, pattern: str, data: Any, **kwargs):
         """
@@ -221,10 +218,10 @@ class CacheDegradationManager:
                     cache.set(key, data, timeout=hierarchical_cache.l2_ttl)
                     logger.debug(f"💾 L2 SET: {key}")
             except RedisError as e:
-                logger.warning(f"⚠️ L2写入失败，进入降级模式: {e}")
+                logger.warning(f"⚠️ L2写入失败, 进入降级模式: {e}")
                 self._enter_degraded_mode()
         else:
-            logger.debug(f"💾 降级模式：仅写入L1: {key}")
+            logger.debug(f"💾 降级模式: 仅写入L1: {key}")
 
     def force_degrade(self):
         """强制进入降级模式 (用于测试)"""

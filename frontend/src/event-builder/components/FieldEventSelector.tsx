@@ -184,9 +184,13 @@ export default function FieldEventSelector({
       grouped[category].push(event);
     });
 
-    // Sort events within each category by name
+    // Sort events within each category by name (with null check)
     Object.keys(grouped).forEach(category => {
-      grouped[category].sort((a, b) => a.name.localeCompare(b.name));
+      grouped[category].sort((a, b) => {
+        const nameA = a.name || '';
+        const nameB = b.name || '';
+        return nameA.localeCompare(nameB);
+      });
     });
 
     return grouped;

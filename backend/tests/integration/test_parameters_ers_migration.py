@@ -7,11 +7,12 @@ Verifies that parameters.py properly uses ParameterService
 and no longer has direct database access (except for complex queries).
 """
 
-import sys
 import os
+import sys
 
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
+
 
 def test_service_methods_exist():
     """Test that all required service methods exist"""
@@ -26,7 +27,9 @@ def test_service_methods_exist():
     assert hasattr(service, 'validate_parameter_name'), "Missing validate_parameter_name method"
     assert hasattr(service, 'check_param_library'), "Missing check_param_library method"
     assert hasattr(service, 'batch_check_param_library'), "Missing batch_check_param_library method"
-    assert hasattr(service, 'link_event_param_to_library'), "Missing link_event_param_to_library method"
+    assert hasattr(
+        service, 'link_event_param_to_library'
+    ), "Missing link_event_param_to_library method"
     assert hasattr(service, 'get_alter_table_sql'), "Missing get_alter_table_sql method"
 
     print("✅ All required service methods exist")
@@ -63,7 +66,9 @@ def test_api_endpoints_use_service():
     direct_access = content.count('fetch_one_as_dict(') + content.count('fetch_all_as_dict(')
 
     # Should have more service usage than direct access
-    assert service_usage > direct_access, f"Service usage ({service_usage}) should be greater than direct access ({direct_access})"
+    assert (
+        service_usage > direct_access
+    ), f"Service usage ({service_usage}) should be greater than direct access ({direct_access})"
 
     print(f"✅ API uses ParameterService: {service_usage} method calls")
     print(f"✅ Direct database access reduced to: {direct_access} (only for complex queries)")
@@ -71,8 +76,9 @@ def test_api_endpoints_use_service():
 
 def test_service_method_signatures():
     """Test that service methods have correct signatures"""
-    from backend.services.parameters.parameter_service import ParameterService
     import inspect
+
+    from backend.services.parameters.parameter_service import ParameterService
 
     service = ParameterService()
 
@@ -140,5 +146,6 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

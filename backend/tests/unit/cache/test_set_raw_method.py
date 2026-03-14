@@ -4,7 +4,7 @@
 测试HierarchicalCache.set_raw()方法
 ===================================
 
-测试set_raw()方法的功能：
+测试set_raw()方法的功能: 
 - 直接设置缓存值（不经过序列化）
 - 支持L1和L2层级设置
 - 更新缓存统计
@@ -14,9 +14,11 @@
 日期: 2026-02-27
 """
 
-import pytest
 import time
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
+
 from backend.core.cache.cache_hierarchical import HierarchicalCache
 
 
@@ -41,7 +43,7 @@ class TestSetRawMethod:
         assert key in self.cache.l1_timestamps
 
     def test_set_raw_both_levels(self):
-        """测试同时写入L1和L2缓存（默认）"""
+        """测试同时写入L1和L2缓存(默认)"""
         key = "dwd_gen:v3:test:key2"
         value = {"data": "test_value_both"}
 
@@ -52,8 +54,8 @@ class TestSetRawMethod:
         assert key in self.cache.l1_cache
         assert self.cache.l1_cache[key] == value
 
-        # 验证L2缓存（通过mock）
-        # 注意：实际L2写入依赖Redis，这里只验证L1
+        # 验证L2缓存(通过mock)
+        # 注意: 实际L2写入依赖Redis, 这里只验证L1
         assert key in self.cache.l1_timestamps
 
     def test_set_raw_with_custom_ttl(self):
@@ -74,7 +76,7 @@ class TestSetRawMethod:
         key = "dwd_gen:v3:test:key4"
         value = {"data": "default_ttl"}
 
-        # 不指定TTL，使用默认值
+        # 不指定TTL, 使用默认值
         self.cache.set_raw(key, value, level='l1')
 
         # 验证数据已写入
@@ -100,7 +102,7 @@ class TestSetRawMethod:
         time.sleep(0.01)
         cache.set_raw("dwd_gen:v3:test:key3", "value3", level='l1')
 
-        # 添加第4个key，应该淘汰最旧的
+        # 添加第4个key, 应该淘汰最旧的
         cache.set_raw("dwd_gen:v3:test:key4", "value4", level='l1')
 
         # 验证最旧的key被淘汰
@@ -166,7 +168,7 @@ class TestSetRawMethod:
         key = "dwd_gen:v3:test:key_l2_only"
         value = {"data": "l2_only"}
 
-        # 仅写入L2（需要mock Redis）
+        # 仅写入L2(需要mock Redis)
         with patch('backend.core.cache.cache_hierarchical.get_cache') as mock_get_cache:
             mock_cache = Mock()
             mock_get_cache.return_value = mock_cache
@@ -191,7 +193,7 @@ class TestSetRawMethod:
             mock_cache.set.side_effect = Exception("Redis connection failed")
             mock_get_cache.return_value = mock_cache
 
-            # 写入both级别（L2应该失败，但不影响L1）
+            # 写入both级别(L2应该失败, 但不影响L1)
             self.cache.set_raw(key, value, ttl=3600, level='both')
 
             # 验证L1缓存仍然成功
@@ -237,11 +239,7 @@ class TestSetRawMethod:
                 {"id": 1, "name": "Alice", "tags": ["admin", "active"]},
                 {"id": 2, "name": "Bob", "tags": ["user"]},
             ],
-            "metadata": {
-                "total": 2,
-                "page": 1,
-                "per_page": 10
-            }
+            "metadata": {"total": 2, "page": 1, "per_page": 10},
         }
 
         # 写入复杂数据
@@ -254,7 +252,7 @@ class TestSetRawMethod:
 
 
 class TestSetRawIntegration:
-    """集成测试：set_raw与get的配合"""
+    """集成测试: set_raw与get的配合"""
 
     def setup_method(self):
         """每个测试前创建新的缓存实例"""
@@ -292,9 +290,9 @@ class TestSetRawIntegration:
         # 等待TTL过期
         time.sleep(1.1)
 
-        # 再次读取应该失败（L1过期）
+        # 再次读取应该失败(L1过期)
         result = cache.get("test", ttl="key1")
-        assert result is None  # L2也没有数据，所以返回None
+        assert result is None  # L2也没有数据, 所以返回None
 
     def test_set_raw_stats_update(self):
         """测试set_raw不影响统计"""
@@ -307,7 +305,7 @@ class TestSetRawIntegration:
         # 写入缓存
         self.cache.set_raw(key, value, level='l1')
 
-        # 验证统计未变化（set_raw不增加hit/miss计数）
+        # 验证统计未变化(set_raw不增加hit/miss计数)
         stats_after = self.cache.get_stats()
         assert stats_after["l1_hits"] == initial_stats["l1_hits"]
         assert stats_after["l2_hits"] == initial_stats["l2_hits"]

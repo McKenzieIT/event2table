@@ -9,11 +9,12 @@ Category Service - 业务逻辑层 (精简架构)
 - 集成缓存防护和失效机制
 """
 
-from typing import List, Optional, Dict, Any
 import logging
+from typing import Any, Dict, List, Optional
+
+from backend.core.cache.cache_system import cached
 from backend.models.entities import EventCategoryEntity
 from backend.models.repositories.category_repository import CategoryRepository
-from backend.core.cache.cache_system import cached
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,8 @@ class CategoryService:
 
     def __init__(self):
         self.category_repo = CategoryRepository()
-        from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
+        from backend.core.cache.cache_system import CacheInvalidator, HierarchicalCache
+
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
         logger.info("✅ CategoryService initialized")
@@ -34,7 +36,7 @@ class CategoryService:
         获取所有类别 (带缓存)
 
         Args:
-            game_gid: 可选的游戏GID，用于过滤特定游戏的事件统计
+            game_gid: 可选的游戏GID, 用于过滤特定游戏的事件统计
 
         Returns:
             类别Entity列表
@@ -140,7 +142,7 @@ class CategoryService:
         if not existing:
             raise ValueError(f"Category ID {category_id} not found")
 
-        # 如果更新name，检查唯一性
+        # 如果更新name, 检查唯一性
         if "name" in updates:
             name_check = self.category_repo.find_by_name(updates["name"])
             if name_check and name_check.id != category_id:
@@ -191,7 +193,7 @@ class CategoryService:
             category_ids: 类别ID列表
 
         Returns:
-            包含删除结果的字典：
+            包含删除结果的字典: 
             - deleted_count: 成功删除的数量
             - failed_ids: 删除失败的ID列表
             - failed_reasons: 失败原因字典 {id: reason}
@@ -205,7 +207,7 @@ class CategoryService:
                 "deleted_count": 0,
                 "failed_ids": [],
                 "failed_reasons": {},
-                "message": "No category IDs provided"
+                "message": "No category IDs provided",
             }
 
         # 验证所有ID
@@ -216,10 +218,10 @@ class CategoryService:
         # 批量删除
         result = self.category_repo.batch_delete(category_ids)
 
-        # 失效缓存（只针对成功删除的）
+        # 失效缓存(只针对成功删除的)
         if result["deleted_count"] > 0:
             self.invalidator.invalidate_pattern("categories.list")
-            # 失效所有相关缓存（包括失败的ID，以防有缓存）
+            # 失效所有相关缓存(包括失败的ID, 以防有缓存)
             for category_id in category_ids:
                 self.invalidator.invalidate_pattern(f"categories.detail:{category_id}")
 
@@ -238,7 +240,9 @@ class CategoryService:
         elif deleted == 0:
             result["message"] = f"Failed to delete any categories ({failed} errors)"
         else:
-            result["message"] = f"Successfully deleted {deleted} out of {total} categories ({failed} failed)"
+            result["message"] = (
+                f"Successfully deleted {deleted} out of {total} categories ({failed} failed)"
+            )
 
         return result
 
@@ -295,7 +299,7 @@ class CategoryService:
         获取类别统计信息 (Repository架构)
 
         Args:
-            game_gid: 可选的游戏GID，用于获取游戏级别的统计
+            game_gid: 可选的游戏GID, 用于获取游戏级别的统计
 
         Returns:
             包含统计信息和详细分类的字典:

@@ -14,17 +14,18 @@ Game Service - 业务逻辑层 (精简架构)
 - 集成Bloom Filter防止缓存穿透 (2026-02-25)
 """
 
-from typing import List, Optional, Dict, Any
 import logging
-import threading
 import os
-from backend.models.entities import GameEntity
-from backend.models.repositories.games import GameRepository
+import threading
+from typing import Any, Dict, List, Optional
+
+from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 from backend.core.cache.cache_system import cached
 from backend.core.cache.decorators import cache_invalidate  # ⚡ PERF: Phase 1.3
-from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter
 from backend.core.config.config import CacheConfig
 from backend.core.utils.business_helpers import validate_game_gid
+from backend.models.entities import GameEntity
+from backend.models.repositories.games import GameRepository
 
 logger = logging.getLogger(__name__)
 
@@ -34,18 +35,19 @@ class GameService:
 
     def __init__(self):
         self.game_repo = GameRepository()
-        from backend.core.cache.cache_system import HierarchicalCache, CacheInvalidator
+        from backend.core.cache.cache_system import CacheInvalidator, HierarchicalCache
+
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
 
-        # Bloom Filter延迟初始化（lazy loading）
+        # Bloom Filter延迟初始化(lazy loading)
         self._bloom_filter = None
         self._bloom_filter_lock = threading.Lock()
         logger.info("✅ GameService initialized (Bloom Filter lazy)")
 
     @property
     def bloom_filter(self):
-        """延迟加载Bloom Filter（线程安全）"""
+        """延迟加载Bloom Filter(线程安全)"""
         if self._bloom_filter is None:
             with self._bloom_filter_lock:
                 if self._bloom_filter is None:
@@ -54,7 +56,7 @@ class GameService:
                         capacity=100000,  # 10万容量
                         error_rate=0.001,  # 0.1%误判率
                         persistence_path="data/games_bloom_filter.pkl",
-                        strict_validation=self._is_test_mode()
+                        strict_validation=self._is_test_mode(),
                     )
                     logger.info("✅ GameService Bloom Filter initialized")
         return self._bloom_filter
@@ -62,17 +64,21 @@ class GameService:
     def _is_test_mode(self) -> bool:
         """检测是否在测试环境"""
         return (
-            os.environ.get("TESTING") == "true" or
-            os.environ.get("PYTEST_CURRENT_TEST") is not None
+            os.environ.get("TESTING") == "true" or os.environ.get("PYTEST_CURRENT_TEST") is not None
         )
 
-    @cached("games.list", timeout=CacheConfig.CACHE_TIMEOUT_STATIC)
+    @cached("games.list", timeout=1800)  # ⚡ TTL优化: 7200秒→1800秒 (30分钟)
     def get_all_games(self, include_stats: bool = False) -> List[GameEntity]:
         """
         获取所有游戏 (带缓存)
 
+        ⚡ TTL设置理由: 游戏列表中等变化频率
+        - 游戏基本信息相对稳定, 但事件数量变化较快
+        - 30分钟TTL平衡了数据新鲜度和性能
+        - 原来使用CACHE_TIMEOUT_STATIC (7200秒=2小时) 过长
+
         Args:
-            include_stats: 是否包含统计信息 (事件数量、流程数量)
+            include_stats: 是否包含统计信息 (事件数量, 流程数量)
 
         Returns:
             游戏Entity列表
@@ -82,15 +88,15 @@ class GameService:
 
         Performance:
             N+1 query fixed - 使用 JOIN 查询替代循环查询
-            预期性能提升：50-100倍（取决于游戏数量）
+            预期性能提升: 50-100倍（取决于游戏数量）
         """
         from backend.core.utils.converters import fetch_all_as_dict
 
         if include_stats:
             # ⚡ Performance Optimization: N+1 query fixed
-            # 使用 LEFT JOIN 获取统计信息，避免 N+1 查询
-            # 修复前：N次查询（N = 游戏数量）
-            # 修复后：1次查询
+            # 使用 LEFT JOIN 获取统计信息, 避免 N+1 查询
+            # 修复前: N次查询(N = 游戏数量)
+            # 修复后: 1次查询
             games_with_stats = fetch_all_as_dict("""
                 SELECT
                     g.id,
@@ -115,15 +121,19 @@ class GameService:
             # 转换为 GameEntity 列表
             games = [GameEntity(**game) for game in games_with_stats]
         else:
-            # 不需要统计信息时，直接从 Repository 获取
+            # 不需要统计信息时, 直接从 Repository 获取
             games = self.game_repo.find_all()
 
         return games
 
-    @cached("games.detail", timeout=CacheConfig.CACHE_TIMEOUT_STATIC)
+    @cached("games.detail", timeout=3600)  # ⚡ TTL优化: 游戏详情缓存1小时
     def get_game_by_gid(self, game_gid: int) -> Optional[GameEntity]:
         """
         根据GID获取游戏
+
+        ⚡ TTL设置理由: 游戏详情相对稳定
+        - 游戏基本信息（名称, ODS数据库等）很少变化
+        - 1小时TTL减少数据库查询, 提升性能
 
         Args:
             game_gid: 游戏业务GID
@@ -162,12 +172,9 @@ class GameService:
             raise ValueError(f"Game GID {game_data.gid} already exists")
 
         # 创建游戏 (Entity已通过Pydantic验证)
-        result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
-        if result is None:
+        created_game = self.game_repo.create(game_data.model_dump())
+        if created_game is None:
             raise ValueError("Failed to create game")
-
-        # Convert dict to GameEntity
-        created_game = GameEntity(**result)
 
         # 失效游戏列表缓存
         self.invalidator.invalidate_pattern("games.list")
@@ -221,8 +228,8 @@ class GameService:
         """
         删除游戏 (自动失效缓存 + 从Bloom Filter移除)
 
-        注意: Bloom Filter不支持删除操作，重建是唯一方式
-        因此我们标记需要重建，而不是立即删除
+        注意: Bloom Filter不支持删除操作, 重建是唯一方式
+        因此我们标记需要重建, 而不是立即删除
 
         Args:
             game_gid: 游戏业务GID
@@ -244,11 +251,11 @@ class GameService:
         self.invalidator.invalidate_pattern("games.list")
         self.invalidator.invalidate_pattern(f"games.detail:{game_gid}")
 
-        # Bloom Filter不支持删除，标记需要重建
+        # Bloom Filter不支持删除, 标记需要重建
         # 下次查询时会自动从数据库重建
         logger.info(f"游戏删除成功,已失效缓存: gid={game_gid} (Bloom Filter将在下次重建时更新)")
 
-    def get_by_id(self, game_id: int) -> Optional[GameEntity]:
+    def get_game_by_database_id(self, game_id: int) -> Optional[GameEntity]:
         """
         根据数据库ID获取游戏
 
@@ -353,7 +360,7 @@ class GameService:
         """
         获取所有游戏及其详细统计信息（带缓存）
 
-        使用LEFT JOIN获取统计信息，避免N+1查询问题
+        使用LEFT JOIN获取统计信息, 避免N+1查询问题
 
         Returns:
             游戏字典列表（包含详细统计）
@@ -410,12 +417,11 @@ class GameService:
 
         # 检查事件数量
         event_count = fetch_one_as_dict(
-            "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
-            (game_gid,)
+            "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?", (game_gid,)
         )
         impact["event_count"] = event_count["count"] if event_count else 0
 
-        # 检查参数数量（通过事件关联）
+        # 检查参数数量(通过事件关联)
         param_count = fetch_one_as_dict(
             """
             SELECT COUNT(*) as count
@@ -423,23 +429,24 @@ class GameService:
             INNER JOIN log_events le ON ep.event_id = le.id
             WHERE le.game_gid = ?
         """,
-            (game_gid,)
+            (game_gid,),
         )
         impact["param_count"] = param_count["count"] if param_count else 0
 
         # 检查Canvas节点配置
         node_count = fetch_one_as_dict(
-            "SELECT COUNT(*) as count FROM event_node_configs WHERE game_gid = ?",
-            (game_gid,)
+            "SELECT COUNT(*) as count FROM event_node_configs WHERE game_gid = ?", (game_gid,)
         )
         impact["node_config_count"] = node_count["count"] if node_count else 0
 
         # 判断是否有关联数据
-        impact["has_associated_data"] = any([
-            impact["event_count"] > 0,
-            impact["param_count"] > 0,
-            impact["node_config_count"] > 0,
-        ])
+        impact["has_associated_data"] = any(
+            [
+                impact["event_count"] > 0,
+                impact["param_count"] > 0,
+                impact["node_config_count"] > 0,
+            ]
+        )
 
         logger.debug(
             f"Deletion impact for game_gid={game_gid}: "
@@ -474,7 +481,7 @@ class GameService:
         # 检查删除影响
         impact = self.check_deletion_impact(game_gid)
 
-        # 如果有关联数据且未强制删除，返回影响统计
+        # 如果有关联数据且未强制删除, 返回影响统计
         if not force and impact["has_associated_data"]:
             raise ValueError(
                 f"Game has {impact['event_count']} events, "
@@ -491,9 +498,9 @@ class GameService:
             cursor = conn.cursor()
 
             try:
-                cursor.execute("BEGIN IMMEDIATE")  # 立即锁，防止并发修改
+                cursor.execute("BEGIN IMMEDIATE")  # 立即锁, 防止并发修改
 
-                # 验证游戏仍然存在（防止已被其他请求删除）
+                # 验证游戏仍然存在(防止已被其他请求删除)
                 cursor.execute("SELECT id FROM games WHERE gid = ?", (game_gid,))
                 game_exists = cursor.fetchone()
 
@@ -501,7 +508,7 @@ class GameService:
                     conn.rollback()
                     raise ValueError(f"Game GID {game_gid} not found (may have been deleted)")
 
-                # 1. 删除事件参数（通过事件ID）
+                # 1. 删除事件参数(通过事件ID)
                 cursor.execute(
                     """
                     DELETE FROM event_params
@@ -516,10 +523,7 @@ class GameService:
                 cursor.execute("DELETE FROM log_events WHERE game_gid = ?", (game_gid,))
 
                 # 3. 删除Canvas节点配置
-                cursor.execute(
-                    "DELETE FROM event_node_configs WHERE game_gid = ?",
-                    (game_gid,)
-                )
+                cursor.execute("DELETE FROM event_node_configs WHERE game_gid = ?", (game_gid,))
 
                 # 4. 删除游戏记录
                 cursor.execute("DELETE FROM games WHERE gid = ?", (game_gid,))

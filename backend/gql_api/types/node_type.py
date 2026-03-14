@@ -4,11 +4,43 @@ Node GraphQL Type
 Defines the GraphQL type for Canvas Node entity.
 """
 
-import graphene
-from graphene import Int, String, Boolean, Float
 import logging
 
+import graphene
+from graphene import Boolean, Float, Int, String
+
 logger = logging.getLogger(__name__)
+
+
+class NodeTypeEnum(graphene.Enum):
+    """Node Type Enumeration for Canvas nodes
+
+    Defines all valid node types in the canvas system.
+    Matches frontend TypeScript constants in canvas/components/constants/nodeTypes.ts
+    """
+
+    EVENT = "event"  # Event Node
+    JOIN = "join"  # Join Node
+    UNION = "union"  # Union Node
+    FILTER = "filter"  # Filter Node
+
+    class Meta:
+        description = "节点类型枚举"
+
+
+class FlowTypeEnum(graphene.Enum):
+    """Flow Type Enumeration for Canvas flows
+
+    Defines all valid flow types in the canvas system.
+    """
+
+    SINGLE = "single"  # Single event flow
+    JOIN = "join"  # Join flow
+    UNION = "union"  # Union flow
+    FILTER = "filter"  # Filter flow
+
+    class Meta:
+        description = "流程类型枚举"
 
 
 class NodeType(graphene.ObjectType):
@@ -26,7 +58,7 @@ class NodeType(graphene.ObjectType):
     name = String(required=True, description="节点名称")
     description = String(description="节点描述")
     game_gid = Int(description="关联游戏GID")
-    node_type = String(description="节点类型")
+    node_type = graphene.Field(NodeTypeEnum, description="节点类型")
     config = String(description="节点配置JSON")
     position_x = Float(description="X坐标")
     position_y = Float(description="Y坐标")
@@ -69,7 +101,7 @@ class FlowType(graphene.ObjectType):
     name = String(required=True, description="流程名称")
     description = String(description="流程描述")
     game_gid = Int(description="关联游戏GID")
-    flow_type = String(description="流程类型")
+    flow_type = graphene.Field(FlowTypeEnum, description="流程类型")
     config = String(description="流程配置JSON")
     nodes = String(description="节点数据JSON")
     edges = String(description="边数据JSON")

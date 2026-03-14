@@ -11,9 +11,10 @@ Parameter Template Repository (参数模板数据访问层)
 - 保持GenericRepository继承
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 
 
 class ParamTemplateRepository(GenericRepository):
@@ -36,7 +37,6 @@ class ParamTemplateRepository(GenericRepository):
             cache_timeout=1800,  # 30分钟缓存（模板变化很少）
         )
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_name(self, template_name: str) -> Optional[Dict[str, Any]]:
         """
@@ -46,7 +46,7 @@ class ParamTemplateRepository(GenericRepository):
             template_name: 模板名
 
         Returns:
-            模板字典，不存在返回None
+            模板字典, 不存在返回None
 
         Example:
             >>> repo = ParamTemplateRepository()
@@ -54,7 +54,6 @@ class ParamTemplateRepository(GenericRepository):
         """
         query = "SELECT * FROM param_templates WHERE template_name = ?"
         return fetch_one_as_dict(query, (template_name,))
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_all_templates(self, include_system: bool = True) -> List[Dict[str, Any]]:
@@ -76,7 +75,6 @@ class ParamTemplateRepository(GenericRepository):
             query += " WHERE is_system = 0"
         query += " ORDER BY base_type, nesting_level, template_name"
         return fetch_all_as_dict(query)
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_templates_by_type(
@@ -102,7 +100,6 @@ class ParamTemplateRepository(GenericRepository):
         query += " ORDER BY nesting_level, template_name"
         return fetch_all_as_dict(query, (base_type,))
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_primitive_types(self) -> List[Dict[str, Any]]:
         """
@@ -122,7 +119,6 @@ class ParamTemplateRepository(GenericRepository):
         """
         return fetch_all_as_dict(query)
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_complex_types(self) -> List[Dict[str, Any]]:
         """
@@ -141,7 +137,6 @@ class ParamTemplateRepository(GenericRepository):
             ORDER BY base_type, nesting_level, template_name
         """
         return fetch_all_as_dict(query)
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_custom_templates(self) -> List[Dict[str, Any]]:
@@ -194,13 +189,14 @@ class ParamTemplateRepository(GenericRepository):
             >>> template_id = repo.create_template('custom', '自定义', 'string', {...})
         """
         import json
+
         from backend.core.utils.converters import get_db_connection
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
-            # 生成HQL解析模板（如果未提供）
+            # 生成HQL解析模板(如果未提供)
             if not hql_parse_template:
                 hql_parse_template = self._generate_hql_template(type_definition)
 
@@ -329,7 +325,6 @@ class ParamTemplateRepository(GenericRepository):
         finally:
             conn.close()
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, template_id: int) -> Optional[Dict[str, Any]]:
         """
@@ -339,7 +334,7 @@ class ParamTemplateRepository(GenericRepository):
             template_id: 模板ID
 
         Returns:
-            模板字典，不存在返回None
+            模板字典, 不存在返回None
 
         Example:
             >>> repo = ParamTemplateRepository()
@@ -347,7 +342,6 @@ class ParamTemplateRepository(GenericRepository):
         """
         query = "SELECT * FROM param_templates WHERE id = ?"
         return fetch_one_as_dict(query, (template_id,))
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_available_types_grouped(self) -> Dict[str, List[Dict[str, Any]]]:
@@ -425,7 +419,6 @@ class ParamTemplateRepository(GenericRepository):
         """
         template = self.find_by_name(template_name)
         return template is not None
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_cast_type(self, template_id: int) -> str:

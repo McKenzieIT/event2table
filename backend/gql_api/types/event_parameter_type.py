@@ -4,9 +4,10 @@ Event Parameter GraphQL Types
 Defines the GraphQL types for Event Parameter extended functionality.
 """
 
-import graphene
-from graphene import Int, String, Boolean, List
 import logging
+
+import graphene
+from graphene import Boolean, Int, List, String
 
 logger = logging.getLogger(__name__)
 
@@ -122,6 +123,7 @@ class EventParameterExtendedType(graphene.ObjectType):
     param_name = String(required=True, description="参数英文名")
     param_name_cn = String(description="参数中文名")
     param_type = String(description="参数类型")
+    hive_type = String(description="Hive数据类型")
     json_path = String(description="JSON路径")
     is_active = Boolean(description="是否活跃")
     version = Int(description="版本号")
@@ -137,6 +139,7 @@ class EventParameterExtendedType(graphene.ObjectType):
             param_name=data.get('param_name'),
             param_name_cn=data.get('param_name_cn'),
             param_type=data.get('param_type'),
+            hive_type=data.get('hive_type'),
             json_path=data.get('json_path'),
             is_active=bool(data.get('is_active', 1)),
             version=data.get('version', 1),

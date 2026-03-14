@@ -1,9 +1,8 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Added React.memo, useCallback
+// Optimized: Stable callbacks for form handlers
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Button, Spinner, Input } from '@shared/ui';
@@ -110,7 +109,7 @@ function CategoryForm() {
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) return;
@@ -121,7 +120,7 @@ function CategoryForm() {
     } catch (error) {
       // Error handled in mutation onError
     }
-  };
+  }, [validateForm, mutation.isLoading, mutation.mutateAsync, formData]);
 
   if (isLoading) {
     return (
@@ -186,4 +185,4 @@ function CategoryForm() {
   );
 }
 
-export default CategoryForm;
+export default memo(CategoryForm);

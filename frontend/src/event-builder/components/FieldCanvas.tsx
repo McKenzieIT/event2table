@@ -108,17 +108,22 @@ const SortableFieldItem = React.memo(({
     // Handle both fieldType and type for compatibility
     const field_type = type || field.fieldType;
 
+    // Handle GraphQL enum values (uppercase) and internal values (lowercase)
     switch (field_type) {
       case 'param':
+      case 'PARAM':  // GraphQL enum value
       case FieldType.PARAMETER:
         return 'bi-link';
       case 'base':
+      case 'BASE':  // GraphQL enum value
       case FieldType.BASIC:
         return 'bi-type';
       case 'custom':
+      case 'CUSTOM':  // GraphQL enum value
       case FieldType.CUSTOM:
         return 'bi-code';
       case 'fixed':
+      case 'FIXED':  // GraphQL enum value
       case FieldType.FIXED:
         return 'bi-pin';
       default:
@@ -130,17 +135,22 @@ const SortableFieldItem = React.memo(({
     // Handle both fieldType and type for compatibility
     const field_type = type || field.fieldType;
 
+    // Handle GraphQL enum values (uppercase) and internal values (lowercase)
     switch (field_type) {
       case 'param':
+      case 'PARAM':  // GraphQL enum value
       case FieldType.PARAMETER:
         return '参数';
       case 'base':
+      case 'BASE':  // GraphQL enum value
       case FieldType.BASIC:
         return '基础';
       case 'custom':
+      case 'CUSTOM':  // GraphQL enum value
       case FieldType.CUSTOM:
         return '自定义';
       case 'fixed':
+      case 'FIXED':  // GraphQL enum value
       case FieldType.FIXED:
         return '固定值';
       default:
@@ -340,6 +350,7 @@ export default function FieldCanvas({
           fieldName: dragData.fieldName,
           displayName: dragData.displayName,
           paramId: dragData.paramId,
+          hive_type: dragData.hive_type,  // ✅ 新增：Hive数据类型
         });
       }
     } catch (error) {
@@ -535,21 +546,32 @@ export default function FieldCanvas({
   // Generate delete confirmation message
   const getDeleteMessage = useCallback(() => {
     if (!deleteModal.field) return '';
-    const fieldType = getFieldTypeLabel(deleteModal.field.fieldType);
-    const fieldName = deleteModal.field.alias || deleteModal.field.name;
+
+    // ✅ BUGFIX #4: 修复字段类型判断和字段名显示
+    // 优先使用 fieldType（后端格式），fallback到 type（内部格式）
+    const fieldTypeValue = deleteModal.field.fieldType || deleteModal.field.type;
+
+    const getFieldTypeLabel = (fieldType) => {
+      // 处理多种格式：GraphQL enum（大写）、内部格式（小写）、后端格式
+      const normalizedType = String(fieldType).toLowerCase();
+
+      const typeLabels = {
+        'param': '参数',
+        'parameter': '参数',
+        'base': '基础字段',
+        'basic': '基础字段',
+        'custom': '自定义字段',
+        'fixed': '固定值'
+      };
+
+      return typeLabels[normalizedType] || '字段';
+    };
+
+    const fieldType = getFieldTypeLabel(fieldTypeValue);
+    const fieldName = deleteModal.field.alias || deleteModal.field.displayName || deleteModal.field.name || deleteModal.field.fieldName;
+
     return `确定要删除${fieldType}"${fieldName}"吗？`;
   }, [deleteModal]);
-
-  // Helper function to get field type label
-  const getFieldTypeLabel = (fieldType) => {
-    const labels = {
-      [FieldType.PARAMETER]: '参数',
-      [FieldType.BASIC]: '基础字段',
-      [FieldType.CUSTOM]: '自定义字段',
-      [FieldType.FIXED]: '固定值'
-    };
-    return labels[fieldType] || '字段';
-  };
 
   // Get active field for drag overlay
   const activeField = fields.find((f) => f.id === activeId);
@@ -652,9 +674,9 @@ export default function FieldCanvas({
                 isActive={true}
               >
                 <div className="field-list">
-                  {safeFields.map((field) => (
+                  {safeFields.map((field, index) => (
                     <SortableFieldItem
-                      key={field.id}
+                      key={`${field.id}-${index}`}
                       field={field}
                       onEdit={handleEditField}
                       onDelete={handleDeleteField}

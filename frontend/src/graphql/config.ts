@@ -27,19 +27,91 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// 错误处理链接
-const errorLink = onError(({ graphQLErrors, networkError }) => {
+// 错误处理链接 - 带详细日志
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward, response }) => {
+  // GraphQL错误 - 详细上下文
   if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) => {
-      console.error(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-      );
+    console.group('❌ GraphQL Errors');
+    console.error('Query:', operation.operationName);
+    console.error('Variables:', JSON.stringify(operation.variables, null, 2));
+    console.error('Error Count:', graphQLErrors.length);
+
+    graphQLErrors.forEach((error, index) => {
+      console.group(`Error #${index + 1}`);
+      console.error('Message:', error.message);
+      console.error('Path:', error.path);
+      console.error('Locations:', error.locations);
+      console.error('Extensions:', error.extensions);
+
+      // 记录验证错误详情
+      if (error.extensions?.code === 'GRAPHQL_VALIDATION_FAILED') {
+        console.error('Validation Failed - Check query syntax');
+      }
+
+      // 处理特定错误码
+      if (error.extensions?.code === 'UNAUTHENTICATED') {
+        console.warn('User is not authenticated - Redirecting to login');
+      }
+
+      if (error.extensions?.code === 'FORBIDDEN') {
+        console.warn('Access forbidden - Insufficient permissions');
+      }
+
+      console.groupEnd();
     });
+
+    console.groupEnd();
   }
 
+  // 网络错误 - 详细上下文
   if (networkError) {
-    console.error(`[Network error]: ${networkError}`);
+    console.group('❌ Network Error');
+    console.error('Query:', operation.operationName);
+    console.error('Variables:', JSON.stringify(operation.variables, null, 2));
+    console.error('Error:', networkError);
+    console.error('Error Message:', networkError.message);
+
+    // 提取状态码（如果可用）
+    const statusCode = (networkError as any).statusCode;
+    if (statusCode) {
+      console.error('Status Code:', statusCode);
+
+      // 处理特定状态码
+      if (statusCode === 401) {
+        console.warn('Unauthorized - Clearing auth token');
+        localStorage.removeItem('authToken');
+      } else if (statusCode === 403) {
+        console.warn('Forbidden - Insufficient permissions');
+      } else if (statusCode === 400) {
+        console.warn('Bad Request - Check query syntax and variables');
+      } else if (statusCode === 500) {
+        console.error('Internal Server Error - Server-side problem');
+      } else if (statusCode === 502) {
+        console.error('Bad Gateway - Server may be down or unreachable');
+      } else if (statusCode === 503) {
+        console.error('Service Unavailable - Server overloaded or maintenance');
+      }
+    }
+
+    // 记录响应体（如果可用）
+    const result = (networkError as any).result;
+    if (result) {
+      console.error('Response Body:', result);
+    }
+
+    console.groupEnd();
   }
+
+  // 记录部分响应（当errorPolicy: 'all'时）
+  if (response && response.errors && response.data) {
+    console.group('⚠️ Partial Response');
+    console.warn('Query:', operation.operationName);
+    console.warn('Partial Data:', response.data);
+    console.warn('Errors:', response.errors);
+    console.groupEnd();
+  }
+
+  return forward(operation);
 });
 
 // 重试链接

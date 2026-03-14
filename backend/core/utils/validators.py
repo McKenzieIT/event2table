@@ -1,7 +1,7 @@
 """
 验证函数模块
 
-提供统一的输入验证、格式检查和安全验证功能。
+提供统一的输入验证, 格式检查和安全验证功能. 
 
 作者: Claude Code
 版本: 1.0.0
@@ -34,9 +34,10 @@
     ... )
 """
 
-import re
 import html
-from typing import Tuple, Optional, Dict, Any
+import re
+from typing import Any, Dict, Optional, Tuple
+
 from backend.core.database import get_db_connection
 from backend.core.logging import get_logger
 
@@ -58,7 +59,7 @@ def validate_event_name(event_name: str) -> Tuple[bool, Optional[str]]:
 
     规则:
     - 必须以字母开头
-    - 只能包含字母、数字、点(.)和下划线(_)
+    - 只能包含字母, 数字, 点(.)和下划线(_)
     - 长度不超过100个字符
 
     Args:
@@ -82,7 +83,7 @@ def validate_event_name(event_name: str) -> Tuple[bool, Optional[str]]:
     event_name = event_name.strip()
 
     if not EVENT_NAME_PATTERN.match(event_name):
-        return False, "事件名格式不正确，应只包含字母、数字、点和下划线，且以字母开头"
+        return False, "事件名格式不正确, 应只包含字母, 数字, 点和下划线, 且以字母开头"
 
     if len(event_name) > 100:
         return False, "事件名长度不能超过100个字符"
@@ -96,7 +97,7 @@ def validate_param_name(param_name: str) -> Tuple[bool, Optional[str]]:
 
     规则:
     - 必须以字母开头
-    - 只能包含字母、数字和下划线(_)
+    - 只能包含字母, 数字和下划线(_)
     - 长度不超过100个字符
 
     Args:
@@ -120,7 +121,7 @@ def validate_param_name(param_name: str) -> Tuple[bool, Optional[str]]:
     param_name = param_name.strip()
 
     if not PARAM_NAME_PATTERN.match(param_name):
-        return False, "参数名格式不正确，应只包含字母、数字和下划线，且以字母开头"
+        return False, "参数名格式不正确, 应只包含字母, 数字和下划线, 且以字母开头"
 
     if len(param_name) > 100:
         return False, "参数名长度不能超过100个字符"
@@ -159,7 +160,7 @@ def validate_game_gid(game_gid: int) -> Tuple[bool, Optional[str]]:
 
 def validate_game_id(game_gid: int) -> Tuple[bool, Optional[str]]:
     """
-    验证游戏ID（GID的别名，为了向后兼容）
+    验证游戏ID（GID的别名, 为了向后兼容）
 
     Args:
         game_gid: 游戏ID
@@ -215,7 +216,7 @@ def sanitize_and_validate_string(
     """
     清理和验证字符串输入（统一安全工具函数）
 
-    防止XSS攻击、输入长度溢出等安全问题。
+    防止XSS攻击, 输入长度溢出等安全问题. 
 
     Args:
         value: 要验证的值（可以是任意类型）
@@ -226,7 +227,7 @@ def sanitize_and_validate_string(
     Returns:
         Tuple[is_valid, sanitized_value_or_error_message]
         - is_valid: 验证是否通过
-        - result: 如果通过，返回清理后的值；否则返回错误消息
+        - result: 如果通过, 返回清理后的值；否则返回错误消息
 
     Examples:
         >>> # 必填字段示例
@@ -349,7 +350,7 @@ def check_games_exist() -> Tuple[bool, Optional[str]]:
         if result and result["count"] > 0:
             return True, None
         else:
-            return False, "系统中还没有游戏，请先创建游戏"
+            return False, "系统中还没有游戏, 请先创建游戏"
 
     except Exception as e:
         logger.error(f"Error checking games exist: {e}")
@@ -388,7 +389,7 @@ def validate_required_fields(
 
     for field in required_fields:
         if field not in data or not data[field]:
-            # 使用别名（如果有）作为错误消息
+            # 使用别名(如果有)作为错误消息
             alias = field_aliases.get(field, field) if field_aliases else field
             missing_fields.append(alias)
 

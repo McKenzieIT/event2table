@@ -10,18 +10,18 @@
 """
 通用数据访问层 (Repository Pattern)
 
-提供统一的CRUD操作接口，消除重复的SQL查询代码
+提供统一的CRUD操作接口, 消除重复的SQL查询代码
 支持可选的缓存集成以提升查询性能
 """
-
-import logging
-from typing import List, Dict, Any, Optional
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
 
 # Import execute_write from backend.core.utils.utils (the original utils.py file)
 # Using importlib to avoid circular import with the utils package
 import importlib.util
+import logging
 import os
+from typing import Any, Dict, List, Optional
+
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 
 spec = importlib.util.spec_from_file_location(
     "backend.core.utils_utils", os.path.join(os.path.dirname(__file__), "utils.py")
@@ -37,7 +37,7 @@ class GenericRepository:
     """
     通用仓储模式实现
 
-    提供标准的数据访问方法，避免重复的SQL查询代码
+    提供标准的数据访问方法, 避免重复的SQL查询代码
     支持可选的缓存以提升性能
     """
 
@@ -90,7 +90,7 @@ class GenericRepository:
             table_name: 表名
             primary_key: 主键字段名（默认为'id'）
             enable_cache: 是否启用缓存（默认False）
-            cache_timeout: 缓存超时时间（秒，默认60）
+            cache_timeout: 缓存超时时间（秒, 默认60）
 
         Raises:
             ValueError: 如果表名不在白名单中
@@ -127,7 +127,7 @@ class GenericRepository:
             record_id: 记录ID
 
         Returns:
-            记录字典，不存在返回None
+            记录字典, 不存在返回None
         """
         # 尝试从缓存获取
         if self.enable_cache and self._cache:
@@ -158,7 +158,7 @@ class GenericRepository:
             value: 字段值
 
         Returns:
-            记录字典，不存在返回None
+            记录字典, 不存在返回None
 
         Raises:
             ValueError: 如果字段名无效
@@ -275,9 +275,7 @@ class GenericRepository:
             >>> game = repo.update(1, {'name': 'Updated Name'})
         """
         if not self.primary_key:
-            raise ValueError(
-                f"Cannot update: no primary key defined for table '{self.table_name}'"
-            )
+            raise ValueError(f"Cannot update: no primary key defined for table '{self.table_name}'")
 
         if not data:
             raise ValueError("Cannot update: no data provided for update")
@@ -329,7 +327,7 @@ class GenericRepository:
         query = f"DELETE FROM {self.table_name} WHERE {self.primary_key} = ?"
         result = execute_write(query, (record_id,)) > 0
 
-        # 删除成功时，清除相关缓存
+        # 删除成功时, 清除相关缓存
         if result and self.enable_cache and self._cache:
             cache_key = f"{self.table_name}:id:{record_id}"
             self._cache.delete(cache_key)
@@ -365,7 +363,7 @@ class GenericRepository:
             record_ids: 记录ID列表
 
         Returns:
-            记录列表，不存在的ID会被忽略
+            记录列表, 不存在的ID会被忽略
         """
         if not record_ids:
             return []
@@ -429,7 +427,7 @@ class GenericRepository:
         query = f"DELETE FROM {self.table_name} WHERE {self.primary_key} IN ({placeholders})"
         deleted_count = execute_write(query, tuple(record_ids))
 
-        # 删除成功时，清除相关缓存
+        # 删除成功时, 清除相关缓存
         if deleted_count > 0 and self.enable_cache and self._cache:
             for record_id in record_ids:
                 cache_key = f"{self.table_name}:id:{record_id}"
@@ -474,7 +472,7 @@ class GenericRepository:
         values = list(updates.values()) + record_ids
         updated_count = execute_write(query, tuple(values))
 
-        # 更新成功时，清除相关缓存
+        # 更新成功时, 清除相关缓存
         if updated_count > 0 and self.enable_cache and self._cache:
             for record_id in record_ids:
                 cache_key = f"{self.table_name}:id:{record_id}"
@@ -495,11 +493,11 @@ class GenericRepository:
 
         取代所有: 多次单独调用 create()
 
-        注意：由于SQLite的executemany()不返回lastrowid，此方法使用循环插入。
-        但保持在单个事务中，仍然比多次单独调用create()更高效。
+        注意: 由于SQLite的executemany()不返回lastrowid, 此方法使用循环插入. 
+        但保持在单个事务中, 仍然比多次单独调用create()更高效. 
 
         Args:
-            records: 要创建的记录列表，每个记录是一个字典
+            records: 要创建的记录列表, 每个记录是一个字典
 
         Returns:
             插入记录的ID列表（按输入顺序）
@@ -516,7 +514,7 @@ class GenericRepository:
         inserted_ids = []
 
         try:
-            # 获取所有字段名（从所有记录中）
+            # 获取所有字段名(从所有记录中)
             all_fields = set()
             for record in records:
                 all_fields.update(record.keys())
@@ -532,9 +530,7 @@ class GenericRepository:
             placeholders = ", ".join(["?" for _ in field_list])
 
             # 构建单条插入SQL
-            insert_sql = (
-                f"INSERT INTO {self.table_name} ({field_names}) VALUES ({placeholders})"
-            )
+            insert_sql = f"INSERT INTO {self.table_name} ({field_names}) VALUES ({placeholders})"
 
             # 在单个事务中循环插入所有记录
             for record in records:
@@ -572,7 +568,7 @@ class GenericRepository:
 
 
 class Repositories:
-    """预定义的仓储实例，便于直接使用（无缓存）"""
+    """预定义的仓储实例, 便于直接使用(无缓存)"""
 
     GAMES = GenericRepository("games", primary_key="id")
     FLOW_TEMPLATES = GenericRepository("flow_templates", primary_key="id")
@@ -586,11 +582,9 @@ class Repositories:
 
 
 class CachedRepositories:
-    """启用缓存的仓储实例，适用于读多写少的场景"""
+    """启用缓存的仓储实例, 适用于读多写少的场景"""
 
-    GAMES = GenericRepository(
-        "games", primary_key="id", enable_cache=True, cache_timeout=120
-    )
+    GAMES = GenericRepository("games", primary_key="id", enable_cache=True, cache_timeout=120)
     FLOW_TEMPLATES = GenericRepository(
         "flow_templates", primary_key="id", enable_cache=True, cache_timeout=120
     )

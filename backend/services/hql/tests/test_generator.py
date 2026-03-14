@@ -4,17 +4,18 @@ HQL V2 核心服务单元测试
 测试核心HQL生成器的各种功能
 """
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # 添加hql_v2到路径
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from backend.services.hql.models.event import Event, Field, Condition
-from backend.services.hql.core.generator import HQLGenerator
 from backend.services.hql.builders.field_builder import FieldBuilder
 from backend.services.hql.builders.where_builder import WhereBuilder
+from backend.services.hql.core.generator import HQLGenerator
+from backend.services.hql.models.event import Condition, Event, Field
 
 
 class TestFieldBuilder:

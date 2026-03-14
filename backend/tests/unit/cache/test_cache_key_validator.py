@@ -11,6 +11,7 @@
 """
 
 import pytest
+
 from backend.core.cache.validators import CacheKeyValidator
 
 
@@ -119,7 +120,7 @@ class TestCacheKeyValidator:
         assert key == "dwd_gen:v3:games.list:page:1:per_page:10"
 
     def test_build_key_param_ordering(self):
-        """测试参数排序（确保一致性）"""
+        """测试参数排序(确保一致性)"""
         key1 = CacheKeyValidator.build_key('games.list', page=1, per_page=10)
         key2 = CacheKeyValidator.build_key('games.list', per_page=10, page=1)
         assert key1 == key2
@@ -144,7 +145,7 @@ class TestCacheKeyValidator:
         with pytest.raises(ValueError):
             CacheKeyValidator.build_key('games.list', **{"page\n": 1})
 
-        # 测试大写（不符合小写要求）
+        # 测试大写(不符合小写要求)
         with pytest.raises(ValueError, match="非法字符"):
             CacheKeyValidator.build_key('games.list', **{"Page": 1})  # 大写
 
@@ -158,20 +159,22 @@ class TestCacheKeyValidator:
         ]
 
         for pattern in valid_patterns:
-            assert CacheKeyValidator.validate_pattern_for_wildcard(pattern), \
-                f"应该验证通过: {pattern}"
+            assert CacheKeyValidator.validate_pattern_for_wildcard(
+                pattern
+            ), f"应该验证通过: {pattern}"
 
     def test_validate_wildcard_invalid_patterns(self):
         """测试无效的通配符模式"""
         invalid_patterns = [
             "dwd_gen:v3:games.list\nFLUSHALL:*",  # 危险字符
             "dwd_gen:v3:*:games.list",  # 通配符在错误位置（索引2）
-            "dwd_gen:v3:games.list:*",  # 通配符在错误位置（索引3是参数名，4才是值）
+            "dwd_gen:v3:games.list:*",  # 通配符在错误位置（索引3是参数名, 4才是值）
         ]
 
         for pattern in invalid_patterns:
-            assert not CacheKeyValidator.validate_pattern_for_wildcard(pattern), \
-                f"应该验证失败: {pattern}"
+            assert not CacheKeyValidator.validate_pattern_for_wildcard(
+                pattern
+            ), f"应该验证失败: {pattern}"
 
     # ========== 集成测试 ==========
 
@@ -187,8 +190,7 @@ class TestCacheKeyValidator:
 
         for injection in injection_attempts:
             # validate() 应该拒绝
-            assert not CacheKeyValidator.validate(injection), \
-                f"应该拒绝注入尝试: {repr(injection)}"
+            assert not CacheKeyValidator.validate(injection), f"应该拒绝注入尝试: {repr(injection)}"
 
             # sanitize() 应该清理
             sanitized = CacheKeyValidator.sanitize(injection)
@@ -205,11 +207,10 @@ class TestCacheKeyValidator:
         ]
 
         for attempt in poisoning_attempts:
-            assert not CacheKeyValidator.validate(attempt), \
-                f"应该拒绝投毒尝试: {repr(attempt)}"
+            assert not CacheKeyValidator.validate(attempt), f"应该拒绝投毒尝试: {repr(attempt)}"
 
     def test_dos_prevention(self):
-        """测试防止拒绝服务（超长键）"""
+        """测试防止拒绝服务(超长键)"""
         # 超长键可能导致Redis内存问题
         long_key = "dwd_gen:v3:" + "a" * 10000
 
@@ -230,40 +231,31 @@ class TestCacheKeyValidatorWhitelistPatterns:
             # 模式1: 基础模式 - 需要前缀
             ("test_key_123", False),  # 无前缀 - 应该失败
             ("dwd_gen:v3:test_key_123", True),  # 有前缀 - 应该通过
-
             # 模式2: 游戏键
             ("dwd_gen:v3:games.list", True),
             ("dwd_gen:v3:games.detail:gid:1", True),
             ("dwd_gen:v3:games.detail:gid:1:page:2", True),
-
             # 模式3: 事件键
             ("dwd_gen:v3:events.list", True),
             ("dwd_gen:v3:events.detail:id:123", True),
-
             # 模式4: 参数键
             ("dwd_gen:v3:params.list:event_id:1", True),
             ("dwd_gen:v3:parameters.detail:id:2", True),
-
             # 模式5: 分类键
             ("dwd_gen:v3:categories.list:game_gid:1", True),
             ("dwd_gen:v3:categories.detail:id:5", True),
-
             # 模式6: HQL键
             ("dwd_gen:v3:hql.history:game_gid:1", True),
             ("dwd_gen:v3:hql.preview:node_id:10", True),
-
             # 模式7: 节点键
             ("dwd_gen:v3:nodes.list", True),
             ("dwd_gen:v3:nodes.config:game_gid:1", True),
-
             # 模式8: 流程键
             ("dwd_gen:v3:flows.templates:game_gid:1", True),
             ("dwd_gen:v3:flows.detail:id:3", True),
-
             # 模式9: 连接配置键
             ("dwd_gen:v3:join_configs.list", True),
             ("dwd_gen:v3:join_configs.detail:id:7", True),
-
             # 模式10: 模板键
             ("dwd_gen:v3:templates.list", True),
             ("dwd_gen:v3:templates.detail:id:4", True),
@@ -271,15 +263,14 @@ class TestCacheKeyValidatorWhitelistPatterns:
 
         for key, should_pass in test_cases:
             result = CacheKeyValidator.validate(key)
-            # 更宽松的断言：只检查明确的失败情况
+            # 更宽松的断言: 只检查明确的失败情况
             if not should_pass:
-                assert not result, \
-                    f"键 {key} 应该失败验证，实际通过: {result}"
+                assert not result, f"键 {key} 应该失败验证, 实际通过: {result}"
             else:
-                # 对于应该通过的键，我们至少要确保它符合基本格式
+                # 对于应该通过的键, 我们至少要确保它符合基本格式
                 if not result:
                     # 检查是否因为白名单模式太严格
-                    # 如果键格式正确但被拒绝，记录警告而不是失败
+                    # 如果键格式正确但被拒绝, 记录警告而不是失败
                     if key.startswith("dwd_gen:v3:"):
                         print(f"警告: 键 {key} 符合格式但未通过白名单验证")
 

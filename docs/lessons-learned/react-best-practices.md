@@ -1740,6 +1740,212 @@ Layer 2: 配置层 - CORS 未配置（根本问题）
 
 ---
 
+## 17个组件优化案例 ⭐ **P1重要**
+
+**优先级**: P1 | **最后更新**: 2026-03-09 | **来源**: [17个组件优化完整报告](../reports/2026-03-07/ALL-17-COMPONENTS-OPTIMIZATION-COMPLETE.md)
+
+### 问题现象
+
+**症状描述**:
+- 17个React组件存在性能问题
+- Dashboard参数更新延迟5分钟
+- 用户交互时UI卡顿
+- 不必要的重新渲染导致性能下降
+
+**影响范围**:
+- 所有Dashboard相关组件
+- 参数管理组件
+- 事件列表组件
+- Canvas组件
+
+### 根本原因
+
+**技术原因**:
+1. **缺少React.memo** - 组件频繁重新渲染，即使props相同
+2. **缺少useCallback** - 回调函数每次渲染都重新创建
+3. **缺少useMemo** - 昂贵计算每次渲染都重新执行
+4. **大量列表渲染** - 未使用虚拟列表处理大量数据
+5. **状态管理不当** - 不必要的状态更新导致级联重新渲染
+
+### 解决方案
+
+**17个组件优化清单**:
+
+**1. DashboardGraphQL.tsx** - Dashboard性能优化
+```typescript
+// ❌ 优化前：每次渲染都重新创建回调
+function DashboardGraphQL() {
+  const handleGameSelect = (gameGid) => {
+    // 处理游戏选择
+  };
+
+  return <GameSelector onSelect={handleGameSelect} />;
+}
+
+// ✅ 优化后：使用useCallback
+function DashboardGraphQL() {
+  const handleGameSelect = useCallback((gameGid: number) => {
+    setCurrentGameGid(gameGid);
+    refetchGames();
+  }, []);
+
+  const pollingInterval = usePollingInterval(10000, 60000);
+
+  const { data: gamesData } = useGames(5, 0, {
+    fetchPolicy: 'cache-first',
+    refetchInterval: pollingInterval,  // 智能轮询
+    nextFetchPolicy: 'cache-first',
+  });
+
+  return <GameSelector onSelect={handleGameSelect} />;
+}
+```
+
+**2. GameCard.tsx** - 游戏卡片组件优化
+```typescript
+// ✅ 使用React.memo避免不必要的重新渲染
+const GameCard = React.memo<GameCardProps>(({ game, onSelect, onDelete }) => {
+  return (
+    <div className="game-card">
+      <h3>{game.name}</h3>
+      <button onClick={() => onSelect(game.gid)}>选择</button>
+      <button onClick={() => onDelete(game.gid)}>删除</button>
+    </div>
+  );
+}, (prevProps, nextProps) => {
+  // 自定义比较函数：只有game.id变化时才重新渲染
+  return prevProps.game.id === nextProps.game.id;
+});
+```
+
+**3. ParametersList.tsx** - 参数列表优化
+```typescript
+// ✅ 使用useMemo缓存过滤和排序结果
+function ParametersList({ parameters, filter }) {
+  const filteredParameters = useMemo(() => {
+    return parameters
+      .filter(param => param.name.includes(filter))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [parameters, filter]);
+
+  return (
+    <ul>
+      {filteredParameters.map(param => <ParameterItem key={param.id} {...param} />)}
+    </ul>
+  );
+}
+```
+
+**4. EventList.tsx** - 事件列表虚拟化
+```typescript
+// ✅ 使用react-window处理大量数据
+import { FixedSizeList } from 'react-window';
+
+function EventList({ events }) {
+  const Row = ({ index, style }) => (
+    <div style={style}>
+      <EventItem {...events[index]} />
+    </div>
+  );
+
+  return (
+    <FixedSizeList
+      height={600}
+      itemCount={events.length}
+      itemSize={80}
+      width="100%"
+    >
+      {Row}
+    </FixedSizeList>
+  );
+}
+```
+
+**5-17. 其他组件优化**:
+- **FieldSelectionModal.tsx** - 使用React.memo + useCallback
+- **EventNodeBuilder.tsx** - 使用ES6默认参数（避免defaultProps）
+- **HqlManage.tsx** - 所有Hook在条件返回前（React Hooks规则）
+- **GameManagementModal.tsx** - 使用useCallback处理事件
+- **ParameterDashboard.tsx** - 使用useMemo缓存统计数据
+- **CategoriesList.tsx** - 使用React.memo优化列表项
+- **BatchOperations.tsx** - 使用useCallback处理批量操作
+- **AlterSqlBuilder.tsx** - 使用useMemo缓存SQL构建结果
+- **ApiDocs.tsx** - 直接导入（不使用lazy loading）
+- **ValidationRules.tsx** - 直接导入（不使用lazy loading）
+- **ParameterNetwork.tsx** - 使用useMemo缓存图数据
+- **ParameterHistory.tsx** - 使用useMemo缓存历史数据
+- **ParameterUsage.tsx** - 使用React.memo优化使用卡片
+
+### 性能提升数据
+
+**优化前 vs 优化后**:
+
+| 组件 | 优化前渲染次数 | 优化后渲染次数 | 性能提升 |
+|------|--------------|--------------|---------|
+| DashboardGraphQL | 120次/分钟 | 12次/分钟 | 90% ↓ |
+| GameCard | 60次/分钟 | 8次/分钟 | 87% ↓ |
+| ParametersList | 45次/分钟 | 6次/分钟 | 87% ↓ |
+| EventList | 100次/分钟 | 5次/分钟 | 95% ↓ |
+| FieldSelectionModal | 30次/分钟 | 2次/分钟 | 93% ↓ |
+
+**Dashboard更新延迟**:
+- 优化前：5分钟（300秒）
+- 优化后：10秒
+- **性能提升：96.7%**
+
+### 代码审查清单
+
+**React优化检查**:
+- [ ] 组件是否使用React.memo包装？
+- [ ] 回调函数是否使用useCallback？
+- [ ] 昂贵计算是否使用useMemo？
+- [ ] 大列表是否使用虚拟列表（react-window）？
+- [ ] Hooks调用是否在条件返回之前？
+- [ ] 是否避免使用defaultProps（React 18+）？
+
+**性能验证**:
+- [ ] 是否使用React DevTools Profiler分析渲染？
+- [ ] 是否测试了优化前后的渲染次数对比？
+- [ ] 是否验证了用户交互响应速度？
+
+### 最佳实践总结
+
+**1. React.memo使用原则**:
+- ✅ 组件频繁重新渲染，但props相同
+- ✅ 大型列表渲染
+- ✅ 复杂组件渲染
+- ❌ 简单组件（渲染成本< memo成本）
+
+**2. useCallback使用原则**:
+- ✅ 回调函数传递给优化过的子组件
+- ✅ 回调函数作为其他Hook的依赖
+- ❌ 回调函数只在本地使用（不传递给子组件）
+
+**3. useMemo使用原则**:
+- ✅ 昂贵计算（排序、过滤、大数据处理）
+- ✅ 复杂对象创建
+- ❌ 简单计算（成本< useMemo成本）
+
+**4. 虚拟列表使用原则**:
+- ✅ 列表项数>100
+- ✅ 列表项渲染成本高
+- ❌ 列表项数<50（直接渲染更简单）
+
+### 业务价值
+
+- Dashboard更新延迟从5分钟缩短到10秒（96.7%提升）
+- 用户获得接近实时的工作体验
+- 减少服务器负载和带宽消耗
+- 提升用户体验满意度
+
+### 案例文档
+
+- [17个组件优化完整报告](../reports/2026-03-07/ALL-17-COMPONENTS-OPTIMIZATION-COMPLETE.md)
+- [Dashboard实时优化报告](../reports/2026-03-07/DASHBOARD-REALTIME-OPTIMIZATION-REPORT.md)
+- [React性能优化模式](./performance-patterns.md#react性能优化)
+
+---
+
 ## 相关经验文档
 
 - [测试指南 - E2E测试](./testing-guide.md#e2e测试) - React组件E2E测试方法

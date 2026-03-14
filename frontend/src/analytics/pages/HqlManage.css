@@ -116,16 +116,8 @@
   opacity: 0.6;
 }
 
+/* DEPRECATED: oled-table styles removed - moved to shared Table.css */
 /* Page-specific table styles - generic styles moved to shared Table.css */
-.oled-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.oled-table tbody tr.user-edited-row {
-  background: rgba(139, 92, 246, 0.05);
-}
 
 .action-buttons {
   display: flex;

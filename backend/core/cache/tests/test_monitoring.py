@@ -16,18 +16,19 @@
 日期: 2026-02-24
 """
 
-import pytest
 import time
 from unittest.mock import Mock, patch
 
+import pytest
+
 from backend.core.cache.monitoring import (
-    CacheAlertManager,
-    AlertRule,
-    AlertLevel,
     AlertEvent,
+    AlertLevel,
+    AlertRule,
+    CacheAlertManager,
     MetricsHistory,
     MetricSnapshot,
-    export_prometheus_metrics
+    export_prometheus_metrics,
 )
 
 
@@ -35,17 +36,19 @@ from backend.core.cache.monitoring import (
 def mock_cache():
     """模拟三级缓存实例"""
     cache = Mock()
-    cache.get_stats = Mock(return_value={
-        "l1_size": 850,
-        "l1_capacity": 1000,
-        "l1_usage": "85.0%",
-        "l1_hits": 500,
-        "l2_hits": 200,
-        "misses": 300,
-        "hit_rate": "70.0%",
-        "l1_evictions": 50,
-        "total_requests": 1000
-    })
+    cache.get_stats = Mock(
+        return_value={
+            "l1_size": 850,
+            "l1_capacity": 1000,
+            "l1_usage": "85.0%",
+            "l1_hits": 500,
+            "l2_hits": 200,
+            "misses": 300,
+            "hit_rate": "70.0%",
+            "l1_evictions": 50,
+            "total_requests": 1000,
+        }
+    )
     cache.l1_size = 1000
     return cache
 
@@ -70,7 +73,7 @@ class TestMetricsHistory:
             l1_usage=0.85,
             l2_memory_usage=0.5,
             qps=100.0,
-            avg_response_time_ms=5.0
+            avg_response_time_ms=5.0,
         )
 
         history.add(snapshot)
@@ -92,7 +95,7 @@ class TestMetricsHistory:
                 l1_usage=0.5,
                 l2_memory_usage=0.5,
                 qps=100.0,
-                avg_response_time_ms=5.0
+                avg_response_time_ms=5.0,
             )
             history.add(snapshot)
 
@@ -113,7 +116,7 @@ class TestMetricsHistory:
             l1_usage=0.5,
             l2_memory_usage=0.5,
             qps=100.0,
-            avg_response_time_ms=5.0
+            avg_response_time_ms=5.0,
         )
         recent_snapshot = MetricSnapshot(
             timestamp=now - 50,  # 50秒前
@@ -123,7 +126,7 @@ class TestMetricsHistory:
             l1_usage=0.6,
             l2_memory_usage=0.5,
             qps=150.0,
-            avg_response_time_ms=3.0
+            avg_response_time_ms=3.0,
         )
 
         history.add(old_snapshot)
@@ -150,7 +153,7 @@ class TestMetricsHistory:
                 l1_usage=0.5,
                 l2_memory_usage=0.5,
                 qps=100.0,
-                avg_response_time_ms=5.0
+                avg_response_time_ms=5.0,
             )
             history.add(snapshot)
 
@@ -198,17 +201,21 @@ class TestCacheAlertManager:
     def test_alert_rule_l1_hit_rate_low(self, alert_manager):
         """测试L1命中率低告警"""
         # 模拟低命中率
-        with patch.object(alert_manager.cache, 'get_stats', return_value={
-            "l1_size": 500,
-            "l1_capacity": 1000,
-            "l1_usage": "50.0%",
-            "hit_rate": "50.0%",  # 低于60%阈值
-            "l1_hits": 50,  # L1命中50次
-            "l2_hits": 0,   # L2命中0次
-            "misses": 50,   # 未命中50次
-            "l1_evictions": 0,
-            "total_requests": 100  # 总请求100次
-        }):
+        with patch.object(
+            alert_manager.cache,
+            'get_stats',
+            return_value={
+                "l1_size": 500,
+                "l1_capacity": 1000,
+                "l1_usage": "50.0%",
+                "hit_rate": "50.0%",  # 低于60%阈值
+                "l1_hits": 50,  # L1命中50次
+                "l2_hits": 0,  # L2命中0次
+                "misses": 50,  # 未命中50次
+                "l1_evictions": 0,
+                "total_requests": 100,  # 总请求100次
+            },
+        ):
             # Mock _check_duration返回足够的时间
             with patch.object(alert_manager, '_check_duration', return_value=301):
                 alerts = alert_manager.check_alerts()
@@ -220,80 +227,96 @@ class TestCacheAlertManager:
     def test_alert_rule_l1_capacity_critical(self, alert_manager):
         """测试L1容量严重告警"""
         # 模拟L1容量超过95%
-        with patch.object(alert_manager.cache, 'get_stats', return_value={
-            "l1_size": 960,
-            "l1_capacity": 1000,
-            "l1_usage": "96.0%",  # 超过95%阈值
-            "hit_rate": "70.0%",
-            "l1_hits": 700,
-            "l2_hits": 200,
-            "misses": 100,
-            "l1_evictions": 50,
-            "total_requests": 1000
-        }):
+        with patch.object(
+            alert_manager.cache,
+            'get_stats',
+            return_value={
+                "l1_size": 960,
+                "l1_capacity": 1000,
+                "l1_usage": "96.0%",  # 超过95%阈值
+                "hit_rate": "70.0%",
+                "l1_hits": 700,
+                "l2_hits": 200,
+                "misses": 100,
+                "l1_evictions": 50,
+                "total_requests": 1000,
+            },
+        ):
             # Mock _check_duration返回足够的时间
             with patch.object(alert_manager, '_check_duration', return_value=31):
                 alerts = alert_manager.check_alerts()
 
-                # 应该触发CRITICAL告警（使用"usage"而不是"capacity"）
+                # 应该触发CRITICAL告警(使用"usage"而不是"capacity")
                 usage_alerts = [a for a in alerts if "usage" in a.metric]
                 assert len(usage_alerts) > 0
 
     def test_alert_deduplication(self, alert_manager):
         """测试告警去重"""
         # 第一次触发告警
-        with patch.object(alert_manager.cache, 'get_stats', return_value={
-            "l1_size": 960,
-            "l1_capacity": 1000,
-            "l1_usage": "96.0%",
-            "hit_rate": "50.0%",
-            "l1_hits": 50,
-            "l2_hits": 0,
-            "misses": 50,
-            "l1_evictions": 0,
-            "total_requests": 100
-        }):
+        with patch.object(
+            alert_manager.cache,
+            'get_stats',
+            return_value={
+                "l1_size": 960,
+                "l1_capacity": 1000,
+                "l1_usage": "96.0%",
+                "hit_rate": "50.0%",
+                "l1_hits": 50,
+                "l2_hits": 0,
+                "misses": 50,
+                "l1_evictions": 0,
+                "total_requests": 100,
+            },
+        ):
             # Mock _check_duration返回足够的时间
             with patch.object(alert_manager, '_check_duration', return_value=31):
                 alerts_first = alert_manager.check_alerts()
                 assert len(alerts_first) > 0
 
-                # 立即再次检查，不应该重复触发
+                # 立即再次检查, 不应该重复触发
                 alerts_second = alert_manager.check_alerts()
-                # 由于去重机制，第二次应该没有新告警
+                # 由于去重机制, 第二次应该没有新告警
                 assert len(alerts_second) == 0
 
     def test_alert_resolution(self, alert_manager):
         """测试告警解除"""
         # 先触发告警
-        with patch.object(alert_manager.cache, 'get_stats', return_value={
-            "l1_size": 960,
-            "l1_capacity": 1000,
-            "l1_usage": "96.0%",
-            "hit_rate": "50.0%",
-            "l1_hits": 50,
-            "l2_hits": 0,
-            "misses": 50,
-            "l1_evictions": 0,
-            "total_requests": 100
-        }):
+        with patch.object(
+            alert_manager.cache,
+            'get_stats',
+            return_value={
+                "l1_size": 960,
+                "l1_capacity": 1000,
+                "l1_usage": "96.0%",
+                "hit_rate": "50.0%",
+                "l1_hits": 50,
+                "l2_hits": 0,
+                "misses": 50,
+                "l1_evictions": 0,
+                "total_requests": 100,
+            },
+        ):
             # Mock _check_duration返回足够的时间
             with patch.object(alert_manager, '_check_duration', return_value=31):
                 alerts = alert_manager.check_alerts()
                 assert len(alerts) > 0
 
         # 恢复正常
-        with patch.object(alert_manager.cache, 'get_stats', return_value={
-            "l1_size": 500,
-            "l1_capacity": 1000,
-            "l1_usage": "50.0%",
-            "hit_rate": "80.0%",
-            "l1_hits": 800,
-            "l2_hits": 150,
-            "misses": 50,
-            "l1_evictions": 0,
-            "total_requests": 1000
-        }):
+        with patch.object(
+            alert_manager.cache,
+            'get_stats',
+            return_value={
+                "l1_size": 500,
+                "l1_capacity": 1000,
+                "l1_usage": "50.0%",
+                "hit_rate": "80.0%",
+                "l1_hits": 800,
+                "l2_hits": 150,
+                "misses": 50,
+                "l1_evictions": 0,
+                "total_requests": 1000,
+            },
+        ):
             alert_manager.collect_metrics()
             alerts = alert_manager.check_alerts()
 
@@ -325,17 +348,21 @@ class TestCacheAlertManager:
     def test_reset(self, alert_manager):
         """测试重置"""
         # 添加一些告警
-        with patch.object(alert_manager.cache, 'get_stats', return_value={
-            "l1_size": 960,
-            "l1_capacity": 1000,
-            "l1_usage": "96.0%",
-            "hit_rate": "50.0%",
-            "l1_hits": 50,
-            "l2_hits": 0,
-            "misses": 50,
-            "l1_evictions": 0,
-            "total_requests": 100
-        }):
+        with patch.object(
+            alert_manager.cache,
+            'get_stats',
+            return_value={
+                "l1_size": 960,
+                "l1_capacity": 1000,
+                "l1_usage": "96.0%",
+                "hit_rate": "50.0%",
+                "l1_hits": 50,
+                "l2_hits": 0,
+                "misses": 50,
+                "l1_evictions": 0,
+                "total_requests": 100,
+            },
+        ):
             for _ in range(30):
                 alert_manager.collect_metrics()
                 time.sleep(0.01)
@@ -360,7 +387,7 @@ class TestAlertEvent:
             current_value=0.5,
             threshold=0.6,
             level=AlertLevel.WARNING,
-            duration=300
+            duration=300,
         )
 
         event_dict = event.to_dict()
@@ -411,7 +438,7 @@ class TestAlertRule:
             threshold=0.6,
             duration=300,
             level=AlertLevel.WARNING,
-            description="Test rule"
+            description="Test rule",
         )
 
         assert rule.name == "test_rule"
@@ -427,7 +454,7 @@ class TestAlertRule:
             metric="l1_hit_rate",
             threshold=0.6,
             duration=300,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
 
         str_repr = str(rule)
@@ -446,7 +473,7 @@ class TestAlertEventDetails:
             metric="l1_hit_rate",
             current_value=0.5,
             threshold=0.6,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
         after_time = time.time()
 
@@ -459,7 +486,7 @@ class TestAlertEventDetails:
             metric="l1_hit_rate",
             current_value=0.5,
             threshold=0.6,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
 
         assert event.resolved is False
@@ -474,7 +501,7 @@ class TestAlertEventDetails:
             metric="qps",
             current_value=100.5,
             threshold=200.0,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
 
         event_dict = event.to_dict()
@@ -501,7 +528,7 @@ class TestMetricsHistoryDetails:
         history = MetricsHistory(max_size=10)
         now = time.time()
 
-        # 添加旧快照（超过时间范围）
+        # 添加旧快照(超过时间范围)
         old_snapshot = MetricSnapshot(
             timestamp=now - 500,
             l1_hit_rate=0.5,
@@ -510,11 +537,11 @@ class TestMetricsHistoryDetails:
             l1_usage=0.5,
             l2_memory_usage=0.5,
             qps=100.0,
-            avg_response_time_ms=5.0
+            avg_response_time_ms=5.0,
         )
         history.add(old_snapshot)
 
-        # 获取最近100秒的快照（应该为空）
+        # 获取最近100秒的快照(应该为空)
         recent = history.get_recent(100)
         assert len(recent) == 0
 
@@ -531,7 +558,7 @@ class TestMetricsHistoryDetails:
                 l1_usage=0.5,
                 l2_memory_usage=0.5,
                 qps=100.0,
-                avg_response_time_ms=5.0
+                avg_response_time_ms=5.0,
             )
             alert_manager.metrics_history.add(snapshot)
 
@@ -543,8 +570,8 @@ class TestMetricsHistoryDetails:
         """测试get_trend处理空值列表"""
         history = MetricsHistory(max_size=10)
 
-        # 创建一个属性存在但值为None的快照（通过getattr处理）
-        # 这在实际中不太可能，但可以测试代码的健壮性
+        # 创建一个属性存在但值为None的快照(通过getattr处理)
+        # 这在实际中不太可能, 但可以测试代码的健壮性
         snapshot = MetricSnapshot(
             timestamp=time.time(),
             l1_hit_rate=0.8,
@@ -553,7 +580,7 @@ class TestMetricsHistoryDetails:
             l1_usage=0.5,
             l2_memory_usage=0.5,
             qps=100.0,
-            avg_response_time_ms=5.0
+            avg_response_time_ms=5.0,
         )
         history.add(snapshot)
 
@@ -578,7 +605,7 @@ class TestCacheAlertManagerDetails:
             "l2_hits": 0,
             "misses": 0,
             "l1_evictions": 0,
-            "total_requests": 0
+            "total_requests": 0,
         }
 
         snapshot = alert_manager.collect_metrics()
@@ -599,7 +626,7 @@ class TestCacheAlertManagerDetails:
             "l2_hits": 200,
             "misses": 100,
             "l1_evictions": 0,
-            "total_requests": 1000
+            "total_requests": 1000,
         }
 
         snapshot = alert_manager.collect_metrics()
@@ -617,7 +644,7 @@ class TestCacheAlertManagerDetails:
             "l2_hits": 200,
             "misses": 100,
             "l1_evictions": 0,
-            "total_requests": 1000
+            "total_requests": 1000,
         }
 
         snapshot = alert_manager.collect_metrics()
@@ -631,7 +658,7 @@ class TestCacheAlertManagerDetails:
             metric="l1_hit_rate",
             current_value=0.5,
             threshold=0.6,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
 
         result = alert_manager._should_trigger_alert(alert_event)
@@ -646,7 +673,7 @@ class TestCacheAlertManagerDetails:
             current_value=0.5,
             threshold=0.6,
             level=AlertLevel.WARNING,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
         alert_manager.active_alerts["test_rule"] = existing_alert
 
@@ -656,23 +683,23 @@ class TestCacheAlertManagerDetails:
             metric="l1_hit_rate",
             current_value=0.3,
             threshold=0.4,
-            level=AlertLevel.CRITICAL
+            level=AlertLevel.CRITICAL,
         )
 
         result = alert_manager._should_trigger_alert(new_alert)
-        # 级别不同，应该触发
+        # 级别不同, 应该触发
         assert result is True
 
     def test_should_trigger_alert_timeout(self, alert_manager):
         """测试超时后应该重新触发"""
-        # 添加旧告警（超过1分钟）
+        # 添加旧告警(超过1分钟)
         old_alert = AlertEvent(
             rule_name="test_rule",
             metric="l1_hit_rate",
             current_value=0.5,
             threshold=0.6,
             level=AlertLevel.WARNING,
-            timestamp=time.time() - 61
+            timestamp=time.time() - 61,
         )
         alert_manager.active_alerts["test_rule"] = old_alert
 
@@ -682,11 +709,11 @@ class TestCacheAlertManagerDetails:
             metric="l1_hit_rate",
             current_value=0.5,
             threshold=0.6,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
 
         result = alert_manager._should_trigger_alert(new_alert)
-        # 超过1分钟，应该重新触发
+        # 超过1分钟, 应该重新触发
         assert result is True
 
     def test_log_alert_warning(self, alert_manager):
@@ -697,7 +724,7 @@ class TestCacheAlertManagerDetails:
             current_value=0.5,
             threshold=0.6,
             level=AlertLevel.WARNING,
-            duration=300
+            duration=300,
         )
 
         rule = AlertRule(
@@ -706,7 +733,7 @@ class TestCacheAlertManagerDetails:
             threshold=0.6,
             duration=300,
             level=AlertLevel.WARNING,
-            description="Test warning"
+            description="Test warning",
         )
 
         # 只测试不抛出异常
@@ -720,7 +747,7 @@ class TestCacheAlertManagerDetails:
             current_value=0.3,
             threshold=0.4,
             level=AlertLevel.CRITICAL,
-            duration=180
+            duration=180,
         )
 
         rule = AlertRule(
@@ -729,7 +756,7 @@ class TestCacheAlertManagerDetails:
             threshold=0.4,
             duration=180,
             level=AlertLevel.CRITICAL,
-            description="Test critical"
+            description="Test critical",
         )
 
         # 只测试不抛出异常
@@ -749,11 +776,12 @@ class TestCacheAlertManagerDetails:
         # Mock cache抛出异常
         alert_manager.cache.l1_size = None
 
-        # 应该不抛出异常，只记录错误
+        # 应该不抛出异常, 只记录错误
         alert_manager._auto_expand_l1()
 
     def test_alert_action_failure(self, alert_manager):
         """测试告警动作执行失败"""
+
         # 创建一个会抛出异常的动作
         def failing_action():
             raise RuntimeError("Action failed")
@@ -766,22 +794,26 @@ class TestCacheAlertManagerDetails:
             duration=300,
             level=AlertLevel.WARNING,
             action=failing_action,
-            description="Test failing action"
+            description="Test failing action",
         )
 
         # Mock _check_duration返回足够的时间
         with patch.object(alert_manager, '_check_duration', return_value=301):
-            with patch.object(alert_manager.cache, 'get_stats', return_value={
-                "l1_size": 500,
-                "l1_capacity": 1000,
-                "l1_usage": "50.0%",
-                "hit_rate": "50.0%",
-                "l1_hits": 50,
-                "l2_hits": 0,
-                "misses": 50,
-                "l1_evictions": 0,
-                "total_requests": 100
-            }):
+            with patch.object(
+                alert_manager.cache,
+                'get_stats',
+                return_value={
+                    "l1_size": 500,
+                    "l1_capacity": 1000,
+                    "l1_usage": "50.0%",
+                    "hit_rate": "50.0%",
+                    "l1_hits": 50,
+                    "l2_hits": 0,
+                    "misses": 50,
+                    "l1_evictions": 0,
+                    "total_requests": 100,
+                },
+            ):
                 # 添加临时规则
                 original_rules = alert_manager.alert_rules
                 alert_manager.alert_rules = [rule]
@@ -820,7 +852,7 @@ class TestCacheAlertManagerDetails:
                 l1_usage=0.5,
                 l2_memory_usage=0.5,
                 qps=100.0,
-                avg_response_time_ms=5.0
+                avg_response_time_ms=5.0,
             )
             alert_manager.metrics_history.add(snapshot)
 
@@ -829,7 +861,7 @@ class TestCacheAlertManagerDetails:
             metric="l1_hit_rate",
             threshold=0.6,
             duration=300,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
 
         duration = alert_manager._check_duration(rule, 0.8)
@@ -846,7 +878,7 @@ class TestCacheAlertManagerDetails:
                 metric="l1_hit_rate",
                 current_value=0.5,
                 threshold=0.6,
-                level=AlertLevel.WARNING
+                level=AlertLevel.WARNING,
             )
             alert_manager.alert_history.append(alert)
 
@@ -861,10 +893,10 @@ class TestGlobalAlertManager:
 
     def test_get_cache_alert_manager_requires_cache_on_first_call(self):
         """测试首次调用需要cache参数"""
-        from backend.core.cache.monitoring import get_cache_alert_manager
-
         # 重置全局实例
         import backend.core.cache.monitoring as monitoring_module
+        from backend.core.cache.monitoring import get_cache_alert_manager
+
         monitoring_module._global_alert_manager = None
 
         with pytest.raises(ValueError, match="hierarchical_cache is required"):
@@ -872,10 +904,10 @@ class TestGlobalAlertManager:
 
     def test_get_cache_alert_manager_creates_instance(self):
         """测试创建全局实例"""
-        from backend.core.cache.monitoring import get_cache_alert_manager
-
         # 重置全局实例
         import backend.core.cache.monitoring as monitoring_module
+        from backend.core.cache.monitoring import get_cache_alert_manager
+
         monitoring_module._global_alert_manager = None
 
         mock_cache = Mock()
@@ -888,7 +920,7 @@ class TestGlobalAlertManager:
             "l2_hits": 200,
             "misses": 100,
             "l1_evictions": 0,
-            "total_requests": 1000
+            "total_requests": 1000,
         }
         mock_cache.l1_size = 1000
 
@@ -899,10 +931,10 @@ class TestGlobalAlertManager:
 
     def test_get_cache_alert_manager_returns_same_instance(self):
         """测试返回相同实例"""
-        from backend.core.cache.monitoring import get_cache_alert_manager
-
         # 重置全局实例
         import backend.core.cache.monitoring as monitoring_module
+        from backend.core.cache.monitoring import get_cache_alert_manager
+
         monitoring_module._global_alert_manager = None
 
         mock_cache = Mock()
@@ -915,7 +947,7 @@ class TestGlobalAlertManager:
             "l2_hits": 200,
             "misses": 100,
             "l1_evictions": 0,
-            "total_requests": 1000
+            "total_requests": 1000,
         }
         mock_cache.l1_size = 1000
 
@@ -936,7 +968,7 @@ class TestPrometheusExportDetails:
             metric="l1_hit_rate",
             current_value=0.5,
             threshold=0.6,
-            level=AlertLevel.WARNING
+            level=AlertLevel.WARNING,
         )
         alert_manager.active_alerts["test_rule"] = alert
 
@@ -955,7 +987,7 @@ class TestPrometheusExportDetails:
             metric="l1_hit_rate",
             current_value=0.3,
             threshold=0.4,
-            level=AlertLevel.CRITICAL
+            level=AlertLevel.CRITICAL,
         )
         alert_manager.active_alerts["test_rule"] = alert
 

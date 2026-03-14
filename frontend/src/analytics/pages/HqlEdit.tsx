@@ -1,6 +1,6 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡ REACT PERF: Component fully optimized
+// - React.memo: Prevents unnecessary re-renders
+// - No state/hooks: Simple static component
 
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -11,7 +11,7 @@ import './HqlEdit.css';
  * 编辑HQL语句
  */
 
-function HqlEdit(): React.JSX.Element {
+const HqlEdit: React.FC = () => {
   return (
     <div className="hql-edit-container">
       <div className="page-header glass-card">
@@ -25,6 +25,6 @@ function HqlEdit(): React.JSX.Element {
       </div>
     </div>
   );
-}
+};
 
-export default HqlEdit;
+export default React.memo(HqlEdit);

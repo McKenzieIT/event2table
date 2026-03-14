@@ -1,9 +1,9 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo, useMemo, useCallback
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/PHASE-2-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import { useState, useMemo, memo } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
@@ -62,7 +62,7 @@ interface ConfirmState {
  *
  * Requires: game_gid URL parameter (enforced by backend API)
  */
-export default function FlowsList(): JSX.Element {
+function FlowsList(): JSX.Element {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -122,8 +122,8 @@ export default function FlowsList(): JSX.Element {
     }
   });
 
-  // Handle delete flow confirmation
-  const handleDeleteFlow = (flow: Flow): void => {
+  // ⚡️ REACT PERF: useCallback优化 - 稳定事件处理函数引用
+  const handleDeleteFlow = useCallback((flow: Flow): void => {
     setConfirmState({
       open: true,
       title: '确认删除',
@@ -133,9 +133,9 @@ export default function FlowsList(): JSX.Element {
         deleteMutation.mutate(flow.id);
       }
     });
-  };
+  }, [deleteMutation]);
 
-  // FIX: 使用useMemo优化过滤逻辑
+  // ⚡️ REACT PERF: useMemo优化 - 缓存过滤后的流程列表
   const filteredFlows = useMemo(() =>
     flows?.filter(flow =>
       flow.flow_name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -143,13 +143,21 @@ export default function FlowsList(): JSX.Element {
     [flows, searchTerm]
   );
 
-  const handleEditFlow = (flowId: number): void => {
+  const handleEditFlow = useCallback((flowId: number): void => {
     navigate(`/flows/${flowId}/edit?game_gid=${gameGid}`);
-  };
+  }, [navigate, gameGid]);
 
-  const handleCreateFlow = (): void => {
+  const handleCreateFlow = useCallback((): void => {
     navigate('/flows/create' + (gameGid ? `?game_gid=${gameGid}` : ''));
-  };
+  }, [navigate, gameGid]);
+
+  const handleSearchChange = useCallback((value: string): void => {
+    setSearchTerm(value);
+  }, []);
+
+  const handleConfirmClose = useCallback((): void => {
+    setConfirmState(s => ({ ...s, open: false }));
+  }, []);
 
   // Show error if game_gid is missing
   if (!gameGid) {
@@ -191,7 +199,7 @@ export default function FlowsList(): JSX.Element {
         <SearchInput
           placeholder="搜索流程名称..."
           value={searchTerm}
-          onChange={(value) => setSearchTerm(value)}
+          onChange={handleSearchChange}
         />
       </div>
 
@@ -268,10 +276,12 @@ export default function FlowsList(): JSX.Element {
         cancelText="取消"
         variant="danger"
         onConfirm={confirmState.onConfirm}
-        onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+        onCancel={handleConfirmClose}
       />
     </div>
   );
 }
 
-// Note: React.memo removed - default export is already on line 65
+// ✅ React.memo优化性能 - 避免不必要的重新渲染
+const FlowsListMemo = memo(FlowsList);
+export default FlowsListMemo;

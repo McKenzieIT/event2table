@@ -13,12 +13,13 @@ HQL History Repository (HQL历史数据访问层 - 精简架构)
 - 保持GenericRepository继承
 """
 
-from typing import List, Dict, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
 from backend.core.utils import execute_write
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
+from backend.core.utils.json_helpers import deserialize_json_field, serialize_json_field
 from backend.models.entities import HQLHistoryEntity
-from backend.core.utils.json_helpers import serialize_json_field, deserialize_json_field
 
 
 class HQLHistoryRepository(GenericRepository):
@@ -39,7 +40,7 @@ class HQLHistoryRepository(GenericRepository):
             table_name="hql_history",
             primary_key="id",
             enable_cache=True,
-            cache_timeout=300  # 5分钟缓存 (历史数据变化不频繁)
+            cache_timeout=300,  # 5分钟缓存 (历史数据变化不频繁)
         )
 
     def find_by_id(self, history_id: int) -> Optional[HQLHistoryEntity]:
@@ -282,7 +283,7 @@ class HQLHistoryRepository(GenericRepository):
         """
         更新HQL历史记录
 
-        注意：通常不允许修改HQL历史记录，此方法仅用于特殊情况
+        注意: 通常不允许修改HQL历史记录, 此方法仅用于特殊情况
 
         Args:
             history_id: 历史记录ID

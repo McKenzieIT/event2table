@@ -10,16 +10,16 @@ Canvas Service单元测试
 - 缓存集成
 """
 
-import sys
 import os
+import sys
 
 # 添加项目根目录到path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from services.canvas.canvas_service import CanvasService
-from models.entities import FlowEntity, EventNodeEntity
 from core.logging import get_logger
+from models.entities import EventNodeEntity, FlowEntity
+from services.canvas.canvas_service import CanvasService
 
 logger = get_logger(__name__)
 
@@ -39,18 +39,13 @@ def test_canvas_service():
         flow_graph = {
             "nodes": [
                 {"id": "n1", "type": "event_source", "data": {"event_id": 1}},
-                {"id": "n2", "type": "output", "data": {"name": "Output"}}
+                {"id": "n2", "type": "output", "data": {"name": "Output"}},
             ],
-            "connections": [
-                {"source": "n1", "target": "n2"}
-            ]
+            "connections": [{"source": "n1", "target": "n2"}],
         }
 
         flow = service.create_flow(
-            game_gid=10000147,
-            flow_name="Test Flow",
-            flow_graph=flow_graph,
-            description="测试Flow"
+            game_gid=10000147, flow_name="Test Flow", flow_graph=flow_graph, description="测试Flow"
         )
 
         print(f"✅ Flow创建成功: ID={flow.id}, Name={flow.flow_name}")
@@ -115,10 +110,7 @@ def test_canvas_service():
     # 测试6: 更新Flow
     print("\n[测试6] 更新Flow模板")
     try:
-        success = service.update_flow(
-            flow_id=flow_id,
-            description="更新后的描述"
-        )
+        success = service.update_flow(flow_id=flow_id, description="更新后的描述")
         if success:
             print("✅ Flow更新成功")
         else:

@@ -2,21 +2,13 @@
  * Events Module Types
  *
  * Type definitions for event-related data structures
+ *
+ * ⚠️ IMPORTANT: Event interface is now imported from @/shared/types/event-types
+ * Do not define Event interface here - use the unified definition
  */
 
-/**
- * Event structure
- */
-export interface Event {
-  id: number;
-  event_id: number;
-  event_name: string;
-  event_display_name?: string;
-  game_gid: number;
-  description?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+// Re-export Event from shared types for convenience
+export type { Event } from '@/shared/types/event-types';
 
 /**
  * HQL field type enum

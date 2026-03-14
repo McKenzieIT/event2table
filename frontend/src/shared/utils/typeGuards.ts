@@ -7,39 +7,23 @@
  * @module typeGuards
  */
 
-/**
- * 游戏对象类型
- */
-export interface Game {
-  id: number;
-  gid: number;
-  name: string;
-  ods_db: string;
-  created_at: string;
-}
+// Import unified type definitions
+import type { Game as BaseGame, Event as BaseEvent, Parameter as BaseParameter } from '../types';
 
 /**
- * 事件对象类型
+ * 游戏对象类型 - Re-export for type guard usage
  */
-export interface Event {
-  id: number;
-  event_name: string;
-  display_name: string;
-  game_gid: number;
-  event_type: 'user' | 'system' | 'auto';
-  created_at: string;
-}
+export type Game = BaseGame;
 
 /**
- * 参数对象类型
+ * 事件对象类型 - Re-export for type guard usage
  */
-export interface Parameter {
-  id: number;
-  param_name: string;
-  param_name_cn: string;
-  param_type: 'string' | 'int' | 'float' | 'boolean' | 'json';
-  game_gid: number | null;
-}
+export type Event = BaseEvent;
+
+/**
+ * 参数对象类型 - Re-export for type guard usage
+ */
+export type Parameter = BaseParameter;
 
 /**
  * API响应基础类型
@@ -64,8 +48,8 @@ export function isGame(data: unknown): data is Game {
     typeof data.gid === 'number' &&
     'name' in data &&
     typeof data.name === 'string' &&
-    'ods_db' in data &&
-    typeof data.ods_db === 'string'
+    ('odsDb' in data || 'ods_db' in data) && // Support both naming conventions
+    (typeof (data as any).odsDb === 'string' || typeof (data as any).ods_db === 'string')
   );
 }
 
@@ -78,12 +62,9 @@ export function isEvent(data: unknown): data is Event {
     data !== null &&
     'id' in data &&
     typeof data.id === 'number' &&
-    'event_name' in data &&
-    typeof data.event_name === 'string' &&
-    'display_name' in data &&
-    typeof data.display_name === 'string' &&
-    'game_gid' in data &&
-    typeof data.game_gid === 'number'
+    ('gameGid' in data || 'game_gid' in data) && // Support both naming conventions
+    (typeof (data as any).gameGid === 'number' || typeof (data as any).game_gid === 'number') &&
+    (('eventName' in data || 'event_name' in data) || 'name' in data) // Support multiple naming conventions
   );
 }
 
@@ -96,10 +77,10 @@ export function isParameter(data: unknown): data is Parameter {
     data !== null &&
     'id' in data &&
     typeof data.id === 'number' &&
-    'param_name' in data &&
-    typeof data.param_name === 'string' &&
-    'param_name_cn' in data &&
-    typeof data.param_name_cn === 'string'
+    (('paramName' in data || 'param_name' in data) && // Support both naming conventions
+    (typeof (data as any).paramName === 'string' || typeof (data as any).param_name === 'string')) &&
+    (('paramNameCn' in data || 'param_name_cn' in data) && // Support both naming conventions
+    (typeof (data as any).paramNameCn === 'string' || typeof (data as any).param_name_cn === 'string'))
   );
 }
 

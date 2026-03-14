@@ -4,9 +4,10 @@ Category GraphQL Type
 Defines the GraphQL type for Category entity.
 """
 
-import graphene
-from graphene import Field, List, Int, String
 import logging
+
+import graphene
+from graphene import Field, Int, List, String
 
 logger = logging.getLogger(__name__)
 

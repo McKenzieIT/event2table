@@ -1,6 +1,6 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders
+// See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
 /**
  * 事件节点管理页面 - 完整实现
@@ -31,6 +31,7 @@ import { FieldsListModal } from "@event-builder/components/FieldsListModal";
 import { AdvancedFilterPanel } from "@event-builder/components/AdvancedFilterPanel";
 import { useDebounce } from "@shared/hooks/useDebounce";
 import { Button, ConfirmDialog } from "@shared/ui";
+import Table from "@shared/ui/Table";
 import type {
   EventNode,
   EventNodeFilters,
@@ -225,12 +226,12 @@ function NodesTable({
   return (
     <div className="glass-card">
       <div className="table-responsive">
-        <table className="table table-hover oled-table mb-0">
-          <thead>
+        <Table variant="bordered" size="md" striped hoverable>
+          <Table.Header>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <Table.Row key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} style={{ width: header.getSize() }}>
+                  <Table.Head key={header.id} style={{ width: header.getSize() }}>
                     {header.isPlaceholder ? null : (
                       <div
                         className={
@@ -250,25 +251,25 @@ function NodesTable({
                         )}
                       </div>
                     )}
-                  </th>
+                  </Table.Head>
                 ))}
-              </tr>
+              </Table.Row>
             ))}
-          </thead>
-          <tbody>
+          </Table.Header>
+          <Table.Body>
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
+              <Table.Row key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
+                  <Table.Cell key={cell.id}>
                     {cell.column.columnDef.cell instanceof Function
                       ? cell.column.columnDef.cell(cell.getContext())
                       : String(cell.column.columnDef.cell)}
-                  </td>
+                  </Table.Cell>
                 ))}
-              </tr>
+              </Table.Row>
             ))}
-          </tbody>
-        </table>
+          </Table.Body>
+        </Table>
       </div>
 
       {/* 分页 */}
@@ -653,4 +654,6 @@ function EventNodes() {
   );
 }
 
-export default EventNodes;
+// ⚡️ REACT PERF: Export with React.memo optimization
+const EventNodesMemo = React.memo(EventNodes);
+export default EventNodesMemo;

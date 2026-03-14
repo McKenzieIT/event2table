@@ -2,21 +2,16 @@
  * Games Module Types
  *
  * Type definitions for game-related data structures
+ *
+ * ⚠️ IMPORTANT: Game interface is now imported from @/shared/types/game-types
+ * Do not define Game interface here - use the unified definition
  */
 
-/**
- * Game data structure
- */
-export interface Game {
-  id: number;
-  game_gid: number;
-  game_name: string;
-  game_name_cn?: string;
-  description?: string;
-  status?: 'active' | 'inactive' | 'archived';
-  created_at?: string;
-  updated_at?: string;
-}
+// Import Game type from shared types
+import type { Game, GameStatus } from '@/shared/types/game-types';
+
+// Re-export for convenience
+export type { Game, GameStatus } from '@/shared/types/game-types';
 
 /**
  * Game list response

@@ -7,9 +7,10 @@ This file contains additional methods needed by parameters.py API routes.
 These methods will be integrated into ParameterService.
 """
 
-from typing import List, Optional, Dict, Any
 import logging
-from backend.core.cache.cache_system import cached, CacheInvalidator
+from typing import Any, Dict, List, Optional
+
+from backend.core.cache.cache_system import CacheInvalidator, cached
 from backend.models.repositories.parameters import ParameterRepository
 
 logger = logging.getLogger(__name__)
@@ -26,15 +27,14 @@ class ParameterServiceExtended:
     def __init__(self):
         self.param_repo = ParameterRepository()
         from backend.core.cache.cache_system import HierarchicalCache
+
         self.cache = HierarchicalCache()
         self.invalidator = CacheInvalidator(self.cache)
 
     # ========== Parameter Details Methods ==========
 
     @cached("parameter.details", timeout=300)
-    def get_parameter_details(
-        self, param_name: str, game_gid: int
-    ) -> Optional[Dict[str, Any]]:
+    def get_parameter_details(self, param_name: str, game_gid: int) -> Optional[Dict[str, Any]]:
         """
         获取参数详情（跨事件使用情况）
 
@@ -43,7 +43,7 @@ class ParameterServiceExtended:
             game_gid: 游戏GID
 
         Returns:
-            参数详情字典，包含:
+            参数详情字典, 包含:
             - param_name: 参数名
             - param_name_cn: 中文名
             - base_type: 基础类型
@@ -120,16 +120,14 @@ class ParameterServiceExtended:
             game_gid: 游戏GID
 
         Returns:
-            公共参数列表，每个参数包含使用它的事件数量
+            公共参数列表, 每个参数包含使用它的事件数量
         """
         return self.param_repo.get_common_params_with_event_count(game_gid)
 
     # ========== Parameter Library Methods ==========
 
     @cached("param_library.check", timeout=300)
-    def check_param_library(
-        self, param_name: str, template_id: int
-    ) -> Optional[Dict[str, Any]]:
+    def check_param_library(self, param_name: str, template_id: int) -> Optional[Dict[str, Any]]:
         """
         检查参数是否存在于库中
 
@@ -138,7 +136,7 @@ class ParameterServiceExtended:
             template_id: 模板ID
 
         Returns:
-            库参数信息，不存在返回None
+            库参数信息, 不存在返回None
         """
         return self.param_repo.check_param_library(param_name, template_id)
 
@@ -150,7 +148,7 @@ class ParameterServiceExtended:
         批量检查参数库
 
         Args:
-            parameters: 参数列表，每个包含 param_name 和 template_id
+            parameters: 参数列表, 每个包含 param_name 和 template_id
 
         Returns:
             匹配结果字典:
@@ -159,9 +157,7 @@ class ParameterServiceExtended:
         """
         return self.param_repo.batch_check_param_library(parameters)
 
-    def link_event_param_to_library(
-        self, param_id: int, library_id: int
-    ) -> Dict[str, Any]:
+    def link_event_param_to_library(self, param_id: int, library_id: int) -> Dict[str, Any]:
         """
         关联事件参数到库参数
 
@@ -175,7 +171,7 @@ class ParameterServiceExtended:
         Raises:
             ValueError: 参数不存在
         """
-        # 失效缓存（在更新前失效）
+        # 失效缓存(在更新前失效)
         self.invalidator.invalidate_pattern(f"parameter.by_id:{param_id}")
         self.invalidator.invalidate_pattern("param_library.*")
 
@@ -196,7 +192,7 @@ class ParameterServiceExtended:
             param_id: 公共参数ID
 
         Returns:
-            包含参数信息和SQL的字典，不存在返回None
+            包含参数信息和SQL的字典, 不存在返回None
         """
         return self.param_repo.get_alter_table_sql(param_id)
 

@@ -11,3 +11,10 @@ export type { UseGameContextReturn, GameContextType } from './useGameContext';
 
 export { useConfirm } from './useConfirm';
 export type { UseConfirmReturn, ConfirmOptions } from './useConfirm';
+
+export { useChromeMCPCompatibleInput, useChromeMCPForm } from './useChromeMCPCompatibleInput';
+export type {
+  UseChromeMCPCompatibleInputOptions,
+  UseChromeMCPCompatibleInputReturn,
+  FormValuesFromFields,
+} from './useChromeMCPCompatibleInput';

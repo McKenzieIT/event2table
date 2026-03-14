@@ -23,10 +23,7 @@ import logging
 from flask import request
 
 # Import shared utilities
-from backend.core.utils import (
-    json_error_response,
-    json_success_response,
-)
+from backend.core.utils import json_error_response, json_success_response
 
 # Import Service Layer
 from backend.services.field_builder import FieldBuilderService
@@ -71,10 +68,7 @@ def api_save_field_builder_config():
 
         # 调用Service层
         result = field_builder_service.save_config(
-            config=config,
-            view_name=view_name,
-            display_name=display_name,
-            config_id=config_id
+            config=config, view_name=view_name, display_name=display_name, config_id=config_id
         )
 
         return json_success_response(
@@ -146,10 +140,7 @@ def api_preview_field_builder_hql():
 
         # 调用Service层
         hql = field_builder_service.preview_hql(
-            config=config,
-            source_events=source_events,
-            view_name=view_name,
-            date_var=date_var
+            config=config, source_events=source_events, view_name=view_name, date_var=date_var
         )
 
         return json_success_response(data={"hql": hql})
@@ -178,10 +169,7 @@ def api_list_field_builder_configs():
         search = request.args.get("search", "").strip()
 
         # 调用Service层
-        configs = field_builder_service.list_configs(
-            limit=limit,
-            search=search if search else None
-        )
+        configs = field_builder_service.list_configs(limit=limit, search=search if search else None)
 
         return json_success_response(data=configs)
 

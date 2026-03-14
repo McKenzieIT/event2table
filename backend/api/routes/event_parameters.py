@@ -29,10 +29,7 @@ import sys
 from flask import request
 
 # Import shared utilities
-from backend.core.utils import (
-    json_error_response,
-    json_success_response,
-)
+from backend.core.utils import json_error_response, json_success_response
 
 # Import ParameterService for business logic
 from backend.services.parameters.parameter_service import ParameterService
@@ -77,10 +74,7 @@ def api_update_event_parameter(id):
         # Update parameter via service
         updated_param = service.update_parameter(id, update_data)
 
-        return json_success_response(
-            data=updated_param.model_dump(),
-            message="参数更新成功"
-        )
+        return json_success_response(data=updated_param.model_dump(), message="参数更新成功")
 
     except ValueError as e:
         logger.error(f"Validation error updating event parameter {id}: {e}")
@@ -232,9 +226,7 @@ def api_create_validation_rule(id):
         required_fields = ["rule_type", "rule_config"]
         for field in required_fields:
             if field not in data:
-                return json_error_response(
-                    f"Missing required field: {field}", status_code=400
-                )
+                return json_error_response(f"Missing required field: {field}", status_code=400)
 
         rule_id = validation_manager.create_validation_rule(
             event_param_id=id,
@@ -243,13 +235,9 @@ def api_create_validation_rule(id):
             error_message=data.get("error_message"),
         )
 
-        return json_success_response(
-            data={"rule_id": rule_id}, message="Validation rule created"
-        )
+        return json_success_response(data={"rule_id": rule_id}, message="Validation rule created")
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
     except Exception as e:
-        logger.error(
-            f"Error creating validation rule for parameter {id}: {e}", exc_info=True
-        )
+        logger.error(f"Error creating validation rule for parameter {id}: {e}", exc_info=True)
         return json_error_response("An internal error occurred", status_code=500)

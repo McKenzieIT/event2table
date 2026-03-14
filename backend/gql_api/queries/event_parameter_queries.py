@@ -4,9 +4,10 @@ Event Parameter Queries
 Implements GraphQL query resolvers for Event Parameter extended functionality.
 """
 
-import graphene
-from graphene import Field, List, Int
 import logging
+
+import graphene
+from graphene import Field, Int, List
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +22,7 @@ class EventParameterQueries:
             from backend.core.utils import fetch_one_as_dict
             from backend.gql_api.types.event_parameter_type import EventParameterExtendedType
 
-            param = fetch_one_as_dict(
-                "SELECT * FROM event_params WHERE id = ?",
-                (id,)
-            )
+            param = fetch_one_as_dict("SELECT * FROM event_params WHERE id = ?", (id,))
 
             return EventParameterExtendedType.from_dict(param) if param else None
 
@@ -46,7 +44,7 @@ class EventParameterQueries:
                 ORDER BY created_at DESC
                 LIMIT ?
                 """,
-                (param_id, limit)
+                (param_id, limit),
             )
 
             return [ParamVersionType.from_dict(v) for v in versions]
@@ -63,8 +61,7 @@ class EventParameterQueries:
             from backend.gql_api.types.event_parameter_type import ParamConfigType
 
             config = fetch_one_as_dict(
-                "SELECT * FROM param_configs WHERE param_id = ?",
-                (param_id,)
+                "SELECT * FROM param_configs WHERE param_id = ?", (param_id,)
             )
 
             return ParamConfigType.from_dict(config) if config else None
@@ -86,7 +83,7 @@ class EventParameterQueries:
                 WHERE param_id = ? AND is_active = 1
                 ORDER BY created_at DESC
                 """,
-                (param_id,)
+                (param_id,),
             )
 
             return [ValidationRuleType.from_dict(r) for r in rules]

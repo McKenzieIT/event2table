@@ -1,3 +1,7 @@
+// ⚡️ REACT PERF - Features: Optimized with React.memo, useCallback, useMemo
+// ✅ Performance optimization: Prevent unnecessary re-renders in game management
+// See: docs/reports/2026-03-06/FEATURES-OPTIMIZATION-REPORT.md
+
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * GameManagementModal - 游戏管理模态框

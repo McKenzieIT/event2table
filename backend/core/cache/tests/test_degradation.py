@@ -16,12 +16,11 @@
 
 import time
 from unittest.mock import Mock, patch
-from redis.exceptions import RedisError, ConnectionError
+
+from redis.exceptions import ConnectionError, RedisError
 
 # 导入被测试模块
-from backend.core.cache.degradation import (
-    CacheDegradationManager
-)
+from backend.core.cache.degradation import CacheDegradationManager
 
 
 class TestNormalModeCacheGet:
@@ -138,7 +137,7 @@ class TestRedisFailureDegradation:
                 # 应该从L1获取数据
                 assert result == "l1_data"
                 assert mock_cache.stats["l1_hits"] == 1
-                # 不应该调用hierarchical_cache.get（降级模式）
+                # 不应该调用hierarchical_cache.get(降级模式)
                 mock_cache.get.assert_not_called()
 
 
@@ -170,14 +169,14 @@ class TestHealthCheck:
         manager = CacheDegradationManager()
 
         with patch('backend.core.cache.degradation.get_cache') as mock_get_cache:
-            # Mock慢响应（150ms）
+            # Mock慢响应(150ms)
             mock_client = Mock()
             mock_client.ping.side_effect = lambda: time.sleep(0.15)
             mock_cache = Mock()
             mock_cache._client = mock_client
             mock_get_cache.return_value = mock_cache
 
-            # 不应该抛出异常，但会记录警告
+            # 不应该抛出异常, 但会记录警告
             manager._health_check()
 
             # 不应该进入降级模式
@@ -194,9 +193,9 @@ class TestHealthCheck:
 
             manager._health_check()
 
-            # 当get_cache返回None时，代码会抛出Exception并记录警告
-            # 但不会自动进入降级模式（因为不是RedisError）
-            # 这是符合设计的：警告但不降级
+            # 当get_cache返回None时, 代码会抛出Exception并记录警告
+            # 但不会自动进入降级模式(因为不是RedisError)
+            # 这是符合设计的: 警告但不降级
             assert manager.degraded == False
 
     def test_health_check_exception_triggers_logging(self):
@@ -205,14 +204,14 @@ class TestHealthCheck:
         manager.degraded = False
 
         with patch('backend.core.cache.degradation.get_cache') as mock_get_cache:
-            # Mock返回None，会触发"Redis缓存未初始化"异常
+            # Mock返回None, 会触发"Redis缓存未初始化"异常
             mock_get_cache.return_value = None
 
             # 这个测试验证异常被正确捕获并记录警告
             # 而不是导致程序崩溃
             manager._health_check()
 
-            # 验证没有进入降级模式（因为Exception不是RedisError）
+            # 验证没有进入降级模式(因为Exception不是RedisError)
             assert manager.degraded == False
 
     def test_health_check_redis_error(self):
@@ -236,11 +235,11 @@ class TestHealthCheck:
         """测试健康检查时间间隔判断"""
         manager = CacheDegradationManager(health_check_interval=10)
 
-        # 刚检查过，不应该再检查
+        # 刚检查过, 不应该再检查
         manager.last_health_check = time.time()
         assert manager._should_check_health() == False
 
-        # 超过间隔，应该检查
+        # 超过间隔, 应该检查
         manager.last_health_check = time.time() - 11
         assert manager._should_check_health() == True
 
@@ -290,7 +289,7 @@ class TestAutoRecovery:
                 mock_cache.l1_ttl = 60
                 mock_cache.stats = {"l1_hits": 0, "misses": 0}
 
-                # 由于刚检查过，不会再次检查健康状态
+                # 由于刚检查过, 不会再次检查健康状态
                 result = manager.get_with_fallback("test_key")
 
                 # 仍然处于降级模式
@@ -299,7 +298,7 @@ class TestAutoRecovery:
 
 
 class TestSetWithFallback:
-    """测试5: 缓存写入（带降级）"""
+    """测试5: 缓存写入(带降级)"""
 
     def test_set_in_normal_mode(self):
         """测试正常模式下写入L1和L2"""
@@ -373,13 +372,13 @@ class TestGetStatus:
         assert status['health_check_interval'] == 15
         assert status['last_health_check'] == 123456.78
         assert status['stats']['degradation_count'] == 3
-        # 确保返回的是副本，不是引用
+        # 确保返回的是副本, 不是引用
         status['stats']['degradation_count'] = 999
         assert manager.stats['degradation_count'] == 3
 
 
 class TestForceOperations:
-    """测试7: 强制操作（用于测试）"""
+    """测试7: 强制操作(用于测试)"""
 
     def test_force_degrade(self):
         """测试强制进入降级模式"""
@@ -509,7 +508,7 @@ class TestEdgeCases:
         for t in threads:
             t.join()
 
-        # 降级计数应该只增加1次（线程安全）
+        # 降级计数应该只增加1次(线程安全)
         assert manager.stats['degradation_count'] == 1
         assert manager.degraded == True
 
@@ -535,7 +534,7 @@ class TestEdgeCases:
         for t in threads:
             t.join()
 
-        # 恢复计数应该只增加1次（线程安全）
+        # 恢复计数应该只增加1次(线程安全)
         assert manager.stats['recovery_count'] == 1
         assert manager.degraded == False
 

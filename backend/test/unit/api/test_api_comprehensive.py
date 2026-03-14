@@ -32,13 +32,13 @@ Test Report:
     pytest tests/test_api_comprehensive.py --html=api_test_report.html
 """
 
-import sys
-import os
 import json
+import os
+import sys
+import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import tempfile
+from unittest.mock import MagicMock, Mock, patch
 
 # Add project path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -50,7 +50,8 @@ os.environ["FLASK_SECRET_KEY"] = "test-secret-key"
 # Import Flask app and test utilities
 try:
     from web_app import app
-    from backend.core.database import init_db, get_db_connection, DB_PATH
+
+    from backend.core.database import DB_PATH, get_db_connection, init_db
     from backend.core.logging import get_logger
 
     logger = get_logger(__name__)
@@ -94,9 +95,7 @@ class APITestCase(unittest.TestCase):
 
             # Delete test events
             for event_id in cls.test_event_ids:
-                cursor.execute(
-                    "DELETE FROM event_params WHERE event_id = ?", (event_id,)
-                )
+                cursor.execute("DELETE FROM event_params WHERE event_id = ?", (event_id,))
                 cursor.execute("DELETE FROM log_events WHERE id = ?", (event_id,))
 
             # Delete test games (with gid >= 99999991 to identify test games created during tests)
@@ -134,9 +133,7 @@ class APITestCase(unittest.TestCase):
             game_gid = test_gid  # Business GID
 
             # Create test category (if not exists)
-            cursor.execute(
-                "INSERT OR IGNORE INTO event_categories (name) VALUES (?)", ("Login",)
-            )
+            cursor.execute("INSERT OR IGNORE INTO event_categories (name) VALUES (?)", ("Login",))
             cursor.execute("SELECT id FROM event_categories WHERE name = ?", ("Login",))
             category_id = cursor.fetchone()[0]
             cls.test_category_id = category_id  # Store for use in tests
@@ -196,11 +193,7 @@ class APITestCase(unittest.TestCase):
         """Helper to make POST request with CSRF token"""
         return self.client.post(
             url,
-            data=data
-            if data is None
-            else json.dumps(data)
-            if isinstance(data, dict)
-            else data,
+            data=data if data is None else json.dumps(data) if isinstance(data, dict) else data,
             content_type=content_type,
             headers={"X-CSRF-Token": "test_csrf_token_1234567890"},
         )
@@ -209,11 +202,7 @@ class APITestCase(unittest.TestCase):
         """Helper to make PUT request with CSRF token"""
         return self.client.put(
             url,
-            data=data
-            if data is None
-            else json.dumps(data)
-            if isinstance(data, dict)
-            else data,
+            data=data if data is None else json.dumps(data) if isinstance(data, dict) else data,
             content_type=content_type,
             headers={"X-CSRF-Token": "test_csrf_token_1234567890"},
         )
@@ -221,9 +210,7 @@ class APITestCase(unittest.TestCase):
     def delete_with_csrf(self, url, data=None):
         """Helper to make DELETE request with CSRF token"""
         if data is None:
-            return self.client.delete(
-                url, headers={"X-CSRF-Token": "test_csrf_token_1234567890"}
-            )
+            return self.client.delete(url, headers={"X-CSRF-Token": "test_csrf_token_1234567890"})
         return self.client.delete(
             url,
             data=json.dumps(data),
@@ -238,9 +225,7 @@ class APITestCase(unittest.TestCase):
             expected_status,
             f"Expected {expected_status}, got {response.status_code}",
         )
-        self.assertEqual(
-            response.content_type, "application/json", "Response should be JSON"
-        )
+        self.assertEqual(response.content_type, "application/json", "Response should be JSON")
 
     def assert_json_contains(self, data, expected_keys):
         """Assert JSON data contains expected keys"""
@@ -452,9 +437,7 @@ class TestParametersAPI(APITestCase):
         """Test PUT /api/parameters/<id> - Update parameter"""
         # Skip this test as the endpoint doesn't exist - it uses /display-name suffix
         # The correct endpoint is /api/parameters/<id>/display-name
-        self.skipTest(
-            "Endpoint /api/parameters/<id> without /display-name suffix not implemented"
-        )
+        self.skipTest("Endpoint /api/parameters/<id> without /display-name suffix not implemented")
 
     def test_05_validate_parameters(self):
         """Test GET /api/parameters/validate - Validate parameters"""
@@ -886,7 +869,6 @@ class TestParameterAliasesAPI(APITestCase):
         super().setUp()
         self.game_gid = self.test_game_gid if self.test_game_gid else 10000147
         self.game_id = self.test_game_ids[0] if self.test_game_ids else 1
-
 
     @cached(ttl=1800)
     def test_01_list_parameter_aliases(self):

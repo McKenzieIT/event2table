@@ -22,8 +22,8 @@ Note: This module is still marked as DEPRECATED for future migration to Paramete
 
 import json
 import logging
-from typing import Dict, List, Optional, Any
 from collections import Counter
+from typing import Any, Dict, List, Optional
 
 from backend.models.repositories.param_library_repository import ParamLibraryRepository
 from backend.models.repositories.parameters import ParameterRepository
@@ -63,7 +63,7 @@ class ParamLibraryManager:
             game_gid: 游戏GID
 
         Returns:
-            参数库字典，包含:
+            参数库字典, 包含:
             - parameters: 参数列表
             - stats: 统计信息
               - total: 总数
@@ -82,13 +82,10 @@ class ParamLibraryManager:
         stats = {
             'total': len(parameters),
             'by_type': self._count_by_type(parameters),
-            'by_category': self._count_by_category(parameters)
+            'by_category': self._count_by_category(parameters),
         }
 
-        return {
-            'parameters': parameters,
-            'stats': stats
-        }
+        return {'parameters': parameters, 'stats': stats}
 
     def _count_by_type(self, parameters: List[Dict[str, Any]]) -> Dict[str, int]:
         """
@@ -148,6 +145,7 @@ class ParamLibraryManager:
         game_gid = None
         if game_id:
             from backend.models.repositories.games import GameRepository
+
             game_repo = GameRepository()
             game = game_repo.find_by_id(game_id)
             if game:
@@ -206,10 +204,7 @@ class ParamLibraryManager:
         Returns:
             Created library parameter ID
         """
-        logger.warning(
-            "create_parameter() is deprecated. "
-            "Use ParamLibraryRepository directly."
-        )
+        logger.warning("create_parameter() is deprecated. " "Use ParamLibraryRepository directly.")
 
         # 解析类型字符串
         type_str = param_data.get("param_type", "string")
@@ -253,8 +248,7 @@ class ParamLibraryManager:
             Number of parameters extracted
         """
         logger.warning(
-            "extract_from_existing_params() is deprecated. "
-            "Use ParamLibraryRepository directly."
+            "extract_from_existing_params() is deprecated. " "Use ParamLibraryRepository directly."
         )
 
         # Use Repository to get frequently used parameters
@@ -310,11 +304,10 @@ class ParamLibraryManager:
             True if updated successfully, False otherwise
         """
         logger.warning(
-            f"update_parameter({library_id}) is deprecated. "
-            "Use ParamLibraryRepository directly."
+            f"update_parameter({library_id}) is deprecated. " "Use ParamLibraryRepository directly."
         )
 
-        # 如果更新了类型，需要更新template_id
+        # 如果更新了类型, 需要更新template_id
         template_id = None
         if "param_type" in param_data:
             type_str = param_data["param_type"]
@@ -334,9 +327,9 @@ class ParamLibraryManager:
         if success and template_id:
             # Update template_id separately if needed
             from backend.core.utils import execute_write
+
             execute_write(
-                "UPDATE param_library SET template_id = ? WHERE id = ?",
-                (template_id, library_id)
+                "UPDATE param_library SET template_id = ? WHERE id = ?", (template_id, library_id)
             )
 
         logger.info(f"Updated library parameter: {library_id}")
@@ -353,16 +346,13 @@ class ParamLibraryManager:
             True if deleted successfully, False if still referenced
         """
         logger.warning(
-            f"delete_parameter({library_id}) is deprecated. "
-            "Use ParamLibraryRepository directly."
+            f"delete_parameter({library_id}) is deprecated. " "Use ParamLibraryRepository directly."
         )
 
         success = self.library_repo.delete_parameter(library_id)
 
         if not success:
-            logger.warning(
-                f"Cannot delete library parameter {library_id}: still referenced"
-            )
+            logger.warning(f"Cannot delete library parameter {library_id}: still referenced")
         else:
             logger.info(f"Deleted library parameter: {library_id}")
 

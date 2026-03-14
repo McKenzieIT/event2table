@@ -10,10 +10,10 @@ HQL语法校验器
 """
 
 import re
-from typing import List, Any, Optional, Tuple
 from dataclasses import dataclass, field
+from typing import Any, List, Optional, Tuple
 
-# 尝试导入sqlparse，如果没有安装则提供基本功能
+# 尝试导入sqlparse, 如果没有安装则提供基本功能
 try:
     import sqlparse
 
@@ -136,18 +136,18 @@ class SyntaxValidator:
     ERROR_PATTERNS = {
         "SELECT_STAR": {
             "pattern": r"SELECT\s+\*\s+FROM",
-            "message": "避免使用SELECT *，明确列出所需字段",
+            "message": "避免使用SELECT *, 明确列出所需字段",
             "suggestion": "明确列出所有需要的字段名",
         },
         "MISSING_WHERE": {
             "pattern": r"CREATE\s+(OR\s+REPLACE\s+)?VIEW.*?WHERE\s+\'\$\{",
             "message": "WHERE子句缺少分区过滤",
-            "suggestion": "添加分区过滤条件，如: WHERE ds = '${bizdate}'",
+            "suggestion": "添加分区过滤条件, 如: WHERE ds = '${bizdate}'",
         },
         "MISSING_QUOTES": {
             "pattern": r'=\s*[\'"][^\'"]*[\'"]\s+',
             "message": "字符串值未加引号",
-            "suggestion": "给字符串值加上单引号，如: value = 'value'",
+            "suggestion": "给字符串值加上单引号, 如: value = 'value'",
         },
         "UNION_WITHOUT_ALL": {
             "pattern": r"UNION\s+(?!ALL)",
@@ -173,15 +173,19 @@ class SyntaxValidator:
         format_errors = self._check_format(hql)
         errors.extend(format_errors)
 
-        # 2. 尝试解析HQL（如果sqlparse可用）
+        # 2. 括号和引号检查（不依赖sqlparse）
+        errors.extend(self._check_quotes(hql))
+        errors.extend(self._check_parentheses(hql))
+
+        # 3. 尝试解析HQL(如果sqlparse可用)
         parse_tree = None
         if SQLPARSE_AVAILABLE:
             try:
                 parse_tree = sqlparse.parse(hql)
 
-                # 3. 语义检查
-                semantic_errors = self._check_semantics(hql, parse_tree)
-                errors.extend(semantic_errors)
+                # 4. JOIN检查（需要parse_tree）
+                join_errors = self._check_joins(hql, parse_tree)
+                errors.extend(join_errors)
 
             except Exception as e:
                 # 解析失败
@@ -195,12 +199,12 @@ class SyntaxValidator:
                     )
                 )
         else:
-            # 如果sqlparse不可用，添加警告
+            # 如果sqlparse不可用, 添加警告
             warnings.append(
                 SyntaxError(
                     line=0,
                     column=0,
-                    message="sqlparse未安装，跳过高级语法检查",
+                    message="sqlparse未安装, 跳过JOIN语法检查",
                     error_type="warning",
                     suggestion="安装sqlparse以获得完整的语法验证: pip install sqlparse",
                 )
@@ -246,7 +250,7 @@ class SyntaxValidator:
                     )
                 )
 
-        # 检查3: 必须包含WHERE（分区过滤）
+        # 检查3: 必须包含WHERE(分区过滤)
         if "WHERE" not in hql_upper:
             errors.append(
                 SyntaxError(
@@ -254,7 +258,7 @@ class SyntaxValidator:
                     column=0,
                     message="缺少WHERE子句（分区过滤要求）",
                     error_type="error",
-                    suggestion="添加WHERE子句，如: WHERE ds = '${bizdate}'",
+                    suggestion="添加WHERE子句, 如: WHERE ds = '${bizdate}'",
                 )
             )
 
@@ -301,7 +305,7 @@ class SyntaxValidator:
                 )
             )
 
-        # 检查双引号（Hive中双引号需要转义）
+        # 检查双引号(Hive中双引号需要转义)
         double_quotes = hql.count('"')
         if double_quotes > 0:
             errors.append(
@@ -310,7 +314,7 @@ class SyntaxValidator:
                     column=0,
                     message="Hive中应避免使用双引号",
                     error_type="warning",
-                    suggestion='使用单引号代替双引号，或转义双引号为\\"',
+                    suggestion='使用单引号代替双引号, 或转义双引号为\\"',
                 )
             )
 
@@ -391,7 +395,7 @@ class SyntaxValidator:
                         column=0,
                         message=f"JOIN缺少ON条件",
                         error_type="error",
-                        suggestion=f"为JOIN添加ON条件，如: {match.group(0)} {match.group(1)} ON t1.id = t2.id",
+                        suggestion=f"为JOIN添加ON条件, 如: {match.group(0)} {match.group(1)} ON t1.id = t2.id",
                     )
                 )
 
@@ -409,7 +413,7 @@ class SyntaxValidator:
                     column=0,
                     message="避免使用SELECT *",
                     error_type="warning",
-                    suggestion="明确列出所需字段名，避免查询大量不需要的数据",
+                    suggestion="明确列出所需字段名, 避免查询大量不需要的数据",
                 )
             )
 
@@ -421,7 +425,7 @@ class SyntaxValidator:
                     column=0,
                     message="UNION后建议加ALL",
                     error_type="warning",
-                    suggestion="使用UNION ALL保留所有记录，避免去重开销",
+                    suggestion="使用UNION ALL保留所有记录, 避免去重开销",
                 )
             )
 
@@ -444,7 +448,7 @@ class SyntaxValidator:
                             column=0,
                             message="WHERE子句缺少分区字段过滤",
                             error_type="warning",
-                            suggestion="添加分区字段过滤，如: WHERE ds = '${bizdate}'",
+                            suggestion="添加分区字段过滤, 如: WHERE ds = '${bizdate}'",
                         )
                     )
 

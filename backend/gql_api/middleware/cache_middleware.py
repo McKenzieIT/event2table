@@ -4,11 +4,12 @@ Cache Middleware for GraphQL
 Integrates with the existing three-tier cache system.
 """
 
-from graphql import GraphQLError
-from typing import Any, Callable
-import logging
-import json
 import hashlib
+import json
+import logging
+from typing import Any, Callable
+
+from graphql import GraphQLError
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +141,7 @@ class CacheMiddleware:
         """
         try:
             from flask import current_app
+
             cache = getattr(current_app, 'cache', None)
             if cache:
                 return cache.get(key)
@@ -159,6 +161,7 @@ class CacheMiddleware:
         """
         try:
             from flask import current_app
+
             cache = getattr(current_app, 'cache', None)
             if cache:
                 cache.set(key, value, timeout=timeout)
@@ -174,6 +177,7 @@ class CacheMiddleware:
         """
         try:
             from flask import current_app
+
             from backend.core.cache.cache_system import CacheInvalidator
 
             if pattern:

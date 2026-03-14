@@ -2,10 +2,11 @@
 DDL Generator - DDL语句生成器
 
 负责生成Hive DDL语句（CREATE TABLE, ALTER TABLE等）
-完全遵循HQL V2架构模式，无框架依赖
+完全遵循HQL V2架构模式, 无框架依赖
 """
 
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from ..models.event import Field
 
 
@@ -13,7 +14,7 @@ class DDLGenerator:
     """
     DDL生成器
 
-    生成Hive DDL语句，支持：
+    生成Hive DDL语句, 支持: 
     - CREATE TABLE (with ORC storage and partitioning)
     - ALTER TABLE (ADD/REPLACE columns)
 
@@ -31,7 +32,7 @@ class DDLGenerator:
     """
 
     # Hive数据类型映射
-    # 默认所有字段都是STRING，除非明确指定其他类型
+    # 默认所有字段都是STRING, 除非明确指定其他类型
     HIVE_TYPE_MAPPING = {
         "STRING": "STRING",
         "BIGINT": "BIGINT",
@@ -46,7 +47,7 @@ class DDLGenerator:
         "MAP": "MAP<STRING, STRING>",
     }
 
-    # 默认字段类型（如果未指定）
+    # 默认字段类型(如果未指定)
     DEFAULT_FIELD_TYPE = "STRING"
 
     # 分区字段配置
@@ -67,7 +68,7 @@ class DDLGenerator:
 
         可以根据业务需求扩展映射规则
         """
-        # 预留扩展点：可以根据字段名推断类型
+        # 预留扩展点: 可以根据字段名推断类型
         self.field_name_type_hints = {
             "id": "BIGINT",
             "count": "BIGINT",
@@ -99,7 +100,7 @@ class DDLGenerator:
                 - stored_as: 存储格式（默认ORC）
                 - partition_by: 分区字段（默认ds）
                 - comment: 表注释（可选）
-                - location: 表位置（可选，用于外部表）
+                - location: 表位置（可选, 用于外部表）
 
         Returns:
             str: CREATE TABLE DDL语句
@@ -333,7 +334,7 @@ class DDLGenerator:
             >>> generator._infer_hive_type(field)
             'BIGINT'
         """
-        # 如果字段有明确的类型指定（通过自定义属性），使用它
+        # 如果字段有明确的类型指定(通过自定义属性), 使用它
         if hasattr(field, "hive_type") and field.hive_type:
             hive_type = field.hive_type
             if not isinstance(hive_type, str):
@@ -345,7 +346,7 @@ class DDLGenerator:
 
         for hint, target_type in self.field_name_type_hints.items():
             if hint.endswith("_"):
-                # 前缀匹配（如: is_active, has_permission）
+                # 前缀匹配(如: is_active, has_permission)
                 if field_name_lower.startswith(hint):
                     return target_type
             else:
@@ -372,13 +373,11 @@ class DDLGenerator:
         if not table_name:
             raise ValueError("table_name cannot be empty")
 
-        # 表名格式：database.table 或 table
-        # 只允许字母、数字、下划线和点
+        # 表名格式: database.table 或 table
+        # 只允许字母, 数字, 下划线和点
         import re
 
-        if not re.match(
-            r"^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$", table_name
-        ):
+        if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*$", table_name):
             raise ValueError(
                 f"Invalid table_name: {table_name}. "
                 "Table name must match pattern: [database.]table_name"
@@ -446,7 +445,7 @@ class DDLGenerator:
             >>> generator.set_default_field_type("VARCHAR(255)")
         """
         if hive_type not in self.HIVE_TYPE_MAPPING.values():
-            # 允许自定义类型，但发出警告
+            # 允许自定义类型, 但发出警告
             import warnings
 
             warnings.warn(

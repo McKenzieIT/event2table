@@ -11,18 +11,19 @@ Provides comprehensive cache statistics and monitoring endpoints
 API端点:
 - GET /admin/cache/status - 缓存状态（健康检查）
 - GET /admin/cache/stats - 缓存统计信息（L1/L2/预热）
-- GET /admin/cache/performance - 性能指标（响应时间、QPS）
+- GET /admin/cache/performance - 性能指标（响应时间, QPS）
 - GET /admin/cache/keys - 列出所有缓存键
 - POST /admin/cache/clear - 清空所有缓存
 """
 
 from datetime import datetime
+
 from flask import Blueprint, jsonify
-from backend.core.logging import get_logger
-from backend.core.cache.cache_system import get_cache, get_redis_client
-from backend.core.cache.cache_system import hierarchical_cache
+
+from backend.core.cache.cache_system import get_cache, get_redis_client, hierarchical_cache
 from backend.core.cache.cache_warmer import cache_warmer
 from backend.core.config import CacheConfig
+from backend.core.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -80,9 +81,7 @@ def cache_status():
                         "hit_rate": f"{hit_rate}%",
                         "total_keys": redis_client.dbsize(),
                         "memory_used": info.get("used_memory_human", "0B"),
-                        "uptime_days": round(
-                            info.get("uptime_in_seconds", 0) / 86400, 2
-                        ),
+                        "uptime_days": round(info.get("uptime_in_seconds", 0) / 86400, 2),
                     },
                 },
             }
@@ -161,13 +160,13 @@ def cache_stats():
     """
     获取缓存统计信息（v3.0）
 
-    返回L1、L2、预热三方面的统计
+    返回L1, L2, 预热三方面的统计
     """
     try:
-        # L1统计（从hierarchical_cache）
+        # L1统计(从hierarchical_cache)
         l1_stats = hierarchical_cache.get_stats()
 
-        # L2统计（Redis）
+        # L2统计(Redis)
         redis_client = get_redis_client()
         l2_stats = {}
         if redis_client:
@@ -218,9 +217,7 @@ def cache_stats():
 
     except Exception as e:
         logger.error(f"获取缓存统计失败: {e}", exc_info=True)
-        return jsonify(
-            {"error": "An internal error occurred", "message": "获取缓存统计失败"}
-        ), 500
+        return jsonify({"error": "An internal error occurred", "message": "获取缓存统计失败"}), 500
 
 
 @cache_monitor_bp.route("/admin/cache/performance")
@@ -228,7 +225,7 @@ def cache_performance():
     """
     获取缓存性能指标（v3.0）
 
-    返回响应时间、吞吐量、效率等性能指标
+    返回响应时间, 吞吐量, 效率等性能指标
     """
     try:
         # 获取L1统计
@@ -243,7 +240,7 @@ def cache_performance():
             except Exception:
                 pass
 
-        # 计算响应时间（基于统计数据估算）
+        # 计算响应时间(基于统计数据估算)
         # L1: <1ms, L2: 5-10ms, L3: 50-200ms
         total_requests = l1_stats["total_requests"]
 
@@ -261,7 +258,7 @@ def cache_performance():
         else:
             avg_response_time_ms = 0
 
-        # 计算QPS（基于Redis统计）
+        # 计算QPS(基于Redis统计)
         if redis_info:
             instantaneous_ops_per_sec = redis_info.get("instantaneous_ops_per_sec", 0)
         else:
@@ -284,9 +281,7 @@ def cache_performance():
                         / max(total_requests, 1)
                     ),
                     "misses_per_sec": round(
-                        instantaneous_ops_per_sec
-                        * l1_stats["misses"]
-                        / max(total_requests, 1)
+                        instantaneous_ops_per_sec * l1_stats["misses"] / max(total_requests, 1)
                     ),
                 },
                 "efficiency": {
@@ -304,9 +299,7 @@ def cache_performance():
                     "l2": {
                         "total_keys": redis_client.dbsize() if redis_client else 0,
                         "memory_used": (
-                            redis_info.get("used_memory_human", "0B")
-                            if redis_info
-                            else "0B"
+                            redis_info.get("used_memory_human", "0B") if redis_info else "0B"
                         ),
                     },
                 },
@@ -315,9 +308,7 @@ def cache_performance():
 
     except Exception as e:
         logger.error(f"获取性能指标失败: {e}", exc_info=True)
-        return jsonify(
-            {"error": "An internal error occurred", "message": "获取性能指标失败"}
-        ), 500
+        return jsonify({"error": "An internal error occurred", "message": "获取性能指标失败"}), 500
 
 
 @cache_monitor_bp.route("/admin/cache/clear", methods=["POST"])

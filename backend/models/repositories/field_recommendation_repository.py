@@ -15,9 +15,9 @@ Field Recommendation Repository (字段推荐数据访问层)
 - 协同过滤推荐
 """
 
-from typing import List, Dict, Any
-from collections import Counter
 import json
+from collections import Counter
+from typing import Any, Dict, List
 
 from backend.core.data_access import GenericRepository
 from backend.core.utils.converters import fetch_all_as_dict
@@ -41,9 +41,8 @@ class FieldRecommendationRepository(GenericRepository):
             table_name="hql_history",
             primary_key="id",
             enable_cache=True,
-            cache_timeout=600  # 10分钟缓存 (推荐数据变化不频繁)
+            cache_timeout=600,  # 10分钟缓存 (推荐数据变化不频繁)
         )
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_history_recommendations(
@@ -114,7 +113,6 @@ class FieldRecommendationRepository(GenericRepository):
 
         return recommendations
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_collaborative_recommendations(
         self, event_name: str, limit: int = 100
@@ -161,7 +159,7 @@ class FieldRecommendationRepository(GenericRepository):
             except (json.JSONDecodeError, KeyError):
                 continue
 
-        # 获取最常用字段（排除已知的常用字段）
+        # 获取最常用字段(排除已知的常用字段)
         top_fields = field_counter.most_common(10)
 
         recommendations = []
@@ -180,7 +178,6 @@ class FieldRecommendationRepository(GenericRepository):
             )
 
         return recommendations
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_field_usage_statistics(self, days: int = 30) -> Dict[str, int]:

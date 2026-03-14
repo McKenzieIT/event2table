@@ -4,9 +4,9 @@
 Core module - exports all core functionality
 """
 
+from .config import DB_PATH, TEST_DB_PATH
 from .database import get_db_connection, init_db, migrate_db
 from .utils import execute_write
-from .config import DB_PATH, TEST_DB_PATH
 
 __all__ = [
     "get_db_connection",

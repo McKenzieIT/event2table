@@ -1,8 +1,7 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
+// ⚡️ REACT PERF: React.memo + useCallback optimization
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from '@shared/ui';
 import './AlterSql.css';
@@ -25,26 +24,26 @@ function AlterSql(): React.JSX.Element {
     { action: 'ADD', column: '', type: 'string' }
   ]);
 
-  const addAlteration = (): void => {
+  const addAlteration = useCallback((): void => {
     setAlterations([...alterations, { action: 'ADD', column: '', type: 'string' }]);
-  };
+  }, [alterations]);
 
-  const removeAlteration = (index: number): void => {
+  const removeAlteration = useCallback((index: number): void => {
     setAlterations(alterations.filter((_, i) => i !== index));
-  };
+  }, [alterations]);
 
-  const updateAlteration = (index: number, field: keyof Alteration, value: string): void => {
+  const updateAlteration = useCallback((index: number, field: keyof Alteration, value: string): void => {
     const newAlterations = [...alterations];
     (newAlterations[index][field] as string) = value;
     setAlterations(newAlterations);
-  };
+  }, [alterations]);
 
-  const generateSQL = (): string => {
+  const generateSQL = useCallback((): string => {
     return alterations
       .filter(a => a.column)
       .map(a => `ALTER TABLE \${tableName} \${a.action} COLUMN \${a.column} \${a.type};`)
       .join('\n');
-  };
+  }, [alterations, tableName]);
 
   return (
     <div className="alter-sql-container">
@@ -120,4 +119,5 @@ function AlterSql(): React.JSX.Element {
   );
 }
 
-export default AlterSql;
+const AlterSqlMemo = memo(AlterSql);
+export default AlterSqlMemo;

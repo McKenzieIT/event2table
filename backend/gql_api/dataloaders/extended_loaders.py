@@ -3,13 +3,15 @@ from backend.core.cache.decorators import cached
 """
 扩展的GraphQL DataLoader实现
 
-为更多查询场景添加DataLoader，进一步优化性能
+为更多查询场景添加DataLoader, 进一步优化性能
 """
 
-from promise.dataloader import DataLoader
-from promise import Promise
-from typing import List, Dict, Any, Optional
 import logging
+from typing import Any, Dict, List, Optional
+
+from promise import Promise
+from promise.dataloader import DataLoader
+
 from backend.core.database import get_db_connection
 from backend.gql_api.dataloaders.optimized_loaders import CachedDataLoader
 
@@ -47,6 +49,7 @@ class CategoryLoader(DataLoader):
         Returns:
             Promise<List[Category>>: 分类列表
         """
+
         def load_from_db(ids: List[int]) -> List[Dict]:
             """从数据库批量加载"""
             conn = get_db_connection()
@@ -54,11 +57,14 @@ class CategoryLoader(DataLoader):
 
             # 一次性查询所有分类
             placeholders = ','.join('?' * len(ids))
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT id, name
                 FROM event_categories
                 WHERE id IN ({placeholders})
-            """, ids)
+            """,
+                ids,
+            )
 
             rows = cursor.fetchall()
             conn.close()
@@ -66,14 +72,11 @@ class CategoryLoader(DataLoader):
             # 转换为字典并按ID索引
             categories_by_id = {row['id']: dict(row) for row in rows}
 
-            # 按请求顺序返回（未找到的返回None）
+            # 按请求顺序返回(未找到的返回None)
             return [categories_by_id.get(cid) for cid in ids]
 
         return self.cache_loader._batch_load_with_cache(
-            category_ids,
-            load_from_db,
-            ttl_l1=300,  # 分类变化较少，缓存时间更长
-            ttl_l2=1800
+            category_ids, load_from_db, ttl_l1=300, ttl_l2=1800  # 分类变化较少, 缓存时间更长
         )
 
 
@@ -98,17 +101,21 @@ class TemplateLoader(DataLoader):
         Returns:
             Promise<List[Template>>: 模板列表
         """
+
         def load_from_db(ids: List[int]) -> List[Dict]:
             """从数据库批量加载"""
             conn = get_db_connection()
             cursor = conn.cursor()
 
             placeholders = ','.join('?' * len(ids))
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT id, name, content, category, description, created_at, updated_at
                 FROM hql_templates
                 WHERE id IN ({placeholders})
-            """, ids)
+            """,
+                ids,
+            )
 
             rows = cursor.fetchall()
             conn.close()
@@ -117,10 +124,7 @@ class TemplateLoader(DataLoader):
             return [templates_by_id.get(tid) for tid in ids]
 
         return self.cache_loader._batch_load_with_cache(
-            template_ids,
-            load_from_db,
-            ttl_l1=120,
-            ttl_l2=600
+            template_ids, load_from_db, ttl_l1=120, ttl_l2=600
         )
 
 
@@ -145,17 +149,21 @@ class NodeLoader(DataLoader):
         Returns:
             Promise<List[Node>>: 节点列表
         """
+
         def load_from_db(ids: List[int]) -> List[Dict]:
             """从数据库批量加载"""
             conn = get_db_connection()
             cursor = conn.cursor()
 
             placeholders = ','.join('?' * len(ids))
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT id, game_gid, node_type, node_name, config, created_at, updated_at
                 FROM event_nodes
                 WHERE id IN ({placeholders})
-            """, ids)
+            """,
+                ids,
+            )
 
             rows = cursor.fetchall()
             conn.close()
@@ -164,10 +172,7 @@ class NodeLoader(DataLoader):
             return [nodes_by_id.get(nid) for nid in ids]
 
         return self.cache_loader._batch_load_with_cache(
-            node_ids,
-            load_from_db,
-            ttl_l1=60,
-            ttl_l2=300
+            node_ids, load_from_db, ttl_l1=60, ttl_l2=300
         )
 
 
@@ -192,17 +197,21 @@ class FlowLoader(DataLoader):
         Returns:
             Promise<List[Flow>>: 流程列表
         """
+
         def load_from_db(ids: List[int]) -> List[Dict]:
             """从数据库批量加载"""
             conn = get_db_connection()
             cursor = conn.cursor()
 
             placeholders = ','.join('?' * len(ids))
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT id, game_gid, flow_name, flow_type, config, created_at, updated_at
                 FROM hql_flows
                 WHERE id IN ({placeholders})
-            """, ids)
+            """,
+                ids,
+            )
 
             rows = cursor.fetchall()
             conn.close()
@@ -211,10 +220,7 @@ class FlowLoader(DataLoader):
             return [flows_by_id.get(fid) for fid in ids]
 
         return self.cache_loader._batch_load_with_cache(
-            flow_ids,
-            load_from_db,
-            ttl_l1=60,
-            ttl_l2=300
+            flow_ids, load_from_db, ttl_l1=60, ttl_l2=300
         )
 
 
@@ -239,18 +245,22 @@ class JoinConfigLoader(DataLoader):
         Returns:
             Promise<List[JoinConfig>>: Join配置列表
         """
+
         def load_from_db(ids: List[int]) -> List[Dict]:
             """从数据库批量加载"""
             conn = get_db_connection()
             cursor = conn.cursor()
 
             placeholders = ','.join('?' * len(ids))
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT id, game_id, join_type, left_table, right_table,
                        join_condition, created_at, updated_at
                 FROM join_configs
                 WHERE id IN ({placeholders})
-            """, ids)
+            """,
+                ids,
+            )
 
             rows = cursor.fetchall()
             conn.close()
@@ -259,10 +269,7 @@ class JoinConfigLoader(DataLoader):
             return [configs_by_id.get(cid) for cid in ids]
 
         return self.cache_loader._batch_load_with_cache(
-            config_ids,
-            load_from_db,
-            ttl_l1=120,
-            ttl_l2=600
+            config_ids, load_from_db, ttl_l1=120, ttl_l2=600
         )
 
 
@@ -287,6 +294,7 @@ class GameStatsLoader(DataLoader):
         Returns:
             Promise<List[GameStats>>: 游戏统计列表
         """
+
         def load_from_db(gids: List[int]) -> List[Dict]:
             """从数据库批量加载统计信息"""
             conn = get_db_connection()
@@ -294,34 +302,43 @@ class GameStatsLoader(DataLoader):
 
             # 批量查询事件数量
             placeholders = ','.join('?' * len(gids))
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT game_gid, COUNT(*) as event_count
                 FROM log_events
                 WHERE game_gid IN ({placeholders})
                 GROUP BY game_gid
-            """, gids)
+            """,
+                gids,
+            )
 
             event_counts = {row['game_gid']: row['event_count'] for row in cursor.fetchall()}
 
             # 批量查询参数数量
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT e.game_gid, COUNT(p.id) as param_count
                 FROM log_events e
                 LEFT JOIN event_params p ON e.id = p.event_id
                 WHERE e.game_gid IN ({placeholders})
                 GROUP BY e.game_gid
-            """, gids)
+            """,
+                gids,
+            )
 
             param_counts = {row['game_gid']: row['param_count'] for row in cursor.fetchall()}
 
             # 批量查询分类数量
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT e.game_gid, COUNT(DISTINCT e.category_id) as category_count
                 FROM log_events e
                 WHERE e.game_gid IN ({placeholders})
                 AND e.category_id IS NOT NULL
                 GROUP BY e.game_gid
-            """, gids)
+            """,
+                gids,
+            )
 
             category_counts = {row['game_gid']: row['category_count'] for row in cursor.fetchall()}
 
@@ -330,20 +347,19 @@ class GameStatsLoader(DataLoader):
             # 组装结果
             stats = []
             for gid in gids:
-                stats.append({
-                    'gameGid': gid,
-                    'eventCount': event_counts.get(gid, 0),
-                    'parameterCount': param_counts.get(gid, 0),
-                    'categoryCount': category_counts.get(gid, 0)
-                })
+                stats.append(
+                    {
+                        'gameGid': gid,
+                        'eventCount': event_counts.get(gid, 0),
+                        'parameterCount': param_counts.get(gid, 0),
+                        'categoryCount': category_counts.get(gid, 0),
+                    }
+                )
 
             return stats
 
         return self.cache_loader._batch_load_with_cache(
-            game_gids,
-            load_from_db,
-            ttl_l1=30,  # 统计信息变化较频繁
-            ttl_l2=120
+            game_gids, load_from_db, ttl_l1=30, ttl_l2=120  # 统计信息变化较频繁
         )
 
 
@@ -356,7 +372,6 @@ _join_config_loader = None
 _game_stats_loader = None
 
 
-
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_category_loader() -> CategoryLoader:
     """获取分类加载器实例"""
@@ -364,7 +379,6 @@ def get_category_loader() -> CategoryLoader:
     if _category_loader is None:
         _category_loader = CategoryLoader()
     return _category_loader
-
 
 
 @cached(ttl=1800)  # Cache for 30 minutes
@@ -376,7 +390,6 @@ def get_template_loader() -> TemplateLoader:
     return _template_loader
 
 
-
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_node_loader() -> NodeLoader:
     """获取节点加载器实例"""
@@ -384,7 +397,6 @@ def get_node_loader() -> NodeLoader:
     if _node_loader is None:
         _node_loader = NodeLoader()
     return _node_loader
-
 
 
 @cached(ttl=1800)  # Cache for 30 minutes
@@ -396,7 +408,6 @@ def get_flow_loader() -> FlowLoader:
     return _flow_loader
 
 
-
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_join_config_loader() -> JoinConfigLoader:
     """获取Join配置加载器实例"""
@@ -404,7 +415,6 @@ def get_join_config_loader() -> JoinConfigLoader:
     if _join_config_loader is None:
         _join_config_loader = JoinConfigLoader()
     return _join_config_loader
-
 
 
 @cached(ttl=1800)  # Cache for 30 minutes

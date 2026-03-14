@@ -11,9 +11,10 @@ Parameter Alias Repository (参数别名数据访问层)
 - 保持GenericRepository继承
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import fetch_one_as_dict, fetch_all_as_dict
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
 
 
 class ParameterAliasRepository(GenericRepository):
@@ -36,11 +37,8 @@ class ParameterAliasRepository(GenericRepository):
             cache_timeout=300,  # 5分钟缓存
         )
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
-    def find_by_param_and_game(
-        self, param_id: int, game_gid: int
-    ) -> List[Dict[str, Any]]:
+    def find_by_param_and_game(self, param_id: int, game_gid: int) -> List[Dict[str, Any]]:
         """
         获取指定参数和游戏的所有别名
 
@@ -64,11 +62,8 @@ class ParameterAliasRepository(GenericRepository):
         """
         return fetch_all_as_dict(query, (game_gid, param_id))
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
-    def find_by_alias_and_game(
-        self, alias: str, game_gid: int
-    ) -> Optional[Dict[str, Any]]:
+    def find_by_alias_and_game(self, alias: str, game_gid: int) -> Optional[Dict[str, Any]]:
         """
         根据别名和游戏查找别名记录
 
@@ -77,7 +72,7 @@ class ParameterAliasRepository(GenericRepository):
             game_gid: 游戏GID
 
         Returns:
-            别名字典，不存在返回None
+            别名字典, 不存在返回None
 
         Example:
             >>> repo = ParameterAliasRepository()
@@ -89,7 +84,6 @@ class ParameterAliasRepository(GenericRepository):
         """
         return fetch_one_as_dict(query, (game_gid, alias))
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_preferred_alias(self, param_id: int, game_gid: int) -> Optional[Dict[str, Any]]:
         """
@@ -100,7 +94,7 @@ class ParameterAliasRepository(GenericRepository):
             game_gid: 游戏GID
 
         Returns:
-            首选别名字典，不存在返回None
+            首选别名字典, 不存在返回None
 
         Example:
             >>> repo = ParameterAliasRepository()
@@ -145,7 +139,7 @@ class ParameterAliasRepository(GenericRepository):
         cursor = conn.cursor()
 
         try:
-            # 如果设置为首选，先取消其他首选别名
+            # 如果设置为首选, 先取消其他首选别名
             if is_preferred:
                 cursor.execute(
                     """
@@ -210,7 +204,7 @@ class ParameterAliasRepository(GenericRepository):
         cursor = conn.cursor()
 
         try:
-            # 如果设置为首选，先取消其他首选别名
+            # 如果设置为首选, 先取消其他首选别名
             if is_preferred and not existing.get("is_preferred"):
                 cursor.execute(
                     """
@@ -305,7 +299,6 @@ class ParameterAliasRepository(GenericRepository):
         result = execute_write(query, (alias_id,))
         return result > 0
 
-
     @cached(ttl=1800)  # Cache for 30 minutes
     def find_by_id(self, alias_id: int) -> Optional[Dict[str, Any]]:
         """
@@ -315,7 +308,7 @@ class ParameterAliasRepository(GenericRepository):
             alias_id: 别名ID
 
         Returns:
-            别名字典，不存在返回None
+            别名字典, 不存在返回None
 
         Example:
             >>> repo = ParameterAliasRepository()
@@ -355,7 +348,6 @@ class ParameterAliasRepository(GenericRepository):
             return deleted_count > 0
         finally:
             conn.close()
-
 
     @cached(ttl=1800)  # Cache for 30 minutes
     def get_all_aliases_by_game(self, game_gid: int) -> List[Dict[str, Any]]:

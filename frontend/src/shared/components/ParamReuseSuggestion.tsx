@@ -19,8 +19,8 @@
  *     template_name: 'int',
  *     usage_count: 1507
  *   }}
- *   onLinkToLibrary={() => console.log('Link to library')}
- *   onCreateIndependent={() => console.log('Create independent')}
+ *   onLinkToLibrary={() => }
+ *   onCreateIndependent={() => }
  * />
  */
 

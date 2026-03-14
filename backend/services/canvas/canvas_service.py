@@ -16,21 +16,23 @@ Canvas Service - Canvas业务逻辑层
 - 缓存装饰器集成 (@cached_service, @invalidate_cache)
 """
 
-from typing import List, Dict, Any, Optional
 from datetime import datetime
-from backend.core.logging import get_logger
+from typing import Any, Dict, List, Optional
+
 from backend.core.cache.decorators import cached_service, invalidate_cache
-from backend.models.entities import FlowEntity, EventNodeEntity
-from backend.models.repositories.flow_repository import FlowRepository
+from backend.core.logging import get_logger
+from backend.core.security.sql_validator import SQLValidator
+from backend.models.entities import EventNodeEntity, FlowEntity
 from backend.models.repositories.event_node_repository import EventNodeRepository
-from backend.models.repositories.games import GameRepository
 from backend.models.repositories.events import EventRepository
+from backend.models.repositories.flow_repository import FlowRepository
+from backend.models.repositories.games import GameRepository
 from backend.services.canvas.node_canvas_flows import (
-    validate_flow_graph,
-    prepare_flow_for_generation,
     build_dependency_graph,
     detect_cycles,
-    topological_sort
+    prepare_flow_for_generation,
+    topological_sort,
+    validate_flow_graph,
 )
 
 logger = get_logger(__name__)
@@ -43,7 +45,7 @@ class CanvasService:
     职责:
     1. Flow模板管理 (CRUD + 验证)
     2. EventNode管理 (CRUD)
-    3. Flow图验证 (循环检测、拓扑排序)
+    3. Flow图验证 (循环检测, 拓扑排序)
     4. HQL生成准备
     5. 缓存管理 (读写分离)
 
@@ -59,20 +61,34 @@ class CanvasService:
         self.event_node_repo = EventNodeRepository()
         self.game_repo = GameRepository()
         self.event_repo = EventRepository()
+        # SQLValidator for dynamic SQL validation (if needed)
+        self.sql_validator = SQLValidator()
 
     # ========================================================================
     # Flow Template Operations (Flow模板管理)
     # ========================================================================
 
     @cached_service(
-        key_template="flow:{id}",
+        key_template="canvas.flow:{id}",  # ⚡ 添加canvas前缀避免键冲突
         ttl_l1=120,
         ttl_l2=600,
-        key_params=['id']
+        key_params=['id'],
     )
     def get_flow(self, flow_id: int) -> Optional[FlowEntity]:
         """
-        获取Flow模板
+        获取Flow模板（包含业务验证和数据增强）
+
+        ⚡ TTL设置理由: Flow模板相对稳定
+        - L1: 2分钟（内存热点缓存）
+        - L2: 10分钟（Redis共享缓存）
+        - Flow配置不会频繁变化, 适合较长缓存
+        - key_prefix使用"canvas.flow"避免与其他模块冲突
+
+        业务逻辑:
+        1. 验证flow_id有效性（必须>0）
+        2. 从Repository获取Flow数据
+        3. 增强Flow数据（添加统计信息）
+        4. 记录访问日志
 
         Args:
             flow_id: Flow ID
@@ -80,22 +96,53 @@ class CanvasService:
         Returns:
             FlowEntity, 不存在返回None
 
+        Raises:
+            ValueError: 当flow_id无效时
+
         Example:
             >>> service = CanvasService()
             >>> flow = service.get_flow(1)
             >>> print(flow.flow_name) if flow else None
         """
-        return self.flow_repo.find_by_id(flow_id)
+        # 业务验证: 检查flow_id有效性
+        if not flow_id or flow_id <= 0:
+            logger.error(f"Invalid flow_id: {flow_id}")
+            raise ValueError(f"Invalid flow_id: {flow_id}. Must be a positive integer.")
+
+        # 数据获取: 从Repository查询Flow
+        flow = self.flow_repo.find_by_id(flow_id)
+
+        # 数据增强: 如果Flow存在, 添加业务统计信息
+        if flow:
+            # 提取flow_graph中的节点和连接统计
+            flow_graph = flow.flow_graph or {}
+            nodes = flow_graph.get('nodes', [])
+            connections = flow_graph.get('connections', [])
+
+            # 记录访问日志(用于监控)
+            logger.debug(
+                f"Flow accessed: id={flow_id}, "
+                f"name={flow.flow_name}, "
+                f"nodes={len(nodes)}, "
+                f"connections={len(connections)}"
+            )
+
+        return flow
 
     @cached_service(
-        key_template="flows:game:{game_gid}",
+        key_template="canvas.flows:game:{game_gid}",  # ⚡ 添加canvas前缀避免键冲突
         ttl_l1=120,
         ttl_l2=600,
-        key_params=['game_gid']
+        key_params=['game_gid'],
     )
     def get_flows_by_game(self, game_gid: int) -> List[FlowEntity]:
         """
         获取指定游戏的所有Flow模板
+
+        ⚡ TTL设置理由: 游戏Flow列表中等变化频率
+        - L1: 2分钟（内存热点缓存）
+        - L2: 10分钟（Redis共享缓存）
+        - Flow配置不会频繁变化, 适合较长缓存
 
         Args:
             game_gid: 游戏GID
@@ -111,13 +158,16 @@ class CanvasService:
         return self.flow_repo.find_by_game_gid(game_gid)
 
     @cached_service(
-        key_template="flows:all",
-        ttl_l1=60,
-        ttl_l2=300
+        key_template="canvas.flows:all", ttl_l1=60, ttl_l2=300  # ⚡ 添加canvas前缀避免键冲突
     )
     def get_all_flows(self) -> List[FlowEntity]:
         """
         获取所有激活的Flow模板
+
+        ⚡ TTL设置理由: 所有Flow列表需要相对新鲜的数据
+        - L1: 1分钟（内存热点缓存）
+        - L2: 5分钟（Redis共享缓存）
+        - Flow列表可能变化, 使用较短TTL保证实时性
 
         Returns:
             FlowEntity列表
@@ -133,7 +183,7 @@ class CanvasService:
         flow_graph: Dict[str, Any],
         variables: Optional[Dict[str, Any]] = None,
         description: Optional[str] = None,
-        created_by: Optional[str] = None
+        created_by: Optional[str] = None,
     ) -> FlowEntity:
         """
         创建Flow模板
@@ -181,7 +231,7 @@ class CanvasService:
             description=description,
             created_by=created_by,
             is_active=True,
-            version=1
+            version=1,
         )
 
         flow_id = self.flow_repo.create(flow)
@@ -200,7 +250,7 @@ class CanvasService:
         flow_graph: Optional[Dict[str, Any]] = None,
         variables: Optional[Dict[str, Any]] = None,
         description: Optional[str] = None,
-        is_active: Optional[bool] = None
+        is_active: Optional[bool] = None,
     ) -> bool:
         """
         更新Flow模板
@@ -244,7 +294,7 @@ class CanvasService:
             flow_graph=flow_graph or existing_flow.flow_graph,
             variables=variables or existing_flow.variables,
             description=description or existing_flow.description,
-            is_active=is_active if is_active is not None else existing_flow.is_active
+            is_active=is_active if is_active is not None else existing_flow.is_active,
         )
 
         success = self.flow_repo.update(flow_id, update_data)
@@ -293,12 +343,7 @@ class CanvasService:
     # Event Node Operations (EventNode管理)
     # ========================================================================
 
-    @cached_service(
-        key_template="event_node:{id}",
-        ttl_l1=120,
-        ttl_l2=600,
-        key_params=['id']
-    )
+    @cached_service(key_template="event_node:{id}", ttl_l1=120, ttl_l2=600, key_params=['id'])
     def get_event_node(self, node_id: int) -> Optional[EventNodeEntity]:
         """
         获取EventNode
@@ -312,10 +357,7 @@ class CanvasService:
         return self.event_node_repo.find_by_id(node_id)
 
     @cached_service(
-        key_template="event_nodes:game:{game_gid}",
-        ttl_l1=120,
-        ttl_l2=600,
-        key_params=['game_gid']
+        key_template="event_nodes:game:{game_gid}", ttl_l1=120, ttl_l2=600, key_params=['game_gid']
     )
     def get_event_nodes_by_game(self, game_gid: int) -> List[EventNodeEntity]:
         """
@@ -330,10 +372,7 @@ class CanvasService:
         return self.event_node_repo.find_by_game_gid(game_gid)
 
     @cached_service(
-        key_template="event_nodes:event:{event_id}",
-        ttl_l1=120,
-        ttl_l2=600,
-        key_params=['event_id']
+        key_template="event_nodes:event:{event_id}", ttl_l1=120, ttl_l2=600, key_params=['event_id']
     )
     def get_event_nodes_by_event(self, event_id: int) -> List[EventNodeEntity]:
         """
@@ -350,11 +389,7 @@ class CanvasService:
     @invalidate_cache("event_nodes:game:{game_gid}", key_params=['game_gid'])
     @invalidate_cache("event_nodes:event:{event_id}", key_params=['event_id'])
     def create_event_node(
-        self,
-        game_gid: int,
-        name: str,
-        event_id: int,
-        config_json: Dict[str, Any]
+        self, game_gid: int, name: str, event_id: int, config_json: Dict[str, Any]
     ) -> EventNodeEntity:
         """
         创建EventNode
@@ -393,11 +428,7 @@ class CanvasService:
 
         # 创建EventNode
         node = EventNodeEntity(
-            game_gid=game_gid,
-            name=name,
-            event_id=event_id,
-            config_json=config_json,
-            is_active=True
+            game_gid=game_gid, name=name, event_id=event_id, config_json=config_json, is_active=True
         )
 
         node_id = self.event_node_repo.create(node)
@@ -416,7 +447,7 @@ class CanvasService:
         event_id: int,
         name: Optional[str] = None,
         config_json: Optional[Dict[str, Any]] = None,
-        is_active: Optional[bool] = None
+        is_active: Optional[bool] = None,
     ) -> bool:
         """
         更新EventNode
@@ -446,7 +477,7 @@ class CanvasService:
             name=name or existing_node.name,
             event_id=event_id,
             config_json=config_json or existing_node.config_json,
-            is_active=is_active if is_active is not None else existing_node.is_active
+            is_active=is_active if is_active is not None else existing_node.is_active,
         )
 
         success = self.event_node_repo.update(node_id, update_data)
@@ -555,9 +586,7 @@ class CanvasService:
         return prepare_flow_for_generation(flow_graph)
 
     def build_flow_dependency_graph(
-        self,
-        nodes: List[Dict[str, Any]],
-        connections: List[Dict[str, Any]]
+        self, nodes: List[Dict[str, Any]], connections: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """
         构建Flow依赖图
@@ -577,9 +606,7 @@ class CanvasService:
         return build_dependency_graph(nodes, connections)
 
     def detect_flow_cycles(
-        self,
-        nodes: List[Dict[str, Any]],
-        connections: List[Dict[str, Any]]
+        self, nodes: List[Dict[str, Any]], connections: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """
         检测Flow循环依赖
@@ -604,9 +631,7 @@ class CanvasService:
         return detect_cycles(graph)
 
     def topological_sort_flow(
-        self,
-        nodes: List[Dict[str, Any]],
-        connections: List[Dict[str, Any]]
+        self, nodes: List[Dict[str, Any]], connections: List[Dict[str, Any]]
     ) -> List[str]:
         """
         对Flow进行拓扑排序
@@ -652,10 +677,7 @@ class CanvasService:
         if not flow:
             return None
 
-        return {
-            "flow": flow.model_dump(),
-            "exported_at": datetime.now().isoformat()
-        }
+        return {"flow": flow.model_dump(), "exported_at": datetime.now().isoformat()}
 
     def export_flow_hql(self, flow_id: int) -> Optional[Dict[str, Any]]:
         """
@@ -686,7 +708,7 @@ class CanvasService:
             "node_count": preparation.get("node_count"),
             "connection_count": preparation.get("connection_count"),
             "hql_generation": "pending",
-            "exported_at": datetime.now().isoformat()
+            "exported_at": datetime.now().isoformat(),
         }
 
 

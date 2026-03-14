@@ -125,8 +125,7 @@ export default function TemplateSelector({
     try {
       const result = await onApplyTemplate(template);
       if (result.success) {
-        console.log('[TemplateSelector] Template applied successfully');
-      }
+              }
     } catch (error) {
       console.error('[TemplateSelector] Error applying template:', error);
     }

@@ -13,14 +13,14 @@
 使用标准:
 - ✅ 3个以上Service使用的逻辑 → 工具函数
 - ✅ 纯函数逻辑(无状态,无副作用) → 工具函数
-- ❌ 业务规则(需要验证、状态管理) → 保留在Service层
+- ❌ 业务规则(需要验证, 状态管理) → 保留在Service层
 """
 
-from typing import List, Dict, Any, Optional
-from datetime import datetime
 import re
-from backend.models.entities import EventEntity, ParameterEntity
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
+from backend.models.entities import EventEntity, ParameterEntity
 
 # ============================================================================
 # 验证函数
@@ -69,7 +69,7 @@ def validate_table_name(table_name: str) -> str:
         if char.lower() in table_name.lower():
             raise ValueError(f"table_name contains dangerous character: {char}")
 
-    # 只保留字母、数字、下划线、点
+    # 只保留字母, 数字, 下划线, 点
     safe_name = "".join(c for c in table_name if c.isalnum() or c in "_.")
     return safe_name
 
@@ -93,11 +93,9 @@ def validate_event_name(event_name: str) -> str:
     # 移除前后空格
     event_name = event_name.strip()
 
-    # 只允许字母、数字、下划线
+    # 只允许字母, 数字, 下划线
     if not re.match(r"^[a-zA-Z0-9_]+$", event_name):
-        raise ValueError(
-            "event_name can only contain letters, numbers, and underscores"
-        )
+        raise ValueError("event_name can only contain letters, numbers, and underscores")
 
     return event_name
 
@@ -125,9 +123,7 @@ def calculate_event_statistics(events: List[EventEntity]) -> Dict[str, int]:
         "total": len(events),
         "with_params": sum(1 for e in events if e.param_count and e.param_count > 0),
         "base_events": sum(1 for e in events if e.name and e.name.startswith("base_")),
-        "custom_events": sum(
-            1 for e in events if e.name and not e.name.startswith("base_")
-        ),
+        "custom_events": sum(1 for e in events if e.name and not e.name.startswith("base_")),
     }
 
 
@@ -175,9 +171,7 @@ def sanitize_name(name: str) -> str:
     return name
 
 
-def generate_table_name(
-    game_gid: int, event_name: str, ods_db: str = "ieu_ods"
-) -> str:
+def generate_table_name(game_gid: int, event_name: str, ods_db: str = "ieu_ods") -> str:
     """
     生成ODS表名
 
@@ -203,9 +197,7 @@ def generate_table_name(
     return f"{ods_db}.ods_{game_gid}_{safe_event}"
 
 
-def generate_dwd_table_name(
-    game_gid: int, event_name: str, dwd_prefix: str = "dwd"
-) -> str:
+def generate_dwd_table_name(game_gid: int, event_name: str, dwd_prefix: str = "dwd") -> str:
     """
     生成DWD表名
 

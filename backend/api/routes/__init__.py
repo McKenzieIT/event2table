@@ -18,23 +18,23 @@ Each module is responsible for a specific domain:
 """
 
 # Import all route modules to register their routes with the blueprint
+from . import cache  # Cache management endpoints
+from . import graphql  # GraphQL API
+from . import health  # Health check endpoint (2026-03-01)
+from . import legacy_api  # Legacy/compatibility API endpoints
+from . import monitoring  # Monitoring endpoints
+from . import v1_adapter  # V1-to-V2 adapter endpoints (2026-02-17)
 from . import (
-    cache,  # Cache management endpoints
     categories,
     event_parameters,
     events,
     field_builder,
     flows,
     games,
-    graphql,  # GraphQL API
     hql_generation,
-    health,  # Health check endpoint (2026-03-01)
     hql_preview_v2,
     join_configs,
-    legacy_api,  # Legacy/compatibility API endpoints
-    monitoring,  # Monitoring endpoints
     parameters,
-    v1_adapter,  # V1-to-V2 adapter endpoints (2026-02-17)
 )
 
 __all__ = [

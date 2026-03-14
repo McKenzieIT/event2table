@@ -1,0 +1,1073 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.11, pytest-7.4.3, pluggy-1.6.0 -- /Users/mckenzie/Documents/event2table/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/mckenzie/Documents/event2table/backend/test
+configfile: pytest.ini
+plugins: cov-4.1.0
+collecting ... collected 228 items
+
+backend/test/integration/test_category_batch_delete.py::test_batch_delete_success ERROR [  0%]
+backend/test/integration/test_category_batch_delete.py::test_batch_delete_with_events ERROR [  0%]
+backend/test/integration/test_category_batch_delete.py::test_batch_delete_mixed ERROR [  1%]
+backend/test/integration/test_category_batch_delete.py::test_batch_delete_empty_list PASSED [  1%]
+backend/test/integration/test_category_batch_delete.py::test_batch_delete_invalid_ids PASSED [  2%]
+backend/test/integration/test_category_batch_delete.py::test_api_batch_delete ERROR [  2%]
+backend/test/integration/test_category_batch_delete.py::test_api_batch_delete_with_events ERROR [  3%]
+backend/test/integration/test_category_batch_delete.py::test_api_batch_delete_empty_request PASSED [  3%]
+backend/test/integration/test_category_batch_delete.py::test_api_batch_delete_too_many_ids PASSED [  3%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_create_category_flow PASSED [  4%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_get_category_by_id PASSED [  4%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_get_category_by_name PASSED [  5%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_update_category_flow PASSED [  5%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_delete_category_flow PASSED [  6%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_batch_delete_categories FAILED [  6%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_batch_update_categories PASSED [  7%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_get_all_categories PASSED [  7%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_category_validation PASSED [  7%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_entity_serialization PASSED [  8%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_repository_returns_entities PASSED [  8%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_service_returns_entities PASSED [  9%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_category_with_optional_fields PASSED [  9%]
+backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_get_all_categories_with_event_count PASSED [ 10%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_create_event_flow FAILED [ 10%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_get_event_by_id FAILED [ 10%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_update_event_flow FAILED [ 11%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_delete_event_flow FAILED [ 11%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_event_validation FAILED [ 12%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_get_events_by_game FAILED [ 12%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_entity_serialization FAILED [ 13%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_repository_returns_entities FAILED [ 13%]
+backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_service_returns_entities FAILED [ 14%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_entity_serialization PASSED [ 14%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_repository_returns_entities FAILED [ 14%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_service_returns_entities FAILED [ 15%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_json_field_serialization FAILED [ 15%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_create_event_node FAILED [ 16%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_update_event_node FAILED [ 16%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_delete_event_node FAILED [ 17%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_get_nodes_by_game_gid FAILED [ 17%]
+backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_count_nodes_by_game_gid FAILED [ 17%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_entity_serialization PASSED [ 18%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_repository_returns_entities PASSED [ 18%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_service_returns_entities PASSED [ 19%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_json_field_serialization PASSED [ 19%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_create_flow_flow PASSED [ 20%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_update_flow_flow PASSED [ 20%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_delete_flow_flow PASSED [ 21%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_get_flows_by_game_gid PASSED [ 21%]
+backend/test/integration/test_flow_module_integration.py::TestFlowModuleIntegration::test_count_flows_by_game_gid PASSED [ 21%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_create_game_flow FAILED [ 22%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_get_game_by_gid FAILED [ 22%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_update_game_flow FAILED [ 23%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_delete_game_flow FAILED [ 23%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_batch_delete_games FAILED [ 24%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_game_validation FAILED [ 24%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_get_all_games_with_stats FAILED [ 25%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_entity_serialization PASSED [ 25%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_repository_returns_entities FAILED [ 25%]
+backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_service_returns_entities FAILED [ 26%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_entity_serialization PASSED [ 26%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_repository_returns_entities PASSED [ 27%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_service_returns_entities PASSED [ 27%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_json_field_serialization PASSED [ 28%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_save_history PASSED [ 28%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_restore_history PASSED [ 28%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_delete_history PASSED [ 29%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_search_history PASSED [ 29%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_canvas_hql_type PASSED [ 30%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_get_history_by_user PASSED [ 30%]
+backend/test/integration/test_hql_history_module_integration.py::TestHQLHistoryModuleIntegration::test_count_by_user PASSED [ 31%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_create_join_config_flow PASSED [ 31%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_get_join_config_by_id PASSED [ 32%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_list_join_configs_by_game PASSED [ 32%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_update_join_config_flow PASSED [ 32%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_delete_join_config_flow PASSED [ 33%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_join_config_validation PASSED [ 33%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_entity_serialization PASSED [ 34%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_repository_returns_entities PASSED [ 34%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_service_returns_entities PASSED [ 35%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_json_field_serialization PASSED [ 35%]
+backend/test/integration/test_join_config_module_integration.py::TestJoinConfigModuleIntegration::test_filter_by_join_type PASSED [ 35%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_create_parameter_flow FAILED [ 36%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_get_parameter_by_id FAILED [ 36%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_update_parameter_flow FAILED [ 37%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_delete_parameter_flow FAILED [ 37%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_get_parameters_by_event FAILED [ 38%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_parameter_validation FAILED [ 38%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_entity_serialization PASSED [ 39%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_repository_returns_entities FAILED [ 39%]
+backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_service_returns_entities FAILED [ 39%]
+backend/test/integration/api/test_api_categories.py::TestCategoriesAPIList::test_list_categories_success FAILED [ 40%]
+backend/test/integration/api/test_api_categories.py::TestCategoriesAPICreate::test_create_category_missing_name PASSED [ 40%]
+backend/test/integration/api/test_api_categories.py::TestCategoriesAPIGet::test_get_category_not_found PASSED [ 41%]
+backend/test/integration/api/test_api_events.py::TestEventsAPIList::test_list_events_requires_game_gid PASSED [ 41%]
+backend/test/integration/api/test_api_events.py::TestEventsAPIList::test_list_events_with_game_gid PASSED [ 42%]
+backend/test/integration/api/test_api_events.py::TestEventsAPICreate::test_create_event_missing_fields PASSED [ 42%]
+backend/test/integration/api/test_api_events.py::TestEventsAPIGet::test_get_event_not_found PASSED [ 42%]
+backend/test/integration/api/test_api_games.py::TestGamesAPIList::test_list_games_success PASSED [ 43%]
+backend/test/integration/api/test_api_games.py::TestGamesAPIList::test_list_games_includes_statistics PASSED [ 43%]
+backend/test/integration/api/test_api_games.py::TestGamesAPICreate::test_create_game_missing_fields PASSED [ 44%]
+backend/test/integration/api/test_api_games.py::TestGamesAPICreate::test_create_game_invalid_gid PASSED [ 44%]
+backend/test/integration/api/test_api_games.py::TestGamesAPICreate::test_create_game_empty_ods_db FAILED [ 45%]
+backend/test/integration/api/test_api_games.py::TestGamesAPIGet::test_get_game_success PASSED [ 45%]
+backend/test/integration/api/test_api_games.py::TestGamesAPIGet::test_get_game_not_found FAILED [ 46%]
+backend/test/integration/api/test_cache_api.py::TestCacheMonitoringAPI::test_api_get_alerts PASSED [ 46%]
+backend/test/integration/api/test_cache_api.py::TestCacheMonitoringAPI::test_api_get_metrics PASSED [ 46%]
+backend/test/integration/api/test_cache_api.py::TestCacheMonitoringAPI::test_api_get_trends PASSED [ 47%]
+backend/test/integration/api/test_cache_api.py::TestCacheCapacityAPI::test_api_get_l1_capacity PASSED [ 47%]
+backend/test/integration/api/test_cache_api.py::TestCacheCapacityAPI::test_api_get_l2_capacity PASSED [ 48%]
+backend/test/integration/api/test_cache_api.py::TestCacheCapacityAPI::test_api_get_capacity_prediction PASSED [ 48%]
+backend/test/integration/api/test_cache_api.py::TestCacheBloomFilterAPI::test_api_get_bloom_filter_stats PASSED [ 49%]
+backend/test/integration/api/test_cache_api.py::TestCacheBloomFilterAPI::test_api_rebuild_bloom_filter PASSED [ 49%]
+backend/test/integration/api/test_cache_api.py::TestCacheWarmUpAPI::test_api_predict_hot_keys PASSED [ 50%]
+backend/test/integration/api/test_cache_api.py::TestCacheWarmUpAPI::test_api_execute_warm_up PASSED [ 50%]
+backend/test/integration/api/test_cache_api.py::TestCacheDegradationAPI::test_api_get_degradation_status PASSED [ 50%]
+backend/test/integration/api/test_cache_api.py::TestCacheDegradationAPI::test_api_switch_degradation PASSED [ 51%]
+backend/test/integration/api/test_cache_api.py::TestCacheStatsAPI::test_api_get_cache_stats PASSED [ 51%]
+backend/test/integration/api/test_cache_api.py::TestCacheStatsAPI::test_api_get_detailed_stats PASSED [ 52%]
+backend/test/integration/api/test_cache_api.py::TestCacheKeysAPI::test_api_list_cache_keys PASSED [ 52%]
+backend/test/integration/api/test_cache_api.py::TestCacheKeysAPI::test_api_search_cache_keys PASSED [ 53%]
+backend/test/integration/api/test_cache_api.py::TestCacheClearAPI::test_api_clear_all_cache PASSED [ 53%]
+backend/test/integration/api/test_cache_api.py::TestCacheInvalidateAPI::test_api_invalidate_game_cache PASSED [ 53%]
+backend/test/integration/api/test_cache_api.py::TestCacheInvalidateAPI::test_api_invalidate_event_cache PASSED [ 54%]
+backend/test/integration/api/test_cache_api.py::TestCacheAPIErrorHandling::test_api_predict_hot_keys_missing_body PASSED [ 54%]
+backend/test/integration/api/test_cache_api.py::TestCacheAPIErrorHandling::test_api_execute_warm_up_missing_body PASSED [ 55%]
+backend/test/integration/api/test_cache_api.py::TestCacheAPIErrorHandling::test_api_switch_degradation_missing_body PASSED [ 55%]
+backend/test/integration/api/test_cache_api.py::TestCacheAPIErrorHandling::test_api_search_cache_keys_missing_query PASSED [ 56%]
+backend/test/integration/api/test_cache_api.py::TestCacheAPIErrorHandling::test_api_invalidate_event_cache_missing_game_gid PASSED [ 56%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheMonitoringAPI::test_api_get_alerts PASSED [ 57%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheMonitoringAPI::test_api_get_metrics PASSED [ 57%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheMonitoringAPI::test_api_get_trends PASSED [ 57%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheCapacityAPI::test_api_get_l1_capacity PASSED [ 58%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheCapacityAPI::test_api_get_l2_capacity PASSED [ 58%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheCapacityAPI::test_api_get_capacity_prediction PASSED [ 59%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheBloomFilterAPI::test_api_get_bloom_filter_stats PASSED [ 59%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheBloomFilterAPI::test_api_rebuild_bloom_filter PASSED [ 60%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheWarmUpAPI::test_api_predict_hot_keys PASSED [ 60%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheWarmUpAPI::test_api_execute_warm_up PASSED [ 60%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheDegradationAPI::test_api_get_degradation_status PASSED [ 61%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheDegradationAPI::test_api_switch_degradation PASSED [ 61%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheAPIErrorHandling::test_api_predict_hot_keys_missing_body PASSED [ 62%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheAPIErrorHandling::test_api_execute_warm_up_missing_body PASSED [ 62%]
+backend/test/integration/api/test_cache_api_simple.py::TestCacheAPIErrorHandling::test_api_switch_degradation_missing_body PASSED [ 63%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_returns_valid_response PASSED [ 63%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_with_conditions PASSED [ 64%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_with_param_field PASSED [ 64%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_validates_required_fields PASSED [ 64%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_handles_invalid_event_id PASSED [ 65%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_generates_correct_view_name PASSED [ 65%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2Validation::test_validates_field_structure PASSED [ 66%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2Validation::test_validates_condition_operators PASSED [ 66%]
+backend/test/integration/api/test_hql_v2_integration.py::TestHQLV2Performance::test_preview_hql_performance_with_large_fields PASSED [ 67%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_default_parameters ERROR [ 67%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_custom_page_size ERROR [ 67%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_page_navigation ERROR [ 68%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_total_pages_calculation ERROR [ 68%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_beyond_last_page ERROR [ 69%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_with_search ERROR [ 69%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_max_page_size_limit ERROR [ 70%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_invalid_page_numbers ERROR [ 70%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_response_structure ERROR [ 71%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_events_count_endpoint ERROR [ 71%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_events_count_with_search ERROR [ 71%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_without_game_gid ERROR [ 72%]
+backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_with_both_filters ERROR [ 72%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_default_parameters PASSED [ 73%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_custom_page_size PASSED [ 73%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_page_navigation PASSED [ 74%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_total_pages_calculation PASSED [ 74%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_beyond_last_page PASSED [ 75%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_with_search PASSED [ 75%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_max_page_size_limit PASSED [ 75%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_invalid_page_numbers PASSED [ 76%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_response_structure PASSED [ 76%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_events_count_endpoint PASSED [ 77%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_events_count_with_search PASSED [ 77%]
+backend/test/integration/api/test_pagination_simple.py::TestEventsPaginationSimple::test_pagination_with_game_gid_filter PASSED [ 78%]
+backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_field_type_validation FAILED [ 78%]
+backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_rejects_invalid_field_type FAILED [ 78%]
+backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_field_name_sanitization FAILED [ 79%]
+backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_json_path_validation FAILED [ 79%]
+backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_allowed_operators PASSED [ 80%]
+backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_rejects_sql_injection_operators FAILED [ 80%]
+backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_where_value_sanitization FAILED [ 81%]
+backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_complex_where_conditions_validation FAILED [ 81%]
+backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_rejects_invalid_logical_operator FAILED [ 82%]
+backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_field_validation_in_where FAILED [ 82%]
+backend/test/integration/security/test_hql_generator_security.py::TestJoinBuilderSecurity::test_join_type_validation PASSED [ 82%]
+backend/test/integration/security/test_hql_generator_security.py::TestJoinBuilderSecurity::test_rejects_invalid_join_type PASSED [ 83%]
+backend/test/integration/security/test_hql_generator_security.py::TestJoinBuilderSecurity::test_join_condition_validation FAILED [ 83%]
+backend/test/integration/security/test_hql_generator_security.py::TestJoinBuilderSecurity::test_join_operator_validation FAILED [ 84%]
+backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_union_type_validation FAILED [ 84%]
+backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_rejects_invalid_union_type FAILED [ 85%]
+backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_partition_filter_validation FAILED [ 85%]
+backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_union_all_prevents_data_duplication FAILED [ 85%]
+backend/test/integration/security/test_hql_generator_security.py::TestSQLInjectionPatterns::test_rejects_common_sql_injection_patterns PASSED [ 86%]
+backend/test/integration/security/test_hql_generator_security.py::TestSQLInjectionPatterns::test_rejects_xss_patterns FAILED [ 86%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_identifier_valid PASSED [ 87%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_identifier_sql_injection_attempt PASSED [ 87%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_identifier_empty_string PASSED [ 88%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_identifier_starts_with_number PASSED [ 88%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_identifier_special_characters PASSED [ 89%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_table_name PASSED [ 89%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_column_name PASSED [ 89%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_field_whitelist_valid PASSED [ 90%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_field_whitelist_invalid PASSED [ 90%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_sanitize_order_by_valid PASSED [ 91%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_sanitize_order_by_sql_injection PASSED [ 91%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_pragma_key_allowed PASSED [ 92%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_pragma_key_not_allowed PASSED [ 92%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_pragma_value_boolean PASSED [ 92%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestSQLValidator::test_validate_pragma_value_journal_mode PASSED [ 93%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestPydanticEntityXSSProtection::test_game_create_sanitizes_xss_in_name PASSED [ 93%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestPydanticEntityXSSProtection::test_game_create_rejects_empty_name PASSED [ 94%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestPydanticEntityXSSProtection::test_game_create_rejects_name_too_long PASSED [ 94%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestPydanticEntityXSSProtection::test_game_create_validates_gid_format PASSED [ 95%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestPydanticEntityXSSProtection::test_game_create_validates_ods_db_literal PASSED [ 95%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestParameterizedQueries::test_rejects_string_concatenation_in_sql PASSED [ 96%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestParameterizedQueries::test_valid_sql_query_pattern PASSED [ 96%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestInputValidationLength::test_game_name_length_validation PASSED [ 96%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestInputValidationLength::test_event_name_length_validation PASSED [ 97%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestInputValidationFormat::test_game_gid_must_be_integer PASSED [ 97%]
+backend/test/integration/security/test_sql_injection_prevention.py::TestInputValidationFormat::test_game_ods_db_must_match_literal PASSED [ 98%]
+backend/test/integration/workflows/test_create_batch_integration.py::TestCreateBatchIntegration::test_prepare_event_record SKIPPED [ 98%]
+backend/test/integration/workflows/test_create_batch_integration.py::TestCreateBatchIntegration::test_prepare_param_record SKIPPED [ 99%]
+backend/test/integration/workflows/test_create_batch_integration.py::TestCreateBatchIntegration::test_create_events_batch_empty_list SKIPPED [ 99%]
+backend/test/integration/workflows/test_create_batch_integration.py::TestCreateBatchIntegration::test_prepare_param_handles_missing_type SKIPPED [100%]/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/coverage/inorout.py:561: CoverageWarning: Module ../api was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.4/messages.html#warning-module-not-imported
+  self.warn(f"Module {pkg} was never imported.", slug="module-not-imported")
+/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/coverage/inorout.py:561: CoverageWarning: Module ../core was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.4/messages.html#warning-module-not-imported
+  self.warn(f"Module {pkg} was never imported.", slug="module-not-imported")
+/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/coverage/inorout.py:561: CoverageWarning: Module ../models was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.4/messages.html#warning-module-not-imported
+  self.warn(f"Module {pkg} was never imported.", slug="module-not-imported")
+/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/coverage/control.py:958: CoverageWarning: No data was collected. (no-data-collected); see https://coverage.readthedocs.io/en/7.13.4/messages.html#warning-no-data-collected
+  self._warn("No data was collected.", slug="no-data-collected")
+/Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/pytest_cov/plugin.py:312: CovReportWarning: Failed to generate report: No data to report.
+
+  warnings.warn(CovReportWarning(message))
+WARNING: Failed to generate report: No data to report.
+
+
+
+==================================== ERRORS ====================================
+_________________ ERROR at setup of test_batch_delete_success __________________
+backend/test/integration/test_category_batch_delete.py:37: in db
+    from backend.core.config.config import TEST_DB_PATH, init_db
+E   ImportError: cannot import name 'init_db' from 'backend.core.config.config' (/Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/core/config/config.py)
+---------------------------- Captured stdout setup -----------------------------
+[CONFTEST] Deleting old test database: /Users/mckenzie/Documents/event2table/data/test_database.db
+[CONFTEST] Creating test database from schema: /Users/mckenzie/Documents/event2table/data/dwd_generator.db -> /Users/mckenzie/Documents/event2table/data/test_database.db
+[CONFTEST] Cleared table: async_tasks
+[CONFTEST] Cleared table: batch_import_details
+[CONFTEST] Cleared table: batch_import_records
+[CONFTEST] Cleared table: common_params
+[CONFTEST] Cleared table: event_categories
+[CONFTEST] Cleared table: event_category_relations
+[CONFTEST] Cleared table: event_common_params
+[CONFTEST] Cleared table: event_node_configs
+[CONFTEST] Cleared table: event_nodes
+[CONFTEST] Cleared table: event_params
+[CONFTEST] Cleared table: field_name_history
+[CONFTEST] Cleared table: field_name_mappings
+[CONFTEST] Cleared table: field_selection_presets
+[CONFTEST] Cleared table: flow_templates
+[CONFTEST] Cleared table: games
+[CONFTEST] Cleared table: hql_generation_templates
+[CONFTEST] Cleared table: hql_history
+[CONFTEST] Cleared table: hql_statements
+[CONFTEST] Cleared table: join_configs
+[CONFTEST] Cleared table: log_events
+[CONFTEST] Cleared table: node_templates
+[CONFTEST] Cleared table: param_configs
+[CONFTEST] Cleared table: param_dependencies
+[CONFTEST] Cleared table: param_library
+[CONFTEST] Cleared table: param_templates
+[CONFTEST] Cleared table: param_validation_rules
+[CONFTEST] Cleared table: param_versions
+[CONFTEST] Cleared table: parameter_aliases
+[CONFTEST] Cleared table: parameter_changes
+[CONFTEST] Cleared table: parameters
+[CONFTEST] Cleared table: parameters_old_v5
+[CONFTEST] Cleared table: sql_optimizations
+[CONFTEST] Creating test data...
+[CONFTEST] Created test data successfully
+[CONFTEST] Test database created successfully
+_______________ ERROR at setup of test_batch_delete_with_events ________________
+backend/test/integration/test_category_batch_delete.py:37: in db
+    from backend.core.config.config import TEST_DB_PATH, init_db
+E   ImportError: cannot import name 'init_db' from 'backend.core.config.config' (/Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/core/config/config.py)
+__________________ ERROR at setup of test_batch_delete_mixed ___________________
+backend/test/integration/test_category_batch_delete.py:37: in db
+    from backend.core.config.config import TEST_DB_PATH, init_db
+E   ImportError: cannot import name 'init_db' from 'backend.core.config.config' (/Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/core/config/config.py)
+___________________ ERROR at setup of test_api_batch_delete ____________________
+backend/test/integration/test_category_batch_delete.py:37: in db
+    from backend.core.config.config import TEST_DB_PATH, init_db
+E   ImportError: cannot import name 'init_db' from 'backend.core.config.config' (/Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/core/config/config.py)
+_____________ ERROR at setup of test_api_batch_delete_with_events ______________
+backend/test/integration/test_category_batch_delete.py:37: in db
+    from backend.core.config.config import TEST_DB_PATH, init_db
+E   ImportError: cannot import name 'init_db' from 'backend.core.config.config' (/Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/core/config/config.py)
+__ ERROR at setup of TestEventsPagination.test_pagination_default_parameters ___
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+___ ERROR at setup of TestEventsPagination.test_pagination_custom_page_size ____
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+____ ERROR at setup of TestEventsPagination.test_pagination_page_navigation ____
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+_ ERROR at setup of TestEventsPagination.test_pagination_total_pages_calculation _
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+___ ERROR at setup of TestEventsPagination.test_pagination_beyond_last_page ____
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+______ ERROR at setup of TestEventsPagination.test_pagination_with_search ______
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+__ ERROR at setup of TestEventsPagination.test_pagination_max_page_size_limit __
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+_ ERROR at setup of TestEventsPagination.test_pagination_invalid_page_numbers __
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+__ ERROR at setup of TestEventsPagination.test_pagination_response_structure ___
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+______ ERROR at setup of TestEventsPagination.test_events_count_endpoint _______
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+_____ ERROR at setup of TestEventsPagination.test_events_count_with_search _____
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+___ ERROR at setup of TestEventsPagination.test_pagination_without_game_gid ____
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+___ ERROR at setup of TestEventsPagination.test_pagination_with_both_filters ___
+backend/test/integration/api/test_pagination.py:363: in test_game
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log setup ------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+=================================== FAILURES ===================================
+__________ TestCategoryModuleIntegration.test_batch_delete_categories __________
+backend/test/integration/test_category_module_integration.py:185: in test_batch_delete_categories
+    assert deleted_count == 3
+E   AssertionError: assert {'deleted_count': 3, 'failed_ids': [], 'failed_reasons': {}, 'message': 'Successfully deleted all 3 categories'} == 3
+______________ TestEventModuleIntegration.test_create_event_flow _______________
+backend/test/integration/test_event_module_integration.py:66: in test_create_event_flow
+    event_data = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...or integration testing'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...or integration testing'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+_______________ TestEventModuleIntegration.test_get_event_by_id ________________
+backend/test/integration/test_event_module_integration.py:93: in test_get_event_by_id
+    event_data = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '测试获取'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '测试获取'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+______________ TestEventModuleIntegration.test_update_event_flow _______________
+backend/test/integration/test_event_module_integration.py:112: in test_update_event_flow
+    event_data = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '测试更新'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '测试更新'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+______________ TestEventModuleIntegration.test_delete_event_flow _______________
+backend/test/integration/test_event_module_integration.py:130: in test_delete_event_flow
+    event_data = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '测试删除'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '测试删除'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+_______________ TestEventModuleIntegration.test_event_validation _______________
+backend/test/integration/test_event_module_integration.py:150: in test_event_validation
+    event_data1 = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...me_cn': '重复测试1'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...me_cn': '重复测试1'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+______________ TestEventModuleIntegration.test_get_events_by_game ______________
+backend/test/integration/test_event_module_integration.py:173: in test_get_events_by_game
+    event_data = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...me_cn': '测试事件0'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...me_cn': '测试事件0'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+_____________ TestEventModuleIntegration.test_entity_serialization _____________
+backend/test/integration/test_event_module_integration.py:206: in test_entity_serialization
+    event = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'id': 1, 'game_gid': 920...time(2024, 1, 1, 12, 0)}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'id': 1, 'game_gid': 920...time(2024, 1, 1, 12, 0)}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+_________ TestEventModuleIntegration.test_repository_returns_entities __________
+backend/test/integration/test_event_module_integration.py:235: in test_repository_returns_entities
+    event_data = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '仓库测试'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '仓库测试'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+___________ TestEventModuleIntegration.test_service_returns_entities ___________
+backend/test/integration/test_event_module_integration.py:256: in test_service_returns_entities
+    event_data = EventEntity(
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for EventEntity
+E   source_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '服务测试'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   target_table
+E     Field required [type=missing, input_value={'game_gid': 92000001, 'n...ame_cn': '服务测试'}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+_______ TestEventNodeModuleIntegration.test_repository_returns_entities ________
+backend/test/integration/test_event_node_module_integration.py:42: in test_repository_returns_entities
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+_________ TestEventNodeModuleIntegration.test_service_returns_entities _________
+backend/test/integration/test_event_node_module_integration.py:86: in test_service_returns_entities
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+_________ TestEventNodeModuleIntegration.test_json_field_serialization _________
+backend/test/integration/test_event_node_module_integration.py:133: in test_json_field_serialization
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+____________ TestEventNodeModuleIntegration.test_create_event_node _____________
+backend/test/integration/test_event_node_module_integration.py:185: in test_create_event_node
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+____________ TestEventNodeModuleIntegration.test_update_event_node _____________
+backend/test/integration/test_event_node_module_integration.py:227: in test_update_event_node
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+____________ TestEventNodeModuleIntegration.test_delete_event_node _____________
+backend/test/integration/test_event_node_module_integration.py:278: in test_delete_event_node
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+__________ TestEventNodeModuleIntegration.test_get_nodes_by_game_gid ___________
+backend/test/integration/test_event_node_module_integration.py:323: in test_get_nodes_by_game_gid
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+_________ TestEventNodeModuleIntegration.test_count_nodes_by_game_gid __________
+backend/test/integration/test_event_node_module_integration.py:375: in test_count_nodes_by_game_gid
+    game_repo.create(
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+_______________ TestGameModuleIntegration.test_create_game_flow ________________
+backend/test/integration/test_game_module_integration.py:68: in test_create_game_flow
+    created_game = service.create_game(game_data)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+________________ TestGameModuleIntegration.test_get_game_by_gid ________________
+backend/test/integration/test_game_module_integration.py:91: in test_get_game_by_gid
+    created_game = service.create_game(game_data)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+_______________ TestGameModuleIntegration.test_update_game_flow ________________
+backend/test/integration/test_game_module_integration.py:110: in test_update_game_flow
+    service.create_game(game_data)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+_______________ TestGameModuleIntegration.test_delete_game_flow ________________
+backend/test/integration/test_game_module_integration.py:128: in test_delete_game_flow
+    service.create_game(game_data)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+______________ TestGameModuleIntegration.test_batch_delete_games _______________
+backend/test/integration/test_game_module_integration.py:147: in test_batch_delete_games
+    service.create_game(game_data)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+________________ TestGameModuleIntegration.test_game_validation ________________
+backend/test/integration/test_game_module_integration.py:165: in test_game_validation
+    service.create_game(game_data1)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+___________ TestGameModuleIntegration.test_get_all_games_with_stats ____________
+backend/test/integration/test_game_module_integration.py:187: in test_get_all_games_with_stats
+    service.create_game(game_data)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+__________ TestGameModuleIntegration.test_repository_returns_entities __________
+backend/test/integration/test_game_module_integration.py:237: in test_repository_returns_entities
+    repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+___________ TestGameModuleIntegration.test_service_returns_entities ____________
+backend/test/integration/test_game_module_integration.py:258: in test_service_returns_entities
+    service.create_game(game_data)
+backend/core/cache/decorators.py:266: in wrapper
+    result = func(*args, **kwargs)
+backend/services/games/game_service.py:174: in create_game
+    result: Optional[Dict[str, Any]] = self.game_repo.create(game_data.model_dump())
+backend/core/data_access.py:254: in create
+    record_ids = self.create_batch([data])
+backend/models/repositories/games.py:524: in create_batch
+    raise e
+backend/models/repositories/games.py:504: in create_batch
+    cursor.executemany(query, params)
+E   sqlite3.OperationalError: table games has no column named name_cn
+__________ TestParameterModuleIntegration.test_create_parameter_flow ___________
+backend/test/integration/test_parameter_module_integration.py:90: in test_create_parameter_flow
+    created_param = service.create_parameter(param_data.model_dump())
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+___________ TestParameterModuleIntegration.test_get_parameter_by_id ____________
+backend/test/integration/test_parameter_module_integration.py:114: in test_get_parameter_by_id
+    created = service.create_parameter(param_data)
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+__________ TestParameterModuleIntegration.test_update_parameter_flow ___________
+backend/test/integration/test_parameter_module_integration.py:140: in test_update_parameter_flow
+    created = service.create_parameter(param_data)
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+__________ TestParameterModuleIntegration.test_delete_parameter_flow ___________
+backend/test/integration/test_parameter_module_integration.py:164: in test_delete_parameter_flow
+    created = service.create_parameter(param_data)
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+_________ TestParameterModuleIntegration.test_get_parameters_by_event __________
+backend/test/integration/test_parameter_module_integration.py:190: in test_get_parameters_by_event
+    service.create_parameter(param_data)
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+___________ TestParameterModuleIntegration.test_parameter_validation ___________
+backend/test/integration/test_parameter_module_integration.py:218: in test_parameter_validation
+    service.create_parameter(param_data1)
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+_______ TestParameterModuleIntegration.test_repository_returns_entities ________
+backend/test/integration/test_parameter_module_integration.py:274: in test_repository_returns_entities
+    created = service.create_parameter(param_data)
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+_________ TestParameterModuleIntegration.test_service_returns_entities _________
+backend/test/integration/test_parameter_module_integration.py:301: in test_service_returns_entities
+    created = service.create_parameter(param_data)
+backend/services/parameters/parameter_service.py:322: in create_parameter
+    game_gid = self.param_repo.get_event_game_gid(event_id)
+E   AttributeError: 'ParameterRepository' object has no attribute 'get_event_game_gid'
+______________ TestCategoriesAPIList.test_list_categories_success ______________
+backend/test/integration/api/test_api_categories.py:23: in test_list_categories_success
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <WrapperTestResponse streamed [404 NOT FOUND]>.status_code
+------------------------------ Captured log call -------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/categories -> 建议迁移到 categories query
+_______________ TestGamesAPICreate.test_create_game_empty_ods_db _______________
+backend/test/integration/api/test_api_games.py:83: in test_create_game_empty_ods_db
+    assert response.status_code == 400
+E   assert 500 == 400
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log call -------------------------------
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+WARNING  backend.core.cache.cache_system:cache_system.py:341 ⚠️ L2缓存写入失败: cannot pickle 'sqlite3.Connection' object
+ERROR    backend.api.routes.games:games.py:162 Error creating game: table games has no column named name_cn
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games -> 建议迁移到 games query
+___________________ TestGamesAPIGet.test_get_game_not_found ____________________
+backend/test/integration/api/test_api_games.py:113: in test_get_game_not_found
+    assert response.status_code == 404
+E   assert 200 == 404
+E    +  where 200 = <WrapperTestResponse streamed [200 OK]>.status_code
+------------------------------ Captured log call -------------------------------
+WARNING  backend.api.middleware.deprecation:deprecation.py:79 V1 API使用警告: /api/games/999999 -> 建议迁移到 games query/999999
+_____________ TestFieldBuilderSecurity.test_field_type_validation ______________
+backend/test/integration/security/test_hql_generator_security.py:25: in test_field_type_validation
+    field = Field(name="test_field", type=field_type)
+<string>:10: in __init__
+    ???
+backend/services/hql/models/event.py:130: in __post_init__
+    raise ValueError("param type field must have json_path")
+E   ValueError: param type field must have json_path
+___________ TestFieldBuilderSecurity.test_rejects_invalid_field_type ___________
+backend/test/integration/security/test_hql_generator_security.py:37: in test_rejects_invalid_field_type
+    with pytest.raises((ValueError, TypeError)):
+E   Failed: DID NOT RAISE (<class 'ValueError'>, <class 'TypeError'>)
+____________ TestFieldBuilderSecurity.test_field_name_sanitization _____________
+backend/test/integration/security/test_hql_generator_security.py:59: in test_field_name_sanitization
+    with pytest.raises((ValueError, ValidationError)):
+E   NameError: name 'ValidationError' is not defined
+______________ TestFieldBuilderSecurity.test_json_path_validation ______________
+backend/test/integration/security/test_hql_generator_security.py:90: in test_json_path_validation
+    assert "<script>" not in (field.json_path or "")
+E   AssertionError: assert '<script>' not in '$.value<script>alert(1)</script>'
+E     '<script>' is contained here:
+E       $.value<script>alert(1)</script>
+E     ?        ++++++++
+________ TestWhereBuilderSecurity.test_rejects_sql_injection_operators _________
+backend/test/integration/security/test_hql_generator_security.py:142: in test_rejects_sql_injection_operators
+    with pytest.raises((ValueError, ValidationError)):
+E   NameError: name 'ValidationError' is not defined
+____________ TestWhereBuilderSecurity.test_where_value_sanitization ____________
+backend/test/integration/security/test_hql_generator_security.py:164: in test_where_value_sanitization
+    where_clause = builder.build_where([condition])
+E   AttributeError: 'WhereBuilder' object has no attribute 'build_where'
+______ TestWhereBuilderSecurity.test_complex_where_conditions_validation _______
+backend/test/integration/security/test_hql_generator_security.py:197: in test_complex_where_conditions_validation
+    where_clause = builder.build_where(conditions)
+E   AttributeError: 'WhereBuilder' object has no attribute 'build_where'
+________ TestWhereBuilderSecurity.test_rejects_invalid_logical_operator ________
+backend/test/integration/security/test_hql_generator_security.py:217: in test_rejects_invalid_logical_operator
+    with pytest.raises((ValueError, ValidationError)):
+E   NameError: name 'ValidationError' is not defined
+___________ TestWhereBuilderSecurity.test_field_validation_in_where ____________
+backend/test/integration/security/test_hql_generator_security.py:231: in test_field_validation_in_where
+    where_clause = builder.build_where([valid_condition])
+E   AttributeError: 'WhereBuilder' object has no attribute 'build_where'
+____________ TestJoinBuilderSecurity.test_join_condition_validation ____________
+backend/test/integration/security/test_hql_generator_security.py:355: in test_join_condition_validation
+    join_sql = builder.build_join(events, conditions, join_type="INNER")
+backend/services/hql/builders/join_builder.py:110: in build_join
+    join_sql = self._build_single_join(
+backend/services/hql/builders/join_builder.py:143: in _build_single_join
+    if cond.get("left_event") == base_event_name
+E   AttributeError: 'str' object has no attribute 'get'
+____________ TestJoinBuilderSecurity.test_join_operator_validation _____________
+backend/test/integration/security/test_hql_generator_security.py:404: in test_join_operator_validation
+    with pytest.raises(ValueError, match="Invalid operator"):
+E   Failed: DID NOT RAISE <class 'ValueError'>
+_____________ TestUnionBuilderSecurity.test_union_type_validation ______________
+backend/test/integration/security/test_hql_generator_security.py:425: in test_union_type_validation
+    union_sql = builder.build_union(events, union_type=union_type)
+E   AttributeError: 'UnionBuilder' object has no attribute 'build_union'. Did you mean: 'build_union_all'?
+___________ TestUnionBuilderSecurity.test_rejects_invalid_union_type ___________
+backend/test/integration/security/test_hql_generator_security.py:446: in test_rejects_invalid_union_type
+    with pytest.raises((ValueError, ValidationError)):
+E   NameError: name 'ValidationError' is not defined
+__________ TestUnionBuilderSecurity.test_partition_filter_validation ___________
+backend/test/integration/security/test_hql_generator_security.py:461: in test_partition_filter_validation
+    union_sql = builder.build_union(events, partition_filter=valid_filter)
+E   AttributeError: 'UnionBuilder' object has no attribute 'build_union'. Did you mean: 'build_union_all'?
+______ TestUnionBuilderSecurity.test_union_all_prevents_data_duplication _______
+backend/test/integration/security/test_hql_generator_security.py:488: in test_union_all_prevents_data_duplication
+    union_sql = builder.build_union(events, union_type="UNION ALL")
+E   AttributeError: 'UnionBuilder' object has no attribute 'build_union'. Did you mean: 'build_union_all'?
+______________ TestSQLInjectionPatterns.test_rejects_xss_patterns ______________
+backend/test/integration/security/test_hql_generator_security.py:527: in test_rejects_xss_patterns
+    assert "<script>" in pattern or "<img" in pattern or "javascript:" in pattern
+E   assert ('<script>' in "<svg onload=alert('xss')>" or '<img' in "<svg onload=alert('xss')>" or 'javascript:' in "<svg onload=alert('xss')>")
+=============================== warnings summary ===============================
+backend/venv/lib/python3.13/site-packages/_pytest/config/__init__.py:1373
+  /Users/mckenzie/Documents/event2table/backend/venv/lib/python3.13/site-packages/_pytest/config/__init__.py:1373: PytestConfigWarning: Unknown config option: env
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+backend/services/games/__init__.py:7
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/services/games/__init__.py:7: DeprecationWarning: backend/services/games/games.py is deprecated. Use backend/api/routes/games.py instead. This file will be removed in Phase 4 cleanup.
+    from .games import games_bp
+
+backend/models/schemas.py:36
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:36: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("name")
+
+backend/models/schemas.py:43
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:43: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("gid")
+
+backend/models/schemas.py:65
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:65: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("name")
+
+backend/models/schemas.py:73
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:73: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class GameResponse(GameBase):
+
+backend/models/schemas.py:102
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:102: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("param_name", pre=True)
+
+backend/models/schemas.py:115
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:115: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("param_name_cn")
+
+backend/models/schemas.py:122
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:122: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("param_description")
+
+backend/models/schemas.py:129
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:129: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("json_path")
+
+backend/models/schemas.py:146
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:146: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class EventParameterResponse(EventParameterBase):
+
+backend/models/schemas.py:178
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:178: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("event_name", pre=True)
+
+backend/models/schemas.py:191
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:191: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("event_name_cn")
+
+backend/models/schemas.py:198
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:198: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("source_table", "target_table", pre=True)
+
+backend/models/schemas.py:213
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:213: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("parameters")
+
+backend/models/schemas.py:228
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:228: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("event_name_cn")
+
+backend/models/schemas.py:236
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:236: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class EventResponse(EventBase):
+
+backend/models/schemas.py:271
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:271: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("field_name")
+
+backend/models/schemas.py:279
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:279: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("field_alias")
+
+backend/models/schemas.py:297
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:297: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("field")
+
+backend/models/schemas.py:319
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:319: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("event_ids")
+
+backend/models/schemas.py:471
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:471: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("name_en")
+
+backend/models/schemas.py:478
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:478: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("name_cn")
+
+backend/models/schemas.py:485
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:485: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("hql_type")
+
+backend/models/schemas.py:525
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/models/schemas.py:525: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator("date_from", "date_to")
+
+integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_returns_valid_response
+integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_with_conditions
+integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_with_param_field
+integration/api/test_hql_v2_integration.py::TestHQLV2PreviewAPI::test_preview_hql_generates_correct_view_name
+integration/api/test_hql_v2_integration.py::TestHQLV2Validation::test_validates_condition_operators
+integration/api/test_hql_v2_integration.py::TestHQLV2Performance::test_preview_hql_performance_with_large_fields
+  /Users/mckenzie/Documents/event2table/backend/test/integration/../../../backend/api/routes/hql_preview_v2.py:980: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "generated_at": datetime.utcnow().isoformat() + "Z",
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------- coverage: platform darwin, python 3.13.11-final-0 ----------
+
+=========================== short test summary info ============================
+FAILED backend/test/integration/test_category_module_integration.py::TestCategoryModuleIntegration::test_batch_delete_categories
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_create_event_flow
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_get_event_by_id
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_update_event_flow
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_delete_event_flow
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_event_validation
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_get_events_by_game
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_entity_serialization
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_repository_returns_entities
+FAILED backend/test/integration/test_event_module_integration.py::TestEventModuleIntegration::test_service_returns_entities
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_repository_returns_entities
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_service_returns_entities
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_json_field_serialization
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_create_event_node
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_update_event_node
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_delete_event_node
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_get_nodes_by_game_gid
+FAILED backend/test/integration/test_event_node_module_integration.py::TestEventNodeModuleIntegration::test_count_nodes_by_game_gid
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_create_game_flow
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_get_game_by_gid
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_update_game_flow
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_delete_game_flow
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_batch_delete_games
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_game_validation
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_get_all_games_with_stats
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_repository_returns_entities
+FAILED backend/test/integration/test_game_module_integration.py::TestGameModuleIntegration::test_service_returns_entities
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_create_parameter_flow
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_get_parameter_by_id
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_update_parameter_flow
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_delete_parameter_flow
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_get_parameters_by_event
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_parameter_validation
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_repository_returns_entities
+FAILED backend/test/integration/test_parameter_module_integration.py::TestParameterModuleIntegration::test_service_returns_entities
+FAILED backend/test/integration/api/test_api_categories.py::TestCategoriesAPIList::test_list_categories_success
+FAILED backend/test/integration/api/test_api_games.py::TestGamesAPICreate::test_create_game_empty_ods_db
+FAILED backend/test/integration/api/test_api_games.py::TestGamesAPIGet::test_get_game_not_found
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_field_type_validation
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_rejects_invalid_field_type
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_field_name_sanitization
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestFieldBuilderSecurity::test_json_path_validation
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_rejects_sql_injection_operators
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_where_value_sanitization
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_complex_where_conditions_validation
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_rejects_invalid_logical_operator
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestWhereBuilderSecurity::test_field_validation_in_where
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestJoinBuilderSecurity::test_join_condition_validation
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestJoinBuilderSecurity::test_join_operator_validation
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_union_type_validation
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_rejects_invalid_union_type
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_partition_filter_validation
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestUnionBuilderSecurity::test_union_all_prevents_data_duplication
+FAILED backend/test/integration/security/test_hql_generator_security.py::TestSQLInjectionPatterns::test_rejects_xss_patterns
+ERROR backend/test/integration/test_category_batch_delete.py::test_batch_delete_success
+ERROR backend/test/integration/test_category_batch_delete.py::test_batch_delete_with_events
+ERROR backend/test/integration/test_category_batch_delete.py::test_batch_delete_mixed
+ERROR backend/test/integration/test_category_batch_delete.py::test_api_batch_delete
+ERROR backend/test/integration/test_category_batch_delete.py::test_api_batch_delete_with_events
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_default_parameters
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_custom_page_size
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_page_navigation
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_total_pages_calculation
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_beyond_last_page
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_with_search
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_max_page_size_limit
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_invalid_page_numbers
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_response_structure
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_events_count_endpoint
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_events_count_with_search
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_without_game_gid
+ERROR backend/test/integration/api/test_pagination.py::TestEventsPagination::test_pagination_with_both_filters
+= 54 failed, 152 passed, 4 skipped, 31 warnings, 18 errors in 66.53s (0:01:06) =

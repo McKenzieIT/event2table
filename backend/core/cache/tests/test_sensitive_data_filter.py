@@ -4,7 +4,7 @@
 敏感数据过滤器单元测试
 ======================
 
-测试敏感数据过滤器的功能：
+测试敏感数据过滤器的功能: 
 - 敏感字段过滤
 - 敏感模式检测
 - 正常日志保留
@@ -16,9 +16,11 @@ CVSS: 8.2 (High)
 """
 
 import logging
-import pytest
 import re
 from io import StringIO
+
+import pytest
+
 from backend.core.cache.filters import SensitiveDataFilter
 
 
@@ -75,17 +77,17 @@ class TestSensitiveDataFilter:
         assert "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" not in result
 
     def test_long_alphanumeric_pattern(self):
-        """测试长字母数字模式过滤（可能的API密钥）"""
+        """测试长字母数字模式过滤(可能的API密钥)"""
         text = "api_key=sk-1234567890abcdef1234567890abcdef"
         result = self.filter._sanitize(text)
         assert "[REDACTED]" in result
-        # 字段名保留，值被过滤
+        # 字段名保留, 值被过滤
         assert "api_key=" in result
         assert "sk-1234567890abcdef1234567890abcdef" not in result
 
     def test_normal_log_preservation(self):
         """测试正常日志内容保留"""
-        # 测试普通日志（不应被过滤）
+        # 测试普通日志(不应被过滤)
         text = "User logged in successfully"
         result = self.filter._sanitize(text)
         assert result == text
@@ -135,7 +137,7 @@ class TestSensitiveDataFilter:
 
     def test_custom_pattern_addition(self):
         """测试自定义敏感模式添加"""
-        # 添加自定义模式（匹配特定格式）
+        # 添加自定义模式(匹配特定格式)
         custom_pattern = re.compile(r'CUSTOM\d{10}')
         self.filter.add_sensitive_pattern(custom_pattern)
 
@@ -247,7 +249,7 @@ class TestSensitiveDataFilterEdgeCases:
         # 应该只过滤完整的敏感字段
         text = "password123 is not a match"
         result = self.filter._sanitize(text)
-        # "password123" 不等于 "password"，所以不应该被过滤
+        # "password123" 不等于 "password", 所以不应该被过滤
         assert "password123" in result
 
     def test_special_characters(self):

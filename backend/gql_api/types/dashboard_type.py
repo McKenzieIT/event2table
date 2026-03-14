@@ -4,9 +4,10 @@ Dashboard GraphQL Type
 Defines the GraphQL type for Dashboard statistics.
 """
 
-import graphene
-from graphene import Int, String, Float, List
 import logging
+
+import graphene
+from graphene import Float, Int, List, String
 
 logger = logging.getLogger(__name__)
 

@@ -5,12 +5,13 @@ This module provides shared fixtures and configuration for all unit tests.
 It ensures test isolation and provides common test data.
 """
 
-import pytest
 import os
 import sys
-from pathlib import Path
 from datetime import datetime
-from unittest.mock import Mock, MagicMock
+from pathlib import Path
+from unittest.mock import MagicMock, Mock
+
+import pytest
 
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -21,11 +22,13 @@ try:
 except ImportError:
     # For testing without full backend import
     import sqlite3
+
     def get_db_connection(db_path):
         """Fallback database connection"""
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         return conn
+
 
 # Test database path
 TEST_DB = "/Users/mckenzie/Documents/event2table/data/test_database.db"
@@ -35,6 +38,7 @@ TEST_GID_START = 90000000  # Never use 10000147 (STAR001)
 # =============================================================================
 # Database Fixtures
 # =============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_db():
@@ -75,6 +79,7 @@ def clean_db(test_db):
 # Game and Event Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="function")
 def test_game(clean_db):
     """
@@ -85,8 +90,7 @@ def test_game(clean_db):
     """
     test_gid = TEST_GID_START + 1
     clean_db.execute(
-        "INSERT INTO games (gid, name, ods_db) VALUES (?, ?, ?)",
-        (test_gid, "Test Game", "ieu_ods")
+        "INSERT INTO games (gid, name, ods_db) VALUES (?, ?, ?)", (test_gid, "Test Game", "ieu_ods")
     )
     clean_db.commit()
     return test_gid
@@ -105,7 +109,7 @@ def test_game_with_events(clean_db):
     # Insert game
     clean_db.execute(
         "INSERT INTO games (gid, name, ods_db) VALUES (?, ?, ?)",
-        (test_gid, "Test Game with Events", "ieu_ods")
+        (test_gid, "Test Game with Events", "ieu_ods"),
     )
 
     # Insert 5 events
@@ -113,16 +117,13 @@ def test_game_with_events(clean_db):
     for i in range(1, 6):
         clean_db.execute(
             "INSERT INTO log_events (game_gid, name, ods_table) VALUES (?, ?, ?)",
-            (test_gid, f"test_event_{i}", f"ods_test_event_{i}")
+            (test_gid, f"test_event_{i}", f"ods_test_event_{i}"),
         )
         event_ids.append(clean_db.lastrowid)
 
     clean_db.commit()
 
-    return {
-        'game_gid': test_gid,
-        'events': event_ids
-    }
+    return {'game_gid': test_gid, 'events': event_ids}
 
 
 @pytest.fixture(scope="function")
@@ -135,7 +136,7 @@ def test_event(clean_db, test_game):
     """
     clean_db.execute(
         "INSERT INTO log_events (game_gid, name, ods_table) VALUES (?, ?, ?)",
-        (test_game, "test_event", "ods_test_event")
+        (test_game, "test_event", "ods_test_event"),
     )
     clean_db.commit()
     return clean_db.lastrowid
@@ -144,6 +145,7 @@ def test_event(clean_db, test_game):
 # =============================================================================
 # Parameter Fixtures
 # =============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_parameter_data(test_game, test_event):
@@ -161,7 +163,7 @@ def test_parameter_data(test_game, test_event):
         'event_id': test_event,
         'game_gid': test_game,
         'is_common': False,
-        'is_active': True
+        'is_active': True,
     }
 
 
@@ -184,9 +186,9 @@ def test_parameters(clean_db, test_game_with_events):
 
     param_data = {
         'zone_id': {'type': 'int', 'events': [0, 1, 2, 3, 4]},  # 5/5 = 100%
-        'guild_id': {'type': 'string', 'events': [0, 1, 2, 3]},   # 4/5 = 80%
-        'role_id': {'type': 'int', 'events': [0, 1, 2]},          # 3/5 = 60%
-        'level': {'type': 'int', 'events': [0, 1]},               # 2/5 = 40%
+        'guild_id': {'type': 'string', 'events': [0, 1, 2, 3]},  # 4/5 = 80%
+        'role_id': {'type': 'int', 'events': [0, 1, 2]},  # 3/5 = 60%
+        'level': {'type': 'int', 'events': [0, 1]},  # 2/5 = 40%
     }
 
     created_params = {}
@@ -199,8 +201,14 @@ def test_parameters(clean_db, test_game_with_events):
                 """INSERT INTO event_params
                    (param_name, param_name_cn, param_type, json_path, event_id, game_gid)
                    VALUES (?, ?, ?, ?, ?, ?)""",
-                (param_name, f"{param_name}_cn", data['type'], f"$.{param_name}",
-                 event_id, game_gid)
+                (
+                    param_name,
+                    f"{param_name}_cn",
+                    data['type'],
+                    f"$.{param_name}",
+                    event_id,
+                    game_gid,
+                ),
             )
 
             if param_name not in created_params:
@@ -209,15 +217,13 @@ def test_parameters(clean_db, test_game_with_events):
 
     clean_db.commit()
 
-    return {
-        'game_gid': game_gid,
-        'params': created_params
-    }
+    return {'game_gid': game_gid, 'params': created_params}
 
 
 # =============================================================================
 # Mock Fixtures
 # =============================================================================
+
 
 @pytest.fixture(scope="function")
 def mock_parameter_repository():
@@ -281,6 +287,7 @@ def mock_uow(mock_parameter_repository, mock_common_param_repository):
 # Utility Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="function")
 def sample_parameter():
     """
@@ -301,7 +308,7 @@ def sample_parameter():
         game_gid=TEST_GID_START + 1,
         is_common=True,
         is_active=True,
-        version=1
+        version=1,
     )
 
 
@@ -325,13 +332,14 @@ def sample_common_parameter():
         occurrence_count=4,
         total_events=5,
         threshold=0.8,
-        calculated_at=datetime.now()
+        calculated_at=datetime.now(),
     )
 
 
 # =============================================================================
 # Test Configuration
 # =============================================================================
+
 
 def pytest_configure(config):
     """
@@ -340,18 +348,10 @@ def pytest_configure(config):
     Sets up custom markers and configuration.
     """
     # Register custom markers
-    config.addinivalue_line(
-        "markers", "unit: Unit tests (fast, isolated)"
-    )
-    config.addinivalue_line(
-        "markers", "integration: Integration tests (slower, uses database)"
-    )
-    config.addinivalue_line(
-        "markers", "domain: Domain layer tests"
-    )
-    config.addinivalue_line(
-        "markers", "application: Application layer tests"
-    )
+    config.addinivalue_line("markers", "unit: Unit tests (fast, isolated)")
+    config.addinivalue_line("markers", "integration: Integration tests (slower, uses database)")
+    config.addinivalue_line("markers", "domain: Domain layer tests")
+    config.addinivalue_line("markers", "application: Application layer tests")
 
 
 @pytest.fixture(scope="session", autouse=True)

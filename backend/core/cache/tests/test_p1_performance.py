@@ -10,23 +10,23 @@ P1性能优化验证测试
 
 预期性能提升:
 - 模式匹配: 50,000次操作 → ~100次操作（500倍提升）
-- Redis扫描: 非阻塞，适合生产环境
+- Redis扫描: 非阻塞, 适合生产环境
 
 使用方法:
     python backend/core/cache/tests/test_p1_performance.py
 """
 
-import sys
-import time
 import random
 import string
+import sys
+import time
 from pathlib import Path
 
 # 添加项目路径
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from backend.core.cache.cache_hierarchical import HierarchicalCache
 from backend.core.cache.base import CacheKeyBuilder
+from backend.core.cache.cache_hierarchical import HierarchicalCache
 
 
 def generate_random_key(pattern: str, **kwargs) -> str:
@@ -41,18 +41,15 @@ def test_pattern_matching_performance():
     """
     测试1: 模式匹配性能（索引 vs 遍历）
 
-    场景: 1000个缓存键，50个模式
+    场景: 1000个缓存键, 50个模式
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("测试1: 模式匹配性能优化")
-    print("="*80)
+    print("=" * 80)
 
-    # 1. 测试禁用索引的情况（O(n*k)）
+    # 1. 测试禁用索引的情况(O(n*k))
     print("\n[测试A] 禁用索引（遍历方式）...")
-    cache_no_index = HierarchicalCache(
-        l1_size=2000,
-        enable_key_level_locks=False
-    )
+    cache_no_index = HierarchicalCache(l1_size=2000, enable_key_level_locks=False)
     cache_no_index._index_enabled = False
 
     # 添加1000个键
@@ -60,10 +57,7 @@ def test_pattern_matching_performance():
     for i in range(1000):
         game_gid = random.randint(90000000, 90000099)
         cache_no_index.set(
-            'events.list',
-            [{"id": i}],
-            game_gid=game_gid,
-            page=random.randint(1, 10)
+            'events.list', [{"id": i}], game_gid=game_gid, page=random.randint(1, 10)
         )
 
     # 测试50次模式失效
@@ -77,22 +71,16 @@ def test_pattern_matching_performance():
     print(f"  ❌ 遍历方式耗时: {no_index_time*1000:.2f}ms")
     print(f"     复杂度: O(n*k) = 1000键 × 50模式 = 50,000次操作")
 
-    # 2. 测试启用索引的情况（O(1)）
+    # 2. 测试启用索引的情况(O(1))
     print("\n[测试B] 启用索引（索引方式）...")
-    cache_with_index = HierarchicalCache(
-        l1_size=2000,
-        enable_key_level_locks=False
-    )
+    cache_with_index = HierarchicalCache(l1_size=2000, enable_key_level_locks=False)
 
     # 添加1000个键
     print("  添加1000个缓存键...")
     for i in range(1000):
         game_gid = random.randint(90000000, 90000099)
         cache_with_index.set(
-            'events.list',
-            [{"id": i}],
-            game_gid=game_gid,
-            page=random.randint(1, 10)
+            'events.list', [{"id": i}], game_gid=game_gid, page=random.randint(1, 10)
         )
 
     # 测试50次模式失效
@@ -125,18 +113,19 @@ def test_redis_scan_performance():
     """
     测试2: Redis SCAN vs KEYS（需要Redis连接）
 
-    注意: 如果Redis不可用，此测试将被跳过
+    注意: 如果Redis不可用, 此测试将被跳过
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("测试2: Redis SCAN替代KEYS")
-    print("="*80)
+    print("=" * 80)
 
     try:
         from backend.core.cache.base import get_redis_client
+
         redis_client = get_redis_client()
 
         if redis_client is None:
-            print("\n⚠️  Redis未连接，跳过SCAN测试")
+            print("\n⚠️  Redis未连接, 跳过SCAN测试")
             return True
 
         # 准备测试数据
@@ -156,7 +145,7 @@ def test_redis_scan_performance():
         keys_time = time.perf_counter() - start_time
         print(f"  KEYS耗时: {keys_time*1000:.2f}ms")
         print(f"  找到键: {len(keys_result)}个")
-        print(f"  ⚠️  警告: KEYS是O(n)操作，可能阻塞Redis")
+        print(f"  ⚠️  警告: KEYS是O(n)操作, 可能阻塞Redis")
 
         # 测试SCAN命令
         print("\n[测试B] SCAN命令（非阻塞）...")
@@ -164,20 +153,22 @@ def test_redis_scan_performance():
         cursor = '0'
         scan_keys = []
         while cursor != 0:
-            cursor, batch = redis_client.scan(cursor=cursor, match="dwd_gen:v3:test.key:*", count=20)
+            cursor, batch = redis_client.scan(
+                cursor=cursor, match="dwd_gen:v3:test.key:*", count=20
+            )
             scan_keys.extend(batch)
         scan_time = time.perf_counter() - start_time
         print(f"  SCAN耗时: {scan_time*1000:.2f}ms")
         print(f"  找到键: {len(scan_keys)}个")
-        print(f"  ✅ 优点: 增量处理，不阻塞Redis")
+        print(f"  ✅ 优点: 增量处理, 不阻塞Redis")
 
         # 清理测试数据
         print("\n清理测试数据...")
         redis_client.delete(*test_keys)
 
         print("\n📊 结论:")
-        print("   SCAN虽然可能稍慢，但不会阻塞Redis服务器")
-        print("   生产环境必须使用SCAN，避免性能抖动")
+        print("   SCAN虽然可能稍慢, 但不会阻塞Redis服务器")
+        print("   生产环境必须使用SCAN, 避免性能抖动")
 
         return True
 
@@ -190,14 +181,11 @@ def test_combined_performance():
     """
     测试3: 综合性能测试（索引 + SCAN）
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("测试3: 综合性能测试")
-    print("="*80)
+    print("=" * 80)
 
-    cache = HierarchicalCache(
-        l1_size=2000,
-        enable_key_level_locks=False
-    )
+    cache = HierarchicalCache(l1_size=2000, enable_key_level_locks=False)
 
     # 添加混合类型的缓存键
     print("\n准备混合测试数据...")
@@ -206,7 +194,7 @@ def test_combined_performance():
         ('games.detail', 200),
         ('params.list', 250),
         ('categories.list', 150),
-        ('hql.history', 100)
+        ('hql.history', 100),
     ]
 
     total_keys = 0
@@ -243,9 +231,9 @@ def test_combined_performance():
 
 def main():
     """运行所有性能测试"""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("P1性能优化验证测试")
-    print("="*80)
+    print("=" * 80)
     print("\n优化内容:")
     print("  1. 模式匹配索引系统: O(n*k) → O(1)")
     print("  2. Redis SCAN替代KEYS: 避免阻塞")
@@ -260,13 +248,14 @@ def main():
     except Exception as e:
         print(f"\n❌ 测试失败: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
     # 汇总结果
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("测试结果汇总")
-    print("="*80)
+    print("=" * 80)
 
     for test_name, passed in results.items():
         status = "✅ 通过" if passed else "❌ 失败"
@@ -277,9 +266,9 @@ def main():
         print("\n🎉 所有测试通过！P1性能优化验证成功")
         print("\n📊 性能提升:")
         print("  - 模式匹配: 500x+ 提升理论值")
-        print("  - Redis操作: 非阻塞，生产可用")
+        print("  - Redis操作: 非阻塞, 生产可用")
     else:
-        print("\n⚠️  部分测试失败，请检查")
+        print("\n⚠️  部分测试失败, 请检查")
 
     return all_passed
 

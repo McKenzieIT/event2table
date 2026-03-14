@@ -1,5 +1,7 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization
+// ⚡️ REACT PERF: Component optimized with React.memo + useMemo + useCallback
+// - Added React.memo to prevent unnecessary re-renders
+// - Added useMemo for parameters extraction and filtering (already present)
+// - Added useCallback for event handlers to stabilize references
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
@@ -15,7 +17,7 @@
  * 使用TypeScript提供类型安全
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
 import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
@@ -72,12 +74,12 @@ function ParametersEnhancedGraphQL() {
     undefined
   );
 
-  // Get parameters list
+  // ⚡️ useMemo: Get parameters list (已有优化)
   const parameters: Parameter[] = useMemo(() => {
     return paramsData?.parametersManagement || [];
   }, [paramsData]);
 
-  // 客户端过滤（useMemo优化）
+  // ⚡️ useMemo: 客户端过滤（已有优化）
   const filteredParameters = useMemo(() => {
     return parameters.filter(param => {
       const matchesSearch = param.paramName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,9 +89,25 @@ function ParametersEnhancedGraphQL() {
     });
   }, [parameters, searchTerm, selectedCategory]);
 
+  // ⚡️ useMemo: 分类列表（已有优化）
   const categories = useMemo(() => {
     return ['all', ...new Set(parameters.map(p => p.category).filter(Boolean) as string[])];
   }, [parameters]);
+
+  // ⚡️ useCallback: 稳定搜索处理器
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  // ⚡️ useCallback: 稳定分类选择处理器
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+  }, []);
+
+  // ⚡️ useCallback: 稳定重载处理器
+  const handleReload = useCallback(() => {
+    window.location.reload();
+  }, []);
 
   if (isLoading) {
     return (
@@ -103,7 +121,7 @@ function ParametersEnhancedGraphQL() {
     return (
       <div className="error-container">
         <p>加载失败: {error.message}</p>
-        <Button variant="primary" onClick={() => window.location.reload()}>
+        <Button variant="primary" onClick={handleReload}>
           重试
         </Button>
       </div>
@@ -126,12 +144,12 @@ function ParametersEnhancedGraphQL() {
         <SearchInput
           placeholder="搜索参数..."
           value={searchTerm}
-          onChange={(value: string) => setSearchTerm(value)}
+          onChange={handleSearchChange}
         />
         <select
           className="category-filter"
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={handleCategoryChange}
         >
           {categories.map(cat => (
             <option key={cat} value={cat}>
@@ -190,4 +208,5 @@ function ParametersEnhancedGraphQL() {
   );
 }
 
-export default ParametersEnhancedGraphQL;
+// ⚡️ Wrap with React.memo to prevent unnecessary re-renders
+export default React.memo(ParametersEnhancedGraphQL);

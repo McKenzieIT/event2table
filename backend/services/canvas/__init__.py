@@ -8,11 +8,7 @@ Exports:
     - canvas_bp: Canvas API蓝图 (路由)
 """
 
-from .canvas_service import CanvasService, get_canvas_service
 from .canvas import canvas_bp
+from .canvas_service import CanvasService, get_canvas_service
 
-__all__ = [
-    "CanvasService",
-    "get_canvas_service",
-    "canvas_bp"
-]
+__all__ = ["CanvasService", "get_canvas_service", "canvas_bp"]

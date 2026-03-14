@@ -10,14 +10,15 @@ HQL History Service (HQL历史业务服务 - 精简架构)
 提供HQL生成历史的业务逻辑处理
 - 使用HQLHistoryEntity进行类型安全的数据传递
 - 集成缓存管理
-- 简化业务逻辑，移除DDD抽象
+- 简化业务逻辑, 移除DDD抽象
 """
 
-from typing import List, Optional, Dict, Any
 from datetime import datetime
-from backend.services.base_service import BaseService
+from typing import Any, Dict, List, Optional
+
 from backend.models.entities import HQLHistoryEntity
 from backend.models.repositories.hql_history_repository import HQLHistoryRepository
+from backend.services.base_service import BaseService
 
 
 class HQLHistoryService(BaseService):
@@ -59,7 +60,7 @@ class HQLHistoryService(BaseService):
 
         Args:
             user_id: 用户ID
-            session_id: 会话ID（如果提供，优先按会话查询）
+            session_id: 会话ID（如果提供, 优先按会话查询）
             limit: 返回数量限制
             offset: 偏移量
 
@@ -177,7 +178,7 @@ class HQLHistoryService(BaseService):
             history_id: 历史记录ID
 
         Returns:
-            包含events, fields, conditions, mode的字典，不存在返回None
+            包含events, fields, conditions, mode的字典, 不存在返回None
         """
         history = self.history_repo.find_by_id(history_id)
         if not history:
@@ -249,7 +250,7 @@ class HQLHistoryService(BaseService):
         Returns:
             HQLHistoryEntity列表
         """
-        # 如果有日期范围过滤，使用Repository的search_by_keyword
+        # 如果有日期范围过滤, 使用Repository的search_by_keyword
         # 并在后续添加日期过滤
         if keyword:
             results = self.history_repo.search_by_keyword(
@@ -265,8 +266,12 @@ class HQLHistoryService(BaseService):
             if date_from or date_to:
                 filtered = []
                 # Parse date strings to datetime objects if needed
-                date_from_dt: Optional[datetime] = datetime.fromisoformat(date_from) if isinstance(date_from, str) else date_from
-                date_to_dt: Optional[datetime] = datetime.fromisoformat(date_to) if isinstance(date_to, str) else date_to
+                date_from_dt: Optional[datetime] = (
+                    datetime.fromisoformat(date_from) if isinstance(date_from, str) else date_from
+                )
+                date_to_dt: Optional[datetime] = (
+                    datetime.fromisoformat(date_to) if isinstance(date_to, str) else date_to
+                )
 
                 for item in results:
                     if date_from_dt and item.created_at and item.created_at < date_from_dt:
@@ -278,7 +283,7 @@ class HQLHistoryService(BaseService):
 
             return results[:limit]
 
-        # 无关键词搜索时，直接使用Repository方法
+        # 无关键词搜索时, 直接使用Repository方法
         if user_id is not None:
             return self.history_repo.find_by_user_id(user_id, limit, offset)
         elif game_gid is not None:
@@ -320,7 +325,7 @@ class HQLHistoryService(BaseService):
 
     def cleanup_old_history(self, user_id: int = 0, keep_count: int = 100) -> int:
         """
-        清理旧历史记录，只保留最近的N条
+        清理旧历史记录, 只保留最近的N条
 
         Args:
             user_id: 用户ID

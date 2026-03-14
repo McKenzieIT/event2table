@@ -4,11 +4,13 @@ GraphQL Subscriptions实现
 实现实时数据更新功能
 """
 
+import logging
+from datetime import datetime
+
 import graphene
 from graphene import Subscription
 from rx import Observable
-import logging
-from datetime import datetime
+
 from backend.core.database import get_db_connection
 
 logger = logging.getLogger(__name__)
@@ -19,20 +21,17 @@ class EventSubscription(graphene.ObjectType):
 
     # 事件创建订阅
     event_created = graphene.String(
-        game_gid=graphene.Int(required=True),
-        description="订阅事件创建通知"
+        game_gid=graphene.Int(required=True), description="订阅事件创建通知"
     )
 
     # 事件更新订阅
     event_updated = graphene.String(
-        event_id=graphene.Int(required=True),
-        description="订阅事件更新通知"
+        event_id=graphene.Int(required=True), description="订阅事件更新通知"
     )
 
     # 事件删除订阅
     event_deleted = graphene.String(
-        game_gid=graphene.Int(required=True),
-        description="订阅事件删除通知"
+        game_gid=graphene.Int(required=True), description="订阅事件删除通知"
     )
 
     def resolve_event_created(root, info, game_gid):
@@ -40,11 +39,13 @@ class EventSubscription(graphene.ObjectType):
         logger.info(f"Client subscribed to event_created for game {game_gid}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                # 这里可以集成Redis Pub/Sub或WebSocket
-                # 示例：每30秒发送一次心跳
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (
+                    # 这里可以集成Redis Pub/Sub或WebSocket
+                    # 示例: 每30秒发送一次心跳
+                    observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
+                )
+            )
 
         return observable()
 
@@ -53,9 +54,9 @@ class EventSubscription(graphene.ObjectType):
         logger.info(f"Client subscribed to event_updated for event {event_id}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -64,9 +65,9 @@ class EventSubscription(graphene.ObjectType):
         logger.info(f"Client subscribed to event_deleted for game {game_gid}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -76,20 +77,17 @@ class ParameterSubscription(graphene.ObjectType):
 
     # 参数创建订阅
     parameter_created = graphene.String(
-        event_id=graphene.Int(required=True),
-        description="订阅参数创建通知"
+        event_id=graphene.Int(required=True), description="订阅参数创建通知"
     )
 
     # 参数更新订阅
     parameter_updated = graphene.String(
-        parameter_id=graphene.Int(required=True),
-        description="订阅参数更新通知"
+        parameter_id=graphene.Int(required=True), description="订阅参数更新通知"
     )
 
     # 参数删除订阅
     parameter_deleted = graphene.String(
-        event_id=graphene.Int(required=True),
-        description="订阅参数删除通知"
+        event_id=graphene.Int(required=True), description="订阅参数删除通知"
     )
 
     def resolve_parameter_created(root, info, event_id):
@@ -97,9 +95,9 @@ class ParameterSubscription(graphene.ObjectType):
         logger.info(f"Client subscribed to parameter_created for event {event_id}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -108,9 +106,9 @@ class ParameterSubscription(graphene.ObjectType):
         logger.info(f"Client subscribed to parameter_updated for parameter {parameter_id}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -119,9 +117,9 @@ class ParameterSubscription(graphene.ObjectType):
         logger.info(f"Client subscribed to parameter_deleted for event {event_id}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -130,23 +128,19 @@ class DashboardSubscription(graphene.ObjectType):
     """Dashboard实时更新订阅"""
 
     # 统计数据更新订阅
-    stats_updated = graphene.String(
-        description="订阅Dashboard统计数据更新"
-    )
+    stats_updated = graphene.String(description="订阅Dashboard统计数据更新")
 
     # 游戏列表更新订阅
-    games_updated = graphene.String(
-        description="订阅游戏列表更新"
-    )
+    games_updated = graphene.String(description="订阅游戏列表更新")
 
     def resolve_stats_updated(root, info):
         """订阅统计数据更新"""
         logger.info("Client subscribed to stats_updated")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -155,9 +149,9 @@ class DashboardSubscription(graphene.ObjectType):
         logger.info("Client subscribed to games_updated")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -167,24 +161,20 @@ class CanvasSubscription(graphene.ObjectType):
 
     # Canvas节点更新订阅
     canvas_node_updated = graphene.String(
-        canvas_id=graphene.Int(required=True),
-        description="订阅Canvas节点更新"
+        canvas_id=graphene.Int(required=True), description="订阅Canvas节点更新"
     )
 
     # Flow更新订阅
-    flow_updated = graphene.String(
-        flow_id=graphene.Int(required=True),
-        description="订阅Flow更新"
-    )
+    flow_updated = graphene.String(flow_id=graphene.Int(required=True), description="订阅Flow更新")
 
     def resolve_canvas_node_updated(root, info, canvas_id):
         """订阅Canvas节点更新"""
         logger.info(f"Client subscribed to canvas_node_updated for canvas {canvas_id}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -193,9 +183,9 @@ class CanvasSubscription(graphene.ObjectType):
         logger.info(f"Client subscribed to flow_updated for flow {flow_id}")
 
         def observable():
-            return Observable.create(lambda observer: (
-                observer.on_next(f"heartbeat:{datetime.now().isoformat()}")
-            ))
+            return Observable.create(
+                lambda observer: (observer.on_next(f"heartbeat:{datetime.now().isoformat()}"))
+            )
 
         return observable()
 
@@ -239,7 +229,7 @@ class SubscriptionPublisher:
     def publish_event_created(self, game_gid: int, event_data: dict):
         """发布事件创建通知"""
         logger.info(f"Publishing event_created for game {game_gid}")
-        # 实际实现中，这里会通过WebSocket或Redis Pub/Sub发送消息
+        # 实际实现中, 这里会通过WebSocket或Redis Pub/Sub发送消息
         # observer.on_next(json.dumps(event_data))
 
     def publish_event_updated(self, event_id: int, event_data: dict):
@@ -260,7 +250,9 @@ class SubscriptionPublisher:
 
     def publish_parameter_deleted(self, event_id: int, parameter_id: int):
         """发布参数删除通知"""
-        logger.info(f"Publishing parameter_deleted for parameter {parameter_id} in event {event_id}")
+        logger.info(
+            f"Publishing parameter_deleted for parameter {parameter_id} in event {event_id}"
+        )
 
     def publish_stats_updated(self, stats_data: dict):
         """发布统计数据更新通知"""

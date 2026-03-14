@@ -14,11 +14,11 @@
 日期: 2026-01-27
 
 特性:
-- 统一键生成（参数排序、版本控制）
+- 统一键生成（参数排序, 版本控制）
 - 三级分层缓存（L1热点 + L2共享 + L3数据库）
-- 智能失效（精确失效、模式失效、批量失效）
-- 缓存预热（启动预热、定时预热、分阶段预热）
-- 统计监控（命中率、性能指标、容量监控）
+- 智能失效（精确失效, 模式失效, 批量失效）
+- 缓存预热（启动预热, 定时预热, 分阶段预热）
+- 统计监控（命中率, 性能指标, 容量监控）
 - 穿透保护（空值缓存）
 - TTL随机化（防止雪崩）
 
@@ -35,14 +35,15 @@
         return fetch_game_from_db(game_gid)
 """
 
-from functools import wraps
-from flask import current_app
 import hashlib
 import logging
 import random
 import threading
 import time
+from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
+
+from flask import current_app
 
 # TypeVar for cached decorator
 F = TypeVar('F', bound=Callable[..., Any])
@@ -150,7 +151,7 @@ class HierarchicalCache:
     优势:
     - 热点数据极快访问（L1）
     - 大容量缓存存储（L2）
-    - 自动LRU淘汰，节省内存
+    - 自动LRU淘汰, 节省内存
     - L2命中自动回填L1
     """
 
@@ -159,9 +160,9 @@ class HierarchicalCache:
         初始化分层缓存
 
         Args:
-            l1_size: L1缓存大小（条数），默认1000
-            l1_ttl: L1缓存TTL（秒），默认60
-            l2_ttl: L2缓存TTL（秒），默认3600
+            l1_size: L1缓存大小（条数）, 默认1000
+            l1_ttl: L1缓存TTL（秒）, 默认60
+            l2_ttl: L2缓存TTL（秒）, 默认3600
         """
         self.l1_size = l1_size
         self.l1_ttl = l1_ttl
@@ -192,12 +193,13 @@ class HierarchicalCache:
 
         查询顺序:
         1. L1内存缓存 (<1ms)
-        2. L2 Redis缓存 (5-10ms，命中后回填L1)
-        3. L3数据库 (返回None，由调用方查询)
+        2. L2 Redis缓存 (5-10ms, 命中后回填L1)
+        3. L3数据库 (返回None, 由调用方查询)
 
         特性:
         - 支持空值缓存（防止缓存穿透）
         - L2命中自动回填L1
+        - 记录响应时间（用于监控）
 
         Args:
             pattern: 缓存模式 (如 'events.list')
@@ -206,6 +208,7 @@ class HierarchicalCache:
         Returns:
             缓存数据或None（未命中）
         """
+        start_time = time.time()
         key = CacheKeyBuilder.build(pattern, **kwargs)
 
         with self._lock:
@@ -220,13 +223,17 @@ class HierarchicalCache:
                         self.stats["empty_hits"] = self.stats.get("empty_hits", 0) + 1
                         self.stats["l1_hits"] += 1
                         logger.debug(f"✅ L1 HIT (空值): {_hash_key(key)}")
+                        # 记录监控
+                        self._record_monitoring(key, hit=True, start_time=start_time)
                         return None
 
                     self.stats["l1_hits"] += 1
                     logger.debug(f"✅ L1 HIT: {_hash_key(key)}")
+                    # 记录监控
+                    self._record_monitoring(key, hit=True, start_time=start_time)
                     return cached_data
                 else:
-                    # L1过期，删除
+                    # L1过期, 删除
                     del self.l1_cache[key]
                     del self.l1_timestamps[key]
                     logger.debug(f"⏰ L1过期: {_hash_key(key)}")
@@ -244,25 +251,49 @@ class HierarchicalCache:
                             self.stats["empty_hits"] = self.stats.get("empty_hits", 0) + 1
                             self.stats["l2_hits"] += 1
                             logger.debug(f"✅ L2 HIT (空值) → L1回填: {_hash_key(key)}")
+                            # 记录监控
+                            self._record_monitoring(key, hit=True, start_time=start_time)
                             return None
 
                         self._set_l1(key, cached)
                     self.stats["l2_hits"] += 1
                     logger.debug(f"✅ L2 HIT → L1回填: {_hash_key(key)}")
+                    # 记录监控
+                    self._record_monitoring(key, hit=True, start_time=start_time)
                     return cached
             except Exception as e:
                 logger.warning(f"⚠️ L2缓存读取失败: {e}")
 
-        # L3: 缓存未命中，返回None
+        # L3: 缓存未命中, 返回None
         self.stats["misses"] += 1
         logger.debug(f"❌ CACHE MISS: {_hash_key(key)}")
+        # 记录监控
+        self._record_monitoring(key, hit=False, start_time=start_time)
         return None
+
+    def _record_monitoring(self, cache_key: str, hit: bool, start_time: float):
+        """
+        记录监控信息
+
+        Args:
+            cache_key: 缓存键
+            hit: 是否命中
+            start_time: 开始时间
+        """
+        try:
+            from backend.core.cache.monitoring_enhanced import record_cache_operation
+
+            response_time_ms = (time.time() - start_time) * 1000
+            record_cache_operation(cache_key, hit, response_time_ms)
+        except Exception as e:
+            # 监控失败不应影响缓存功能
+            logger.debug(f"记录缓存监控失败: {e}")
 
     def set(self, pattern: str, data: Any, ttl: Optional[int] = None, **kwargs):
         """
         写入三级缓存
 
-        同时写入L1和L2，确保数据一致性
+        同时写入L1和L2, 确保数据一致性
 
         特性:
         - 支持TTL抖动（防止缓存雪崩）
@@ -271,19 +302,20 @@ class HierarchicalCache:
         Args:
             pattern: 缓存模式 (如 'events.list')
             data: 要缓存的数据
-            ttl: TTL时间（秒），None则使用默认l2_ttl
+            ttl: TTL时间（秒）, None则使用默认l2_ttl
             **kwargs: 参数键值对
         """
-        from backend.core.config.config import CacheConfig
         import random
+
+        from backend.core.config.config import CacheConfig
 
         key = CacheKeyBuilder.build(pattern, **kwargs)
 
-        # 应用TTL抖动（防止缓存雪崩）
+        # 应用TTL抖动(防止缓存雪崩)
         if ttl is None:
             ttl = self.l2_ttl
 
-        # 添加随机抖动（±10%）
+        # 添加随机抖动(±10%)
         jitter_pct = CacheConfig.CACHE_JITTER_PCT
         jitter = int(ttl * jitter_pct)
         if jitter > 0:
@@ -315,13 +347,13 @@ class HierarchicalCache:
         """
         写入L1缓存（带LRU淘汰）
 
-        当L1缓存满时，删除最旧的条目
+        当L1缓存满时, 删除最旧的条目
 
         Args:
             key: 缓存键
             data: 缓存数据
         """
-        # 如果L1已满，删除最旧的条目
+        # 如果L1已满, 删除最旧的条目
         if len(self.l1_cache) >= self.l1_size:
             oldest_key = min(self.l1_timestamps, key=self.l1_timestamps.get)
             del self.l1_cache[oldest_key]
@@ -409,7 +441,7 @@ class HierarchicalCache:
             >>> key = 'dwd_gen:v3:test.key:event_id:0:game_id:1'
             >>> pattern = 'dwd_gen:v3:test.key:game_id:*'
             >>> _match_pattern(key, pattern)
-            True  # game_id=1匹配，忽略event_id参数
+            True  # game_id=1匹配, 忽略event_id参数
         """
         # Remove common prefix
         prefix = CacheKeyBuilder.PREFIX
@@ -486,7 +518,7 @@ class HierarchicalCache:
                 "l1_sets": self.stats["l1_sets"],
                 "l2_sets": self.stats["l2_sets"],
                 "total_requests": total_requests,
-                # 新增：空值缓存统计
+                # 新增: 空值缓存统计
                 "empty_hits": self.stats.get("empty_hits", 0),
             }
 
@@ -516,7 +548,7 @@ class HierarchicalCache:
                 logger.warning(f"⚠️ L2缓存清空失败: {e}")
 
     def clear_all(self):
-        """清空所有缓存（L1和L2）"""
+        """清空所有缓存(L1和L2)"""
         self.clear_l1()
         self.clear_l2()
 
@@ -561,9 +593,9 @@ class CacheInvalidator:
     智能缓存失效管理器
 
     功能:
-    - 精确失效：删除特定缓存键
-    - 模式失效：使用通配符删除匹配的键
-    - 批量失效：使用Redis Pipeline优化批量删除
+    - 精确失效: 删除特定缓存键
+    - 模式失效: 使用通配符删除匹配的键
+    - 批量失效: 使用Redis Pipeline优化批量删除
     """
 
     def __init__(self, cache: HierarchicalCache) -> None:
@@ -748,7 +780,7 @@ logger.info("✅ 统一缓存系统已加载 (3.0.0)")
 
 
 # ============================================================================
-# 兼容性函数（用于平滑迁移）
+# 兼容性函数(用于平滑迁移)
 # ============================================================================
 
 
@@ -756,8 +788,8 @@ def cache_result(cache_key_pattern, timeout=None):
     """
     缓存装饰器（兼容性包装器）
 
-    这是一个兼容性函数，包装 @cached 装饰器以保持向后兼容。
-    新代码应该直接使用 @cached 装饰器。
+    这是一个兼容性函数, 包装 @cached 装饰器以保持向后兼容. 
+    新代码应该直接使用 @cached 装饰器. 
 
     Usage:
         @cache_result('games:all', timeout=3600)
@@ -782,8 +814,8 @@ def clear_game_cache(game_id=None):
     """
     清除游戏相关缓存（兼容性包装器）
 
-    这是一个兼容性函数，使用 CacheInvalidator 来清除缓存。
-    新代码应该直接使用 cache_invalidator。
+    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存. 
+    新代码应该直接使用 cache_invalidator. 
 
     Args:
         game_id: 游戏ID（None表示清除所有游戏缓存）
@@ -807,7 +839,7 @@ def clear_event_cache(event_id):
     """
     清除事件相关缓存（兼容性包装器）
 
-    这是一个兼容性函数，使用 CacheInvalidator 来清除缓存。
+    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存. 
 
     Args:
         event_id: 事件ID
@@ -820,7 +852,7 @@ def clear_cache_pattern(pattern):
     """
     清除匹配模式的所有缓存（兼容性包装器）
 
-    这是一个兼容性函数，使用 CacheInvalidator 来清除缓存。
+    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存. 
 
     Args:
         pattern: 缓存键模式（支持通配符）
@@ -878,6 +910,7 @@ def get_redis_client():
     # 尝试直接导入redis
     try:
         import redis
+
         from backend.core.config.config import CacheConfig
 
         return redis.Redis(
@@ -894,8 +927,8 @@ def parse_json_cached(json_str):
     """
     解析JSON字符串（带缓存）
 
-    这是一个兼容性函数，用于解析JSON字符串。
-    由于v3.0不再需要JSON解析缓存，此函数直接返回解析结果。
+    这是一个兼容性函数, 用于解析JSON字符串. 
+    由于v3.0不再需要JSON解析缓存, 此函数直接返回解析结果. 
 
     Args:
         json_str: JSON字符串

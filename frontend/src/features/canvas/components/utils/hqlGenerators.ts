@@ -3,11 +3,13 @@
  * 复用原node-executor.js的HQL生成逻辑
  */
 
+import type { GameData } from '../types';
+
 // ============================================
 // Type Definitions
 // ============================================
 
-export interface GameData {
+export interface HQLGeneratorGameData {
   ods_db: string;
   gid: string | number;
   name?: string;
@@ -77,7 +79,7 @@ export class HQLGenerators {
    * @param gameData - 游戏数据
    * @returns HQL语句
    */
-  static generateEventHQL(eventConfig: EventConfig, gameData: GameData): string {
+  static generateEventHQL(eventConfig: EventConfig, gameData: HQLGeneratorGameData): string {
     if (!gameData || !gameData.ods_db || !gameData.gid) {
       throw new Error(
         "Invalid gameData: missing required fields (ods_db, gid)"

@@ -26,8 +26,8 @@ import './HQLPreview.css';
  * <HQLPreview
  *   hqlContent="-- Generated HQL"
  *   sqlMode="view"
- *   onModeChange={(mode) => console.log(mode)}
- *   onContentChange={(content) => console.log(content)}
+ *   onModeChange={(mode) => }
+ *   onContentChange={(content) => }
  *   fields={fields}
  *   isLoading={false}
  * />
@@ -39,8 +39,8 @@ import './HQLPreview.css';
 /** SQL模式类型 */
 export type SQLMode = 'view' | 'procedure' | 'custom';
 
-/** 字段类型 */
-export interface Field {
+/** HQL预览组件专用的字段类型 */
+export interface HQLPreviewField {
   id?: number;
   fieldName?: string;
   name?: string;
@@ -67,7 +67,7 @@ export interface HQLPreviewProps {
   /** 是否只读 */
   readOnly?: boolean;
   /** 字段数组 */
-  fields?: Field[];
+  fields?: HQLPreviewField[];
   /** 是否加载中 */
   isLoading?: boolean;
   /** 显示详情回调 */
@@ -96,7 +96,7 @@ const HQLPreview = forwardRef<HQLPreviewRef, HQLPreviewProps>(({
   onShowDetails
 }, ref) => {
   // 确保 fields 是一个数组
-  const safeFields: Field[] = Array.isArray(fields) ? fields : [];
+  const safeFields: HQLPreviewField[] = Array.isArray(fields) ? fields : [];
 
   // 状态管理
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -152,8 +152,7 @@ const HQLPreview = forwardRef<HQLPreviewRef, HQLPreviewProps>(({
       if (window.toast) {
         window.toast.success('已复制到剪贴板');
       } else {
-        console.log('[HQLPreview] 已复制到剪贴板');
-      }
+              }
     } catch (error) {
       console.error('[HQLPreview] 复制失败:', error);
       if (window.toast) {
@@ -179,8 +178,7 @@ const HQLPreview = forwardRef<HQLPreviewRef, HQLPreviewProps>(({
     if (window.toast) {
       window.toast.success(`已下载: ${filename}`);
     } else {
-      console.log('[HQLPreview] 已下载:', filename);
-    }
+          }
   }, [sqlMode]);
 
   // 模式切换
@@ -207,8 +205,7 @@ const HQLPreview = forwardRef<HQLPreviewRef, HQLPreviewProps>(({
       if (window.toast) {
         window.toast.success('SQL格式化成功');
       } else {
-        console.log('[HQLPreview] SQL格式化成功');
-      }
+              }
     } catch (error) {
       console.error('[HQLPreview] SQL格式化失败:', error);
       if (window.toast) {

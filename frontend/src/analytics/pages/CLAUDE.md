@@ -23,4 +23,11 @@
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
 | #6358 | 12:33 AM | 🔵 | EventsList component structure analyzed | ~298 |
+
+### Mar 7, 2026
+
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #6421 | 3:45 PM | 🔵 | REST Dashboard uses 5-second staleTime causing frequent refetches on navigation | ~273 |
+| #6420 | 3:44 PM | 🔵 | DashboardGraphQL fetches 100 games and 100 flows on every page load | ~247 |
 </claude-mem-context>

@@ -4,10 +4,12 @@ Category Queries
 Implements GraphQL query resolvers for Category entity.
 """
 
-import graphene
-from graphene import Field, List, Int, String
-from typing import List as TypingList, Dict, Any
 import logging
+from typing import Any, Dict
+from typing import List as TypingList
+
+import graphene
+from graphene import Field, Int, List, String
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +24,8 @@ class CategoryQueries:
             from backend.core.utils import fetch_one_as_dict
             from backend.gql_api.types.category_type import CategoryType
 
-            category = fetch_one_as_dict("""
+            category = fetch_one_as_dict(
+                """
                 SELECT
                     ec.id,
                     ec.name,
@@ -33,7 +36,9 @@ class CategoryQueries:
                 LEFT JOIN log_events le ON le.category_id = ec.id
                 WHERE ec.id = ?
                 GROUP BY ec.id, ec.name, ec.created_at, ec.updated_at
-            """, (id,))
+            """,
+                (id,),
+            )
 
             if category:
                 return CategoryType.from_dict(category)
@@ -50,7 +55,8 @@ class CategoryQueries:
             from backend.core.utils import fetch_all_as_dict
             from backend.gql_api.types.category_type import CategoryType
 
-            categories = fetch_all_as_dict("""
+            categories = fetch_all_as_dict(
+                """
                 SELECT
                     ec.id,
                     ec.name,
@@ -62,7 +68,9 @@ class CategoryQueries:
                 GROUP BY ec.id, ec.name, ec.created_at, ec.updated_at
                 ORDER BY ec.id
                 LIMIT ? OFFSET ?
-            """, (limit, offset))
+            """,
+                (limit, offset),
+            )
 
             return [CategoryType.from_dict(cat) for cat in categories]
 
@@ -93,7 +101,7 @@ class CategoryQueries:
                 ORDER BY ec.id
                 LIMIT 20
                 """,
-                (search_pattern,)
+                (search_pattern,),
             )
 
             return [CategoryType.from_dict(cat) for cat in categories]

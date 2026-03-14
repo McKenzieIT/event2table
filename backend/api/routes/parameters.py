@@ -39,19 +39,15 @@ from typing import Optional
 
 from flask import request, session
 
-# Import shared utilities
-from backend.core.utils import (
-    json_error_response,
-    json_success_response,
-    validate_json_request,
-)
-
 # Import cache system
 from backend.core.cache.cache_system import HierarchicalCache
 
+# Import shared utilities
+from backend.core.utils import json_error_response, json_success_response, validate_json_request
+from backend.services.games.game_service import GameService
+
 # Import Service layer
 from backend.services.parameters.parameter_service import ParameterService
-from backend.services.games.game_service import GameService
 
 # Cache TTL constants
 PARAMETERS_ALL_CACHE_TTL = 300  # 5 minutes
@@ -61,8 +57,8 @@ hierarchical_cache = HierarchicalCache()
 
 # Import parameter route helpers (code complexity reduction)
 from backend.api.routes._param_helpers import (
-    resolve_game_context,
     get_where_clause_for_game,
+    resolve_game_context,
     validate_parameter_name,
 )
 
@@ -84,7 +80,7 @@ def _get_game_id_from_gid(game_gid: int) -> Optional[int]:
 def _get_game_gid_from_id(game_id: int) -> Optional[int]:
     """Cached game_id to game_gid conversion using GameService"""
     game_service = GameService()
-    game = game_service.get_by_id(game_id)
+    game = game_service.get_game_by_database_id(game_id)
     return game.gid if game else None
 
 
@@ -122,7 +118,7 @@ def api_get_all_parameters():
             search=search or None,
             type_filter=type_filter or None,
             page=page,
-            page_size=limit
+            page_size=limit,
         )
 
         return json_success_response(
@@ -175,9 +171,7 @@ def api_get_parameter_details(param_name):
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
     except Exception as e:
-        logger.error(
-            f"Error fetching parameter details for {param_name}: {e}", exc_info=True
-        )
+        logger.error(f"Error fetching parameter details for {param_name}: {e}", exc_info=True)
         return json_error_response("Failed to fetch parameter details", status_code=500)
 
 
@@ -214,9 +208,7 @@ def api_get_parameter_stats():
         return json_error_response(str(e), status_code=400)
     except Exception as e:
         logger.error(f"Error fetching parameter stats: {e}", exc_info=True)
-        return json_error_response(
-            "Failed to fetch parameter statistics", status_code=500
-        )
+        return json_error_response("Failed to fetch parameter statistics", status_code=500)
 
 
 @api_bp.route("/api/parameters/<int:id>", methods=["PUT"])
@@ -249,8 +241,7 @@ def api_update_parameter(id):
 
         logger.info(f"Parameter updated via service: {id} -> {data['param_name']}")
         return json_success_response(
-            data=updated_param.model_dump(),
-            message="Parameter updated successfully"
+            data=updated_param.model_dump(), message="Parameter updated successfully"
         )
 
     except ValueError as e:
@@ -318,7 +309,7 @@ def api_get_common_parameters():
 
         # Use ParameterService
         service = ParameterService()
-        common_params = service.get_common_params(game_gid)
+        common_params = service.get_common_parameters_by_game(game_gid)
 
         return json_success_response(data=common_params)
 
@@ -362,9 +353,7 @@ def api_validate_parameter():
 
         # Use ParameterService to check if parameter exists
         if not game_gid:
-            return json_success_response(
-                data={"valid": True, "exists": False}
-            )
+            return json_success_response(data={"valid": True, "exists": False})
 
         service = ParameterService()
         result = service.validate_parameter_name(param_name, game_gid)
@@ -416,9 +405,7 @@ def api_check_param_library():
 
         exists = library_param is not None
 
-        return json_success_response(
-            data={"exists": exists, "library_param": library_param}
-        )
+        return json_success_response(data={"exists": exists, "library_param": library_param})
 
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
@@ -440,9 +427,7 @@ def api_link_event_param_to_library(param_id):
         service = ParameterService()
         result = service.link_event_param_to_library(param_id, library_id)
 
-        return json_success_response(
-            data=result, message="参数已关联到库"
-        )
+        return json_success_response(data=result, message="参数已关联到库")
 
     except ValueError as e:
         return json_error_response(str(e), status_code=404)

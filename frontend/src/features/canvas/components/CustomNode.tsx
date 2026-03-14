@@ -68,10 +68,10 @@ export default function CustomNode({ data, selected }: CustomNodeProps): React.J
                   return (
                     <div key={idx} className="node-field-item">
                       <span className="field-name">
-                        {typedField.alias || typedField.field_name}
+                        {typedField.alias || typedField.name}
                       </span>
                       <span className="field-type">
-                        {typedField.field_type === "param" ? "参数" : "基础"}
+                        {typedField.type === "param" ? "参数" : "基础"}
                       </span>
                     </div>
                   );

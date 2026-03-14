@@ -13,7 +13,7 @@
 缓存预热服务
 ============
 
-在应用启动时预热常用数据，消除冷启动延迟
+在应用启动时预热常用数据, 消除冷启动延迟
 
 功能:
 - 预热热门游戏
@@ -26,7 +26,8 @@
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
+
 from backend.core.cache.cache_system import get_cache
 from backend.core.utils.converters import fetch_all_as_dict
 
@@ -38,12 +39,7 @@ class CacheWarmer:
 
     def __init__(self, cache=None):
         self.cache = cache if cache is not None else get_cache()
-        self.stats = {
-            "games_warmed": 0,
-            "events_warmed": 0,
-            "params_warmed": 0,
-            "total_keys": 0
-        }
+        self.stats = {"games_warmed": 0, "events_warmed": 0, "params_warmed": 0, "total_keys": 0}
 
     def warmup_popular_games(self, limit: int = 100) -> int:
         """
@@ -58,8 +54,7 @@ class CacheWarmer:
         logger.info(f"🔥 Warming up top {limit} popular games...")
 
         games = fetch_all_as_dict(
-            'SELECT id, gid, name, ods_db FROM games ORDER BY gid LIMIT ?',
-            (limit,)
+            'SELECT id, gid, name, ods_db FROM games ORDER BY gid LIMIT ?', (limit,)
         )
 
         for game in games:
@@ -84,7 +79,7 @@ class CacheWarmer:
 
         events = fetch_all_as_dict(
             'SELECT id, event_name, game_gid, created_at FROM log_events ORDER BY created_at DESC LIMIT ?',
-            (limit,)
+            (limit,),
         )
 
         for event in events:
@@ -100,7 +95,7 @@ class CacheWarmer:
         预热常用参数
 
         Args:
-            game_gid: 可选的游戏GID，不指定则预热所有游戏的参数
+            game_gid: 可选的游戏GID, 不指定则预热所有游戏的参数
 
         Returns:
             预热的参数数量
@@ -113,7 +108,7 @@ class CacheWarmer:
                    INNER JOIN log_events le ON ep.event_id = le.id
                    WHERE le.game_gid = ? AND ep.is_common = 1
                    LIMIT 50''',
-                (game_gid,)
+                (game_gid,),
             )
         else:
             params = fetch_all_as_dict(
@@ -153,6 +148,7 @@ class CacheWarmer:
         # 获取总缓存键数
         try:
             import redis
+
             redis_client = redis.Redis(host='127.0.0.1', port=6379, db=0)
             self.stats["total_keys"] = redis_client.dbsize()
         except Exception as e:

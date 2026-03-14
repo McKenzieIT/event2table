@@ -12,13 +12,14 @@ This service provides business logic for parameter management:
 - Integrates cache protection and invalidation mechanisms
 """
 
-from typing import List, Optional, Dict, Any, Union
 import logging
 import sqlite3
-from backend.models.entities import ParameterEntity, CommonParameterEntity
-from backend.models.repositories.parameters import ParameterRepository
+from typing import Any, Dict, List, Optional, Union
+
 from backend.core.cache.cache_system import CacheInvalidator, cached
 from backend.core.config.config import CacheConfig
+from backend.models.entities import CommonParameterEntity, ParameterEntity
+from backend.models.repositories.parameters import ParameterRepository
 
 logger = logging.getLogger(__name__)
 
@@ -40,23 +41,54 @@ class ParameterService:
         self.cache: HierarchicalCache = HierarchicalCache()
         self.invalidator: CacheInvalidator = CacheInvalidator(self.cache)
 
-    @cached("parameters.list", timeout=CacheConfig.CACHE_TIMEOUT_PARAMS)
-    def get_all_parameters(self) -> List[ParameterEntity]:
-        """Get all parameters with caching.
+    # ❌ DISABLED: Caches 17.5MB object (36,719 rows × 500 bytes)
+    # Use get_parameters_paginated() instead for memory efficiency
+    # def get_all_parameters(self) -> List[ParameterEntity]:
+    #     """Get all parameters with caching.
+    #
+    #     Returns:
+    #         List of all ParameterEntity objects.
+    #
+    #     Raises:
+    #         DatabaseError: If database query fails.
+    #
+    #     Example:
+    #         >>> service = ParameterService()
+    #         >>> params = service.get_all_parameters()
+    #         >>> print(f"Total parameters: {len(params)}")
+    #     """
+    #     # ParameterRepository现在直接返回ParameterEntity
+    #     return self.param_repo.find_all()
+
+    def get_all_parameters_uncached(
+        self, limit: int = 1000, offset: int = 0
+    ) -> List[ParameterEntity]:
+        """Get parameters without caching (for bulk operations).
+
+        ⚠️ WARNING: This method does NOT cache results to avoid memory issues.
+        Use get_parameters_paginated() for regular queries.
+
+        Args:
+            limit: Maximum number of parameters to return (default: 1000)
+            offset: Number of parameters to skip (default: 0)
 
         Returns:
-            List of all ParameterEntity objects.
+            List of ParameterEntity objects.
 
         Raises:
-            DatabaseError: If database query fails.
+            ValueError: If limit > 10000 (prevents memory issues).
 
         Example:
             >>> service = ParameterService()
-            >>> params = service.get_all_parameters()
-            >>> print(f"Total parameters: {len(params)}")
+            >>> # Get first 1000 parameters
+            >>> params = service.get_all_parameters_uncached(limit=1000)
+            >>> print(f"Retrieved: {len(params)}")
         """
-        # ParameterRepository现在直接返回ParameterEntity
-        return self.param_repo.find_all()
+        if limit > 10000:
+            raise ValueError("limit cannot exceed 10000 to prevent memory issues")
+
+        # Use Repository method with LIMIT/OFFSET
+        return self.param_repo.find_with_limit(limit, offset)
 
     @cached("parameters.paginated", timeout=CacheConfig.CACHE_TIMEOUT_PARAMS)
     def get_parameters_paginated(
@@ -65,7 +97,7 @@ class ParameterService:
         search: Optional[str] = None,
         type_filter: Optional[str] = None,
         page: int = 1,
-        page_size: int = 50
+        page_size: int = 50,
     ) -> Dict[str, Any]:
         """
         获取分页参数列表 (带缓存)
@@ -90,6 +122,7 @@ class ParameterService:
         # Validate game_gid if provided
         if game_gid:
             from backend.services.games.game_service import GameService
+
             game_service = GameService()
             game = game_service.get_game_by_gid(game_gid)
             if not game:
@@ -101,7 +134,7 @@ class ParameterService:
             search=search if search else "",
             type_filter=type_filter if type_filter else "",
             page=page,
-            limit=page_size
+            limit=page_size,
         )
 
     @cached("parameters.by_event", timeout=180)
@@ -153,59 +186,83 @@ class ParameterService:
         return self.param_repo.find_by_id(param_id)
 
     @cached("parameters.by_game", timeout=180)
-    def get_parameters_by_game(self, game_gid: int) -> List[ParameterEntity]:
+    def get_parameters_by_game(
+        self, game_gid: int, limit: int = 1000, offset: int = 0
+    ) -> List[ParameterEntity]:
         """
-        根据游戏GID获取所有参数 (带缓存)
+        根据游戏GID获取参数列表 (带缓存 + 分页)
+
+        ⚡ PERFORMANCE: Added pagination to prevent caching >1MB objects.
 
         Args:
             game_gid: 游戏业务GID
+            limit: 最大返回数量 (默认1000, 最大10000)
+            offset: 跳过数量 (默认0)
 
         Returns:
             参数Entity列表
 
         Raises:
-            ValueError: game_gid无效
+            ValueError: game_gid无效或limit超过10000
+
+        Example:
+            >>> service = ParameterService()
+            >>> # Get first 1000 parameters
+            >>> params = service.get_parameters_by_game(10000147, limit=1000)
+            >>> # Get next 1000 parameters
+            >>> params_next = service.get_parameters_by_game(10000147, limit=1000, offset=1000)
         """
         from backend.core.utils.business_helpers import validate_game_gid
+
         validate_game_gid(game_gid)
 
-        # Use Repository method
-        return self.param_repo.get_parameters_by_game(game_gid)
+        if limit > 10000:
+            raise ValueError("limit cannot exceed 10000 to prevent memory issues")
+
+        # Use Repository method with pagination
+        return self.param_repo.get_parameters_by_game_paginated(
+            game_gid, limit=limit, offset=offset
+        )
 
     @cached("parameters.common", timeout=360)
     def get_common_parameters(
-        self, game_gid: Optional[int] = None, threshold: float = 0.8
+        self, game_gid: Optional[int] = None, threshold: float = 0.8, limit: int = 500
     ) -> List[CommonParameterEntity]:
         """
-        获取公共参数列表 (带缓存)
+        获取公共参数列表 (带缓存 + 数量限制)
+
+        ⚡ PERFORMANCE: Added limit to prevent caching >1MB objects.
 
         Args:
             game_gid: 可选的游戏GID过滤
             threshold: 公共参数阈值 (默认0.8)
+            limit: 最大返回数量 (默认500, 最大1000)
 
         Returns:
             公共参数Entity列表
+
+        Raises:
+            ValueError: limit超过1000
         """
+        if limit > 1000:
+            raise ValueError("limit cannot exceed 1000 to prevent memory issues")
+
         # 使用Repository的get_common_parameters方法
-        # 注意：get_common_parameters返回字典列表（因为包含统计信息）
-        common_params = self.param_repo.get_common_parameters(game_gid)
+        # 注意: get_common_parameters返回字典列表(因为包含统计信息)
+        common_params = self.param_repo.get_common_parameters(game_gid, limit=limit)
 
         # Filter by threshold if specified
         if threshold < 1.0:
             total_events = self._get_total_event_count(game_gid)
             common_params = [
-                p
-                for p in common_params
-                if p.get("usage_count", 0) / total_events >= threshold
+                p for p in common_params if p.get("usage_count", 0) / total_events >= threshold
             ]
 
         # Convert to CommonParameterEntity
         return [CommonParameterEntity(**p) for p in common_params]
 
     def create_parameter(
-        self,
-        param_data: Union[Dict[str, Any], ParameterEntity],
-        **kwargs
+        self, param_data: Union[Dict[str, Any], ParameterEntity], **kwargs
     ) -> ParameterEntity:
         """Create a new parameter with automatic cache invalidation.
 
@@ -284,9 +341,7 @@ class ParameterService:
 
         return result
 
-    def update_parameter(
-        self, param_id: int, updates: Dict[str, Any]
-    ) -> ParameterEntity:
+    def update_parameter(self, param_id: int, updates: Dict[str, Any]) -> ParameterEntity:
         """
         更新参数 (自动失效缓存)
 
@@ -321,17 +376,13 @@ class ParameterService:
 
         if "json_path" in updates and updates["json_path"]:
             if not updates["json_path"].startswith("$."):
-                raise ValueError(
-                    f"JSON path must start with '$.', got: {updates['json_path']}"
-                )
+                raise ValueError(f"JSON path must start with '$.', got: {updates['json_path']}")
 
         # 更新参数
         self.param_repo.update(param_id, updates)
 
         # 失效缓存
-        self._invalidate_parameter_cache(
-            existing.event_id, existing.game_gid
-        )
+        self._invalidate_parameter_cache(existing.event_id, existing.game_gid)
         logger.info(f"参数更新成功,已失效缓存: param_id={param_id}")
 
         return self.get_parameter_by_id(param_id)
@@ -437,9 +488,7 @@ class ParameterService:
 
     # ========== 新增方法: 参数类型管理 ==========
 
-    def change_parameter_type(
-        self, param_id: int, new_type: str
-    ) -> ParameterEntity:
+    def change_parameter_type(self, param_id: int, new_type: str) -> ParameterEntity:
         """
         更改参数类型 (自动失效缓存)
 
@@ -461,9 +510,7 @@ class ParameterService:
         # 验证类型
         valid_types = ["base", "param", "common", "calculate"]
         if new_type not in valid_types:
-            raise ValueError(
-                f"Invalid param_type: {new_type}. Must be one of {valid_types}"
-            )
+            raise ValueError(f"Invalid param_type: {new_type}. Must be one of {valid_types}")
 
         # 更新类型
         updated = self.update_parameter(param_id, {"param_type": new_type})
@@ -475,10 +522,7 @@ class ParameterService:
 
     @cached("parameters.search", timeout=120)
     def search_by_name(
-        self,
-        keyword: str,
-        event_id: Optional[int] = None,
-        game_gid: Optional[int] = None
+        self, keyword: str, event_id: Optional[int] = None, game_gid: Optional[int] = None
     ) -> List[ParameterEntity]:
         """
         根据参数名搜索参数 (带缓存)
@@ -508,10 +552,7 @@ class ParameterService:
 
     @cached("parameters.by_type", timeout=180)
     def find_by_type(
-        self,
-        param_type: str,
-        game_gid: Optional[int] = None,
-        event_id: Optional[int] = None
+        self, param_type: str, game_gid: Optional[int] = None, event_id: Optional[int] = None
     ) -> List[ParameterEntity]:
         """
         根据参数类型查找参数 (带缓存)
@@ -544,9 +585,7 @@ class ParameterService:
 
     @cached("parameters.by_template", timeout=180)
     def find_by_template(
-        self,
-        template_id: int,
-        event_id: Optional[int] = None
+        self, template_id: int, event_id: Optional[int] = None
     ) -> List[ParameterEntity]:
         """
         根据模板ID查找参数 (带缓存)
@@ -590,6 +629,7 @@ class ParameterService:
             ValueError: game_gid无效
         """
         from backend.core.utils.business_helpers import validate_game_gid
+
         validate_game_gid(game_gid)
 
         # Use Repository method
@@ -615,14 +655,17 @@ class ParameterService:
         # Use Repository method
         return self.param_repo.count_by_event(event_id)
 
-    @cached("parameters.usage_stats", timeout=360)
+    @cached("parameters.usage_stats", timeout=180)  # ⚡ TTL优化: 360秒→180秒 (3分钟)
     def usage_stats(
-        self,
-        game_gid: Optional[int] = None,
-        param_name: Optional[str] = None
+        self, game_gid: Optional[int] = None, param_name: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         获取参数使用统计 (带缓存)
+
+        ⚡ TTL设置理由: 参数使用统计数据变化频率中等
+        - 参数创建/更新/删除会改变统计
+        - 3分钟TTL平衡了实时性和性能
+        - 缓存失效会在参数变更时自动清理
 
         Args:
             game_gid: 可选的游戏GID过滤
@@ -655,7 +698,7 @@ class ParameterService:
     # ========== Common Params Service Methods ==========
 
     @cached("params.commonByGame", timeout=180)
-    def get_common_params(self, game_gid: int) -> List[Dict[str, Any]]:
+    def get_common_parameters_by_game(self, game_gid: int) -> List[Dict[str, Any]]:
         """
         获取指定游戏的公共参数列表 (带缓存)
 
@@ -672,7 +715,9 @@ class ParameterService:
             raise ValueError(f"Invalid game_gid: {game_gid}")
 
         # Validate game exists using Repository
-        game = self.game_repo.find_by_gid(game_gid)  # ✅ Fixed: use GameRepository not ParameterRepository
+        game = self.game_repo.find_by_gid(
+            game_gid
+        )  # ✅ Fixed: use GameRepository not ParameterRepository
         if not game:
             raise ValueError(f"Game not found: {game_gid}")
 
@@ -726,7 +771,7 @@ class ParameterService:
                 "threshold": 0,
                 "added": 0,
                 "analyzed": 0,
-                "message": "No events found for this game"
+                "message": "No events found for this game",
             }
 
         total_events = len(events)
@@ -773,14 +818,16 @@ class ParameterService:
         added_count = 0
         for param in common_params_to_add:
             try:
-                self.param_repo.create_common_param({
-                    "game_id": game_id,
-                    "game_gid": game_gid,
-                    "param_name": param["param_name"],
-                    "param_name_cn": param["param_name_cn"],
-                    "param_type": "string",
-                    "table_name": "common"
-                })
+                self.param_repo.create_common_param(
+                    {
+                        "game_id": game_id,
+                        "game_gid": game_gid,
+                        "param_name": param["param_name"],
+                        "param_name_cn": param["param_name_cn"],
+                        "param_type": "string",
+                        "table_name": "common",
+                    }
+                )
                 added_count += 1
                 logger.info(
                     f"Added common param: {param['param_name']} (appeared in {param['count']} events)"
@@ -864,9 +911,7 @@ class ParameterService:
     # ========== API Layer Helper Methods ==========
 
     @cached("parameters.details", timeout=180)
-    def get_parameter_details(
-        self, param_name: str, game_gid: int
-    ) -> Optional[Dict[str, Any]]:
+    def get_parameter_details(self, param_name: str, game_gid: int) -> Optional[Dict[str, Any]]:
         """
         获取参数详细信息 (带缓存)
 
@@ -921,10 +966,7 @@ class ParameterService:
 
     @cached("parameters.search_full", timeout=120)
     def search_parameters(
-        self,
-        keyword: str,
-        game_gid: int,
-        data_type: Optional[str] = None
+        self, keyword: str, game_gid: int, data_type: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         搜索参数 (带缓存)
@@ -949,9 +991,7 @@ class ParameterService:
         # Use Repository method
         return self.param_repo.search_parameters_advanced(keyword, game_gid, data_type)
 
-    def validate_parameter_name(
-        self, param_name: str, game_gid: int
-    ) -> Dict[str, Any]:
+    def validate_parameter_name(self, param_name: str, game_gid: int) -> Dict[str, Any]:
         """
         验证参数名称
 
@@ -1004,9 +1044,7 @@ class ParameterService:
         # Use Repository method
         return self.param_repo.check_param_library(param_name, template_id)
 
-    def batch_check_param_library(
-        self, parameters: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    def batch_check_param_library(self, parameters: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         批量检查参数库
 
@@ -1027,9 +1065,7 @@ class ParameterService:
         # Use Repository method
         return self.param_repo.batch_check_param_library(parameters)
 
-    def link_event_param_to_library(
-        self, param_id: int, library_id: int
-    ) -> Dict[str, Any]:
+    def link_event_param_to_library(self, param_id: int, library_id: int) -> Dict[str, Any]:
         """
         关联事件参数到库参数
 

@@ -1,3 +1,7 @@
+// ⚡️ REACT PERF - Features: Optimized with React.memo
+// ✅ Performance optimization: Prevent unnecessary re-renders in add game form
+// See: docs/reports/2026-03-06/FEATURES-OPTIMIZATION-REPORT.md
+
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * AddGameModalGraphQL - 添加游戏模态框（GraphQL版本）
@@ -5,7 +9,7 @@
  * 使用GraphQL Mutation替代REST API
  */
 
-import React, { ChangeEvent, FormEvent, memo } from 'react';
+import React, { useRef, useEffect, ChangeEvent, FormEvent, memo } from 'react';
 import { BaseModal, Button, Input, Select, useToast } from '@shared/ui';
 import { useCreateGame } from '../../graphql/hooks';
 import { useFormValidation } from '@shared/hooks/useFormValidation';
@@ -25,6 +29,10 @@ interface FormData {
 
 const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClose }) => {
   const { success, error: showError } = useToast();
+
+  // Refs to input elements (for Chrome MCP compatibility)
+  const gidRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const {
     formData,
@@ -83,6 +91,29 @@ const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClo
     onClose();
   };
 
+  // Chrome MCP兼容性: 监听DOM值变化并同步到state
+  useEffect(() => {
+    if (!gidRef.current || !nameRef.current) {
+      return;
+    }
+
+    const gidDomValue = gidRef.current.value;
+    const nameDomValue = nameRef.current.value;
+
+    const updates: Partial<FormData> = {};
+
+    if (gidDomValue !== formData.gid) {
+      updates.gid = gidDomValue;
+    }
+    if (nameDomValue !== formData.name) {
+      updates.name = nameDomValue;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+  }, [formData.gid, formData.name, setFormData]);
+
   return (
     <BaseModal isOpen={isOpen} onClose={handleClose} title="添加游戏" size="md">
       <form onSubmit={handleSubmit} className="add-game-form">
@@ -96,6 +127,7 @@ const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClo
             placeholder="请输入游戏GID（数字）"
             error={touched.gid && errors.gid}
             onBlur={() => handleBlur('gid')}
+            ref={gidRef}
           />
           {touched.gid && errors.gid && <span className="error-message">{errors.gid}</span>}
 
@@ -110,6 +142,7 @@ const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClo
             onBlur={() => handleBlur('name')}
             placeholder="请输入游戏名称"
             error={touched.name && errors.name}
+            ref={nameRef}
           />
           {touched.name && errors.name && <span className="error-message">{errors.name}</span>}
         </div>

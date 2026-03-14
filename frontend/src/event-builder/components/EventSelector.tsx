@@ -14,15 +14,7 @@ import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEvents } from '@shared/api/events';
 import { SearchInput, Skeleton, ErrorState } from '@shared/ui';
-
-/**
- * 事件接口
- */
-export interface Event {
-  id: number;
-  event_name: string;
-  event_name_cn?: string;
-}
+import type { Event } from '@shared/types/event-types';
 
 /**
  * 组件Props接口
@@ -39,6 +31,8 @@ export interface EventSelectorProps {
 export default function EventSelector({ gameGid, onSelect, selectedEvent }: EventSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
+  console.log('[EventSelector] Component render - searchQuery:', searchQuery, 'gameGid:', gameGid);
+
   // 使用普通useQuery而非useInfiniteQuery，因为API返回扁平结构
   const {
     data,
@@ -52,36 +46,66 @@ export default function EventSelector({ gameGid, onSelect, selectedEvent }: Even
     enabled: !!gameGid,
   });
 
+  console.log('[EventSelector] React Query state:', {
+    isLoading,
+    isError,
+    hasData: !!data,
+    searchQuery,
+    queryKey: ['events', gameGid, searchQuery]
+  });
+
+  if (data) {
+    console.log('[EventSelector] React Query data received:', {
+      success: data.success,
+      hasData: !!data.data,
+      eventsCount: data.data?.events?.length || 0,
+      firstEvent: data.data?.events?.[0]?.event_name
+    });
+  }
+
   // 显式验证：从data中提取events
-  // fetchEvents返回的是事件数组，不是完整API响应
+  // fetchEvents返回的是完整API响应: { success: true, data: { events: [...], pagination: {...} } }
   const events = useMemo(() => {
+    console.log('[EventSelector] useMemo called - data:', !!data);
+
     if (!data) {
+      console.log('[EventSelector] useMemo: No data, returning []');
       return [];
     }
 
-    // fetchEvents函数直接返回事件数组: [{ id, event_name, event_name_cn }, ...]
-    if (Array.isArray(data)) {
-      return data as Event[];
+    // ✅ 主要格式：fetchEvents返回的完整API响应
+    // { success: true, data: { events: [...], pagination: {...} } }
+    if (data.success && data.data && Array.isArray(data.data.events)) {
+      const events = data.data.events as Event[];
+      console.log('[EventSelector] useMemo: Matched primary format, returning', events.length, 'events');
+      console.log('[EventSelector] useMemo: First 3 events:', events.slice(0, 3).map(e => e.event_name));
+      return events;
     }
 
     // 兼容：data是完整API响应 { data: { events: [...] } }
     if (data.data && Array.isArray(data.data.events)) {
-      return data.data.events as Event[];
+      const events = data.data.events as Event[];
+      console.log('[EventSelector] useMemo: Matched secondary format, returning', events.length, 'events');
+      return events;
     }
 
-    // 兼容：带success的格式 { success: true, data: { events: [...] } }
-    if (data.success && data.data && Array.isArray(data.data.events)) {
-      return data.data.events as Event[];
+    // 兼容：fetchEvents直接返回事件数组
+    if (Array.isArray(data)) {
+      console.log('[EventSelector] useMemo: Matched array format, returning', data.length, 'events');
+      return data as Event[];
     }
 
     // 兼容：data.events 直接是数组
     if (Array.isArray(data.events)) {
+      console.log('[EventSelector] useMemo: Matched data.events format, returning', data.events.length, 'events');
       return data.events as Event[];
     }
 
-    console.warn('[EventSelector] Unexpected data structure:', data);
+    console.warn('[EventSelector] useMemo: Unexpected data structure:', data);
     return [];
   }, [data]);
+
+  console.log('[EventSelector] Final events array length:', events.length);
 
   return (
     <div className="sidebar-section glass-card-dark">

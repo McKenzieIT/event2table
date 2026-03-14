@@ -4,12 +4,12 @@ DDL Generator Example Usage
 演示如何使用DDL生成器生成Hive DDL语句
 """
 
-from backend.services.hql.models.event import Field
 from backend.services.hql.core.ddl_generator import DDLGenerator
+from backend.services.hql.models.event import Field
 
 
 def example_create_table():
-    """示例：生成CREATE TABLE语句"""
+    """示例: 生成CREATE TABLE语句"""
     print("=" * 60)
     print("Example 1: CREATE TABLE for Login Event")
     print("=" * 60)
@@ -41,7 +41,7 @@ def example_create_table():
 
 
 def example_alter_table_add_columns():
-    """示例：生成ADD COLUMNS语句"""
+    """示例: 生成ADD COLUMNS语句"""
     print("=" * 60)
     print("Example 2: ALTER TABLE ADD COLUMNS")
     print("=" * 60)
@@ -65,7 +65,7 @@ def example_alter_table_add_columns():
 
 
 def example_alter_table_replace_columns():
-    """示例：生成REPLACE COLUMNS语句"""
+    """示例: 生成REPLACE COLUMNS语句"""
     print("=" * 60)
     print("Example 3: ALTER TABLE REPLACE COLUMNS")
     print("=" * 60)
@@ -93,7 +93,7 @@ def example_alter_table_replace_columns():
 
 
 def example_custom_field_types():
-    """示例：自定义字段类型映射"""
+    """示例: 自定义字段类型映射"""
     print("=" * 60)
     print("Example 4: Custom Field Type Mapping")
     print("=" * 60)
@@ -121,7 +121,7 @@ def example_custom_field_types():
 
 
 def example_external_table():
-    """示例：生成外部表DDL"""
+    """示例: 生成外部表DDL"""
     print("=" * 60)
     print("Example 5: CREATE EXTERNAL TABLE")
     print("=" * 60)
@@ -149,7 +149,7 @@ def example_external_table():
 
 
 def example_field_type_inference():
-    """示例：字段类型推断演示"""
+    """示例: 字段类型推断演示"""
     print("=" * 60)
     print("Example 6: Field Type Inference Demo")
     print("=" * 60)

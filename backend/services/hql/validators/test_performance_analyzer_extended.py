@@ -50,7 +50,7 @@ class TestPerformanceAnalyzerExtended:
 
         report = analyzer.analyze(hql)
 
-        # 5个JOIN应该触发警告（>3个）
+        # 5个JOIN应该触发警告(>3个)
         assert report.score < 85
         assert len(report.issues) > 0
         assert any("join" in issue.message.lower() for issue in report.issues)
@@ -161,7 +161,7 @@ class TestPerformanceAnalyzerExtended:
 
         report = analyzer.analyze(hql)
 
-        # 应该返回报告，不应该抛出异常
+        # 应该返回报告, 不应该抛出异常
         assert report is not None
         assert isinstance(report.score, int)
 
@@ -238,7 +238,7 @@ class TestPerformanceAnalyzerExtended:
         """测试高复杂度HQL检测 - 触发行184和236-237"""
         analyzer = HQLPerformanceAnalyzer()
 
-        # 创建一个非常复杂的HQL（多个JOIN、子查询、UNION等）
+        # 创建一个非常复杂的HQL(多个JOIN, 子查询, UNION等)
         hql = """
         SELECT 
             a.role_id,

@@ -93,7 +93,7 @@ describe('Rendering Performance Tests', () => {
         100
       );
 
-      console.log(`Button (100): ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per component)`);
+      console.log(`Button-100: ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per component)`);
 
       // Should render 100 buttons in less than 100ms
       expect(metrics.renderTime).toBeLessThan(100);
@@ -121,7 +121,7 @@ describe('Rendering Performance Tests', () => {
         1000
       );
 
-      console.log(`Button (1000): ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per component)`);
+      console.log(`Button-1000: ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per component)`);
 
       // Should render 1000 buttons in less than 500ms
       expect(metrics.renderTime).toBeLessThan(500);
@@ -152,7 +152,7 @@ describe('Rendering Performance Tests', () => {
 
       const metrics = measurePerformance('Card-50', 'Initial Render', () => render(<CardGrid />), 50);
 
-      console.log(`Card (50): ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per card)`);
+      console.log(`Card-50: ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per card)`);
 
       // Should render 50 cards in less than 200ms
       expect(metrics.renderTime).toBeLessThan(200);
@@ -184,7 +184,7 @@ describe('Rendering Performance Tests', () => {
 
       const metrics = measurePerformance('Input-100', 'Initial Render', () => render(<InputGrid />), 100);
 
-      console.log(`Input (100): ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per input)`);
+      console.log(`Input-100: ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per input)`);
 
       // Should render 100 inputs in less than 150ms
       expect(metrics.renderTime).toBeLessThan(150);
@@ -229,7 +229,7 @@ describe('Rendering Performance Tests', () => {
         100
       );
 
-      console.log(`Table (100 rows): ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per row)`);
+      console.log(`Table-100-rows: ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per row)`);
 
       // Should render 100-row table in less than 200ms
       expect(metrics.renderTime).toBeLessThan(200);
@@ -284,7 +284,7 @@ describe('Rendering Performance Tests', () => {
         50
       );
 
-      console.log(`Table sort (50 rows): ${metrics.renderTime.toFixed(2)}ms`);
+      console.log(`Table-sort: ${metrics.renderTime.toFixed(2)}ms`);
 
       // Sort should be fast
       expect(metrics.renderTime).toBeLessThan(50);
@@ -305,7 +305,7 @@ describe('Rendering Performance Tests', () => {
 
       const metrics = measurePerformance('Badge-500', 'Initial Render', () => render(<BadgeGrid />), 500);
 
-      console.log(`Badge (500): ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per badge)`);
+      console.log(`Badge-500: ${metrics.renderTime.toFixed(2)}ms (${metrics.avgTimePerComponent.toFixed(3)}ms per badge)`);
 
       // Should render 500 badges in less than 100ms (they're very simple)
       expect(metrics.renderTime).toBeLessThan(100);
@@ -346,7 +346,7 @@ describe('Rendering Performance Tests', () => {
         1
       );
 
-      console.log(`Modal mount: ${mountMetrics.renderTime.toFixed(2)}ms`);
+      console.log(`Modal-mount: ${mountMetrics.renderTime.toFixed(2)}ms`);
 
       // Should mount in less than 50ms
       expect(mountMetrics.renderTime).toBeLessThan(50);
@@ -416,7 +416,7 @@ describe('Rendering Performance Tests', () => {
         30 // Approximate component count
       );
 
-      console.log(`Dashboard: ${metrics.renderTime.toFixed(2)}ms`);
+      console.log(`Dashboard-complex: ${metrics.renderTime.toFixed(2)}ms`);
 
       // Complex dashboard should render in less than 300ms
       expect(metrics.renderTime).toBeLessThan(300);

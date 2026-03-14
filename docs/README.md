@@ -1,5 +1,6 @@
 # Event2Table 文档中心
 
+> **🆕 更新 (2026-03-13)**: 完成根目录清理和经验整合，归档52个临时报告，提取23个关键经验点
 > **🆕 更新 (2026-03-02)**: 完善归档文档系统，建立文档生命周期管理
 > **🆕 更新 (2026-02-24)**: 建立经验文档系统，整合399个文档精华
 
@@ -25,6 +26,8 @@
   - React Hooks规则 ⚠️ P0极其重要 - 避免Hooks顺序错误导致组件崩溃
   - Lazy Loading最佳实践 ⚠️ P0极其重要 - 避免双重Suspense嵌套导致加载超时
   - Input组件CSS布局规范 ⚠️ P0极其重要 - 始终使用label prop，Grid架构说明
+  - 17个组件优化案例 ⭐ P1重要 - Dashboard性能提升96.7% 🆕
+  - React 18+ defaultProps已废弃 ⚠️ P0极其重要 - ES6默认参数替代 🆕
   - React性能优化 ⭐ P1重要 - React.memo、useCallback
   - React子组件定义顺序 ⭐ P1重要 - 组件定义顺序
   - useEffect依赖数组最佳实践 ⭐ P1重要 - 避免useCallback+useEffect组合
@@ -32,8 +35,21 @@
   - API响应数据结构处理 ⭐ P1重要 - 处理嵌套数据结构
 
 - **[测试指南](lessons-learned/testing-guide.md)** - E2E测试、TDD、自动化测试
+  - Chrome DevTools MCP测试流程 ⚠️ P0极其重要 - 标准测试流程（5步骤）🆕
+  - React与Chrome MCP兼容性 ⚠️ P0极其重要 - useEffect监听DOM值 🆕
+  - TDD方法论完整实践 ⚠️ P0极其重要 - Red-Green-Refactor循环案例 🆕
+  - 100%测试覆盖率达成策略 ⚠️ P0极其重要 - 84个E2E测试，P0/P1/P2分层 🆕
+  - E2E测试分层策略 ⚠️ P0极其重要 - P0核心功能、P1重要功能、P2质量保障 🆕
+  - 测试遗漏分析方法 ⚠️ P0极其重要 - 为什么测试没有发现滚动问题 🆕
   - E2E测试方法论 ⚠️ P0极其重要 - Chrome DevTools MCP测试流程
   - TDD实践 ⚠️ P0极其重要 - Red-Green-Refactor循环
+  - TDD Red阶段经验 ⚠️ P0极其重要 - 11个P0问题测试驱动
+  - GraphQL 400错误诊断 ⚠️ P0极其重要 - 枚举值大小写不匹配
+  - 自动化性能测试 ⚠️ P0极其重要 - 828个问题自动分类
+  - 控制台错误检测 ⚠️ P0极其重要 - Chrome DevTools MCP错误捕获
+  - Dashboard实时优化 ⭐ P1重要 - 更新延迟96.7%提升
+  - 缓存失效装饰器 ⭐ P1重要 - 自动化缓存清理
+  - 修复验证流程 ⚠️ P0极其重要 - 完整修复验证闭环
   - 错误消息质量 ⭐ P1重要 - 用户友好错误消息
   - 测试自动化 ⭐ P1重要 - Pre-commit Hook强制测试
   - 避免重复工作 ⭐ P1重要 - 调查优先于实现
@@ -41,6 +57,9 @@
 
 - **[安全要点](lessons-learned/security-essentials.md)** - XSS防护、SQL注入、输入验证
   - SQL注入防护 ⚠️ P0极其重要 - 参数化查询、SQLValidator
+  - XSS防护实施 ⚠️ P0极其重要 - html.escape()集成 🆕
+  - 权限检查完整性 ⚠️ P0极其重要 - @authenticated装饰器 🆕
+  - 输入验证层次 ⚠️ P0极其重要 - 多层次验证体系 🆕
   - XSS防护 ⚠️ P0极其重要 - HTML转义、React自动转义
   - 输入验证 ⚠️ P0极其重要 - Pydantic Schema验证
   - 异常信息脱敏 ⚠️ P0极其重要 - 错误响应不暴露敏感信息
@@ -49,12 +68,20 @@
   - 批量删除验证 ⭐ P1重要 - 输入验证和系统保护
 
 - **[性能模式](lessons-learned/performance-patterns.md)** - 缓存、N+1查询、优化技巧
+  - 缓存失效诊断与修复 ⚠️ P0极其重要 - Systematic Debugging，2分钟定位3个根因 🆕
+  - 显式缓存失效装饰器 ⚠️ P0极其重要 - 避免自动推断，显式指定失效键 🆕
+  - 缓存失效验证最佳实践 ⚠️ P0极其重要 - 6步日志完整性，数据库验证 🆕
   - 缓存策略 ⚠️ P0极其重要 - Redis缓存TTL 5-10分钟、缓存清理、一致性验证
+  - 并行优化策略 ⚠️ P0极其重要 - Worker任务包设计，67%时间节省
+  - DataLoader批量查询优化 ⚠️ P0极其重要 - N+1查询解决方案
+  - 批量操作优化 ⚠️ P0极其重要 - 合并操作减少API调用
+  - TTL分层设置策略 ⚠️ P0极其重要 - 静态/中等/实时数据TTL规范
   - N+1查询优化 ⚠️ P0极其重要 - 使用JOIN、合并统计查询
   - 分页支持 ⚠️ P0极其重要 - LIMIT/OFFSET分页
   - 数据库索引 ⭐ P1重要 - 索引设计和优化
   - game_gid转换缓存 ⭐ P1重要 - LRU缓存优化
   - Dashboard统计查询合并 ⭐ P1重要 - 合并统计查询
+  - Entity架构下的性能优化 ⭐ P1重要 - 性能优化最佳实践
   - 多级缓存架构 ⭐ P1重要 - L1+L2+L3缓存层级
   - Cache Tags系统 ⭐ P1重要 - 按标签批量失效缓存
   - 性能监控装饰器 ⭐ P1重要 - 函数执行时间监控
@@ -66,8 +93,17 @@
   - 数据库文件位置规范 ⚠️ P0极其重要 - 所有DB文件必须在data/目录
 
 - **[API设计模式](lessons-learned/api-design-patterns.md)** - 分层架构、错误处理
+  - GraphQL迁移策略 ⚠️ P0极其重要 - 并行迁移、依赖分析、性能监控 🆕
+  - GraphQL性能监控体系 ⚠️ P0极其重要 - 请求数↓66%、响应时间↓38% 🆕
+  - 批量操作Mutations设计 ⚠️ P0极其重要 - 减少网络请求，提高效率 🆕
+  - GraphQL订阅实时推送 ⚠️ P0极其重要 - WebSocket实现，6个订阅类型 🆕
   - 分层架构 ⚠️ P0极其重要 - API → Service → Repository → Schema
   - 错误处理 ⚠️ P0极其重要 - 具体可操作的错误消息
+  - GraphQL类型同步规范 ⚠️ P0极其重要 - 枚举值大小写一致性
+  - GraphQL 400错误诊断 ⚠️ P0极其重要 - 枚举值不匹配诊断
+  - DataLoader批量查询优化 ⚠️ P0极其重要 - N+1查询解决方案
+  - 批量查询优化模式 ⚠️ P0极其重要 - 合并查询减少API调用
+  - 缓存键设计规范 ⚠️ P0极其重要 - 缓存键命名规范
   - GraphQL实施经验 ⭐ P1重要 - Schema设计、DataLoader优化
   - Service层缓存集成 ⭐ P1重要 - @cached装饰器使用
   - API缓存失效策略 ⭐ P1重要 - CacheInvalidator使用
@@ -78,6 +114,11 @@
 - **[调试技能](lessons-learned/debugging-skills.md)** - Chrome DevTools MCP、Subagent分析
   - Chrome DevTools MCP调试法 ⚠️ P0极其重要 - 标准调试流程
   - Subagent并行分析法 ⭐ P1重要 - 根因分析策略
+
+- **[Python开发](lessons-learned/python-development.md)** - mypy类型安全、Pydantic验证器
+  - mypy --strict合规 ⚠️ P0极其重要 - 类型注解完整检查
+  - Pydantic validator最佳实践 ⚠️ P0极其重要 - mode="before"使用规范 🆕
+  - GenericRepository类型安全 ⭐ P1重要 - 泛型Repository设计
 
 - **[重构检查清单](lessons-learned/refactoring-checklist.md)** - TDD、代码审查、技术债务
   - TDD重构流程 ⚠️ P0极其重要 - Red-Green-Refactor循环
@@ -132,11 +173,23 @@
 | 🚨 解决React Hooks错误 | [React最佳实践](lessons-learned/react-best-practices.md) | Hooks规则 |
 | 🐌 页面加载超时 | [React最佳实践](lessons-learned/react-best-practices.md) | Lazy Loading |
 | 🔒 防止SQL注入 | [安全要点](lessons-learned/security-essentials.md) | SQL注入防护 |
-| 🧪 编写E2E测试 | [测试指南](lessons-learned/testing-guide.md) | E2E测试 |
-| ⚡ 优化查询性能 | [性能模式](lessons-learned/performance-patterns.md) | N+1查询 |
+| 🛡️ XSS防护实施 | [安全要点](lessons-learned/security-essentials.md) | XSS防护实施 |
+| 🔐 权限检查完整性 | [安全要点](lessons-learned/security-essentials.md) | 权限检查完整性 |
+| 🧪 Chrome MCP测试流程 | [测试指南](lessons-learned/testing-guide.md) | Chrome MCP测试流程 🆕 |
+| 🔬 React与Chrome MCP兼容性 | [测试指南](lessons-learned/testing-guide.md) | React Chrome MCP兼容性 🆕 |
+| 📝 TDD方法论实践 | [测试指南](lessons-learned/testing-guide.md) | TDD方法论完整实践 🆕 |
+| 🎯 100%测试覆盖率 | [测试指南](lessons-learned/testing-guide.md) | 100%测试覆盖率策略 🆕 |
+| 🔍 GraphQL 400错误诊断 | [API设计模式](lessons-learned/api-design-patterns.md) | GraphQL 400错误诊断 |
+| 🚀 GraphQL迁移策略 | [API设计模式](lessons-learned/api-design-patterns.md) | GraphQL迁移策略 🆕 |
+| ⚡ 并行优化策略 | [性能模式](lessons-learned/performance-patterns.md) | 并行优化策略 |
+| 📦 DataLoader批量查询 | [API设计模式](lessons-learned/api-design-patterns.md) | DataLoader批量查询优化 |
+| 🔢 批量操作优化 | [性能模式](lessons-learned/performance-patterns.md) | 批量操作优化 |
+| 🔧 缓存失效诊断 | [性能模式](lessons-learned/performance-patterns.md) | 缓存失效诊断与修复 🆕 |
+| 🔐 显式缓存失效 | [性能模式](lessons-learned/performance-patterns.md) | 显式缓存失效装饰器 🆕 |
 | 🗄️ 了解game_gid迁移 | [数据库模式](lessons-learned/database-patterns.md) | game_gid迁移 |
 | 🔧 处理API错误 | [API设计模式](lessons-learned/api-design-patterns.md) | 错误处理 |
 | 🐛 调试Bug | [调试技能](lessons-learned/debugging-skills.md) | Chrome DevTools MCP |
+| 🐍 Pydantic validator最佳实践 | [Python开发](lessons-learned/python-development.md) | Pydantic validator最佳实践 |
 | 📝 代码审查 | [重构检查清单](lessons-learned/refactoring-checklist.md) | 代码审查清单 |
 
 ---
@@ -239,16 +292,17 @@
 ## 🔍 文档统计
 
 ### 经验文档系统
-- **经验文档总数**: 11个
-- **P0核心经验**: 7个主题（22个经验点）✅ 100%完成
-- **P1重要经验**: 8个主题（32个经验点）✅ 100%完成
-- **整合文档数**: 399个
-- **经验贡献者**: Event2Table Development Team
+- **经验文档总数**: 19个
+- **P0核心经验**: 11个主题（69个经验点 +23个新于2026-03-13）✅ 100%完成
+- **P1重要经验**: 12个主题（58个经验点 +24个新于2026-03-13）✅ 100%完成
+- **整合文档数**: 1032个（+52个2026-03-13临时报告）
+- **文档减少率**: 93% (根目录：56个→3个核心文档)
 
 ### 归档文档系统
-- **归档报告总数**: 670+个
-- **分类主题**: 6大主题（架构、测试、进度、修复、专题、GraphQL）
-- **文档减少率**: 53% (676 → 317个活跃文档，含归档)
+- **归档报告总数**: 868个（+52个2026-03-13临时报告）
+- **分类主题**: 8大主题（架构、测试、进度、修复、专题、GraphQL、2026-03、临时报告）
+- **最新归档**: 2026-03-13报告（52个临时报告，根目录清理）
+- **重复文件清理**: 7个CLAUDE.md副本、10个API遗留文件
 
 ### 文档覆盖度
 - **开发规范**: 95% ✅
@@ -361,13 +415,23 @@ Event2Table项目采用**三阶段文档生命周期管理**：
 
 ---
 
-**文档版本**: 2.2
-**最后更新**: 2026-03-03
+**文档版本**: 2.3
+**最后更新**: 2026-03-13
 **维护者**: Event2Table Development Team
 
 ---
 
 ## 📋 更新日志
+
+### v2.3 (2026-03-13)
+- ✅ **根目录清理完成**：52个临时报告归档到 `docs/archive/2026/03-march/reports/`
+- ✅ **经验文档系统增强**：提取23个关键经验点，更新3个核心经验文档
+- ✅ **GraphQL迁移策略**：新增并行迁移、性能监控、批量Mutations、WebSocket订阅章节
+- ✅ **Chrome MCP测试流程**：新增标准测试流程、React兼容性处理、100%覆盖率策略
+- ✅ **TDD方法论实践**：新增Red-Green-Refactor循环案例、测试驱动修复
+- ✅ **缓存失效诊断**：新增Systematic Debugging方法论、显式失效装饰器、验证最佳实践
+- ✅ **重复文件清理**：删除7个CLAUDE.md副本、10个API遗留文件
+- ✅ **文档索引更新**：更新快速查找场景表、文档统计信息
 
 ### v2.2 (2026-03-03)
 - ✅ **文档整合完成**：移除 `docs/docs/` 重复嵌套结构（323个文档）

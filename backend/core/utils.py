@@ -216,7 +216,7 @@ def validate_event_name(event_name: str) -> Tuple[bool, Optional[str]]:
     event_name = event_name.strip()
 
     if not EVENT_NAME_PATTERN.match(event_name):
-        return False, "事件名格式不正确，应只包含字母、数字、点和下划线，且以字母开头"
+        return False, "事件名格式不正确, 应只包含字母, 数字, 点和下划线, 且以字母开头"
 
     if len(event_name) > 100:
         return False, "事件名长度不能超过100个字符"
@@ -240,7 +240,7 @@ def validate_param_name(param_name: str) -> Tuple[bool, Optional[str]]:
     param_name = param_name.strip()
 
     if not PARAM_NAME_PATTERN.match(param_name):
-        return False, "参数名格式不正确，应只包含字母、数字和下划线，且以字母开头"
+        return False, "参数名格式不正确, 应只包含字母, 数字和下划线, 且以字母开头"
 
     if len(param_name) > 100:
         return False, "参数名长度不能超过100个字符"
@@ -659,7 +659,7 @@ def handle_api_errors(func: Callable) -> Callable:
     """
     API错误处理装饰器
 
-    统一处理API异常，确保所有错误都返回标准JSON格式
+    统一处理API异常, 确保所有错误都返回标准JSON格式
     """
 
     @wraps(func)
@@ -737,15 +737,15 @@ def get_game_gid_param(request_obj, param_name: str = "game_gid") -> Optional[st
     """
     从请求中获取 game_gid 参数（支持字符串和整数类型）
 
-    由于数据库中 games.gid 是 TEXT 类型，但部分代码使用 type=int，
-    此函数提供统一的方式来获取和转换 game_gid 参数。
+    由于数据库中 games.gid 是 TEXT 类型, 但部分代码使用 type=int, 
+    此函数提供统一的方式来获取和转换 game_gid 参数. 
 
     Args:
         request_obj: Flask request 对象
         param_name: 参数名称（默认为 "game_gid"）
 
     Returns:
-        game_gid 字符串，如果参数不存在返回 None
+        game_gid 字符串, 如果参数不存在返回 None
 
     Example:
         # 在视图函数中使用
@@ -753,12 +753,12 @@ def get_game_gid_param(request_obj, param_name: str = "game_gid") -> Optional[st
         if not game_gid:
             return json_error_response("game_gid is required", status_code=400)
 
-        # 现在 game_gid 是字符串类型，可以直接用于 SQL 查询
+        # Now game_gid is a string type, can be used directly in SQL queries
         game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
     """
     from flask import request
 
-    # 尝试作为整数获取（向后兼容）
+    # Try to get as integer (for backward compatibility)
     value_int = request.args.get(param_name, type=int)
     if value_int is not None:
         return str(value_int)
@@ -806,7 +806,6 @@ def safe_int_convert(value, default=0, min_value=None, max_value=None):
         return default
 
 
-
 @cached(ttl=1800)
 def fetch_all_as_dict(query: str, params: Tuple = None) -> List[Dict[str, Any]]:
     """
@@ -828,7 +827,6 @@ def fetch_all_as_dict(query: str, params: Tuple = None) -> List[Dict[str, Any]]:
         return [dict(row) for row in rows]
     finally:
         conn.close()
-
 
 
 @cached(ttl=1800)
@@ -1302,7 +1300,7 @@ def sanitize_and_validate_string(
     """
     清理和验证字符串输入（统一安全工具函数）
 
-    防止 XSS 攻击、输入长度溢出等安全问题。
+    防止 XSS 攻击, 输入长度溢出等安全问题. 
 
     Args:
         value: 要验证的值（可以是任意类型）
@@ -1313,7 +1311,7 @@ def sanitize_and_validate_string(
     Returns:
         tuple: (is_valid, sanitized_value_or_error_message)
             - is_valid (bool): 验证是否通过
-            - result (str): 如果通过，返回清理后的值；否则返回错误消息
+            - result (str): 如果通过, 返回清理后的值；否则返回错误消息
 
     Examples:
         >>> # 必填字段示例

@@ -296,18 +296,10 @@
   overflow-x: auto;
 }
 
-/* Page-specific table styles - generic styles moved to shared Table.css */
-.oled-table thead {
-  background: var(--bg-elevated);
-}
-
-.oled-table code {
-  padding: var(--space-1) var(--space-2);
-  background: var(--bg-elevated);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
+/* DEPRECATED: oled-table styles removed - moved to shared Table.css */
+/* Former .oled-table styles were: */
+/*   .oled-table thead { background: var(--bg-elevated); } */
+/*   .oled-table code { padding: var(--space-1) var(--space-2); background: var(--bg-elevated); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: var(--text-xs); } */
 
 .empty-state-card {
   text-align: center;

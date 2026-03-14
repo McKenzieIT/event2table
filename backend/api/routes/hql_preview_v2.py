@@ -37,24 +37,25 @@ Endpoints:
 Note: This module is NOT deprecated. It's part of the HQL V2 architecture.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-新的HQL预览API，与现有API并行运行
+新的HQL预览API, 与现有API并行运行
 """
 
-from flask import Blueprint, request, jsonify
-from typing import Dict, Any
+from typing import Any, Dict
 
-# Import HQL V2 core service
-from backend.services.hql.core.generator import HQLGenerator
-from backend.services.hql.adapters.project_adapter import ProjectAdapter
+from flask import Blueprint, jsonify, request
 
 # Import HQL API helpers (code complexity reduction)
 from backend.api.routes._hql_helpers import (
+    build_success_response,
+    handle_hql_generation_error,
     parse_json_request,
     validate_required_fields,
-    handle_hql_generation_error,
-    build_success_response,
 )
-from backend.core.utils import success_response, error_response
+from backend.core.utils import error_response, success_response
+from backend.services.hql.adapters.project_adapter import ProjectAdapter
+
+# Import HQL V2 core service
+from backend.services.hql.core.generator import HQLGenerator
 
 hql_preview_v2_bp = Blueprint("hql_preview_v2", __name__)
 
@@ -121,13 +122,9 @@ def generate_hql_v2():
         return jsonify(error_response(error, status_code=400)[0]), 400
 
     if not data["events"]:
-        return jsonify(
-            error_response("events cannot be empty", status_code=400)[0]
-        ), 400
+        return jsonify(error_response("events cannot be empty", status_code=400)[0]), 400
     if not data["fields"]:
-        return jsonify(
-            error_response("fields cannot be empty", status_code=400)[0]
-        ), 400
+        return jsonify(error_response("fields cannot be empty", status_code=400)[0]), 400
 
     try:
         # Support both formats:
@@ -145,14 +142,12 @@ def generate_hql_v2():
         adapter = ProjectAdapter()
         events = adapter.events_from_api_request(events_data)
         fields = adapter.fields_from_api_request(data["fields"])
-        conditions = adapter.conditions_from_api_request(
-            data.get("where_conditions", [])
-        )
+        conditions = adapter.conditions_from_api_request(data.get("where_conditions", []))
 
         # 获取选项
         options = data.get("options", {})
 
-        # 2. 检查缓存（如果启用）
+        # 2. 检查缓存(如果启用)
         from backend.services.hql.core.cache import get_global_cache
 
         cache = get_global_cache()
@@ -172,24 +167,20 @@ def generate_hql_v2():
             }
             return jsonify(success_response(data=result)[0])
 
-        # 3. 调用核心服务（完全无业务依赖）
+        # 3. 调用核心服务(完全无业务依赖)
         generator = HQLGenerator()
-        hql = generator.generate(
-            events=events, fields=fields, conditions=conditions, **options
-        )
+        hql = generator.generate(events=events, fields=fields, conditions=conditions, **options)
 
         # 4. 存储到缓存
         cache.set(cache_key, hql)
 
-        # 5. 性能分析（如果请求）
+        # 5. 性能分析(如果请求)
         from datetime import datetime
 
         result = {"hql": hql, "generated_at": datetime.utcnow().isoformat() + "Z"}
 
         if options.get("include_performance"):
-            from backend.services.hql.validators.performance_analyzer import (
-                HQLPerformanceAnalyzer,
-            )
+            from backend.services.hql.validators.performance_analyzer import HQLPerformanceAnalyzer
 
             analyzer = HQLPerformanceAnalyzer()
             report = analyzer.analyze(hql)
@@ -228,7 +219,7 @@ def generate_hql_debug():
     """
     V2版本的HQL生成API - 调试模式
 
-    返回完整的生成跟踪信息，包括每个步骤的中间结果
+    返回完整的生成跟踪信息, 包括每个步骤的中间结果
 
     Request Body:
     {
@@ -256,46 +247,34 @@ def generate_hql_debug():
         try:
             data = request.get_json(force=False)
         except BadRequest:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         if data is None:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         # 验证必填字段
         if "events" not in data or not data["events"]:
-            return jsonify(
-                error_response("events is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("events is required", status_code=400)[0]), 400
 
         if "fields" not in data or not data["fields"]:
-            return jsonify(
-                error_response("fields is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("fields is required", status_code=400)[0]), 400
 
         # 1. 通过适配层转换数据
         adapter = ProjectAdapter()
         events = adapter.events_from_api_request(data["events"])
         fields = adapter.fields_from_api_request(data["fields"])
-        conditions = adapter.conditions_from_api_request(
-            data.get("where_conditions", [])
-        )
+        conditions = adapter.conditions_from_api_request(data.get("where_conditions", []))
 
         # 获取选项
         options = data.get("options", {})
         debug = data.get("debug", True)
 
         if not debug:
-            # 非调试模式，调用普通生成器
+            # 非调试模式, 调用普通生成器
             from backend.services.hql.core.generator import HQLGenerator
 
             generator = HQLGenerator()
-            hql = generator.generate(
-                events=events, fields=fields, conditions=conditions, **options
-            )
+            hql = generator.generate(events=events, fields=fields, conditions=conditions, **options)
 
             from datetime import datetime
 
@@ -308,7 +287,7 @@ def generate_hql_debug():
 
         generator = DebuggableHQLGenerator()
 
-        # 使用options中的debug值，避免参数重复
+        # 使用options中的debug值, 避免参数重复
         debug_mode = options.pop("debug", True)
 
         trace = generator.generate(
@@ -326,7 +305,7 @@ def generate_hql_debug():
         return jsonify(success_response(data=trace)[0])
 
     except ValueError as e:
-        # 检查是否为"not found"错误，返回404而不是400
+        # 检查是否为"not found"错误, 返回404而不是400
         error_msg = str(e)
         if "not found" in error_msg.lower():
             return jsonify(error_response(error_msg, status_code=404)[0]), 404
@@ -335,9 +314,7 @@ def generate_hql_debug():
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 @hql_preview_v2_bp.route("/hql-preview-v2/api/validate", methods=["POST"])
@@ -400,7 +377,7 @@ def validate_hql():
             ],
         }
 
-        # 添加解析详情（可选）
+        # 添加解析详情(可选)
         if result.is_valid and result.parse_tree:
             response_data["parse_details"] = {
                 "statements": (
@@ -416,9 +393,7 @@ def validate_hql():
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 @hql_preview_v2_bp.route("/hql-preview-v2/api/recommend-fields", methods=["GET"])
@@ -449,14 +424,14 @@ def recommend_fields():
         }
     }
 
-    推荐策略：
+    推荐策略: 
     1. 历史频率统计（权重5.0）- 从hql_history表统计
     2. 事件特定推荐（权重3.0）- 业务规则
     3. 协同过滤（权重2.0）- 相似事件组合
     4. 模糊匹配（权重1.5）- 部分字段名
     """
-    from backend.services.hql.services.field_recommender import FieldRecommender
     from backend.core.config.config import get_db_path
+    from backend.services.hql.services.field_recommender import FieldRecommender
 
     event_name = request.args.get("event_name", "")
     partial = request.args.get("partial", "")
@@ -479,9 +454,7 @@ def recommend_fields():
         )
 
         return jsonify(
-            success_response(
-                data={"suggestions": suggestions, "count": len(suggestions)}
-            )[0]
+            success_response(data={"suggestions": suggestions, "count": len(suggestions)})[0]
         )
 
     except Exception as e:
@@ -513,9 +486,7 @@ def recommend_fields():
         ]
 
         if partial:
-            common_fields = [
-                f for f in common_fields if partial.lower() in f["name"].lower()
-            ]
+            common_fields = [f for f in common_fields if partial.lower() in f["name"].lower()]
 
         return jsonify(
             success_response(
@@ -533,7 +504,7 @@ def generate_hql_incremental():
     """
     增量生成HQL API
 
-    相比完整生成，增量生成只重新生成变化的部分，性能提升3-5x
+    相比完整生成, 增量生成只重新生成变化的部分, 性能提升3-5x
 
     Request Body:
     {
@@ -569,43 +540,32 @@ def generate_hql_incremental():
         try:
             data = request.get_json(force=False)
         except BadRequest:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         if data is None:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         # 验证必填字段
         if "events" not in data or not data["events"]:
-            return jsonify(
-                error_response("events is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("events is required", status_code=400)[0]), 400
 
         if "fields" not in data or not data["fields"]:
-            return jsonify(
-                error_response("fields is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("fields is required", status_code=400)[0]), 400
 
         # 1. 通过适配层转换数据
         adapter = ProjectAdapter()
         events = adapter.events_from_api_request(data["events"])
         fields = adapter.fields_from_api_request(data["fields"])
-        conditions = adapter.conditions_from_api_request(
-            data.get("where_conditions", [])
-        )
+        conditions = adapter.conditions_from_api_request(data.get("where_conditions", []))
 
         # 获取选项和previous_hql
         options = data.get("options", {})
         previous_hql = data.get("previous_hql")
 
         # 2. 调用增量生成器
-        from backend.services.hql.core.incremental_generator import (
-            IncrementalHQLGenerator,
-        )
         from datetime import datetime
+
+        from backend.services.hql.core.incremental_generator import IncrementalHQLGenerator
 
         generator = IncrementalHQLGenerator()
         result = generator.generate_incremental(
@@ -625,7 +585,7 @@ def generate_hql_incremental():
             "generation_time": result["generation_time"],
         }
 
-        # 如果有差异信息，添加到响应
+        # 如果有差异信息, 添加到响应
         if result.get("diff"):
             diff = result["diff"]
             response_data["diff"] = {
@@ -652,9 +612,7 @@ def generate_hql_incremental():
 
         return (
             jsonify(
-                error_response(
-                    f"Failed to generate incremental HQL: {str(e)}", status_code=500
-                )[0]
+                error_response(f"Failed to generate incremental HQL: {str(e)}", status_code=500)[0]
             ),
             500,
         )
@@ -705,7 +663,7 @@ def cache_stats():
     返回LRU缓存的详细统计信息
 
     Returns:
-        缓存统计：大小、命中率、未命中数等
+        缓存统计: 大小, 命中率, 未命中数等
     """
     from backend.services.hql.core.cache import get_global_cache
 
@@ -756,7 +714,7 @@ def analyze_hql():
     }
 
     Returns:
-        性能分析报告，包括：
+        性能分析报告, 包括: 
         - 复杂度评分
         - 潜在问题列表
         - 优化建议
@@ -764,18 +722,14 @@ def analyze_hql():
     try:
         data = request.get_json()
         if not data:
-            return jsonify(
-                error_response("Request body is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Request body is required", status_code=400)[0]), 400
 
         hql = data.get("hql")
         if not hql:
             return jsonify(error_response("hql is required", status_code=400)[0]), 400
 
         # 使用性能分析器
-        from backend.services.hql.validators.performance_analyzer import (
-            HQLPerformanceAnalyzer,
-        )
+        from backend.services.hql.validators.performance_analyzer import HQLPerformanceAnalyzer
 
         # 执行分析
         analyzer = HQLPerformanceAnalyzer()
@@ -810,7 +764,7 @@ def analyze_hql():
                 "subquery_depth": report.metrics.subquery_count,
                 "estimated_rows": report.metrics.complexity,  # 使用complexity作为估算
             },
-            "summary": f"HQL分析完成，复杂度评分: {report.score}/100，发现{len(report.issues)}个问题",
+            "summary": f"HQL分析完成, 复杂度评分: {report.score}/100, 发现{len(report.issues)}个问题",
         }
 
         return jsonify(success_response(data=response_data)[0])
@@ -819,9 +773,7 @@ def analyze_hql():
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 @hql_preview_v2_bp.route("/hql-preview-v2/api/preview", methods=["POST"])
@@ -860,30 +812,20 @@ def preview_hql():
         try:
             data = request.get_json(force=False)
         except BadRequest:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         if data is None:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         # 验证必填字段
         if "game_gid" not in data:
-            return jsonify(
-                error_response("game_gid is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("game_gid is required", status_code=400)[0]), 400
 
         if "event_id" not in data:
-            return jsonify(
-                error_response("event_id is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("event_id is required", status_code=400)[0]), 400
 
         if "fields" not in data:
-            return jsonify(
-                error_response("fields is required", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("fields is required", status_code=400)[0]), 400
 
         game_gid = data["game_gid"]
         event_id = data["event_id"]
@@ -896,17 +838,13 @@ def preview_hql():
         # 查询事件信息
         event = Repositories.LOG_EVENTS.find_by_id(event_id)
         if not event:
-            return jsonify(
-                error_response(f"Event {event_id} not found", status_code=404)[0]
-            ), 404
+            return jsonify(error_response(f"Event {event_id} not found", status_code=404)[0]), 404
 
         # 转换为V2格式
-        from backend.services.hql.models.event import Event, Field, Condition
+        from backend.services.hql.models.event import Condition, Event, Field
 
         # 创建Event对象
-        v2_event = Event(
-            name=event["event_name"], table_name=f"ieu_ods.ods_{game_gid}_all_view"
-        )
+        v2_event = Event(name=event["event_name"], table_name=f"ieu_ods.ods_{game_gid}_all_view")
 
         # 转换字段
         v2_fields = []
@@ -914,11 +852,7 @@ def preview_hql():
             # 验证字段必须有name和type
             if "name" not in field_data:
                 return (
-                    jsonify(
-                        error_response(
-                            'Field missing "name" property', status_code=400
-                        )[0]
-                    ),
+                    jsonify(error_response('Field missing "name" property', status_code=400)[0]),
                     400,
                 )
 
@@ -991,9 +925,7 @@ def preview_hql():
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 # ============================================================================
@@ -1048,25 +980,20 @@ def save_history():
         try:
             data = request.get_json(force=False)
         except BadRequest:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         if data is None:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         # 验证必填字段
         required_fields = ["events", "fields", "mode", "hql"]
         for field in required_fields:
             if field not in data:
-                return jsonify(
-                    error_response(f"{field} is required", status_code=400)[0]
-                ), 400
+                return jsonify(error_response(f"{field} is required", status_code=400)[0]), 400
+
+        from datetime import datetime
 
         from backend.services.hql.hql_history_service import HQLHistoryService
-        from datetime import datetime
 
         service = HQLHistoryService()
 
@@ -1099,13 +1026,10 @@ def save_history():
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 @hql_preview_v2_bp.route("/hql-preview-v2/api/history/list", methods=["GET"])
-
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_history_list():
     """
@@ -1113,7 +1037,7 @@ def get_history_list():
 
     Query Parameters:
         user_id: 用户ID (default: 0)
-        session_id: 会话ID (可选，优先级高于user_id)
+        session_id: 会话ID (可选, 优先级高于user_id)
         limit: 返回数量限制 (default: 50)
         offset: 偏移量 (default: 0)
 
@@ -1150,24 +1074,17 @@ def get_history_list():
         )
 
         return jsonify(
-            success_response(
-                data={"history": history_list, "count": len(history_list)}
-            )[0]
+            success_response(data={"history": history_list, "count": len(history_list)})[0]
         )
 
     except Exception as e:
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route(
-    "/hql-preview-v2/api/history/<int:history_id>", methods=["GET"]
-)
-
+@hql_preview_v2_bp.route("/hql-preview-v2/api/history/<int:history_id>", methods=["GET"])
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_history_by_id(history_id: int):
     """
@@ -1197,11 +1114,7 @@ def get_history_by_id(history_id: int):
 
         if not history:
             return (
-                jsonify(
-                    error_response(f"History {history_id} not found", status_code=404)[
-                        0
-                    ]
-                ),
+                jsonify(error_response(f"History {history_id} not found", status_code=404)[0]),
                 404,
             )
 
@@ -1213,17 +1126,13 @@ def get_history_by_id(history_id: int):
             "events": json.loads(history["events_json"]),
             "fields": json.loads(history["fields_json"]),
             "conditions": (
-                json.loads(history["conditions_json"])
-                if history["conditions_json"]
-                else []
+                json.loads(history["conditions_json"]) if history["conditions_json"] else []
             ),
             "mode": history["mode"],
             "hql": history["hql"],
             "performance_score": history["performance_score"],
             "created_at": history["created_at"],
-            "metadata": json.loads(history["metadata_json"])
-            if history["metadata_json"]
-            else None,
+            "metadata": json.loads(history["metadata_json"]) if history["metadata_json"] else None,
         }
 
         return jsonify(success_response(data=result)[0])
@@ -1232,19 +1141,15 @@ def get_history_by_id(history_id: int):
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route(
-    "/hql-preview-v2/api/history/<int:history_id>/restore", methods=["POST"]
-)
+@hql_preview_v2_bp.route("/hql-preview-v2/api/history/<int:history_id>/restore", methods=["POST"])
 def restore_history(history_id: int):
     """
     恢复历史版本
 
-    返回历史记录的完整配置，用于前端恢复UI状态
+    返回历史记录的完整配置, 用于前端恢复UI状态
 
     Response:
     {
@@ -1270,11 +1175,7 @@ def restore_history(history_id: int):
 
         if not restored:
             return (
-                jsonify(
-                    error_response(f"History {history_id} not found", status_code=404)[
-                        0
-                    ]
-                ),
+                jsonify(error_response(f"History {history_id} not found", status_code=404)[0]),
                 404,
             )
 
@@ -1285,18 +1186,12 @@ def restore_history(history_id: int):
 
         traceback.print_exc()
         return (
-            jsonify(
-                error_response(f"Failed to restore history: {str(e)}", status_code=500)[
-                    0
-                ]
-            ),
+            jsonify(error_response(f"Failed to restore history: {str(e)}", status_code=500)[0]),
             500,
         )
 
 
-@hql_preview_v2_bp.route(
-    "/hql-preview-v2/api/history/<int:history_id>", methods=["DELETE"]
-)
+@hql_preview_v2_bp.route("/hql-preview-v2/api/history/<int:history_id>", methods=["DELETE"])
 def delete_history(history_id: int):
     """
     删除历史记录
@@ -1318,28 +1213,18 @@ def delete_history(history_id: int):
 
         if not deleted:
             return (
-                jsonify(
-                    error_response(f"History {history_id} not found", status_code=404)[
-                        0
-                    ]
-                ),
+                jsonify(error_response(f"History {history_id} not found", status_code=404)[0]),
                 404,
             )
 
-        return jsonify(
-            success_response(data={"deleted": True, "history_id": history_id})[0]
-        )
+        return jsonify(success_response(data={"deleted": True, "history_id": history_id})[0])
 
     except Exception as e:
         import traceback
 
         traceback.print_exc()
         return (
-            jsonify(
-                error_response(f"Failed to delete history: {str(e)}", status_code=500)[
-                    0
-                ]
-            ),
+            jsonify(error_response(f"Failed to delete history: {str(e)}", status_code=500)[0]),
             500,
         )
 
@@ -1391,14 +1276,10 @@ def search_history():
         try:
             data = request.get_json(force=False)
         except BadRequest:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         if data is None:
-            return jsonify(
-                error_response("Invalid JSON format", status_code=400)[0]
-            ), 400
+            return jsonify(error_response("Invalid JSON format", status_code=400)[0]), 400
 
         from backend.services.hql.hql_history_service import HQLHistoryService
 
@@ -1416,25 +1297,25 @@ def search_history():
 
         # Validate limit and offset
         if not isinstance(limit, int) or limit < 1 or limit > 500:
-            return jsonify(
-                error_response("limit must be between 1 and 500", status_code=400)[0]
-            ), 400
+            return (
+                jsonify(error_response("limit must be between 1 and 500", status_code=400)[0]),
+                400,
+            )
 
         if not isinstance(offset, int) or offset < 0:
-            return jsonify(
-                error_response(
-                    "offset must be a non-negative integer", status_code=400
-                )[0]
-            ), 400
+            return (
+                jsonify(
+                    error_response("offset must be a non-negative integer", status_code=400)[0]
+                ),
+                400,
+            )
 
         # Validate hql_type
         valid_hql_types = ["select", "ddl", "dml", "canvas"]
         if hql_type is not None and hql_type not in valid_hql_types:
             return (
                 jsonify(
-                    error_response(
-                        f"hql_type must be one of {valid_hql_types}", status_code=400
-                    )[0]
+                    error_response(f"hql_type must be one of {valid_hql_types}", status_code=400)[0]
                 ),
                 400,
             )
@@ -1466,9 +1347,7 @@ def search_history():
         import traceback
 
         traceback.print_exc()
-        return jsonify(
-            error_response("An internal error occurred", status_code=500)[0]
-        ), 500
+        return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
 @hql_preview_v2_bp.route("/hql-preview-v2/api/history/global", methods=["GET"])
@@ -1524,25 +1403,25 @@ def global_search_history():
 
         # Validate limit and offset
         if limit < 1 or limit > 500:
-            return jsonify(
-                error_response("limit must be between 1 and 500", status_code=400)[0]
-            ), 400
+            return (
+                jsonify(error_response("limit must be between 1 and 500", status_code=400)[0]),
+                400,
+            )
 
         if offset < 0:
-            return jsonify(
-                error_response(
-                    "offset must be a non-negative integer", status_code=400
-                )[0]
-            ), 400
+            return (
+                jsonify(
+                    error_response("offset must be a non-negative integer", status_code=400)[0]
+                ),
+                400,
+            )
 
         # Validate hql_type
         valid_hql_types = ["select", "ddl", "dml", "canvas"]
         if hql_type is not None and hql_type not in valid_hql_types:
             return (
                 jsonify(
-                    error_response(
-                        f"hql_type must be one of {valid_hql_types}", status_code=400
-                    )[0]
+                    error_response(f"hql_type must be one of {valid_hql_types}", status_code=400)[0]
                 ),
                 400,
             )
@@ -1570,9 +1449,7 @@ def global_search_history():
         traceback.print_exc()
         return (
             jsonify(
-                error_response(
-                    f"Failed to perform global search: {str(e)}", status_code=500
-                )[0]
+                error_response(f"Failed to perform global search: {str(e)}", status_code=500)[0]
             ),
             500,
         )

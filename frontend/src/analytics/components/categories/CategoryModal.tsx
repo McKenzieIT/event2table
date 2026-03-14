@@ -13,7 +13,7 @@
  * 通过 initialData prop 区分模式：null = 新增，有值 = 编辑
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Input } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
@@ -70,6 +70,10 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
   // 提交状态
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Refs to input elements (for Chrome MCP compatibility)
+  const nameRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
+
   // 当模态框打开或 initialData 变化时，重置表单
   useEffect(() => {
     if (isOpen) {
@@ -86,6 +90,29 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
       setErrors({});
     }
   }, [initialData, isOpen]);
+
+  // Chrome MCP兼容性: 监听DOM值变化并同步到state
+  useEffect(() => {
+    if (!nameRef.current || !descRef.current) {
+      return;
+    }
+
+    const nameDomValue = nameRef.current.value;
+    const descDomValue = descRef.current.value;
+
+    const updates: Partial<CategoryFormData> = {};
+
+    if (nameDomValue !== formData.name) {
+      updates.name = nameDomValue;
+    }
+    if (descDomValue !== formData.description) {
+      updates.description = descDomValue;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+  }, [formData.name, formData.description]);
 
   // 关闭模态框
   const handleClose = () => {
@@ -209,6 +236,7 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
                 placeholder="例如：战斗事件"
                 className="category-modal__input"
                 disabled={isSubmitting}
+                ref={nameRef}
               />
               {errors.name && (
                 <span className="category-modal__error">{errors.name}</span>
@@ -228,6 +256,7 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
                 className="category-modal__textarea"
                 disabled={isSubmitting}
                 rows={4}
+                ref={descRef}
               />
               <span className="category-modal__hint">
                 可选：提供详细说明帮助团队理解分类用途

@@ -5,16 +5,17 @@ Flow Manager
 
 流程管理器
 
-提供流程的高级操作功能：
+提供流程的高级操作功能: 
 - 加载流程
 - 生成HQL
 - 验证流程
 """
 
 import logging
-from typing import Dict, Any, Optional
-from backend.services.flows.flow_service import FlowService
+from typing import Any, Dict, Optional
+
 from backend.models.entities import FlowEntity
+from backend.services.flows.flow_service import FlowService
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class FlowManager:
     """
     流程管理器 (精简架构)
 
-    提供流程的高级操作功能，使用FlowService处理业务逻辑
+    提供流程的高级操作功能, 使用FlowService处理业务逻辑
     """
 
     def __init__(self):
@@ -48,18 +49,16 @@ class FlowManager:
         if not flow:
             raise ValueError(f"Flow {flow_id} not found")
 
-        # 转换为字典（兼容旧代码）
+        # 转换为字典(兼容旧代码)
         flow_dict = flow.model_dump()
 
-        # 添加游戏名称（如果有）
+        # 添加游戏名称(如果有)
         if flow.game_gid:
             game = self.flow_service.game_repo.find_by_gid(flow.game_gid)
             if game:
                 flow_dict["game_name"] = game.name
             else:
-                logger.warning(
-                    f"Flow {flow_id} references non-existent game_gid {flow.game_gid}"
-                )
+                logger.warning(f"Flow {flow_id} references non-existent game_gid {flow.game_gid}")
 
         return flow_dict
 
@@ -102,7 +101,7 @@ class FlowManager:
             if "type" not in node:
                 return False, f"Node {i} missing type field"
 
-        # 检查edges字段（可选）
+        # 检查edges字段(可选)
         if "edges" in flow_graph:
             edges = flow_graph["edges"]
             if not isinstance(edges, list):
@@ -130,7 +129,7 @@ class FlowManager:
             new_name: 新流程名称
 
         Returns:
-            新流程ID，失败返回None
+            新流程ID, 失败返回None
         """
         try:
             # 加载原流程
@@ -146,7 +145,7 @@ class FlowManager:
                 variables=original_flow.variables,
                 description=f"Cloned from {original_flow.flow_name}",
                 created_by=original_flow.created_by,
-                is_active=True
+                is_active=True,
             )
 
             created_flow = self.flow_service.create_flow(new_flow)
@@ -167,7 +166,7 @@ class FlowManager:
             flow_id: 流程ID
 
         Returns:
-            流程导出数据，失败返回None
+            流程导出数据, 失败返回None
         """
         try:
             flow = self.load_flow(flow_id)

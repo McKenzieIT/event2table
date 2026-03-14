@@ -12,7 +12,7 @@ from backend.core.cache.decorators import cached
 """
 SQL构建通用工具函数模块
 
-提供SQL语句构建的通用函数，支持HiveQL语法。
+提供SQL语句构建的通用函数, 支持HiveQL语法. 
 
 作者: Claude Code
 版本: 1.0.0
@@ -37,7 +37,7 @@ SQL构建通用工具函数模块
     'COUNT(user_id) AS user_count'
 """
 
-from typing import Dict, List, Optional, Callable
+from typing import Callable, Dict, List, Optional
 
 # ============================================================================
 # 聚合函数生成器
@@ -48,7 +48,7 @@ class AggregateFunctionBuilder:
     """
     SQL聚合函数构建器
 
-    使用策略模式支持不同的聚合函数。
+    使用策略模式支持不同的聚合函数. 
     """
 
     # 内置聚合函数模板
@@ -85,7 +85,7 @@ class AggregateFunctionBuilder:
         """
         func_upper = func.upper()
 
-        # 使用自定义构建器（如果提供）
+        # 使用自定义构建器(如果提供)
         if custom_builder:
             return custom_builder(func, field, alias)
 
@@ -93,7 +93,7 @@ class AggregateFunctionBuilder:
         if func_upper in cls.AGGREGATE_TEMPLATES:
             return cls.AGGREGATE_TEMPLATES[func_upper](field, alias)
 
-        # 默认：直接使用函数名
+        # 默认: 直接使用函数名
         return f"{func}({field}) AS {alias}"
 
     @classmethod
@@ -103,7 +103,7 @@ class AggregateFunctionBuilder:
 
         Args:
             name: 函数名
-            builder: 构建函数，签名: (field: str, alias: str) -> str
+            builder: 构建函数, 签名: (field: str, alias: str) -> str
 
         Example:
             >>> def build_percentile(field: str, alias: str) -> str:
@@ -116,7 +116,6 @@ class AggregateFunctionBuilder:
 # ============================================================================
 # 字段处理工具
 # ============================================================================
-
 
 
 @cached(ttl=1800)  # Cache for 30 minutes
@@ -145,13 +144,13 @@ def get_field_name(field: Dict, fallback_key: str = "name") -> str:
 
 def normalize_field_list(fields: List[Dict]) -> List[Dict]:
     """
-    标准化字段列表，统一字段名键
+    标准化字段列表, 统一字段名键
 
     Args:
         fields: 字段列表
 
     Returns:
-        标准化后的字段列表，每个字段包含:
+        标准化后的字段列表, 每个字段包含:
             - name: 字段名
             - alias: 别名
             - type: 数据类型

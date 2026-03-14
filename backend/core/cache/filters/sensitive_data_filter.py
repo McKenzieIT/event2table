@@ -4,7 +4,7 @@
 敏感数据过滤器
 ==============
 
-自动过滤日志中的敏感信息（密码、令牌、密钥等）
+自动过滤日志中的敏感信息（密码, 令牌, 密钥等）
 
 核心功能:
 - 过滤敏感字段（password, token, key等）
@@ -19,7 +19,7 @@ CVSS: 8.2 (High)
 
 import logging
 import re
-from typing import Optional, Set, Pattern
+from typing import Optional, Pattern, Set
 
 
 class SensitiveDataFilter(logging.Filter):
@@ -42,17 +42,32 @@ class SensitiveDataFilter(logging.Filter):
 
     # 敏感字段列表
     SENSITIVE_FIELDS: Set[str] = {
-        'password', 'passwd', 'pwd',
-        'token', 'access_token', 'refresh_token', 'auth_token',
-        'key', 'api_key', 'secret_key', 'private_key', 'public_key',
-        'session', 'session_id',
-        'auth', 'authorization', 'authenticate',
-        'credential', 'credentials',
-        'secret', 'passcode',
-        'jwt', 'bearer'
+        'password',
+        'passwd',
+        'pwd',
+        'token',
+        'access_token',
+        'refresh_token',
+        'auth_token',
+        'key',
+        'api_key',
+        'secret_key',
+        'private_key',
+        'public_key',
+        'session',
+        'session_id',
+        'auth',
+        'authorization',
+        'authenticate',
+        'credential',
+        'credentials',
+        'secret',
+        'passcode',
+        'jwt',
+        'bearer',
     }
 
-    # 敏感值模式（正则表达式）
+    # 敏感值模式(正则表达式)
     SENSITIVE_PATTERNS: Set[Pattern] = {
         # Bearer tokens
         re.compile(r'Bearer\s+[A-Za-z0-9\-._~+/]+=*', re.IGNORECASE),
@@ -66,7 +81,11 @@ class SensitiveDataFilter(logging.Filter):
         re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', re.IGNORECASE),
     }
 
-    def __init__(self, custom_fields: Optional[Set[str]] = None, custom_patterns: Optional[Set[Pattern]] = None):
+    def __init__(
+        self,
+        custom_fields: Optional[Set[str]] = None,
+        custom_patterns: Optional[Set[Pattern]] = None,
+    ):
         """
         初始化敏感数据过滤器
 
@@ -76,7 +95,7 @@ class SensitiveDataFilter(logging.Filter):
         """
         super().__init__()
 
-        # 合并自定义敏感字段（统一转为小写存储）
+        # 合并自定义敏感字段(统一转为小写存储)
         self.sensitive_fields = self.SENSITIVE_FIELDS.copy()
         if custom_fields:
             # 将自定义字段转为小写
@@ -120,12 +139,12 @@ class SensitiveDataFilter(logging.Filter):
         Returns:
             清理后的文本
         """
-        # 1. 先过滤敏感模式（如Bearer token, Basic auth等）
-        # 这些模式应该在整个文本上匹配，不受字段名限制
+        # 1. 先过滤敏感模式(如Bearer token, Basic auth等)
+        # 这些模式应该在整个文本上匹配, 不受字段名限制
         for pattern in self.sensitive_patterns:
             text = pattern.sub('[REDACTED]', text)
 
-        # 2. 过滤敏感字段（多次迭代以处理所有匹配）
+        # 2. 过滤敏感字段(多次迭代以处理所有匹配)
         max_iterations = 3  # 防止无限循环
         for _ in range(max_iterations):
             original_text = text
@@ -139,16 +158,18 @@ class SensitiveDataFilter(logging.Filter):
                 # 使用format()方法避免f-string转义问题
                 escaped_field = re.escape(field)
 
-                # 分别匹配不同的格式，使用回调函数保留原始字段名的大小写
-                # 格式1: field=value (使用S+匹配非空白字符，但不包括&和,等分隔符)
-                # 使用负向后瞻和负向前瞻确保匹配完整的字段名，而不是子串
-                pattern1_str = r'(?<![a-zA-Z0-9_])' + escaped_field + r'(?![a-zA-Z0-9_])\s*=\s*[^\s&,}]+'
+                # 分别匹配不同的格式, 使用回调函数保留原始字段名的大小写
+                # 格式1: field=value (使用S+匹配非空白字符, 但不包括&和,等分隔符)
+                # 使用负向后瞻和负向前瞻确保匹配完整的字段名, 而不是子串
+                pattern1_str = (
+                    r'(?<![a-zA-Z0-9_])' + escaped_field + r'(?![a-zA-Z0-9_])\s*=\s*[^\s&,}]+'
+                )
                 pattern1 = re.compile(pattern1_str, re.IGNORECASE)
 
                 def replace_with_case_preserver(match):
                     """保留原始字段名的大小写"""
                     matched_text = match.group(0)
-                    # 提取原始字段名（在=或:之前的部分）
+                    # 提取原始字段名(在=或:之前的部分)
                     parts = re.split(r'[\s:=]+', matched_text, maxsplit=1)
                     original_field_name = parts[0]
                     return original_field_name + '=[REDACTED]'
@@ -156,14 +177,20 @@ class SensitiveDataFilter(logging.Filter):
                 text = pattern1.sub(replace_with_case_preserver, text)
 
                 # 格式2: field:value
-                pattern2_str = r'(?<![a-zA-Z0-9_])' + escaped_field + r'(?![a-zA-Z0-9_])\s*:\s*[^\s&,}]+'
+                pattern2_str = (
+                    r'(?<![a-zA-Z0-9_])' + escaped_field + r'(?![a-zA-Z0-9_])\s*:\s*[^\s&,}]+'
+                )
                 pattern2 = re.compile(pattern2_str, re.IGNORECASE)
                 text = pattern2.sub(replace_with_case_preserver, text)
 
                 # 格式3: "field":"value" 或 'field':'value' (JSON格式)
                 # 这个模式需要特殊处理以保留引号
                 # 使用负向后瞻确保不匹配子串
-                pattern3_str = r'(?<![a-zA-Z0-9_])(["\']?)' + escaped_field + r'\1(?![a-zA-Z0-9_])\s*:\s*["\']([^"\']+)["\']'
+                pattern3_str = (
+                    r'(?<![a-zA-Z0-9_])(["\']?)'
+                    + escaped_field
+                    + r'\1(?![a-zA-Z0-9_])\s*:\s*["\']([^"\']+)["\']'
+                )
                 pattern3 = re.compile(pattern3_str, re.IGNORECASE)
 
                 def replace_json_with_case(match):
@@ -177,7 +204,7 @@ class SensitiveDataFilter(logging.Filter):
 
                 text = pattern3.sub(replace_json_with_case, text)
 
-            # 如果文本没有变化，提前退出
+            # 如果文本没有变化, 提前退出
             if text == original_text:
                 break
 
@@ -211,7 +238,7 @@ class SensitiveDataFilter(logging.Filter):
         self.sensitive_fields.discard(field.lower())
 
 
-# 全局过滤器实例（单例）
+# 全局过滤器实例(单例)
 _global_filter: Optional[SensitiveDataFilter] = None
 
 
@@ -246,10 +273,7 @@ def setup_logging_filter():
 # 测试代码
 if __name__ == "__main__":
     # 配置日志
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(levelname)s - %(message)s'
-    )
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
     # 添加过滤器
     setup_logging_filter()
@@ -266,7 +290,7 @@ if __name__ == "__main__":
     # 测试3: API key过滤
     logger.info("API request: api_key=sk-1234567890abcdef1234567890abcdef")
 
-    # 测试4: 正常日志（应该保留）
+    # 测试4: 正常日志(应该保留)
     logger.info("User logged in successfully")
 
     # 测试5: JSON格式

@@ -4,10 +4,12 @@ Template Queries
 Implements GraphQL query resolvers for Template entity.
 """
 
-import graphene
-from graphene import Field, List, Int, String, Boolean
-from typing import List as TypingList, Dict, Any
 import logging
+from typing import Any, Dict
+from typing import List as TypingList
+
+import graphene
+from graphene import Boolean, Field, Int, List, String
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +24,7 @@ class TemplateQueries:
             from backend.core.utils import fetch_one_as_dict
             from backend.gql_api.types.template_type import TemplateType
 
-            template = fetch_one_as_dict(
-                "SELECT * FROM canvas_templates WHERE id = ?",
-                (id,)
-            )
+            template = fetch_one_as_dict("SELECT * FROM canvas_templates WHERE id = ?", (id,))
 
             return TemplateType.from_dict(template) if template else None
 
@@ -34,8 +33,15 @@ class TemplateQueries:
             return None
 
     @staticmethod
-    def resolve_templates(root, info, game_gid: int = None, category: str = None,
-                          search: str = None, limit: int = 20, offset: int = 0):
+    def resolve_templates(
+        root,
+        info,
+        game_gid: int = None,
+        category: str = None,
+        search: str = None,
+        limit: int = 20,
+        offset: int = 0,
+    ):
         """Resolve list of templates with optional filtering."""
         try:
             from backend.core.utils import fetch_all_as_dict

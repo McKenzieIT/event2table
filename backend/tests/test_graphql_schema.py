@@ -5,6 +5,7 @@ Tests for GraphQL schema and resolvers.
 """
 
 import pytest
+
 from backend.gql_api.schema import schema
 
 

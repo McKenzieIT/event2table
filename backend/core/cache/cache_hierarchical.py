@@ -15,11 +15,12 @@ L3: 数据库查询
 日期: 2026-01-20
 """
 
-from functools import wraps
-from typing import Any, Optional, Dict
-from backend.core.cache.cache_system import CacheKeyBuilder, get_cache
 import logging
 import time
+from functools import wraps
+from typing import Any, Dict, Optional
+
+from backend.core.cache.cache_system import CacheKeyBuilder, get_cache
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class HierarchicalCache:
     优势:
     - 热点数据极快访问（L1）
     - 大容量缓存存储（L2）
-    - 自动LRU淘汰，节省内存
+    - 自动LRU淘汰, 节省内存
     - L2命中自动回填L1
     """
 
@@ -44,9 +45,9 @@ class HierarchicalCache:
         初始化分层缓存
 
         Args:
-            l1_size: L1缓存大小（条数），默认1000
-            l1_ttl: L1缓存TTL（秒），默认60
-            l2_ttl: L2缓存TTL（秒），默认3600
+            l1_size: L1缓存大小（条数）, 默认1000
+            l1_ttl: L1缓存TTL（秒）, 默认60
+            l2_ttl: L2缓存TTL（秒）, 默认3600
         """
         self.l1_size = l1_size
         self.l1_ttl = l1_ttl
@@ -65,8 +66,8 @@ class HierarchicalCache:
 
         查询顺序:
         1. L1内存缓存 (<1ms)
-        2. L2 Redis缓存 (5-10ms，命中后回填L1)
-        3. L3数据库 (返回None，由调用方查询)
+        2. L2 Redis缓存 (5-10ms, 命中后回填L1)
+        3. L3数据库 (返回None, 由调用方查询)
 
         Args:
             pattern: 缓存模式 (如 'events.list')
@@ -85,7 +86,7 @@ class HierarchicalCache:
                 logger.debug(f"✅ L1 HIT: {key}")
                 return self.l1_cache[key]
             else:
-                # L1过期，删除
+                # L1过期, 删除
                 del self.l1_cache[key]
                 del self.l1_timestamps[key]
                 logger.debug(f"⏰ L1过期: {key}")
@@ -104,7 +105,7 @@ class HierarchicalCache:
             except Exception as e:
                 logger.warning(f"⚠️ L2缓存读取失败: {e}")
 
-        # L3: 缓存未命中，返回None
+        # L3: 缓存未命中, 返回None
         self.stats["misses"] += 1
         logger.debug(f"❌ CACHE MISS: {key}")
         return None
@@ -113,7 +114,7 @@ class HierarchicalCache:
         """
         写入三级缓存
 
-        同时写入L1和L2，确保数据一致性
+        同时写入L1和L2, 确保数据一致性
 
         Args:
             pattern: 缓存模式 (如 'events.list')
@@ -138,13 +139,13 @@ class HierarchicalCache:
         """
         写入L1缓存（带LRU淘汰）
 
-        当L1缓存满时，删除最旧的条目
+        当L1缓存满时, 删除最旧的条目
 
         Args:
             key: 缓存键
             data: 缓存数据
         """
-        # 如果L1已满，删除最旧的条目
+        # 如果L1已满, 删除最旧的条目
         if len(self.l1_cache) >= self.l1_size:
             oldest_key = min(self.l1_timestamps, key=self.l1_timestamps.get)
             del self.l1_cache[oldest_key]
@@ -229,7 +230,7 @@ class HierarchicalCache:
             >>> key = 'dwd_gen:v3:test.key:event_id:0:game_id:1'
             >>> pattern = 'dwd_gen:v3:test.key:game_id:*'
             >>> _match_pattern(key, pattern)
-            True  # game_id=1匹配，忽略event_id参数
+            True  # game_id=1匹配, 忽略event_id参数
         """
         # Remove common prefix
         prefix = CacheKeyBuilder.PREFIX
@@ -316,29 +317,23 @@ class HierarchicalCache:
         self.stats = {"l1_hits": 0, "l2_hits": 0, "misses": 0, "l1_evictions": 0}
         logger.info("📊 缓存统计已重置")
 
-    def set_raw(
-        self,
-        key: str,
-        value: Any,
-        ttl: Optional[int] = None,
-        level: str = "both"
-    ):
+    def set_raw(self, key: str, value: Any, ttl: Optional[int] = None, level: str = "both"):
         """
         直接设置缓存值（不经过序列化）
 
-        用于预热系统批量写入已序列化的数据，避免重复序列化开销
+        用于预热系统批量写入已序列化的数据, 避免重复序列化开销
 
         Args:
-            key: 缓存键（完整键，包含前缀）
-            value: 缓存值（可以是bytes、str或已序列化的数据）
-            ttl: TTL（秒），None表示使用默认TTL
+            key: 缓存键（完整键, 包含前缀）
+            value: 缓存值（可以是bytes, str或已序列化的数据）
+            ttl: TTL（秒）, None表示使用默认TTL
             level: 缓存层级 ('l1', 'l2', 'both')
 
         Raises:
             ValueError: 如果level参数无效
 
         Example:
-            >>> # 预热场景：批量写入已序列化的数据
+            >>> # 预热场景: 批量写入已序列化的数据
             >>> hierarchical_cache.set_raw('dwd_gen:v3:events:game_id:1', serialized_data, ttl=3600, level='both')
         """
         # 验证level参数
@@ -360,7 +355,7 @@ class HierarchicalCache:
             cache = get_cache()
             if cache is not None:
                 try:
-                    # 直接写入，不进行额外的序列化
+                    # 直接写入, 不进行额外的序列化
                     cache.set(key, value, timeout=l2_ttl)
                     logger.debug(f"💾 L2 SET RAW: {key}")
                 except Exception as e:
@@ -375,7 +370,7 @@ class HierarchicalCache:
             data: 缓存数据
             ttl: TTL（秒）
         """
-        # 如果L1已满，删除最旧的条目
+        # 如果L1已满, 删除最旧的条目
         if len(self.l1_cache) >= self.l1_size:
             oldest_key = min(self.l1_timestamps, key=self.l1_timestamps.get)
             del self.l1_cache[oldest_key]

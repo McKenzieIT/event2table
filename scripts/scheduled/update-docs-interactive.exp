@@ -1,0 +1,63 @@
+#!/usr/bin/expect -f
+# Expect脚本：自动化执行Claude Code skill
+
+# 设置超时时间
+set timeout 300
+
+# 切换到项目目录
+cd /Users/mckenzie/Documents/event2table
+
+# 设置环境变量
+set env(PATH) "/Users/mckenzie/.nvm/versions/node/v20.20.0/bin:/usr/local/bin:/usr/bin:/bin"
+
+# 记录开始时间
+set timestamp [clock format [clock seconds] -format "%Y-%m-%d %H:%M:%S"]
+puts "\[LOG\] 开始执行: $timestamp"
+
+# 启动Claude Code CLI
+spawn /Users/mckenzie/.nvm/versions/node/v20.20.0/bin/claude
+
+# 等待Claude提示符
+expect {
+    timeout { puts "\[ERROR\] 启动Claude超时"; exit 1 }
+    eof { puts "\[ERROR\] Claude意外退出"; exit 1 }
+    -re {"> |\\$ |# |\\.\\.|Claude>|How can I help"} {
+        puts "\[LOG\] Claude已启动"
+    }
+}
+
+# 发送skill命令
+send -- "/update-docs 更新文档，并整合docs/目录下的文档，将重复的文档提取经验到新或已有经验文档中，过程中不能因为token和时间去忽略重要的经验，完成后将旧的文档进行归档，并在开发文档中更新经验和索引\r"
+
+puts "\[LOG\] 已发送skill命令"
+
+# 等待skill执行完成
+expect {
+    timeout {
+        puts "\[ERROR\] Skill执行超时"
+        exit 1
+    }
+    -re {Done|完成|✓|finished|complete} {
+        puts "\[LOG\] Skill执行完成"
+    }
+    -re {Error|错误|失败|×} {
+        puts "\[ERROR\] Skill执行出错"
+        exit 1
+    }
+    -re {"> |\\$ |# |\\.\\.\\.|Claude>|How can I help} {
+        puts "\[LOG\] Skill执行完成（返回提示符）"
+    }
+}
+
+# 发送退出命令
+send -- "exit\r"
+
+# 等待会话结束
+expect eof
+
+# 记录结束时间
+set end_timestamp [clock format [clock seconds] -format "%Y-%m-%d %H:%M:%S"]
+puts "\[LOG\] 执行完成: $end_timestamp"
+
+puts "\[SUCCESS\] 文档整合任务完成"
+exit 0

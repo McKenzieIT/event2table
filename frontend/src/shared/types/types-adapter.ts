@@ -77,16 +77,10 @@ export interface Field extends SharedField {
 
 /**
  * WHERE条件接口 (原有)
- * @deprecated 使用 SharedCondition 或 WhereCondition 代替
+ * @deprecated 使用 WhereCondition from './whereBuilder' 代替
  */
-export interface WhereCondition {
-  id: string;
-  field: string;
-  operator: '=' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' | 'IN' | 'NOT IN' | 'IS NULL' | 'IS NOT NULL';
-  value?: string | number | boolean;
-  logic?: 'AND' | 'OR';
-  dataType?: string;
-}
+// Import from whereBuilder instead of defining here
+export type { WhereCondition } from './whereBuilder';
 
 /**
  * 字段配置接口 (原有)
@@ -211,25 +205,26 @@ export function fromSharedField(sharedField: SharedField, id?: string): Field {
 /**
  * WHERE条件转换器: 前端 -> 共享类型
  */
-export function toSharedCondition(condition: WhereCondition): SharedCondition {
+export function toSharedCondition(condition: import('./whereBuilder').WhereCondition): SharedCondition {
   return {
     field: condition.field,
     operator: condition.operator as any,
     value: condition.value,
-    logical_op: condition.logic as any
+    logical_op: condition.logicalOp as any
   };
 }
 
 /**
  * WHERE条件转换器: 共享类型 -> 前端
  */
-export function fromSharedCondition(shared: SharedCondition): WhereCondition {
+export function fromSharedCondition(shared: SharedCondition): import('./whereBuilder').WhereCondition {
   return {
     id: crypto.randomUUID(),
+    type: 'condition',
     field: shared.field,
     operator: shared.operator as any,
     value: shared.value,
-    logic: shared.logical_op
+    logicalOp: shared.logical_op as any
   };
 }
 
@@ -247,6 +242,22 @@ export function isSharedField(field: any): field is SharedField {
  */
 export function isFrontendField(field: any): field is Field {
   return field && typeof field.id === 'string' && field.dataType !== undefined;
+}
+
+/**
+ * 字段适配器: 前端 -> 共享类型 (别名)
+ * @deprecated 使用 toSharedField 代替
+ */
+export function adaptFieldFromFrontend(field: Field): SharedField {
+  return toSharedField(field);
+}
+
+/**
+ * 字段适配器: 共享类型 -> 前端 (别名)
+ * @deprecated 使用 fromSharedField 代替
+ */
+export function adaptFieldToFrontend(sharedField: SharedField, id?: string): Field {
+  return fromSharedField(sharedField, id);
 }
 
 // ========== 导出所有类型 ==========

@@ -194,14 +194,14 @@ class EventEntity(BaseModel):
     - name: 1-100字符
 
     字段映射:
-    - name (Entity) ↔ event_name (Database)
-    - name_cn (Entity) ↔ event_name_cn (Database)
+    - name (Entity) <-> event_name (Database)
+    - name_cn (Entity) <-> event_name_cn (Database)
     """
 
     # 主键
     id: Optional[int] = Field(None, description="数据库自增ID")
 
-    # 业务字段 (使用数据库列名作为字段名，同时接受Entity字段名作为别名)
+    # 业务字段 (使用数据库列名作为字段名, 同时接受Entity字段名作为别名)
     game_gid: int = Field(..., ge=0, description="游戏GID")
 
     # 使用alias同时接受name和event_name
@@ -813,7 +813,7 @@ class EventCategoryEntity(BaseModel):
     """
     事件类别实体 - 全局唯一的事件类别模型定义
 
-    用于事件的分类管理，如"充值/付费"、"任务系统"等
+    用于事件的分类管理, 如"充值/付费", "任务系统"等
     支持全局分类和游戏级别分类
     """
 
@@ -822,7 +822,7 @@ class EventCategoryEntity(BaseModel):
 
     # 业务字段
     name: str = Field(..., min_length=1, max_length=50, description="类别名称(唯一)")
-    game_gid: Optional[int] = Field(None, description="游戏GID，用于游戏级别的分类")
+    game_gid: Optional[int] = Field(None, description="游戏GID, 用于游戏级别的分类")
     name_cn: Optional[str] = Field(None, max_length=100, description="中文名称")
     description: Optional[str] = Field(None, description="类别描述")
     color: Optional[str] = Field(None, max_length=20, description="显示颜色")
@@ -834,7 +834,7 @@ class EventCategoryEntity(BaseModel):
     created_at: Optional[datetime] = Field(None, description="创建时间")
     updated_at: Optional[datetime] = Field(None, description="更新时间")
 
-    # 统计信息（仅在查询时填充，不写入数据库）
+    # 统计信息(仅在查询时填充, 不写入数据库)
     event_count: Optional[int] = Field(default=0, description="该类别下的事件数量", exclude=True)
 
     @field_validator('name', 'name_cn', mode='before')
@@ -871,6 +871,10 @@ class EventNodeEntity(BaseModel):
     game_gid: int = Field(..., ge=0, description="游戏业务GID")
     name: str = Field(..., min_length=1, max_length=100, description="节点名称")
     event_id: int = Field(..., ge=0, description="关联的事件ID")
+
+    # 关联数据（仅用于显示，不存储）
+    event_name: Optional[str] = Field(None, description="事件名称（仅显示用）")
+    event_name_cn: Optional[str] = Field(None, description="事件中文名称（仅显示用）")
 
     # 配置
     config_json: Dict[str, Any] = Field(default_factory=dict, description="节点配置JSON")

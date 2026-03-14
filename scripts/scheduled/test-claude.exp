@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+# Simple test for Claude CLI
+
+set timeout 30
+set claude_cli "/Users/mckenzie/.nvm/versions/node/v20.20.0/bin/claude"
+
+puts "Testing Claude CLI..."
+puts "Spawning: $claude_cli"
+
+spawn $claude_cli
+
+puts "Waiting for prompt..."
+
+expect {
+    timeout {
+        puts "Timeout after 30 seconds"
+        exit 1
+    }
+    -re {How|What|Claude|ready|Welcome|>} {
+        puts "Got prompt: $expect_out(0,string)"
+        send -- "exit\r"
+    }
+}
+
+expect eof
+puts "Test complete"

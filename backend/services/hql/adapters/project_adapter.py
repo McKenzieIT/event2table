@@ -6,10 +6,12 @@
 负责将当前项目的数据模型转换为抽象的Event/Field/Condition模型
 """
 
-from typing import Dict, Any, List
-from ..models.event import Event, Field, Condition
+from typing import Any, Dict, List
+
 from backend.models.repositories.events import EventRepository
 from backend.models.repositories.games import GameRepository
+
+from ..models.event import Condition, Event, Field
 
 
 class ProjectAdapter:
@@ -22,7 +24,7 @@ class ProjectAdapter:
     """
 
     def __init__(self):
-        """初始化适配器，注入Repository依赖"""
+        """初始化适配器, 注入Repository依赖"""
         self.event_repo = EventRepository()
         self.game_repo = GameRepository()
 
@@ -30,7 +32,7 @@ class ProjectAdapter:
         """
         从项目数据构建抽象Event
 
-        这是业务逻辑的核心：
+        这是业务逻辑的核心: 
         - 查询log_events表获取事件信息
         - 查询games表获取数据库信息
         - 构建完整的表名
@@ -50,7 +52,9 @@ class ProjectAdapter:
             game_gid = int(game_gid)
             event_id = int(event_id)
         except (ValueError, TypeError):
-            raise ValueError(f"Invalid game_gid or event_id: must be integers, got game_gid={game_gid}, event_id={event_id}")
+            raise ValueError(
+                f"Invalid game_gid or event_id: must be integers, got game_gid={game_gid}, event_id={event_id}"
+            )
 
         # 查询事件
         event = self.event_repo.find_by_id(event_id)
@@ -135,7 +139,8 @@ class ProjectAdapter:
             alias=field_data.get("alias"),
             aggregate_func=field_data.get("aggregateFunc") or field_data.get("aggregate_func"),
             json_path=field_data.get("jsonPath") or field_data.get("json_path"),
-            custom_expression=field_data.get("customExpression") or field_data.get("custom_expression"),
+            custom_expression=field_data.get("customExpression")
+            or field_data.get("custom_expression"),
             fixed_value=field_data.get("fixedValue") or field_data.get("fixed_value"),
         )
 
@@ -186,9 +191,7 @@ class ProjectAdapter:
         for event_data in events_data:
             if "game_gid" in event_data and "event_id" in event_data:
                 # 需要查询数据库
-                event = self.event_from_project(
-                    event_data["game_gid"], event_data["event_id"]
-                )
+                event = self.event_from_project(event_data["game_gid"], event_data["event_id"])
             else:
                 # 直接使用请求数据
                 event = self.event_from_request_data(event_data)

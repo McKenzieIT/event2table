@@ -31,12 +31,13 @@ Migration Guide:
     NEW: return json_success_response(data=data)
 """
 
-from functools import wraps
-from flask import jsonify
-from typing import Tuple, Dict, Any
 import logging
+from functools import wraps
+from typing import Any, Dict, Tuple
 
-from backend.core.utils import json_success_response, json_error_response
+from flask import jsonify
+
+from backend.core.utils import json_error_response, json_success_response
 
 logger = logging.getLogger(__name__)
 
@@ -80,9 +81,7 @@ def handle_api_errors(f):
     return decorated_function
 
 
-def create_error_response(
-    message: str, status_code: int = 400
-) -> Tuple[Dict[str, Any], int]:
+def create_error_response(message: str, status_code: int = 400) -> Tuple[Dict[str, Any], int]:
     """Deprecated: Use json_error_response() from backend.core.utils instead."""
     return {"success": False, "error": message}, status_code
 

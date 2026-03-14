@@ -20,11 +20,11 @@ Author: Event2Table Development Team
 Date: 2026-02-23
 """
 
-import graphene
-from graphene import ObjectType, Field, List, Int, String, Boolean, Float, Argument
-from graphene import Enum
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
+import graphene
+from graphene import Argument, Boolean, Enum, Field, Float, Int, List, ObjectType, String
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +33,14 @@ logger = logging.getLogger(__name__)
 # ENUMS
 # ============================================================================
 
+
 class ParameterTypeEnum(Enum):
     """
     Parameter Type Enumeration
 
     Defines the supported data types for event parameters.
     """
+
     INT = "int"
     STRING = "string"
     ARRAY = "array"
@@ -55,6 +57,7 @@ class ParameterFilterModeEnum(Enum):
 
     Defines filtering modes for parameter queries.
     """
+
     ALL = "all"
     COMMON = "common"
     NON_COMMON = "non_common"
@@ -69,9 +72,10 @@ class FieldTypeEnum(Enum):
 
     Defines categories of fields available for event configuration.
     """
+
     ALL = "all"
-    PARAMS = "params"
-    NON_COMMON = "non-common"
+    PARAM = "param"
+    NON_COMMON = "non_common"
     COMMON = "common"
     BASE = "base"
 
@@ -82,6 +86,7 @@ class FieldTypeEnum(Enum):
 # ============================================================================
 # TYPES
 # ============================================================================
+
 
 class ParameterManagementType(graphene.ObjectType):
     """
@@ -201,6 +206,7 @@ class FieldTypeType(graphene.ObjectType):
     # Field identification
     name = String(required=True, description="字段名称")
     display_name = String(description="显示名称")
+    description = String(description="字段描述")
     type = FieldTypeEnum(description="字段类型")
     category = String(description="字段分类（base, common, param）")
 
@@ -302,6 +308,7 @@ class BatchOperationResultType(graphene.ObjectType):
 # QUERY RESOLVERS
 # ============================================================================
 
+
 class ParameterManagementQueries(ObjectType):
     """
     Parameter Management Query Resolvers
@@ -315,14 +322,14 @@ class ParameterManagementQueries(ObjectType):
         game_gid=Int(required=True, description="游戏GID"),
         mode=Argument(ParameterFilterModeEnum, default_value="all", description="过滤模式"),
         event_id=Int(description="事件ID（可选）"),
-        description="查询参数列表（支持过滤和统计）"
+        description="查询参数列表（支持过滤和统计）",
     )
 
     common_parameters = Field(
         List(CommonParameterType),
         game_gid=Int(required=True, description="游戏GID"),
         threshold=Float(default_value=0.5, description="公共参数阈值（0-1）"),
-        description="查询公共参数列表"
+        description="查询公共参数列表",
     )
 
     parameter_changes = Field(
@@ -330,18 +337,20 @@ class ParameterManagementQueries(ObjectType):
         game_gid=Int(required=True, description="游戏GID"),
         parameter_id=Int(description="参数ID（可选）"),
         limit=Int(default_value=50, description="返回数量限制"),
-        description="查询参数变更记录"
+        description="查询参数变更记录",
     )
 
     event_fields = Field(
         List(FieldTypeType),
         event_id=Int(required=True, description="事件ID"),
         field_type=Argument(FieldTypeEnum, default_value="all", description="字段类型"),
-        description="查询事件字段列表"
+        description="查询事件字段列表",
     )
 
     @staticmethod
-    def resolve_parameters_management(root, info, game_gid: int, mode: str = "all", event_id: Optional[int] = None):
+    def resolve_parameters_management(
+        root, info, game_gid: int, mode: str = "all", event_id: Optional[int] = None
+    ):
         """
         Resolve parameters with filtering and statistics.
 
@@ -356,8 +365,8 @@ class ParameterManagementQueries(ObjectType):
             List of ParameterManagementType objects
         """
         try:
-            from backend.core.utils import fetch_all_as_dict
             from backend.core.data_access import Repositories
+            from backend.core.utils import fetch_all_as_dict
 
             # Get game_id from game_gid
             game_repo = Repositories.get('games')
@@ -440,7 +449,9 @@ class ParameterManagementQueries(ObjectType):
 
             # Add event_id filter if provided
             if event_id:
-                query = query.replace("WHERE le.game_gid = ?", "WHERE le.game_gid = ? AND ep.event_id = ?")
+                query = query.replace(
+                    "WHERE le.game_gid = ?", "WHERE le.game_gid = ? AND ep.event_id = ?"
+                )
                 params.append(event_id)
 
             parameters = fetch_all_as_dict(query, tuple(params))
@@ -469,8 +480,7 @@ class ParameterManagementQueries(ObjectType):
 
             # Get total event count
             total_events = fetch_all_as_dict(
-                "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?",
-                (game_gid,)
+                "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?", (game_gid,)
             )[0]['count']
 
             if total_events == 0:
@@ -499,7 +509,9 @@ class ParameterManagementQueries(ObjectType):
                 ORDER BY occurrence_count DESC, param_name
             """
 
-            params = fetch_all_as_dict(query, (total_events, threshold, threshold_count, total_events, game_gid))
+            params = fetch_all_as_dict(
+                query, (total_events, threshold, threshold_count, total_events, game_gid)
+            )
 
             # Parse event_codes
             for param in params:
@@ -515,7 +527,9 @@ class ParameterManagementQueries(ObjectType):
             return []
 
     @staticmethod
-    def resolve_parameter_changes(root, info, game_gid: int, parameter_id: Optional[int] = None, limit: int = 50):
+    def resolve_parameter_changes(
+        root, info, game_gid: int, parameter_id: Optional[int] = None, limit: int = 50
+    ):
         """
         Resolve parameter change history.
 
@@ -593,7 +607,7 @@ class ParameterManagementQueries(ObjectType):
                     'is_common': True,
                     'data_type': 'string',
                     'json_path': None,
-                    'usage_count': 0
+                    'usage_count': 0,
                 },
                 {
                     'name': 'role_id',
@@ -603,7 +617,7 @@ class ParameterManagementQueries(ObjectType):
                     'is_common': True,
                     'data_type': 'int',
                     'json_path': None,
-                    'usage_count': 0
+                    'usage_count': 0,
                 },
                 {
                     'name': 'account_id',
@@ -613,7 +627,7 @@ class ParameterManagementQueries(ObjectType):
                     'is_common': True,
                     'data_type': 'string',
                     'json_path': None,
-                    'usage_count': 0
+                    'usage_count': 0,
                 },
                 {
                     'name': 'utdid',
@@ -623,7 +637,7 @@ class ParameterManagementQueries(ObjectType):
                     'is_common': True,
                     'data_type': 'string',
                     'json_path': None,
-                    'usage_count': 0
+                    'usage_count': 0,
                 },
                 {
                     'name': 'envinfo',
@@ -633,7 +647,7 @@ class ParameterManagementQueries(ObjectType):
                     'is_common': True,
                     'data_type': 'string',
                     'json_path': None,
-                    'usage_count': 0
+                    'usage_count': 0,
                 },
                 {
                     'name': 'tm',
@@ -643,7 +657,7 @@ class ParameterManagementQueries(ObjectType):
                     'is_common': True,
                     'data_type': 'int',
                     'json_path': None,
-                    'usage_count': 0
+                    'usage_count': 0,
                 },
                 {
                     'name': 'ts',
@@ -653,8 +667,8 @@ class ParameterManagementQueries(ObjectType):
                     'is_common': True,
                     'data_type': 'string',
                     'json_path': None,
-                    'usage_count': 0
-                }
+                    'usage_count': 0,
+                },
             ]
 
             # Get parameter fields
@@ -689,16 +703,16 @@ class ParameterManagementQueries(ObjectType):
 
             # Add type field to param fields
             for field in param_fields:
-                field['type'] = 'params'
+                field['type'] = 'param'
 
             # Combine and filter based on field_type
             all_fields = base_fields + param_fields
 
             if field_type == "all":
                 filtered = all_fields
-            elif field_type == "params":
-                filtered = [f for f in all_fields if f['type'] == 'params']
-            elif field_type == "non-common":
+            elif field_type == "param":
+                filtered = [f for f in all_fields if f['type'] == 'param']
+            elif field_type == "non_common":
                 filtered = [f for f in all_fields if not f['is_common']]
             elif field_type == "common":
                 filtered = [f for f in all_fields if f['is_common']]
@@ -717,6 +731,7 @@ class ParameterManagementQueries(ObjectType):
 # ============================================================================
 # MUTATION RESOLVERS
 # ============================================================================
+
 
 class ChangeParameterTypeMutation(graphene.Mutation):
     """
@@ -744,7 +759,11 @@ class ChangeParameterTypeMutation(graphene.Mutation):
         return ChangeParameterTypeMutation(
             success=result['success'],
             message=result['message'],
-            parameter=ParameterManagementType.from_dict(result['parameter']) if result.get('parameter') else None
+            parameter=(
+                ParameterManagementType.from_dict(result['parameter'])
+                if result.get('parameter')
+                else None
+            ),
         )
 
 
@@ -757,7 +776,7 @@ class AutoSyncCommonParametersMutation(graphene.Mutation):
 
     class Arguments:
         game_gid = Int(required=True, description="游戏GID")
-        threshold = Float(description="公共参数阈值（0-1），默认0.5")
+        threshold = Float(description="公共参数阈值（0-1）, 默认0.5")
 
     # Output fields
     success = Boolean(description="操作是否成功")
@@ -768,13 +787,19 @@ class AutoSyncCommonParametersMutation(graphene.Mutation):
         """Execute mutation."""
         from backend.gql_api.resolvers.parameter_resolvers import mutate_auto_sync_common_parameters
 
-        result = mutate_auto_sync_common_parameters(info, game_gid, False)  # force_recalculate defaults to False
+        result = mutate_auto_sync_common_parameters(
+            info, game_gid, False
+        )  # force_recalculate defaults to False
 
         # Convert dict result to Mutation object
         return AutoSyncCommonParametersMutation(
             success=result['success'],
             message=result['message'],
-            result=BatchOperationResultType.from_dict(result['result']) if result.get('result') else None
+            result=(
+                BatchOperationResultType.from_dict(result['result'])
+                if result.get('result')
+                else None
+            ),
         )
 
 
@@ -783,29 +808,77 @@ class BatchAddFieldsToCanvasMutation(graphene.Mutation):
     Batch Add Fields to Canvas Mutation
 
     Adds multiple fields to a Canvas node configuration.
+    返回格式已修改为匹配前端期望: ok, fields, count
     """
 
     class Arguments:
-        event_id = Int(required=True, description="事件ID")
-        field_type = Argument(FieldTypeEnum, required=True, description="字段类型")
+        eventId = Int(required=True, description="事件ID")
+        fieldType = Argument(FieldTypeEnum, required=True, description="字段类型")
 
-    # Output fields
-    success = Boolean(description="操作是否成功")
+    # Output fields - 修改为匹配前端期望的格式
+    ok = Boolean(description="操作是否成功")
+    fields = List(lambda: FieldTypeType, description="添加的字段列表")
+    count = Int(description="添加数量")
     message = String(description="结果消息")
-    result = Field(BatchOperationResultType, description="批量操作结果")
+    result = Field(BatchOperationResultType, description="批量操作结果（保留兼容性）")
 
-    def mutate(self, info, event_id: int, field_type: str):
+    def mutate(self, info, eventId: int, fieldType: str):
         """Execute mutation."""
-        from backend.gql_api.resolvers.parameter_resolvers import mutate_batch_add_fields_to_canvas
+        import logging
+        from backend.services.events.event_builder_app_service import EventBuilderAppService
 
-        result = mutate_batch_add_fields_to_canvas(info, event_id, field_type)
+        logger = logging.getLogger(__name__)
 
-        # Convert dict result to Mutation object
-        return BatchAddFieldsToCanvasMutation(
-            success=result['success'],
-            message=result['message'],
-            result=BatchOperationResultType.from_dict(result['result']) if result.get('result') else None
-        )
+        try:
+            # 直接调用服务层
+            service = EventBuilderAppService()
+            result = service.batch_add_fields(eventId, fieldType)
+
+            # 转换字段列表为字典格式（让Graphene自动序列化）
+            field_dicts = []
+            if result.get('fields'):
+                logger.info(f"[batchAddFieldsToCanvas] Processing {len(result['fields'])} fields")
+                for i, field in enumerate(result['fields']):
+                    # 直接构造字典，包含所有需要的字段
+                    # Graphene会自动将这些字典序列化为GraphQL响应
+                    field_type_value = field.get('field_type', 'param')
+
+                    field_dict = {
+                        'name': field['name'],
+                        'type': field_type_value,  # GraphQL enum值
+                        'category': field.get('field_type', 'param'),
+                        'display_name': field.get('description', field.get('name', '')),
+                        'description': field.get('description', field.get('name', '')),
+                        'json_path': field.get('json_path'),
+                        'is_common': False,
+                        'data_type': None,
+                        'usage_count': 0,
+                    }
+                    logger.info(f"[batchAddFieldsToCanvas] Field {i}: name={field['name']}, type={field_type_value}")
+                    field_dicts.append(field_dict)
+
+                logger.info(f"[batchAddFieldsToCanvas] Created {len(field_dicts)} field dicts")
+
+            # 返回前端期望的格式
+            # Graphene会自动将字典映射到FieldTypeType的GraphQL字段
+            return BatchAddFieldsToCanvasMutation(
+                ok=result['ok'],
+                fields=field_dicts,
+                count=result.get('count', 0),
+                message=result.get('message', ''),
+                result=None,
+            )
+
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error in batch_add_fields_to_canvas: {e}", exc_info=True)
+
+            # 返回错误
+            return BatchAddFieldsToCanvasMutation(
+                ok=False, fields=[], count=0, message=f"批量添加字段失败: {str(e)}", result=None
+            )
 
 
 class ParameterManagementMutations(ObjectType):
@@ -816,9 +889,7 @@ class ParameterManagementMutations(ObjectType):
     """
 
     # Mutation field definitions
-    change_parameter_type = ChangeParameterTypeMutation.Field(
-        description="修改参数类型"
-    )
+    change_parameter_type = ChangeParameterTypeMutation.Field(description="修改参数类型")
 
     auto_sync_common_parameters = AutoSyncCommonParametersMutation.Field(
         description="自动同步公共参数"

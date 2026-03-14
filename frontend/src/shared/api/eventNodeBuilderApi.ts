@@ -5,18 +5,11 @@
  * @module eventNodeBuilder
  */
 
+import type { Event } from '@shared/types/event-types';
+
 // ============================================
 // Type Definitions
 // ============================================
-
-export interface Event {
-  id: number;
-  event_name: string;
-  display_name: string;
-  game_gid: number;
-  event_type: 'user' | 'system' | 'auto';
-  created_at: string;
-}
 
 export interface FieldConfig {
   field_name: string;
@@ -57,6 +50,7 @@ export interface EventParameter {
   param_name: string;
   param_name_cn: string;
   param_type: string;
+  hive_type?: string;
   default_value?: string;
   description?: string;
 }
@@ -76,11 +70,13 @@ export interface HQLPreviewResponse {
 export interface SaveConfigRequest {
   game_gid: number;
   event_id: number;
-  name_en: string;
-  name_cn: string;
-  description: string;
-  fields: FieldConfig[];
-  where_conditions: WhereCondition[];
+  name: string;  // ✅ BUGFIX #5: 匹配后端API格式 (单个name字段)
+  config: {
+    fields: FieldConfig[];
+    where_conditions: WhereCondition[];
+    name_cn?: string;
+    description?: string;
+  };
 }
 
 export interface ConfigListResponse {

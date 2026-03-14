@@ -108,7 +108,7 @@ export default function PageHeader({
           </Button>
         )}
         {onLoadConfig && (
-          <Button variant="secondary" onLoadConfig={onLoadConfig}>
+          <Button variant="secondary" onClick={onLoadConfig}>
             加载配置
           </Button>
         )}

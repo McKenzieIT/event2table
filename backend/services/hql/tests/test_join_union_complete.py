@@ -5,8 +5,9 @@ JOIN和UNION完整测试套件
 """
 
 import pytest
+
 from backend.services.hql.core.generator import HQLGenerator
-from backend.services.hql.models.event import Event, Field, Condition
+from backend.services.hql.models.event import Condition, Event, Field
 
 
 class TestJOINModeFullCoverage:
@@ -192,10 +193,10 @@ class TestUNIONModeFullCoverage:
         # 验证包含UNION ALL
         assert "UNION ALL" in result
         # 验证不包含分区过滤的WHERE
-        # （或者只是简单的SELECT...FROM）
+        # (或者只是简单的SELECT...FROM)
 
     def test_generate_union_mode_multiple_events(self):
-        """测试UNION模式多事件（3个）"""
+        """测试UNION模式多事件(3个)"""
         generator = HQLGenerator()
         events = [
             Event(name="login", table_name="ods_login"),
@@ -206,7 +207,7 @@ class TestUNIONModeFullCoverage:
 
         result = generator.generate(events=events, fields=fields, conditions=[], mode="union")
 
-        # 应该有2个UNION ALL（3个事件）
+        # 应该有2个UNION ALL(3个事件)
         assert result.count("UNION ALL") == 2
         assert "ods_login" in result
         assert "ods_logout" in result

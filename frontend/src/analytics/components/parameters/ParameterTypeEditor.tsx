@@ -33,14 +33,7 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { BaseModal, Button, Select, Spinner, useToast } from '@shared/ui';
 import { CHANGE_PARAMETER_TYPE } from '@/graphql/mutations';
-
-export interface Parameter {
-  id: number;
-  paramName: string;
-  paramNameCn?: string;
-  type: 'base' | 'param' | 'custom';
-  gameGid?: number;
-}
+import type { Parameter } from '@shared/types/parameter-types';
 
 interface ParameterTypeEditorProps {
   isOpen: boolean;
