@@ -6,6 +6,28 @@
 
 ## 2026年3月
 
+### 2026-03-05到2026-03-09报告（152个文件） 🆕 **新归档**
+
+**提取的经验**:
+- 自动化性能优化流程 → [performance-patterns.md](../lessons-learned/performance-patterns.md)
+- DataLoader批量查询优化 → [api-design-patterns.md](../lessons-learned/api-design-patterns.md)
+- XSS防护实施 → [security-essentials.md](../lessons-learned/security-essentials.md)
+- TDD Red阶段经验 → [testing-guide.md](../lessons-learned/testing-guide.md)
+
+**完整报告列表**:
+- [2026-03-05报告](./2026/03-march/reports/2026-03-05/) - 38个文件
+- [2026-03-06报告](./2026/03-march/reports/2026-03-06/) - 26个文件
+- [2026-03-07报告](./2026/03-march/reports/2026-03-07/) - 18个文件
+- [2026-03-08报告](./2026/03-march/reports/2026-03-08/) - 32个文件
+- [2026-03-09报告](./2026/03-march/reports/2026-03-09/) - 5个文件
+
+**核心报告摘要**:
+- `PERFORMANCE-OPTIMIZATION-COMPLETE-FINAL-REPORT.md` (2026-03-05) - 828个性能问题自动分类
+- `JS-TS-MIGRATION-COMPLETE-FINAL.md` (2026-03-06) - 100% TypeScript覆盖率
+- `GRAPHQL-DATALOADER-OPTIMIZATION-REPORT.md` (2026-03-07) - DataLoader减少查询70-99%
+- `GRAPHQL-COMPREHENSIVE-AUDIT-REPORT.md` (2026-03-08) - 11个P0问题发现
+- `XSS-PROTECTION-FIX-SUMMARY.md` (2026-03-09) - XSS防护完整实施
+
 ### 测试报告
 
 - [E2E测试P0问题报告](./2026-03/03-march/reports/E2E-TEST-P0-ISSUE.md) - React应用挂载问题诊断
@@ -102,18 +124,57 @@
 
 ---
 
-## 快速查找
+## 快速查找 🔍
+
+### 按主题索引 ⭐ **推荐（2026-03-13 新增）**
+
+- 📋 **[主题索引](TOPIC_INDEX.md)** - 按主题快速查找所有归档文档
+  - GraphQL迁移 (9个)
+  - E2E测试 (10个)
+  - 缓存失效修复 (4个)
+  - Chrome MCP (3个)
+  - 测试覆盖率 (2个)
+  - TDD实践 (2个)
+  - 其他 (35个)
+  - **评分统计**：25个核心文档（⭐⭐⭐）、34个重要参考（⭐⭐）、6个补充材料（⭐）
+
+**优势**：
+- 无需记住具体日期，直接按主题浏览历史文档
+- 评分系统帮助快速识别核心文档
+- 标签系统便于按需筛选
+
+### 文档管理工具 🛠️
+
+- ⭐ **[评分系统用户指南](SCORING-SYSTEM-USER-GUIDE.md)** - 如何使用文档评分系统
+- 🔄 **[自动化用户指南](AUTOMATION-USER-GUIDE.md)** - 索引自动更新的三种方式
+  - Git Pre-commit Hook（提交时自动更新）
+  - 文件监控后台服务（实时监控）
+  - 手动触发命令（按需更新）
 
 ### 按日期
 
+- [2026年3月](./2026/03-march/) - 65个报告
 - [2026年2月](./2026-02/) - 269个归档文档
 
-### 按主题
+### 按主题分类（2026年2月）
 
 - [优化](./2026-02/optimization-reports/) - 后端优化、性能优化、缓存优化
 - [测试](./2026-02/testing-reports/) - E2E测试、单元测试、测试基础设施
 - [E2E](./2026-02/e2e-test-reports/) - E2E测试迭代报告、问题修复
 - [报告](./2026-02/reports/) - 项目报告、文档整合报告
+
+### 搜索工具 🔎
+
+```bash
+# 在所有归档中搜索关键词
+rg "缓存失效" docs/archive/
+
+# 在特定月份中搜索
+rg "GraphQL" docs/archive/2026/03-march/
+
+# 搜索并显示上下文
+rg "Performance" docs/archive/ -A 3 -B 3
+```
 
 ### 按类型
 
