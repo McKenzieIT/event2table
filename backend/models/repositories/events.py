@@ -679,18 +679,27 @@ class EventRepository(GenericRepository):
             conn.commit()
 
             # 获取插入的ID列表(使用lastrowid)
-            # 注意: executemany不返回rowcount, 需要查询获取
+            # ✅ PERFORMANCE: 使用单个UNION ALL查询代替N+1循环查询
             inserted_ids = []
-            for event_data in events_data:
-                game_gid = event_data.get('game_gid')
-                event_name = event_data.get('event_name')
-                cursor.execute(
-                    "SELECT id FROM log_events WHERE game_gid = ? AND event_name = ?",
-                    (game_gid, event_name),
-                )
-                row = cursor.fetchone()
-                if row:
-                    inserted_ids.append(row[0])
+            if events_data:
+                # 提取所有(game_gid, event_name)组合
+                identifiers = [(e.get('game_gid'), e.get('event_name')) for e in events_data]
+
+                # 单个查询获取所有ID
+                # 注意: 每个event可能存在多次，使用GROUP_CONCAT或MAX获取最新ID
+                # SQLite中lastrowid是连接级别的，无法在executemany后直接获取
+                # 这里简化处理：假设(game_gid, event_name)唯一或返回第一个ID
+                if identifiers:
+                    # 使用UNION ALL组合多个查询
+                    union_queries = ' UNION ALL '.join([
+                        f"SELECT id FROM log_events WHERE game_gid = ? AND event_name = ?"
+                        for _ in identifiers
+                    ])
+
+                    # 展开参数: [(gid1, name1), (gid2, name2)] -> [gid1, name1, gid2, name2]
+                    flat_params = [item for pair in identifiers for item in pair]
+                    cursor.execute(union_queries, flat_params)
+                    inserted_ids = [row[0] for row in cursor.fetchall()]
 
             return inserted_ids
 
