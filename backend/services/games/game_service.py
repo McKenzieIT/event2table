@@ -301,6 +301,7 @@ class GameService:
 
     # ========== 私有辅助方法 ==========
 
+    @cached("games.event_count", timeout=1800)  # ⚡ PERF: Task 1.3 - Cache event count (30 min TTL)
     def _get_event_count(self, game_gid: int) -> int:
         """获取游戏的事件数量"""
         from backend.core.utils.converters import fetch_one_as_dict
@@ -311,6 +312,7 @@ class GameService:
         )
         return count["count"] if count else 0
 
+    @cached("games.flow_count", timeout=1800)  # ⚡ PERF: Task 1.3 - Cache flow count (30 min TTL)
     def _get_flow_count(self, game_gid: int) -> int:
         """获取游戏的流程数量"""
         from backend.core.utils.converters import fetch_one_as_dict
