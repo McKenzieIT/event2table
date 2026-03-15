@@ -285,7 +285,7 @@ class GameRepository(GenericRepository):
         conn.close()
         return updated_count
 
-    def find_by_ods_db(self, ods_db: str) -> List[Dict[str, Any]]:
+    def find_by_ods_db(self, ods_db: str) -> List[GameEntity]:
         """
         根据ODS数据库查询游戏列表
 
@@ -293,16 +293,17 @@ class GameRepository(GenericRepository):
             ods_db: ODS数据库名称 ('ieu_ods' 或 'overseas_ods')
 
         Returns:
-            游戏列表
+            GameEntity列表
 
         Example:
             >>> repo = GameRepository()
             >>> games = repo.find_by_ods_db('ieu_ods')
         """
         query = "SELECT * FROM games WHERE ods_db = ? ORDER BY name"
-        return fetch_all_as_dict(query, (ods_db,))
+        rows = fetch_all_as_dict(query, (ods_db,))
+        return [GameEntity(**row) for row in rows]
 
-    def search_by_name(self, name_pattern: str) -> List[Dict[str, Any]]:
+    def search_by_name(self, name_pattern: str) -> List[GameEntity]:
         """
         根据名称模糊搜索游戏
 
@@ -310,14 +311,15 @@ class GameRepository(GenericRepository):
             name_pattern: 名称匹配模式（支持SQL LIKE语法）
 
         Returns:
-            匹配的游戏列表
+            GameEntity列表
 
         Example:
             >>> repo = GameRepository()
             >>> games = repo.search_by_name('%王者%')
         """
         query = "SELECT * FROM games WHERE name LIKE ? ORDER BY name"
-        return fetch_all_as_dict(query, (name_pattern,))
+        rows = fetch_all_as_dict(query, (name_pattern,))
+        return [GameEntity(**row) for row in rows]
 
     def get_game_categories_summary(self, game_gid: int) -> List[Dict[str, Any]]:
         """
@@ -364,7 +366,7 @@ class GameRepository(GenericRepository):
         """
         return self.find_by_gid(gid) is not None
 
-    def get_game_for_update(self, game_id: int) -> Optional[Dict[str, Any]]:
+    def get_game_for_update(self, game_id: int) -> Optional[GameEntity]:
         """
         获取游戏信息用于更新操作
 
@@ -372,13 +374,14 @@ class GameRepository(GenericRepository):
             game_id: 游戏ID
 
         Returns:
-            游戏字典
+            GameEntity对象, 不存在返回None
 
         Note:
             此方法不使用缓存, 确保获取最新数据用于更新操作
         """
         query = "SELECT * FROM games WHERE id = ?"
-        return fetch_one_as_dict(query, (game_id,))
+        row = fetch_one_as_dict(query, (game_id,))
+        return GameEntity(**row) if row else None
 
     def get_gids_by_list(self, gids: List[str]) -> List[str]:
         """
@@ -404,7 +407,7 @@ class GameRepository(GenericRepository):
         rows = fetch_all_as_dict(query, gids)
         return [row['gid'] for row in rows]
 
-    def get_by_ids(self, game_ids: List[int]) -> List[Dict[str, Any]]:
+    def get_by_ids(self, game_ids: List[int]) -> List[GameEntity]:
         """
         批量查询游戏（按数据库ID）
 
@@ -412,7 +415,7 @@ class GameRepository(GenericRepository):
             game_ids: 游戏ID列表
 
         Returns:
-            游戏列表
+            GameEntity列表
 
         Example:
             >>> repo = GameRepository()
@@ -424,7 +427,8 @@ class GameRepository(GenericRepository):
         placeholders = ",".join(["?" for _ in game_ids])
         query = f"SELECT * FROM games WHERE id IN ({placeholders})"
 
-        return fetch_all_as_dict(query, game_ids)
+        rows = fetch_all_as_dict(query, game_ids)
+        return [GameEntity(**row) for row in rows]
 
     def delete_batch(self, game_ids: List[int]) -> int:
         """
