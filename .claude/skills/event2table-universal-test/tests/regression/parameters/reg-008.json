@@ -1,0 +1,47 @@
+{
+  "id": "REG-008",
+  "name": "Parameters Enhanced",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameters/enhanced",
+  "timeout": 10000,
+  "module": "parameters",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameters/enhanced"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".enhanced-table"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".batch-actions"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters/parameters_enhanced.png"
+    }
+  ]
+}

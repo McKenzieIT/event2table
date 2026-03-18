@@ -1,0 +1,43 @@
+{
+  "id": "REG-033",
+  "name": "API Documentation",
+  "type": "regression",
+  "priority": "low",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/api-docs",
+  "timeout": 10000,
+  "module": "other",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/api-docs"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".api-docs"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".endpoint-list"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/other/api_documentation.png"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "REG-019",
+  "name": "Field Builder",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/field-builder",
+  "timeout": 10000,
+  "module": "canvas",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/field-builder"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".field-builder"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".field-config"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/canvas/field_builder.png"
+    }
+  ]
+}

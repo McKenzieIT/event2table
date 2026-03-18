@@ -1,0 +1,55 @@
+{
+  "id": "REG-004",
+  "name": "Event Create Form",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/events/create",
+  "timeout": 10000,
+  "module": "events",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/events/create"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": "#event-name-input"
+        },
+        {
+          "type": "element_exists",
+          "selector": "#event-table-input"
+        },
+        {
+          "type": "element_exists",
+          "selector": "#event-type-select"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".submit-button"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/events/event_create_form.png"
+    }
+  ]
+}

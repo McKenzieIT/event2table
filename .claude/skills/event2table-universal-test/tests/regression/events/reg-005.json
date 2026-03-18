@@ -1,0 +1,51 @@
+{
+  "id": "REG-005",
+  "name": "Event Detail Page",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/events/1",
+  "timeout": 10000,
+  "module": "events",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/events/1"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".event-detail"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".event-info"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".related-events"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/events/event_detail_page.png"
+    }
+  ]
+}

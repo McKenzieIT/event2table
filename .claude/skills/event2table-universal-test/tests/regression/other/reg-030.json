@@ -1,0 +1,43 @@
+{
+  "id": "REG-030",
+  "name": "Create Log",
+  "type": "regression",
+  "priority": "low",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/logs/create",
+  "timeout": 10000,
+  "module": "other",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/logs/create"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".log-form"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".log-fields"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/other/create_log.png"
+    }
+  ]
+}

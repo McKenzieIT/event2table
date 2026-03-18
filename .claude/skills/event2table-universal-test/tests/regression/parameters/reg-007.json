@@ -1,0 +1,47 @@
+{
+  "id": "REG-007",
+  "name": "Parameters List",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameters",
+  "timeout": 10000,
+  "module": "parameters",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameters"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".parameters-table"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".filter-controls"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters/parameters_list.png"
+    }
+  ]
+}

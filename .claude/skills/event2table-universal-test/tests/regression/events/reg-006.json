@@ -1,0 +1,51 @@
+{
+  "id": "REG-006",
+  "name": "Event Edit Form",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/events/1/edit",
+  "timeout": 10000,
+  "module": "events",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/events/1/edit"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": "#event-name-input"
+        },
+        {
+          "type": "element_exists",
+          "selector": "#event-table-input"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".update-button"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/events/event_edit_form.png"
+    }
+  ]
+}

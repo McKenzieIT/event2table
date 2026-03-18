@@ -1,0 +1,43 @@
+{
+  "id": "AN-001",
+  "name": "Dashboard Load and Display",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/",
+  "timeout": 30000,
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "selector": ".dashboard-container"
+      },
+      "timeout": 15000
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".stat-card"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".action-card"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/dashboard-initial-load.png"
+    }
+  ]
+}

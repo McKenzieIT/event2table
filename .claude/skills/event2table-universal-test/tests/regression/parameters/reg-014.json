@@ -1,0 +1,43 @@
+{
+  "id": "REG-014",
+  "name": "Parameter Network",
+  "type": "regression",
+  "priority": "low",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameter-network",
+  "timeout": 10000,
+  "module": "parameters",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameter-network"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".network-graph"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".node-details"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters/parameter_network.png"
+    }
+  ]
+}

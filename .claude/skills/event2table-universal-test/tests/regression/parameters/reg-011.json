@@ -1,0 +1,43 @@
+{
+  "id": "REG-011",
+  "name": "Parameter Analysis",
+  "type": "regression",
+  "priority": "medium",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameter-analysis",
+  "timeout": 10000,
+  "module": "parameters",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameter-analysis"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".analysis-charts"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".insight-cards"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters/parameter_analysis.png"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "REG-028",
+  "name": "Import Events",
+  "type": "regression",
+  "priority": "medium",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/import-events",
+  "timeout": 10000,
+  "module": "other",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/import-events"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".import-form"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".file-upload"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/other/import_events.png"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "REG-018",
+  "name": "Event Nodes List",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/event-nodes",
+  "timeout": 10000,
+  "module": "canvas",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/event-nodes"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".nodes-list"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".node-filters"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/canvas/event_nodes_list.png"
+    }
+  ]
+}

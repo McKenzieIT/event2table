@@ -1,0 +1,18 @@
+{
+  "total_tests": 34,
+  "by_module": {
+    "dashboard": 1,
+    "games": 1,
+    "events": 4,
+    "parameters": 9,
+    "canvas": 6,
+    "hql": 5,
+    "other": 8
+  },
+  "by_priority": {
+    "critical": 7,
+    "high": 13,
+    "medium": 8,
+    "low": 6
+  }
+}

@@ -1,31 +1,3 @@
-/**
- * ⚠️ DEPRECATED - 此组件已废弃，请使用GameManagementModalGraphQL.tsx
- *
- * 废弃时间：2026-03-19
- * 废弃原因：
- * - 项目统一使用GraphQL API
- * - GameManagementModalGraphQL提供更好的类型安全和性能
- * - 避免维护两套相似代码，降低维护成本
- *
- * 迁移指南：
- * 1. 将导入从 'GameManagementModal' 改为 'GameManagementModalGraphQL'
- * 2. 更新mutation调用为GraphQL mutations（使用Apollo Client）
- * 3. 删除fetch API调用，改用useMutation hook
- *
- * 示例：
- * // ❌ 旧代码（REST API）
- * import GameManagementModal from '@/features/games/GameManagementModal';
- *
- * // ✅ 新代码（GraphQL）
- * import GameManagementModal from '@/features/games/GameManagementModalGraphQL';
- *
- * @deprecated 使用 GameManagementModalGraphQL 替代
- * @see GameManagementModalGraphQL
- *
- * 保留原因：向后兼容，确保现有代码不会立即崩溃
- * 计划删除时间：2026-06-19（废弃后3个月）
- */
-
 // ⚡️ REACT PERF - Features: Optimized with React.memo, useCallback, useMemo
 // ✅ Performance optimization: Prevent unnecessary re-renders in game management
 // See: docs/reports/2026-03-06/FEATURES-OPTIMIZATION-REPORT.md

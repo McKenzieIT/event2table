@@ -1,0 +1,47 @@
+{
+  "id": "REG-009",
+  "name": "Parameter Dashboard",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameters/dashboard",
+  "timeout": 10000,
+  "module": "parameters",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameters/dashboard"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".dashboard-charts"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".parameter-stats"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters/parameter_dashboard.png"
+    }
+  ]
+}

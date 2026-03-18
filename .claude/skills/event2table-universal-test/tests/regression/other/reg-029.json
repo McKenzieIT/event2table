@@ -1,0 +1,43 @@
+{
+  "id": "REG-029",
+  "name": "Batch Operations",
+  "type": "regression",
+  "priority": "medium",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/batch-operations",
+  "timeout": 10000,
+  "module": "other",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/batch-operations"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".batch-controls"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".operation-list"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/other/batch_operations.png"
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-18",
+  "name": "Event2Table Universal Test System",
+
+  "globalSettings": {
+    "baseUrl": "http://localhost:5173",
+    "defaultTimeout": 10000,
+    "screenshotFormat": "png",
+    "retryOnFailure": true,
+    "maxRetries": 3,
+    "parallelExecution": true,
+    "maxParallel": 4,
+    "outputDirectory": "output",
+    "reportFormat": "html"
+  },
+
+  "engine": {
+    "default": "agent-browser",
+    "fallback": "chrome-devtools-mcp",
+    "mapping": {
+      "regression": "agent-browser",
+      "e2e": "agent-browser",
+      "performance": "agent-browser",
+      "security": "agent-browser",
+      "debugging": "chrome-devtools-mcp"
+    }
+  },
+
+  "testTypes": {
+    "regression": {
+      "description": "Quick validation after code changes",
+      "timeout": 5000,
+      "priority": ["critical", "high"],
+      "coverage": "all-pages"
+    },
+    "e2e": {
+      "description": "Complete user workflow validation",
+      "timeout": 10000,
+      "priority": ["critical"],
+      "coverage": "critical-paths"
+    },
+    "performance": {
+      "description": "Core Web Vitals and profiling",
+      "timeout": 15000,
+      "thresholds": {
+        "LCP": 2500,
+        "FID": 100,
+        "CLS": 0.1,
+        "TTI": 3000
+      }
+    },
+    "security": {
+      "description": "XSS, SQL injection, CSRF detection",
+      "timeout": 8000,
+      "checks": ["xss", "sql-injection", "csrf", "input-validation"]
+    },
+    "visual": {
+      "description": "UI screenshot comparison",
+      "timeout": 10000,
+      "baselineDirectory": "output/baselines",
+      "diffDirectory": "output/diffs"
+    }
+  },
+
+  "commonSteps": {
+    "navigate": {
+      "action": "open",
+      "description": "Navigate to URL"
+    },
+    "waitForLoad": {
+      "action": "wait",
+      "condition": { "load": "networkidle" },
+      "description": "Wait for page to fully load"
+    },
+    "takeSnapshot": {
+      "action": "snapshot",
+      "saveRefs": true,
+      "description": "Get DOM snapshot with element references"
+    },
+    "takeScreenshot": {
+      "action": "screenshot",
+      "fullPage": false,
+      "description": "Capture page screenshot"
+    }
+  },
+
+  "commonValidations": {
+    "noConsoleErrors": {
+      "type": "console_clean",
+      "level": "error",
+      "description": "No console errors"
+    },
+    "elementVisible": {
+      "type": "element_visible",
+      "description": "Element is visible on page"
+    },
+    "elementExists": {
+      "type": "element_exists",
+      "description": "Element exists in DOM"
+    },
+    "pageLoaded": {
+      "type": "page_loaded",
+      "description": "Page fully loaded"
+    },
+    "textVisible": {
+      "type": "text_visible",
+      "description": "Text is visible on page"
+    }
+  },
+
+  "pageCoverage": {
+    "total": 34,
+    "modules": {
+      "dashboard": { "pages": 1, "path": "/" },
+      "games": { "pages": 1, "path": "/games" },
+      "events": { "pages": 4, "paths": ["/events", "/events/create", "/events/:id", "/events/:id/edit"] },
+      "parameters": { "pages": 9, "paths": ["/parameters", "/parameters/enhanced", "/parameters/dashboard", "/parameters/compare", "/parameter-analysis", "/parameter-usage", "/parameter-history", "/parameter-network", "/common-params"] },
+      "canvas": { "pages": 6, "paths": ["/canvas", "/event-node-builder", "/event-nodes", "/field-builder", "/flow-builder", "/flows"] },
+      "hql": { "pages": 5, "paths": ["/hql-manage", "/hql-results", "/hql/:id/edit", "/generate", "/generate/result"] },
+      "other": { "pages": 8, "paths": ["/categories", "/import-events", "/batch-operations", "/logs/create", "/log-detail", "/alter-sql/:paramId", "/api-docs", "/validation-rules"] }
+    }
+  },
+
+  "performanceTargets": {
+    "regression": { "target": 300, "max": 600 },
+    "e2e": { "target": 600, "max": 1200 },
+    "performance": { "target": 900, "max": 1800 },
+    "security": { "target": 480, "max": 900 },
+    "visual": { "target": 600, "max": 1200 },
+    "all": { "target": 1200, "max": 2400 }
+  }
+}

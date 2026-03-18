@@ -1,0 +1,47 @@
+{
+  "id": "REG-024",
+  "name": "HQL Edit",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/hql/1/edit",
+  "timeout": 10000,
+  "module": "hql",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/hql/1/edit"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".hql-editor"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".preview-panel"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/hql/hql_edit.png"
+    }
+  ]
+}

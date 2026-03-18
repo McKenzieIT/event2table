@@ -1,0 +1,43 @@
+{
+  "id": "REG-013",
+  "name": "Parameter History",
+  "type": "regression",
+  "priority": "medium",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameter-history",
+  "timeout": 10000,
+  "module": "parameters",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameter-history"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".history-timeline"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".version-list"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters/parameter_history.png"
+    }
+  ]
+}

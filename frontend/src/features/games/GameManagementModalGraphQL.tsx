@@ -9,15 +9,17 @@
 // 游戏管理组件 - GraphQL版本 (已迁移)
 // 替代原有的REST API版本
 
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { 
-  GET_GAMES, 
-  GET_GAME, 
-  CREATE_GAME, 
-  UPDATE_GAME, 
+import { useDebounce } from '@/hooks/useDebounce';
+import {
+  GET_GAMES,
+  GET_GAME,
+  CREATE_GAME,
+  UPDATE_GAME,
   DELETE_GAME,
-  SEARCH_GAMES 
+  BATCH_DELETE_GAMES,
+  SEARCH_GAMES
 } from '../../shared/graphql/operations';
 
 interface Game {
@@ -36,17 +38,24 @@ export const GameManagementModal: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedGames, setSelectedGames] = useState<number[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // ✅ 使用防抖优化搜索 - 减少不必要的GraphQL请求
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // 查询游戏列表
   const { loading, error, data, refetch } = useQuery(GET_GAMES, {
     variables: { limit: 20, offset: 0 },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-first',  // ✅ 优化：优先使用缓存
+    nextFetchPolicy: 'cache-first',  // ✅ 优化：后续也使用缓存
+    notifyOnNetworkStatusChange: true,  // ✅ 优化：通知网络状态变化
   });
 
-  // 搜索游戏
+  // 搜索游戏（使用防抖后的查询）
   const { data: searchData, loading: searchLoading } = useQuery(SEARCH_GAMES, {
-    variables: { query: searchQuery },
-    skip: !searchQuery,
+    variables: { query: debouncedSearchQuery },
+    skip: !debouncedSearchQuery,
   });
 
   // 创建游戏
@@ -73,8 +82,16 @@ export const GameManagementModal: React.FC = () => {
         setEditingGame(null);
         refetch();
       } else {
-        alert(`更新失败: ${result.updateGame.errors.join(', ')}`);
+        // ✅ 显示具体错误信息
+        const errorMsg = result.updateGame.errors?.join(', ') || '未知错误';
+        alert(`更新失败: ${errorMsg}`);
+        console.error('Update game errors:', result.updateGame.errors);
       }
+    },
+    onError: (error) => {
+      // ✅ 处理网络错误和GraphQL错误
+      alert(`更新失败: ${error.message}`);
+      console.error('Update game error:', error);
     },
   });
 
@@ -87,6 +104,22 @@ export const GameManagementModal: React.FC = () => {
       } else {
         alert(`删除失败: ${result.deleteGame.errors.join(', ')}`);
       }
+    },
+  });
+
+  // 批量删除游戏
+  const [batchDeleteGames, { loading: batchDeleting }] = useMutation(BATCH_DELETE_GAMES, {
+    onCompleted: (result) => {
+      if (result.batchDeleteGames.success) {
+        alert(`成功删除 ${result.batchDeleteGames.deletedCount} 个游戏`);
+        setSelectedGames([]);
+        refetch();
+      } else {
+        alert(`删除失败: ${result.batchDeleteGames.errors.join(', ')}`);
+      }
+    },
+    onError: (error) => {
+      alert(`删除失败: ${error.message}`);
     },
   });
 
@@ -105,6 +138,14 @@ export const GameManagementModal: React.FC = () => {
   const handleUpdateGame = useCallback((gameData: any) => {
     if (!editingGame) return;
 
+    // ✅ 添加验证：确保游戏存在
+    const gameExists = data?.games?.some((g: Game) => g.gid === editingGame.gid);
+    if (!gameExists) {
+      alert(`游戏 GID ${editingGame.gid} 不存在，请刷新页面重试`);
+      refetch();  // 刷新游戏列表
+      return;
+    }
+
     updateGame({
       variables: {
         gid: editingGame.gid,
@@ -112,7 +153,7 @@ export const GameManagementModal: React.FC = () => {
         ods_db: gameData.ods_db,
       },
     });
-  }, [editingGame, updateGame]);
+  }, [editingGame, updateGame, data, refetch]);
 
   // ✅ 使用 useCallback 优化 - 处理删除游戏
   const handleDeleteGame = useCallback((game: Game) => {
@@ -126,21 +167,63 @@ export const GameManagementModal: React.FC = () => {
     }
   }, [deleteGame]);
 
+  // ✅ 使用 useCallback 优化 - 处理批量删除游戏
+  const handleBatchDelete = useCallback(async () => {
+    if (selectedGames.length === 0) return;
+
+    if (!confirm(`确定要删除选中的 ${selectedGames.length} 个游戏吗？`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await batchDeleteGames({
+        variables: { ids: selectedGames }
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [selectedGames, batchDeleteGames]);
+
   if (loading) return <div className="loading">加载中...</div>;
   if (error) return <div className="error">错误: {error.message}</div>;
 
-  const games = searchQuery ? searchData?.searchGames : data?.games;
+  // ✅ 使用 useMemo 优化 - 缓存游戏列表计算
+  const games = useMemo(() => {
+    return debouncedSearchQuery ? searchData?.searchGames : data?.games;
+  }, [debouncedSearchQuery, searchData, data]);
+
+  // ✅ 使用 useMemo 优化 - 缓存过滤后的游戏列表
+  const filteredGames = useMemo(() => {
+    if (!games?.length) return [];
+    return games.filter((game: Game) =>
+      game.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      game.gid?.toString().includes(searchQuery)
+    );
+  }, [games, searchQuery]);
 
   return (
     <div className="game-management-modal">
       <div className="modal-header">
         <h2>游戏管理</h2>
-        <button 
-          className="btn-primary"
-          onClick={() => setShowCreateForm(true)}
-        >
-          创建游戏
-        </button>
+        <div className="header-actions">
+          {selectedGames.length > 0 && (
+            <button
+              className="btn-danger"
+              onClick={handleBatchDelete}
+              disabled={batchDeleting || isDeleting}
+              style={{ marginRight: '10px' }}
+            >
+              删除选中 ({selectedGames.length})
+            </button>
+          )}
+          <button
+            className="btn-primary"
+            onClick={() => setShowCreateForm(true)}
+          >
+            创建游戏
+          </button>
+        </div>
       </div>
 
       {/* 搜索框 */}
@@ -156,8 +239,20 @@ export const GameManagementModal: React.FC = () => {
 
       {/* 游戏列表 */}
       <div className="game-list">
-        {games?.map((game: Game) => (
+        {filteredGames?.map((game: Game) => (
           <div key={game.id} className="game-item">
+            <input
+              type="checkbox"
+              checked={selectedGames.includes(game.gid)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setSelectedGames([...selectedGames, game.gid]);
+                } else {
+                  setSelectedGames(selectedGames.filter(id => id !== game.gid));
+                }
+              }}
+              style={{ marginRight: '10px' }}
+            />
             <div className="game-info">
               <h3>{game.name}</h3>
               <p>GID: {game.gid}</p>

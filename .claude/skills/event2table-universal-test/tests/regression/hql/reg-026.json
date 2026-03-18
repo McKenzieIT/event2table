@@ -1,0 +1,47 @@
+{
+  "id": "REG-026",
+  "name": "Generate Result",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/generate/result",
+  "timeout": 10000,
+  "module": "hql",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/generate/result"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".result-display"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".download-links"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/hql/generate_result.png"
+    }
+  ]
+}

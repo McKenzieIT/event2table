@@ -1,0 +1,43 @@
+{
+  "id": "AN-003",
+  "name": "Games Search Functionality",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/games",
+  "timeout": 30000,
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/games"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "selector": "input[placeholder*='搜索']"
+      },
+      "timeout": 15000
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      },
+      "timeout": 15000
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "text_contains",
+          "selector": ".games-grid",
+          "text": "STAR"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/games-search-results.png"
+    }
+  ]
+}

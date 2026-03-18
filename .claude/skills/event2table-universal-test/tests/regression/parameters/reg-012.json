@@ -1,0 +1,43 @@
+{
+  "id": "REG-012",
+  "name": "Parameter Usage",
+  "type": "regression",
+  "priority": "medium",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameter-usage",
+  "timeout": 10000,
+  "module": "parameters",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameter-usage"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".usage-table"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".usage-charts"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters/parameter_usage.png"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "REG-003",
+  "name": "Events List Display",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/events",
+  "timeout": 10000,
+  "module": "events",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/events"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".events-table"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".pagination"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/events/events_list_display.png"
+    }
+  ]
+}

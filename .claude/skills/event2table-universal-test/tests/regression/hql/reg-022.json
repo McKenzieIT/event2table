@@ -1,0 +1,47 @@
+{
+  "id": "REG-022",
+  "name": "HQL Manage",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/hql-manage",
+  "timeout": 10000,
+  "module": "hql",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/hql-manage"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".hql-list"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".hql-actions"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/hql/hql_manage.png"
+    }
+  ]
+}

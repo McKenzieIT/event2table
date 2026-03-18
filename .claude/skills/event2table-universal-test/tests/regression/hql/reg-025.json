@@ -1,0 +1,47 @@
+{
+  "id": "REG-025",
+  "name": "Generate HQL",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/generate",
+  "timeout": 10000,
+  "module": "hql",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/generate"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".generate-wizard"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".step-indicator"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/hql/generate_hql.png"
+    }
+  ]
+}

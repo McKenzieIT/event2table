@@ -1,0 +1,47 @@
+{
+  "id": "REG-020",
+  "name": "Flow Builder",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/flow-builder",
+  "timeout": 10000,
+  "module": "canvas",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/flow-builder"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".flow-canvas"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".flow-controls"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/canvas/flow_builder.png"
+    }
+  ]
+}

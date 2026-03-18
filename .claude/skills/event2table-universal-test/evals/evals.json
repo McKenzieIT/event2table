@@ -1,0 +1,26 @@
+{
+  "skill_name": "event2table-universal-test",
+  "evals": [
+    {
+      "id": 1,
+      "name": "run-dashboard-regression-test",
+      "prompt": "Run regression test for the dashboard page at http://localhost:5173/. The test should: 1) Navigate to the dashboard, 2) Wait for page to load, 3) Check that the dashboard container exists, 4) Verify no console errors, 5) Take a screenshot.",
+      "expected_output": "Test executes successfully with agent-browser commands: open, wait, snapshot, validate, screenshot. Should return test result showing dashboard loaded successfully with all checks passed.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "test-games-page",
+      "prompt": "Test the games list page. Navigate to http://localhost:5173/games, wait for the games grid to load, verify that the search input exists, check for console errors, and capture a screenshot.",
+      "expected_output": "Successfully executes test using agent-browser CLI. Returns test results showing games page loaded, search input found, no console errors, and screenshot saved.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "e2e-event-creation",
+      "prompt": "Run E2E test for event creation workflow. Navigate to http://localhost:5173/events/create, fill in the event name 'test_login', set table name 'ods_test_all_view', select event type 'single', submit the form, and verify success message appears.",
+      "expected_output": "Executes multi-step E2E test using agent-browser. Fills form fields, clicks submit, waits for success message. Returns test result showing workflow completed successfully.",
+      "files": []
+    }
+  ]
+}

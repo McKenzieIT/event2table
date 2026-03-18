@@ -1,0 +1,43 @@
+{
+  "id": "REG-032",
+  "name": "Alter SQL",
+  "type": "regression",
+  "priority": "low",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/alter-sql/123",
+  "timeout": 10000,
+  "module": "other",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/alter-sql/123"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".sql-editor"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".preview-panel"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/other/alter_sql.png"
+    }
+  ]
+}

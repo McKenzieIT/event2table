@@ -1,0 +1,43 @@
+{
+  "id": "REG-031",
+  "name": "Log Detail",
+  "type": "regression",
+  "priority": "low",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/log-detail",
+  "timeout": 10000,
+  "module": "other",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/log-detail"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".log-detail"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".log-metadata"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/other/log_detail.png"
+    }
+  ]
+}

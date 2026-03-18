@@ -1,0 +1,47 @@
+{
+  "id": "REG-023",
+  "name": "HQL Results",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/hql-results",
+  "timeout": 10000,
+  "module": "hql",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/hql-results"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".results-table"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".export-controls"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/hql/hql_results.png"
+    }
+  ]
+}

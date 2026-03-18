@@ -1,0 +1,51 @@
+{
+  "id": "REG-002",
+  "name": "Games List Display",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/games",
+  "timeout": 10000,
+  "module": "games",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/games"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".games-grid"
+        },
+        {
+          "type": "element_exists",
+          "selector": "input[placeholder*='\u641c\u7d22']"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".game-card"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/games/games_list_display.png"
+    }
+  ]
+}

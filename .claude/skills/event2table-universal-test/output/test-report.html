@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event2Table E2E测试报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card.total .value { color: #667eea; }
+        .stat-card.passed .value { color: #28a745; }
+        .stat-card.failed .value { color: #dc3545; }
+        .stat-card.rate .value { color: #17a2b8; }
+
+        .test-list {
+            padding: 40px;
+        }
+
+        .test-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .test-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-item.passed {
+            border-left: 4px solid #28a745;
+        }
+
+        .test-item.failed {
+            border-left: 4px solid #dc3545;
+        }
+
+        .test-header {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .test-header:hover {
+            background: #e9ecef;
+        }
+
+        .test-info {
+            flex: 1;
+        }
+
+        .test-id {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .test-name {
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+
+        .test-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .test-status.passed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .test-status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .test-details {
+            padding: 20px;
+            display: none;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .test-item.active .test-details {
+            display: block;
+        }
+
+        .test-item.active .test-header {
+            background: #e9ecef;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-item.passed {
+            background: #d4edda;
+        }
+
+        .step-item.failed {
+            background: #f8d7da;
+        }
+
+        .step-item.timeout {
+            background: #fff3cd;
+        }
+
+        .screenshot-container {
+            margin-top: 20px;
+        }
+
+        .screenshot-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .filter-bar {
+            padding: 20px 40px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            background: white;
+            color: #6c757d;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn.all.active { background: #667eea; }
+        .filter-btn.passed.active { background: #28a745; }
+        .filter-btn.failed.active { background: #dc3545; }
+
+        .footer {
+            padding: 20px 40px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Event2Table E2E测试报告</h1>
+            <p>全面覆盖34个页面的端到端自动化测试</p>
+        </div>
+
+        <div class="summary">
+            <div class="stat-card total">
+                <h3>总测试数</h3>
+                <div class="value">39</div>
+            </div>
+            <div class="stat-card passed">
+                <h3>通过</h3>
+                <div class="value">29</div>
+            </div>
+            <div class="stat-card failed">
+                <h3>失败</h3>
+                <div class="value">10</div>
+            </div>
+            <div class="stat-card rate">
+                <h3>通过率</h3>
+                <div class="value">74.4%</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <span>筛选:</span>
+            <button class="filter-btn all active" onclick="filterTests('all')">全部</button>
+            <button class="filter-btn passed" onclick="filterTests('passed')">✅ 通过</button>
+            <button class="filter-btn failed" onclick="filterTests('failed')">❌ 失败</button>
+        </div>
+
+        <div class="test-list" id="testList">
+            <!-- 测试项将通过JavaScript动态生成 -->
+        </div>
+
+        <div class="footer">
+            <p>生成时间: 2026-03-18 21:23:12 | 测试工具: agent-browser CLI | Event2Table Universal Test System</p>
+        </div>
+    </div>
+
+    <script>
+        // 测试数据
+        const testData = [{"test_id":"AN-001","test_name":"Dashboard Load and Display","url":"/","status":"failed","steps":[{"action":"open","status":"timeout","output":"","error":"Command timed out"},{"action":"wait","status":"timeout","output":"","error":"Command timed out"},{"action":"validate","status":"timeout","output":"","error":"Command timed out"},{"action":"screenshot","status":"timeout","output":"","error":"Command timed out"}],"screenshot":null,"error":"Command timed out","timestamp":"2026-03-18T21:15:26.261643"},{"test_id":"AN-002","test_name":"Games List Display","url":"/games","status":"failed","steps":[{"action":"open","status":"timeout","output":"","error":"Command timed out"},{"action":"wait","status":"timeout","output":"","error":"Command timed out"},{"action":"validate","status":"timeout","output":"","error":"Command timed out"},{"action":"screenshot","status":"timeout","output":"","error":"Command timed out"}],"screenshot":null,"error":"Command timed out","timestamp":"2026-03-18T21:15:32.525285"},{"test_id":"AN-003","test_name":"Events List Display","url":"/events","status":"failed","steps":[{"action":"open","status":"timeout","output":"","error":"Command timed out"},{"action":"wait","status":"timeout","output":"","error":"Command timed out"},{"action":"validate","status":"timeout","output":"","error":"Command timed out"},{"action":"screenshot","status":"timeout","output":"","error":"Command timed out"}],"screenshot":null,"error":"Command timed out","timestamp":"2026-03-18T21:15:38.749742"},{"test_id":"AN-004","test_name":"Parameters List","url":"/parameters","status":"failed","steps":[{"action":"open","status":"timeout","output":"","error":"Command timed out"},{"action":"wait","status":"timeout","output":"","error":"Command timed out"},{"action":"validate","status":"timeout","output":"","error":"Command timed out"},{"action":"screenshot","status":"timeout","output":"","error":"Command timed out"}],"screenshot":null,"error":"Command timed out","timestamp":"2026-03-18T21:15:45.009319"},{"test_id":"AN-005","test_name":"Canvas Page","url":"/canvas","status":"failed","steps":[{"action":"open","status":"timeout","output":"","error":"Command timed out"},{"action":"wait","status":"timeout","output":"","error":"Command timed out"},{"action":"validate","status":"timeout","output":"","error":"Command timed out"},{"action":"screenshot","status":"timeout","output":"","error":"Command timed out"}],"screenshot":null,"error":"Command timed out","timestamp":"2026-03-18T21:15:51.248094"},{"test_id":"REG-001","test_name":"Dashboard Load Test","url":"http://localhost:5173/","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"- link \"Event2Table\" [ref=e1]...","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/dashboard/dashboard_load_test.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/dashboard/dashboard_load_test.png","error":null,"timestamp":"2026-03-18T21:16:02.482749"},{"test_id":"REG-002","test_name":"Games List Display","url":"http://localhost:5173/games","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/games/games_list_display.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/games/games_list_display.png","error":null,"timestamp":"2026-03-18T21:16:14.252309"},{"test_id":"REG-003","test_name":"Events List Display","url":"http://localhost:5173/events","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/events_list_display.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/events_list_display.png","error":null,"timestamp":"2026-03-18T21:16:26.031347"},{"test_id":"REG-004","test_name":"Event Create Form","url":"http://localhost:5173/events/create","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/event_create_form.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/event_create_form.png","error":null,"timestamp":"2026-03-18T21:16:37.806826"},{"test_id":"REG-005","test_name":"Event Detail Page","url":"http://localhost:5173/events/1","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/event_detail_page.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/event_detail_page.png","error":null,"timestamp":"2026-03-18T21:16:49.587830"},{"test_id":"REG-006","test_name":"Event Edit Form","url":"http://localhost:5173/events/1/edit","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/event_edit_form.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/events/event_edit_form.png","error":null,"timestamp":"2026-03-18T21:17:01.382489"},{"test_id":"REG-007","test_name":"Parameters List","url":"http://localhost:5173/parameters","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameters_list.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameters_list.png","error":null,"timestamp":"2026-03-18T21:17:13.164430"},{"test_id":"REG-008","test_name":"Parameters Enhanced","url":"http://localhost:5173/parameters/enhanced","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameters_enhanced.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameters_enhanced.png","error":null,"timestamp":"2026-03-18T21:17:24.950628"},{"test_id":"REG-009","test_name":"Parameter Dashboard","url":"http://localhost:5173/parameters/dashboard","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_dashboard.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_dashboard.png","error":null,"timestamp":"2026-03-18T21:17:36.724389"},{"test_id":"REG-010","test_name":"Parameter Compare","url":"http://localhost:5173/parameters/compare","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_compare.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_compare.png","error":null,"timestamp":"2026-03-18T21:17:48.506950"},{"test_id":"REG-011","test_name":"Parameter Analysis","url":"http://localhost:5173/parameter-analysis","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_analysis.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_analysis.png","error":null,"timestamp":"2026-03-18T21:18:00.287043"},{"test_id":"REG-012","test_name":"Parameter Usage","url":"http://localhost:5173/parameter-usage","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_usage.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_usage.png","error":null,"timestamp":"2026-03-18T21:18:12.065260"},{"test_id":"REG-013","test_name":"Parameter History","url":"http://localhost:5173/parameter-history","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_history.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_history.png","error":null,"timestamp":"2026-03-18T21:18:23.846279"},{"test_id":"REG-014","test_name":"Parameter Network","url":"http://localhost:5173/parameter-network","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_network.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_network.png","error":null,"timestamp":"2026-03-18T21:18:35.628221"},{"test_id":"REG-015","test_name":"Common Parameters","url":"http://localhost:5173/common-params","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/common_parameters.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/common_parameters.png","error":null,"timestamp":"2026-03-18T21:18:47.410902"},{"test_id":"REG-016","test_name":"Canvas Page","url":"http://localhost:5173/canvas","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/canvas_page.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/canvas_page.png","error":null,"timestamp":"2026-03-18T21:18:59.191895"},{"test_id":"REG-017","test_name":"Event Node Builder","url":"http://localhost:5173/event-node-builder","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/event_node_builder.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/event_node_builder.png","error":null,"timestamp":"2026-03-18T21:19:10.974411"},{"test_id":"REG-018","test_name":"Event Nodes List","url":"http://localhost:5173/event-nodes","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/event_nodes_list.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/event_nodes_list.png","error":null,"timestamp":"2026-03-18T21:19:22.756294"},{"test_id":"REG-019","test_name":"Field Builder","url":"http://localhost:5173/field-builder","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/field_builder.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/field_builder.png","error":null,"timestamp":"2026-03-18T21:19:34.537799"},{"test_id":"REG-020","test_name":"Flow Builder","url":"http://localhost:5173/flow-builder","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/flow_builder.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/flow_builder.png","error":null,"timestamp":"2026-03-18T21:19:46.319287"},{"test_id":"REG-021","test_name":"Flows List","url":"http://localhost:5173/flows","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/flows_list.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/canvas/flows_list.png","error":null,"timestamp":"2026-03-18T21:19:58.101322"},{"test_id":"REG-022","test_name":"HQL Manage","url":"http://localhost:5173/hql-manage","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/hql_manage.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/hql_manage.png","error":null,"timestamp":"2026-03-18T21:20:09.883437"},{"test_id":"REG-023","test_name":"HQL Results","url":"http://localhost:5173/hql-results","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/hql_results.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/hql_results.png","error":null,"timestamp":"2026-03-18T21:20:21.665866"},{"test_id":"REG-024","test_name":"HQL Edit","url":"http://localhost:5173/hql/1/edit","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/hql_edit.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/hql_edit.png","error":null,"timestamp":"2026-03-18T21:20:33.447805"},{"test_id":"REG-025","test_name":"Generate HQL","url":"http://localhost:5173/generate","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/generate_hql.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/generate_hql.png","error":null,"timestamp":"2026-03-18T21:20:45.229321"},{"test_id":"REG-026","test_name":"Generate Result","url":"http://localhost:5173/generate/result","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/generate_result.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/hql/generate_result.png","error":null,"timestamp":"2026-03-18T21:20:57.010744"},{"test_id":"REG-027","test_name":"Categories List","url":"http://localhost:5173/categories","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/categories_list.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/categories_list.png","error":null,"timestamp":"2026-03-18T21:21:08.793216"},{"test_id":"REG-028","test_name":"Import Events","url":"http://localhost:5173/import-events","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/import_events.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/import_events.png","error":null,"timestamp":"2026-03-18T21:21:20.575082"},{"test_id":"REG-029","test_name":"Batch Operations","url":"http://localhost:5173/batch-operations","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/batch_operations.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/batch_operations.png","error":null,"timestamp":"2026-03-18T21:21:32.357183"},{"test_id":"REG-030","test_name":"Create Log","url":"http://localhost:5173/logs/create","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/create_log.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/create_log.png","error":null,"timestamp":"2026-03-18T21:21:44.138983"},{"test_id":"REG-031","test_name":"Log Detail","url":"http://localhost:5173/log-detail","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/log_detail.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/log_detail.png","error":null,"timestamp":"2026-03-18T21:21:55.920924"},{"test_id":"REG-032","test_name":"Alter SQL","url":"http://localhost:5173/alter-sql/123","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/alter_sql.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/alter_sql.png","error":null,"timestamp":"2026-03-18T21:22:07.702985"},{"test_id":"REG-033","test_name":"API Documentation","url":"http://localhost:5173/api-docs","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/api_documentation.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/api_documentation.png","error":null,"timestamp":"2026-03-18T21:22:19.484880"},{"test_id":"REG-034","test_name":"Validation Rules","url":"http://localhost:5173/validation-rules","status":"passed","steps":[{"action":"open","status":"passed","output":"✓ Event2Table - Data Warehouse HQL Generator","error":null},{"action":"wait","status":"passed","output":"","error":null},{"action":"snapshot","status":"passed","output":"","error":null},{"action":"validate","status":"passed","output":"","error":null},{"action":"screenshot","status":"passed","output":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/validation_rules.png","error":null}],"screenshot":"/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/other/validation_rules.png","error":null,"timestamp":"2026-03-18T21:22:31.267250"}];
+
+        function renderTests(filter = 'all') {
+            const testList = document.getElementById('testList');
+            testList.innerHTML = '';
+
+            const filteredTests = testData.filter(test => {
+                if (filter === 'all') return true;
+                return test.status === filter;
+            });
+
+            filteredTests.forEach(test => {
+                const testItem = document.createElement('div');
+                testItem.className = `test-item ${test.status}`;
+                testItem.dataset.status = test.status;
+
+                const stepsHtml = test.steps.map(step => {
+                    const statusIcon = {
+                        'passed': '✅',
+                        'failed': '❌',
+                        'timeout': '⏱️'
+                    }[step.status] || '⏳';
+
+                    return `
+                        <li class="step-item ${step.status}">
+                            <span>${statusIcon}</span>
+                            <strong>${step.action}</strong>
+                            ${step.error ? `<span class="error-message">${step.error}</span>` : ''}
+                        </li>
+                    `;
+                }).join('');
+
+                testItem.innerHTML = `
+                    <div class="test-header" onclick="toggleDetails(this)">
+                        <div class="test-info">
+                            <div class="test-id">${test.test_id}</div>
+                            <div class="test-name">${test.test_name}</div>
+                        </div>
+                        <div class="test-status ${test.status}">
+                            ${test.status === 'passed' ? '✅ 通过' : '❌ 失败'}
+                        </div>
+                    </div>
+                    <div class="test-details">
+                        <div class="detail-section">
+                            <h4>📋 基本信息</h4>
+                            <p><strong>URL:</strong> ${test.url}</p>
+                            <p><strong>时间:</strong> ${new Date(test.timestamp).toLocaleString('zh-CN')}</p>
+                        </div>
+                        ${test.error ? `
+                        <div class="detail-section">
+                            <h4>❌ 错误信息</h4>
+                            <div class="error-message">${test.error}</div>
+                        </div>
+                        ` : ''}
+                        <div class="detail-section">
+                            <h4>🔄 执行步骤</h4>
+                            <ul class="step-list">
+                                ${stepsHtml}
+                            </ul>
+                        </div>
+                        ${test.screenshot ? `
+                        <div class="detail-section">
+                            <h4>📸 截图</h4>
+                            <div class="screenshot-container">
+                                <img src="${test.screenshot}" alt="${test.test_name}" loading="lazy">
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                testList.appendChild(testItem);
+            });
+        }
+
+        function toggleDetails(header) {
+            const testItem = header.parentElement;
+            testItem.classList.toggle('active');
+        }
+
+        function filterTests(filter) {
+            // 更新按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.filter-btn.${filter}`).classList.add('active');
+
+            // 重新渲染测试列表
+            renderTests(filter);
+        }
+
+        // 初始化渲染
+        renderTests();
+    </script>
+</body>
+</html>

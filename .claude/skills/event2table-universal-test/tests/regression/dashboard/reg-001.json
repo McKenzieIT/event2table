@@ -1,0 +1,51 @@
+{
+  "id": "REG-001",
+  "name": "Dashboard Load Test",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/",
+  "timeout": 10000,
+  "module": "dashboard",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".dashboard-container"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".stat-card"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".action-card"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/dashboard/dashboard_load_test.png"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "AN-002",
+  "name": "Games List Display",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/games",
+  "timeout": 30000,
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/games"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "selector": ".games-grid"
+      },
+      "timeout": 15000
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": "input[placeholder*='搜索']"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".game-card"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/games-list-display.png"
+    }
+  ]
+}

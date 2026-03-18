@@ -1,0 +1,47 @@
+{
+  "id": "REG-017",
+  "name": "Event Node Builder",
+  "type": "regression",
+  "priority": "critical",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/event-node-builder",
+  "timeout": 10000,
+  "module": "canvas",
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/event-node-builder"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "load": "networkidle"
+      }
+    },
+    {
+      "action": "snapshot",
+      "saveRefs": true
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".node-builder"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".config-panel"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/canvas/event_node_builder.png"
+    }
+  ]
+}

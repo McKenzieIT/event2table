@@ -27,7 +27,7 @@ import { eventNodesApi } from "@shared/api/eventNodes";
 import { ErrorBoundary, ErrorFallback } from "@shared/ui/ErrorBoundary";
 import { HQLViewModal } from "@event-builder/components/HQLViewModal";
 import { QuickEditModal } from "@event-builder/components/QuickEditModal";
-import { FieldsListModal } from "@event-builder/components/FieldsListModal";
+import FieldsListModal from "@event-builder/components/FieldsListModal";
 import { AdvancedFilterPanel } from "@event-builder/components/AdvancedFilterPanel";
 import { useDebounce } from "@shared/hooks/useDebounce";
 import { Button, ConfirmDialog } from "@shared/ui";

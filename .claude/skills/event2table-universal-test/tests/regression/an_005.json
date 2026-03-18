@@ -1,0 +1,39 @@
+{
+  "id": "AN-005",
+  "name": "Parameters List Display",
+  "type": "regression",
+  "priority": "high",
+  "engine": "agent-browser",
+  "url": "http://localhost:5173/parameters?game_gid=10000147",
+  "timeout": 30000,
+  "steps": [
+    {
+      "action": "open",
+      "url": "http://localhost:5173/parameters?game_gid=10000147"
+    },
+    {
+      "action": "wait",
+      "condition": {
+        "selector": ".parameters-table"
+      },
+      "timeout": 15000
+    },
+    {
+      "action": "validate",
+      "checks": [
+        {
+          "type": "console_clean",
+          "level": "error"
+        },
+        {
+          "type": "element_exists",
+          "selector": ".parameter-row"
+        }
+      ]
+    },
+    {
+      "action": "screenshot",
+      "path": "output/screenshots/regression/parameters-list-display.png"
+    }
+  ]
+}
