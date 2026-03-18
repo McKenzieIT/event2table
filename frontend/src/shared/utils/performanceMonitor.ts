@@ -147,7 +147,7 @@ class PerformanceMonitor {
     return this.fps;
   }
 
-  getMemoryUsage(): number | undefined {
+  getSystemMemoryUsage(): number | undefined {
     return this.getMemoryUsage();
   }
 
@@ -225,7 +225,7 @@ export function getFPS() {
 }
 
 export function getMemoryUsage() {
-  return performanceMonitor.getMemoryUsage();
+  return performanceMonitor.getSystemMemoryUsage();
 }
 
 export function resetPerformanceMetrics() {

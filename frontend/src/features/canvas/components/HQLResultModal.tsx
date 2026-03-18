@@ -24,13 +24,13 @@
  * @migrated-to-typescript 2026-02-27
  */
 
-import React, { useState, useEffect, useRef, useMemo, ChangeEvent, KeyboardEvent } from 'react';
+import React, { useState, useEffect, useRef, useMemo, ChangeEvent, KeyboardEvent, Suspense } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { BaseModal, EmptyState } from '@shared/ui';
+import { BaseModal, EmptyState, Spinner } from '@shared/ui';
 import { formatSQL, calculateSQLStats } from '@shared/utils/sqlFormatter';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
-import DataPreviewModal from './DataPreviewModal';
+import { LazyDataPreviewModal } from '@shared/utils/lazyModals';
 import './HQLResultModal.css';
 
 // ============================================
@@ -554,15 +554,17 @@ const HQLResultModal: React.FC<HQLResultModalProps> = ({
         )}
       </div>
 
-      {/* Data Preview Modal */}
+      {/* Data Preview Modal - Lazy loaded */}
       {showDataPreview && (
-        <DataPreviewModal
-          isOpen={showDataPreview}
-          onClose={() => setShowDataPreview(false)}
-          sql={displayHQL}
-          outputFields={outputFields}
-          gameData={gameData}
-        />
+        <Suspense fallback={<Spinner size="lg" label="加载中..." />}>
+          <LazyDataPreviewModal
+            isOpen={showDataPreview}
+            onClose={() => setShowDataPreview(false)}
+            sql={displayHQL}
+            outputFields={outputFields}
+            gameData={gameData}
+          />
+        </Suspense>
       )}
 
       {/* Promise-based confirm dialog */}

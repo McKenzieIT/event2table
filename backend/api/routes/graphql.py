@@ -19,6 +19,7 @@ from backend.gql_api.middleware.complexity_limit import ComplexityLimitMiddlewar
 
 # Import middleware
 from backend.gql_api.middleware.depth_limit import DepthLimitMiddleware
+from backend.gql_api.middleware.dataloader_context import DataLoaderContextMiddleware
 from backend.gql_api.middleware.error_handling import ErrorHandlingMiddleware
 
 # Import schema
@@ -35,12 +36,14 @@ graphql_bp.add_url_rule(
         schema=schema,
         graphiql=True,  # Enable GraphiQL IDE
         middleware=[
+            DataLoaderContextMiddleware(),  # ✅ NEW: Inject DataLoaders into context
             DepthLimitMiddleware(max_depth=10),
             ComplexityLimitMiddleware(max_complexity=1000),
             ErrorHandlingMiddleware(),
             cache_middleware,
             cache_invalidation_middleware,
         ],
+        context_value=lambda: {},  # Initialize empty context for DataLoader injection
     ),
 )
 
@@ -49,4 +52,4 @@ graphql_bp.add_url_rule(
     '/graphiql', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True)
 )
 
-logger.info("GraphQL API routes registered with cache middleware")
+logger.info("GraphQL API routes registered with DataLoader context middleware")

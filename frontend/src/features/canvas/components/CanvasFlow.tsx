@@ -1,9 +1,10 @@
-// ⚡️ REACT PERF - Canvas: Optimized with React.memo, useCallback
+// ⚡️ REACT PERF - Canvas: Optimized with React.memo, useCallback, lazy modals
 // ✅ Performance optimization: Prevent unnecessary re-renders in canvas flow editor
+// ✅ Lazy loading: Modals are lazy-loaded to reduce initial bundle size
 // See: docs/reports/2026-03-06/FEATURES-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useCallback, useEffect, ReactNode, memo } from 'react';
+import React, { useState, useCallback, useEffect, ReactNode, memo, Suspense } from 'react';
 import ReactFlow, {
     Background,
     Controls,
@@ -27,8 +28,6 @@ import JoinNode from './nodes/JoinNode';
 import OutputNode from './nodes/OutputNode';
 import NodeSidebar from './NodeSidebar';
 import Toolbar from './Toolbar';
-import JoinConfigModal from './JoinConfigModal';
-import HQLResultModal from './HQLResultModal';
 import PropertiesPanel from './PropertiesPanel';
 import { loadEventConfig } from '../api/canvasApi';
 import { configToReactFlowNode } from './utils/nodeConverter';
@@ -38,8 +37,9 @@ import { useCanvasHistory } from './utils/useCanvasHistory';
 import { useFlowLoad } from '../hooks/useFlowLoad';
 import { useFlowSave } from '../hooks/useFlowSave';
 import { useFlowExecute } from '../hooks/useFlowExecute';
-import { useToast } from '@shared/ui';
+import { useToast, Spinner } from '@shared/ui';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+import { LazyJoinConfigModal, LazyHQLResultModal, LazyDataPreviewModal } from '@shared/utils/lazyModals';
 import { GameData } from './utils/hqlGenerators';
 import './CanvasFlow.css';
 
@@ -593,30 +593,34 @@ const CanvasFlow: React.FC<CanvasFlowProps> = ({ gameData, flowId }) => {
                 </ReactFlow>
             </div>
 
-            {/* JOIN configuration modal */}
+            {/* JOIN configuration modal - Lazy loaded */}
             {showJoinConfig && (
-                <JoinConfigModal
-                    isOpen={showJoinConfig}
-                    onClose={() => setShowJoinConfig(false)}
-                    node={selectedNode}
-                    availableFields={availableFields}
-                    onApply={handleJoinConfigApply}
-                    data-testid="join-config-modal"
-                />
+                <Suspense fallback={<Spinner size="lg" label="加载中..." />}>
+                    <LazyJoinConfigModal
+                        isOpen={showJoinConfig}
+                        onClose={() => setShowJoinConfig(false)}
+                        node={selectedNode}
+                        availableFields={availableFields}
+                        onApply={handleJoinConfigApply}
+                        data-testid="join-config-modal"
+                    />
+                </Suspense>
             )}
 
-            {/* HQL result modal */}
+            {/* HQL result modal - Lazy loaded */}
             {showHQLResult && (
-                <HQLResultModal
-                    isOpen={showHQLResult}
-                    onClose={() => setShowHQLResult(false)}
-                    hql={generatedHQL}
-                    flowName={flowName}
-                    gameData={gameData}
-                    onRegenerate={handleGenerateHQL}
-                    outputFields={outputFields}
-                    data-testid="hql-result-modal"
-                />
+                <Suspense fallback={<Spinner size="lg" label="加载中..." />}>
+                    <LazyHQLResultModal
+                        isOpen={showHQLResult}
+                        onClose={() => setShowHQLResult(false)}
+                        hql={generatedHQL}
+                        flowName={flowName}
+                        gameData={gameData}
+                        onRegenerate={handleGenerateHQL}
+                        outputFields={outputFields}
+                        data-testid="hql-result-modal"
+                    />
+                </Suspense>
             )}
 
             {/* Properties panel */}
