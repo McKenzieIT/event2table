@@ -1,9 +1,3 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 import React, { useState, useEffect, useMemo, useCallback, ChangeEvent, memo } from 'react';
 import { Button, Input, EmptyState } from '@shared/ui';

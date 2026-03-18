@@ -1,19 +1,18 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Integrated React.memo + useMemo + useCallback
+// ✅ Performance: Optimized re-renders for sidebar component
+// - Added React.memo to prevent unnecessary re-renders
+// - Memoized filteredConfigs computation with useMemo
+// - Stabilized event handler functions with useCallback
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useEventConfigs } from '../hooks/useEventConfigs';
 import { Button, Spinner } from '@shared/ui';
 import SearchBar from "./SearchBar";
 import "./NodeSidebar.css";
 import type { NodeSidebarProps, EventConfig, GameData } from "./types";
 
-export default function NodeSidebar({
+function NodeSidebar({
   gameData,
   savedConfigs,
   onConfigsLoad,
@@ -32,20 +31,24 @@ export default function NodeSidebar({
     }
   }, [data, onConfigsLoad]);
 
-  // 搜索过滤逻辑
-  const filteredConfigs = savedConfigs.filter((config) => {
-    if (!searchTerm) return true;
+  // ⚡️ REACT PERF: useMemo优化 - 缓存过滤后的配置列表
+  const filteredConfigs = useMemo(
+    () =>
+      savedConfigs.filter((config) => {
+        if (!searchTerm) return true;
 
-    const term = searchTerm.toLowerCase();
-    const nameMatch = config.name_cn?.toLowerCase().includes(term);
-    const eventMatch = config.event_name_cn?.toLowerCase().includes(term);
-    const eventNameMatch = config.event_name?.toLowerCase().includes(term);
+        const term = searchTerm.toLowerCase();
+        const nameMatch = config.name_cn?.toLowerCase().includes(term);
+        const eventMatch = config.event_name_cn?.toLowerCase().includes(term);
+        const eventNameMatch = config.event_name?.toLowerCase().includes(term);
 
-    return nameMatch || eventMatch || eventNameMatch;
-  });
+        return nameMatch || eventMatch || eventNameMatch;
+      }),
+    [savedConfigs, searchTerm]
+  );
 
-  // 双击配置节点处理
-  const onDoubleClickConfig = (config: EventConfig): void => {
+  // ⚡️ REACT PERF: useCallback优化 - 稳定双击配置处理函数
+  const onDoubleClickConfig = useCallback((config: EventConfig): void => {
     if (onAddNode) {
       const position = { x: 100, y: 100 };
       onAddNode({
@@ -77,10 +80,10 @@ export default function NodeSidebar({
       }),
     );
     event.dataTransfer.effectAllowed = "move";
-  };
+  }, []);
 
-  // 拖拽连接节点
-  const onDragConnectionStart = (event: React.DragEvent, connectionType: string): void => {
+  // ⚡️ REACT PERF: useCallback优化 - 稳定拖拽连接节点处理函数
+  const onDragConnectionStart = useCallback((event: React.DragEvent, connectionType: string): void => {
     event.dataTransfer.setData(
       "application/reactflow",
       JSON.stringify({
@@ -90,10 +93,10 @@ export default function NodeSidebar({
       }),
     );
     event.dataTransfer.effectAllowed = "move";
-  };
+  }, []);
 
-  // 拖拽输出节点
-  const onDragOutputStart = (event: React.DragEvent): void => {
+  // ⚡️ REACT PERF: useCallback优化 - 稳定拖拽输出节点处理函数
+  const onDragOutputStart = useCallback((event: React.DragEvent): void => {
     event.dataTransfer.setData(
       "application/reactflow",
       JSON.stringify({
@@ -103,7 +106,7 @@ export default function NodeSidebar({
       }),
     );
     event.dataTransfer.effectAllowed = "move";
-  };
+  }, []);
 
   return (
     <div className={`node-sidebar ${isOpen ? "open" : "closed"}`}>
@@ -253,3 +256,7 @@ export default function NodeSidebar({
     </div>
   );
 }
+
+// ⚡️ REACT PERF: Export with React.memo optimization
+const NodeSidebarMemo = memo(NodeSidebar);
+export default NodeSidebarMemo;
