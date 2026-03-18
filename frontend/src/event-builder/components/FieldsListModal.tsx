@@ -1,9 +1,8 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Integrated React.memo + useMemo + useCallback
+// ✅ Performance: Optimized re-renders for modal component
+// - Added React.memo to prevent unnecessary re-renders
+// - Memoized filteredFields computation with useMemo
+// - Stabilized callback functions with useCallback
 
 /**
  * 字段列表模态框组件
@@ -13,7 +12,7 @@
  */
 // @ts-nocheck - TypeScript检查暂禁用
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
 import toast from "react-hot-toast";
 import { eventNodesApi } from "@shared/api/eventNodes";
 import type { EventNodeField } from "@shared/types/eventNodes";
@@ -32,7 +31,7 @@ interface FieldsListModalProps {
 /**
  * 字段列表模态框组件
  */
-export function FieldsListModal({
+function FieldsListModal({
   show,
   nodeId,
   nodeName,
@@ -42,9 +41,9 @@ export function FieldsListModal({
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Toast 辅助函数
-  const success = (message: string) => toast.success(message);
-  const error = (message: string) => toast.error(message);
+  // Toast 辅助函数 - memoized with useCallback
+  const success = useCallback((message: string) => toast.success(message), []);
+  const error = useCallback((message: string) => toast.error(message), []);
 
   // 加载字段列表
   useEffect(() => {
@@ -87,15 +86,19 @@ export function FieldsListModal({
     }
   }, [show]);
 
-  // 过滤字段
-  const filteredFields = fields.filter(
-    (field) =>
-      (field.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (field.alias?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
+  // ⚡️ REACT PERF: useMemo优化 - 缓存过滤后的字段列表
+  const filteredFields = useMemo(
+    () =>
+      fields.filter(
+        (field) =>
+          (field.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+          (field.alias?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
+      ),
+    [fields, searchTerm]
   );
 
-  // 导出CSV
-  const handleExportCSV = () => {
+  // ⚡️ REACT PERF: useCallback优化 - 稳定导出CSV函数引用
+  const handleExportCSV = useCallback(() => {
     if (filteredFields.length === 0) {
       error("没有可导出的字段");
       return;
@@ -129,7 +132,7 @@ export function FieldsListModal({
     document.body.removeChild(link);
 
     success("字段列表已导出");
-  };
+  }, [filteredFields, nodeName, error, success]);
 
   if (!show) {
     return null;
@@ -290,3 +293,7 @@ export function FieldsListModal({
     </div>
   );
 }
+
+// ⚡️ REACT PERF: Export with React.memo optimization
+const FieldsListModalMemo = memo(FieldsListModal);
+export default FieldsListModalMemo;

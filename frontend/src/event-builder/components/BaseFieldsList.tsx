@@ -1,15 +1,13 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Integrated React.memo + useCallback
+// ✅ Performance: Optimized re-renders for sidebar component
+// - Added React.memo to prevent unnecessary re-renders
+// - Stabilized event handler functions with useCallback
 
 /**
  * BaseFieldsList Component
  * 基础字段列表组件
  */
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 
 /**
  * 基础字段接口
@@ -40,10 +38,11 @@ const BASE_FIELDS: BaseField[] = [
 /**
  * BaseFieldsList Component
  */
-export default function BaseFieldsList({ onAddField }: BaseFieldsListProps) {
+function BaseFieldsList({ onAddField }: BaseFieldsListProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const handleDoubleClick = (field: BaseField) => {
+  // ⚡️ REACT PERF: useCallback优化 - 稳定双击处理函数引用
+  const handleDoubleClick = useCallback((field: BaseField) => {
     onAddField('base', field.fieldName, field.displayName, field.hive_type);
 
     // Add success animation
@@ -54,9 +53,10 @@ export default function BaseFieldsList({ onAddField }: BaseFieldsListProps) {
         element.classList.remove('double-click-success');
       }, 600);
     }
-  };
+  }, [onAddField]);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, field: BaseField) => {
+  // ⚡️ REACT PERF: useCallback优化 - 稳定拖拽处理函数引用
+  const handleDragStart = useCallback((e: React.DragEvent<HTMLDivElement>, field: BaseField) => {
     e.dataTransfer.effectAllowed = 'copy';
     // 设置多种格式以确保兼容性
     const dragData = {
@@ -70,7 +70,7 @@ export default function BaseFieldsList({ onAddField }: BaseFieldsListProps) {
     // 使用多种格式设置数据
     e.dataTransfer.setData('application/json', JSON.stringify(dragData));
     e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-  };
+  }, []);
 
   return (
     <div className="sidebar-section glass-card-dark">
@@ -107,3 +107,7 @@ export default function BaseFieldsList({ onAddField }: BaseFieldsListProps) {
     </div>
   );
 }
+
+// ⚡️ REACT PERF: Export with React.memo optimization
+const BaseFieldsListMemo = memo(BaseFieldsList);
+export default BaseFieldsListMemo;

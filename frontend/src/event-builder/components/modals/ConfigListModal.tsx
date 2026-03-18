@@ -1,16 +1,14 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
+// ⚡️ REACT PERF: Integrated React.memo + useCallback
+// ✅ Performance: Optimized re-renders for modal component
+// - Added React.memo to prevent unnecessary re-renders
+// - Stabilized all event handler functions with useCallback
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * ConfigListModal Component
  * 配置列表模态框组件
  */
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchConfigList, deleteConfig, copyNode } from '@shared/api/eventNodeBuilder';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
@@ -60,7 +58,7 @@ type ConfigListModalComponent = React.FC<ConfigListModalProps>;
  * - 支持分页加载
  * - 支持选择、复制、删除配置
  */
-const ConfigListModal: ConfigListModalComponent = ({ gameGid, onSelect, onClose }) => {
+function ConfigListModal({ gameGid, onSelect, onClose }: ConfigListModalProps) {
   const [page, setPage] = useState(1);
   const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
 
@@ -77,17 +75,17 @@ const ConfigListModal: ConfigListModalComponent = ({ gameGid, onSelect, onClose 
   const hasMore = data?.data?.has_more || false;
 
   /**
-   * 处理配置选择
+   * 处理配置选择 - useCallback优化
    */
-  const handleSelect = (config: ConfigListItem): void => {
+  const handleSelect = useCallback((config: ConfigListItem): void => {
     onSelect(config as EventNode);
     onClose();
-  };
+  }, [onSelect, onClose]);
 
   /**
-   * 处理配置删除
+   * 处理配置删除 - useCallback优化
    */
-  const handleDelete = async (configId: number, e: React.MouseEvent): Promise<void> => {
+  const handleDelete = useCallback(async (configId: number, e: React.MouseEvent): Promise<void> => {
     e.stopPropagation();
     const confirmed = await confirm('确定要删除这个配置吗？');
     if (!confirmed) {
@@ -101,12 +99,12 @@ const ConfigListModal: ConfigListModalComponent = ({ gameGid, onSelect, onClose 
     } else {
       toast.error('删除失败: ' + (result.error || '未知错误'));
     }
-  };
+  }, [confirm, refetch]);
 
   /**
-   * 处理配置复制
+   * 处理配置复制 - useCallback优化
    */
-  const handleCopy = async (nodeId: number, e: React.MouseEvent): Promise<void> => {
+  const handleCopy = useCallback(async (nodeId: number, e: React.MouseEvent): Promise<void> => {
     e.stopPropagation();
     const result = await copyNode(nodeId);
     if (result.success) {
@@ -115,12 +113,12 @@ const ConfigListModal: ConfigListModalComponent = ({ gameGid, onSelect, onClose 
     } else {
       toast.error('复制失败: ' + (result.error || '未知错误'));
     }
-  };
+  }, [refetch]);
 
   /**
-   * 处理键盘事件
+   * 处理键盘事件 - useCallback优化
    */
-  const handleKeyDown = (e: React.KeyboardEvent): void => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent): void => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClose();
@@ -128,7 +126,7 @@ const ConfigListModal: ConfigListModalComponent = ({ gameGid, onSelect, onClose 
       e.preventDefault();
       onClose();
     }
-  };
+  }, [onClose]);
 
   return (
     <div
@@ -220,6 +218,8 @@ const ConfigListModal: ConfigListModalComponent = ({ gameGid, onSelect, onClose 
       <ConfirmDialogComponent />
     </div>
   );
-};
+}
 
-export default ConfigListModal;
+// ⚡️ REACT PERF: Export with React.memo optimization
+const ConfigListModalMemo = memo(ConfigListModal);
+export default ConfigListModalMemo;
