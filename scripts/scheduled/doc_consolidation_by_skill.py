@@ -28,6 +28,15 @@ DOCS_DIR = PROJECT_DIR / "docs"
 LOG_FILE = PROJECT_DIR / "logs" / "doc-consolidation.log"
 ERROR_LOG = PROJECT_DIR / "logs" / "doc-consolidation-error.log"
 
+# 受保护的文件列表（绝不会被归档）
+PROTECTED_FILES = {
+    PROJECT_DIR / "CLAUDE.md",
+    PROJECT_DIR / "README.md",
+    PROJECT_DIR / "CHANGELOG.md",
+    PROJECT_DIR / "package.json",
+    PROJECT_DIR / "requirements.txt",
+}
+
 # 日志函数
 def log(message, error=False):
     """记录日志"""
@@ -59,7 +68,9 @@ def find_all_markdown_files(directory):
                 file_path = Path(root) / file
                 # 只添加存在的文件
                 if file_path.exists():
-                    md_files.append(file_path)
+                    # 跳过受保护的文件
+                    if file_path not in PROTECTED_FILES:
+                        md_files.append(file_path)
     return md_files
 
 def extract_document_content(filepath):
@@ -180,6 +191,11 @@ def identify_document_type(filepath):
 
 def archive_document(filepath, archive_category):
     """归档文档到指定类别"""
+    # 检查文件是否受保护
+    if filepath in PROTECTED_FILES:
+        log(f"⚠️  跳过受保护文件: {filepath}")
+        return None
+
     # 创建归档目录
     archive_dir = DOCS_DIR / "archive" / archive_category
     archive_dir.mkdir(parents=True, exist_ok=True)
