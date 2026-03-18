@@ -2005,3 +2005,88 @@ class CacheInvalidationMonitor:
 - P1经验点：6个
 - 总计：13个性能优化经验点
 - 最后更新：2026-03-09 🆕 新增并行优化策略、缓存失效装饰器、Dashboard实时优化
+
+### 来自 docs/plans/2026-03-05-performance-optimization-automation.md (2026-03-18)
+
+**关键主题**:
+- Performance Optimization Automation - Implementation Plan
+- Pre-requisites
+- Check git status
+- Check current branch
+- Ensure no uncommitted changes
+
+**重要经验**:
+- print(f"✅ Saved to {output_path}")
+- print(f"✅ AST analysis complete: {output_path}")
+- print(f"✅ Generated task packages: {output_path}")
+- print(f"   ⚠️  Skipping {file_path} (needs manual review)")
+- print(f"   ❌ Error fixing {task['original_issue']['file_path']}: {e}")
+
+
+### 来自 docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md (2026-03-18)
+
+**关键主题**:
+- 2026-03-07 综合性能优化经验提取
+- 📊 执行摘要
+- 🎯 核心经验提取
+- 经验 #1: DataLoader 批量查询优化 ⭐⭐⭐
+- 1. 移除 SQL 子查询，使用 DataLoader 延迟加载
+
+**重要经验**:
+- **状态**: ✅ 已完成并验证
+- | **Phase 1** | N+1 查询修复 | **API 响应: 2326x** | ✅ |
+- | **Phase 2** | 缓存层增强 | 缓存命中率 85%+ | ✅ |
+- | **Phase 3** | 前端 React 优化 | **重渲染: 50-70% ↓** | ✅ |
+- | **Phase 4** | GraphQL DataLoader | **查询数: 70-99% ↓** | ✅ |
+
+
+### 来自 docs/plans/2026-03-05-performance-optimization-automation.md (2026-03-18)
+
+**关键主题**:
+- Performance Optimization Automation - Implementation Plan
+- Pre-requisites
+- Check git status
+- Check current branch
+- Ensure no uncommitted changes
+
+**重要经验**:
+- print(f"✅ Saved to {output_path}")
+- print(f"✅ AST analysis complete: {output_path}")
+- print(f"✅ Generated task packages: {output_path}")
+- print(f"   ⚠️  Skipping {file_path} (needs manual review)")
+- print(f"   ❌ Error fixing {task['original_issue']['file_path']}: {e}")
+
+
+### 来自 docs/plans/2026-03-02-parallel-optimization-plan.md (2026-03-18)
+
+**关键主题**:
+- Phase 1 并行优化执行计划（方案A + 方案B）
+- 📊 任务依赖分析
+- 可并行执行的任务 ✅
+- 有依赖的任务 ⚠️
+- 🚀 并行执行计划（3个阶段）
+
+**重要经验**:
+- ### 可并行执行的任务 ✅
+- | Group 1 | 分析缓存未命中原因 | 优化SELECT *查询 | ✅ 是 | 独立模块，无依赖 |
+- | Group 2 | 优化缓存键策略 | 归档废弃文件 | ✅ 是 | 独立操作，无冲突 |
+- | Group 3 | 调整TTL设置 | 调查剩余N+1查询 | ✅ 是 | 独立文件，无依赖 |
+- | Group 4 | 缓存预热 | 最终验证 | ❌ 否 | 需要所有优化完成 |
+
+
+### 来自 docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md (2026-03-18)
+
+**关键主题**:
+- 2026-03-07 综合性能优化经验提取
+- 📊 执行摘要
+- 🎯 核心经验提取
+- 经验 #1: DataLoader 批量查询优化 ⭐⭐⭐
+- 1. 移除 SQL 子查询，使用 DataLoader 延迟加载
+
+**重要经验**:
+- **状态**: ✅ 已完成并验证
+- | **Phase 1** | N+1 查询修复 | **API 响应: 2326x** | ✅ |
+- | **Phase 2** | 缓存层增强 | 缓存命中率 85%+ | ✅ |
+- | **Phase 3** | 前端 React 优化 | **重渲染: 50-70% ↓** | ✅ |
+- | **Phase 4** | GraphQL DataLoader | **查询数: 70-99% ↓** | ✅ |
+

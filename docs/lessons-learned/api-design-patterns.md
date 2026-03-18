@@ -2493,3 +2493,19 @@ export interface GetEventsQuery {
 - P1经验点：4个
 - 总计：10个API设计模式经验点
 - 最后更新：2026-03-09 🆕 新增GraphQL类型同步、400错误诊断、缓存失效装饰器、TDD Red阶段经验
+### 来自 docs/graphql-migration/GRAPHQL_API_DOCUMENTATION.md (2026-03-18)
+
+**关键主题**:
+- GraphQL API 文档
+- 📋 目录
+- 概述
+- 快速开始
+- GraphiQL IDE
+
+**重要经验**:
+- - ✅ **单次请求获取多个资源** - 减少网络请求次数
+- - ✅ **精确查询所需字段** - 避免数据冗余
+- - ✅ **强类型系统** - 提供完整的类型安全
+- - ✅ **实时订阅** - 支持WebSocket实时更新
+- **✅ 推荐**: 只查询需要的字段
+

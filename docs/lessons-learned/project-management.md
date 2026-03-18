@@ -405,3 +405,71 @@ git commit -m "feat: add new feature and update docs"
 **更新时间**: 2026-03-12
 
 ---
+
+### 来自 docs/development/architecture.md (2026-03-18)
+
+**关键主题**:
+- 架构设计文档
+- 目录
+- Repository模式详解 ⭐
+- 什么是Repository模式？
+- 架构对比
+
+**重要经验**:
+- 直接SQL查询 ❌
+- - ❌ 数据访问逻辑散落在各处
+- - ❌ 难以测试（无法Mock）
+- - ❌ 代码重复
+- - ❌ 缓存管理混乱
+
+
+### 来自 docs/development/architecture.md (2026-03-18)
+
+**关键主题**:
+- 架构设计文档
+- 目录
+- Repository模式详解 ⭐
+- 什么是Repository模式？
+- 架构对比
+
+**重要经验**:
+- 直接SQL查询 ❌
+- - ❌ 数据访问逻辑散落在各处
+- - ❌ 难以测试（无法Mock）
+- - ❌ 代码重复
+- - ❌ 缓存管理混乱
+
+
+### 来自 docs/development/architecture.md (2026-03-18)
+
+**关键主题**:
+- 架构设计文档
+- 目录
+- Repository模式详解 ⭐
+- 什么是Repository模式？
+- 架构对比
+
+**重要经验**:
+- 直接SQL查询 ❌
+- - ❌ 数据访问逻辑散落在各处
+- - ❌ 难以测试（无法Mock）
+- - ❌ 代码重复
+- - ❌ 缓存管理混乱
+
+
+### 来自 docs/development/architecture.md (2026-03-18)
+
+**关键主题**:
+- 架构设计文档
+- 目录
+- Repository模式详解 ⭐
+- 什么是Repository模式？
+- 架构对比
+
+**重要经验**:
+- 直接SQL查询 ❌
+- - ❌ 数据访问逻辑散落在各处
+- - ❌ 难以测试（无法Mock）
+- - ❌ 代码重复
+- - ❌ 缓存管理混乱
+

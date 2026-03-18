@@ -10,6 +10,15 @@ from ..config import DB_PATH
 # Import from database module to make them available at package level
 from .database import create_indexes, get_db, get_db_connection, init_db, migrate_db
 
+# Import connection pool for performance optimization
+from .connection_pool import (
+    ConnectionPool,
+    ConnectionPoolConfig,
+    PoolExhaustedError,
+    get_connection_pool,
+    get_db_connection as get_pooled_connection,
+)
+
 __all__ = [
     "get_db_connection",
     "get_db",
@@ -17,4 +26,10 @@ __all__ = [
     "migrate_db",
     "create_indexes",
     "DB_PATH",
+    # Connection pool exports
+    "ConnectionPool",
+    "ConnectionPoolConfig",
+    "PoolExhaustedError",
+    "get_connection_pool",
+    "get_pooled_connection",
 ]

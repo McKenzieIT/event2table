@@ -1,0 +1,20 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#06B6D4" rx="100" ry="100"/>
+
+  <!-- Grid pattern (data warehouse theme) -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(15, 23, 42, 0.1)" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#grid)"/>
+
+  <!-- E2T Text -->
+  <text x="256" y="340" font-family="Arial, sans-serif" font-size="220" font-weight="bold" text-anchor="middle" fill="#0f172a">E2T</text>
+
+  <!-- Database icon (cylinder) -->
+  <ellipse cx="256" cy="100" rx="60" ry="20" fill="none" stroke="#0f172a" stroke-width="8"/>
+  <path d="M196 100 v60 a60 20 0 0 0 120 0 v-60" fill="none" stroke="#0f172a" stroke-width="8"/>
+  <path d="M196 160 v60 a60 20 0 0 0 120 0 v-60" fill="none" stroke="#0f172a" stroke-width="8"/>
+</svg>

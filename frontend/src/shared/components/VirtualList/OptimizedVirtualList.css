@@ -1,0 +1,84 @@
+.optimized-virtual-list {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}
+
+.optimized-virtual-list.mounted {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.virtual-list-spacer {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.virtual-list-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
+  contain: layout style paint;
+}
+
+/* Performance optimization: GPU acceleration */
+.virtual-list-item,
+.optimized-virtual-list {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Smooth scrolling */
+.optimized-virtual-list {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar styling */
+.optimized-virtual-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.optimized-virtual-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.optimized-virtual-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.optimized-virtual-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Loading indicator for end reached */
+.virtual-list-loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

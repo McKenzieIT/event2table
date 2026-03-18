@@ -518,3 +518,105 @@ npm run test:e2e  # E2E测试
 
 - [性能模式 - 数据库索引](./performance-patterns.md#数据库索引) - 性能分析工具
 - [测试指南 - 测试工具选择](./testing-guide.md#测试工具选择) - 测试工具对比
+
+### 来自 docs/cache/operations/monitoring.md (2026-03-18)
+
+**关键主题**:
+- 缓存系统监控和告警文档
+- 📊 监控体系概览
+- 三级监控架构
+- 核心监控组件
+- 🎯 核心监控指标
+
+**重要经验**:
+- logger.warning(f"⚠️ L2缓存读取失败: {e}")
+- | **DEBUG** | 详细的缓存操作日志 | `✅ L1 HIT: dwd_gen:v3:events.list:game_id:1` |
+- | **INFO** | 正常操作记录 | `✅ 缓存告警管理器初始化完成` |
+- | **CRITICAL** | 严重问题 | `❌ L1缓存扩容失败: ...` |
+- | **ERROR** | 错误异常 | `❌ 告警动作执行失败: ...` |
+
+
+### 来自 docs/development/MIGRATION-GUIDE.md (2026-03-18)
+
+**关键主题**:
+- Event2Table 架构迁移指南
+- 目录
+- 1. 迁移概述
+- 为什么迁移?
+- 迁移收益
+
+**重要经验**:
+- | DDD代码清理 | **✅ 完成** (17个文件, 4132行) |
+- - ✅ **精简分层架构**: API → Service → Repository → Entity
+- - ✅ **统一Entity模型**: 单一真相来源,不可能不一致
+- - ✅ **Pydantic v2**: 自动验证、类型安全、IDE支持
+- - ✅ **Repository返回Entity**: 类型明确,自动验证
+
+
+### 来自 docs/cache/operations/monitoring.md (2026-03-18)
+
+**关键主题**:
+- 缓存系统监控和告警文档
+- 📊 监控体系概览
+- 三级监控架构
+- 核心监控组件
+- 🎯 核心监控指标
+
+**重要经验**:
+- logger.warning(f"⚠️ L2缓存读取失败: {e}")
+- | **DEBUG** | 详细的缓存操作日志 | `✅ L1 HIT: dwd_gen:v3:events.list:game_id:1` |
+- | **INFO** | 正常操作记录 | `✅ 缓存告警管理器初始化完成` |
+- | **CRITICAL** | 严重问题 | `❌ L1缓存扩容失败: ...` |
+- | **ERROR** | 错误异常 | `❌ 告警动作执行失败: ...` |
+
+
+### 来自 docs/plans/2026-03-06-PHASE-3-AGENT-QUICK-REFERENCE.md (2026-03-18)
+
+**关键主题**:
+- Phase 3 Agent Quick Reference Guide
+- 🎯 Agent任务清单
+- Agent 9: P0 表单输入组件（8个）
+- 1. TypeScript类型检查
+- 2. ESLint检查
+
+**重要经验**:
+- 1. ✅ `TextArea/TextArea.tsx`
+- 2. ✅ `Select/Select.tsx`
+- 3. ✅ `Checkbox/Checkbox.tsx`
+- 4. ✅ `Switch/Switch.tsx`
+- 5. ✅ `Radio/Radio.tsx`
+
+
+### 来自 docs/development/MIGRATION-GUIDE.md (2026-03-18)
+
+**关键主题**:
+- Event2Table 架构迁移指南
+- 目录
+- 1. 迁移概述
+- 为什么迁移?
+- 迁移收益
+
+**重要经验**:
+- | DDD代码清理 | **✅ 完成** (17个文件, 4132行) |
+- - ✅ **精简分层架构**: API → Service → Repository → Entity
+- - ✅ **统一Entity模型**: 单一真相来源,不可能不一致
+- - ✅ **Pydantic v2**: 自动验证、类型安全、IDE支持
+- - ✅ **Repository返回Entity**: 类型明确,自动验证
+
+
+### 来自 docs/hql/README.md (2026-03-18)
+
+**关键主题**:
+- HQL生成器文档
+- 概述
+- 文档索引
+- 安全文档
+- 架构文档
+
+**重要经验**:
+- - 操作符白名单的重要性
+- -- ✅ HQL允许的占位符（调度系统替换）
+- -- ❌ HIVE不支持参数化（Hive不支持）
+- **关键区别**:
+- # ✅ 正确：使用白名单
+

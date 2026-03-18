@@ -437,3 +437,20 @@ redis-cli DBSIZE
 - [性能模式 - 缓存策略](./performance-patterns.md#缓存策略) - 缓存使用规范
 - [测试指南 - 测试隔离](./testing-guide.md#测试隔离) - 环境隔离配置
 - [调试技能](./debugging-skills.md) - 问题诊断方法
+
+### 来自 docs/lessons-learned/deployment-operations.md (2026-03-18)
+
+**关键主题**:
+- 部署与运维
+- 缓存预热策略 ⚠️ **P0极其重要**
+- 核心原则
+- 预热时机
+- backend/app.py
+
+**重要经验**:
+- ## 缓存预热策略 ⚠️ **P0极其重要**
+- # ✅ 数据更新后预热缓存
+- - [ ] 服务启动时是否预热关键缓存？
+- ## 环境隔离配置 ⚠️ **P0极其重要**
+- ## 监控指标设置 ⭐ **P1重要**
+

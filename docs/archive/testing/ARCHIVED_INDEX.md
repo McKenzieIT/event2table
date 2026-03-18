@@ -117,3 +117,8 @@ Ralph Loop迭代测试报告（2026年2月）：
 **归档时间**: 2026-02-22
 **归档人**: Event2Table Documentation Team
 **维护者**: Event2Table Development Team
+
+## 2026-03-18 归档
+
+- `docs/development/e2e-testing-lessons.md` → `docs/archive/testing/2026-03/e2e-testing-lessons.md`
+- `docs/testing/e2e-testing-guide.md` → `docs/archive/testing/2026-03/e2e-testing-guide.md`

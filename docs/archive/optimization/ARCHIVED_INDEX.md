@@ -72,3 +72,14 @@
 **归档时间**: 2026-02-22
 **归档人**: Event2Table Documentation Team
 **维护者**: Event2Table Development Team
+
+## 2026-03-18 归档
+
+- `docs/plans/2026-03-02-phase3-comprehensive-optimization.md` → `docs/archive/optimization/2026-03/2026-03-02-phase3-comprehensive-optimization_1.md`
+- `docs/plans/2026-03-02-parallel-optimization-plan.md` → `docs/archive/optimization/2026-03/2026-03-02-parallel-optimization-plan_1.md`
+- `docs/plans/2026-03-02-phase1-performance-optimization.md` → `docs/archive/optimization/2026-03/2026-03-02-phase1-performance-optimization.md`
+- `docs/plans/2026-03-05-parallel-optimization-implementation.md` → `docs/archive/optimization/2026-03/2026-03-05-parallel-optimization-implementation.md`
+- `docs/plans/2026-03-06-PHASE-3-OPTIMIZATION-PLAN.md` → `docs/archive/optimization/2026-03/2026-03-06-PHASE-3-OPTIMIZATION-PLAN.md`
+- `docs/plans/2026-03-02-backend-architecture-optimization-plan.md` → `docs/archive/optimization/2026-03/2026-03-02-backend-architecture-optimization-plan.md`
+- `docs/plans/2026-03-07-dashboard-realtime-optimization.md` → `docs/archive/optimization/2026-03/2026-03-07-dashboard-realtime-optimization.md`
+- `docs/plans/2026-02-26/architecture-optimization-execution-plan.md` → `docs/archive/optimization/2026-03/architecture-optimization-execution-plan.md`

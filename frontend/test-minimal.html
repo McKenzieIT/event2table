@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Minimal React Test</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module">
+    import React from '/node_modules/react/umd/react.development.js';
+    import ReactDOM from '/node_modules/react-dom/umd/react-dom.development.js';
+
+    console.log('TEST: Starting...');
+
+    try {
+      const root = document.getElementById('root');
+      ReactDOM.render(React.createElement('div', null, 'Minimal React Test Works!'), root);
+      console.log('TEST: Success!');
+      root.style.cssText = 'position:fixed;top:50px;left:50px;background:lime;padding:20px;font-size:24px;';
+    } catch (e) {
+      console.error('TEST: Error:', e);
+      document.body.innerHTML = '<pre style="color:red;">Error: ' + e.message + '\n' + e.stack + '</pre>';
+    }
+  </script>
+</body>
+</html>
