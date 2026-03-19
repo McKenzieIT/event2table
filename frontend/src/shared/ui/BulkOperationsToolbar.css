@@ -1,0 +1,219 @@
+/**
+ * 批量操作工具栏样式
+ */
+
+.bulk-operations-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.bulk-operations-info {
+  display: flex;
+  align-items: center;
+}
+
+.bulk-operations-count {
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  background-color: #e0f2fe;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.bulk-operations-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bulk-operations-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+.bulk-operations-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bulk-operations-button-validate {
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.bulk-operations-button-validate:hover:not(:disabled) {
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
+}
+
+.bulk-operations-button-export {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.bulk-operations-button-export:hover:not(:disabled) {
+  background-color: #dcfce7;
+  border-color: #86efac;
+}
+
+.bulk-operations-button-delete {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.bulk-operations-button-delete:hover:not(:disabled) {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.bulk-operations-button-cancel {
+  background-color: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+.bulk-operations-button-cancel:hover:not(:disabled) {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.bulk-operations-button-confirm-delete {
+  background-color: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+.bulk-operations-button-confirm-delete:hover:not(:disabled) {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* 模态框样式 */
+.bulk-operations-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.bulk-operations-modal {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 400px;
+  width: 90%;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.bulk-operations-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.bulk-operations-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.bulk-operations-modal-body {
+  padding: 20px;
+}
+
+.bulk-operations-modal-body p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.bulk-operations-modal-warning {
+  color: #dc2626 !important;
+  font-weight: 500;
+  margin-top: 16px !important;
+}
+
+.bulk-operations-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.bulk-operations-modal-footer .bulk-operations-button {
+  min-width: 100px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .bulk-operations-toolbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bulk-operations-info {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .bulk-operations-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .bulk-operations-button {
+    flex: 1;
+    min-width: 80px;
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}

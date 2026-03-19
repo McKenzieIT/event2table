@@ -165,9 +165,22 @@ class FlowService(BaseService):
                 'last_used': Optional[datetime],  # 最后使用时间
             }
         """
-        # TODO: 实现真实的使用统计逻辑
-        # 当前返回默认值, 可后续集成到analytics系统
-        return {'views': 0, 'last_used': None}
+        from backend.core.utils import fetch_one_as_dict
+        
+        # 统计flow关联的事件节点数量作为views
+        node_count_query = '''
+            SELECT COUNT(*) as count
+            FROM canvas_nodes
+            WHERE flow_id = ? AND is_active = 1
+        '''
+        node_count_result = fetch_one_as_dict(node_count_query, (flow_id,))
+        views = node_count_result['count'] if node_count_result else 0
+        
+        # 获取flow的updated_at作为last_used
+        flow = self.flow_repo.find_by_id(flow_id)
+        last_used = flow.updated_at if flow else None
+        
+        return {'views': views, 'last_used': last_used}
 
     def _get_last_modified(self, flow_id: int) -> Optional[datetime]:
         """
