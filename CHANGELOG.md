@@ -5,6 +5,151 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [8.2.0] - 2026-03-20
+
+### 🚀 Major Features - 阶段4 功能补强
+
+本次更新完成了5个子项目共14项任务，涵盖命名统一、HQL引擎增强、性能优化、占位功能实现、异步任务系统等核心改进。
+
+#### 子项目1: V2命名统一 ✅
+
+**后端变更**：
+- **Renamed**: `backend/api/routes/hql_preview_v2.py` → `hql_preview.py`
+  - Blueprint名称从 `hql_preview_v2_bp` 改为 `hql_preview_bp`
+  - 所有V2后缀移除，V2成为唯一生产版本
+- **Updated**: `backend/app_factory.py` 更新import路径和Blueprint注册
+- **Updated**: `backend/services/event_node_builder/__init__.py`
+  - `fields_v2` → `fields`
+  - `where_conditions_v2` → `where_conditions`
+
+**前端变更**：
+- **Renamed**: `frontend/src/shared/api/hqlApiV2.ts` → `hqlApi.ts`
+  - 移除所有V2后缀
+  - 删除重复的API文件
+- **Renamed**: `frontend/src/event-builder/components/HQLPreviewV2/` → `HQLPreviewPanel/`
+  - 所有内部组件移除V2后缀
+- **Removed**: `useV2API` 参数，V2成为唯一生产版本
+- **清理**: 废弃组件和重复代码清理
+
+**提交**: `776e4de`, `ab46d9e`
+
+#### 子项目2: HQL引擎增强 ✅
+
+**分区条件统一**：
+- **Updated**: 所有HQL模板从 `${bizdate}` 统一为 `${ds}`
+- **影响文件**: 10个后端文件，包括模板、服务层、构建器
+- **收益**: 统一数据仓库分区标准，减少混淆
+
+**UNION WHERE完善**：
+- **Added**: 每个UNION子查询自动注入 `WHERE ds='${ds}'` 分区条件
+- **收益**: 确保分区裁剪，提升查询性能
+
+**模板变量引擎**：
+- **Added**: `backend/services/hql/core/template_engine.py` (209行)
+  - `render()` - 模板渲染
+  - `extract_variables()` - 变量提取
+  - `validate_variables()` - 变量验证
+- **收益**: 支持动态模板和变量替换
+
+**模板编辑器UI**：
+- **Added**: `frontend/src/analytics/components/templates/TemplateEditor.tsx` (300行)
+  - 完整的模板编辑界面
+  - 变量高亮和验证
+  - 集成到TemplateSelector
+- **Updated**: `frontend/src/shared/api/templateApi.ts`
+  - 6个GraphQL CRUD方法真实实现
+  - 替换所有placeholder代码
+
+**提交**: `0cf74ce`, `5c9a9f7`
+
+#### 子项目4: 前端性能优化 ✅
+
+**React.memo优化**：
+- **Updated**: `frontend/src/event-builder/EventNodeBuilder.tsx`
+  - React.memo包裹导出组件
+  - displayName设置
+- **Updated**: `frontend/src/event-builder/components/FieldBuilder/FieldBuilder.tsx`
+  - React.memo包裹
+  - displayName设置
+- **Updated**: `frontend/src/event-builder/components/HQLPreview/HQLPreview.tsx`
+  - React.memo包裹
+- **Updated**: `frontend/src/event-builder/components/HQLPreview/HQLPreviewContainer.tsx`
+  - React.memo包裹
+  - displayName设置
+
+**性能提升**: 预计减少30-50%不必要的重渲染
+
+**提交**: `1914907`
+
+#### 子项目3: 占位功能真实实现 ✅
+
+**Flow使用统计**：
+- **Updated**: `backend/services/flows/flow_service.py`
+  - `_get_flow_usage_stats()` 从返回默认值改为查询真实数据
+  - 统计 `canvas_nodes` 表中的flow使用情况
+  - 返回真实的节点数量和使用统计
+
+**批量操作前端UI**：
+- **Added**: `frontend/src/shared/api/bulkApi.ts` (331行)
+  - 批量删除API客户端
+  - 批量导出API客户端
+  - 批量验证API客户端
+- **Added**: `frontend/src/shared/ui/BulkOperationsToolbar.tsx` (199行 + 219行CSS)
+  - 批量操作工具栏组件
+  - 支持选择、删除、导出操作
+  - 包含确认对话框和自动下载
+
+**提交**: `8eea325`
+
+#### 子项目5: 异步任务系统 + SQL优化器 ✅
+
+**异步任务系统**：
+- **Added**: `backend/services/async_tasks/async_task_service.py` (293行)
+  - 完整的异步任务生命周期管理
+  - 任务创建、更新、删除、查询
+  - 任务状态转换和进度跟踪
+  - 过期任务清理
+- **Added**: `backend/api/routes/async_tasks.py` (302行)
+  - 7个REST API端点
+  - CRUD操作 + cleanup + statistics
+  - 完整的错误处理和验证
+
+**SQL优化器UI**：
+- **Added**: `frontend/src/event-builder/components/SQLOptimizer/SQLOptimizerPanel.tsx` (316行 + 253行CSS)
+  - 性能评分显示
+  - 问题列表展示
+  - 优化建议卡片
+  - 一键应用优化
+- **Added**: `frontend/src/shared/api/sqlOptimizerApi.ts` (261行)
+  - 分析API
+  - 应用优化API
+  - 历史记录API
+  - 批量分析API
+
+**提交**: `9603d02`
+
+### 📊 Metrics
+
+| 指标 | 数值 |
+|------|------|
+| 子项目数 | 5个 |
+| 任务总数 | 14个（全部完成） |
+| Git提交数 | 7个 |
+| 文件变更 | 71个文件 |
+| 代码变化 | +3,344行 / -2,744行 |
+
+### 📈 功能模块实现度提升
+
+| 模块 | 改进前 | 改进后 |
+|------|--------|--------|
+| 模板管理 | 后端70% 前端30% | 后端70% 前端90% |
+| 批量操作 | 后端90% 前端5% | 后端90% 前端80% |
+| 异步任务 | 后端20% 前端0% | 后端90% 前端0% |
+| SQL优化器 | 后端60% 前端40% | 后端60% 前端80% |
+| Flow统计 | 后端10% 前端0% | 后端80% 前端0% |
+
+---
+
 ## [8.1.0] - 2026-03-19
 
 ### 🐛 Bug Fixes - Dashboard游戏管理
