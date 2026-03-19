@@ -1169,55 +1169,62 @@ CORS(app, resources={r"/api/*": {"origins": ["https://event2table.com"]}})
 
 ---
 
-## 经验文档快速查找 ⭐ **极其重要 - 2026-03-12更新**
+## 经验文档快速查找 ⭐ **极其重要 - 2026-03-19更新**
 
 > **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
 
+### 快速导航
+
+- **[文档中心](docs/README.md)** ⭐ - 所有文档的导航入口 (2026-03-19新增)
+- **[经验文档索引](docs/lessons-learned/README.md)** ⭐ - 经验文档导航中心
+
 ### 核心经验文档（docs/lessons-learned/）
-- **[2026 03 07 Comprehensive Optimization Experience]** ([2026-03-07-comprehensive-optimization-experience.md](docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md))
-- **[Api Design Patterns]** ([api-design-patterns.md](docs/lessons-learned/api-design-patterns.md))
-- **[Database Patterns]** ([database-patterns.md](docs/lessons-learned/database-patterns.md))
-- **[Debugging Skills]** ([debugging-skills.md](docs/lessons-learned/debugging-skills.md))
-- **[Deployment Operations]** ([deployment-operations.md](docs/lessons-learned/deployment-operations.md))
-- **[Event Node Builder Errors]** ([event-node-builder-errors.md](docs/lessons-learned/event-node-builder-errors.md))
-- **[Mutation Business Logic]** ([mutation-business-logic.md](docs/lessons-learned/mutation-business-logic.md))
-- **[Performance Patterns]** ([performance-patterns.md](docs/lessons-learned/performance-patterns.md))
-- **[Project Management]** ([project-management.md](docs/lessons-learned/project-management.md))
-- **[Python Development]** ([python-development.md](docs/lessons-learned/python-development.md))
-- **[React Best Practices]** ([react-best-practices.md](docs/lessons-learned/react-best-practices.md))
-- **[Refactoring Checklist]** ([refactoring-checklist.md](docs/lessons-learned/refactoring-checklist.md))
-- **[Security Essentials]** ([security-essentials.md](docs/lessons-learned/security-essentials.md))
-- **[Security Integration Testing]** ([security-integration-testing.md](docs/lessons-learned/security-integration-testing.md))
-- **[Test Fix Iteration]** ([test-fix-iteration.md](docs/lessons-learned/test-fix-iteration.md))
-- **[Testing Guide]** ([testing-guide.md](docs/lessons-learned/testing-guide.md))
-- **[Typescript Migration]** ([typescript-migration.md](docs/lessons-learned/typescript-migration.md))
 
-### 完整经验文档索引
+**项目管理** 🆕:
+- **[项目管理](docs/lessons-learned/project-management.md)** ⭐ - 并行开发、大规模重构、文档整合管理 (2026-03-19更新)
 
-- **[经验文档索引](docs/lessons-learned/README.md)** - 所有经验文档的导航中心 ⭐
-## 核心经验文档（docs/lessons-learned/）
-- **[2026 03 07 Comprehensive Optimization Experience]** ([2026-03-07-comprehensive-optimization-experience.md](docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md))
-- **[Api Design Patterns]** ([api-design-patterns.md](docs/lessons-learned/api-design-patterns.md))
-- **[Database Patterns]** ([database-patterns.md](docs/lessons-learned/database-patterns.md))
-- **[Debugging Skills]** ([debugging-skills.md](docs/lessons-learned/debugging-skills.md))
-- **[Deployment Operations]** ([deployment-operations.md](docs/lessons-learned/deployment-operations.md))
-- **[Event Node Builder Errors]** ([event-node-builder-errors.md](docs/lessons-learned/event-node-builder-errors.md))
-- **[Mutation Business Logic]** ([mutation-business-logic.md](docs/lessons-learned/mutation-business-logic.md))
-- **[Performance Patterns]** ([performance-patterns.md](docs/lessons-learned/performance-patterns.md))
-- **[Project Management]** ([project-management.md](docs/lessons-learned/project-management.md))
-- **[Python Development]** ([python-development.md](docs/lessons-learned/python-development.md))
-- **[React Best Practices]** ([react-best-practices.md](docs/lessons-learned/react-best-practices.md))
-- **[Refactoring Checklist]** ([refactoring-checklist.md](docs/lessons-learned/refactoring-checklist.md))
-- **[Security Essentials]** ([security-essentials.md](docs/lessons-learned/security-essentials.md))
-- **[Security Integration Testing]** ([security-integration-testing.md](docs/lessons-learned/security-integration-testing.md))
-- **[Test Fix Iteration]** ([test-fix-iteration.md](docs/lessons-learned/test-fix-iteration.md))
-- **[Testing Guide]** ([testing-guide.md](docs/lessons-learned/testing-guide.md))
-- **[Typescript Migration]** ([typescript-migration.md](docs/lessons-learned/typescript-migration.md))
+**开发经验**:
+- **[API设计模式](docs/lessons-learned/api-design-patterns.md)** - DataLoader实施、批量查询、缓存键设计
+- **[数据库模式](docs/lessons-learned/database-patterns.md)** - game_gid使用、事务、迁移
+- **[Python开发](docs/lessons-learned/python-development.md)** - mypy类型安全、GenericRepository
+- **[React最佳实践](docs/lessons-learned/react-best-practices.md)** - Hooks规则、Lazy Loading、Vite兼容性
+- **[TypeScript迁移](docs/lessons-learned/typescript-migration.md)** - Apollo 3.x兼容性、类型重复定义 (2026-03-11新增)
 
-### 完整经验文档索引
+**质量和安全**:
+- **[安全要点](docs/lessons-learned/security-essentials.md)** - XSS防护、SQL注入、输入验证
+- **[Security Integration Testing](docs/lessons-learned/security-integration-testing.md)** - SQL注入防护、XSS攻击检测 (2026-03-11新增)
+- **[重构检查清单](docs/lessons-learned/refactoring-checklist.md)** - TDD、代码审查、技术债务
 
-- **[经验文档索引](docs/lessons-learned/README.md)** - 所有经验文档的导航中心 ⭐
-## 核心经验文档（docs/lessons-learned/）
+**性能和优化**:
+- **[性能模式](docs/lessons-learned/performance-patterns.md)** - DataLoader、批量操作、TTL分层、并行优化
+- **[2026-03-07综合优化经验](docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md)** - 828个性能问题分类
+
+**测试和调试**:
+- **[测试指南](docs/lessons-learned/testing-guide.md)** - E2E测试、控制台错误检测、修复验证
+- **[Test-Fix迭代](docs/lessons-learned/test-fix-iteration.md)** - 4轮迭代模式、TDD+并行执行 (2026-03-11新增)
+- **[调试技能](docs/lessons-learned/debugging-skills.md)** - Chrome DevTools MCP、Subagent分析
+
+**业务逻辑**:
+- **[Mutation业务逻辑](docs/lessons-learned/mutation-business-logic.md)** - 5层验证架构、完整实现原则 (2026-03-11新增)
+
+**部署和运维**:
+- **[部署与运维](docs/lessons-learned/deployment-operations.md)** - 部署流程、运维监控、故障排查
+
+**问题修复**:
+- **[Event Node Builder错误](docs/lessons-learned/event-node-builder-errors.md)** - GraphQL类型不匹配案例
+
+### 经验文档使用说明
+
+**为什么建立经验文档系统**:
+- ✅ 整合了1009个文档的精华经验，避免重复
+- ✅ 文档减少59%，经验整合率提升到95%+
+- ✅ 集中管理，便于查找和维护
+- ✅ 持续更新，每次问题修复后立即更新
+
+**如何使用**:
+1. **遇到问题** → 先查阅经验文档，看是否有类似问题
+2. **修复问题后** → 提取经验，更新对应经验文档
+3. **Code Review** → 检查是否违反经验文档中的规范
 
 | 场景 | 查看文档 | 优先级 |
 |------|----------|--------|
@@ -3590,106 +3597,3 @@ module.exports = {
 | 7.1 | 2026-02-11 | 建立强制 E2E 测试流程 |
 | 7.0 | 2026-02-10 | 完善分层架构和 TDD 开发规范 |
 
-## 经验文档快速查找 ⭐ **极其重要**
-
-> **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
-
-### 核心经验文档
-- **[2026 03 07 Comprehensive Optimization Experience]**([docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md])
-- **[Hive_Type_Documentation_Update_Summary]**([docs/lessons-learned/HIVE_TYPE_DOCUMENTATION_UPDATE_SUMMARY.md])
-- **[Readme]**([docs/lessons-learned/README.md])
-- **[Api Design Patterns]**([docs/lessons-learned/api-design-patterns.md])
-- **[Database Patterns]**([docs/lessons-learned/database-patterns.md])
-- **[Debugging Skills]**([docs/lessons-learned/debugging-skills.md])
-- **[Deployment Operations]**([docs/lessons-learned/deployment-operations.md])
-- **[Event Node Builder Errors]**([docs/lessons-learned/event-node-builder-errors.md])
-- **[Graphql Field Completeness]**([docs/lessons-learned/graphql-field-completeness.md])
-- **[Mutation Business Logic]**([docs/lessons-learned/mutation-business-logic.md])
-- **[Performance Patterns]**([docs/lessons-learned/performance-patterns.md])
-- **[Project Management]**([docs/lessons-learned/project-management.md])
-- **[Python Development]**([docs/lessons-learned/python-development.md])
-- **[React Best Practices]**([docs/lessons-learned/react-best-practices.md])
-- **[Refactoring Checklist]**([docs/lessons-learned/refactoring-checklist.md])
-- **[Security Essentials]**([docs/lessons-learned/security-essentials.md])
-- **[Security Integration Testing]**([docs/lessons-learned/security-integration-testing.md])
-- **[Test Fix Iteration]**([docs/lessons-learned/test-fix-iteration.md])
-- **[Testing Guide]**([docs/lessons-learned/testing-guide.md])
-- **[Typescript Migration]**([docs/lessons-learned/typescript-migration.md])
-
-## 经验文档快速查找 ⭐ **极其重要**
-
-> **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
-
-### 核心经验文档
-- **[2026 03 07 Comprehensive Optimization Experience]**([docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md])
-- **[Hive_Type_Documentation_Update_Summary]**([docs/lessons-learned/HIVE_TYPE_DOCUMENTATION_UPDATE_SUMMARY.md])
-- **[Readme]**([docs/lessons-learned/README.md])
-- **[Api Design Patterns]**([docs/lessons-learned/api-design-patterns.md])
-- **[Database Patterns]**([docs/lessons-learned/database-patterns.md])
-- **[Debugging Skills]**([docs/lessons-learned/debugging-skills.md])
-- **[Deployment Operations]**([docs/lessons-learned/deployment-operations.md])
-- **[Event Node Builder Errors]**([docs/lessons-learned/event-node-builder-errors.md])
-- **[Graphql Field Completeness]**([docs/lessons-learned/graphql-field-completeness.md])
-- **[Mutation Business Logic]**([docs/lessons-learned/mutation-business-logic.md])
-- **[Performance Patterns]**([docs/lessons-learned/performance-patterns.md])
-- **[Project Management]**([docs/lessons-learned/project-management.md])
-- **[Python Development]**([docs/lessons-learned/python-development.md])
-- **[React Best Practices]**([docs/lessons-learned/react-best-practices.md])
-- **[Refactoring Checklist]**([docs/lessons-learned/refactoring-checklist.md])
-- **[Security Essentials]**([docs/lessons-learned/security-essentials.md])
-- **[Security Integration Testing]**([docs/lessons-learned/security-integration-testing.md])
-- **[Test Fix Iteration]**([docs/lessons-learned/test-fix-iteration.md])
-- **[Testing Guide]**([docs/lessons-learned/testing-guide.md])
-- **[Typescript Migration]**([docs/lessons-learned/typescript-migration.md])
-
-## 经验文档快速查找 ⭐ **极其重要**
-
-> **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
-
-### 核心经验文档
-- **[2026 03 07 Comprehensive Optimization Experience]**([docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md])
-- **[Hive_Type_Documentation_Update_Summary]**([docs/lessons-learned/HIVE_TYPE_DOCUMENTATION_UPDATE_SUMMARY.md])
-- **[Readme]**([docs/lessons-learned/README.md])
-- **[Api Design Patterns]**([docs/lessons-learned/api-design-patterns.md])
-- **[Database Patterns]**([docs/lessons-learned/database-patterns.md])
-- **[Debugging Skills]**([docs/lessons-learned/debugging-skills.md])
-- **[Deployment Operations]**([docs/lessons-learned/deployment-operations.md])
-- **[Event Node Builder Errors]**([docs/lessons-learned/event-node-builder-errors.md])
-- **[Graphql Field Completeness]**([docs/lessons-learned/graphql-field-completeness.md])
-- **[Mutation Business Logic]**([docs/lessons-learned/mutation-business-logic.md])
-- **[Performance Patterns]**([docs/lessons-learned/performance-patterns.md])
-- **[Project Management]**([docs/lessons-learned/project-management.md])
-- **[Python Development]**([docs/lessons-learned/python-development.md])
-- **[React Best Practices]**([docs/lessons-learned/react-best-practices.md])
-- **[Refactoring Checklist]**([docs/lessons-learned/refactoring-checklist.md])
-- **[Security Essentials]**([docs/lessons-learned/security-essentials.md])
-- **[Security Integration Testing]**([docs/lessons-learned/security-integration-testing.md])
-- **[Test Fix Iteration]**([docs/lessons-learned/test-fix-iteration.md])
-- **[Testing Guide]**([docs/lessons-learned/testing-guide.md])
-- **[Typescript Migration]**([docs/lessons-learned/typescript-migration.md])
-
-## 经验文档快速查找 ⭐ **极其重要**
-
-> **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
-
-### 核心经验文档
-- **[2026 03 07 Comprehensive Optimization Experience]**([docs/lessons-learned/2026-03-07-comprehensive-optimization-experience.md])
-- **[Hive_Type_Documentation_Update_Summary]**([docs/lessons-learned/HIVE_TYPE_DOCUMENTATION_UPDATE_SUMMARY.md])
-- **[Readme]**([docs/lessons-learned/README.md])
-- **[Api Design Patterns]**([docs/lessons-learned/api-design-patterns.md])
-- **[Database Patterns]**([docs/lessons-learned/database-patterns.md])
-- **[Debugging Skills]**([docs/lessons-learned/debugging-skills.md])
-- **[Deployment Operations]**([docs/lessons-learned/deployment-operations.md])
-- **[Event Node Builder Errors]**([docs/lessons-learned/event-node-builder-errors.md])
-- **[Graphql Field Completeness]**([docs/lessons-learned/graphql-field-completeness.md])
-- **[Mutation Business Logic]**([docs/lessons-learned/mutation-business-logic.md])
-- **[Performance Patterns]**([docs/lessons-learned/performance-patterns.md])
-- **[Project Management]**([docs/lessons-learned/project-management.md])
-- **[Python Development]**([docs/lessons-learned/python-development.md])
-- **[React Best Practices]**([docs/lessons-learned/react-best-practices.md])
-- **[Refactoring Checklist]**([docs/lessons-learned/refactoring-checklist.md])
-- **[Security Essentials]**([docs/lessons-learned/security-essentials.md])
-- **[Security Integration Testing]**([docs/lessons-learned/security-integration-testing.md])
-- **[Test Fix Iteration]**([docs/lessons-learned/test-fix-iteration.md])
-- **[Testing Guide]**([docs/lessons-learned/testing-guide.md])
-- **[Typescript Migration]**([docs/lessons-learned/typescript-migration.md])

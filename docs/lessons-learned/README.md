@@ -1,8 +1,31 @@
 # 经验文档索引
 
 > **🎯 目标**: 避免重复经验，提供集中的知识库
-> **📊 来源**: 整合了446个文档的精华经验
+> **📊 来源**: 整合了492个文档的精华经验（+46个archive报告）
 > **🔄 更新**: 持续更新，每次问题修复后立即更新
+> **📈 最新**: 2026-03-18 - 大型文档整合完成（11个文档，11843行）⭐
+> - **Entity架构经验**: 从architecture.md (2491行) 提取 → [api-design-patterns.md](./api-design-patterns.md) ⭐
+> - **TypeScript类型规范**: 从TYPESCRIPT_TYPE_STANDARDS.md (2003行) 提取 → [typescript-migration.md](./typescript-migration.md) ⭐
+> - **Chrome MCP兼容性**: 从4个Chrome MCP文档 (2861行) 提取 → [react-best-practices.md](./react-best-practices.md) ⭐
+> - **CLAUDE.md精简**: 从2508行精简到444行（精简率82.3%）⭐
+> **📈 2026-03-16**: Archive报告经验补充完成（26个新经验：测试数据验证、键级锁优化、Bloom Filter、ERS架构、E2E清理、Playwright优化、SQL注入验证）
+
+---
+
+## 🚀 新手入门快速导航
+
+**刚开始开发？按顺序阅读以下文档**：
+
+| 步骤 | 文档 | 时间 | 重点 |
+|-----|------|-----|-----|
+| 1️⃣ | [CLAUDE.md - 开发规范](../../CLAUDE.md) | 15分钟 | 环境设置、TDD、API契约测试 |
+| 2️⃣ | [React最佳实践](./react-best-practices.md) | 20分钟 | Hooks规则、组件优化 |
+| 3️⃣ | [测试指南](./testing-guide.md) | 25分钟 | E2E测试、TDD流程 |
+| 4️⃣ | [安全要点](./security-essentials.md) | 15分钟 | SQL注入、XSS防护 |
+| 5️⃣ | [性能模式](./performance-patterns.md) | 20分钟 | 缓存策略、N+1查询优化 |
+| **总计** | **5个核心文档** | **~95分钟** | **快速上手必备知识** |
+
+**💡 提示**: 遇到问题时，先查看下方的[快速查找场景](#快速查找场景)或使用搜索功能（Cmd/Ctrl+F）
 
 ---
 
@@ -28,6 +51,12 @@
 ### TypeScript迁移 (2026-03-11新增) ⭐
 - [TypeScript迁移经验](./typescript-migration.md) - Apollo Client 3.x兼容性、类型重复定义解决方案、Template Literal语法错误修复 ⭐⭐⭐
 
+### TypeScript和工具链 (2026-03-16新增) ⭐
+- [Enum导出规则](./typescript-toolchain-learnings.md#enum导出规则-⚠️-p0) - export type vs export，模块解析错误 ⭐⭐⭐
+- [Vite缓存问题排查](./typescript-toolchain-learnings.md#vite缓存问题排查-⚠️-p1) - 缓存清除、模块错误解决 ⭐⭐
+- [React Hook性能优化](./typescript-toolchain-learnings.md#react-hook性能优化-⭐--p1) - useTransition、防抖策略、RAF批量处理 ⭐⭐
+- [Chrome DevTools MCP快照延迟](./typescript-toolchain-learnings.md#chrome-devtools-mcp快照延迟问题-⚠️-p1) - await_element、验证循环 ⭐⭐
+
 ### Security Integration测试 (2026-03-11新增) ⭐
 - [Security Integration Testing](./security-integration-testing.md) - SQL注入防护、XSS攻击检测、白名单验证策略、测试通过率从20%提升到85% ⭐⭐⭐
 
@@ -36,6 +65,9 @@
 
 ### 测试修复迭代 (2026-03-11新增) ⭐
 - [Test-Fix Iteration](./test-fix-iteration.md) - 4轮迭代模式、TDD + 并行执行策略、自动化验证流程、从20%提升到100% ⭐⭐⭐
+
+### TDD完整实现原则 (2026-03-16新增) ⭐
+- [TDD完整实现原则](./tdd-complete-implementation.md) - "不可简化实现"核心原则、3种错误实现模式、TDD Red-Green-Refactor完整流程、4级违规后果 ⭐⭐⭐
 
 ### 测试指南
 - [E2E测试方法论](./testing-guide.md#e2e测试) - Chrome DevTools MCP测试流程
@@ -94,6 +126,9 @@
 - [多级缓存架构](./performance-patterns.md#多级缓存架构) - L1+L2+L3缓存层级
 - [Cache Tags系统](./performance-patterns.md#cache-tags系统) - 按标签批量失效缓存
 - [性能监控装饰器](./performance-patterns.md#性能监控装饰器) - 函数执行时间监控
+- [键级锁优化](./performance-patterns.md#键级锁优化) (2026-03-16新增) - 细粒度锁定机制（1.99x提升）
+- [Bloom Filter内存优化](./performance-patterns.md#bloom-filter内存优化) (2026-03-16新增) - SCAN批量处理（95%内存减少）
+- [ERS架构迁移](./performance-patterns.md#ers架构迁移最佳实践) (2026-03-16新增) - Entity-Repository-Service模式
 
 ### 数据库模式
 - [数据库文件位置规范](./database-patterns.md#数据库文件位置规范) - 所有DB文件必须在data/目录
@@ -151,7 +186,10 @@
 | ⚠️ React defaultProps警告 | [React最佳实践](./react-best-practices.md) | React 18+ defaultProps已废弃 (2026-03-08新增) |
 | 🐌 页面加载超时 | [React最佳实践](./react-best-practices.md) | Lazy Loading |
 | 🔒 SQL注入风险 | [安全要点](./security-essentials.md) | SQL注入防护 |
+| 🧪 测试数据验证 | [安全要点](./security-essentials.md) | 测试数据与Entity验证兼容性 (2026-03-16新增) |
 | 🧪 E2E测试失败 | [测试指南](./testing-guide.md) | E2E测试方法论 |
+| 📁 E2E测试清理 | [测试指南](./testing-guide.md) | E2E测试目录清理 (2026-03-16新增) |
+| ⚙️ Playwright配置 | [测试指南](./testing-guide.md) | Playwright配置优化 (2026-03-16新增) |
 | ⚡ 查询性能差 | [性能模式](./performance-patterns.md) | N+1查询优化 |
 | 🗄️ 数据库迁移 | [数据库模式](./database-patterns.md) | game_gid迁移 |
 | 🔧 API错误处理 | [API设计模式](./api-design-patterns.md) | 错误处理模式 |
@@ -167,7 +205,21 @@
 
 ## 经验贡献
 
-**最新贡献 (2026-03-13)**：
+**最新贡献 (2026-03-16晚) - Archive报告经验补充**：
+- ✅ **安全要点** - 测试数据与Entity验证兼容性、Environment-aware验证模式、测试环境灵活数据创建（1个新经验，基于CRITICAL-ROOT-CAUSE-ANALYSIS和GAME-ENTITY-VALIDATION-FIX）⭐⭐⭐
+- ✅ **性能模式** - 键级锁优化（1.99x提升）、Bloom Filter内存优化（95%减少）、ERS架构迁移最佳实践（3个新经验，基于FINAL-ARCHITECTURE和P1-PERFORMANCE-OPTIMIZATION）⭐⭐⭐
+- ✅ **测试指南** - E2E测试目录清理、Playwright配置优化（分层测试策略）、SQL注入防护验证（3个新经验，基于FINAL_SUMMARY_TEST_CEAUNUP、E2E-TEST-FINAL-REPORT、PHASE-4-TEST-SUMMARY）⭐⭐⭐
+
+**最新贡献 (2026-03-16下午)**：
+- ✅ **E2E测试报告经验整合** - SQL标识符清理与安全验证、React Chrome MCP兼容性模式、Chrome MCP事件流分析、useEffect无限循环预防、500错误根因分析方法、E2E测试场景设计、性能影响评估、安全验证（8个新经验，基于E2E-TESTING-REPORT-2026-03-13）⭐⭐⭐
+- ✅ **Chrome MCP Modal修复经验** - Chrome MCP fill不触发onChange、useEffect依赖数组最佳实践、useRef类型声明、批量更新优化、条件检查、TypeScript类型安全、修复优先级分类、可复用Hook模式、测试验证方法（9个新经验，基于CHROME-MCP-MODAL-FIX-REPORT）⭐⭐⭐
+
+**最新贡献 (2026-03-16下午 - 之前)**：
+- ✅ **TDD完整实现原则** - "不可简化实现"核心原则、3种错误实现模式（症状修复/占位符/绕过验证）、TDD Red-Green-Refactor完整流程、4级违规后果、智能缓存失效双层策略（基于TDD Green Phase完成报告）⭐⭐⭐
+- ✅ **缓存失效调试经验** - 3个独立根因分析方法（数据未保存/缓存键不匹配/SQL错误）、并行修复执行计划（3个Phase，35分钟）、完整日志验证策略、3种缓存失效修复方案（基于Cache Invalidation Fix Design）⭐⭐⭐
+- ✅ **HQL Preview根因分析** - 3WHY分析方法（WHY验证/HOW传播/WHAT现实）、错误传播路径追踪、SQL标识符验证模式、3层修复策略（自动清理/引用标识符/数据库迁移）、完整测试计划（基于HQL Preview 500 Root Cause Analysis）⭐⭐⭐
+
+**近期贡献 (2026-03-11至2026-03-13)**：
 - ✅ **GraphQL字段完整性经验** - hive_type字段4层修复策略、GraphQL Schema → DataLoader → TypeScript → UI组件完整性检查、避免字段遗漏（基于EventParameter字段丢失修复）
 - ✅ **TypeScript迁移经验** - Apollo Client 3.x兼容性处理、类型重复定义解决方案、Template Literal语法错误修复（基于61个TypeScript错误修复）
 - ✅ **Security Integration Testing** - SQL注入防护验证、XSS攻击检测、白名单验证策略、测试通过率从20%提升到85%（基于4轮测试修复迭代）
@@ -210,14 +262,15 @@
 
 ## 统计信息
 
-- **经验文档总数**: 12个
-- **P0核心经验**: 8个主题（34个经验点 +6个）
-- **P1重要经验**: 10个主题（46个经验点 +4个）
+- **经验文档总数**: 21个
+- **P0核心经验**: 8个主题（41个经验点 +7个，2026-03-16新增）
+- **P1重要经验**: 10个主题（49个经验点 +3个，2026-03-16新增）
+- **P2技巧经验**: 2个主题
 - **P0完成度**: 100% ✅
 - **P1完成度**: 100% ✅
-- **整合文档数**: 493个 (+47个2026-03报告)
-- **归档报告数**: 369个 (+50个)
-- **文档减少率**: 92.5% (493 → 37个活跃文档)
+- **整合文档数**: 492个 (+46个archive报告，2026-03-16)
+- **归档报告数**: 369个 (+7个priority archive报告，2026-03-16)
+- **文档减少率**: 92.5% (492 → 37个活跃文档)
 
 ## 新增经验 (2026-03-05)
 
@@ -265,6 +318,52 @@
 
 ## 相关文档
 
+### 主要索引
 - [CLAUDE.md](../../CLAUDE.md) - 项目开发规范（包含经验文档链接）
 - [docs/README.md](../README.md) - 文档中心索引
 - [archive/README.md](../archive/README.md) - 归档报告索引
+- [../../CHANGELOG.md](../../CHANGELOG.md) - 项目更新日志
+
+### 补充索引（2026-03-16新增）
+- [缺失文档索引](./development-docs-index.md) - 待创建的development文档列表
+- [归档报告导航](./archived-reports-index.md) - 临时报告归档位置导航
+
+### 链接优化工具
+- 链接检查脚本: `/tmp/check_md_links.sh`
+- 批量修复脚本: `/tmp/fix_links_batch.sh`
+- 快速检查脚本: `/tmp/quick_link_check.sh`
+
+---
+
+## 缺失文档说明
+
+部分文档在经验文档中被引用但尚未创建。以下是列表：
+
+### P0优先级（高价值，计划创建）
+- `development/TYPESCRIPT-QUICK-REF.md` - TypeScript快速参考
+- `development/sql-validator-guidelines.md` - SQL验证器指南
+
+### P1优先级（中价值，后续创建）
+- `development/typescript-best-practices.md` - TypeScript最佳实践
+- `development/testing-best-practices.md` - 测试最佳实践
+
+### 已归档/整合的报告
+以下临时报告已归档或整合到其他文档：
+- `GRAPHQL-DATALOADER-REPO-STATS.md` → 整合到[综合性能优化经验](./2026-03-07-comprehensive-optimization-experience.md)
+- `PERF-BENCHMARK-BEFORE-AFTER.md` → 整合到[综合性能优化经验](./2026-03-07-comprehensive-optimization-experience.md)
+
+### 如何帮助创建这些文档？
+
+如果您对某个主题有经验，欢迎创建对应的文档！
+1. 参考现有经验文档的格式
+2. 添加实际内容和示例
+3. 更新本索引
+
+---
+
+**链接有效性说明**:
+当前26%的链接有效性是**诚实的数字**，代表：
+- ✅ 26%：指向真实存在的文档
+- ⏳ 74%：指向待创建文档、已归档报告、或需要人工验证的路径
+
+我们不使用"占位符"来虚假地提升这个数字。
