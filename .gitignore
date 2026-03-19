@@ -140,3 +140,4 @@ data/*.backup_*
 # Migration scripts (run once)
 scripts/migrate/*.sql
 scripts/migrate/*.py
+docs-backup-*.tar.gz
