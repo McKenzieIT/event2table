@@ -389,19 +389,6 @@ export const GET_FLOWS = gql`
   }
 `;
 
-`;
-
-/**
-      gameGid
-      flowName
-      flowType
-      config
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
 /**
  * Get a single flow by ID
  */

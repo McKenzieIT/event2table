@@ -7,7 +7,7 @@ Main application file that registers all modules
 
 from pathlib import Path
 import os
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request, jsonify
 from flask_caching import Cache
 from flask_cors import CORS
 from backend.core.database import init_db, migrate_db, get_db_connection, create_indexes
@@ -29,7 +29,6 @@ from backend.api.routes.v1_adapter import v1_adapter_bp  # V1-to-V2 Adapter API 
 from backend.api.routes.health import health_bp  # Health check endpoint (2026-03-01)
 
 # GraphQL API
-from flask import request, jsonify
 from backend.gql_api.schema import schema
 from flask_graphql import GraphQLView
 
@@ -181,19 +180,9 @@ except Exception as e:
 # 缓存控制 - 开发模式禁用 HTML 缓存
 @app.after_request
 def add_cache_headers(response):
-    """
-    缓存策略：
-    - 开发模式：HTML 禁用缓存，确保修改立即生效
-    - 生产模式：HTML 使用短缓存，JS/CSS（带hash）使用长缓存
-    """
-    if DEBUG_MODE and 'text/html' in response.content_type:
-        # 开发模式：HTML 禁用缓存
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-    elif not DEBUG_MODE and 'text/html' in response.content_type:
-        # 生产模式：HTML 禁用缓存（确保更新立即生效）
-        # JS/CSS 文件带有内容哈希，所以不需要 HTML 缓存
+    """Disable HTML caching to ensure updates take effect immediately.
+    JS/CSS files use content-hash filenames for long-term caching."""
+    if 'text/html' in response.content_type:
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
@@ -325,14 +314,6 @@ if flows_bp:
 if hql_bp:
     app.register_blueprint(hql_bp)  # HQL management
 
-# Register module blueprints (API endpoints must be registered BEFORE React shell)
-# NOTE: games_bp routes are now in api_bp (backend.api.routes.games)
-# Old games_bp from backend.services.games has conflicting routes - DO NOT USE
-# NOTE: events_bp is deprecated and conflicts with React SPA routes - DO NOT REGISTER
-# All event operations now use GraphQL API (/api/graphql) or REST API (/api/events)
-# if react_bp:
-#     app.register_blueprint(react_bp)
-# app.register_blueprint(events_bp)  # ❌ DEPRECATED - Conflicts with React Router /events
 app.register_blueprint(common_params_bp)
 
 # Register React shell LAST as catch-all for all frontend routes
@@ -341,13 +322,17 @@ if react_bp:
 
 
 # Global JSON error handlers for API endpoints
-from flask import request
+API_ROUTE_PREFIXES = ('/api/', '/canvas/', '/hql-preview-v2/')
+
+
+def _is_api_request():
+    return request.path.startswith(API_ROUTE_PREFIXES)
+
 
 @app.errorhandler(400)
 def bad_request_error(error):
     """Handle 400 Bad Request errors with JSON response for API routes"""
-    if request.path.startswith('/api/') or request.path.startswith('/canvas/') or request.path.startswith('/hql-preview-v2/'):
-        from flask import jsonify
+    if _is_api_request():
         return jsonify({
             'success': False,
             'error': 'Bad Request',
@@ -360,9 +345,7 @@ def bad_request_error(error):
 @app.errorhandler(404)
 def not_found_error(error):
     """Handle 404 Not Found errors with JSON response for API routes, or serve SPA for frontend routes"""
-    # For API routes, return JSON error
-    if request.path.startswith('/api/') or request.path.startswith('/canvas/') or request.path.startswith('/hql-preview-v2/'):
-        from flask import jsonify
+    if _is_api_request():
         from datetime import datetime
         return jsonify({
             'success': False,
@@ -383,8 +366,7 @@ def not_found_error(error):
 @app.errorhandler(405)
 def method_not_allowed_error(error):
     """Handle 405 Method Not Allowed errors with JSON response for API routes"""
-    if request.path.startswith('/api/') or request.path.startswith('/canvas/') or request.path.startswith('/hql-preview-v2/'):
-        from flask import jsonify
+    if _is_api_request():
         return jsonify({
             'success': False,
             'error': 'Method Not Allowed',
@@ -397,8 +379,7 @@ def method_not_allowed_error(error):
 @app.errorhandler(500)
 def internal_server_error(error):
     """Handle 500 Internal Server Error with JSON response for API routes"""
-    if request.path.startswith('/api/') or request.path.startswith('/canvas/') or request.path.startswith('/hql-preview-v2/'):
-        from flask import jsonify
+    if _is_api_request():
         return jsonify({
             'success': False,
             'error': 'Internal Server Error',
@@ -442,50 +423,6 @@ def get_games_with_counts():
     ''')
 
 
-@app.route('/test')
-def test():
-    """Test route to verify Flask is working"""
-    return """
-    <!DOCTYPE html>
-    <html>
-    <head><title>Test Page</title></head>
-    <body>
-        <h1>Flask is Working!</h1>
-        <p>If you see this, Flask server is running correctly.</p>
-        <a href="/">Go to Home</a>
-    </body>
-    </html>
-    """
-
-
-@app.route('/react_shell_test')
-def react_shell_test():
-    """Test route for React App Shell - Phase 1 of gradual migration"""
-    return render_template('react_shell_test.html')
-
-
-@app.route('/react_spa_test')
-def react_spa_test():
-    """Test route for React SPA with client-side routing - Phase 6"""
-    return render_template('react_spa_test.html')
-
-
-@app.route('/debug-env')
-def debug_env():
-    """Debug route to check environment variables"""
-    from flask import jsonify
-    return jsonify({
-        'FLASK_ENV': os.environ.get('FLASK_ENV'),
-        'FLASK_DEBUG': os.environ.get('FLASK_DEBUG'),
-        'DEBUG_MODE': DEBUG_MODE,
-        'config.ENV': 'development' if (os.environ.get('FLASK_ENV') == 'development' or DEBUG_MODE) else 'production'
-    })
-
-
-@app.route('/diagnostics')
-def diagnostics():
-    """Diagnostics route to check React loading"""
-    return render_template('test_react.html')
 
 
 if __name__ == '__main__':
@@ -501,19 +438,6 @@ if __name__ == '__main__':
     logger.info("Starting web server...")
     logger.info(f"Access the application at: http://{FlaskConfig.HOST}:{FlaskConfig.PORT}")
     logger.info("=" * 80)
-
-    # 🆕 缓存预热 (2026-02-25)
-    logger.info("🔥 Warming up cache...")
-    try:
-        from backend.services.cache.cache_warmup import warmup_cache_on_startup
-        warmup_stats = warmup_cache_on_startup()
-        logger.info(f"✅ Cache warmup completed:")
-        logger.info(f"   - Games: {warmup_stats['games_warmed']}")
-        logger.info(f"   - Events: {warmup_stats['events_warmed']}")
-        logger.info(f"   - Params: {warmup_stats['params_warmed']}")
-        logger.info(f"   - Total keys: {warmup_stats['total_keys']}")
-    except Exception as e:
-        logger.warning(f"⚠️  Cache warmup failed (non-critical): {e}")
 
     logger.info("=" * 80)
 

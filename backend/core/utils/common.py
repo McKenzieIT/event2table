@@ -22,31 +22,8 @@ from datetime import datetime
 from flask import request
 from pydantic import ValidationError
 
-# 避免循环导入 - 在运行时导入响应函数
-# 这些函数在 backend.core.utils (parent module, legacy utils.py) 中定义
-
-# 全局变量用于缓存导入的函数
-_json_success_response = None
-_json_error_response = None
-
-def _ensure_response_functions():
-    """确保响应函数已导入(延迟导入以避免循环依赖)"""
-    global _json_success_response, _json_error_response
-    if _json_success_response is None or _json_error_response is None:
-        # 导入父模块 (backend.core.utils - 即 legacy utils.py)
-        import backend.core.utils as utils_module
-        _json_success_response = utils_module.json_success_response
-        _json_error_response = utils_module.json_error_response
-
-def json_success_response(data=None, message="Success", status_code=200):
-    """向后兼容的wrapper - 延迟导入以避免循环依赖"""
-    _ensure_response_functions()
-    return _json_success_response(data=data, message=message, status_code=status_code)
-
-def json_error_response(message, status_code=500):
-    """向后兼容的wrapper - 延迟导入以避免循环依赖"""
-    _ensure_response_functions()
-    return _json_error_response(message, status_code=status_code)
+# 直接从 response 模块导入，避免循环依赖
+from .response import json_success_response, json_error_response
 
 logger = logging.getLogger(__name__)
 

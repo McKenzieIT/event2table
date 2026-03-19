@@ -434,3 +434,425 @@ def python_type_to_hive_type(python_type: str) -> str:
     }
 
     return type_mapping.get(python_type, "STRING")
+
+
+# ============================================================================
+# Game Context Helpers
+# ============================================================================
+
+from typing import Optional, Tuple
+from flask import flash, redirect, url_for
+
+from backend.core.config import ODSDatabase, CommonParamConfig
+from backend.core.database import get_db_connection
+from backend.core.utils.converters import fetch_one_as_dict
+
+
+def get_game_gid_param(request_obj, param_name: str = "game_gid") -> Optional[str]:
+    """
+    从请求中获取 game_gid 参数（支持字符串和整数类型）
+
+    由于数据库中 games.gid 是 TEXT 类型, 但部分代码使用 type=int, 
+    此函数提供统一的方式来获取和转换 game_gid 参数. 
+
+    Args:
+        request_obj: Flask request 对象
+        param_name: 参数名称（默认为 "game_gid"）
+
+    Returns:
+        game_gid 字符串, 如果参数不存在返回 None
+
+    Example:
+        # 在视图函数中使用
+        game_gid = get_game_gid_param(request)
+        if not game_gid:
+            return json_error_response("game_gid is required", status_code=400)
+
+        # Now game_gid is a string type, can be used directly in SQL queries
+        game = fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (game_gid,))
+    """
+    from flask import request
+
+    # Try to get as integer (for backward compatibility)
+    value_int = request.args.get(param_name, type=int)
+    if value_int is not None:
+        return str(value_int)
+
+    # 尝试作为字符串获取
+    value_str = request.args.get(param_name, type=str)
+    if value_str:
+        return value_str.strip()
+
+    # 参数不存在
+    return None
+
+
+def require_game_with_redirect(func):
+    """
+    Decorator to require game selection before accessing a route
+
+    Usage:
+        @require_game_with_redirect
+        @events_bp.route('/events')
+        def list_events():
+            ...
+    """
+
+    def wrapper(*args, **kwargs):
+        exists, message = check_games_exist()
+        if not exists:
+            flash(message, "error")
+            return redirect(url_for("games.list_games"))
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def get_ods_db_name(ods_type: str) -> str:
+    """
+    Get ODS database name by type
+
+    Args:
+        ods_type: ODS type ('domestic' or 'overseas')
+
+    Returns:
+        Database name
+    """
+    return ODSDatabase.get_db_name(ods_type)
+
+
+def calculate_common_param_threshold(event_count: int, ratio: Optional[float] = None) -> int:
+    """
+    Calculate the threshold for common parameters
+
+    Args:
+        event_count: Total number of events
+        ratio: Threshold ratio (default from config)
+
+    Returns:
+        Minimum number of events a parameter must appear in to be considered common
+    """
+    if ratio is None:
+        ratio = CommonParamConfig.DEFAULT_THRESHOLD_RATIO
+
+    threshold = int(event_count * ratio)
+    # Ensure at least 1 event is required
+    return max(1, threshold)
+
+
+def check_games_exist() -> Tuple[bool, Optional[str]]:
+    """
+    Check if any games exist in the database
+
+    Returns:
+        Tuple of (exists, redirect_message)
+    """
+    conn = get_db_connection()
+    try:
+        count = conn.execute("SELECT COUNT(*) as count FROM games").fetchone()["count"]
+        if count == 0:
+            return False, "请先创建游戏"
+        return True, None
+    finally:
+        conn.close()
+
+
+def validate_game_exists(game_gid: int) -> Tuple[bool, Optional[dict], Optional[str]]:
+    """
+    Validate that a game exists
+
+    Args:
+        game_gid: The game GID to validate
+
+    Returns:
+        Tuple of (exists, game_dict, error_message)
+    """
+    conn = get_db_connection()
+    try:
+        game = conn.execute("SELECT * FROM games WHERE gid = ?", (game_gid,)).fetchone()
+        if game:
+            return True, dict(game), None
+        else:
+            return False, None, "游戏不存在"
+    finally:
+        conn.close()
+
+
+# ============================================================================
+# Query Helper Functions
+# ============================================================================
+
+from typing import List, Dict, Any
+
+from backend.core.utils.converters import fetch_all_as_dict
+
+
+def get_event_with_game_info(event_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Get event with game and category details
+
+    Args:
+        event_id: Event ID
+
+    Returns:
+        Event dictionary with game and category info, or None if not found
+
+    Example:
+        event = get_event_with_game_info(123)
+        if event:
+            print(f"Event: {event['event_name']}, Game: {event['game_name']}")
+    """
+    return fetch_one_as_dict(
+        """
+        SELECT le.*, g.gid, g.name as game_name, g.ods_db, ec.name as category_name
+        FROM log_events le
+        LEFT JOIN games g ON le.game_gid = g.gid
+        LEFT JOIN event_categories ec ON le.category_id = ec.id
+        WHERE le.id = ?
+    """,
+        (event_id,),
+    )
+
+
+def get_game_by_gid(gid: str) -> Optional[Dict[str, Any]]:
+    """
+    Get game by GID
+
+    Args:
+        gid: Game GID
+
+    Returns:
+        Game dictionary or None if not found
+
+    Example:
+        game = get_game_by_gid('10000147')
+        if game:
+            print(f"Game: {game['name']}, ODS DB: {game['ods_db']}")
+    """
+    return fetch_one_as_dict("SELECT * FROM games WHERE gid = ?", (gid,))
+
+
+def get_active_parameters(event_id: int) -> List[Dict[str, Any]]:
+    """
+    Get active parameters for an event
+
+    Args:
+        event_id: Event ID
+
+    Returns:
+        List of parameter dictionaries
+
+    Example:
+        params = get_active_parameters(123)
+        for param in params:
+            print(f"Parameter: {param['param_name']}, Type: {param['template_name']}")
+    """
+    return fetch_all_as_dict(
+        """
+        SELECT ep.*, pt.template_name, pt.display_name as type_display_name
+        FROM event_params ep
+        LEFT JOIN param_templates pt ON ep.template_id = pt.id
+        WHERE ep.event_id = ? AND ep.is_active = 1
+        ORDER BY ep.id
+    """,
+        (event_id,),
+    )
+
+
+def get_event_with_parameters(event_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Get event with all its parameters in a single query
+
+    Args:
+        event_id: Event ID
+
+    Returns:
+        Dictionary with event info and parameters list, or None if not found
+
+    Example:
+        event_data = get_event_with_parameters(123)
+        if event_data:
+            print(f"Event: {event_data['event']['event_name']}")
+            for param in event_data['parameters']:
+                print(f"  - {param['param_name']}")
+    """
+    event = get_event_with_game_info(event_id)
+    if not event:
+        return None
+
+    parameters = get_active_parameters(event_id)
+
+    return {"event": event, "parameters": parameters}
+
+
+def get_games_with_event_counts() -> List[Dict[str, Any]]:
+    """
+    Get all games with their event counts
+
+    Returns:
+        List of games with event count for each
+
+    Example:
+        games = get_games_with_event_counts()
+        for game in games:
+            print(f"Game: {game['name']}, Events: {game['event_count']}")
+    """
+    return fetch_all_as_dict("""
+        SELECT g.*,
+               (SELECT COUNT(*) FROM log_events WHERE game_gid = g.gid) as event_count
+        FROM games g
+        ORDER BY g.name
+    """)
+
+
+def check_game_has_events(game_gid: int) -> bool:
+    """
+    Check if a game has any events
+
+    Args:
+        game_gid: Game GID (business GID)
+
+    Returns:
+        True if game has events, False otherwise
+
+    Example:
+        if not check_game_has_events(10000147):
+            print("This game has no events yet")
+    """
+    result = fetch_one_as_dict(
+        "SELECT COUNT(*) as count FROM log_events WHERE game_gid = ?", (game_gid,)
+    )
+    return result["count"] > 0 if result else False
+
+
+def get_categories_by_game(game_gid: int) -> List[Dict[str, Any]]:
+    """
+    Get all categories used by events in a specific game
+
+    Args:
+        game_gid: Game GID (business GID)
+
+    Returns:
+        List of categories with event counts
+
+    Example:
+        categories = get_categories_by_game(10000147)
+        for cat in categories:
+            print(f"Category: {cat['name']}, Events: {cat['event_count']}")
+    """
+    return fetch_all_as_dict(
+        """
+        SELECT ec.*,
+               (SELECT COUNT(*) FROM log_events
+                WHERE game_gid = ? AND category_id = ec.id) as event_count
+        FROM event_categories ec
+        WHERE ec.id IN (
+            SELECT DISTINCT category_id FROM log_events WHERE game_gid = ?
+        )
+        ORDER BY ec.name
+    """,
+        (game_gid, game_gid),
+    )
+
+
+def get_or_401(
+    query: str, params: tuple, error_message: str = "Resource not found"
+) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    """
+    Fetch a resource or return 401 error response
+
+    Args:
+        query: SQL query string
+        params: Query parameters
+        error_message: Custom error message
+
+    Returns:
+        Tuple of (found, data_dict, error_message)
+
+    Example:
+        found, game, error = get_or_401('SELECT * FROM games WHERE id = ?', (game_id,))
+        if not found:
+            return error_response(error, status_code=404)
+    """
+    data = fetch_one_as_dict(query, params)
+    if not data:
+        return False, None, error_message
+    return True, data, None
+
+
+def find_column_by_keywords(headers: List[str], keywords: List[str]) -> Optional[int]:
+    """
+    Intelligently find column index by keywords with fuzzy matching
+
+    Args:
+        headers: List of header names from Excel
+        keywords: List of keywords to search for
+
+    Returns:
+        Column index (0-based) or None if not found
+    """
+    for idx, header in enumerate(headers):
+        header_lower = header.lower()
+
+        # Direct match
+        for keyword in keywords:
+            if keyword.lower() in header_lower:
+                return idx
+
+        # Fuzzy match - check if header contains any keyword characters
+        for keyword in keywords:
+            keyword_lower = keyword.lower()
+            # Remove common separators and check
+            header_clean = header_lower.replace("_", "").replace("-", "").replace(" ", "")
+            keyword_clean = keyword_lower.replace("_", "").replace("-", "").replace(" ", "")
+
+            # Check if keyword is a substring of header or vice versa
+            if keyword_clean in header_clean or header_clean in keyword_clean:
+                return idx
+
+    return None
+
+
+__all__ = [
+    # 验证函数
+    'validate_game_gid',
+    'validate_table_name',
+    'validate_event_name',
+    # 统计函数
+    'calculate_event_statistics',
+    'calculate_param_usage',
+    # 数据转换函数
+    'sanitize_name',
+    'generate_table_name',
+    'generate_dwd_table_name',
+    # HQL生成辅助函数
+    'format_json_path',
+    'build_hql_field_alias',
+    'format_hql_field',
+    # 缓存相关函数
+    'build_cache_key',
+    'build_game_cache_key',
+    'build_event_cache_key',
+    # 数据验证辅助函数
+    'is_valid_game_gid',
+    'is_safe_table_name',
+    # 类型转换辅助函数
+    'python_type_to_hive_type',
+    # 游戏上下文辅助
+    'get_game_gid_param',
+    'require_game_with_redirect',
+    'get_ods_db_name',
+    'calculate_common_param_threshold',
+    'check_games_exist',
+    'validate_game_exists',
+    # 查询辅助函数
+    'get_event_with_game_info',
+    'get_game_by_gid',
+    'get_active_parameters',
+    'get_event_with_parameters',
+    'get_games_with_event_counts',
+    'check_game_has_events',
+    'get_categories_by_game',
+    'get_or_401',
+    'find_column_by_keywords',
+]

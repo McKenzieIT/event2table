@@ -27,7 +27,7 @@ from backend.core.cache.cache_system import clear_event_cache, clear_game_cache
 from backend.core.cache.decorators import cached
 from backend.core.config import UPLOAD_DIR, CacheConfig
 from backend.core.database import DB_PATH, get_db_connection
-from backend.core.exceptions import DatabaseError, NotFoundError, ValidationError
+from backend.core.errors import DatabaseError, NotFoundError, ValidationError
 from backend.core.logging import get_logger
 from backend.core.utils import (
     db_transaction,

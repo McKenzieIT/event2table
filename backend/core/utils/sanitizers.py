@@ -212,3 +212,126 @@ def sanitize_identifier(identifier: str) -> str:
         'my_field'
     """
     return IdentifierSanitizer.sanitize(identifier)
+
+
+# ============================================================================
+# HTML and User Input Sanitization Functions
+# ============================================================================
+
+import re
+
+# Sanitization patterns
+XSS_PATTERN = re.compile(r"<script[^>]*>.*?</script>", re.IGNORECASE)
+XSS_EVENT_PATTERN = re.compile(r"on\w+\s*=", re.IGNORECASE)  # onclick=, onload=, etc.
+XSS_JS_PATTERN = re.compile(r"javascript:", re.IGNORECASE)  # javascript:伪协议
+XSS_DATA_PATTERN = re.compile(r"data:text/html", re.IGNORECASE)  # data:伪协议
+XSS_IFRAME_PATTERN = re.compile(r"<iframe[^>]*>.*?</iframe>", re.IGNORECASE)
+XSS_OBJECT_PATTERN = re.compile(r"<object[^>]*>.*?</object>", re.IGNORECASE)
+XSS_EMBED_PATTERN = re.compile(r"<embed[^>]*>", re.IGNORECASE)
+XSS_LINK_PATTERN = re.compile(r"<link[^>]*>", re.IGNORECASE)
+XSS_META_PATTERN = re.compile(r"<meta[^>]*>", re.IGNORECASE)
+XSS_STYLE_PATTERN = re.compile(r"<style[^>]*>.*?</style>", re.IGNORECASE)
+XSS_FORM_PATTERN = re.compile(r"<form[^>]*>.*?</form>", re.IGNORECASE)
+XSS_INPUT_PATTERN = re.compile(r"<input[^>]*>", re.IGNORECASE)
+
+
+def sanitize_html(text: str) -> str:
+    """
+    Enhanced HTML sanitization to prevent XSS attacks
+
+    Removes dangerous HTML tags, JavaScript event handlers, and
+    escapes HTML special characters to prevent XSS attacks.
+
+    Args:
+        text: Text to sanitize
+
+    Returns:
+        Sanitized text with dangerous HTML removed
+    """
+    if not text:
+        return ""
+
+    # Remove dangerous HTML tags
+    text = XSS_PATTERN.sub("", text)  # <script> tags
+    text = XSS_IFRAME_PATTERN.sub("", text)  # <iframe> tags
+    text = XSS_OBJECT_PATTERN.sub("", text)  # <object> tags
+    text = XSS_EMBED_PATTERN.sub("", text)  # <embed> tags
+    text = XSS_LINK_PATTERN.sub("", text)  # <link> tags
+    text = XSS_META_PATTERN.sub("", text)  # <meta> tags
+    text = XSS_STYLE_PATTERN.sub("", text)  # <style> tags
+    text = XSS_FORM_PATTERN.sub("", text)  # <form> tags
+    text = XSS_INPUT_PATTERN.sub("", text)  # <input> tags
+
+    # Remove JavaScript event handlers (onclick, onload, etc.)
+    text = XSS_EVENT_PATTERN.sub("", text)
+
+    # Remove javascript: and data: pseudo-protocols
+    text = XSS_JS_PATTERN.sub("", text)
+    text = XSS_DATA_PATTERN.sub("", text)
+
+    # Escape HTML special characters (do this last to catch any remaining)
+    html_escape_table = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#x27;",
+        "`": "&#96;",  # Backtick (ES6 template literals)
+        "=": "&#61;",  # Equals sign (can be used in attributes)
+    }
+    return "".join(html_escape_table.get(c, c) for c in text)
+
+
+def escape_output(text: str) -> str:
+    """
+    Escape text for safe output in HTML templates
+
+    Note: Jinja2 auto-escapes by default, but this is for manual output
+    or when bypassing auto-escaping.
+
+    Args:
+        text: Text to escape
+
+    Returns:
+        HTML-escaped text
+    """
+    if not text:
+        return ""
+
+    # Use comprehensive HTML escaping
+    return sanitize_html(text)
+
+
+def sanitize_user_input(text: str, allow_html: bool = False) -> str:
+    """
+    Sanitize user input for safe storage and display
+
+    Args:
+        text: Text to sanitize
+        allow_html: Whether to allow HTML (currently not supported, always sanitized)
+
+    Returns:
+        Sanitized text
+    """
+    if not text:
+        return ""
+
+    text = text.strip()
+
+    # Always sanitize HTML for security
+    text = sanitize_html(text)
+
+    # Limit length
+    if len(text) > 10000:
+        text = text[:10000]
+
+    return text
+
+
+__all__ = [
+    'IdentifierSanitizer',
+    'sanitize_identifier',
+    'sanitize_html',
+    'sanitize_user_input',
+    'escape_output',
+]
