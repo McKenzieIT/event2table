@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E测试报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .timestamp {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .summary-card .label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .summary-card.passed .value {
+            color: #28a745;
+        }
+
+        .summary-card.failed .value {
+            color: #dc3545;
+        }
+
+        .summary-card.rate .value {
+            color: #667eea;
+        }
+
+        .table-container {
+            padding: 40px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .test-row {
+            transition: background-color 0.2s;
+        }
+
+        .test-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .test-row.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .test-row.danger {
+            border-left: 4px solid #dc3545;
+        }
+
+        .test-details {
+            background-color: #f8f9fa;
+        }
+
+        .test-details td {
+            padding: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-toggle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .btn-toggle:hover {
+            background: #5568d3;
+        }
+
+        .error-details, .screenshot-section {
+            margin-top: 12px;
+        }
+
+        .error-content, .screenshot-content {
+            margin-top: 12px;
+            padding: 16px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .error-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+
+        .error-error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .error-warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .screenshot-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #5568d3;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 12px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>E2E测试报告</h1>
+            <div class="timestamp">生成时间: 2026-03-19 15:20:21</div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-card">
+                <div class="label">总测试数</div>
+                <div class="value">39</div>
+            </div>
+            <div class="summary-card passed">
+                <div class="label">通过</div>
+                <div class="value">1</div>
+            </div>
+            <div class="summary-card failed">
+                <div class="label">失败</div>
+                <div class="value">38</div>
+            </div>
+            <div class="summary-card rate">
+                <div class="label">通过率</div>
+                <div class="value">2.56%</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>测试ID</th>
+                        <th>测试名称</th>
+                        <th>URL</th>
+                        <th>状态</th>
+                        <th>时间戳</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr class="test-row danger">
+                <td>AN-001</td>
+                <td>Dashboard Load and Display</td>
+                <td><a href="http://localhost:5173/" target="_blank">http://localhost:5173/</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:22:10.842808</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>AN-002</td>
+                <td>Games List Display</td>
+                <td><a href="http://localhost:5173/games" target="_blank">http://localhost:5173/games</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:24:30.941719</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>AN-003</td>
+                <td>Games Search Functionality</td>
+                <td><a href="http://localhost:5173/games" target="_blank">http://localhost:5173/games</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:26:51.074960</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>AN-004</td>
+                <td>Events List with Game Context</td>
+                <td><a href="http://localhost:5173/events?game_gid=10000147" target="_blank">http://localhost:5173/events?game_gid=10000147</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:29:51.165243</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>AN-005</td>
+                <td>Parameters List Display</td>
+                <td><a href="http://localhost:5173/parameters?game_gid=10000147" target="_blank">http://localhost:5173/parameters?game_gid=10000147</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:32:11.293471</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-016</td>
+                <td>Canvas Page</td>
+                <td><a href="http://localhost:5173/canvas" target="_blank">http://localhost:5173/canvas</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:34:31.426404</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-017</td>
+                <td>Event Node Builder</td>
+                <td><a href="http://localhost:5173/event-node-builder" target="_blank">http://localhost:5173/event-node-builder</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:36:21.536543</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-018</td>
+                <td>Event Nodes List</td>
+                <td><a href="http://localhost:5173/event-nodes" target="_blank">http://localhost:5173/event-nodes</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:38:11.623731</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-019</td>
+                <td>Field Builder</td>
+                <td><a href="http://localhost:5173/field-builder" target="_blank">http://localhost:5173/field-builder</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:40:01.714428</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-020</td>
+                <td>Flow Builder</td>
+                <td><a href="http://localhost:5173/flow-builder" target="_blank">http://localhost:5173/flow-builder</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:41:44.684269</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-021</td>
+                <td>Flows List</td>
+                <td><a href="http://localhost:5173/flows" target="_blank">http://localhost:5173/flows</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:43:34.797131</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-001</td>
+                <td>Dashboard Load Test</td>
+                <td><a href="http://localhost:5173/" target="_blank">http://localhost:5173/</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:45:24.938621</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-003</td>
+                <td>Events List Display</td>
+                <td><a href="http://localhost:5173/events" target="_blank">http://localhost:5173/events</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:47:15.142125</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-004</td>
+                <td>Event Create Form</td>
+                <td><a href="http://localhost:5173/events/create" target="_blank">http://localhost:5173/events/create</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T12:49:05.243418</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-005</td>
+                <td>Event Detail Page</td>
+                <td><a href="http://localhost:5173/events/1" target="_blank">http://localhost:5173/events/1</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T13:00:12.249692</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-006</td>
+                <td>Event Edit Form</td>
+                <td><a href="http://localhost:5173/events/1/edit" target="_blank">http://localhost:5173/events/1/edit</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T13:48:57.520961</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-002</td>
+                <td>Games List Display</td>
+                <td><a href="http://localhost:5173/games" target="_blank">http://localhost:5173/games</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:07:57.637569</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                <div class="screenshot-section">
+                    <button class="btn-toggle" onclick="toggleScreenshot(this)">显示截图</button>
+                    <div class="screenshot-content" style="display:none;">
+                        <img src="/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/games/games_list_display.png" alt="Screenshot" class="screenshot-img" />
+                    </div>
+                </div>
+                
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-022</td>
+                <td>HQL Manage</td>
+                <td><a href="http://localhost:5173/hql-manage" target="_blank">http://localhost:5173/hql-manage</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:23:58.627764</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-023</td>
+                <td>HQL Results</td>
+                <td><a href="http://localhost:5173/hql-results" target="_blank">http://localhost:5173/hql-results</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:40:27.348181</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-024</td>
+                <td>HQL Edit</td>
+                <td><a href="http://localhost:5173/hql/1/edit" target="_blank">http://localhost:5173/hql/1/edit</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:42:17.487905</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-025</td>
+                <td>Generate HQL</td>
+                <td><a href="http://localhost:5173/generate" target="_blank">http://localhost:5173/generate</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:44:07.614892</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-026</td>
+                <td>Generate Result</td>
+                <td><a href="http://localhost:5173/generate/result" target="_blank">http://localhost:5173/generate/result</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:45:57.744236</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-027</td>
+                <td>Categories List</td>
+                <td><a href="http://localhost:5173/categories" target="_blank">http://localhost:5173/categories</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:47:47.812454</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-028</td>
+                <td>Import Events</td>
+                <td><a href="http://localhost:5173/import-events" target="_blank">http://localhost:5173/import-events</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:49:27.872267</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-029</td>
+                <td>Batch Operations</td>
+                <td><a href="http://localhost:5173/batch-operations" target="_blank">http://localhost:5173/batch-operations</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:51:07.939474</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-030</td>
+                <td>Create Log</td>
+                <td><a href="http://localhost:5173/logs/create" target="_blank">http://localhost:5173/logs/create</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:52:48.002941</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-031</td>
+                <td>Log Detail</td>
+                <td><a href="http://localhost:5173/log-detail" target="_blank">http://localhost:5173/log-detail</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:54:28.083396</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-032</td>
+                <td>Alter SQL</td>
+                <td><a href="http://localhost:5173/alter-sql/123" target="_blank">http://localhost:5173/alter-sql/123</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:56:08.148349</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-033</td>
+                <td>API Documentation</td>
+                <td><a href="http://localhost:5173/api-docs" target="_blank">http://localhost:5173/api-docs</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:57:48.211251</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-034</td>
+                <td>Validation Rules</td>
+                <td><a href="http://localhost:5173/validation-rules" target="_blank">http://localhost:5173/validation-rules</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T14:59:38.116811</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-007</td>
+                <td>Parameters List</td>
+                <td><a href="http://localhost:5173/parameters" target="_blank">http://localhost:5173/parameters</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:00:56.492801</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-008</td>
+                <td>Parameters Enhanced</td>
+                <td><a href="http://localhost:5173/parameters/enhanced" target="_blank">http://localhost:5173/parameters/enhanced</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:01:56.207632</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row success">
+                <td>REG-009</td>
+                <td>Parameter Dashboard</td>
+                <td><a href="http://localhost:5173/parameters/dashboard" target="_blank">http://localhost:5173/parameters/dashboard</a></td>
+                <td><span class="badge bg-success">PASSED</span></td>
+                <td>2026-03-19T15:02:55.922592</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                <div class="screenshot-section">
+                    <button class="btn-toggle" onclick="toggleScreenshot(this)">显示截图</button>
+                    <div class="screenshot-content" style="display:none;">
+                        <img src="/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_dashboard.png" alt="Screenshot" class="screenshot-img" />
+                    </div>
+                </div>
+                
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-010</td>
+                <td>Parameter Compare</td>
+                <td><a href="http://localhost:5173/parameters/compare" target="_blank">http://localhost:5173/parameters/compare</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:03:04.521231</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-011</td>
+                <td>Parameter Analysis</td>
+                <td><a href="http://localhost:5173/parameter-analysis" target="_blank">http://localhost:5173/parameter-analysis</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:04:02.550660</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-012</td>
+                <td>Parameter Usage</td>
+                <td><a href="http://localhost:5173/parameter-usage" target="_blank">http://localhost:5173/parameter-usage</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:05:02.094879</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-013</td>
+                <td>Parameter History</td>
+                <td><a href="http://localhost:5173/parameter-history" target="_blank">http://localhost:5173/parameter-history</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:06:02.083628</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                <div class="screenshot-section">
+                    <button class="btn-toggle" onclick="toggleScreenshot(this)">显示截图</button>
+                    <div class="screenshot-content" style="display:none;">
+                        <img src="/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_history.png" alt="Screenshot" class="screenshot-img" />
+                    </div>
+                </div>
+                
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-014</td>
+                <td>Parameter Network</td>
+                <td><a href="http://localhost:5173/parameter-network" target="_blank">http://localhost:5173/parameter-network</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:06:42.239613</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                <div class="screenshot-section">
+                    <button class="btn-toggle" onclick="toggleScreenshot(this)">显示截图</button>
+                    <div class="screenshot-content" style="display:none;">
+                        <img src="/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_network.png" alt="Screenshot" class="screenshot-img" />
+                    </div>
+                </div>
+                
+                </td>
+            </tr>
+            
+            <tr class="test-row danger">
+                <td>REG-015</td>
+                <td>Common Parameters</td>
+                <td><a href="http://localhost:5173/common-params" target="_blank">http://localhost:5173/common-params</a></td>
+                <td><span class="badge bg-danger">FAILED</span></td>
+                <td>2026-03-19T15:19:32.726556</td>
+            </tr>
+            <tr class="test-details">
+                <td colspan="5">
+                    
+                    
+                <div class="screenshot-section">
+                    <button class="btn-toggle" onclick="toggleScreenshot(this)">显示截图</button>
+                    <div class="screenshot-content" style="display:none;">
+                        <img src="/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/common_parameters.png" alt="Screenshot" class="screenshot-img" />
+                    </div>
+                </div>
+                
+                </td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function toggleError(button) {
+            const content = button.nextElementSibling;
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                button.textContent = '隐藏错误详情';
+            } else {
+                content.style.display = 'none';
+                button.textContent = '显示错误详情';
+            }
+        }
+
+        function toggleScreenshot(button) {
+            const content = button.nextElementSibling;
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                button.textContent = '隐藏截图';
+            } else {
+                content.style.display = 'none';
+                button.textContent = '显示截图';
+            }
+        }
+    </script>
+</body>
+</html>

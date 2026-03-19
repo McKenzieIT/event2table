@@ -10,7 +10,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import { Sidebar } from '@analytics/components/sidebar/Sidebar';
 import { GameSelectionSheet } from '@analytics/components/game-selection/GameSelectionSheet';
-import GameManagementModal from '../../../features/games/GameManagementModal';
+import GameManagementModal from '../../../features/games/GameManagementModalGraphQL';
 import AddGameModal from '../../../features/games/AddGameModal';
 import { useGameStore } from '../../../stores/gameStore';
 import { useGameContext } from '@/shared/hooks/useGameContext';

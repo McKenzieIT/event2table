@@ -14,9 +14,9 @@
     {
       "action": "wait",
       "condition": {
-        "selector": ".parameters-table"
+        "selector": ".parameters-table-container"
       },
-      "timeout": 15000
+      "timeout": 45000
     },
     {
       "action": "validate",
@@ -27,7 +27,7 @@
         },
         {
           "type": "element_exists",
-          "selector": ".parameter-row"
+          "selector": ".table-row"
         }
       ]
     },

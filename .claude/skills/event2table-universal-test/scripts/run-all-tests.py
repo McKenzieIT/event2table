@@ -95,7 +95,9 @@ for idx, test_file in enumerate(test_files, 1):
                     else:
                         cmd = 'agent-browser wait 2000'
 
-                    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=15)
+                    # Use step timeout if specified, otherwise default to 15 seconds
+                    wait_timeout = step.get('timeout', 15) / 1000  # Convert ms to seconds
+                    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=wait_timeout)
                     step_result['output'] = result.stdout.strip()
                     step_result['status'] = 'passed' if result.returncode == 0 else 'failed'
 

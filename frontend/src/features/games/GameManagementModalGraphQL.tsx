@@ -34,7 +34,12 @@ interface Game {
   updatedAt: string;
 }
 
-export const GameManagementModal: React.FC = () => {
+interface GameManagementModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const GameManagementModal: React.FC<GameManagementModalProps> = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -110,12 +115,12 @@ export const GameManagementModal: React.FC = () => {
   // 批量删除游戏
   const [batchDeleteGames, { loading: batchDeleting }] = useMutation(BATCH_DELETE_GAMES, {
     onCompleted: (result) => {
-      if (result.batchDeleteGames.success) {
+      if (result.batchDeleteGames.ok) {
         alert(`成功删除 ${result.batchDeleteGames.deletedCount} 个游戏`);
         setSelectedGames([]);
         refetch();
       } else {
-        alert(`删除失败: ${result.batchDeleteGames.errors.join(', ')}`);
+        alert(`删除失败: ${result.batchDeleteGames.errors?.join(', ') || '未知错误'}`);
       }
     },
     onError: (error) => {
@@ -185,6 +190,9 @@ export const GameManagementModal: React.FC = () => {
     }
   }, [selectedGames, batchDeleteGames]);
 
+  // 如果模态框未打开，不渲染任何内容
+  if (!isOpen) return null;
+
   if (loading) return <div className="loading">加载中...</div>;
   if (error) return <div className="error">错误: {error.message}</div>;
 
@@ -203,9 +211,13 @@ export const GameManagementModal: React.FC = () => {
   }, [games, searchQuery]);
 
   return (
-    <div className="game-management-modal">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="game-management-modal" onClick={(e) => e.stopPropagation()}>
       <div className="modal-header">
         <h2>游戏管理</h2>
+        <button className="modal-close" onClick={onClose} aria-label="关闭对话框">
+          ✕
+        </button>
         <div className="header-actions">
           {selectedGames.length > 0 && (
             <button
@@ -299,6 +311,7 @@ export const GameManagementModal: React.FC = () => {
           loading={updating}
         />
       )}
+    </div>
     </div>
   );
 };

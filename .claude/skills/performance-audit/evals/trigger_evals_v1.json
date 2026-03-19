@@ -1,0 +1,22 @@
+[
+  {"query": "the dashboard is taking forever to load, users are complaining it takes like 10 seconds to show the game list", "should_trigger": true},
+  {"query": "i need to check if there are any performance regressions after the recent react refactoring we did last week", "should_trigger": true},
+  {"query": "can you analyze why the parameters page is so slow? it's lagging when i scroll through the list", "should_trigger": true},
+  {"query": "we're about to release v2.0 and want to make sure we didn't introduce any performance issues", "should_trigger": true},
+  {"query": "the frontend build bundle is 5MB which seems way too big, can you help optimize it?", "should_trigger": true},
+  {"query": "i'm noticing n+1 query problems in the events service, need to identify all of them", "should_trigger": true},
+  {"query": "users are reporting ui lag when they switch between games in the canvas view", "should_trigger": true},
+  {"query": "can you set up performance baselines for our api endpoints so we can detect slowdowns?", "should_trigger": true},
+  {"query": "the lighthouse score for our homepage dropped from 95 to 65, need to investigate", "should_trigger": true},
+  {"query": "i want to run a comprehensive performance audit before our next sprint", "should_trigger": true},
+  {"query": "can you write a fibonacci function in python?", "should_trigger": false},
+  {"query": "how do i create a new game in the system?", "should_trigger": false},
+  {"query": "the login form is not working, users can't authenticate", "should_trigger": false},
+  {"query": "i need to add a new column to the games table", "should_trigger": false},
+  {"query": "can you help me write unit tests for the event service?", "should_trigger": false},
+  {"query": "the api is returning 500 errors when i try to delete a game", "should_trigger": false},
+  {"query": "i need to refactor the game entity class to use a different pattern", "should_trigger": false},
+  {"query": "can you generate documentation for the hql builder module?", "should_trigger": false},
+  {"query": "we need to add authentication to the graphql endpoint", "should_trigger": false},
+  {"query": "the docker container won't start, it's crashing on boot", "should_trigger": false}
+]

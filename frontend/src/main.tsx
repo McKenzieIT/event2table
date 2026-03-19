@@ -1,7 +1,7 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ApolloProvider } from "@apollo/client/react";
 import { Toaster } from "react-hot-toast";
@@ -52,11 +52,11 @@ const root = ReactDOM.createRoot(rootElement);
 console.log('[main.tsx] ✅ React root created successfully');
 
 console.log('[main.tsx] 🔵 Rendering app with providers...');
-console.log('[main.tsx] 🔵 Providers: ErrorBoundary > HashRouter > ApolloProvider > QueryClientProvider > ToastProvider');
+console.log('[main.tsx] 🔵 Providers: ErrorBoundary > BrowserRouter > ApolloProvider > QueryClientProvider > ToastProvider');
 
 root.render(
   <ErrorBoundary>
-    <HashRouter future={{
+    <BrowserRouter future={{
       v7_startTransition: true,
       v7_relativeSplatPath: true,
     }}>
@@ -68,7 +68,7 @@ root.render(
         </QueryClientProvider>
       </ApolloProvider>
       <Toaster position="top-right" />
-    </HashRouter>
+    </BrowserRouter>
   </ErrorBoundary>
 );
 

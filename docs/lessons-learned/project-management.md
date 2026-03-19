@@ -394,6 +394,286 @@ git commit -m "feat: add new feature and update docs"
 
 ---
 
+## 文档整合管理 ⭐ **P1重要**
+
+**优先级**: P1 | **出现次数**: 1次 | **来源**: [文档整合报告](../archive/2026/03-march/doc-integration-report.md) (2026-03-19)
+
+### 核心原则
+
+**避免文档重复 + 建立清晰引用关系**
+
+### 问题识别
+
+**症状**:
+- 🚨 相同内容在多个文档中重复
+- 🚨 文档数量过多难以维护
+- 🚨 更新时需要同步多个文档
+- 🚨 用户不知道哪个是权威来源
+
+**影响**:
+- ⚠️ 维护成本增加
+- ⚠️ 文档不一致风险
+- ⚠️ 用户困惑
+
+### 整合策略
+
+**1. 相似度检测**:
+```python
+# 使用TF-IDF + 余弦相似度检测重复内容
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+def detect_similarity(doc1, doc2):
+    vectorizer = TfidfVectorizer()
+    tfidf = vectorizer.fit_transform([doc1, doc2])
+    similarity = cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0]
+    return similarity
+
+# 阈值设置
+# - 0.7+ (70%): 高度相似，应该整合
+# - 0.5-0.7 (50-70%): 中度相似，需要人工判断
+# - <0.5 (50%): 低相似度，保持独立
+```
+
+**2. 整合决策树**:
+```
+相似度 > 70%?
+├─ 是 → 整合到权威来源
+│  └─ 归档重复文档
+└─ 否 → 检查功能独立性
+   ├─ 功能相同 → 合并
+   └─ 功能不同 → 保持独立，添加交叉引用
+```
+
+**3. 权威来源选择**:
+```markdown
+优先级：
+1. 最全面的文档
+2. 最新更新的文档
+3. 在主路径的文档（docs/development/ 而非 docs/archive/）
+4. 被其他文档引用最多的文档
+```
+
+### 整合实施
+
+**阶段1: 分析**
+```bash
+# 运行文档相似度分析
+python scripts/tools/doc_analyzer.py docs 0.7
+
+# 输出：
+# - 整合报告 (Markdown)
+# - JSON数据 (用于自动化)
+# - 重复组列表
+```
+
+**阶段2: 整合**
+```markdown
+1. 保留权威来源
+2. 提取重复文档中的独特内容
+3. 合并到权威来源
+4. 添加引用说明
+5. 更新所有引用
+```
+
+**阶段3: 归档**
+```bash
+# 创建归档目录
+mkdir -p docs/archive/2026/03-march/
+
+# 移动重复文档
+mv docs/development/branch-protection-setup.md \
+   docs/archive/2026/03-march/development/
+
+# 添加归档说明
+echo "归档于 2026-03-19，内容已整合到 github-setup-guide.md" \
+  >> docs/archive/2026/03-march/development/branch-protection-setup.md
+```
+
+**阶段4: 验证**
+```bash
+# 检查断开的链接
+find docs -name "*.md" -exec grep -H "\[.*\](" {} \; | \
+  while read line; do
+    link=$(echo "$line" | grep -oP '(?<=\][^\)]*\]\()[^\)]+')
+    if [ ! -f "docs/$link" ]; then
+      echo "断开的链接: $link"
+    fi
+  done
+```
+
+### 最佳实践
+
+**✅ DO (应该做)**:
+1. **创建索引文档**: 比如强制合并多个功能文档
+   ```markdown
+   # docs/api/README.md
+   ## API索引
+   - [Games API](GAMES-API.md)
+   - [Events API](EVENTS-API.md)
+   - [Flows API](FLOWS-API.md)
+   ```
+
+2. **使用引用而非重复**:
+   ```markdown
+   ❌ 错误：在每个文档中重复相同内容
+   ## React Hooks规则
+   1. 只在顶层调用Hooks
+   2. 不在条件语句中使用Hooks
+
+   ✅ 正确：引用权威来源
+   ## React Hooks规则
+   详见：[React最佳实践](../lessons-learned/react-best-practices.md#hooks规则)
+   ```
+
+3. **保持功能独立性**:
+   ```python
+   # EVENT-NODES-API.md vs CANVAS-API.md
+   # 相似度59%，但功能不同
+   # → 保持独立，添加交叉引用
+   ```
+
+4. **归档保留历史**:
+   ```bash
+   # 归档而非删除
+   mv old-doc.md docs/archive/2026/03-march/
+
+   # 保留引用
+   # "旧版本见：archive/2026/03-march/old-doc.md"
+   ```
+
+**❌ DON'T (不应该做)**:
+1. **强制合并不同功能的文档**:
+   - API文档虽然格式相似，但功能不同
+   - 应该创建索引文档而非合并
+
+2. **删除旧文档**:
+   - 归档而非删除
+   - 保留历史记录
+
+3. **忽略相似度阈值**:
+   - 阈值太低会误判（50%以下）
+   - 阈值太高会漏掉（70%以上）
+   - 推荐使用65%作为初始阈值
+
+4. **归档后不更新引用**:
+   - 必须更新所有引用
+   - 添加归档说明
+
+### 工具和脚本
+
+**文档分析脚本** (`scripts/tools/doc_analyzer.py`):
+```python
+# 检测文档相似度
+python scripts/tools/doc_analyzer.py docs 0.65
+
+# 输出：
+# - doc-integration-report.md
+# - doc-integration-report.json
+```
+
+**链接验证脚本** (`scripts/tools/verify_links.py`):
+```bash
+# 验证所有内部链接
+python scripts/tools/verify_links.py docs/
+
+# 输出：
+# - 断开的链接列表
+# - 链接健康报告
+```
+
+### 实际案例
+
+**案例1: GitHub设置文档整合** (2026-03-19)
+```
+问题：
+- github-setup-guide.md (431行)
+- branch-protection-setup.md (151行)
+- 相似度50%
+
+分析：
+- branch-protection-setup.md 的内容已在 github-setup-guide.md 中
+- 但有独特的API调用方法
+
+解决方案：
+1. 将API调用方法合并到 github-setup-guide.md
+2. 归档 branch-protection-setup.md
+3. 更新所有引用
+
+结果：
+✅ 减少文档数量
+✅ 保持内容完整性
+✅ 用户体验提升
+```
+
+**案例2: API文档索引** (2026-03-19)
+```
+问题：
+- EVENT-NODES-API.md vs CANVAS-API.md (相似度59%)
+- FLOWS-API.md vs JOIN-CONFIGS-API.md (相似度53%)
+
+分析：
+- 格式相似但功能不同
+- 强制合并会降低可用性
+
+解决方案：
+1. 保持文档独立
+2. 创建统一索引 (docs/api/README.md)
+3. 添加交叉引用
+
+结果：
+✅ 功能独立性保持
+✅ 统一访问入口
+✅ 清晰的文档组织
+```
+
+### 文档生命周期
+
+```
+活跃文档 (docs/)
+├─ 开发指南 (docs/development/)
+├─ API文档 (docs/api/)
+├─ 测试文档 (docs/testing/)
+└─ 经验文档 (docs/lessons-learned/)
+
+↓ 6个月未更新或功能废弃
+
+归档文档 (docs/archive/)
+├─ 2026/03-march/
+│  ├─ reports/
+│  ├─ testing/
+│  └─ development/
+└─ ...
+```
+
+**归档触发条件**:
+- ✅ 文档6个月未更新
+- ✅ 功能已废弃或移除
+- ✅ 临时性文档已完成使命
+- ✅ 重复内容已整合
+
+**归档结构**:
+```
+docs/archive/
+├── {year}/{month}/
+│   ├── {category}/
+│   │   ├── document-name.md
+│   │   └── README.md (归档说明)
+```
+
+### 代码审查清单
+
+**文档整合时检查**:
+- [ ] 是否检测了文档相似度？
+- [ ] 相似度阈值是否合理（65-70%）？
+- [ ] 功能是否独立？
+- [ ] 是否保留了独特内容？
+- [ ] 是否更新了所有引用？
+- [ ] 是否正确归档（而非删除）？
+- [ ] 是否添加了归档说明？
+
+---
+
 ## 相关经验文档
 
 - [调试技能 - 并行开发](./debugging-skills.md#并行开发策略) - 并行开发具体方法

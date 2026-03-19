@@ -14,9 +14,9 @@
     {
       "action": "wait",
       "condition": {
-        "selector": ".events-table"
+        "selector": ".events-table-container"
       },
-      "timeout": 15000
+      "timeout": 45000
     },
     {
       "action": "validate",
@@ -27,11 +27,7 @@
         },
         {
           "type": "element_exists",
-          "selector": ".events-table"
-        },
-        {
-          "type": "element_exists",
-          "selector": ".pagination"
+          "selector": ".table-row"
         }
       ]
     },

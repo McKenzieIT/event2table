@@ -1,6 +1,6 @@
 ---
 name: code-audit
-description: Comprehensive code quality audit tool for Event2Table project. Enforces game_gid compliance, checks API contracts, validates TDD compliance, detects security vulnerabilities (SQL injection, XSS), and analyzes code quality (complexity, duplication).
+description: Code quality, security, and compliance auditing. ALWAYS use this skill when users mention: code review, audit, check, validate, verify, security, vulnerability, SQL injection, XSS, compliance, standards, TDD, code quality, complexity, duplication, or API contracts. Trigger for queries about: checking code before committing, security scanning, vulnerability detection, enforcing coding standards, validating against project rules, or analyzing code quality. Use even when code review/audit is mentioned incidentally or as a secondary concern. If the query contains words like "review", "check", "audit", "validate", "secure", "safe", "compliant", or "quality", consult this skill.
 ---
 
 # Code Audit Skill

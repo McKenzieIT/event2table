@@ -1,0 +1,1595 @@
+{
+  "timestamp": "2026-03-19T15:20:21.296932",
+  "total_tests": 39,
+  "passed": 1,
+  "failed": 38,
+  "pass_rate": 2.56,
+  "tests": [
+    {
+      "test_id": "AN-001",
+      "test_name": "Dashboard Load and Display",
+      "url": "http://localhost:5173/",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:22:10.842808",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "AN-002",
+      "test_name": "Games List Display",
+      "url": "http://localhost:5173/games",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:24:30.941719",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "AN-003",
+      "test_name": "Games Search Functionality",
+      "url": "http://localhost:5173/games",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:26:51.074960",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "AN-004",
+      "test_name": "Events List with Game Context",
+      "url": "http://localhost:5173/events?game_gid=10000147",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:29:51.165243",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "AN-005",
+      "test_name": "Parameters List Display",
+      "url": "http://localhost:5173/parameters?game_gid=10000147",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:32:11.293471",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-016",
+      "test_name": "Canvas Page",
+      "url": "http://localhost:5173/canvas",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:34:31.426404",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-017",
+      "test_name": "Event Node Builder",
+      "url": "http://localhost:5173/event-node-builder",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:36:21.536543",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-018",
+      "test_name": "Event Nodes List",
+      "url": "http://localhost:5173/event-nodes",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:38:11.623731",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-019",
+      "test_name": "Field Builder",
+      "url": "http://localhost:5173/field-builder",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:40:01.714428",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-020",
+      "test_name": "Flow Builder",
+      "url": "http://localhost:5173/flow-builder",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:41:44.684269",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-021",
+      "test_name": "Flows List",
+      "url": "http://localhost:5173/flows",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:43:34.797131",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-001",
+      "test_name": "Dashboard Load Test",
+      "url": "http://localhost:5173/",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:45:24.938621",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-003",
+      "test_name": "Events List Display",
+      "url": "http://localhost:5173/events",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:47:15.142125",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-004",
+      "test_name": "Event Create Form",
+      "url": "http://localhost:5173/events/create",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T12:49:05.243418",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-005",
+      "test_name": "Event Detail Page",
+      "url": "http://localhost:5173/events/1",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "passed",
+          "output": "(no interactive elements)",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T13:00:12.249692",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-006",
+      "test_name": "Event Edit Form",
+      "url": "http://localhost:5173/events/1/edit",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T13:48:57.520961",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-002",
+      "test_name": "Games List Display",
+      "url": "http://localhost:5173/games",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "snapshot",
+          "status": "passed",
+          "output": "- link \"Event2Table\" [ref=e1]\n- button \"折叠侧边栏\" [ref=e2]\n- button \"切换 仪表板 分组\" [expanded=true, ref=e6]\n- link \"概览\" [ref=e10]\n- button \"切换 事件节点 分组\" [expanded=true, ref=e7]\n- link \"事件节点构建器\" [ref=e11]\n- link \"事件节点管理\" [ref=e12]\n- button \"切换 HQL生成 分组\" [expanded=true, ref=e8]\n- link \"HQL构建画布\" [ref=e13]\n- link \"HQL流程管理\" [ref=e14]\n- button \"切换 数据管理 分组\" [expanded=false, ref=e9]\n- link \"游戏管理\" [ref=e16]\n- link \"分类管理\" [ref=e17]\n- link \"日志事件\" [ref=e18]\n- link \"参数管理\" [ref=e19]\n- link \"公参管理\" [ref=e20]\n- button \"切换游戏\" [ref=e3]\n- button \"游戏管理\" [ref=e4]\n- navigation \"面包屑导航\" [ref=e5]\n  - link \"首页\" [ref=e15]",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 4
+        },
+        {
+          "action": "screenshot",
+          "status": "passed",
+          "output": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/games/games_list_display.png",
+          "error": null
+        }
+      ],
+      "screenshot": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/games/games_list_display.png",
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:07:57.637569",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-022",
+      "test_name": "HQL Manage",
+      "url": "http://localhost:5173/hql-manage",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:23:58.627764",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-023",
+      "test_name": "HQL Results",
+      "url": "http://localhost:5173/hql-results",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:40:27.348181",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-024",
+      "test_name": "HQL Edit",
+      "url": "http://localhost:5173/hql/1/edit",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:42:17.487905",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-025",
+      "test_name": "Generate HQL",
+      "url": "http://localhost:5173/generate",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:44:07.614892",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-026",
+      "test_name": "Generate Result",
+      "url": "http://localhost:5173/generate/result",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "snapshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:45:57.744236",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-027",
+      "test_name": "Categories List",
+      "url": "http://localhost:5173/categories",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:47:47.812454",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-028",
+      "test_name": "Import Events",
+      "url": "http://localhost:5173/import-events",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:49:27.872267",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-029",
+      "test_name": "Batch Operations",
+      "url": "http://localhost:5173/batch-operations",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:51:07.939474",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-030",
+      "test_name": "Create Log",
+      "url": "http://localhost:5173/logs/create",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:52:48.002941",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-031",
+      "test_name": "Log Detail",
+      "url": "http://localhost:5173/log-detail",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:54:28.083396",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-032",
+      "test_name": "Alter SQL",
+      "url": "http://localhost:5173/alter-sql/123",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:56:08.148349",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-033",
+      "test_name": "API Documentation",
+      "url": "http://localhost:5173/api-docs",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:57:48.211251",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-034",
+      "test_name": "Validation Rules",
+      "url": "http://localhost:5173/validation-rules",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T14:59:38.116811",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-007",
+      "test_name": "Parameters List",
+      "url": "http://localhost:5173/parameters",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "snapshot",
+          "status": "passed",
+          "output": "(no interactive elements)",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:00:56.492801",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-008",
+      "test_name": "Parameters Enhanced",
+      "url": "http://localhost:5173/parameters/enhanced",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "snapshot",
+          "status": "passed",
+          "output": "(no interactive elements)",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:01:56.207632",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-009",
+      "test_name": "Parameter Dashboard",
+      "url": "http://localhost:5173/parameters/dashboard",
+      "status": "passed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m \u001b[1mEvent2Table - Data Warehouse HQL Generator\u001b[0m\n  \u001b[2mhttp://localhost:5173/parameters/dashboard\u001b[0m",
+          "error": null
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "snapshot",
+          "status": "passed",
+          "output": "- link \" Event2Table\" [ref=e1]\n- button \"折叠侧边栏\" [ref=e2]\n- button \"切换 仪表板 分组\" [expanded=true, ref=e6]\n- link \" 概览\" [ref=e12]\n- button \"切换 事件节点 分组\" [expanded=true, ref=e7]\n- link \" 事件节点构建器\" [ref=e13]\n- link \" 事件节点管理\" [ref=e14]\n- button \"切换 HQL生成 分组\" [expanded=true, ref=e8]\n- link \" HQL构建画布\" [ref=e15]\n- link \" HQL流程管理\" [ref=e16]\n- button \"切换 数据管理 分组\" [expanded=false, ref=e9]\n- link \" 游戏管理\" [ref=e19]\n- link \" 分类管理\" [ref=e20]\n- link \" 日志事件\" [ref=e21]\n- link \" 参数管理\" [ref=e22]\n- link \" 公参管理\" [ref=e23]\n- button \"切换游戏\" [ref=e3]\n- button \"游戏管理\" [ref=e4]\n- navigation \"面包屑导航\" [ref=e5]\n  - link \"首页\" [ref=e17]\n  - link \"参数管理\" [ref=e18]\n- heading \"参数统计\" [level=1, ref=e10]\n- heading \"参数分布\" [level=3, ref=e11]",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "passed",
+          "output": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_dashboard.png",
+          "error": null
+        }
+      ],
+      "screenshot": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_dashboard.png",
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:02:55.922592"
+    },
+    {
+      "test_id": "REG-010",
+      "test_name": "Parameter Compare",
+      "url": "http://localhost:5173/parameters/compare",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:03:04.521231",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-011",
+      "test_name": "Parameter Analysis",
+      "url": "http://localhost:5173/parameter-analysis",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:04:02.550660",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-012",
+      "test_name": "Parameter Usage",
+      "url": "http://localhost:5173/parameter-usage",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        }
+      ],
+      "screenshot": null,
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:05:02.094879",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-013",
+      "test_name": "Parameter History",
+      "url": "http://localhost:5173/parameter-history",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "passed",
+          "output": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_history.png",
+          "error": null
+        }
+      ],
+      "screenshot": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_history.png",
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:06:02.083628",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-014",
+      "test_name": "Parameter Network",
+      "url": "http://localhost:5173/parameter-network",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "passed",
+          "output": "\u001b[32m✓\u001b[0m Done",
+          "error": null
+        },
+        {
+          "action": "validate",
+          "status": "partial",
+          "output": "",
+          "error": null,
+          "checks_passed": 1,
+          "checks_total": 3
+        },
+        {
+          "action": "screenshot",
+          "status": "passed",
+          "output": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_network.png",
+          "error": null
+        }
+      ],
+      "screenshot": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/parameter_network.png",
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:06:42.239613",
+      "error": "Command timed out"
+    },
+    {
+      "test_id": "REG-015",
+      "test_name": "Common Parameters",
+      "url": "http://localhost:5173/common-params",
+      "status": "failed",
+      "steps": [
+        {
+          "action": "open",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "wait",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "validate",
+          "status": "timeout",
+          "output": "",
+          "error": "Command timed out"
+        },
+        {
+          "action": "screenshot",
+          "status": "passed",
+          "output": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/common_parameters.png",
+          "error": null
+        }
+      ],
+      "screenshot": "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/output/screenshots/regression/parameters/common_parameters.png",
+      "errors": [],
+      "recommendations": [],
+      "timestamp": "2026-03-19T15:19:32.726556",
+      "error": "Command timed out"
+    }
+  ]
+}

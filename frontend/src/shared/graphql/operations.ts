@@ -93,10 +93,9 @@ export const DELETE_GAME = gql`
 export const BATCH_DELETE_GAMES = gql`
   mutation BatchDeleteGames($ids: [Int!]!) {
     batchDeleteGames(ids: $ids) {
-      success
-      message
-      errors
+      ok
       deletedCount
+      errors
     }
   }
 `;

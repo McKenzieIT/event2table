@@ -1,6 +1,6 @@
 ---
 name: performance-audit
-description: Comprehensive full-stack performance audit for Event2Table project. Detects performance bottlenecks in frontend React optimization, bundle size, lazy loading, backend N+1 queries, caching, algorithm efficiency, database indexes, query optimization, Vite/build optimization, CDN, and compression. Provides automated fix suggestions with preventive documentation updates. Use when users report UI lag or slow loading, need to diagnose performance bottlenecks, check for performance regression, before major releases, or after significant code changes.
+description: Performance optimization and bottleneck detection for applications. ALWAYS use this skill when users mention: slow/sluggish/laggy UI, loading delays, page speed issues, bundle size concerns, React performance, N+1 queries, database optimization, caching, API latency, or any performance-related terms. Trigger for: performance audits, profiling, bottleneck analysis, regression checks, pre-release validation, or optimization tasks. Use even when performance is mentioned incidentally or as a secondary concern. If the query contains words like "optimize", "slow", "fast", "performance", "lag", "delay", "loading time", or "response time", consult this skill.
 ---
 
 # Performance Audit Skill

@@ -1,0 +1,67 @@
+{
+  "patterns": [
+    {
+      "name": "React hydration error",
+      "category": "react",
+      "severity": "error",
+      "matchers": {
+        "message": ["hydration", "Text content does not match"],
+        "source": ["*.react.js", "*.jsx"]
+      },
+      "recommendation": "检查服务器端渲染和客户端渲染的HTML是否一致",
+      "references": ["https://react.dev/reference/react-dom/hydrate"]
+    },
+    {
+      "name": "API endpoint not found",
+      "category": "network",
+      "severity": "error",
+      "matchers": {
+        "status": [404],
+        "url_pattern": ["/api/*"]
+      },
+      "recommendation": "检查API端点是否正确，后端服务是否运行",
+      "references": []
+    },
+    {
+      "name": "Slow API request",
+      "category": "performance",
+      "severity": "warning",
+      "matchers": {
+        "time": ">3000",
+        "url_pattern": ["/api/*"]
+      },
+      "recommendation": "API响应时间过长，考虑添加缓存或优化查询",
+      "references": []
+    },
+    {
+      "name": "Uncaught Promise rejection",
+      "category": "javascript",
+      "severity": "error",
+      "matchers": {
+        "message": ["unhandledrejection", "promise rejection", "Unhandled promise rejection"]
+      },
+      "recommendation": "添加Promise catch处理器或全局unhandledrejection监听器",
+      "references": []
+    },
+    {
+      "name": "Component lifecycle error",
+      "category": "react",
+      "severity": "error",
+      "matchers": {
+        "message": ["Cannot read property", "undefined is not an object", "null is not an object"]
+      },
+      "recommendation": "检查组件生命周期，确保在正确的时机访问DOM和props",
+      "references": []
+    },
+    {
+      "name": "Console warning",
+      "category": "console",
+      "severity": "warning",
+      "matchers": {
+        "level": "warning"
+      },
+      "recommendation": "检查控制台警告，修复潜在问题",
+      "references": []
+    }
+  ]
+}

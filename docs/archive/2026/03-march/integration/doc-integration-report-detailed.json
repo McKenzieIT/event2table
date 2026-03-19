@@ -1,0 +1,50 @@
+{
+  "total_docs": 112,
+  "analyzed_docs": 112,
+  "duplicate_groups": [
+    {
+      "representative": "docs/development/github-setup-guide.md",
+      "duplicates": [
+        "docs/development/branch-protection-setup.md"
+      ],
+      "count": 2
+    },
+    {
+      "representative": "docs/api/EVENT-NODES-API.md",
+      "duplicates": [
+        "docs/api/CANVAS-API.md"
+      ],
+      "count": 2
+    },
+    {
+      "representative": "docs/api/FLOWS-API.md",
+      "duplicates": [
+        "docs/api/JOIN-CONFIGS-API.md"
+      ],
+      "count": 2
+    }
+  ],
+  "high_similarities": [
+    {
+      "doc1": "docs/api/EVENT-NODES-API.md",
+      "doc2": "docs/api/CANVAS-API.md",
+      "similarity": 0.599,
+      "doc1_size": 2260,
+      "doc2_size": 2440
+    },
+    {
+      "doc1": "docs/api/FLOWS-API.md",
+      "doc2": "docs/api/JOIN-CONFIGS-API.md",
+      "similarity": 0.535,
+      "doc1_size": 1086,
+      "doc2_size": 573
+    },
+    {
+      "doc1": "docs/development/github-setup-guide.md",
+      "doc2": "docs/development/branch-protection-setup.md",
+      "similarity": 0.503,
+      "doc1_size": 1764,
+      "doc2_size": 1408
+    }
+  ]
+}

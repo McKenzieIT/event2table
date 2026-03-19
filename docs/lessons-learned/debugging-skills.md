@@ -637,3 +637,36 @@ npm run test:e2e  # E2E测试
 - 1. ✅ STAR001 游戏保护规则
 - 2. ✅ 完整实现原则
 
+
+### 来自 docs/README.md (2026-03-19)
+
+**关键主题**:
+- Event2Table 文档中心
+- 📚 快速导航
+- 新用户入门
+- 核心开发文档
+- 经验文档系统 ⭐
+
+**重要经验**:
+- **正确示例** ✅:
+- **错误示例** ❌:
+- 1. ✅ 更新API文档（如果修改了API）
+- 2. ✅ 更新架构文档（如果修改了架构）
+- 3. ✅ 提取经验到经验文档
+
+
+### 来自 docs/ci-cd/QUICKSTART.md (2026-03-19)
+
+**关键主题**:
+- CI/CD Quick Start Guide
+- Quick Reference
+- Run Tests Locally
+- Backend tests
+- Frontend tests
+
+**重要经验**:
+- - ✅ Tests must pass before merge
+- - ✅ Auto-deploy only on main branch
+- - ✅ Auto-rollback on failure
+- - ✅ Monitor after deployment
+

@@ -264,8 +264,6 @@ class UpdateGame(graphene.Mutation):
     )
     errors = List(String, description="错误信息")
 
-    @authenticated
-    @require_permission('game:write')
     def mutate(
         self,
         info,

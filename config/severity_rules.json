@@ -1,0 +1,44 @@
+{
+  "scoring_rules": [
+    {
+      "level": "critical",
+      "score": 100,
+      "types": ["javascript", "network"],
+      "conditions": {
+        "network_status": [500, 502, 503],
+        "js_error": ["Uncaught Error", "ReferenceError", "TypeError"]
+      },
+      "action": "立即修复"
+    },
+    {
+      "level": "high",
+      "score": 75,
+      "types": ["javascript", "network", "console"],
+      "conditions": {
+        "network_status": [404, 401, 403],
+        "console_level": "error",
+        "js_error": ["Warning", "Deprecated"]
+      },
+      "action": "尽快修复"
+    },
+    {
+      "level": "medium",
+      "score": 50,
+      "types": ["network", "console"],
+      "conditions": {
+        "network_time": ">5000",
+        "console_level": "warning"
+      },
+      "action": "建议修复"
+    },
+    {
+      "level": "low",
+      "score": 25,
+      "types": ["console"],
+      "conditions": {
+        "console_level": "info"
+      },
+      "action": "可选修复"
+    }
+  ]
+}

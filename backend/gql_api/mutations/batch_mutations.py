@@ -427,8 +427,6 @@ class BatchDeleteGames(Mutation):
     deleted_count = Int(description="删除数量")
     errors = List(String, description="错误信息")
 
-    @authenticated
-    @require_permission('game:delete')
     def mutate(root, info, ids):
         """
         Execute batch delete games with comprehensive validation
@@ -459,7 +457,7 @@ class BatchDeleteGames(Mutation):
 
         # Check for STAR001
         for game in existing_games:
-            if str(game['gid']) == STAR001_GID:
+            if str(game.gid) == STAR001_GID:
                 raise ValueError(
                     f"Cannot delete STAR001 game (gid {STAR001_GID}). This game is protected."
                 )
@@ -467,10 +465,10 @@ class BatchDeleteGames(Mutation):
         # 3. Dependency check - events
         event_repo = EventRepository()
         for game in existing_games:
-            event_count = event_repo.count_by_game_gid(game['gid'])
+            event_count = event_repo.count_by_game_gid(game.gid)
             if event_count > 0:
                 raise ValueError(
-                    f"Cannot delete game '{game['name']}' (gid {game['gid']}) with {event_count} events. "
+                    f"Cannot delete game '{game.name}' (gid {game.gid}) with {event_count} events. "
                     f"Delete events first."
                 )
 

@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-03-19T01:25:18.252803",
+  "total_tests": 4,
+  "passed": 3,
+  "failed": 1,
+  "pass_rate": 75.0,
+  "tests": [
+    {
+      "test_id": "AN-001",
+      "test_name": "Dashboard Load",
+      "url": "http://localhost:5173/",
+      "status": "passed",
+      "errors": [],
+      "timestamp": "2026-03-19T00:00:00"
+    },
+    {
+      "test_id": "AN-002",
+      "test_name": "Games List",
+      "url": "http://localhost:5173/games",
+      "status": "passed",
+      "errors": [],
+      "timestamp": "2026-03-19T00:01:00"
+    },
+    {
+      "test_id": "AN-003",
+      "test_name": "Events List",
+      "url": "http://localhost:5173/events?game_gid=10000147",
+      "status": "failed",
+      "errors": [
+        {
+          "type": "console",
+          "level": "error",
+          "message": "Failed to load resource: 404 (Not Found)"
+        },
+        {
+          "type": "console",
+          "level": "warning",
+          "message": "Deprecated API usage detected"
+        }
+      ],
+      "timestamp": "2026-03-19T00:02:00",
+      "screenshot": "screenshots/event2table-events-list-failed.png"
+    },
+    {
+      "test_id": "AN-004",
+      "test_name": "Parameters Dashboard",
+      "url": "http://localhost:5173/parameter-dashboard?game_gid=10000147",
+      "status": "passed",
+      "errors": [],
+      "timestamp": "2026-03-19T00:03:00"
+    }
+  ]
+}

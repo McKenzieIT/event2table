@@ -6,3 +6,7 @@
 - `docs/development/architecture-refactoring.md` → `docs/archive/architecture/2026-03/architecture-refactoring.md`
 - `docs/development/PRD-ARCHITECTURE-UPDATE.md` → `docs/archive/architecture/2026-03/PRD-ARCHITECTURE-UPDATE.md`
 - `docs/development/ARCHITECTURE-SUMMARY-2026.md` → `docs/archive/architecture/2026-03/ARCHITECTURE-SUMMARY-2026.md`
+
+## 2026-03-19 归档
+
+- `docs/cache/architecture/system-design.md` → `docs/archive/architecture/2026-03/system-design_1.md`

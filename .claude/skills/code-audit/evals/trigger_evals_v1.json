@@ -1,0 +1,22 @@
+[
+  {"query": "i'm about to commit this code, can you check if it follows event2table standards?", "should_trigger": true},
+  {"query": "need to verify all game_id references have been migrated to game_gid", "should_trigger": true},
+  {"query": "can you scan for sql injection vulnerabilities in the user input handling?", "should_trigger": true},
+  {"query": "we need to ensure all new code follows tdd principles before merging", "should_trigger": true},
+  {"query": "check if the frontend api calls match the backend endpoints", "should_trigger": true},
+  {"query": "i'm worried about xss attacks in the user-generated content, can you audit?", "should_trigger": true},
+  {"query": "the code complexity is getting out of hand, need to analyze it", "should_trigger": true},
+  {"query": "can you detect duplicate code patterns that should be refactored?", "should_trigger": true},
+  {"query": "verify that all service methods have @cached decorators where needed", "should_trigger": true},
+  {"query": "check if any react components are violating hooks rules", "should_trigger": true},
+  {"query": "what's the weather like today?", "should_trigger": false},
+  {"query": "can you help me write a react component for a login form?", "should_trigger": false},
+  {"query": "i need to deploy the application to production", "should_trigger": false},
+  {"query": "how do i install the required dependencies for this project?", "should_trigger": false},
+  {"query": "can you generate a random test game gid for me?", "should_trigger": false},
+  {"query": "the database schema needs to be updated to add new fields", "should_trigger": false},
+  {"query": "i want to create a new branch for the feature i'm working on", "should_trigger": false},
+  {"query": "can you explain how the hql generator works?", "should_trigger": false},
+  {"query": "we need to set up a ci/cd pipeline for automated testing", "should_trigger": false},
+  {"query": "the application logs are showing too many debug messages", "should_trigger": false}
+]

@@ -83,3 +83,7 @@
 - `docs/plans/2026-03-02-backend-architecture-optimization-plan.md` → `docs/archive/optimization/2026-03/2026-03-02-backend-architecture-optimization-plan.md`
 - `docs/plans/2026-03-07-dashboard-realtime-optimization.md` → `docs/archive/optimization/2026-03/2026-03-07-dashboard-realtime-optimization.md`
 - `docs/plans/2026-02-26/architecture-optimization-execution-plan.md` → `docs/archive/optimization/2026-03/architecture-optimization-execution-plan.md`
+
+## 2026-03-19 归档
+
+- `docs/performance/GRAPHQL-PERFORMANCE-OPTIMIZATION-REPORT.md` → `docs/archive/optimization/2026-03/GRAPHQL-PERFORMANCE-OPTIMIZATION-REPORT.md`

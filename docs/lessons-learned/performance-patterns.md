@@ -2090,3 +2090,37 @@ class CacheInvalidationMonitor:
 - | **Phase 3** | 前端 React 优化 | **重渲染: 50-70% ↓** | ✅ |
 - | **Phase 4** | GraphQL DataLoader | **查询数: 70-99% ↓** | ✅ |
 
+
+### 来自 docs/performance/DATALOADER-RESOLVER-GUIDE.md (2026-03-19)
+
+**关键主题**:
+- DataLoader Resolver Integration Guide
+- Why Use DataLoader?
+- N+1 query problem
+- Total queries: 1 + N (where N = number of games)
+- Batch loading
+
+**重要经验**:
+- ❌ **Wrong**: Creating new loader instance
+- ✅ **Correct**: Getting loader from context
+- ❌ **Wrong**: Breaking batching with .get()
+- ✅ **Correct**: Load all, then get all
+- ❌ **Wrong**: No error handling
+
+
+### 来自 docs/performance/GRAPHQL-OPTIMIZATION-FINAL-REPORT.md (2026-03-19)
+
+**关键主题**:
+- GraphQL Performance Optimization - Final Report
+- Executive Summary
+- Implementation Summary
+- ✅ Completed Components
+- 1. DataLoader Context Middleware
+
+**重要经验**:
+- **Status**: ✅ Implementation Complete
+- ### ✅ Completed Components
+- DataLoaderContextMiddleware(),  # ✅ NEW
+- context_value=lambda: {},  # ✅ NEW
+- ✅ **DataLoaders are now integrated into GraphQL context**
+

@@ -122,3 +122,7 @@ Ralph Loop迭代测试报告（2026年2月）：
 
 - `docs/development/e2e-testing-lessons.md` → `docs/archive/testing/2026-03/e2e-testing-lessons.md`
 - `docs/testing/e2e-testing-guide.md` → `docs/archive/testing/2026-03/e2e-testing-guide.md`
+
+## 2026-03-19 归档
+
+- `docs/plans/2026-03-18-universal-test-system-design.md` → `docs/archive/testing/2026-03/2026-03-18-universal-test-system-design.md`

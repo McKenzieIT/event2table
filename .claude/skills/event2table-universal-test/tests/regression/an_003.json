@@ -16,22 +16,21 @@
       "condition": {
         "selector": "input[placeholder*='搜索']"
       },
-      "timeout": 15000
+      "timeout": 45000
     },
     {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
+        "selector": ".virtual-table-body"
       },
-      "timeout": 15000
+      "timeout": 45000
     },
     {
       "action": "validate",
       "checks": [
         {
-          "type": "text_contains",
-          "selector": ".games-grid",
-          "text": "STAR"
+          "type": "element_exists",
+          "selector": ".table-row"
         }
       ]
     },

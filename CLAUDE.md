@@ -58,6 +58,114 @@ which python3  # 应该显示: /Users/mckenzie/Documents/event2table/backend/ven
 
 ---
 
+## Agent-Browser问题解决规范 ⚠️ **极其重要 - 2026-03-19新增**
+
+> **🚨 当agent-browser出现连接问题时，必须解决问题而非绕过**
+> **🆕 更新 (2026-03-19)**: 建立agent-browser故障排除和替代方案规范
+
+### 核心原则
+
+**1. 优先解决问题，不要绕过**
+- ❌ **禁止**: agent-browser出问题时创建替代测试脚本
+- ✅ **正确**: 诊断并解决agent-browser连接问题
+- ✅ **正确**: 使用项目专用测试技能 (event2table-universal-test)
+
+**2. Agent-Browser常见问题**
+
+**问题**: `Resource temporarily unavailable (os error 35)`
+- **原因**: daemon进程忙碌或卡死
+- **解决**:
+  ```bash
+  # 步骤1: 终止所有agent-browser进程
+  pkill -f "agent-browser"
+
+  # 步骤2: 等待2-3秒
+  sleep 3
+
+  # 步骤3: 重新启动agent-browser
+  agent-browser open http://localhost:5173
+  ```
+
+**问题**: 命令在后台运行且无输出
+- **原因**: agent-browser默认后台执行
+- **解决**: 使用命令链 `&&` 连接多个命令
+  ```bash
+  # ✅ 正确: 使用命令链
+  agent-browser open http://localhost:5173 && \
+  agent-browser wait --load networkidle && \
+  agent-browser get url
+
+  # ❌ 错误: 分别执行命令（容易失败）
+  agent-browser open http://localhost:5173
+  agent-browser wait --load networkidle
+  ```
+
+**问题**: Chrome进程占用过多内存
+- **原因**: 多个Chrome进程未清理
+- **解决**: 定期清理agent-browser进程
+  ```bash
+  # 每次测试前后清理
+  pkill -f "agent-browser"
+  ```
+
+### 3. 替代测试方案
+
+**方案1: 使用项目专用测试技能**
+```bash
+# 使用event2table-universal-test技能
+/skills: event2table-universal-test
+```
+
+**方案2: 直接GraphQL API测试**
+```bash
+# 适用于后端逻辑验证
+curl -s -X POST http://127.0.0.1:5001/api/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"mutation { ... }"}'
+```
+
+**方案3: 代码审查验证**
+- 检查组件props接口
+- 检查条件渲染逻辑
+- 检查事件绑定
+
+### 4. 禁止行为
+
+**❌ 禁止**:
+- 创建替代测试脚本绕过agent-browser问题
+- 在agent-browser未修复时使用其他工具而不报告问题
+- 不更新文档说明agent-browser问题
+
+**✅ 正确做法**:
+- 尝试诊断并解决agent-browser问题
+- 将问题记录到开发文档
+- 使用项目专用测试技能作为替代
+- 明确说明无法执行UI测试的原因
+
+### 5. 文档更新要求
+
+当遇到agent-browser问题时，必须：
+1. 记录错误信息（os error 35等）
+2. 记录解决步骤
+3. 更新本规范添加新的问题模式
+4. 如果问题无法解决，记录到issue tracker
+
+### 代码审查检查项
+
+**每次使用agent-browser时必须检查**:
+- [ ] 是否有多个Chrome进程残留？
+- [ ] daemon进程是否响应？
+- [ ] 命令链是否正确使用 `&&` 连接？
+- [ ] 是否等待足够时间让页面加载？
+
+**违反后果**:
+- ⚠️ 技术债务累积
+- ⚠️ 测试覆盖不完整
+- ⚠️ 无法发现真实用户体验问题
+- ❌ Code Review必须要求记录问题和解决方案
+
+---
+
 ## 问题修复记录
 
 完整的问题修复记录已迁移至 [CHANGELOG.md](/CHANGELOG.md)
