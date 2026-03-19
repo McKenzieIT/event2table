@@ -1,11 +1,3 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
-
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * Type Test for Radio Component
  *
@@ -13,6 +5,7 @@
  * It will be compiled by TypeScript during the build process.
  */
 
+import React from 'react';
 import { Radio } from './Radio';
 
 // Test 1: Basic usage with minimal props
@@ -190,6 +183,3 @@ const test12 = () => {
     />
   );
 };
-
-// Import React for the tests
-import React from 'react';

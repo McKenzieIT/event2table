@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript检查暂禁用
 import React from 'react';
 import { Spinner } from '../Spinner/Spinner';
 import './PageLoader.css';

@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * EmptyState Component Tests
  * 测试空状态组件的所有功能

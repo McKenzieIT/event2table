@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Checkbox Component Tests
  * 测试复选框组件的所有功能

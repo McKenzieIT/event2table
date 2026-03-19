@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * Radio Component Tests
  * 测试单选框组件的所有功能

@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * TextArea Component Tests
  * 测试文本域组件的所有功能

@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * PageLoader Component Tests
  * 测试页面加载组件的所有功能

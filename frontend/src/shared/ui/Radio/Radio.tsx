@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * Radio Component - Cyberpunk Lab Theme
  *

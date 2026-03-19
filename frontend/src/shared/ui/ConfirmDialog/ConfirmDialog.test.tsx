@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode disabled for test files
 /**
  * ConfirmDialog Component Tests
  * 测试确认对话框组件的所有功能
