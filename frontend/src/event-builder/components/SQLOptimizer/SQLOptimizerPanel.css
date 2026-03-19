@@ -1,0 +1,253 @@
+/**
+ * SQLOptimizerPanel Styles
+ * SQL 优化器面板样式
+ */
+
+.sql-optimizer-panel {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.optimizer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.optimizer-header h5 {
+  color: #212529;
+  font-weight: 600;
+}
+
+.optimizer-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sql-optimizer-panel .card {
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.sql-optimizer-panel .card-body {
+  padding: 16px;
+}
+
+.sql-optimizer-panel .card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.sql-optimizer-panel .list-group-item {
+  border: none;
+  border-bottom: 1px solid #e9ecef;
+  padding: 12px 0;
+  transition: background-color 0.2s ease;
+}
+
+.sql-optimizer-panel .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.sql-optimizer-panel .list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+.sql-optimizer-panel .list-group-item.active {
+  background-color: #e7f1ff;
+  border-color: #0d6efd;
+}
+
+.sql-optimizer-panel pre {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.sql-optimizer-panel code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  color: #d63384;
+}
+
+.sql-optimizer-panel .progress {
+  height: 24px;
+  border-radius: 12px;
+  background-color: #e9ecef;
+}
+
+.sql-optimizer-panel .progress-bar {
+  transition: width 0.6s ease;
+}
+
+.sql-optimizer-panel .spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.sql-optimizer-panel .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.sql-optimizer-panel .badge {
+  font-size: 0.75rem;
+  padding: 0.25em 0.5em;
+  border-radius: 0.25rem;
+}
+
+.sql-optimizer-panel .alert {
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.sql-optimizer-panel .alert-info {
+  background-color: #e7f1ff;
+  border-color: #b8daff;
+  color: #084298;
+}
+
+.sql-optimizer-panel .text-success {
+  color: #198754 !important;
+}
+
+.sql-optimizer-panel .text-warning {
+  color: #ffc107 !important;
+}
+
+.sql-optimizer-panel .text-danger {
+  color: #dc3545 !important;
+}
+
+.sql-optimizer-panel .text-info {
+  color: #0dcaf0 !important;
+}
+
+.sql-optimizer-panel .text-muted {
+  color: #6c757d !important;
+}
+
+.sql-optimizer-panel .text-secondary {
+  color: #6c757d !important;
+}
+
+.sql-optimizer-panel .bg-success {
+  background-color: #198754 !important;
+}
+
+.sql-optimizer-panel .bg-warning {
+  background-color: #ffc107 !important;
+}
+
+.sql-optimizer-panel .bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.sql-optimizer-panel .bg-info {
+  background-color: #0dcaf0 !important;
+}
+
+.sql-optimizer-panel .bg-secondary {
+  background-color: #6c757d !important;
+}
+
+.sql-optimizer-panel .display-4 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sql-optimizer-panel .fw-bold {
+  font-weight: 700 !important;
+}
+
+.sql-optimizer-panel .me-2 {
+  margin-right: 0.5rem !important;
+}
+
+.sql-optimizer-panel .me-3 {
+  margin-right: 1rem !important;
+}
+
+.sql-optimizer-panel .ms-3 {
+  margin-left: 1rem !important;
+}
+
+.sql-optimizer-panel .mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.sql-optimizer-panel .mb-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+.sql-optimizer-panel .mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.sql-optimizer-panel .mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.sql-optimizer-panel .mt-1 {
+  margin-top: 0.25rem !important;
+}
+
+.sql-optimizer-panel .mt-3 {
+  margin-top: 1rem !important;
+}
+
+.sql-optimizer-panel .small {
+  font-size: 0.875rem;
+}
+
+.sql-optimizer-panel .flex-grow-1 {
+  flex-grow: 1 !important;
+}
+
+.sql-optimizer-panel .d-flex {
+  display: flex !important;
+}
+
+.sql-optimizer-panel .align-items-center {
+  align-items: center !important;
+}
+
+.sql-optimizer-panel .align-items-start {
+  align-items: flex-start !important;
+}
+
+.sql-optimizer-panel .justify-content-between {
+  justify-content: space-between !important;
+}
+
+.sql-optimizer-panel .justify-content-start {
+  justify-content: flex-start !important;
+}
+
+.sql-optimizer-panel .list-group-flush {
+  border-radius: inherit;
+}
+
+.sql-optimizer-panel .list-group-flush .list-group-item {
+  border-width: 0 0 1px;
+}
