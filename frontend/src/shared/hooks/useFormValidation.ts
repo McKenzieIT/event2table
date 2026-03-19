@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { useState, useCallback } from 'react';
 
 interface ValidationRules {
@@ -9,27 +8,38 @@ interface ValidationRules {
   message?: string;
 }
 
-export function useFormValidation<T extends Record<string, any>>(
-  initialValues: T,
-  rules: Record<keyof T, ValidationRules>
-) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+interface UseFormValidationReturn<T extends Record<string, unknown>> {
+  errors: Record<keyof T, string | null>;
+  touched: Record<keyof T, boolean>;
+  handleBlur: (name: keyof T) => void;
+  validateField: (name: keyof T, value: unknown) => string | null;
+  validateAll: () => boolean;
+  clearErrors: () => void;
+  setErrors: React.Dispatch<React.SetStateAction<Record<keyof T, string | null>>>;
+  setTouched: React.Dispatch<React.SetStateAction<Record<keyof T, boolean>>>;
+}
 
-  const validateField = useCallback((name: keyof T, value: any): string | null => {
+export function useFormValidation<T extends Record<string, unknown>>(
+  initialValues: T,
+  rules: Partial<Record<keyof T, ValidationRules>>
+): UseFormValidationReturn<T> {
+  const [errors, setErrors] = useState<Record<keyof T, string | null>>({} as Record<keyof T, string | null>);
+  const [touched, setTouched] = useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
+
+  const validateField = useCallback((name: keyof T, value: unknown): string | null => {
     const rule = rules[name];
     if (!rule) return null;
     
     if (rule.required && (!value || (typeof value === 'string' && !value.trim()))) {
       return rule.message || '此字段为必填项';
     }
-    if (rule.minLength && value && value.length < rule.minLength) {
+    if (rule.minLength && typeof value === 'string' && value.length < rule.minLength) {
       return rule.message || `最少${rule.minLength}个字符`;
     }
-    if (rule.maxLength && value && value.length > rule.maxLength) {
+    if (rule.maxLength && typeof value === 'string' && value.length > rule.maxLength) {
       return rule.message || `最多${rule.maxLength}个字符`;
     }
-    if (rule.pattern && value && !rule.pattern.test(value)) {
+    if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
       return rule.message || '格式不正确';
     }
     return null;
@@ -43,27 +53,29 @@ export function useFormValidation<T extends Record<string, any>>(
   }, [initialValues, validateField]);
 
   const validateAll = useCallback((): boolean => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Partial<Record<keyof T, string>> = {};
     let isValid = true;
     (Object.keys(rules) as Array<keyof T>).forEach(name => {
       const error = validateField(name, initialValues[name]);
       if (error) {
-        newErrors[name as string] = error;
+        newErrors[name] = error;
         isValid = false;
       }
     });
-    setErrors(newErrors);
+    setErrors(newErrors as Record<keyof T, string | null>);
     setTouched(prev => {
       const newTouched = { ...prev };
-      Object.keys(rules).forEach(key => { newTouched[key] = true; });
+      Object.keys(rules).forEach(key => { 
+        newTouched[key as keyof T] = true; 
+      });
       return newTouched;
     });
     return isValid;
   }, [initialValues, rules, validateField]);
 
   const clearErrors = useCallback(() => {
-    setErrors({});
-    setTouched({});
+    setErrors({} as Record<keyof T, string | null>);
+    setTouched({} as Record<keyof T, boolean>);
   }, []);
 
   return { errors, touched, handleBlur, validateField, validateAll, clearErrors, setErrors, setTouched };

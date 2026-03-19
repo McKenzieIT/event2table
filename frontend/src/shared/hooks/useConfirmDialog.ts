@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript检查暂禁用
 /**
  * Confirm Dialog Hook
  * 提供类似 window.confirm 的API但使用UI对话框
@@ -6,8 +5,32 @@
 
 import { useState, useCallback } from 'react';
 
-export function useConfirmDialog() {
-  const [dialogState, setDialogState] = useState({
+interface ConfirmDialogOptions {
+  title?: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'warning' | 'danger' | 'info' | 'success';
+}
+
+interface DialogState {
+  open: boolean;
+  title: string;
+  message: string;
+  onConfirm: (() => void) | null;
+  onCancel: (() => void) | null;
+  confirmText: string;
+  cancelText: string;
+  variant: ConfirmDialogOptions['variant'];
+}
+
+interface UseConfirmDialogReturn {
+  dialogState: DialogState;
+  confirm: (message: string, options?: ConfirmDialogOptions) => Promise<boolean>;
+  closeDialog: () => void;
+}
+
+export function useConfirmDialog(): UseConfirmDialogReturn {
+  const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     title: '确认',
     message: '',
@@ -18,8 +41,8 @@ export function useConfirmDialog() {
     variant: 'warning',
   });
 
-  const confirm = useCallback((message, options = {}) => {
-    return new Promise((resolve) => {
+  const confirm = useCallback((message: string, options: ConfirmDialogOptions = {}): Promise<boolean> => {
+    return new Promise<boolean>((resolve) => {
       setDialogState({
         open: true,
         title: options.title || '确认',

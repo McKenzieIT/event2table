@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * Apollo Client Configuration
  *
@@ -10,9 +9,6 @@ import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/clien
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
-import type { ApolloQueryResult } from '@apollo/client';
-import type { FetchResult } from '@apollo/client';
-import type { DocumentNode } from 'graphql';
 
 // HTTP link to GraphQL endpoint
 // Use relative URI to leverage Vite proxy in development
@@ -80,7 +76,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward, re
     console.error('Error Message:', networkError.message);
 
     // Extract status code if available
-    const statusCode = (networkError as any).statusCode;
+    const statusCode = (networkError as { statusCode?: number }).statusCode;
     if (statusCode) {
       console.error('Status Code:', statusCode);
 
@@ -102,7 +98,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward, re
     }
 
     // Log response body if available
-    const result = (networkError as any).result;
+    const result = (networkError as { result?: unknown }).result;
     if (result) {
       console.error('Response Body:', result);
     }
@@ -139,7 +135,7 @@ const retryLink = new RetryLink({
 });
 
 // Create Apollo Client with enhanced configuration
-export const client: ApolloClient<any> = new ApolloClient({
+export const client = new ApolloClient({
   link: from([
     retryLink,
     errorLink,
@@ -155,7 +151,7 @@ export const client: ApolloClient<any> = new ApolloClient({
             merge: (existing, incoming, args) => {
               if (!args) return incoming;
 
-              const { offset = 0 } = args;
+              const { offset = 0 } = args as { offset?: number };
               const merged = existing ? existing.slice(0) : [];
 
               for (let i = 0; i < incoming.length; ++i) {
@@ -172,7 +168,7 @@ export const client: ApolloClient<any> = new ApolloClient({
             merge: (existing, incoming, args) => {
               if (!args) return incoming;
 
-              const { offset = 0 } = args;
+              const { offset = 0 } = args as { offset?: number };
               const merged = existing ? existing.slice(0) : [];
 
               for (let i = 0; i < incoming.length; ++i) {

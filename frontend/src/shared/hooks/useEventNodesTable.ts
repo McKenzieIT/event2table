@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript检查暂禁用
 /**
  * 事件节点表格Hook
  * Event Nodes Table Hook
@@ -15,6 +14,7 @@ import {
   createColumnHelper,
   SortingState,
   ColumnFiltersState,
+  Table,
 } from '@tanstack/react-table';
 import type { EventNode } from '@shared/types/eventNodes';
 
@@ -22,6 +22,18 @@ import type { EventNode } from '@shared/types/eventNodes';
  * 列定义类型
  */
 export type EventNodesColumnDef = ReturnType<typeof createColumnHelper<EventNode>>['_inferColumnDef'];
+
+interface UseEventNodesTableReturn {
+  table: Table<EventNode>;
+  selectedRows: typeof ReturnType<typeof useReactTable<EventNode>>['getFilteredSelectedRowModel']['flatRows'];
+  selectedIds: (string | number)[];
+  selectedCount: number;
+  isAllRowsSelected: boolean;
+  isSomeRowsSelected: boolean;
+  toggleAllRowsSelected: () => void;
+  clearSelection: () => void;
+  sorting: SortingState;
+}
 
 /**
  * 事件节点表格Hook
@@ -33,14 +45,14 @@ export type EventNodesColumnDef = ReturnType<typeof createColumnHelper<EventNode
 export function useEventNodesTable(
   data: EventNode[],
   columns: EventNodesColumnDef[]
-) {
+): UseEventNodesTableReturn {
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'created_at', desc: true },
   ]);
-  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
   // 初始化表格
-  const table = useReactTable({
+  const table = useReactTable<EventNode>({
     data,
     columns,
     state: {

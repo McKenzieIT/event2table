@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript检查暂禁用
 import { useGameStore } from '@/stores/gameStore';
 import { useCallback, useEffect, useRef, useTransition } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -20,6 +19,13 @@ interface UseGameContextReturn {
   isLoadingGame: boolean;
 }
 
+// Extend Window interface to include gameData
+declare global {
+  interface Window {
+    gameData?: Game;
+  }
+}
+
 export function useGameContext(): UseGameContextReturn {
   const location = useLocation();
   const [isPending, startTransition] = useTransition();
@@ -35,8 +41,8 @@ export function useGameContext(): UseGameContextReturn {
 
   const selectGame = useCallback((game: Game) => {
     setCurrentGame(game);
-    localStorage.setItem('selectedGameGid', game.gid);
-    localStorage.setItem('selectedGameId', game.id);
+    localStorage.setItem('selectedGameGid', String(game.gid));
+    localStorage.setItem('selectedGameId', String(game.id));
     localStorage.setItem('selectedGameName', game.name);
     window.gameData = game;
     window.dispatchEvent(new CustomEvent('gameChanged', { detail: game }));
@@ -65,7 +71,7 @@ export function useGameContext(): UseGameContextReturn {
 
       try {
         const response = await fetch('/api/games');
-        const result = await response.json();
+        const result = await response.json() as { success: boolean; data: Game[] };
         
         if (result.success && Array.isArray(result.data)) {
           const game = result.data.find(g => 
@@ -81,7 +87,7 @@ export function useGameContext(): UseGameContextReturn {
               dwd_prefix: game.dwd_prefix
             };
 
-            localStorage.setItem('selectedGameGid', game.gid);
+            localStorage.setItem('selectedGameGid', String(game.gid));
             window.gameData = gameData;
 
             if (isMounted.current) {
@@ -106,14 +112,15 @@ export function useGameContext(): UseGameContextReturn {
   }, [location.search, location.pathname, currentGame, setCurrentGame]);
 
   useEffect(() => {
-    const handleGameChange = (e: CustomEvent) => {
-      setCurrentGame(e.detail);
+    const handleGameChange = (e: Event) => {
+      const customEvent = e as CustomEvent<Game>;
+      setCurrentGame(customEvent.detail);
     };
 
-    window.addEventListener('gameChanged', handleGameChange as EventListener);
+    window.addEventListener('gameChanged', handleGameChange);
 
     return () => {
-      window.removeEventListener('gameChanged', handleGameChange as EventListener);
+      window.removeEventListener('gameChanged', handleGameChange);
     };
   }, [setCurrentGame]);
 

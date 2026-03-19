@@ -1,13 +1,22 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
-
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import { useState, useCallback } from 'react';
+import { useState, useCallback, ReactElement } from 'react';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+
+interface ConfirmOptions {
+  title?: string;
+  variant?: 'warning' | 'danger' | 'info' | 'success';
+}
+
+interface DialogState {
+  open: boolean;
+  title: string;
+  message: string;
+  variant: ConfirmOptions['variant'];
+}
+
+interface UsePromiseConfirmReturn {
+  confirm: (message: string, options?: ConfirmOptions) => Promise<boolean>;
+  ConfirmDialogComponent: () => ReactElement;
+}
 
 /**
  * Promise-based confirm dialog hook
@@ -22,18 +31,18 @@ import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
  * const confirmed = await confirm('确定要删除吗？');
  * if (confirmed) { ... }
  */
-export function usePromiseConfirm() {
-  const [dialogState, setDialogState] = useState({
+export function usePromiseConfirm(): UsePromiseConfirmReturn {
+  const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     title: '确认',
     message: '',
     variant: 'danger',
   });
 
-  const [resolveRef, setResolveRef] = useState(null);
+  const [resolveRef, setResolveRef] = useState<((value: boolean) => void) | null>(null);
 
-  const confirm = useCallback((message, options = {}) => {
-    return new Promise((resolve) => {
+  const confirm = useCallback((message: string, options: ConfirmOptions = {}): Promise<boolean> => {
+    return new Promise<boolean>((resolve) => {
       setDialogState({
         open: true,
         title: options.title || '确认',
@@ -60,7 +69,7 @@ export function usePromiseConfirm() {
     setResolveRef(null);
   }, [resolveRef]);
 
-  const ConfirmDialogComponent = () => (
+  const ConfirmDialogComponent = useCallback(() => (
     <ConfirmDialog
       open={dialogState.open}
       title={dialogState.title}
@@ -71,7 +80,7 @@ export function usePromiseConfirm() {
       onConfirm={handleConfirm}
       onCancel={handleCancel}
     />
-  );
+  ), [dialogState, handleConfirm, handleCancel]);
 
   return { confirm, ConfirmDialogComponent };
 }

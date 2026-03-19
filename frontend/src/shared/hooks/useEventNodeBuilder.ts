@@ -1,4 +1,3 @@
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * useEventNodeBuilder Hook
  * 事件节点构建器状态管理Hook
@@ -61,7 +60,8 @@ export interface UseEventNodeBuilderReturn {
     fieldName: string,
     displayName: string,
     paramId?: number | null,
-    jsonPath?: string | null
+    jsonPath?: string | null,
+    hiveType?: string
   ) => void;
   removeField: (fieldId: string) => void;
   updateField: (fieldId: string, updates: Partial<CanvasField>) => void;
@@ -123,7 +123,7 @@ export function useEventNodeBuilder(gameGid?: number): UseEventNodeBuilderReturn
     displayName: string,
     paramId: number | null = null,
     jsonPath: string | null = null,
-    hive_type?: string  // ✅ 新增：Hive数据类型参数
+    hiveType?: string
   ) => {
     setCanvasFields(prev => {
       // Support both lowercase (internal) and uppercase (GraphQL enum) values
@@ -147,8 +147,8 @@ export function useEventNodeBuilder(gameGid?: number): UseEventNodeBuilderReturn
       const normalizedFieldType = fieldType.toLowerCase();
       const mappedType = typeMapping[fieldType] || typeMapping[normalizedFieldType] || normalizedFieldType;
 
-      // ✅ BUGFIX #1: 生成唯一ID，避免重复键导致组件崩溃
-      // 使用组合字段生成唯一ID：timestamp + random + field hash
+      // Generate unique ID to avoid duplicate keys causing component crashes
+      // Use combination of timestamp + random + field hash
       const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${fieldName}`;
 
       const newField: CanvasField = {
@@ -157,9 +157,9 @@ export function useEventNodeBuilder(gameGid?: number): UseEventNodeBuilderReturn
         name: fieldName,
         displayName,
         alias: fieldName,
-        dataType: hive_type || 'STRING',  // ✅ 修复：使用传入的hive_type，fallback到'STRING'
+        dataType: hiveType || 'STRING',
         isEditable: true,
-        fieldType: normalizedFieldType, // Store normalized value
+        fieldType: normalizedFieldType,
         fieldName,
         order: prev.length + 1,
         paramId,
