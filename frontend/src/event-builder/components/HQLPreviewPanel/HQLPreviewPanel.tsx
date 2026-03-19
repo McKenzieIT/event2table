@@ -14,21 +14,21 @@
 // @ts-nocheck - TypeScript检查暂禁用
 
 import React, { useState, useEffect } from 'react';
-import { hqlApiV2 } from '../../../shared/api/hqlApiV2';
+import { hqlApi } from '../../../shared/api/hqlApi';
 import type { GenerateRequest } from '../../../shared/types';
 import type { HQLGenerateResponse } from '@shared/types/api-types';
 import { HQL_PREVIEW_DEBOUNCE } from '@shared/constants/timeouts';
 import { DebugViewer } from './DebugViewer';
 import { PerformanceIndicator } from './PerformanceIndicator';
-import { WhereConditionBuilderV2 } from './WhereConditionBuilderV2';
-import './HQLPreviewPanelV2.css';
+import { WhereConditionBuilder } from './WhereConditionBuilder';
+import './HQLPreviewPanel.css';
 
 // 从共享API类型导入类型定义
 type ApiEvent = GenerateRequest['events'][0];
 type ApiField = GenerateRequest['fields'][0];
 type ApiCondition = NonNullable<GenerateRequest['where_conditions']>[number];
 
-interface HQLPreviewPanelV2Props {
+interface HQLPreviewPanelProps {
   events: ApiEvent[];
   fields: ApiField[];
   conditions?: ApiCondition[];
@@ -63,7 +63,7 @@ interface PerformanceReport {
   suggestions: string[];
 }
 
-export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
+export const HQLPreviewPanel: React.FC<HQLPreviewPanelProps> = ({
   events,
   fields,
   conditions = [],
@@ -105,7 +105,7 @@ export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
 
       if (debugMode) {
         // 调试模式：使用generate-debug端点
-        const response = await hqlApiV2.generateDebug(requestData, apiBaseUrl);
+        const response = await hqlApi.generateDebug(requestData, apiBaseUrl);
         setDebugTrace(response.data);
         setHql(response.data.hql);
 
@@ -119,7 +119,7 @@ export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
         }
       } else {
         // 普通模式：使用generate端点
-        const response = await hqlApiV2.generate(requestData, apiBaseUrl);
+        const response = await hqlApi.generate(requestData, apiBaseUrl);
         setHql(response.data.hql);
 
         // 提取性能报告
@@ -233,4 +233,4 @@ export const HQLPreviewPanelV2: React.FC<HQLPreviewPanelV2Props> = ({
   );
 };
 
-export default HQLPreviewPanelV2;
+export default HQLPreviewPanel;

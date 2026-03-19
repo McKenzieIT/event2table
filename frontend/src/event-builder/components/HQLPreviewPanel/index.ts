@@ -1,21 +1,21 @@
 /**
- * HQLPreviewV2组件导出
+ * HQLPreviewPanel组件导出
  *
- * 导出所有V2组件
+ * 导出所有组件
  */
 
-export { HQLPreviewPanelV2 } from './HQLPreviewPanelV2';
+export { HQLPreviewPanel } from './HQLPreviewPanel';
 export { DebugViewer } from './DebugViewer';
-export { WhereConditionBuilderV2 } from './WhereConditionBuilderV2';
+export { WhereConditionBuilder } from './WhereConditionBuilder';
 export { PerformanceIndicator } from './PerformanceIndicator';
 export { CacheIndicator } from './CacheIndicator';
 
-// 导出TypeScript版本的V2组件
-export { default as MultiEventConfigV2 } from './MultiEventConfigV2';
-export { default as HQLHistoryV2 } from './HQLHistoryV2';
+// 导出TypeScript版本的组件
+export { default as MultiEventConfig } from './MultiEventConfig';
+export { default as HQLHistory } from './HQLHistory';
 export { default as FieldAutocomplete } from './FieldAutocomplete';
 
 // 导出类型
-export type { MultiEventConfigV2Props } from './MultiEventConfigV2';
-export type { HQLHistoryV2Props, HistoryItem } from './HQLHistoryV2';
+export type { MultiEventConfigProps } from './MultiEventConfig';
+export type { HQLHistoryProps, HistoryItem } from './HQLHistory';
 export type { FieldAutocompleteProps, FieldSuggestion } from './FieldAutocomplete';

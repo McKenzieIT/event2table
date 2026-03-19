@@ -12,7 +12,7 @@
  */
 
 import React, { useState } from 'react';
-import './WhereConditionBuilderV2.css';
+import './WhereConditionBuilder.css';
 
 interface Condition {
   id: string;
@@ -22,13 +22,13 @@ interface Condition {
   logicalOp: 'AND' | 'OR';
 }
 
-interface WhereConditionBuilderV2Props {
+interface WhereConditionBuilderProps {
   conditions: Condition[];
   onConditionsChange: (conditions: Condition[]) => void;
   availableFields?: string[];
 }
 
-export const WhereConditionBuilderV2: React.FC<WhereConditionBuilderV2Props> = ({
+export const WhereConditionBuilder: React.FC<WhereConditionBuilderProps> = ({
   conditions,
   onConditionsChange,
   availableFields = []
@@ -209,4 +209,4 @@ export const WhereConditionBuilderV2: React.FC<WhereConditionBuilderV2Props> = (
   );
 };
 
-export default WhereConditionBuilderV2;
+export default WhereConditionBuilder;

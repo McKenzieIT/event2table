@@ -10,7 +10,7 @@
 
 import React, { useState } from 'react';
 import HQLPreview from '../HQLPreview';
-import { HQLPreviewPanelV2, MultiEventConfigV2, HQLHistoryV2 } from '../HQLPreviewV2';
+import { HQLPreviewPanel, MultiEventConfig, HQLHistory } from '../HQLPreviewPanel';
 import type { Event, Field, ConditionValue } from '@shared/types/api-types';
 import './HQLPreviewWrapper.css';
 
@@ -116,7 +116,7 @@ export const HQLPreviewWrapper: React.FC<HQLPreviewWrapperProps> = ({
           <>
             {/* 多事件配置 */}
             {mode !== 'single' && (
-              <MultiEventConfigV2
+              <MultiEventConfig
                 availableEvents={availableEvents}
                 selectedEvents={selectedEvents}
                 joinConditions={joinConditions}
@@ -126,7 +126,7 @@ export const HQLPreviewWrapper: React.FC<HQLPreviewWrapperProps> = ({
             )}
 
             {/* HQL 预览面板 */}
-            <HQLPreviewPanelV2
+            <HQLPreviewPanel
               events={events}
               fields={fields}
               conditions={conditions}
@@ -165,7 +165,7 @@ export const HQLPreviewWrapper: React.FC<HQLPreviewWrapperProps> = ({
 
             {/* 历史版本 */}
             {v2History.length > 0 && (
-              <HQLHistoryV2
+              <HQLHistory
                 history={v2History}
                 onRestore={(item) => {
                   if (onHQLGenerated) {

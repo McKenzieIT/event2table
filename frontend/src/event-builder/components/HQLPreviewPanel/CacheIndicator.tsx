@@ -1,12 +1,12 @@
 /**
  * 缓存统计指示器组件
  *
- * 显示HQL V2 API缓存统计信息
+ * 显示HQL API缓存统计信息
  */
 // @ts-nocheck - TypeScript检查暂禁用
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { hqlApiV2 } from '../../../shared/api/hqlApiV2';
+import { hqlApi } from '../../../shared/api/hqlApi';
 import type { CacheStatsResponse } from '../../../shared/types';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './CacheIndicator.css';
@@ -42,7 +42,7 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
     setError('');
 
     try {
-      const response = await hqlApiV2.getCacheStats(apiBaseUrl);
+      const response = await hqlApi.getCacheStats(apiBaseUrl);
       setStats(response.data);
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || 'Failed to fetch cache stats';
@@ -61,7 +61,7 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
     setConfirmState(prev => ({ ...prev, open: false }));
     setLoading(true);
     try {
-      await hqlApiV2.clearCache(apiBaseUrl);
+      await hqlApi.clearCache(apiBaseUrl);
       await fetchStats();
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || 'Failed to clear cache';

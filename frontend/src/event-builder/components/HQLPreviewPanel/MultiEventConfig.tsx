@@ -17,7 +17,7 @@
 
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import './MultiEventConfigV2.css';
+import './MultiEventConfig.css';
 import type { Event } from '@shared/types/event-types';
 import type { Field } from '@shared/types/hql-types';
 
@@ -39,7 +39,7 @@ export interface JoinCondition {
 }
 
 /** 组件Props */
-export interface MultiEventConfigV2Props {
+export interface MultiEventConfigProps {
   /** 可用事件列表 */
   availableEvents?: Event[];
   /** 已选择事件 */
@@ -66,13 +66,13 @@ interface NewJoinConditionState {
 
 // ========== 组件 ==========
 
-export default function MultiEventConfigV2({
+export default function MultiEventConfig({
   availableEvents = [],
   selectedEvents = [],
   joinConditions = [],
   onEventsChange,
   onJoinConditionsChange
-}: MultiEventConfigV2Props) {
+}: MultiEventConfigProps) {
   const [mode, setMode] = useState<ConfigMode>('join');
   const [showEventSelector, setShowEventSelector] = useState<boolean>(false);
   const [newJoinCondition, setNewJoinCondition] = useState<NewJoinConditionState>({

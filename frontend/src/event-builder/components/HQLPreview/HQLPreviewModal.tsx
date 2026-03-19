@@ -17,8 +17,8 @@ import CodeMirror from '@uiw/react-codemirror';
 import toast from 'react-hot-toast';
 import './HQLPreviewModal.css';
 import { BaseModal } from '@shared/ui/BaseModal';
-import PerformanceIndicator from '../HQLPreviewV2/PerformanceIndicator';
-import DebugViewer from '../HQLPreviewV2/DebugViewer';
+import PerformanceIndicator from '../HQLPreviewPanel/PerformanceIndicator';
+import DebugViewer from '../HQLPreviewPanel/DebugViewer';
 import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
 
 // ========== 类型定义 ==========
@@ -103,8 +103,6 @@ export interface HQLPreviewModalProps {
   gameData?: GameData;
   /** 选中事件 */
   selectedEvent?: SelectedEvent | null;
-  /** 是否使用V2 API */
-  useV2API?: boolean;
 }
 
 /** Tab类型 */
@@ -123,8 +121,7 @@ export default function HQLPreviewModal({
   canvasFields = [],
   whereConditions = [],
   gameData,
-  selectedEvent,
-  useV2API = false
+  selectedEvent
 }: HQLPreviewModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>('SELECT');
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -143,27 +140,12 @@ export default function HQLPreviewModal({
     if (!isOpen || !canvasFields.length) return;
 
     const timeoutId = setTimeout(async () => {
-      if (useV2API) {
-        // 使用 V2 API 生成 HQL
-        await generateHQLWithV2API();
-      } else {
-        // 使用 V1 前端生成（原有逻辑）
-        const mockHQL: HQLOutputs = {
-          SELECT: generateSELECTHQL(canvasFields, whereConditions, gameData, selectedEvent),
-          CREATE_TABLE: generateCREATEHQL(canvasFields, whereConditions, gameData, selectedEvent, 'table'),
-          CREATE_VIEW: generateCREATEHQL(canvasFields, whereConditions, gameData, selectedEvent, 'view'),
-          INSERT: generateINSERTHQL(canvasFields, whereConditions, gameData, selectedEvent)
-        };
-
-        setHqlOutputs(mockHQL);
-        if (!isEditing) {
-          setCurrentHQL(mockHQL[activeTab]);
-        }
-      }
+      // 使用 V2 API 生成 HQL
+      await generateHQLWithV2API();
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [isOpen, canvasFields, whereConditions, activeTab, isEditing, gameData, selectedEvent, useV2API]);
+  }, [isOpen, canvasFields, whereConditions, activeTab, isEditing, gameData, selectedEvent]);
 
   // V2 API 调用函数
   const generateHQLWithV2API = async () => {
@@ -448,40 +430,38 @@ export default function HQLPreviewModal({
           </div>
 
           {/* V2 API 特性展示 */}
-          {useV2API && (
-            <div className="v2-features-section">
-              {/* 加载状态 */}
-              {isLoading && (
-                <div className="v2-loading">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">加载中...</span>
-                  </div>
-                  <p>正在生成HQL并分析性能...</p>
+          <div className="v2-features-section">
+            {/* 加载状态 */}
+            {isLoading && (
+              <div className="v2-loading">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">加载中...</span>
                 </div>
-              )}
+                <p>正在生成HQL并分析性能...</p>
+              </div>
+            )}
 
-              {/* API错误 */}
-              {apiError && (
-                <div className="v2-error alert alert-danger">
-                  <i className="bi bi-exclamation-triangle"></i>
-                  <div>
-                    <strong>API调用失败</strong>
-                    <p>{apiError}</p>
-                  </div>
+            {/* API错误 */}
+            {apiError && (
+              <div className="v2-error alert alert-danger">
+                <i className="bi bi-exclamation-triangle"></i>
+                <div>
+                  <strong>API调用失败</strong>
+                  <p>{apiError}</p>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* 性能分析 */}
-              {!isLoading && !apiError && performanceReport && (
-                <PerformanceIndicator performance={performanceReport} />
-              )}
+            {/* 性能分析 */}
+            {!isLoading && !apiError && performanceReport && (
+              <PerformanceIndicator performance={performanceReport} />
+            )}
 
-              {/* 调试模式 */}
-              {!isLoading && !apiError && debugTrace && (
-                <DebugViewer debugTrace={debugTrace} />
-              )}
-            </div>
-          )}
+            {/* 调试模式 */}
+            {!isLoading && !apiError && debugTrace && (
+              <DebugViewer debugTrace={debugTrace} />
+            )}
+          </div>
         </div>
 
         {/* Modal Footer */}

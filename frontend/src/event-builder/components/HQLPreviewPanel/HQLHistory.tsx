@@ -17,7 +17,7 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import './HQLHistoryV2.css';
+import './HQLHistory.css';
 
 // ========== 类型定义 ==========
 
@@ -62,7 +62,7 @@ export interface HistoryItem {
 }
 
 /** 组件Props */
-export interface HQLHistoryV2Props {
+export interface HQLHistoryProps {
   /** 历史记录列表 */
   history?: HistoryItem[];
   /** 恢复回调 */
@@ -78,7 +78,7 @@ type GenerationMode = 'single' | 'join' | 'union';
 
 // ========== 组件 ==========
 
-export default function HQLHistoryV2({
+export default function HQLHistory({
   history = [],
   onRestore,
   onCompare,
