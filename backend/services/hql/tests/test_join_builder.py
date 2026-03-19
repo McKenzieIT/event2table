@@ -117,8 +117,8 @@ class TestJoinBuilder:
         ]
 
         where_conditions = [
-            {"field": "login.ds", "operator": "=", "value": "'${bizdate}'"},
-            {"field": "logout.ds", "operator": "=", "value": "'${bizdate}'"},
+            {"field": "login.ds", "operator": "=", "value": "'${ds}'"},
+            {"field": "logout.ds", "operator": "=", "value": "'${ds}'"},
         ]
 
         full_sql = builder.build_join_with_where(
@@ -127,8 +127,8 @@ class TestJoinBuilder:
 
         assert "JOIN" in full_sql
         assert "WHERE" in full_sql
-        assert "login.ds = '${bizdate}'" in full_sql
-        assert "logout.ds = '${bizdate}'" in full_sql
+        assert "login.ds = '${ds}'" in full_sql
+        assert "logout.ds = '${ds}'" in full_sql
 
     def test_throw_on_missing_join_condition(self):
         """测试缺少JOIN条件时抛出异常"""
@@ -245,9 +245,9 @@ class TestJoinBuilder:
             events,
             join_conditions,
             partition_field="ds",
-            partition_value="'${bizdate}'",
+            partition_value="'${ds}'",
             join_type="INNER",
         )
 
-        assert "ds = '${bizdate}'" in full_sql
-        assert full_sql.count("ds = '${bizdate}'") == 2  # 两个表都需要分区过滤
+        assert "ds = '${ds}'" in full_sql
+        assert full_sql.count("ds = '${ds}'") == 2  # 两个表都需要分区过滤

@@ -142,7 +142,7 @@ class SyntaxValidator:
         "MISSING_WHERE": {
             "pattern": r"CREATE\s+(OR\s+REPLACE\s+)?VIEW.*?WHERE\s+\'\$\{",
             "message": "WHERE子句缺少分区过滤",
-            "suggestion": "添加分区过滤条件, 如: WHERE ds = '${bizdate}'",
+            "suggestion": "添加分区过滤条件, 如: WHERE ds = '${ds}'",
         },
         "MISSING_QUOTES": {
             "pattern": r'=\s*[\'"][^\'"]*[\'"]\s+',
@@ -258,7 +258,7 @@ class SyntaxValidator:
                     column=0,
                     message="缺少WHERE子句（分区过滤要求）",
                     error_type="error",
-                    suggestion="添加WHERE子句, 如: WHERE ds = '${bizdate}'",
+                    suggestion="添加WHERE子句, 如: WHERE ds = '${ds}'",
                 )
             )
 
@@ -448,7 +448,7 @@ class SyntaxValidator:
                             column=0,
                             message="WHERE子句缺少分区字段过滤",
                             error_type="warning",
-                            suggestion="添加分区字段过滤, 如: WHERE ds = '${bizdate}'",
+                            suggestion="添加分区字段过滤, 如: WHERE ds = '${ds}'",
                         )
                     )
 

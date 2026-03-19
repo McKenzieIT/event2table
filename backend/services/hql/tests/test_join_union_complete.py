@@ -168,7 +168,7 @@ class TestUNIONModeFullCoverage:
         # 验证包含UNION ALL
         assert "UNION ALL" in result
         # 验证包含分区过滤
-        assert "ds" in result or "bizdate" in result
+        assert "ds" in result
         # 验证包含两个事件
         assert "ods_login" in result
         assert "ods_logout" in result

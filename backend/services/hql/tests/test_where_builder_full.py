@@ -268,12 +268,12 @@ class TestWhereBuilderFullCoverage:
 
         from backend.services.hql.models.event import Event
 
-        event = Event(name="test", table_name="table", partition_field="bizdate")
+        event = Event(name="test", table_name="table", partition_field="ds")
         context = {"event": event}
 
         result = builder._build_partition_filter(context)
 
-        assert result == "bizdate = '${ds}'"
+        assert result == "ds = '${ds}'"
 
     def test_build_partition_filter_context_without_event(self):
         """测试构建分区过滤 - 上下文无事件"""

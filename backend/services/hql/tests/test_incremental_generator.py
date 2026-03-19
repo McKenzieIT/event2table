@@ -323,7 +323,7 @@ class TestIncrementalHQLGenerator:
             account_id,
             get_json_object(params, '$.zoneId') AS zone_id
         FROM ieu_ods.ods_10000147_all_view
-        WHERE ds = '${bizdate}'
+        WHERE ds = '${ds}'
         """
 
         fields = generator._parse_fields_from_hql(hql)
@@ -337,7 +337,7 @@ class TestIncrementalHQLGenerator:
         CREATE OR REPLACE VIEW dwd_event_login AS
         SELECT ds, role_id
         FROM ieu_ods.ods_10000147_all_view
-        WHERE ds = '${bizdate}' AND role_id > 100
+        WHERE ds = '${ds}' AND role_id > 100
         """
 
         conditions = generator._parse_conditions_from_hql(hql)

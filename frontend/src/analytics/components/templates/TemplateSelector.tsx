@@ -15,9 +15,10 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchTemplates } from '@shared/api/templateApi';
+import { fetchTemplates, type Template } from '@shared/api/templateApi';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import { Input, EmptyState } from '@shared/ui';
+import TemplateEditor from './TemplateEditor';
 
 import './TemplateSelector.css';
 
@@ -71,6 +72,7 @@ export default function TemplateSelector({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [editingTemplateId, setEditingTemplateId] = useState<number | null>(null);
   const [confirmState, setConfirmState] = useState<ConfirmState>({
     open: false,
     template: null,
@@ -133,10 +135,8 @@ export default function TemplateSelector({
 
   // Edit template
   const handleEditTemplate = useCallback((template: Template) => {
-    if (onEditTemplate) {
-      onEditTemplate(template);
-    }
-  }, [onEditTemplate]);
+    setEditingTemplateId(typeof template.id === 'number' ? template.id : null);
+  }, []);
 
   // Clone template
   const handleCloneTemplate = useCallback((template: Template) => {
@@ -165,6 +165,29 @@ export default function TemplateSelector({
     setConfirmState(prev => ({ ...prev, open: false }));
   }, [confirmState.template, onDeleteTemplate]);
 
+  // Handle template save
+  const handleTemplateSave = useCallback((savedTemplate: Template) => {
+    if (savedTemplate.id) {
+      setTemplates(prev => {
+        const index = prev.findIndex(t => t.id === savedTemplate.id);
+        if (index >= 0) {
+          const updated = [...prev];
+          updated[index] = savedTemplate;
+          return updated;
+        }
+        return [...prev, savedTemplate];
+      });
+    } else {
+      setTemplates(prev => [...prev, savedTemplate]);
+    }
+    setEditingTemplateId(null);
+  }, []);
+
+  // Handle template delete
+  const handleTemplateDelete = useCallback(() => {
+    loadTemplates();
+  }, [loadTemplates]);
+
   const handleCancelDelete = useCallback(() => {
     setConfirmState(prev => ({ ...prev, open: false }));
   }, []);
@@ -183,8 +206,20 @@ export default function TemplateSelector({
       <div className="template-selector">
         {/* Header */}
         <div className="template-selector-header">
-          <h3 className="title">📋 模板系统</h3>
-          <p className="subtitle">快速创建和复用查询模板</p>
+          <div className="header-content">
+            <div>
+              <h3 className="title">📋 模板系统</h3>
+              <p className="subtitle">快速创建和复用查询模板</p>
+            </div>
+            <Button
+              variant="primary"
+              onClick={() => setEditingTemplateId(null)}
+              className="create-template-btn"
+            >
+              <i className="bi bi-plus-lg"></i>
+              新建模板
+            </Button>
+          </div>
         </div>
 
         {/* Tags Filter */}
@@ -319,41 +354,18 @@ export default function TemplateSelector({
           </>
         )}
 
-        {/* Create Modal - Simplified for now */}
-        {showCreateModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h3 className="modal-title">
-                  创建新模板
-                </h3>
-                <button
-                  onClick={handleCloseCreateModal}
-                  className="close-button"
-                  aria-label="关闭"
-                >
-                  <i className="bi-x"></i>
-                </button>
-              </div>
-
-              {/* Placeholder for template creation form */}
-              <div className="modal-body">
-                <p>模板创建功能待实现</p>
-              </div>
-
-              {/* Close Button */}
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={handleCloseCreateModal}
-                >
-                  关闭
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Template Editor */}
+        <TemplateEditor
+          templateId={editingTemplateId}
+          gameGid={Number(gameGid)}
+          isOpen={editingTemplateId !== null || showCreateModal}
+          onClose={() => {
+            setEditingTemplateId(null);
+            setShowCreateModal(false);
+          }}
+          onSave={handleTemplateSave}
+          onDelete={handleTemplateDelete}
+        />
       </div>
 
       <ConfirmDialog
