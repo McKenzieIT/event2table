@@ -5,17 +5,9 @@ Flows Service Module
 
 流程/Canvas管理服务模块
 
-此模块导出flows_bp blueprint, 用于注册到Flask应用
+NOTE: flows_bp blueprint 已于 2026-03-19 移除
+Flow相关的API已迁移到 backend/api/routes/flows.py
+Service层逻辑保留在 flow_service.py
 """
 
-from flask import Blueprint
-
-# Create flows blueprint
-flows_bp = Blueprint('flows', __name__)
-
-# NOTE: routes.py已废弃, 不再导入
-# Flow相关的API已迁移到backend/api/routes/flows.py
-# from backend.services.flows import routes
-
-# Export blueprint
-__all__ = ['flows_bp']
+__all__ = []

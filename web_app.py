@@ -35,7 +35,8 @@ from flask_graphql import GraphQLView
 # Service Blueprints - from backend/services (standardized package imports)
 # NOTE: games_bp routes are now in api_bp (backend.api.routes.games)
 # Old games_bp from backend.services.games has conflicting routes - DO NOT USE
-from backend.services.events import events_bp  # event_nodes_bp removed 2026-03-01 (replaced by GraphQL + event_node_builder_bp)
+# NOTE: events_bp routes are now in api_bp (backend.api.routes.events)
+# Old events_bp from backend.services.events has been removed (2026-03-19)
 from backend.services.parameters import common_params_bp, parameter_aliases_bp
 from backend.services.canvas import canvas_bp
 from backend.services.cache_monitor import cache_monitor_bp
@@ -54,11 +55,7 @@ except ImportError:
     async_task_bp = None
     logger.warning("async_task_bp not found - async_tasks module not available")
 
-try:
-    from backend.services.flows import flows_bp
-except ImportError:
-    flows_bp = None
-    logger.warning("flows_bp not found - flows module not available")
+# flows_bp removed 2026-03-19 - migrated to backend/api/routes/flows.py
 
 try:
     from backend.services.hql import hql_bp
@@ -309,8 +306,7 @@ if async_task_bp:
     app.register_blueprint(async_task_bp)  # Async tasks
 if sql_optimizer_bp:
     app.register_blueprint(sql_optimizer_bp)  # SQL optimizer
-if flows_bp:
-    app.register_blueprint(flows_bp)  # Flows management
+# flows_bp removed 2026-03-19 - migrated to backend/api/routes/flows.py
 if hql_bp:
     app.register_blueprint(hql_bp)  # HQL management
 
