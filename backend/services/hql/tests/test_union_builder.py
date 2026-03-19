@@ -61,13 +61,13 @@ class TestUnionBuilder:
         fields = [Field(name="role_id", type="base")]
 
         union_sql = builder.build_union_with_partition_filter(
-            events, fields, partition_field="ds", partition_value="'${bizdate}'"
+            events, fields, partition_field="ds", partition_value="'${ds}'"
         )
 
         assert "UNION ALL" in union_sql
-        assert "ds = '${bizdate}'" in union_sql
+        assert "ds = '${ds}'" in union_sql
         # 每个子查询都应该有分区过滤
-        assert union_sql.count("ds = '${bizdate}'") == 2
+        assert union_sql.count("ds = '${ds}'") == 2
 
     def test_build_union_with_where(self):
         """测试带自定义WHERE条件的UNION"""

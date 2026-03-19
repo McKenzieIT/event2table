@@ -572,6 +572,50 @@ export const GET_TEMPLATE = gql`
   }
 `;
 
+export const CREATE_TEMPLATE = gql`
+  mutation CreateTemplate($name: String!, $content: String!, $category: String, $description: String) {
+    createTemplate(name: $name, content: $content, category: $category, description: $description) {
+      ok
+      template {
+        id
+        name
+        content
+        category
+        description
+        createdAt
+      }
+      errors
+    }
+  }
+`;
+
+export const UPDATE_TEMPLATE = gql`
+  mutation UpdateTemplate($id: Int!, $name: String, $content: String, $category: String, $description: String) {
+    updateTemplate(id: $id, name: $name, content: $content, category: $category, description: $description) {
+      ok
+      template {
+        id
+        name
+        content
+        category
+        description
+        updatedAt
+      }
+      errors
+    }
+  }
+`;
+
+export const DELETE_TEMPLATE = gql`
+  mutation DeleteTemplate($id: Int!) {
+    deleteTemplate(id: $id) {
+      ok
+      message
+      errors
+    }
+  }
+`;
+
 // ============================================================================
 // 节点管理 (Nodes)
 // ============================================================================

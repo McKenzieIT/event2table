@@ -88,7 +88,7 @@ class JoinBuilder:
             )
 
         # 值可以是任意字符串(由调用者确保安全)
-        # 这是HQL生成器, value可能包含占位符如'${bizdate}'
+        # 这是HQL生成器, value可能包含占位符如'${ds}'
 
     def build_join(
         self,
@@ -253,7 +253,7 @@ class JoinBuilder:
             # 安全: 这是HQL生成器, 用于构建Hive查询字符串
             # field已通过SQLValidator.validate_identifier()验证
             # operator已在VALID_OPERATORS白名单中验证
-            # value是调用者提供的值(可能包含HQL占位符如'${bizdate}')
+            # value是调用者提供的值(可能包含HQL占位符如'${ds}')
             where_parts.append(f"{field} {operator} {value}")
 
         where_clause = " AND ".join(where_parts)
@@ -271,7 +271,7 @@ class JoinBuilder:
         events: List[Event],
         join_conditions: List[Dict[str, Any]],
         partition_field: str = "ds",
-        partition_value: str = "'${bizdate}'",
+        partition_value: str = "'${ds}'",
         join_type: str = "INNER",
         use_aliases: bool = False,
     ) -> str:

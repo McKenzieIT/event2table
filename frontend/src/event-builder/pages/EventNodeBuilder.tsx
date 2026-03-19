@@ -99,7 +99,7 @@ interface DragDropField {
   sourceId?: number | null;
 }
 
-export default function EventNodeBuilder(): React.JSX.Element {
+const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Element {
   // 路由和上下文
   const { currentGame } = (useOutletContext() as OutletContext) || {};
   const [searchParams] = useSearchParams();
@@ -644,4 +644,8 @@ export default function EventNodeBuilder(): React.JSX.Element {
       </div>
     </EventNodeBuilderErrorBoundary>
   );
-}
+});
+
+EventNodeBuilder.displayName = 'EventNodeBuilder';
+
+export default EventNodeBuilder;

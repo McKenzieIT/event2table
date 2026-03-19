@@ -51,7 +51,7 @@ import './FieldBuilder.css';
  * // With saved configuration
  * /field-builder?gameGid=10000147&configId=456
  */
-function FieldBuilder() {
+const FieldBuilder = React.memo(function FieldBuilder() {
   // URL parameters
   const { gameGid } = useParams();
   const navigate = useNavigate();
@@ -523,5 +523,7 @@ function FieldBuilder() {
     </div>
   );
 }
+
+FieldBuilder.displayName = 'FieldBuilder';
 
 export default FieldBuilder;

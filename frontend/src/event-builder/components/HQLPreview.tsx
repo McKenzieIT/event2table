@@ -85,7 +85,7 @@ export interface HQLPreviewRef {
 /**
  * HQL预览组件
  */
-const HQLPreview = forwardRef<HQLPreviewRef, HQLPreviewProps>(({
+const HQLPreview = React.memo(forwardRef<HQLPreviewRef, HQLPreviewProps>(({
   hqlContent = '',
   sqlMode = 'view',
   onModeChange,

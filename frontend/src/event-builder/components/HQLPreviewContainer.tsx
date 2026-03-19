@@ -129,7 +129,7 @@ export interface HQLPreviewContainerProps {
  * />
  * ```
  */
-export default function HQLPreviewContainer({
+const HQLPreviewContainer = React.memo(function HQLPreviewContainer({
   gameGid,
   event,
   fields = [],
@@ -272,7 +272,11 @@ export default function HQLPreviewContainer({
       onShowDetails={onShowDetails}
     />
   );
-}
+});
+
+HQLPreviewContainer.displayName = 'HQLPreviewContainer';
+
+export default HQLPreviewContainer;
 
 // ============================================
 // Export Types

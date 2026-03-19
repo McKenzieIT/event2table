@@ -62,7 +62,7 @@ def example_2_with_hql_generator():
     dml = dml_generator.generate_insert_overwrite(
         target_table="dwd.v_dwd_10000147_login_di",
         source_query=select_query,
-        partition_ds="${bizdate}",
+        partition_ds="${ds}",
         include_comments=True,
     )
 
@@ -117,9 +117,9 @@ def example_5_batch_insert():
     print("=" * 80)
 
     queries = [
-        "SELECT role_id, 'login' AS event_type FROM ods_login WHERE ds = '${bizdate}'",
-        "SELECT role_id, 'logout' AS event_type FROM ods_logout WHERE ds = '${bizdate}'",
-        "SELECT role_id, 'purchase' AS event_type FROM ods_purchase WHERE ds = '${bizdate}'",
+        "SELECT role_id, 'login' AS event_type FROM ods_login WHERE ds = '${ds}'",
+        "SELECT role_id, 'logout' AS event_type FROM ods_logout WHERE ds = '${ds}'",
+        "SELECT role_id, 'purchase' AS event_type FROM ods_purchase WHERE ds = '${ds}'",
     ]
 
     dml = DMLBuilderFactory.create_batch_insert(
@@ -188,7 +188,7 @@ def example_7_real_world_scenario():
     dml = dml_generator.generate_insert_overwrite(
         target_table=target_table,
         source_query=select_query,
-        partition_ds="${bizdate}",
+        partition_ds="${ds}",
         include_comments=True,
     )
 
@@ -196,7 +196,7 @@ def example_7_real_world_scenario():
     print("-" * 80)
     print(f"源表: {source_table}")
     print(f"目标表: {target_table}")
-    print("分区: ds='${bizdate}'")
+    print("分区: ds='${ds}'")
     print("-" * 80)
     print(dml)
     print()

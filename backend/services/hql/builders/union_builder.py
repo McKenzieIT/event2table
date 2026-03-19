@@ -160,7 +160,7 @@ class UnionBuilder:
         events: List[Event],
         fields: List[Field],
         partition_field: str = "ds",
-        partition_value: str = "'${bizdate}'",
+        partition_value: str = "'${ds}'",
         use_aliases: bool = False,
     ) -> str:
         """
@@ -415,11 +415,11 @@ class UnionBuilder:
 
         # 安全的partition_filter，使用现有方法
         # 解析partition_field和partition_value
-        # 格式: "ds = '${bizdate}'"
+        # 格式: "ds = '${ds}'"
         if '=' in partition_filter:
             parts = partition_filter.split('=', 1)
             partition_field = parts[0].strip()
-            partition_value = parts[1].strip() if len(parts) > 1 else "'${bizdate}'"
+            partition_value = parts[1].strip() if len(parts) > 1 else "'${ds}'"
 
             # 验证partition_field为SQL标识符
             SQLValidator.validate_identifier(partition_field, "partition_field")
