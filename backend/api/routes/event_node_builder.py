@@ -81,12 +81,12 @@ def preview_hql():
         events_data = [event_obj]
 
         # 转换字段格式(使用 adapter)
-        fields_v2 = []
+        fields = []
         for idx, field in enumerate(fields):
             try:
                 logger.debug(f"Processing field {idx}: {field}")
                 field_obj = adapter.field_from_project(field)
-                fields_v2.append(field_obj)
+                fields.append(field_obj)
             except ValueError as e:
                 logger.error(f"Invalid field at index {idx}: {field}, error: {str(e)}")
                 return json_error_response(
@@ -94,21 +94,21 @@ def preview_hql():
                 )
 
         # 转换 WHERE 条件格式(使用 adapter)
-        where_conditions_v2 = []
+        where_conditions = []
         if filter_conditions:
             conditions = filter_conditions.get("conditions", [])
             for cond in conditions:
                 try:
                     condition_obj = adapter.condition_from_project(cond)
-                    where_conditions_v2.append(condition_obj)
+                    where_conditions.append(condition_obj)
                 except (KeyError, ValueError) as e:
                     return json_error_response(f"Invalid condition: {str(e)}", status_code=400)
 
         # 生成 HQL
         hql_result = generator.generate(
             events_data,  # 位置参数1: events
-            fields_v2,  # 位置参数2: fields
-            where_conditions_v2,  # 位置参数3: conditions
+            fields,  # 位置参数2: fields
+            where_conditions,  # 位置参数3: conditions
             mode="single",  # 关键字参数
             sql_mode=sql_mode.upper(),
             include_comments=True,

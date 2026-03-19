@@ -100,5 +100,5 @@ export * from './fieldBuilder';
 export * from './whereBuilder';
 
 // ========== API Client Types - API客户端类型 ==========
-export type { GenerateRequest as ApiGenerateRequest, GenerateResponse as ApiGenerateResponse, DebugTraceResponse } from '../api/hqlApiV2';
+export type { GenerateRequest as ApiGenerateRequest, GenerateResponse as ApiGenerateResponse, DebugTraceResponse } from '../api/hqlApi';
 

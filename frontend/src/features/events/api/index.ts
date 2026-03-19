@@ -4,4 +4,4 @@
  * Centralized exports for all events API functions
  */
 
-export * from './hqlApiV2';
+export * from '@shared/api/hqlApi';

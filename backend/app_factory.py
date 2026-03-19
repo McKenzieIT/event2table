@@ -154,7 +154,7 @@ def _init_extensions(app):
 def _register_blueprints(app):
     """Register all API and service blueprints."""
     from backend.api import api_bp
-    from backend.api.routes.hql_preview_v2 import hql_preview_v2_bp
+    from backend.api.routes.hql_preview import hql_preview_bp
     from backend.api.routes.v1_adapter import v1_adapter_bp
     from backend.api.routes.health import health_bp
     from backend.api.routes.bulk_operations import bulk_bp
@@ -167,7 +167,7 @@ def _register_blueprints(app):
     # Core API blueprints
     app.register_blueprint(health_bp)
     app.register_blueprint(api_bp)
-    app.register_blueprint(hql_preview_v2_bp)
+    app.register_blueprint(hql_preview_bp)
     app.register_blueprint(v1_adapter_bp)
 
     # Migrated service blueprints (from backend/api/routes/)

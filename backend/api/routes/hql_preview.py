@@ -57,10 +57,10 @@ from backend.services.hql.adapters.project_adapter import ProjectAdapter
 # Import HQL V2 core service
 from backend.services.hql.core.generator import HQLGenerator
 
-hql_preview_v2_bp = Blueprint("hql_preview_v2", __name__)
+hql_preview_bp = Blueprint("hql_preview", __name__)
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/generate", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/generate", methods=["POST"])
 def generate_hql_v2():
     """
     V2版本的HQL生成API
@@ -214,7 +214,7 @@ def generate_hql_v2():
         return handle_hql_generation_error(e, "generate_hql_v2")
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/generate-debug", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/generate-debug", methods=["POST"])
 def generate_hql_debug():
     """
     V2版本的HQL生成API - 调试模式
@@ -317,7 +317,7 @@ def generate_hql_debug():
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/validate", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/validate", methods=["POST"])
 def validate_hql():
     """
     验证HQL语法（完整版本）
@@ -396,7 +396,7 @@ def validate_hql():
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/recommend-fields", methods=["GET"])
+@hql_preview_bp.route("/hql-preview/api/recommend-fields", methods=["GET"])
 def recommend_fields():
     """
     推荐字段（智能推荐）
@@ -499,7 +499,7 @@ def recommend_fields():
         )
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/generate-incremental", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/generate-incremental", methods=["POST"])
 def generate_hql_incremental():
     """
     增量生成HQL API
@@ -618,7 +618,7 @@ def generate_hql_incremental():
         )
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/status", methods=["GET"])
+@hql_preview_bp.route("/hql-preview/api/status", methods=["GET"])
 def api_status():
     """
     API状态检查
@@ -655,7 +655,7 @@ def api_status():
     )
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/cache-stats", methods=["GET"])
+@hql_preview_bp.route("/hql-preview/api/cache-stats", methods=["GET"])
 def cache_stats():
     """
     缓存统计信息API
@@ -684,7 +684,7 @@ def cache_stats():
     )
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/cache-clear", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/cache-clear", methods=["POST"])
 def cache_clear():
     """
     清空缓存API
@@ -701,7 +701,7 @@ def cache_clear():
     return jsonify(success_response(data={"message": "Cache cleared successfully"})[0])
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/analyze", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/analyze", methods=["POST"])
 def analyze_hql():
     """
     HQL性能分析API
@@ -776,7 +776,7 @@ def analyze_hql():
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/preview", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/preview", methods=["POST"])
 def preview_hql():
     """
     简化版HQL预览API
@@ -933,7 +933,7 @@ def preview_hql():
 # ============================================================================
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/history/save", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/history/save", methods=["POST"])
 def save_history():
     """
     保存HQL生成历史（增强版）
@@ -1029,7 +1029,7 @@ def save_history():
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/history/list", methods=["GET"])
+@hql_preview_bp.route("/hql-preview/api/history/list", methods=["GET"])
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_history_list():
     """
@@ -1084,7 +1084,7 @@ def get_history_list():
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/history/<int:history_id>", methods=["GET"])
+@hql_preview_bp.route("/hql-preview/api/history/<int:history_id>", methods=["GET"])
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_history_by_id(history_id: int):
     """
@@ -1144,7 +1144,7 @@ def get_history_by_id(history_id: int):
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/history/<int:history_id>/restore", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/history/<int:history_id>/restore", methods=["POST"])
 def restore_history(history_id: int):
     """
     恢复历史版本
@@ -1191,7 +1191,7 @@ def restore_history(history_id: int):
         )
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/history/<int:history_id>", methods=["DELETE"])
+@hql_preview_bp.route("/hql-preview/api/history/<int:history_id>", methods=["DELETE"])
 def delete_history(history_id: int):
     """
     删除历史记录
@@ -1229,7 +1229,7 @@ def delete_history(history_id: int):
         )
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/history/search", methods=["POST"])
+@hql_preview_bp.route("/hql-preview/api/history/search", methods=["POST"])
 def search_history():
     """
     搜索HQL历史记录（支持模糊搜索和多条件过滤）
@@ -1350,7 +1350,7 @@ def search_history():
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
 
-@hql_preview_v2_bp.route("/hql-preview-v2/api/history/global", methods=["GET"])
+@hql_preview_bp.route("/hql-preview/api/history/global", methods=["GET"])
 def global_search_history():
     """
     全局搜索HQL历史记录（跨所有用户和会话）

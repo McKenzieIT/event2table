@@ -477,8 +477,8 @@ def test_canvas_system():
     # Test 5.3: Real-time HQL preview
     print("\n5.3 Testing Real-time HQL Preview...")
     try:
-        from backend.api.routes.hql_preview_v2 import hql_preview_v2_bp
-        assert hql_preview_v2_bp is not None, "HQL preview v2 blueprint not found"
+        from backend.api.routes.hql_preview import hql_preview_bp
+        assert hql_preview_bp is not None, "HQL preview blueprint not found"
         log_test("Canvas System", "Real-time HQL preview API available", "PASS")
     except Exception as e:
         log_test("Canvas System", "Real-time HQL preview API available", "FAIL", str(e))

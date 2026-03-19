@@ -1,7 +1,7 @@
 /**
- * HQL V2 API客户端
+ * HQL API客户端
  *
- * 提供与HQL V2 API交互的方法
+ * 提供与HQL API交互的方法
  */
 
 import type { 
@@ -144,12 +144,12 @@ interface ClearCacheResponse {
 }
 
 /**
- * HQL V2 API客户端类
- * HQL V2 API Client Class
+ * HQL API客户端类
+ * HQL API Client Class
  *
  * @example
  * ```ts
- * const client = new HQLApiV2Client('/hql-preview-v2');
+ * const client = new HQLApiClient('/hql-preview-v2');
  * const result = await client.generate({
  *   events: [{ game_gid: 1001, event_id: 1 }],
  *   fields: [{ fieldName: 'user_id', fieldType: 'base' }]
@@ -157,7 +157,7 @@ interface ClearCacheResponse {
  * console.log(result.data.hql);
  * ```
  */
-class HQLApiV2Client {
+class HQLApiClient {
   private baseUrl: string;
 
   /**
@@ -374,7 +374,7 @@ class HQLApiV2Client {
 }
 
 // 导出单例实例
-export const hqlApiV2 = new HQLApiV2Client();
+export const hqlApi = new HQLApiClient();
 
 // 导出类型
 export type {
@@ -390,6 +390,6 @@ export type {
 };
 
 // 导出类（用于创建自定义实例）
-export { HQLApiV2Client };
+export { HQLApiClient };
 
-export default hqlApiV2;
+export default hqlApi;
