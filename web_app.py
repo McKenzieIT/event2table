@@ -37,10 +37,21 @@ from flask_graphql import GraphQLView
 # Old games_bp from backend.services.games has conflicting routes - DO NOT USE
 # NOTE: events_bp routes are now in api_bp (backend.api.routes.events)
 # Old events_bp from backend.services.events has been removed (2026-03-19)
-from backend.services.parameters import common_params_bp, parameter_aliases_bp
-from backend.services.canvas import canvas_bp
-from backend.services.cache_monitor import cache_monitor_bp
-from backend.services.event_node_builder import event_node_builder_bp  # Event Node Builder API
+# NOTE: The following blueprints have been migrated to backend/api/routes/ (2026-03-19)
+# - common_params_bp → backend.api.routes.common_params
+# - parameter_aliases_bp → backend.api.routes.parameter_aliases
+# - canvas_bp → backend.api.routes.canvas
+# - cache_monitor_bp → backend.api.routes.cache_monitor
+# - event_node_builder_bp → backend.api.routes.event_node_builder
+# - bulk_bp → backend.api.routes.bulk_operations
+
+# Import migrated blueprints from backend/api/routes
+from backend.api.routes.bulk_operations import bulk_bp
+from backend.api.routes.cache_monitor import cache_monitor_bp
+from backend.api.routes.canvas import canvas_bp
+from backend.api.routes.event_node_builder import event_node_builder_bp
+from backend.api.routes.common_params import common_params_bp
+from backend.api.routes.parameter_aliases import parameter_aliases_bp
 
 # Optional blueprints (may not exist in all deployments)
 try:
@@ -64,7 +75,7 @@ except ImportError:
     logger.warning("hql_bp not found - hql module not available")
 
 try:
-    from backend.services.bulk_operations import bulk_bp
+    from backend.api.routes.bulk_operations import bulk_bp
 except ImportError:
     bulk_bp = None
     logger.warning("bulk_bp not found - bulk_operations module not available")
@@ -293,15 +304,18 @@ app.register_blueprint(hql_preview_v2_bp)  # HQL Preview V2 API (/hql-preview-v2
 app.register_blueprint(v1_adapter_bp)  # V1-to-V2 Adapter API (/api/v1-adapter/*) (2026-02-17)
 app.register_blueprint(event_node_builder_bp)  # Event Node Builder API (/event_node_builder/*)
 
+# Migrated blueprints from backend/services to backend/api/routes (2026-03-19)
+app.register_blueprint(common_params_bp)  # Common parameters (/api/common-params/*)
+app.register_blueprint(parameter_aliases_bp)  # Parameter aliases (/api/parameter-aliases/*)
+app.register_blueprint(canvas_bp)  # Canvas pages and API (/canvas/*, /api/canvas/*)
+app.register_blueprint(cache_monitor_bp)  # Cache monitoring (/admin/cache/*)
+app.register_blueprint(bulk_bp)  # Bulk operations
+
 # Register GraphQL API endpoint
 app.add_url_rule('/api/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True), methods=['GET', 'POST'])
 logger.info("✅ GraphQL API registered at /api/graphql with GraphiQL IDE")
-if bulk_bp:
-    app.register_blueprint(bulk_bp)  # Bulk operations
-app.register_blueprint(cache_monitor_bp)  # Cache monitoring (/admin/cache/*)
-app.register_blueprint(canvas_bp)  # Canvas pages and API (/canvas/*, /api/canvas/*)
 # event_nodes_bp removed 2026-03-01 (replaced by GraphQL + event_node_builder_bp)
-app.register_blueprint(parameter_aliases_bp)  # Parameter aliases
+app.register_blueprint(common_params_bp)  # Common parameters
 if async_task_bp:
     app.register_blueprint(async_task_bp)  # Async tasks
 if sql_optimizer_bp:
@@ -309,8 +323,6 @@ if sql_optimizer_bp:
 # flows_bp removed 2026-03-19 - migrated to backend/api/routes/flows.py
 if hql_bp:
     app.register_blueprint(hql_bp)  # HQL management
-
-app.register_blueprint(common_params_bp)
 
 # Register React shell LAST as catch-all for all frontend routes
 if react_bp:
