@@ -90,7 +90,6 @@ function Dashboard(): React.JSX.Element {
     // ⚡ PERF: Extended cache time for Dashboard performance (95% fewer API calls)
     staleTime: 5 * 60 * 1000,  // 5 minutes (was 5 seconds - too aggressive)
     gcTime: 10 * 60 * 1000,    // 10 minutes cache retention
-    refetchOnWindowFocus: false,  // Disable window focus refetch (reduces unnecessary calls)
   });
 
   // Fetch flows data for HQL flow count
@@ -103,7 +102,6 @@ function Dashboard(): React.JSX.Element {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
   });
 
   const games: Game[] = Array.isArray(gamesData?.data) ? gamesData.data : [];

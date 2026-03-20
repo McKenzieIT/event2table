@@ -7,6 +7,7 @@
 
 // 导出新增的通用工具
 export * from './commonUtils';
+export * from './errorHandler';
 
 // 导出现有的工具函数
 export * from './apiValidator';

@@ -2486,6 +2486,462 @@ Week 13-20:P2 - DDD架构迁移
 
 ---
 
-**文档版本**: 8.0
-**最后更新**: 2026-02-23
+## 异步任务模块 ⭐ 新增 (v2.1.0)
+
+> **🆕 2026-03-20**: 异步任务功能已上线，支持后台执行耗时操作
+
+### 概述
+
+异步任务模块允许系统在后台执行耗时操作（如HQL生成、数据导入导出等），避免长时间阻塞HTTP请求，提升用户体验和系统性能。
+
+### 架构设计
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        异步任务架构                          │
+└─────────────────────────────────────────────────────────────┘
+
+┌──────────────┐
+│   前端客户端  │
+└──────┬───────┘
+       │ 1. 提交任务
+       ↓
+┌─────────────────────────────────────────────────────────────┐
+│                      API Layer                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ POST /api/async-tasks                                 │  │
+│  │ - 接收任务请求                                        │  │
+│  │ - 验证任务参数                                        │  │
+│  │ - 生成task_id                                         │  │
+│  │ - 返回任务ID                                          │  │
+│  └──────────────────────────────────────────────────────┘  │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ 2. 提交到队列
+                       ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Task Queue (Redis)                       │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ - 任务队列（优先级队列）                               │  │
+│  │ - 任务状态存储                                        │  │
+│  │ - 任务结果缓存                                        │  │
+│  └──────────────────────────────────────────────────────┘  │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ 3. Worker消费
+                       ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Task Workers                             │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ Worker Pool (多线程/多进程)                            │  │
+│  │ - Worker 1: HQL生成任务                                │  │
+│  │ - Worker 2: 数据导入任务                               │  │
+│  │ - Worker 3: 数据导出任务                               │  │
+│  │ - Worker 4: 批量操作任务                               │  │
+│  └──────────────────────────────────────────────────────┘  │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ 4. 执行任务
+                       ↓
+┌─────────────────────────────────────────────────────────────┐
+│                   Task Executors                            │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ HQLTaskExecutor                                       │  │
+│  │ - 调用HQLGenerator生成HQL                             │  │
+│  │ - 更新任务进度                                        │  │
+│  │ - 保存任务结果                                        │  │
+│  └──────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ ImportTaskExecutor                                    │  │
+│  │ - 解析导入文件                                        │  │
+│  │ - 批量插入数据库                                      │  │
+│  │ - 返回导入统计                                        │  │
+│  └──────────────────────────────────────────────────────┘  │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ 5. 更新状态
+                       ↓
+┌─────────────────────────────────────────────────────────────┐
+│                  Task Storage                               │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ - 任务状态（pending/running/completed/failed）        │  │
+│  │ - 任务进度（0-100%）                                   │  │
+│  │ - 任务结果                                            │  │
+│  │ - 错误信息                                            │  │
+│  └──────────────────────────────────────────────────────┘  │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ 6. 回调通知
+                       ↓
+┌─────────────────────────────────────────────────────────────┐
+│                   Callback Service                          │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ - 发送HTTP回调                                        │  │
+│  │ - 重试机制                                            │  │
+│  │ - 错误处理                                            │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 核心组件
+
+#### 1. TaskManager（任务管理器）
+
+**职责**:
+- 接收任务请求
+- 验证任务参数
+- 生成任务ID
+- 提交任务到队列
+- 查询任务状态
+- 获取任务结果
+
+**文件**: `backend/services/async_tasks/task_manager.py`
+
+```python
+class TaskManager:
+    """异步任务管理器"""
+    
+    def __init__(self):
+        self.queue = TaskQueue()
+        self.storage = TaskStorage()
+    
+    def submit_task(self, task_type: str, params: dict, 
+                   callback_url: str = None, priority: str = 'normal') -> str:
+        """
+        提交异步任务
+        
+        Args:
+            task_type: 任务类型
+            params: 任务参数
+            callback_url: 回调URL
+            priority: 优先级（low/normal/high）
+            
+        Returns:
+            task_id: 任务ID
+        """
+        # 1. 验证任务类型
+        if task_type not in TASK_TYPES:
+            raise ValueError(f"Invalid task type: {task_type}")
+        
+        # 2. 生成任务ID
+        task_id = generate_task_id()
+        
+        # 3. 创建任务记录
+        task = Task(
+            task_id=task_id,
+            task_type=task_type,
+            params=params,
+            status='pending',
+            priority=priority,
+            callback_url=callback_url
+        )
+        
+        # 4. 保存任务记录
+        self.storage.save_task(task)
+        
+        # 5. 提交到队列
+        self.queue.enqueue(task)
+        
+        return task_id
+    
+    def get_task_status(self, task_id: str) -> Task:
+        """查询任务状态"""
+        return self.storage.get_task(task_id)
+    
+    def get_task_result(self, task_id: str) -> dict:
+        """获取任务结果"""
+        task = self.storage.get_task(task_id)
+        if task.status != 'completed':
+            raise ValueError("Task not completed")
+        return task.result
+```
+
+#### 2. TaskQueue（任务队列）
+
+**职责**:
+- 管理任务队列
+- 支持优先级
+- 任务调度
+
+**文件**: `backend/services/async_tasks/task_queue.py`
+
+```python
+class TaskQueue:
+    """任务队列（基于Redis）"""
+    
+    def __init__(self):
+        self.redis = get_redis_connection()
+    
+    def enqueue(self, task: Task):
+        """将任务加入队列"""
+        # 根据优先级选择队列
+        queue_name = f"task_queue:{task.priority}"
+        
+        # 序列化任务
+        task_data = task.model_dump_json()
+        
+        # 加入队列
+        self.redis.lpush(queue_name, task_data)
+    
+    def dequeue(self, priority: str = None) -> Task:
+        """从队列取出任务"""
+        # 按优先级顺序检查队列
+        priorities = ['high', 'normal', 'low']
+        
+        for p in priorities:
+            if priority and p != priority:
+                continue
+            
+            queue_name = f"task_queue:{p}"
+            task_data = self.redis.rpop(queue_name)
+            
+            if task_data:
+                return Task.model_validate_json(task_data)
+        
+        return None
+```
+
+#### 3. TaskWorker（任务Worker）
+
+**职责**:
+- 从队列消费任务
+- 执行任务
+- 更新任务状态
+- 保存任务结果
+
+**文件**: `backend/services/async_tasks/task_worker.py`
+
+```python
+class TaskWorker:
+    """任务Worker"""
+    
+    def __init__(self, worker_id: str):
+        self.worker_id = worker_id
+        self.queue = TaskQueue()
+        self.storage = TaskStorage()
+        self.executors = {
+            'hql_generation': HQLTaskExecutor(),
+            'data_import': ImportTaskExecutor(),
+            'data_export': ExportTaskExecutor(),
+            'batch_operation': BatchTaskExecutor(),
+            'cache_warmup': CacheWarmupExecutor()
+        }
+    
+    def run(self):
+        """运行Worker"""
+        while True:
+            try:
+                # 1. 从队列获取任务
+                task = self.queue.dequeue()
+                if not task:
+                    time.sleep(1)
+                    continue
+                
+                # 2. 更新任务状态为running
+                task.status = 'running'
+                task.worker_id = self.worker_id
+                task.started_at = datetime.now()
+                self.storage.update_task(task)
+                
+                # 3. 获取执行器
+                executor = self.executors.get(task.task_type)
+                if not executor:
+                    raise ValueError(f"No executor for task type: {task.task_type}")
+                
+                # 4. 执行任务
+                result = executor.execute(task.params)
+                
+                # 5. 更新任务状态为completed
+                task.status = 'completed'
+                task.result = result
+                task.completed_at = datetime.now()
+                self.storage.update_task(task)
+                
+                # 6. 发送回调
+                if task.callback_url:
+                    self._send_callback(task)
+                
+            except Exception as e:
+                # 任务失败
+                task.status = 'failed'
+                task.error = str(e)
+                task.completed_at = datetime.now()
+                self.storage.update_task(task)
+                logger.error(f"Task {task.task_id} failed: {e}")
+    
+    def _send_callback(self, task: Task):
+        """发送回调通知"""
+        try:
+            requests.post(
+                task.callback_url,
+                json={
+                    'task_id': task.task_id,
+                    'status': task.status,
+                    'result': task.result,
+                    'completed_at': task.completed_at.isoformat()
+                },
+                timeout=10
+            )
+        except Exception as e:
+            logger.error(f"Callback failed for task {task.task_id}: {e}")
+```
+
+#### 4. TaskExecutor（任务执行器）
+
+**职责**:
+- 执行具体任务逻辑
+- 更新任务进度
+- 返回执行结果
+
+**文件**: `backend/services/async_tasks/executors/hql_executor.py`
+
+```python
+class HQLTaskExecutor:
+    """HQL生成任务执行器"""
+    
+    def __init__(self):
+        self.hql_generator = HQLGenerator()
+    
+    def execute(self, params: dict) -> dict:
+        """
+        执行HQL生成任务
+        
+        Args:
+            params: 任务参数
+                - event_id: 事件ID
+                - mode: 生成模式（join/union/single）
+                - parameters: 参数配置
+        
+        Returns:
+            dict: 执行结果
+                - hql: 生成的HQL
+                - execution_time: 执行时间（毫秒）
+                - row_count: 行数
+        """
+        start_time = time.time()
+        
+        # 1. 生成HQL
+        hql = self.hql_generator.generate(
+            event_id=params['event_id'],
+            mode=params['mode'],
+            parameters=params.get('parameters', {})
+        )
+        
+        # 2. 估算行数
+        row_count = self._estimate_row_count(hql)
+        
+        # 3. 计算执行时间
+        execution_time = int((time.time() - start_time) * 1000)
+        
+        return {
+            'hql': hql,
+            'execution_time': execution_time,
+            'row_count': row_count
+        }
+```
+
+### 任务类型
+
+| 任务类型 | 执行器 | 预计耗时 | 描述 |
+|---------|--------|---------|------|
+| `hql_generation` | HQLTaskExecutor | 1-10秒 | HQL查询生成 |
+| `data_import` | ImportTaskExecutor | 10-60秒 | 数据导入 |
+| `data_export` | ExportTaskExecutor | 10-60秒 | 数据导出 |
+| `batch_operation` | BatchTaskExecutor | 5-30秒 | 批量操作 |
+| `cache_warmup` | CacheWarmupExecutor | 30-120秒 | 缓存预热 |
+
+### 任务状态流转
+
+```
+pending (待处理)
+    ↓
+running (执行中)
+    ↓
+    ├─→ completed (完成)
+    ├─→ failed (失败)
+    └─→ cancelled (取消)
+```
+
+### 性能指标
+
+| 指标 | 值 |
+|------|-----|
+| 任务提交延迟 | < 100ms |
+| 状态查询延迟 | < 50ms |
+| 结果获取延迟 | < 100ms |
+| 最大并发任务数 | 1000 |
+| 任务保留时间 | 7天 |
+| Worker数量 | 4个（可配置） |
+
+### API端点
+
+| 端点 | 方法 | 描述 |
+|------|------|------|
+| `/api/async-tasks` | POST | 提交异步任务 |
+| `/api/async-tasks/<task_id>` | GET | 查询任务状态 |
+| `/api/async-tasks/<task_id>/result` | GET | 获取任务结果 |
+| `/api/async-tasks` | GET | 获取任务列表 |
+| `/api/async-tasks/<task_id>` | DELETE | 取消任务 |
+| `/api/async-tasks/<task_id>/cleanup` | DELETE | 删除任务记录 |
+
+### 使用示例
+
+#### 提交HQL生成任务
+
+```python
+# 1. 提交任务
+response = requests.post('/api/async-tasks', json={
+    'task_type': 'hql_generation',
+    'params': {
+        'event_id': 123,
+        'mode': 'join'
+    }
+})
+task_id = response.json()['data']['task_id']
+
+# 2. 轮询状态
+while True:
+    response = requests.get(f'/api/async-tasks/{task_id}')
+    status = response.json()['data']['status']
+    
+    if status == 'completed':
+        # 3. 获取结果
+        result_response = requests.get(f'/api/async-tasks/{task_id}/result')
+        result = result_response.json()['data']['result']
+        print(f"HQL: {result['hql']}")
+        break
+    elif status == 'failed':
+        print("任务失败")
+        break
+    
+    time.sleep(2)
+```
+
+### 配置说明
+
+**环境变量**:
+
+```env
+# 异步任务配置
+ASYNC_TASK_ENABLED=true
+ASYNC_TASK_WORKER_COUNT=4
+ASYNC_TASK_MAX_CONCURRENT=1000
+ASYNC_TASK_RETENTION_DAYS=7
+ASYNC_TASK_CALLBACK_TIMEOUT=10
+```
+
+### 监控指标
+
+- 任务提交速率（每秒）
+- 任务完成速率（每秒）
+- 任务失败率
+- 平均任务执行时间
+- 队列长度
+- Worker活跃数
+
+### 相关文档
+
+- [API文档: 异步任务](../api/ASYNC-TASKS-API.md)
+- [用户手册: 异步任务](../user-guide/async-tasks.md)
+- [API总览](../api/README.md)
+
+---
+
+**文档版本**: 9.0
+**最后更新**: 2026-03-20
 **维护者**: Event2Table Development Team

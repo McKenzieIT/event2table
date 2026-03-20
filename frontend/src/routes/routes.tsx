@@ -42,6 +42,8 @@ import FieldBuilder from "@event-builder/pages/FieldBuilder";
 import Generate from "@analytics/pages/Generate";
 import GenerateResult from "@analytics/pages/GenerateResult";
 import AlterSql from "@analytics/pages/AlterSql";
+import { TaskManagementPage } from "@features/async-tasks/pages/TaskManagementPage";
+import { PerformancePage } from "@features/monitoring/pages/PerformancePage";
 // import AlterSqlBuilder from "@analytics/pages/AlterSqlBuilder";  // Temporarily disabled for debugging
 
 // Route configuration
@@ -86,6 +88,8 @@ export const routes: RouteObject[] = [
       { path: "generate/result", element: <GenerateResult /> },
       { path: "hql-results", element: <HqlResults /> },
       { path: "alter-sql/:paramId", element: <AlterSql /> },
+      { path: "async-tasks", element: <TaskManagementPage /> },
+      { path: "performance", element: <PerformancePage /> },
       // { path: "alter-sql-builder", element: <AlterSqlBuilder /> },  // Temporarily disabled for debugging
       { path: "parameter-analysis", element: <ParameterAnalysis /> },
       { path: "parameter-network", element: <ParameterNetwork /> },

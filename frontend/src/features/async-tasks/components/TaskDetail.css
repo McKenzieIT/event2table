@@ -1,0 +1,120 @@
+/**
+ * TaskDetail Component Styles
+ */
+
+.task-detail {
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.task-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.task-detail__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.task-detail__cancel-btn {
+  padding: 6px 12px;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  background-color: white;
+  color: #ef4444;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.task-detail__cancel-btn:hover:not(:disabled) {
+  background-color: #fef2f2;
+}
+
+.task-detail__cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-detail__content {
+  padding: 16px;
+}
+
+.task-detail__section {
+  margin-bottom: 16px;
+}
+
+.task-detail__section:last-child {
+  margin-bottom: 0;
+}
+
+.task-detail__section--error {
+  padding: 12px;
+  background-color: #fef2f2;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+}
+
+.task-detail__section-title {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.task-detail__error-message {
+  margin: 0;
+  font-size: 14px;
+  color: #dc2626;
+}
+
+.task-detail__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.task-detail__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-detail__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.task-detail__value {
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.task-detail__value--mono {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.task-detail__result {
+  margin: 0;
+  padding: 12px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #374151;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+}

@@ -1,0 +1,91 @@
+/**
+ * HQL Version Actions Component Styles
+ */
+
+.hql-version-actions {
+  margin-top: 1.5rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+}
+
+.actions-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.actions-header h6 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.save-version-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.save-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.selected-version-info,
+.compare-version-info {
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.info-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.version-number {
+  font-weight: 600;
+  color: var(--primary-600);
+}
+
+.version-date {
+  font-size: 0.8125rem;
+}
+
+.version-description {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}

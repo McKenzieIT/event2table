@@ -114,7 +114,6 @@ const GameManagementModal: React.FC<GameManagementModalProps> = ({ isOpen, onClo
     },
     enabled: isOpen,
     staleTime: 5 * 1000,  // ✅ 从30秒缩短到5秒，提升数据一致性
-    refetchOnWindowFocus: true,  // ✅ 启用窗口焦点刷新
   });
 
   const games: GameType[] = apiResponse?.data || [];

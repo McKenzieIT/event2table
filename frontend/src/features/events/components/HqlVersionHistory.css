@@ -1,0 +1,115 @@
+/**
+ * HQL Version History Component Styles
+ */
+
+.hql-version-history {
+  margin-top: 1.5rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+}
+
+.hql-version-history.loading,
+.hql-version-history.error,
+.hql-version-history.empty {
+  padding: 2rem;
+  text-align: center;
+}
+
+.version-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.version-history-header h6 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.version-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.version-item {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.version-item:hover {
+  border-color: var(--primary-300);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.version-item.selected {
+  border-color: var(--primary-500);
+  background: var(--primary-50);
+}
+
+.version-item.comparing {
+  border-color: var(--info-500);
+  background: var(--info-50);
+}
+
+.version-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.version-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.version-number {
+  font-weight: 600;
+  color: var(--primary-600);
+}
+
+.version-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.version-description {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.version-details {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-default);
+}
+
+.version-details .hql-content {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.version-meta {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+}

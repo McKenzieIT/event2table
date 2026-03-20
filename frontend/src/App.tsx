@@ -5,6 +5,7 @@
 import React from 'react';
 import { useRoutes, Navigate } from 'react-router-dom';
 import { routes } from './routes/routes';
+import { ErrorBoundary } from './shared/components/ErrorBoundary';
 
 /**
  * App Component
@@ -17,9 +18,9 @@ function App(): React.JSX.Element {
   const element = useRoutes(routes);
 
   return (
-    <>
+    <ErrorBoundary>
       {element || <Navigate to="/" replace />}
-    </>
+    </ErrorBoundary>
   );
 }
 

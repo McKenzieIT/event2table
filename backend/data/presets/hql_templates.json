@@ -1,0 +1,88 @@
+{
+  "templates": [
+    {
+      "name": "basic_login_event",
+      "display_name": "基础登录事件",
+      "category": "登录事件",
+      "subcategory": "基础登录",
+      "hql_content": "CREATE OR REPLACE VIEW dwd_login AS\nSELECT\n    ds,\n    role_id,\n    account_id,\n    utdid,\n    get_json_object(params, '$.zone_id') AS zone_id,\n    get_json_object(params, '$.level') AS level,\n    get_json_object(params, '$.ip') AS ip,\n    get_json_object(params, '$.device_id') AS device_id\nFROM ieu_ods.ods_all_view\nWHERE ds = '${bizdate}'\n  AND event = 'game.login';",
+      "variables": {
+        "bizdate": "业务日期"
+      },
+      "description": "基础登录事件模板,包含角色ID、账号ID、设备信息等基础字段",
+      "tags": ["常用", "登录", "基础"],
+      "is_featured": true,
+      "is_system": true
+    },
+    {
+      "name": "payment_event",
+      "display_name": "充值付费事件",
+      "category": "充值付费",
+      "subcategory": "充值",
+      "hql_content": "CREATE OR REPLACE VIEW dwd_payment AS\nSELECT\n    ds,\n    role_id,\n    account_id,\n    get_json_object(params, '$.amount') AS amount,\n    get_json_object(params, '$.currency') AS currency,\n    get_json_object(params, '$.product_id') AS product_id,\n    get_json_object(params, '$.payment_method') AS payment_method\nFROM ieu_ods.ods_all_view\nWHERE ds = '${bizdate}'\n  AND event = 'game.payment';",
+      "variables": {
+        "bizdate": "业务日期"
+      },
+      "description": "充值付费事件模板,包含金额、货币、商品ID、支付方式等字段",
+      "tags": ["常用", "付费", "充值"],
+      "is_featured": true,
+      "is_system": true
+    },
+    {
+      "name": "task_complete_event",
+      "display_name": "任务完成事件",
+      "category": "任务系统",
+      "subcategory": "任务",
+      "hql_content": "CREATE OR REPLACE VIEW dwd_task_complete AS\nSELECT\n    ds,\n    role_id,\n    account_id,\n    get_json_object(params, '$.task_id') AS task_id,\n    get_json_object(params, '$.task_type') AS task_type,\n    get_json_object(params, '$.task_level') AS task_level,\n    get_json_object(params, '$.reward') AS reward\nFROM ieu_ods.ods_all_view\nWHERE ds = '${bizdate}'\n  AND event = 'game.task_complete';",
+      "variables": {
+        "bizdate": "业务日期"
+      },
+      "description": "任务完成事件模板,包含任务ID、任务类型、任务等级、奖励等字段",
+      "tags": ["任务", "系统"],
+      "is_featured": false,
+      "is_system": true
+    },
+    {
+      "name": "equipment_equip_event",
+      "display_name": "装备穿戴事件",
+      "category": "装备系统",
+      "subcategory": "装备",
+      "hql_content": "CREATE OR REPLACE VIEW dwd_equipment_equip AS\nSELECT\n    ds,\n    role_id,\n    account_id,\n    get_json_object(params, '$.equipment_id') AS equipment_id,\n    get_json_object(params, '$.equipment_type') AS equipment_type,\n    get_json_object(params, '$.quality') AS quality,\n    get_json_object(params, '$.slot') AS slot\nFROM ieu_ods.ods_all_view\nWHERE ds = '${bizdate}'\n  AND event = 'game.equipment_equip';",
+      "variables": {
+        "bizdate": "业务日期"
+      },
+      "description": "装备穿戴事件模板,包含装备ID、装备类型、品质、装备槽位等字段",
+      "tags": ["装备", "系统"],
+      "is_featured": false,
+      "is_system": true
+    },
+    {
+      "name": "social_friend_add_event",
+      "display_name": "添加好友事件",
+      "category": "社交系统",
+      "subcategory": "好友",
+      "hql_content": "CREATE OR REPLACE VIEW dwd_social_friend_add AS\nSELECT\n    ds,\n    role_id,\n    account_id,\n    get_json_object(params, '$.friend_id') AS friend_id,\n    get_json_object(params, '$.friend_name') AS friend_name,\n    get_json_object(params, '$.source') AS source\nFROM ieu_ods.ods_all_view\nWHERE ds = '${bizdate}'\n  AND event = 'game.social_friend_add';",
+      "variables": {
+        "bizdate": "业务日期"
+      },
+      "description": "添加好友事件模板,包含好友ID、好友名称、添加来源等字段",
+      "tags": ["社交", "好友", "系统"],
+      "is_featured": false,
+      "is_system": true
+    },
+    {
+      "name": "level_up_event",
+      "display_name": "升级事件",
+      "category": "角色成长",
+      "subcategory": "升级",
+      "hql_content": "CREATE OR REPLACE VIEW dwd_level_up AS\nSELECT\n    ds,\n    role_id,\n    account_id,\n    get_json_object(params, '$.old_level') AS old_level,\n    get_json_object(params, '$.new_level') AS new_level,\n    get_json_object(params, '$.exp_gained') AS exp_gained,\n    get_json_object(params, '$.time_spent') AS time_spent\nFROM ieu_ods.ods_all_view\nWHERE ds = '${bizdate}'\n  AND event = 'game.level_up';",
+      "variables": {
+        "bizdate": "业务日期"
+      },
+      "description": "角色升级事件模板,包含旧等级、新等级、获得经验、耗时等字段",
+      "tags": ["常用", "角色", "升级"],
+      "is_featured": true,
+      "is_system": true
+    }
+  ]
+}

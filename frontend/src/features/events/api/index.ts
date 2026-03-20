@@ -5,3 +5,4 @@
  */
 
 export * from '@shared/api/hqlApi';
+export * from './hqlVersionApi';

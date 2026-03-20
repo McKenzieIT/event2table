@@ -24,6 +24,8 @@ import {
   Skeleton,
   EmptyState
 } from '@shared/ui';
+import { BatchEditModal } from '@features/events/components/BatchEditModal';
+import { BatchValidateModal } from '@features/events/components/BatchValidateModal';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import Table from '@shared/ui/Table';
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
@@ -120,6 +122,10 @@ function EventsList() {
     message: ''
   });
   const [pageSize, setPageSize] = useState<number>(10);
+  
+  // 批量操作模态框状态
+  const [showBatchEditModal, setShowBatchEditModal] = useState<boolean>(false);
+  const [showBatchValidateModal, setShowBatchValidateModal] = useState<boolean>(false);
 
   // ========== 游戏上下文检查 ==========
 
@@ -406,12 +412,26 @@ function EventsList() {
         </div>
         <div className="header-actions">
           {selectedEvents.length > 0 && (
-            <Button
-              variant="danger"
-              onClick={handleBatchDelete}
-            >
-              删除选中 ({selectedEvents.length})
-            </Button>
+            <>
+              <Button
+                variant="outline-primary"
+                onClick={() => setShowBatchEditModal(true)}
+              >
+                批量编辑
+              </Button>
+              <Button
+                variant="outline-info"
+                onClick={() => setShowBatchValidateModal(true)}
+              >
+                批量验证
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleBatchDelete}
+              >
+                删除选中 ({selectedEvents.length})
+              </Button>
+            </>
           )}
           <Button
             variant="outline-success"
@@ -631,6 +651,27 @@ function EventsList() {
         variant="danger"
         onConfirm={confirmState.onConfirm}
         onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+      />
+
+      {/* 批量编辑模态框 */}
+      <BatchEditModal
+        isOpen={showBatchEditModal}
+        onClose={() => setShowBatchEditModal(false)}
+        selectedEvents={filteredEvents.filter(e => selectedEvents.includes(e.id))}
+        categoryOptions={categories
+          .filter(c => c !== 'all')
+          .map(c => ({ value: parseInt(c), label: c }))}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['events', currentGame?.gid] });
+          setSelectedEvents([]);
+        }}
+      />
+
+      {/* 批量验证模态框 */}
+      <BatchValidateModal
+        isOpen={showBatchValidateModal}
+        onClose={() => setShowBatchValidateModal(false)}
+        selectedEvents={filteredEvents.filter(e => selectedEvents.includes(e.id))}
       />
     </div>
     );

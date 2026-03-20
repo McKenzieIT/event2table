@@ -1,0 +1,70 @@
+/**
+ * TaskList Component Styles
+ */
+
+.task-list {
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.task-list--loading,
+.task-list--empty {
+  padding: 48px;
+  text-align: center;
+}
+
+.task-list__loading,
+.task-list__empty p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.task-list__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.task-list__table thead {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.task-list__table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.task-list__table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+.task-list__table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.task-list__table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.task-list__cell {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.task-list__cell--mono {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+}
+
+.task-list__row {
+  cursor: pointer;
+}

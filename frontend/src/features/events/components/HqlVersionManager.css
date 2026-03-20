@@ -1,0 +1,18 @@
+/**
+ * HQL Version Manager Component Styles
+ */
+
+.hql-version-manager {
+  margin-top: 1.5rem;
+}
+
+.view-mode-toggle {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.view-mode-toggle .btn-group {
+  display: flex;
+  gap: 0.25rem;
+}
