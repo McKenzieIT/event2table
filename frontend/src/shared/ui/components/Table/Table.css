@@ -1,0 +1,675 @@
+/**
+ * Unified Table Component Styles
+ * 
+ * Features:
+ * - Responsive design with breakpoints
+ * - Theme customization (light/dark/auto)
+ * - Striped rows
+ * - Hover effects
+ * - Column pinning
+ * - Virtual scrolling support
+ * - Editable cells
+ */
+
+/* ============================================================================
+ * CSS Variables - Theme System
+ * ============================================================================ */
+
+:root {
+  /* Light Theme */
+  --table-bg: #ffffff;
+  --table-border: #e5e7eb;
+  --table-text: #111827;
+  --table-text-secondary: #6b7280;
+  --table-hover: #f9fafb;
+  --table-selected: #eff6ff;
+  --table-header-bg: #f9fafb;
+  --table-header-text: #111827;
+  --table-cell-bg: #ffffff;
+  --table-cell-edit-bg: #ffffff;
+  --table-input-bg: #ffffff;
+  --table-input-border: #d1d5db;
+  --table-input-focus: #3b82f6;
+  --table-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --table-resizer: #d1d5db;
+  --table-resizer-hover: #9ca3af;
+  --table-pagination-bg: #ffffff;
+  --table-pagination-border: #e5e7eb;
+  --table-pagination-text: #374151;
+  --table-pagination-hover: #f3f4f6;
+  --table-pagination-active: #3b82f6;
+  --table-pagination-active-text: #ffffff;
+}
+
+[data-theme='dark'] {
+  /* Dark Theme */
+  --table-bg: #1f2937;
+  --table-border: #374151;
+  --table-text: #f9fafb;
+  --table-text-secondary: #9ca3af;
+  --table-hover: #374151;
+  --table-selected: #1e3a8a;
+  --table-header-bg: #111827;
+  --table-header-text: #f9fafb;
+  --table-cell-bg: #1f2937;
+  --table-cell-edit-bg: #1f2937;
+  --table-input-bg: #374151;
+  --table-input-border: #4b5563;
+  --table-input-focus: #60a5fa;
+  --table-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --table-resizer: #4b5563;
+  --table-resizer-hover: #6b7280;
+  --table-pagination-bg: #1f2937;
+  --table-pagination-border: #374151;
+  --table-pagination-text: #e5e7eb;
+  --table-pagination-hover: #374151;
+  --table-pagination-active: #3b82f6;
+  --table-pagination-active-text: #ffffff;
+}
+
+/* ============================================================================
+ * Size Variants
+ * ============================================================================ */
+
+.table--sm {
+  --table-cell-padding: 0.375rem 0.75rem;
+  --table-font-size: 0.75rem;
+  --table-header-font-size: 0.75rem;
+  --table-border-width: 1px;
+}
+
+.table--md {
+  --table-cell-padding: 0.625rem 1rem;
+  --table-font-size: 0.875rem;
+  --table-header-font-size: 0.875rem;
+  --table-border-width: 1px;
+}
+
+.table--lg {
+  --table-cell-padding: 0.75rem 1.25rem;
+  --table-font-size: 1rem;
+  --table-header-font-size: 1rem;
+  --table-border-width: 1px;
+}
+
+/* ============================================================================
+ * Table Container & Wrapper
+ * ============================================================================ */
+
+.table-wrapper {
+  width: 100%;
+  background: var(--table-bg);
+  border-radius: 0.5rem;
+  box-shadow: var(--table-shadow);
+  overflow: hidden;
+}
+
+.table-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: none;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: var(--table-bg);
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--table-border);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--table-resizer-hover);
+}
+
+/* ============================================================================
+ * Main Table
+ * ============================================================================ */
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--table-bg);
+  font-size: var(--table-font-size);
+  color: var(--table-text);
+}
+
+/* ============================================================================
+ * Table Header
+ * ============================================================================ */
+
+.table-header {
+  background: var(--table-header-bg);
+  border-bottom: var(--table-border-width) solid var(--table-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.table-th {
+  padding: var(--table-cell-padding);
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--table-header-font-size);
+  color: var(--table-header-text);
+  border-right: var(--table-border-width) solid var(--table-border);
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-th:last-child {
+  border-right: none;
+}
+
+.table-th--sortable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.table-th--sortable:hover {
+  background: var(--table-hover);
+}
+
+.table-th-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.table-sort-indicator {
+  font-size: 0.75rem;
+  color: var(--table-text-secondary);
+  transition: transform 0.15s ease;
+}
+
+.table-th--sortable:hover .table-sort-indicator {
+  color: var(--table-text);
+}
+
+/* ============================================================================
+ * Column Resizer
+ * ============================================================================ */
+
+.table-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: transparent;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  transition: background 0.15s ease;
+}
+
+.table-resizer:hover,
+.table-resizer.isResizing {
+  background: var(--table-resizer);
+}
+
+/* ============================================================================
+ * Table Body
+ * ============================================================================ */
+
+.table-body {
+  background: var(--table-bg);
+}
+
+/* ============================================================================
+ * Table Rows
+ * ============================================================================ */
+
+.table-tr {
+  transition: background-color 0.15s ease;
+  border-bottom: var(--table-border-width) solid var(--table-border);
+}
+
+.table-tr:last-child {
+  border-bottom: none;
+}
+
+.table--hoverable .table-tr:hover {
+  background: var(--table-hover);
+}
+
+.table--striped .table-tr:nth-child(even) {
+  background: var(--table-hover);
+}
+
+.table--striped .table-tr:nth-child(even):hover {
+  background: var(--table-hover);
+  filter: brightness(0.95);
+}
+
+.table-tr--selected {
+  background: var(--table-selected) !important;
+}
+
+.table-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: var(--table-border-width) solid var(--table-border);
+  transition: background-color 0.15s ease;
+}
+
+.table-row:hover {
+  background: var(--table-hover);
+}
+
+.table-row--selected {
+  background: var(--table-selected) !important;
+}
+
+.table-row-wrapper {
+  width: 100%;
+}
+
+/* ============================================================================
+ * Table Cells
+ * ============================================================================ */
+
+.table-td,
+.table-cell {
+  padding: var(--table-cell-padding);
+  text-align: left;
+  color: var(--table-text);
+  border-right: var(--table-border-width) solid var(--table-border);
+  background: var(--table-cell-bg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-td:last-child,
+.table-cell:last-child {
+  border-right: none;
+}
+
+.table-cell {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Text Alignment */
+.table-th--left,
+.table-td--left,
+.table-cell--left {
+  text-align: left;
+}
+
+.table-th--center,
+.table-td--center,
+.table-cell--center {
+  text-align: center;
+  justify-content: center;
+}
+
+.table-th--right,
+.table-td--right,
+.table-cell--right {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+/* ============================================================================
+ * Column Pinning
+ * ============================================================================ */
+
+.table-th--pinned,
+.table-td--pinned,
+.table-cell--pinned {
+  position: sticky;
+  z-index: 10;
+  background: var(--table-cell-bg);
+}
+
+.table-th--pinned-left,
+.table-td--pinned-left,
+.table-cell--pinned-left {
+  left: 0;
+  border-right: 2px solid var(--table-border);
+}
+
+.table-th--pinned-right,
+.table-td--pinned-right,
+.table-cell--pinned-right {
+  right: 0;
+  border-left: 2px solid var(--table-border);
+}
+
+.table-header .table-th--pinned {
+  z-index: 30;
+}
+
+/* ============================================================================
+ * Editable Cells
+ * ============================================================================ */
+
+.table-cell-edit {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.table-input {
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  font-size: var(--table-font-size);
+  border: 1px solid var(--table-input-border);
+  border-radius: 0.25rem;
+  background: var(--table-input-bg);
+  color: var(--table-text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.table-input:focus {
+  border-color: var(--table-input-focus);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.table-input::placeholder {
+  color: var(--table-text-secondary);
+}
+
+/* ============================================================================
+ * Checkbox
+ * ============================================================================ */
+
+.table-checkbox {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--table-pagination-active);
+}
+
+/* ============================================================================
+ * Loading State
+ * ============================================================================ */
+
+.table-loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--table-text-secondary);
+}
+
+.table-spinner {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto;
+  border: 3px solid var(--table-border);
+  border-top-color: var(--table-pagination-active);
+  border-radius: 50%;
+  animation: table-spin 0.6s linear infinite;
+}
+
+@keyframes table-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+ * Empty State
+ * ============================================================================ */
+
+.table-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--table-text-secondary);
+}
+
+.table-empty-message {
+  font-size: 0.875rem;
+  color: var(--table-text-secondary);
+}
+
+/* ============================================================================
+ * Pagination
+ * ============================================================================ */
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--table-pagination-bg);
+  border-top: var(--table-border-width) solid var(--table-pagination-border);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pagination-total {
+  font-size: 0.875rem;
+  color: var(--table-pagination-text);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pagination-button {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: var(--table-pagination-text);
+  background: var(--table-pagination-bg);
+  border: 1px solid var(--table-pagination-border);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background: var(--table-pagination-hover);
+  border-color: var(--table-resizer);
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-button.active {
+  background: var(--table-pagination-active);
+  color: var(--table-pagination-active-text);
+  border-color: var(--table-pagination-active);
+}
+
+.pagination-size-changer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-select {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  color: var(--table-pagination-text);
+  background: var(--table-pagination-bg);
+  border: 1px solid var(--table-pagination-border);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.pagination-select:focus {
+  border-color: var(--table-pagination-active);
+}
+
+.pagination-jumper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--table-pagination-text);
+}
+
+.pagination-input {
+  width: 3rem;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--table-pagination-text);
+  background: var(--table-pagination-bg);
+  border: 1px solid var(--table-pagination-border);
+  border-radius: 0.25rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.pagination-input:focus {
+  border-color: var(--table-pagination-active);
+}
+
+.pagination-go-button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* ============================================================================
+ * Variants
+ * ============================================================================ */
+
+/* Bordered */
+.table--bordered {
+  border: var(--table-border-width) solid var(--table-border);
+}
+
+.table--bordered .table-th,
+.table--bordered .table-td {
+  border: var(--table-border-width) solid var(--table-border);
+}
+
+/* Compact */
+.table--compact {
+  --table-cell-padding: 0.25rem 0.5rem;
+  --table-font-size: 0.75rem;
+  --table-header-font-size: 0.75rem;
+}
+
+/* Minimal */
+.table--minimal .table-header {
+  border-bottom: none;
+}
+
+.table--minimal .table-th {
+  border-right: none;
+  font-weight: 500;
+}
+
+.table--minimal .table-td {
+  border-right: none;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.table--minimal .table-tr:last-child .table-td {
+  border-bottom: none;
+}
+
+/* ============================================================================
+ * Responsive Design
+ * ============================================================================ */
+
+@media (max-width: 768px) {
+  .table-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-controls {
+    justify-content: center;
+  }
+
+  .pagination-size-changer,
+  .pagination-jumper {
+    justify-content: center;
+  }
+
+  .table--lg {
+    --table-cell-padding: 0.5rem 0.75rem;
+    --table-font-size: 0.875rem;
+    --table-header-font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-pagination {
+    padding: 0.5rem;
+  }
+
+  .pagination-button {
+    min-width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.75rem;
+  }
+
+  .pagination-total,
+  .pagination-jumper {
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================================================
+ * Accessibility
+ * ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .table-tr,
+  .table-row,
+  .table-th--sortable,
+  .table-input,
+  .pagination-button {
+    transition: none;
+  }
+
+  .table-spinner {
+    animation: none;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.table-th--sortable:focus-visible,
+.table-button:focus-visible,
+.table-input:focus-visible,
+.pagination-button:focus-visible {
+  outline: 2px solid var(--table-input-focus);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --table-border: #000000;
+    --table-text: #000000;
+    --table-header-text: #000000;
+  }
+
+  [data-theme='dark'] {
+    --table-border: #ffffff;
+    --table-text: #ffffff;
+    --table-header-text: #ffffff;
+  }
+}

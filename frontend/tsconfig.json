@@ -42,7 +42,12 @@
       "@canvas/*": ["./src/canvas/*"],
       "@event-builder/*": ["./src/event-builder/*"],
       "@analytics/*": ["./src/analytics/*"],
-      "@types": ["./src/types"]
+      "@types": ["./src/types"],
+      "@ui/*": ["./src/shared/ui/*"],
+      "@ui-components/*": ["./src/shared/ui/components/*"],
+      "@ui-hooks/*": ["./src/shared/ui/hooks/*"],
+      "@ui-utils/*": ["./src/shared/ui/utils/*"],
+      "@ui-types": ["./src/shared/ui/types"]
     }
   },
   "include": [
@@ -59,4 +64,3 @@
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
-

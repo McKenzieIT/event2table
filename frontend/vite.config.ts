@@ -19,6 +19,11 @@ export default defineConfig(({ mode }) => {
       '@event-builder': path.resolve(__dirname, './src/event-builder'),
       '@analytics': path.resolve(__dirname, './src/analytics'),
       '@canvas-react': path.resolve(__dirname, '../canvas-react/src'),
+      '@ui': path.resolve(__dirname, './src/shared/ui'),
+      '@ui-components': path.resolve(__dirname, './src/shared/ui/components'),
+      '@ui-hooks': path.resolve(__dirname, './src/shared/ui/hooks'),
+      '@ui-utils': path.resolve(__dirname, './src/shared/ui/utils'),
+      '@ui-types': path.resolve(__dirname, './src/shared/ui/types'),
     },
     // 🆕 确保 GraphQL 文件正确解析
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.graphql', '.gql'],
