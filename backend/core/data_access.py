@@ -14,21 +14,11 @@
 支持可选的缓存集成以提升查询性能
 """
 
-# Import execute_write from backend.core.utils.utils (the original utils.py file)
-# Using importlib to avoid circular import with the utils package
-import importlib.util
 import logging
-import os
 from typing import Any, Dict, List, Optional
 
 from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict
-
-spec = importlib.util.spec_from_file_location(
-    "backend.core.utils_utils", os.path.join(os.path.dirname(__file__), "utils.py")
-)
-utils_utils_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(utils_utils_module)
-execute_write = utils_utils_module.execute_write
+from backend.core.utils.database import execute_write
 
 logger = logging.getLogger(__name__)
 
