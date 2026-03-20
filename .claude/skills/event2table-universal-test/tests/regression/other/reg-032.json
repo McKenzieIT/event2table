@@ -9,14 +9,11 @@
   "module": "other",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/alter-sql/123"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".alter-sql-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "validate",

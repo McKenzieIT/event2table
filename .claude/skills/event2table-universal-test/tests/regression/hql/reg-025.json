@@ -9,14 +9,11 @@
   "module": "hql",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/generate"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".generate-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",

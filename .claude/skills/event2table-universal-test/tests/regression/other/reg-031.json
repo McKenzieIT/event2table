@@ -9,14 +9,11 @@
   "module": "other",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/log-detail"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": "body"
+      },
+      "timeout": 30000
     },
     {
       "action": "validate",

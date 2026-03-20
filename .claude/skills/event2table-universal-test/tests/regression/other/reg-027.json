@@ -9,14 +9,11 @@
   "module": "other",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/categories"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".categories-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "validate",

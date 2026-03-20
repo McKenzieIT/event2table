@@ -8,10 +8,6 @@
   "timeout": 30000,
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/events?game_gid=10000147"
-    },
-    {
       "action": "wait",
       "condition": {
         "selector": ".events-table-container"

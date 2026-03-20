@@ -9,14 +9,11 @@
   "module": "canvas",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/field-builder"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".field-builder-page"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",
@@ -31,11 +28,11 @@
         },
         {
           "type": "element_exists",
-          "selector": ".field-builder"
+          "selector": ".field-builder-page"
         },
         {
           "type": "element_exists",
-          "selector": ".field-config"
+          "selector": "[data-testid=\"field-builder-page\"]"
         }
       ]
     },

@@ -9,14 +9,11 @@
   "module": "parameters",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/parameter-history"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".param-history-container"
+      },
+      "timeout": 60000
     },
     {
       "action": "validate",

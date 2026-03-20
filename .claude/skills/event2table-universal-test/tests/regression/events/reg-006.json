@@ -4,19 +4,16 @@
   "type": "regression",
   "priority": "high",
   "engine": "agent-browser",
-  "url": "http://localhost:5173/events/1/edit",
+  "url": "http://localhost:5173/events/1/edit?game_gid=10000147",
   "timeout": 10000,
   "module": "events",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/events/1/edit"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".form-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",

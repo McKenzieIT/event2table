@@ -753,3 +753,20 @@ docs/archive/
 - - ❌ 代码重复
 - - ❌ 缓存管理混乱
 
+
+### 来自 docs/lessons-learned/service-architecture.md (2026-03-20)
+
+**关键主题**:
+- Service Layer Architecture Experience
+- Overview
+- ERS Architecture Overview
+- Critical Architecture Violation: Direct Database Access
+- Problem Symptoms
+
+**重要经验**:
+- │  - ❌ 不包含数据库访问逻辑                            │
+- │  - ✅ 所有数据库访问都在这里                          │
+- # ❌ WRONG: Service layer with direct DB access
+- # Service层构建SQL查询（应该在Repository层）
+- # ✅ CORRECT: Service layer uses Repository
+

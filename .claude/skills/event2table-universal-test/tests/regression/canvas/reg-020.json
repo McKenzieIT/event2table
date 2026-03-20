@@ -9,14 +9,11 @@
   "module": "canvas",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/flow-builder"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".flow-builder-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",
@@ -31,11 +28,11 @@
         },
         {
           "type": "element_exists",
-          "selector": ".flow-canvas"
+          "selector": ".flow-builder-container"
         },
         {
           "type": "element_exists",
-          "selector": ".flow-controls"
+          "selector": ".builder-card"
         }
       ]
     },

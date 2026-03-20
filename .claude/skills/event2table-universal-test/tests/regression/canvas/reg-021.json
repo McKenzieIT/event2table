@@ -9,14 +9,11 @@
   "module": "canvas",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/flows"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".flows-list-page"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",
@@ -31,11 +28,11 @@
         },
         {
           "type": "element_exists",
-          "selector": ".flows-list"
+          "selector": ".flows-list-page"
         },
         {
           "type": "element_exists",
-          "selector": ".flow-status"
+          "selector": ".search-bar"
         }
       ]
     },

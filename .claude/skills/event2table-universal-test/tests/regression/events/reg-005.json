@@ -9,14 +9,11 @@
   "module": "events",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/events/1"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".detail-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",

@@ -196,7 +196,12 @@
       "Bash(git merge:*)",
       "Bash(do echo \"=== $table ===\")",
       "Bash(/tmp/test_migration_apis.sh:*)",
-      "Bash(__NEW_LINE_b23e058fce72312b__ chmod +x /tmp/test_migration_apis.sh)"
+      "Bash(__NEW_LINE_b23e058fce72312b__ chmod +x /tmp/test_migration_apis.sh)",
+      "Bash(npx agent-browser:*)",
+      "Bash(agent-browser:*)",
+      "Bash(npx agent-browser eval:*)",
+      "Bash(agent-browser eval:*)",
+      "Edit(//Users/mckenzie/Documents/event2table/**)"
     ],
     "additionalDirectories": [
       "/Users/mckenzie/.claude/plans",

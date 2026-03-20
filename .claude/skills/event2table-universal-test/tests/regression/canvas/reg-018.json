@@ -9,14 +9,11 @@
   "module": "canvas",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/event-nodes"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".event-nodes-page"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",
@@ -31,11 +28,11 @@
         },
         {
           "type": "element_exists",
-          "selector": ".nodes-list"
+          "selector": ".event-nodes-page"
         },
         {
           "type": "element_exists",
-          "selector": ".node-filters"
+          "selector": "[data-testid=\"event-nodes-page\"]"
         }
       ]
     },

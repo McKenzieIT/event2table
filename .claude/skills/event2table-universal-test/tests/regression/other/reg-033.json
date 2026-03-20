@@ -9,14 +9,11 @@
   "module": "other",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/api-docs"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".api-docs-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "validate",

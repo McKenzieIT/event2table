@@ -10,3 +10,7 @@
 ## 2026-03-19 归档
 
 - `docs/cache/architecture/system-design.md` → `docs/archive/architecture/2026-03/system-design_1.md`
+
+## 2026-03-20 归档
+
+- `docs/development/architecture.md` → `docs/archive/architecture/2026-03/architecture.md`

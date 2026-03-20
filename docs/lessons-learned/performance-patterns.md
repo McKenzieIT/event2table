@@ -310,6 +310,179 @@ def list_events():
 - [ ] 是否返回总数和总页数？
 - [ ] 是否使用LIMIT + OFFSET而非加载全部数据？
 
+### 高级分页优化 ⭐ **2026-03-20新增**
+
+**优先级**: P0 | **来源**: [EVENTS_PAGINATION_IMPLEMENTATION.md](../archive/2026-03/03-march/reports/EVENTS_PAGINATION_IMPLEMENTATION.md) | **状态**: ✅ 12/12集成测试通过
+
+#### N+1查询预防（分页场景）
+
+**问题**: 分页查询关联数据时容易产生N+1查询
+
+```python
+# ❌ 错误：每个event都查询一次参数数量
+events = fetch_all_as_dict('SELECT * FROM log_events LIMIT 20')
+for event in events:
+    event['param_count'] = fetch_one_as_dict(
+        'SELECT COUNT(*) FROM event_params WHERE event_id = ?',
+        (event['id'],)
+    )['count']
+# 结果：1 + 20 = 21个查询 ❌
+```
+
+**解决方案**: 使用子查询一次性获取关联计数
+
+```python
+# ✅ 正确：使用子查询
+events = fetch_all_as_dict('''
+    SELECT
+        le.*,
+        (SELECT COUNT(*) FROM event_params ep
+         WHERE ep.event_id = le.id AND ep.is_active = 1) as param_count
+    FROM log_events le
+    WHERE le.game_gid = ?
+    LIMIT ? OFFSET ?
+''', (game_gid, per_page, offset))
+# 结果：1个查询 ✅
+```
+
+#### 分页缓存策略
+
+**双层缓存设计**:
+```python
+from backend.core.cache.decorators import cached, cache_invalidate
+
+# ✅ 列表缓存（2分钟TTL）
+@cached("events.list.paginated", timeout=120)
+def get_events_paginated(self, game_gid, page, per_page, search):
+    return self.event_repo.get_paginated(game_gid, page, per_page, search)
+
+# ✅ 计数缓存（2分钟TTL）
+@cached("events.count", timeout=120)
+def get_events_count(self, game_gid, search):
+    return self.event_repo.count_by_filters(game_gid, search)
+
+# ✅ 写操作自动清理缓存
+@cache_invalidate
+def create_event(self, event_data):
+    return self.event_repo.create(event_data)
+```
+
+**缓存键设计**:
+- 列表缓存: `events:list:paginated:{game_gid}:{page}:{per_page}:{search}`
+- 计数缓存: `events:count:{game_gid}:{search}`
+- 失效策略: create/update/delete操作自动清理相关缓存
+
+#### 分页边缘情况处理
+
+**必须处理的边缘情况**:
+1. **页码超出范围**: 返回空数组但保留有效的分页元数据
+2. **无效页码** (0, -1): 默认为第1页
+3. **per_page超限** (>100): 限制为最大值100
+4. **空结果集**: total=0时total_pages=1（而非0）
+5. **搜索无匹配**: 返回空数组但正确的total
+6. **无game_gid过滤**: 返回所有游戏的事件
+
+**实现示例**:
+```python
+def get_paginated(self, game_gid=None, page=1, per_page=20, search=None):
+    # ✅ 边缘情况：无效页码
+    if page < 1:
+        page = 1
+
+    # ✅ 边缘情况：per_page超限
+    per_page = min(per_page, 100)
+
+    # 查询数据
+    events = self._query_events(game_gid, page, per_page, search)
+    total = self._count_events(game_gid, search)
+
+    # ✅ 边缘情况：空结果集
+    total_pages = max(1, (total + per_page - 1) // per_page)
+
+    return {
+        'events': events,
+        'pagination': {
+            'page': page,
+            'per_page': per_page,
+            'total': total,
+            'total_pages': total_pages
+        }
+    }
+```
+
+#### 分页搜索支持
+
+**高级分页API**:
+```python
+@api_bp.route('/api/events', methods=['GET'])
+def api_list_events():
+    """
+    支持参数:
+    - game_gid: 游戏过滤（可选）
+    - page: 页码（默认1）
+    - per_page: 每页数量（默认20，最大100）
+    - search: 事件名称搜索（可选）
+    """
+    game_gid = request.args.get('game_gid', type=int)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    search = request.args.get('search', type=str)
+
+    return json_success_response(
+        data=event_service.get_events_paginated(
+            game_gid=game_gid,
+            page=page,
+            per_page=per_page,
+            search=search
+        )
+    )
+```
+
+**响应格式**:
+```json
+{
+  "success": true,
+  "data": {
+    "events": [...],
+    "pagination": {
+      "page": 1,
+      "per_page": 20,
+      "total": 45,
+      "total_pages": 3
+    }
+  }
+}
+```
+
+#### 分页性能优化清单
+
+- [ ] **是否使用LIMIT/OFFSET进行分页？** （而非加载全部数据）
+- [ ] **是否使用索引列进行过滤？** (game_gid, id)
+- [ ] **是否使用子查询避免N+1问题？** （关联计数）
+- [ ] **是否实现双层缓存？** (列表缓存 + 计数缓存)
+- [ ] **是否限制per_page最大值？** (建议100)
+- [ ] **是否处理所有边缘情况？** (页码超限、空结果等)
+- [ ] **是否支持搜索功能？** (event_name LIKE '%search%')
+- [ ] **是否返回完整的分页元数据？** (page, per_page, total, total_pages)
+
+#### 集成测试覆盖
+
+**完整的分页测试套件** (12个测试):
+1. ✅ 默认分页参数 (page=1, per_page=20)
+2. ✅ 自定义每页数量
+3. ✅ 页码导航 (第1页 vs 第2页)
+4. ✅ 总页数计算
+5. ✅ 超出最大页码
+6. ✅ 分页 + 搜索组合
+7. ✅ per_page最大值限制 (100)
+8. ✅ 无效页码 (0, -1)
+9. ✅ 响应结构验证
+10. ✅ 计数端点
+11. ✅ 计数 + 搜索
+12. ✅ 分页 + game_gid过滤
+
+**测试通过率**: 12/12 (100%) ✅
+
 ---
 
 ## game_gid转换缓存 ⭐ **P1重要**

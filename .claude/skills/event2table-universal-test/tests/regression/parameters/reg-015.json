@@ -9,14 +9,11 @@
   "module": "parameters",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/common-params"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".common-params-page"
+      },
+      "timeout": 60000
     },
     {
       "action": "validate",

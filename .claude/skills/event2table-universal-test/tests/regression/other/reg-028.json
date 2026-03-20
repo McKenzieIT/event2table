@@ -9,14 +9,11 @@
   "module": "other",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/import-events"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".import-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "validate",

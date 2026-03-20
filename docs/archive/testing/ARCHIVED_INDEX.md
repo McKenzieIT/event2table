@@ -126,3 +126,7 @@ Ralph Loop迭代测试报告（2026年2月）：
 ## 2026-03-19 归档
 
 - `docs/plans/2026-03-18-universal-test-system-design.md` → `docs/archive/testing/2026-03/2026-03-18-universal-test-system-design.md`
+
+## 2026-03-20 归档
+
+- `docs/reports/2026-03/FORM-VALIDATION-TEST-REPORT.md` → `docs/archive/testing/2026-03/FORM-VALIDATION-TEST-REPORT.md`

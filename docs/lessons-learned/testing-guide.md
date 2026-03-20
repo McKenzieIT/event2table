@@ -2831,6 +2831,45 @@ function useEventNodes() {
 - - ❌ Hard to script and automate
 
 
+### Agent-Browser测试方法论 ⚠️ **P0极其重要 - 2026-03-20新增**
+
+> **完整文档**: [Agent-Browser Testing Methodology](./agent-browser-testing.md) ⭐
+
+**核心经验**:
+- **问题1: Resource temporarily unavailable (os error 35)** - 终止所有agent-browser进程 → 等待2-3秒 → 重新启动
+- **问题2: 命令在后台运行且无输出** - 使用命令链 `&&` 连接多个命令（确保顺序执行）
+- **问题3: Chrome进程内存占用过多** - 定期清理agent-browser进程（每次测试前后）
+
+**替代测试方案**（当agent-browser不可用时）:
+1. ✅ **event2table-universal-test技能** - 项目专用测试技能，覆盖39个页面
+2. ✅ **直接GraphQL API测试** - `curl -s -X POST http://127.0.0.1:5001/api/graphql`
+3. ✅ **代码审查验证** - 检查组件props、条件渲染、事件绑定
+
+**禁止行为** ⚠️:
+- ❌ 创建替代测试脚本绕过agent-browser问题
+- ❌ 不更新文档说明agent-browser问题
+- ❌ 在agent-browser未修复时使用其他工具而不报告问题
+
+**快速参考**:
+```bash
+# 修复agent-browser连接问题
+pkill -f "agent-browser"
+sleep 3
+agent-browser open http://localhost:5173
+
+# 使用命令链（避免后台执行问题）
+agent-browser open http://localhost:5173 && \
+agent-browser wait --load networkidle && \
+agent-browser get url
+
+# 清理Chrome进程
+pkill -f "agent-browser"
+```
+
+**相关文档**: [Agent-Browser Testing Methodology](./agent-browser-testing.md)
+
+---
+
 ### 来自 docs/plans/2026-03-19-universal-test-system-phase3-completion.md (2026-03-19)
 
 **关键主题**:
@@ -2846,4 +2885,21 @@ function useEventNodes() {
 - - ✅ Green阶段：实现功能，所有测试通过
 - - ✅ Refactor阶段：代码优化完成
 - - ✅ 美观的渐变设计（紫色主题）
+
+
+### 来自 docs/reports/2026-03/FORM-VALIDATION-TEST-SUMMARY.md (2026-03-20)
+
+**关键主题**:
+- 🎯 Event2Table 表单验证测试 - 执行摘要
+- 📊 快速统计
+- ✅ 测试完成清单
+- 测试的表单
+- 🎯 关键发现
+
+**重要经验**:
+- **测试状态**: ✅ 完成
+- ## ✅ 测试完成清单
+- ## 🎯 关键发现
+- ### ✅ 优点
+- ### ⚠️ 问题
 

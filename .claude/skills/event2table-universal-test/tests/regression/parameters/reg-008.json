@@ -9,14 +9,11 @@
   "module": "parameters",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/parameters/enhanced"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".parameters-enhanced-container"
+      },
+      "timeout": 60000
     },
     {
       "action": "snapshot",

@@ -9,14 +9,11 @@
   "module": "hql",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/hql/1/edit"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".hql-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",

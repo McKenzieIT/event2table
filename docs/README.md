@@ -111,6 +111,10 @@ RESTful API 和 GraphQL API 文档。
 
 **核心经验** ⭐:
 - [README.md](lessons-learned/README.md) ⭐ - 经验文档索引
+- [Agent-Browser Testing](lessons-learned/agent-browser-testing.md) ⭐ - Agent-Browser测试方法论 (2026-03-20新增)
+- [Repository Migration](lessons-learned/repository-migration.md) ⭐ - Repository模式迁移经验 (2026-03-20新增)
+- [mypy Compliance](lessons-learned/mypy-compliance.md) ⭐ - mypy --strict合规经验 (2026-03-20新增)
+- [Service Architecture](lessons-learned/service-architecture.md) ⭐ - Service层架构经验 (2026-03-20新增)
 - [项目管理](lessons-learned/project-management.md) ⭐ - 并行开发、大规模重构、文档整合
 - [重构检查清单](lessons-learned/refactoring-checklist.md) - 重构最佳实践
 - [调试技能](lessons-learned/debugging-skills.md) - 调试技巧
@@ -283,11 +287,11 @@ python scripts/tools/generate_api_docs.py
 | API文档 | 10+ | 2026-03-19 |
 | 缓存系统 | 7 | 2026-02-25 |
 | 测试文档 | 5+ | 2026-02-18 |
-| 经验文档 | 20+ | 2026-03-19 |
+| 经验文档 | 25+ | 2026-03-20 ⭐ |
 | 计划文档 | 10+ | 2026-03-18 |
 | 归档文档 | 100+ | 2026-03-19 |
 
-**总计**: 200+ 文档
+**总计**: 200+ 文档 (+4个新经验文档，2026-03-20) ⭐
 
 ---
 

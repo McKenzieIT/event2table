@@ -9,14 +9,11 @@
   "module": "games",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/games"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".games-table-container"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",
@@ -35,7 +32,7 @@
         },
         {
           "type": "element_exists",
-          "selector": "input[placeholder*='\u641c\u7d22']"
+          "selector": "input[placeholder*='搜索']"
         },
         {
           "type": "element_exists",

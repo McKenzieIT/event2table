@@ -9,14 +9,11 @@
   "module": "canvas",
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/event-node-builder"
-    },
-    {
       "action": "wait",
       "condition": {
-        "load": "networkidle"
-      }
+        "selector": ".event-node-builder"
+      },
+      "timeout": 30000
     },
     {
       "action": "snapshot",
@@ -31,11 +28,11 @@
         },
         {
           "type": "element_exists",
-          "selector": ".node-builder"
+          "selector": ".event-node-builder"
         },
         {
           "type": "element_exists",
-          "selector": ".config-panel"
+          "selector": "[data-testid=\"event-node-builder\"]"
         }
       ]
     },

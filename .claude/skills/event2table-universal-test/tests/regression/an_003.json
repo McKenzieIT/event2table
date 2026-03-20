@@ -8,10 +8,6 @@
   "timeout": 30000,
   "steps": [
     {
-      "action": "open",
-      "url": "http://localhost:5173/games"
-    },
-    {
       "action": "wait",
       "condition": {
         "selector": "input[placeholder*='搜索']"

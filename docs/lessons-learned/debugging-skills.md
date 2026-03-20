@@ -670,3 +670,70 @@ npm run test:e2e  # E2E测试
 - - ✅ Auto-rollback on failure
 - - ✅ Monitor after deployment
 
+
+### 来自 docs/README.md (2026-03-20)
+
+**关键主题**:
+- Event2Table 文档中心
+- 📚 快速导航
+- 新用户入门
+- 核心开发文档
+- 经验文档系统 ⭐
+
+**重要经验**:
+- **正确示例** ✅:
+- **错误示例** ❌:
+- 1. ✅ 更新API文档（如果修改了API）
+- 2. ✅ 更新架构文档（如果修改了架构）
+- 3. ✅ 提取经验到经验文档
+
+
+### 来自 docs/ci-cd/QUICKSTART.md (2026-03-20)
+
+**关键主题**:
+- CI/CD Quick Start Guide
+- Quick Reference
+- Run Tests Locally
+- Backend tests
+- Frontend tests
+
+**重要经验**:
+- - ✅ Tests must pass before merge
+- - ✅ Auto-deploy only on main branch
+- - ✅ Auto-rollback on failure
+- - ✅ Monitor after deployment
+
+
+### 来自 docs/reports/2026-03/GAMES-MODULE-MIGRATION-REPORT.md (2026-03-20)
+
+**关键主题**:
+- Games Module Entity Architecture Migration - Final Report
+- Executive Summary
+- Migration Status
+- ✅ Repository Layer (backend/models/repositories/games.py)
+- Query methods (all return GameEntity)
+
+**重要经验**:
+- **Status**: ✅ **COMPLETE** - All validation standards met
+- ### ✅ Repository Layer (backend/models/repositories/games.py)
+- - ✅ All methods return `GameEntity` objects (not Dict)
+- - ✅ Uses `@cached` decorator on query methods (30min TTL)
+- - ✅ Type-safe operations with Pydantic Entity validation
+
+
+### 来自 docs/reports/2026-03/BUG-FIX-REPORT-2026-03-14.md (2026-03-20)
+
+**关键主题**:
+- Event Node Builder Bug修复报告
+- 执行摘要
+- 修复结果
+- 测试覆盖
+- Bug #1: 重复React键导致组件崩溃（P0）
+
+**重要经验**:
+- **修复状态**: ✅ 所有Bug已修复并验证
+- | #1 | P0 | 重复React键导致组件崩溃 | ✅ 已修复 | ✅ 验证成功 |
+- | #2-3 | P0 | FieldConfigModal交互问题 | ✅ 已修复 | ✅ 验证成功 |
+- | #4 | P1 | 删除确认显示错误字段名 | ✅ 已修复 | ✅ 验证成功 |
+- - ✅ **39个字段成功添加**（32参数 + 7基础）
+
