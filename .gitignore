@@ -201,3 +201,9 @@ Desktop.ini
 .claude/skills/*/scripts/utils/
 .claude/skills/*/tests/
 .claude/skills/*/config/test_configs/
+
+# Playwright测试输出（本地开发）
+playwright-tests/
+
+# Scripts临时文件（本地开发）
+scripts/temp/
