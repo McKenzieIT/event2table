@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Component Migration Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Cyberpunk Lab Theme */
+    :root {
+      --primary: #00f0ff;
+      --secondary: #ff00ff;
+      --accent: #ffff00;
+      --background: #0a0a0f;
+      --surface: #1a1a2e;
+      --text: #e0e0e0;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--text);
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    .cyber-glow {
+      box-shadow: 0 0 10px var(--primary), 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+
+    .cyber-border {
+      border: 1px solid var(--primary);
+    }
+
+    .cyber-text {
+      color: var(--primary);
+    }
+
+    .cyber-bg {
+      background: var(--surface);
+    }
+
+    /* File tree styles */
+    .file-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .file-item:hover {
+      background: rgba(0, 240, 255, 0.1);
+    }
+
+    .file-item.selected {
+      background: rgba(0, 240, 255, 0.2);
+      border-left: 3px solid var(--primary);
+    }
+
+    .file-item.has-migration {
+      border-left: 3px solid var(--warning);
+    }
+
+    /* Diff viewer styles */
+    .diff-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 2px 8px;
+    }
+
+    .diff-added {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+    }
+
+    .diff-removed {
+      background: rgba(255, 68, 68, 0.15);
+      color: var(--error);
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 4px;
+      background: var(--surface);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.3s ease;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--background);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .animate-pulse-slow {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scan-line {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+
+    .scan-effect::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      animation: scan-line 3s linear infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div id="app"></div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
