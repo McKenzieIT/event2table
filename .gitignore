@@ -166,3 +166,6 @@ Desktop.ini
 
 # Lock文件（保留package-lock.json和yarn.lock）
 *.lock
+
+# ==================== Git Worktrees ====================
+.worktrees/
