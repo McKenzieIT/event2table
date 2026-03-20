@@ -108,6 +108,28 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# ==================== 测试文件管理 ====================
+# 测试输出目录
+frontend/test/e2e/output/
+frontend/test/e2e/test-results/
+backend/test/.pytest_cache/
+backend/test/__pycache__/
+backend/test/.coverage
+backend/test/htmlcov/
+frontend/test-results/
+playwright-tests/test-results/
+playwright-tests/screenshots/
+
+# 临时测试脚本（已归档）
+backend/test/verify_*.py
+frontend/test/e2e/verify-*.spec.ts
+frontend/test/e2e/*fix-verification*.spec.ts
+frontend/test/e2e/chrome-mcp*.spec.ts
+
+# 过时测试（已归档到docs/archive/testing/）
+frontend/test/e2e/deprecated/
+backend/test/deprecated/
+
 # ==================== Node.js ====================
 # Dependencies
 node_modules/
@@ -207,3 +229,4 @@ playwright-tests/
 
 # Scripts临时文件（本地开发）
 scripts/temp/
+scripts/

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Node Builder - Scroll Diagnosis Tool</title>
+    <style>
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            padding: 20px;
+            background: #030712;
+            color: #F9FAFB;
+            margin: 0;
+        }
+
+        h1 {
+            color: #06B6D4;
+            border-bottom: 2px solid #06B6D4;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #8B5CF6;
+            margin-top: 0;
+        }
+
+        .test-section {
+            margin-bottom: 40px;
+            border: 2px solid #06B6D4;
+            padding: 20px;
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        .test-container {
+            height: 200px;
+            overflow: hidden;
+            border: 1px solid #333;
+            background: #111827;
+            margin: 10px 0;
+        }
+
+        .test-item {
+            padding: 10px;
+            border-bottom: 1px solid #374151;
+            color: #E5E7EB;
+        }
+
+        button {
+            background: #06B6D4;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #0891B2;
+        }
+
+        .diagnostics {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #374151;
+            border-radius: 4px;
+        }
+
+        .diagnostics h3 {
+            margin-top: 0;
+            color: #F9FAFB;
+        }
+
+        .diagnostics p {
+            margin: 5px 0;
+            color: #D1D5DB;
+        }
+
+        .status-yes {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .status-no {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .status-partial {
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .warning-box {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box h3 {
+            color: #dc3545;
+            margin-top: 0;
+        }
+
+        .info-box {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid #06B6D4;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: #06B6D4;
+            margin-top: 0;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border: 1px solid #374151;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Event Node Builder - Scroll Diagnosis Tool</h1>
+
+    <div class="info-box">
+        <h3>📖 How to Use</h3>
+        <ol>
+            <li>Click "Generate Long Content" buttons for each section</li>
+            <li>Review the scroll diagnostics to see if scrolling works</li>
+            <li>Compare results before/after CSS fixes</li>
+        </ol>
+    </div>
+
+    <div class="warning-box">
+        <h3>⚠️ Expected Behavior (BEFORE Fix)</h3>
+        <p><strong>All three sections should show:</strong> <span class="status-no">✗ NOT SCROLLABLE</span></p>
+        <p><strong>Expected issues:</strong></p>
+        <ul>
+            <li><code>overflow: hidden</code> prevents scrolling</li>
+            <li>Content gets clipped at container boundaries</li>
+            <li>User cannot access all items in long lists</li>
+        </ul>
+    </div>
+
+    <div class="summary">
+        <div class="summary-card">
+            <h3>🎯 Test Sections</h3>
+            <p><strong>1. Event List</strong>: Tests <code>.sidebar-section--event</code></p>
+            <p><strong>2. Parameter List</strong>: Tests <code>.sidebar-section--params</code></p>
+            <p><strong>3. Field Canvas</strong>: Tests <code>.field-canvas .panel-content</code></p>
+        </div>
+        <div class="summary-card">
+            <h3>🔧 Key Diagnostics</h3>
+            <p><strong>scrollHeight</strong>: Total height including overflow</p>
+            <p><strong>clientHeight</strong>: Visible height</p>
+            <p><strong>overflow-y</strong>: CSS overflow property</p>
+            <p><strong>isScrollable</strong>: scrollHeight > clientHeight</p>
+        </div>
+    </div>
+
+    <!-- Test 1: Event List -->
+    <div class="test-section">
+        <h2>Test 1: Event List (.sidebar-section--event)</h2>
+        <p><strong>Current CSS</strong>: <code>overflow: hidden;</code> (line 132 in EventNodeBuilder.css)</p>
+        <div id="event-list-container" class="test-container">
+            <p style="padding: 20px; text-align: center; color: #6B7280;">
+                Click "Generate 50 Events" to test scrolling
+            </p>
+        </div>
+        <button onclick="generateEvents()">Generate 50 Events</button>
+        <button onclick="clearEvents()">Clear Events</button>
+        <div class="diagnostics" id="event-diagnostics">
+            <p style="color: #6B7280;">Waiting for test data...</p>
+        </div>
+    </div>
+
+    <!-- Test 2: Parameter List -->
+    <div class="test-section">
+        <h2>Test 2: Parameter List (.sidebar-section--params)</h2>
+        <p><strong>Current CSS</strong>: <code>overflow: hidden;</code> (line 140 in EventNodeBuilder.css)</p>
+        <div id="param-list-container" class="test-container">
+            <p style="padding: 20px; text-align: center; color: #6B7280;">
+                Click "Generate 50 Parameters" to test scrolling
+            </p>
+        </div>
+        <button onclick="generateParams()">Generate 50 Parameters</button>
+        <button onclick="clearParams()">Clear Parameters</button>
+        <div class="diagnostics" id="param-diagnostics">
+            <p style="color: #6B7280;">Waiting for test data...</p>
+        </div>
+    </div>
+
+    <!-- Test 3: Field Canvas -->
+    <div class="test-section">
+        <h2>Test 3: Field Canvas (.field-canvas .panel-content)</h2>
+        <p><strong>Current CSS</strong>: <code>overflow: hidden;</code> (line 79 in FieldCanvas.css)</p>
+        <div id="field-list-container" class="test-container">
+            <p style="padding: 20px; text-align: center; color: #6B7280;">
+                Click "Generate 50 Fields" to test scrolling
+            </p>
+        </div>
+        <button onclick="generateFields()">Generate 50 Fields</button>
+        <button onclick="clearFields()">Clear Fields</button>
+        <div class="diagnostics" id="field-diagnostics">
+            <p style="color: #6B7280;">Waiting for test data...</p>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // Diagnostic Functions
+        // ========================================
+
+        function diagnoseScroll(elementId, diagnosticsId) {
+            const el = document.getElementById(elementId);
+            const diag = document.getElementById(diagnosticsId);
+
+            if (!el || !diag) {
+                console.error('Element or diagnostics not found:', elementId, diagnosticsId);
+                return;
+            }
+
+            const scrollHeight = el.scrollHeight;
+            const clientHeight = el.clientHeight;
+            const overflow = window.getComputedStyle(el).overflow;
+            const overflowY = window.getComputedStyle(el).overflowY;
+            const overflowX = window.getComputedStyle(el).overflowX;
+
+            const isScrollable = scrollHeight > clientHeight;
+            const hasOverflowAuto = overflowY === 'auto' || overflowY === 'scroll';
+            const hasHiddenOverflow = overflow === 'hidden' || overflowY === 'hidden';
+
+            let status = '';
+            let explanation = '';
+
+            if (isScrollable && hasOverflowAuto) {
+                status = '<span class="status-yes">✓ SCROLLABLE</span>';
+                explanation = 'Content overflows and overflow-y allows scrolling.';
+            } else if (!isScrollable && hasOverflowAuto) {
+                status = '<span class="status-partial">~ READY TO SCROLL</span>';
+                explanation = 'overflow-y is auto/scroll, but content doesn\'t overflow yet.';
+            } else if (isScrollable && hasHiddenOverflow) {
+                status = '<span class="status-no">✗ NOT SCROLLABLE (CONTENT HIDDEN)</span>';
+                explanation = 'Content overflows BUT overflow:hidden clips it! This is the BUG.';
+            } else {
+                status = '<span class="status-no">✗ NOT SCROLLABLE</span>';
+                explanation = 'overflow:hidden prevents scrolling, even if content overflows.';
+            }
+
+            diag.innerHTML = `
+                <h3>📊 Scroll Diagnostics</h3>
+                <p><strong>scrollHeight</strong>: ${scrollHeight}px (total content height)</p>
+                <p><strong>clientHeight</strong>: ${clientHeight}px (visible height)</p>
+                <p><strong>overflow</strong>: ${overflow}</p>
+                <p><strong>overflow-x</strong>: ${overflowX}</p>
+                <p><strong>overflow-y</strong>: ${overflowY}</p>
+                <p><strong>Status</strong>: ${status}</p>
+                <p><strong>Explanation</strong>: ${explanation}</p>
+            `;
+
+            // Log to console for debugging
+            console.log(`[Diagnosis] ${elementId}:`, {
+                scrollHeight,
+                clientHeight,
+                overflow,
+                overflowX,
+                overflowY,
+                isScrollable,
+                hasOverflowAuto,
+                hasHiddenOverflow
+            });
+        }
+
+        // ========================================
+        // Event List Functions
+        // ========================================
+
+        function generateEvents() {
+            const container = document.getElementById('event-list-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 50; i++) {
+                const div = document.createElement('div');
+                div.className = 'test-item';
+                div.textContent = `Event ${i}: phxcard.gacha_event_${i}`;
+                container.appendChild(div);
+            }
+
+            diagnoseScroll('event-list-container', 'event-diagnostics');
+        }
+
+        function clearEvents() {
+            const container = document.getElementById('event-list-container');
+            container.innerHTML = '<p style="padding: 20px; text-align: center; color: #6B7280;">Click "Generate 50 Events" to test scrolling</p>';
+            document.getElementById('event-diagnostics').innerHTML = '<p style="color: #6B7280;">Waiting for test data...</p>';
+        }
+
+        // ========================================
+        // Parameter List Functions
+        // ========================================
+
+        function generateParams() {
+            const container = document.getElementById('param-list-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 50; i++) {
+                const div = document.createElement('div');
+                div.className = 'test-item';
+                div.textContent = `Parameter ${i}: zone_id_${i} (type: BIGINT)`;
+                container.appendChild(div);
+            }
+
+            diagnoseScroll('param-list-container', 'param-diagnostics');
+        }
+
+        function clearParams() {
+            const container = document.getElementById('param-list-container');
+            container.innerHTML = '<p style="padding: 20px; text-align: center; color: #6B7280;">Click "Generate 50 Parameters" to test scrolling</p>';
+            document.getElementById('param-diagnostics').innerHTML = '<p style="color: #6B7280;">Waiting for test data...</p>';
+        }
+
+        // ========================================
+        // Field Canvas Functions
+        // ========================================
+
+        function generateFields() {
+            const container = document.getElementById('field-list-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 50; i++) {
+                const div = document.createElement('div');
+                div.className = 'test-item';
+                div.textContent = `Field ${i}: role_id_${i} (alias: role_id_${i})`;
+                container.appendChild(div);
+            }
+
+            diagnoseScroll('field-list-container', 'field-diagnostics');
+        }
+
+        function clearFields() {
+            const container = document.getElementById('field-list-container');
+            container.innerHTML = '<p style="padding: 20px; text-align: center; color: #6B7280;">Click "Generate 50 Fields" to test scrolling</p>';
+            document.getElementById('field-diagnostics').innerHTML = '<p style="color: #6B7280;">Waiting for test data...</p>';
+        }
+
+        // ========================================
+        // Run on Load
+        // ========================================
+
+        window.addEventListener('load', () => {
+            console.log('🔍 Scroll Diagnosis Tool loaded');
+            console.log('Ready to test scroll behavior in Event Node Builder');
+        });
+    </script>
+</body>
+</html>

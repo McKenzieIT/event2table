@@ -1,0 +1,23 @@
+[
+  {
+    "gid": 90000001,
+    "name": "E2E Test Game 1",
+    "ods_db": "ieu_ods",
+    "description": "First E2E test game for automated testing",
+    "dwd_prefix": "dwd"
+  },
+  {
+    "gid": 90000002,
+    "name": "E2E Test Game 2",
+    "ods_db": "ieu_ods",
+    "description": "Second E2E test game for automated testing",
+    "dwd_prefix": "dwd"
+  },
+  {
+    "gid": 90000003,
+    "name": "E2E Test Game 3",
+    "ods_db": "ieu_ods",
+    "description": "Third E2E test game for automated testing",
+    "dwd_prefix": "dwd"
+  }
+]

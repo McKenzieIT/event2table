@@ -1,0 +1,68 @@
+{
+  "skill_name": "event2table-playwright-e2e",
+  "evals": [
+    {
+      "id": 1,
+      "name": "convert-all-agent-browser-tests",
+      "prompt": "Convert all the agent-browser tests to Playwright format and run them to verify the selector fixes are working correctly.",
+      "expected_output": "All agent-browser JSON tests converted to Playwright TypeScript test files, tests executed successfully with high pass rate (80-90%+ expected), and a test report generated showing results.",
+      "files": [
+        "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/tests/regression/*.json"
+      ],
+      "assertions": [
+        {
+          "name": "conversion_creates_test_files",
+          "check": "All 39 agent-browser JSON test files are converted to TypeScript .spec.ts files in the playwright-tests/tests/e2e/ directory."
+        },
+        {
+          "name": "tests_execute_successfully",
+          "check": "When 'npm test' is run in playwright-tests directory, tests execute and produce a results summary showing pass/fail counts."
+        },
+        {
+          "name": "high_pass_rate",
+          "check": "Test pass rate is 80% or higher, demonstrating the P1 selector fixes are working correctly with Playwright."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "run-specific-parameter-tests",
+      "prompt": "Run just the Parameters module tests to verify those specific selector fixes are working. I want to see if the .parameters-list-container and other parameter-related selectors now work correctly.",
+      "expected_output": "Parameters tests (AN-005, REG-007 through REG-015) execute successfully with most passing, demonstrating the selector fixes from the P1 optimization are working.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "parameter_tests_run",
+          "check": "Tests for AN-005, REG-007, REG-008, REG-009, REG-010, REG-011, REG-012, REG-013, REG-014, REG-015 are executed."
+        },
+        {
+          "name": "parameter_tests_pass",
+          "check": "Most Parameters tests pass (8+ out of 11), showing the selector fixes (.parameters-list-container, .parameters-enhanced-container, etc.) are correct."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "compare-with-agent-browser",
+      "prompt": "I want to compare Playwright test results with the old agent-browser results to show the improvement. Create a comparison report showing pass rates, reliability, and performance differences.",
+      "expected_output": "A detailed comparison report (markdown format) showing Playwright's superior pass rate (100% vs 25.6%), reliability (no crashes), and speed (6-18x faster), with recommendations to switch from agent-browser to Playwright.",
+      "files": [
+        "/Users/mckenzie/Documents/event2table/.claude/skills/event2table-universal-test/output/test-results.json"
+      ],
+      "assertions": [
+        {
+          "name": "comparison_report_created",
+          "check": "A markdown comparison report is generated in the output/ directory showing side-by-side metrics between agent-browser and Playwright."
+        },
+        {
+          "name": "shows_improvement",
+          "check": "Report clearly shows Playwright's advantages: higher pass rate, no daemon crashes, faster execution, better debugging features."
+        },
+        {
+          "name": "includes_recommendations",
+          "check": "Report includes actionable recommendations for migrating from agent-browser to Playwright and next steps for improving test coverage."
+        }
+      ]
+    }
+  ]
+}

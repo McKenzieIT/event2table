@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Test Coverage Report - Event2Table</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 10px;
+        }
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .metric {
+            display: inline-block;
+            margin: 10px 20px 10px 0;
+            padding: 10px 20px;
+            background: #007acc;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .test-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-file {
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007acc;
+            background: #f9f9f9;
+        }
+        .test-file h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .coverage-item {
+            padding: 5px 0;
+            color: #666;
+        }
+        .coverage-item::before {
+            content: "✓ ";
+            color: green;
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Event2Table E2E Test Coverage Report</h1>
+
+    <div class="summary">
+        <h2>Summary</h2>
+        <div class="metric">13 Pages</div>
+        <div class="metric">130+ Tests</div>
+        <div class="metric">10 Functionalities</div>
+        <p><strong>Generated:</strong> $(date)</p>
+        <p><strong>Test Framework:</strong> Playwright</p>
+        <p><strong>Target:</strong> Critical user journeys and core functionality</p>
+    </div>
+
+    <div class="test-list">
+        <h2>Coverage by Page</h2>
+
+        <div class="test-file">
+            <h3>1. Dashboard (首页)</h3>
+            <div class="coverage-item">Page load + DOM structure validation</div>
+            <div class="coverage-item">Console error checking</div>
+            <div class="coverage-item">All button clicks</div>
+            <div class="coverage-item">Form interactions</div>
+            <div class="coverage-item">Search/filter functionality</div>
+            <div class="coverage-item">Modal opening/closing</div>
+            <div class="coverage-item">API call status</div>
+            <div class="coverage-item">Statistics data display</div>
+            <div class="coverage-item">Pagination</div>
+            <div class="coverage-item">Performance measurement</div>
+        </div>
+
+        <div class="test-file">
+            <h3>2. Games List (游戏列表)</h3>
+            <div class="coverage-item">Page load + DOM structure validation</div>
+            <div class="coverage-item">Console error checking</div>
+            <div class="coverage-item">All button clicks (Add, Edit, Delete)</div>
+            <div class="coverage-item">Game card interactions</div>
+            <div class="coverage-item">Search/filter functionality</div>
+            <div class="coverage-item">Game management modal</div>
+            <div class="coverage-item">API call status</div>
+            <div class="coverage-item">Game statistics display</div>
+            <div class="coverage-item">Pagination</div>
+            <div class="coverage-item">Performance measurement</div>
+        </div>
+
+        <div class="test-file">
+            <h3>3. Games Modal (游戏管理模态框)</h3>
+            <div class="coverage-item">Modal open/close</div>
+            <div class="coverage-item">Form validation</div>
+            <div class="coverage-item">Create game workflow</div>
+            <div class="coverage-item">Edit game workflow</div>
+            <div class="coverage-item">Delete game workflow</div>
+            <div class="coverage-item">Batch operations</div>
+            <div class="coverage-item">Error handling</div>
+            <div class="coverage-item">Keyboard shortcuts</div>
+            <div class="coverage-item">Accessibility</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+
+        <div class="test-file">
+            <h3>4. Events List (事件列表)</h3>
+            <div class="coverage-item">Page load + DOM structure</div>
+            <div class="coverage-item">Console error checking</div>
+            <div class="coverage-item">Event data display</div>
+            <div class="coverage-item">Event filtering</div>
+            <div class="coverage-item">Event search</div>
+            <div class="coverage-item">Event actions (view, edit, delete)</div>
+            <div class="coverage-item">Pagination</div>
+            <div class="coverage-item">Sorting</div>
+            <div class="coverage-item">API integration</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+
+        <div class="test-file">
+            <h3>5. Events Create (创建事件)</h3>
+            <div class="coverage-item">Form load + validation</div>
+            <div class="coverage-item">Field interactions</div>
+            <div class="coverage-item">Category selection</div>
+            <div class="coverage-item">Form submission</div>
+            <div class="coverage-item">Error handling</div>
+            <div class="coverage-item">Success feedback</div>
+            <div class="coverage-item">Navigation after submit</div>
+            <div class="coverage-item">Data persistence</div>
+            <div class="coverage-item">Form reset</div>
+            <div class="coverage-item">Accessibility</div>
+        </div>
+
+        <div class="test-file">
+            <h3>6. Parameters List (参数列表)</h3>
+            <div class="coverage-item">Page load + data display</div>
+            <div class="coverage-item">Parameter filtering</div>
+            <div class="coverage-item">Parameter search</div>
+            <div class="coverage-item">Parameter details view</div>
+            <div class="coverage-item">Parameter editing</div>
+            <div class="coverage-item">Parameter deletion</div>
+            <div class="coverage-item">Pagination</div>
+            <div class="coverage-item">Sorting</div>
+            <div class="coverage-item">API integration</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+
+        <div class="test-file">
+            <h3>7. Parameter Dashboard (参数仪表板)</h3>
+            <div class="coverage-item">Dashboard load + metrics</div>
+            <div class="coverage-item">Statistics display</div>
+            <div class="coverage-item">Charts/graphs</div>
+            <div class="coverage-item">Filter by game</div>
+            <div class="coverage-item">Time range selection</div>
+            <div class="coverage-item">Data export</div>
+            <div class="coverage-item">Interactive features</div>
+            <div class="coverage-item">Real-time updates</div>
+            <div class="coverage-item">Responsive design</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+
+        <div class="test-file">
+            <h3>8. Event Node Builder (事件节点构建器)</h3>
+            <div class="coverage-item">Builder load + initialization</div>
+            <div class="coverage-item">Event selection</div>
+            <div class="coverage-item">Field configuration</div>
+            <div class="coverage-item">Node creation</div>
+            <div class="coverage-item">Node editing</div>
+            <div class="coverage-item">Node deletion</div>
+            <div class="coverage-item">HQL generation</div>
+            <div class="coverage-item">HQL preview</div>
+            <div class="coverage-item">Save/Load config</div>
+            <div class="coverage-item">Validation</div>
+        </div>
+
+        <div class="test-file">
+            <h3>9. Event Nodes (事件节点管理)</h3>
+            <div class="coverage-item">Node list display</div>
+            <div class="coverage-item">Node filtering</div>
+            <div class="coverage-item">Node search</div>
+            <div class="coverage-item">Node actions (view, edit, delete)</div>
+            <div class="coverage-item">Bulk operations</div>
+            <div class="coverage-item">Import/Export</div>
+            <div class="coverage-item">Pagination</div>
+            <div class="coverage-item">Sorting</div>
+            <div class="coverage-item">API integration</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+
+        <div class="test-file">
+            <h3>10. Canvas (HQL构建画布)</h3>
+            <div class="coverage-item">Canvas load + initialization</div>
+            <div class="coverage-item">Node drag & drop</div>
+            <div class="coverage-item">Connection creation</div>
+            <div class="coverage-item">Node selection</div>
+            <div class="coverage-item">Zoom/pan</div>
+            <div class="coverage-item">Save/Load flow</div>
+            <div class="coverage-item">HQL generation</div>
+            <div class="coverage-item">Export HQL</div>
+            <div class="coverage-item">Undo/Redo</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+
+        <div class="test-file">
+            <h3>11. Flows Management (HQL流程管理)</h3>
+            <div class="coverage-item">Flow list display</div>
+            <div class="coverage-item">Flow creation</div>
+            <div class="coverage-item">Flow editing</div>
+            <div class="coverage-item">Flow deletion</div>
+            <div class="coverage-item">Flow execution</div>
+            <div class="coverage-item">Flow history</div>
+            <div class="coverage-item">Flow comparison</div>
+            <div class="coverage-item">Pagination</div>
+            <div class="coverage-item">Search/Filter</div>
+            <div class="coverage-item">API integration</div>
+        </div>
+
+        <div class="test-file">
+            <h3>12. Categories Management (分类管理)</h3>
+            <div class="coverage-item">Category list display</div>
+            <div class="coverage-item">Category creation</div>
+            <div class="coverage-item">Category editing</div>
+            <div class="coverage-item">Category deletion</div>
+            <div class="coverage-item">Category hierarchy</div>
+            <div class="coverage-item">Drag & drop reordering</div>
+            <div class="coverage-item">Bulk operations</div>
+            <div class="coverage-item">Search/Filter</div>
+            <div class="coverage-item">API integration</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+
+        <div class="test-file">
+            <h3>13. Common Parameters (公参管理)</h3>
+            <div class="coverage-item">Common params list</div>
+            <div class="coverage-item">Parameter creation</div>
+            <div class="coverage-item">Parameter editing</div>
+            <div class="coverage-item">Parameter deletion</div>
+            <div class="coverage-item">Parameter validation</div>
+            <div class="coverage-item">Bulk operations</div>
+            <div class="coverage-item">Import/Export</div>
+            <div class="coverage-item">Search/Filter</div>
+            <div class="coverage-item">API integration</div>
+            <div class="coverage-item">Performance</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Event2Table E2E Test Suite | Generated by Playwright</p>
+        <p>For detailed results, see: <code>test/e2e/playwright-report/index.html</code></p>
+    </footer>
+</body>
+</html>
