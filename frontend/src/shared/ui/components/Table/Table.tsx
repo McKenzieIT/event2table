@@ -636,6 +636,11 @@ const Table = <TData extends Record<string, unknown>>({
                   const isPinnedLeft = header.column.getIsPinned() === 'left';
                   const isPinnedRight = header.column.getIsPinned() === 'right';
                   const isPinned = isPinnedLeft || isPinnedRight;
+                  
+                  // Column grouping support - check if this is a group header
+                  const isGroupHeader = !header.isPlaceholder && header.colSpan > 1;
+                  const colSpan = header.colSpan;
+                  const rowSpan = header.rowSpan || 1;
 
                   return (
                     <th
@@ -647,12 +652,15 @@ const Table = <TData extends Record<string, unknown>>({
                         isPinned && 'table-th--pinned',
                         isPinnedLeft && 'table-th--pinned-left',
                         isPinnedRight && 'table-th--pinned-right',
+                        isGroupHeader && 'table-th--group',
                       ].filter(Boolean).join(' ')}
                       style={{
-                        width: header.getSize(),
+                        width: header.getSize() !== 150 ? header.getSize() : undefined,
                         left: isPinnedLeft ? header.getStart() : undefined,
                         right: isPinnedRight ? header.getTotalRight() : undefined,
                       }}
+                      colSpan={colSpan}
+                      rowSpan={rowSpan}
                       onClick={
                         header.column.getCanSort()
                           ? header.column.getToggleSortingHandler()
@@ -667,11 +675,13 @@ const Table = <TData extends Record<string, unknown>>({
                           </span>
                         )}
                       </div>
-                      <div
-                        className="table-resizer"
-                        onMouseDown={header.getResizeHandler()}
-                        onClick={(e) => e.stopPropagation()}
-                      />
+                      {!isGroupHeader && !header.isPlaceholder && (
+                        <div
+                          className="table-resizer"
+                          onMouseDown={header.getResizeHandler()}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      )}
                     </th>
                   );
                 })}

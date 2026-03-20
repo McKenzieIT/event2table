@@ -124,6 +124,9 @@ export interface TableProps<TData extends RowData> {
   
   // Theme
   theme?: 'light' | 'dark' | 'auto';
+  
+  // Column grouping
+  enableColumnGrouping?: boolean;
 }
 
 // ============================================================================
