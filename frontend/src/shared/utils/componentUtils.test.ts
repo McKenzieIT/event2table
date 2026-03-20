@@ -208,8 +208,10 @@ describe('safeFilter', () => {
     });
 
     it('should pass array to predicate', () => {
-      const result = safeFilter([1, 2, 3, 4], (value, index, array) => value === array.length);
-      expect(result).toEqual([3]);
+      const result = safeFilter([1, 2, 3, 4], (value, index, array) => {
+        return array.length === 4 && value === 4;
+      });
+      expect(result).toEqual([4]);
     });
 
     it('should return empty array when no elements match', () => {

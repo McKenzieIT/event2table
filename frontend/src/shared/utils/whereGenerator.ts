@@ -5,10 +5,18 @@ export function generateWhereClause(conditions: WhereItem[]): string {
     return '';
   }
 
-  const clauses = conditions.map((item, index) => {
-    const prefix = index > 0 && item.logicalOp ? `${item.logicalOp} ` : '';
+  const clauses: string[] = [];
+  
+  conditions.forEach((item, index) => {
     const clause = generateWhereItem(item);
-    return prefix + clause;
+    if (clause) {
+      // Add logical operator prefix for items after the first
+      if (index > 0 && item.logicalOp) {
+        clauses.push(`${item.logicalOp} ${clause}`);
+      } else {
+        clauses.push(clause);
+      }
+    }
   });
 
   return clauses.join(' ');
@@ -67,11 +75,17 @@ function generateCondition(condition: WhereCondition): string {
 
 function generateGroup(group: WhereGroup): string {
   if (!group.children || group.children.length === 0) {
-    return '';
+    return '()';
   }
 
-  const inner = group.children.map(child => generateWhereItem(child)).join(' ');
-  return `(${inner})`;
+  const innerClauses: string[] = [];
+  group.children.forEach((child, index) => {
+    const prefix = index > 0 && child.logicalOp ? `${child.logicalOp} ` : '';
+    const clause = generateWhereItem(child);
+    innerClauses.push(prefix + clause);
+  });
+
+  return `(${innerClauses.join(' ')})`;
 }
 
 function escapeValue(value: unknown): string {

@@ -26,42 +26,49 @@ export interface ValidationResult {
 }
 
 export const validationRules = {
-  required: (value: unknown, message: string = '此字段不能为空'): string | null => {
+  required: (value: unknown, _param?: unknown, message: string = '此字段不能为空'): string | null => {
+    // Allow 0 and false as valid values
+    if (value === 0 || value === false) {
+      return null;
+    }
     if (!value || (typeof value === 'string' && !value.trim())) {
       return message;
     }
     return null;
   },
   
-  minLength: (value: unknown, min: number, message?: string): string | null => {
-    if (value && typeof value === 'string' && value.length < min) {
-      return message || `至少需要${min}个字符`;
+  minLength: (value: unknown, min?: number | unknown, message?: string): string | null => {
+    const minLength = typeof min === 'number' ? min : 0;
+    if (value && typeof value === 'string' && value.length < minLength) {
+      return message || `至少需要${minLength}个字符`;
     }
     return null;
   },
   
-  maxLength: (value: unknown, max: number, message?: string): string | null => {
-    if (value && typeof value === 'string' && value.length > max) {
-      return message || `最多${max}个字符`;
+  maxLength: (value: unknown, max?: number | unknown, message?: string): string | null => {
+    const maxLength = typeof max === 'number' ? max : Infinity;
+    if (value && typeof value === 'string' && value.length > maxLength) {
+      return message || `最多${maxLength}个字符`;
     }
     return null;
   },
   
-  pattern: (value: unknown, regex: RegExp, message?: string): string | null => {
-    if (value && typeof value === 'string' && !regex.test(value)) {
+  pattern: (value: unknown, regex?: RegExp | unknown, message?: string): string | null => {
+    const pattern = regex instanceof RegExp ? regex : /.*/;
+    if (value && typeof value === 'string' && !pattern.test(value)) {
       return message || '格式不正确';
     }
     return null;
   },
   
-  number: (value: unknown, message?: string): string | null => {
+  number: (value: unknown, _param?: unknown, message?: string): string | null => {
     if (value && typeof value === 'string' && !/^\d+$/.test(value)) {
       return message || '必须是数字';
     }
     return null;
   },
   
-  email: (value: unknown, message?: string): string | null => {
+  email: (value: unknown, _param?: unknown, message?: string): string | null => {
     if (value && typeof value === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       return message || '邮箱格式不正确';
     }
@@ -96,6 +103,7 @@ export function validateField(value: unknown, rules?: ValidationRuleItem[]): str
   }
   
   for (const rule of rules) {
+    // Pass custom message to validator if provided
     const error = rule.validator(value, rule.param, rule.message);
     if (error) {
       return error;

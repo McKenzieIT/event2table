@@ -47,7 +47,7 @@ describe('validationRules', () => {
     });
 
     it('should use custom error message', () => {
-      expect(validationRules.required('', 'Custom message')).toBe('Custom message');
+      expect(validationRules.required('', undefined, 'Custom message')).toBe('Custom message');
     });
   });
 
@@ -145,7 +145,7 @@ describe('validationRules', () => {
     });
 
     it('should use custom error message', () => {
-      expect(validationRules.number('abc', 'Invalid number')).toBe('Invalid number');
+      expect(validationRules.number('abc', undefined, 'Invalid number')).toBe('Invalid number');
     });
   });
 
@@ -174,7 +174,7 @@ describe('validationRules', () => {
     });
 
     it('should use custom error message', () => {
-      expect(validationRules.email('invalid', 'Invalid email')).toBe('Invalid email');
+      expect(validationRules.email('invalid', undefined, 'Invalid email')).toBe('Invalid email');
     });
   });
 });
@@ -197,7 +197,7 @@ describe('validateField', () => {
       { validator: validationRules.maxLength, param: 10, message: 'Too long' },
     ];
 
-    expect(validateField('ab', rules)).toBe('Required');
+    expect(validateField('', rules)).toBe('Required');
   });
 
   it('should return null when all rules pass', () => {
@@ -234,7 +234,7 @@ describe('validateField', () => {
       { validator: validationRules.minLength, param: 3 },
     ];
 
-    expect(validateField('ab', rules)).toBe('Lowercase only');
+    expect(validateField('AB', rules)).toBe('Lowercase only');
     expect(validateField('ABC', rules)).toBe('Lowercase only');
     expect(validateField('abc', rules)).toBeNull();
   });
