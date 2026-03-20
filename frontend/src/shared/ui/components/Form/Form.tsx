@@ -1,5 +1,5 @@
 import React, { createContext, useContext, forwardRef, useCallback } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, FormProvider } from 'react-hook-form';
 import type {
   FormProps,
   FormContextValue,
@@ -96,18 +96,20 @@ const Form = forwardRef<HTMLFormElement, FormProps>(({
   );
 
   return (
-    <FormContext.Provider value={contextValue}>
-      <form
-        ref={ref}
-        id={id}
-        onSubmit={handleSubmit}
-        className={className}
-        noValidate
-        {...props}
-      >
-        {children}
-      </form>
-    </FormContext.Provider>
+    <FormProvider {...form}>
+      <FormContext.Provider value={contextValue}>
+        <form
+          ref={ref}
+          id={id}
+          onSubmit={handleSubmit}
+          className={className}
+          noValidate
+          {...props}
+        >
+          {children}
+        </form>
+      </FormContext.Provider>
+    </FormProvider>
   );
 });
 

@@ -488,6 +488,44 @@
 }
 
 /* ========================================
+   Drag Support
+   ======================================== */
+
+.modal-content--draggable {
+  /* 拖拽时使用will-change优化性能 */
+  will-change: transform;
+}
+
+.modal-content--draggable .modal-header {
+  cursor: move;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.modal-content--draggable .modal-header:active {
+  cursor: grabbing;
+}
+
+.modal-content--dragging {
+  /* 拖拽中禁用过渡动画，避免卡顿 */
+  transition: none !important;
+  /* 拖拽时提升层级 */
+  z-index: 10;
+}
+
+.modal-content--dragging .modal-header {
+  cursor: grabbing;
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  .modal-content--draggable .modal-header {
+    cursor: default;
+  }
+}
+
+/* ========================================
    Accessibility
    ======================================== */
 
@@ -498,6 +536,8 @@
   .modal-content--slideUp,
   .modal-content--fadeIn,
   .modal-content--scale,
+  .modal-content--draggable,
+  .modal-content--dragging,
   .modal-confirm-backdrop,
   .modal-confirm {
     animation: none;

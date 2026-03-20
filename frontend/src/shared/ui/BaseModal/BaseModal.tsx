@@ -1,5 +1,11 @@
 // @ts-nocheck - TypeScript检查暂禁用
 /**
+ * @deprecated This component is deprecated. Use Modal from '@/shared/ui/components/Modal' instead.
+ * Will be removed in v3.0.0
+ * Migration guide: Replace 'BaseModal' with 'Modal' in imports.
+ * @see Modal
+ */
+/**
  * BaseModal Component
  * 统一基础模态框组件
  *

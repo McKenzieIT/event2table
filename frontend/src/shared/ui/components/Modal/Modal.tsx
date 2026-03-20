@@ -27,10 +27,12 @@ import type {
   ModalSize, 
   ModalAnimation, 
   ModalVariant,
-  ModalConfirmConfig 
+  ModalConfirmConfig,
+  ModalDragConfig 
 } from './Modal.types';
 import { MODAL_ANIMATION_DELAY } from '@shared/constants/timeouts';
 import { Z_INDICES } from '@shared/constants/zIndices';
+import { useDraggable } from '@shared/hooks/useDraggable';
 import './Modal.css';
 
 // 默认确认对话框配置
@@ -90,6 +92,7 @@ export const Modal = React.memo(function Modal({
   onAfterClose,
   ariaDescribedby,
   ariaLabelledby,
+  draggable = false,
 }: ModalProps) {
   // ========== 状态管理 ==========
   const [showConfirm, setShowConfirm] = useState(false);
@@ -100,6 +103,34 @@ export const Modal = React.memo(function Modal({
   const triggerElementRef = useRef<HTMLElement | null>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+
+  // ========== 拖拽功能 ==========
+  // 解析拖拽配置
+  const dragConfig = useMemo<ModalDragConfig>(() => {
+    if (typeof draggable === 'boolean') {
+      return { enabled: draggable };
+    }
+    return { enabled: true, ...draggable };
+  }, [draggable]);
+
+  // 使用拖拽 Hook
+  const { 
+    position: dragPosition, 
+    isDragging, 
+    handlers: dragHandlers, 
+    elementRef: dragElementRef,
+    reset: resetDragPosition,
+  } = useDraggable({
+    enabled: dragConfig.enabled && isOpen && !showConfirm && !isClosing,
+    bounds: dragConfig.bounds || 'window',
+    grid: dragConfig.grid,
+  });
+
+  // 合并 refs
+  const setContentRef = useCallback((node: HTMLDivElement | null) => {
+    modalContentRef.current = node;
+    dragElementRef.current = node;
+  }, [dragElementRef]);
 
   // ========== 性能优化：useMemo ==========
   
@@ -159,13 +190,21 @@ export const Modal = React.memo(function Modal({
       classes.push(`modal-content--${variant}`);
     }
     
+    // 添加拖拽类
+    if (dragConfig.enabled) {
+      classes.push('modal-content--draggable');
+    }
+    if (isDragging) {
+      classes.push('modal-content--dragging');
+    }
+    
     // 添加自定义className
     if (className) {
       classes.push(className);
     }
     
     return classes.join(' ');
-  }, [size, fullScreen, animation, glassmorphism, variant, className]);
+  }, [size, fullScreen, animation, glassmorphism, variant, dragConfig.enabled, isDragging, className]);
 
   // ========== 性能优化：useCallback ==========
   
@@ -313,13 +352,17 @@ export const Modal = React.memo(function Modal({
       // 恢复body滚动
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
+      // 关闭时重置拖拽位置
+      if (dragConfig.enabled) {
+        resetDragPosition();
+      }
     }
 
     return () => {
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
     };
-  }, [isOpen]);
+  }, [isOpen, dragConfig.enabled, resetDragPosition]);
 
   // ========== 渲染 ==========
   
@@ -346,16 +389,24 @@ export const Modal = React.memo(function Modal({
       >
         {/* Modal内容 */}
         <div
-          ref={modalContentRef}
+          ref={setContentRef}
           className={modalClasses}
-          style={style}
+          style={{
+            ...style,
+            transform: dragConfig.enabled 
+              ? `translate(${dragPosition.x}px, ${dragPosition.y}px)` 
+              : undefined,
+          }}
           onClick={(e) => e.stopPropagation()}
           tabIndex={-1}
           {...ariaProps}
         >
           {/* Header */}
           {showHeader && (
-            <div className="modal-header">
+            <div 
+              className="modal-header"
+              {...(dragConfig.enabled ? dragHandlers : {})}
+            >
               <h2 
                 className="modal-title" 
                 id="modal-title"

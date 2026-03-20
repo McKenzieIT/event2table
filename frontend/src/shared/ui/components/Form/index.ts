@@ -17,6 +17,9 @@ export { default as FormInput } from './FormInput';
 export { default as FormSelect } from './FormSelect';
 export { default as FormCheckbox } from './FormCheckbox';
 export { default as FormRadio } from './FormRadio';
+export { default as FormDatePicker } from './FormDatePicker';
+export { default as FormUpload } from './FormUpload';
+export { default as FormRichText } from './FormRichText';
 
 // Types
 export type {
@@ -27,6 +30,10 @@ export type {
   SelectFieldProps,
   CheckboxFieldProps,
   RadioFieldProps,
+  DatePickerFieldProps,
+  UploadFieldProps,
+  RichTextFieldProps,
+  UploadFile,
   SelectOption,
   RadioOption,
   FormErrorMessageProps,
