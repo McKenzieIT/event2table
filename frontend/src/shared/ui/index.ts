@@ -119,18 +119,28 @@
 export { default as Button } from './Button/Button';
 export { default as Input } from './Input/Input';
 export { default as TextArea } from './TextArea/TextArea';
-export { default as Table } from './Table/Table';
+export { Table } from './components/Table/Table';
 export { default as Badge } from './Badge/Badge';
-export { default as Select } from './Select/Select';
 export { default as Checkbox } from './Checkbox/Checkbox';
 export { default as Radio } from './Radio/Radio';
 export { default as Switch } from './Switch/Switch';
 export { default as Spinner } from './Spinner/Spinner';
 
+// Select exports
+export { Select } from './components/Select/Select';
+export type { SelectProps, SelectOption } from './components/Select/Select.types';
+
+// Backward compatibility - Old Table alias
+/**
+ * @deprecated Use Table from '@/shared/ui/components/Table' instead.
+ * Will be removed in v3.0.0
+ */
+export { default as LegacyTable } from './Table/Table';
+
 // 基础组件类型导出
 export type { InputProps } from './Input/Input';
 export type { TextAreaProps } from './TextArea/TextArea';
-export type { SelectProps, SelectOption } from './Select/Select';
+export type { TableProps, TableColumn } from './components/Table/Table.types';
 export type { CheckboxProps } from './Checkbox/Checkbox';
 export type { RadioProps } from './Radio/Radio';
 export type { SwitchProps } from './Switch/Switch';
@@ -152,9 +162,22 @@ export type { SelectGamePromptProps } from './SelectGamePrompt';
 // ============================================================================
 
 export { default as Card } from './Card/Card';
-export { default as Modal, BaseModal } from './BaseModal/BaseModal';
 export { default as PageLoader } from './PageLoader/PageLoader';
 export { default as Pagination } from './Pagination/Pagination';
+
+// ============================================================================
+// Modal组件 - 统一的模态框组件
+// ============================================================================
+
+// Modal exports
+export { Modal } from './components/Modal/Modal';
+export type { ModalProps, ModalSize, ModalAnimation, ModalVariant } from './components/Modal/Modal.types';
+
+// Backward compatibility - BaseModal alias
+/**
+ * @deprecated Use Modal instead. Will be removed in v3.0.0
+ */
+export { Modal as BaseModal } from './components/Modal/Modal';
 
 // 布局组件类型导出
 export type { PaginationProps } from './Pagination/Pagination';
