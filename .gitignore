@@ -1,8 +1,58 @@
-# Python
+# ==================== 临时文件管理 ====================
+# 测试截图（根目录）
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+
+# 但保留output/screenshots/目录
+!output/screenshots/**/*.png
+!output/screenshots/**/*.jpg
+!output/screenshots/**/*.jpeg
+
+# 临时报告（根目录）
+REPORT.md
+*REPORT.md
+*IMPLEMENTATION-REPORT.md
+*PROGRESS*.md
+*SUMMARY.md
+*_TEST-*.md
+*TEST-*.md
+
+# 但保留output/reports/目录
+!output/reports/**/*.md
+
+# 日志文件
+::log_file
+*.log
+logs/*.log
+
+# 临时文件
+*.tmp
+*.temp
+*.cache
+.DS_Store
+Thumbs.db
+
+# ==================== 数据库文件 ====================
+# SQLite WAL和SHM文件
+*.db-wal
+*.db-shm
+
+# 但保留data/目录的结构文件
+!data/.gitkeep
+
+# ==================== Python ====================
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -19,125 +69,100 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
-# Virtual environments
-venv/
-ENV/
-env/
-.venv
-backend/venv/
-backend/venv/
+# PyInstaller
+*.manifest
+*.spec
 
-# Pytest
-.pytest_cache/
+# Unit test / coverage reports
+htmlcov/
+.tox/
 .coverage
 .coverage.*
-htmlcov/
+.cache
+nosetests.xml
+coverage.xml
 *.cover
 .hypothesis/
+.pytest_cache/
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-data/*.db
+# ==================== Node.js ====================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Logs
-logs/
-*.log
+# ==================== IDE ====================
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==================== 构建产物 ====================
+# Python
+*.egg-info/
+dist/
+build/
 
 # Frontend
-node_modules/
-.vite/
-dist/
-debug-*.png
-console-test.png
+frontend/dist/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
 
-# Test outputs (frontend/test/output/)
-frontend/test/output/
-playwright-report/
-playwright-report-2/
-screenshots/
-test-results.json
-
-# Test outputs (unified location)
-test-output/
-test/output/
-backend/test/output/
-test-results/
-frontend/test-results/
-
-# Test analysis reports (archived)
-docs/testing/reports/test-analysis-reports//
-
-# Performance test scripts (archived)
-frontend/tests/performance/*.js
-frontend/tests/performance/*.md
-
-# Environment variables
+# ==================== 环境变量 ====================
+.env
 .env.local
-.env.*.local
-.env.development
-.env.production
-.env.test
+.env.development.local
+.env.test.local
+.env.production.local
 
-# IDE
-.vscode/
-.idea/
+# ==================== 操作系统 ====================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+.Icon
+._*
+
+# ==================== 其他 ====================
+# 备份文件
+*.bak
+*.backup
 *.swp
 *.swo
-*~
 
-# OS
-.DS_Store
-Thumbs.db
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
 
-# Cache
-.cache/
-*.cache
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-
-# Build artifacts
-build/
-*.egg-info/
-
-# Claude Code
-.claude/plans/
-.claude/sessions/
-
-# Ralph Loop E2E Testing
-docs/ralph/
-
-# Git Worktrees
-.worktrees/
-
-# Ignore auto-generated folder context files
-**/CLAUDE.md
-
-# But keep the root CLAUDE.md if you want
-!CLAUDE.md
-# Test directories (new structure, currently in development)
-backend/test/
-frontend/test/
-
-# Update-docs skill output (temporary working documents)
-.claude/skills/update-docs/output/
-
-# Temporary backup and test files
-test-cleanup-backup-*.tar.gz
-test-game-deletion.md
-test-reports/
-
-# Database backups (keep production backups in data/)
-data/*.backup
-data/*.backup_*
-
-# Migration scripts (run once)
-scripts/migrate/*.sql
-scripts/migrate/*.py
-docs-backup-*.tar.gz
+# Lock文件（保留package-lock.json和yarn.lock）
+*.lock
