@@ -16,12 +16,34 @@ REPORT.md
 *REPORT.md
 *IMPLEMENTATION-REPORT.md
 *PROGRESS*.md
-*SUMMARY.md
-*_TEST-*.md
-*TEST-*.md
+*_SUMMARY.md
 
 # 但保留output/reports/目录
 !output/reports/**/*.md
+
+# 测试输出（全部排除）
+output/test-results/
+output/screenshots/
+playwright-tests/test-results/
+playwright-tests/screenshots/
+frontend/test-results/
+test-results/
+test-reports/
+test-output/
+
+# 测试日志
+*.log
+console-error-*.log
+playwright-*.log
+test-*.log
+test-results.txt
+webkit-*.txt
+
+# 但保留关键报告
+!output/PLAYWRIGHT-IMPLEMENTATION-FINAL-SUMMARY.md
+!output/COMPREHENSIVE-TEST-ANALYSIS-2026-03-20.md
+!output/SUPPLEMENTARY-TEST-PLAN.md
+!output/WEBKIT-COMPATIBILITY-ANALYSIS.md
 
 # 日志文件
 ::log_file
@@ -166,3 +188,16 @@ Desktop.ini
 
 # Lock文件（保留package-lock.json和yarn.lock）
 *.lock
+
+# ==================== Claude Code相关 ====================
+# Agent输出目录
+.agents/
+
+# .claude目录的部分内容
+.claude/skills/*/output/
+.claude/skills/*/references/
+.claude/skills/*/scripts/detectors/
+.claude/skills/*/scripts/fixers/
+.claude/skills/*/scripts/utils/
+.claude/skills/*/tests/
+.claude/skills/*/config/test_configs/
