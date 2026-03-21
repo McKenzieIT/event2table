@@ -86,7 +86,6 @@ export const FormInput = <
       <Controller
         name={name}
         control={control}
-        defaultValue=""
         render={({ field, fieldState: { invalid } }) => (
           <input
             id={name as string}

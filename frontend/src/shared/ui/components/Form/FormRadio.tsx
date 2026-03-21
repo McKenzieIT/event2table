@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { FieldValues, FieldPath } from 'react-hook-form';
 import type { RadioFieldProps } from './Form.types';
-import { FormErrorMessage } from './Form';
+import { FormErrorMessage, FormHelperText } from './Form';
 
 /**
  * FormRadio Component
@@ -44,6 +44,7 @@ export const FormRadio = <
 }: RadioFieldProps<TFieldValues>) => {
   const {
     control,
+    trigger,
     formState: { errors },
   } = useFormContext<TFieldValues>();
 
@@ -105,7 +106,11 @@ export const FormRadio = <
                   name={name as string}
                   value={option.value}
                   checked={field.value === option.value}
-                  onChange={(e) => field.onChange(e.target.value)}
+                  onChange={async (e) => {
+                    await field.onChange(e.target.value);
+                    // Trigger validation to clear errors when a value is selected
+                    await trigger(name);
+                  }}
                   disabled={disabled || option.disabled}
                   aria-invalid={!!error}
                   className="form-radio-input"
@@ -118,6 +123,7 @@ export const FormRadio = <
         )}
       />
 
+      <FormHelperText text={!error ? helperText : undefined} />
       <FormErrorMessage error={error} className="form-error-message" />
     </div>
   );

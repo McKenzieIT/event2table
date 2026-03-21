@@ -60,6 +60,10 @@ import { TableSort } from './TableSort';
 import { useTableVirtualScroll } from './useTableVirtualScroll';
 import { useTableHandlers } from './useTableHandlers';
 import { useTableRender } from './useTableRender';
+import { TableVirtualizedRows } from './TableVirtualizedRows';
+import { TableRegularRows } from './TableRegularRows';
+import { TableLoadingState } from './TableLoadingState';
+import { TableEmptyState } from './TableEmptyState';
 import './Table.css';
 
 // ============================================================================
@@ -513,131 +517,43 @@ const Table = React.memo(<TData extends Record<string, unknown>>({
 
           <TableBody className={bodyClassName}>
             {loading ? (
-              <tr>
-                <td colSpan={table.getAllColumns().length} className="table-loading">
-                  {loadingComponent || <div className="table-spinner" />}
-                </td>
-              </tr>
+              <TableLoadingState
+                colSpan={table.getAllColumns().length}
+                loadingComponent={loadingComponent}
+              />
             ) : displayRows.length === 0 ? (
-              <tr>
-                <td colSpan={table.getAllColumns().length} className="table-empty">
-                  {emptyComponent || <div className="table-empty-message">No data available</div>}
-                </td>
-              </tr>
+              <TableEmptyState
+                colSpan={table.getAllColumns().length}
+                emptyComponent={emptyComponent}
+              />
             ) : (
               <>
                 {virtual ? (
-                  <>
-                    {/* Spacer for virtualized rows above viewport */}
-                    {virtualRows.length > 0 && virtualRows[0].start > 0 && (
-                      <tr style={{ height: virtualRows[0].start }} />
-                    )}
-                    {virtualRows.map((virtualRow) => {
-                      const row = rows[virtualRow.index];
-                      return (
-                        <tr
-                          key={row.id}
-                          data-index={virtualRow.index}
-                          ref={dynamicRowHeight ? rowVirtualizer.measureElement : undefined}
-                          className={[
-                            'table-tr',
-                            'table-tr--virtual',
-                            row.getIsSelected() && 'table-tr--selected',
-                          ].filter(Boolean).join(' ')}
-                          onClick={(e) => handleRowClick(row.original, e)}
-                          onDoubleClick={(e) => handleRowDoubleClick(row.original, e)}
-                        >
-                          {row.getVisibleCells().map((cell: any) => {
-                            const columnDef = cell.column.columnDef as TableColumn<TData>;
-                            const isPinnedLeft = cell.column.getIsPinned() === 'left';
-                            const isPinnedRight = cell.column.getIsPinned() === 'right';
-                            const isPinned = isPinnedLeft || isPinnedRight;
-
-                            return (
-                              <td
-                                key={cell.id}
-                                className={[
-                                  'table-td',
-                                  columnDef.align && `table-td--${columnDef.align}`,
-                                  isPinned && 'table-td--pinned',
-                                  isPinnedLeft && 'table-td--pinned-left',
-                                  isPinnedRight && 'table-td--pinned-right',
-                                ].filter(Boolean).join(' ')}
-                                style={{
-                                  width: cell.column.getSize(),
-                                  left: isPinnedLeft ? cell.column.getStart() : undefined,
-                                  right: isPinnedRight ? cell.column.getTotalRight() : undefined,
-                                }}
-                                onClick={(e) => handleCellClick(cell, e)}
-                                onDoubleClick={() => {
-                                  if (editable && columnDef.editable) {
-                                    setEditingCell({
-                                      rowIndex: virtualRow.index,
-                                      columnId: cell.column.id,
-                                    });
-                                  }
-                                }}
-                              >
-                                {renderCell(cell, virtualRow.index)}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                    {/* Spacer for virtualized rows below viewport */}
-                    {virtualRows.length > 0 && (
-                      <tr style={{ height: totalSize - virtualRows[virtualRows.length - 1].end }} />
-                    )}
-                  </>
+                  <TableVirtualizedRows
+                    rows={rows}
+                    virtualRows={virtualRows}
+                    totalSize={totalSize}
+                    rowVirtualizer={rowVirtualizer}
+                    dynamicRowHeight={dynamicRowHeight}
+                    editable={editable}
+                    editingCell={editingCell}
+                    setEditingCell={setEditingCell}
+                    renderCell={renderCell}
+                    onRowClick={handleRowClick}
+                    onRowDoubleClick={handleRowDoubleClick}
+                    onCellClick={handleCellClick}
+                  />
                 ) : (
-                  displayRows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className={[
-                        'table-tr',
-                        row.getIsSelected() && 'table-tr--selected',
-                      ].filter(Boolean).join(' ')}
-                      onClick={(e) => handleRowClick(row.original, e)}
-                      onDoubleClick={(e) => handleRowDoubleClick(row.original, e)}
-                    >
-                      {row.getVisibleCells().map((cell: any) => {
-                        const columnDef = cell.column.columnDef as TableColumn<TData>;
-                        const isPinnedLeft = cell.column.getIsPinned() === 'left';
-                        const isPinnedRight = cell.column.getIsPinned() === 'right';
-                        const isPinned = isPinnedLeft || isPinnedRight;
-
-                        return (
-                          <td
-                            key={cell.id}
-                            className={[
-                              'table-td',
-                              columnDef.align && `table-td--${columnDef.align}`,
-                              isPinned && 'table-td--pinned',
-                              isPinnedLeft && 'table-td--pinned-left',
-                              isPinnedRight && 'table-td--pinned-right',
-                            ].filter(Boolean).join(' ')}
-                            style={{
-                              width: cell.column.getSize(),
-                              left: isPinnedLeft ? cell.column.getStart() : undefined,
-                              right: isPinnedRight ? cell.column.getTotalRight() : undefined,
-                            }}
-                            onClick={(e) => handleCellClick(cell, e)}
-                            onDoubleClick={() => {
-                              if (editable && columnDef.editable) {
-                                setEditingCell({
-                                  rowIndex: row.index,
-                                  columnId: cell.column.id,
-                                });
-                              }
-                            }}
-                          >
-                            {renderCell(cell, row.index)}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))
+                  <TableRegularRows
+                    rows={displayRows}
+                    editable={editable}
+                    editingCell={editingCell}
+                    setEditingCell={setEditingCell}
+                    renderCell={renderCell}
+                    onRowClick={handleRowClick}
+                    onRowDoubleClick={handleRowDoubleClick}
+                    onCellClick={handleCellClick}
+                  />
                 )}
               </>
             )}

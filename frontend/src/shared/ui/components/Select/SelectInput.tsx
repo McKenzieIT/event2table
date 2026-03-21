@@ -17,7 +17,10 @@ export interface SelectInputProps {
   onRemoveOption: (event: MouseEvent, value: string | number) => void;
   onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   onFocus: (event: FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (event: FocusEvent<HTMLDivElement>) => void;
   triggerRef: React.RefObject<HTMLDivElement>;
+  ariaDescribedBy?: string;
+  required?: boolean;
 }
 
 /**
@@ -40,13 +43,17 @@ export const SelectInput = React.memo<SelectInputProps>(({
   onRemoveOption,
   onKeyDown,
   onFocus,
-  triggerRef
+  onBlur,
+  triggerRef,
+  ariaDescribedBy,
+  required = false
 }) => {
   return (
     <>
       {label && (
         <label id={labelId} className="cyber-select__label">
           {label}
+          {required && <span className="cyber-select__required" aria-hidden="true">*</span>}
         </label>
       )}
 
@@ -62,9 +69,11 @@ export const SelectInput = React.memo<SelectInputProps>(({
         aria-invalid={isInvalid}
         aria-labelledby={label ? labelId : undefined}
         aria-multiselectable={multiple}
+        aria-describedby={ariaDescribedBy}
         onClick={onTriggerClick}
         onKeyDown={onKeyDown}
         onFocus={onFocus}
+        onBlur={onBlur}
       >
         {multiple && selectedOptions.length > 0 ? (
           <div className="cyber-select-tags">

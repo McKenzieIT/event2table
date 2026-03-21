@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 /**
  * Props for TableFooter component
@@ -13,10 +13,10 @@ export interface TableFooterProps {
 /**
  * TableFooter Component
  */
-export const TableFooter: React.FC<TableFooterProps> = ({
+export const TableFooter = memo(function TableFooter({
   className = '',
   children,
-}) => {
+}: TableFooterProps) {
   return (
     <tfoot className={className}>
       {children && (
@@ -26,6 +26,6 @@ export const TableFooter: React.FC<TableFooterProps> = ({
       )}
     </tfoot>
   );
-};
+});
 
 TableFooter.displayName = 'TableFooter';

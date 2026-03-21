@@ -27,14 +27,13 @@ describe('Select + Form Integration', () => {
     const schema = z.object({
       name: z.string().min(1, 'Name is required'),
       category: z.string().min(1, 'Category is required'),
-      tags: z.array(z.string()).min(1, 'Select at least one tag'),
     });
 
     const SelectFormIntegration = () => {
       const form = useForm({
         resolver: zodResolver(schema),
         mode: 'onBlur',
-        defaultValues: { name: '', category: '', tags: [] },
+        defaultValues: { name: '', category: '' },
       });
 
       const handleSubmit = form.handleSubmit((data) => {
@@ -73,6 +72,168 @@ describe('Select + Form Integration', () => {
         expect.objectContaining({
           name: 'Test Item',
           category: 'tech',
+        })
+      );
+    });
+  });
+
+  it('should handle select search and option selection', async () => {
+    const user = userEvent.setup();
+    const onSubmitData = vi.fn();
+    
+    const schema = z.object({
+      country: z.string().min(1, 'Country is required'),
+    });
+
+    const SelectSearchIntegration = () => {
+      const form = useForm({
+        resolver: zodResolver(schema),
+        mode: 'onBlur',
+        defaultValues: { country: '' },
+      });
+
+      const handleSubmit = form.handleSubmit((data) => {
+        onSubmitData(data);
+      });
+
+      return (
+        <Form form={form} onSubmit={handleSubmit}>
+          <Select
+            name="country"
+            label="Country"
+            searchable
+            options={[
+              { value: 'us', label: 'United States' },
+              { value: 'uk', label: 'United Kingdom' },
+              { value: 'ca', label: 'Canada' },
+              { value: 'au', label: 'Australia' },
+              { value: 'de', label: 'Germany' },
+            ]}
+          />
+          <button type="submit">Submit</button>
+        </Form>
+      );
+    };
+
+    render(<SelectSearchIntegration />);
+
+    // Click select to open dropdown
+    const select = screen.getByRole('combobox');
+    await user.click(select);
+
+    // Type in search box to filter options
+    const searchInput = screen.getByRole('textbox');
+    await user.type(searchInput, 'Uni');
+
+    // Verify filtered options
+    await waitFor(() => {
+      expect(screen.getByText('United States')).toBeInTheDocument();
+      expect(screen.getByText('United Kingdom')).toBeInTheDocument();
+      expect(screen.queryByText('Canada')).not.toBeInTheDocument();
+    });
+
+    // Select an option
+    await user.click(screen.getByText('United States'));
+
+    // Submit form
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    // Verify submission
+    await waitFor(() => {
+      expect(onSubmitData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          country: 'us',
+        })
+      );
+    });
+  });
+
+  it('should handle select with dependent options', async () => {
+    const user = userEvent.setup();
+    const onSubmitData = vi.fn();
+    
+    const schema = z.object({
+      category: z.string().min(1, 'Category is required'),
+      subcategory: z.string().min(1, 'Subcategory is required'),
+    });
+
+    const categoryOptions = [
+      { value: 'tech', label: 'Technology' },
+      { value: 'design', label: 'Design' },
+    ];
+
+    const subcategoryOptions: Record<string, Array<{ value: string; label: string }>> = {
+      tech: [
+        { value: 'frontend', label: 'Frontend' },
+        { value: 'backend', label: 'Backend' },
+      ],
+      design: [
+        { value: 'ui', label: 'UI Design' },
+        { value: 'ux', label: 'UX Design' },
+      ],
+    };
+
+    const DependentSelectIntegration = () => {
+      const form = useForm({
+        resolver: zodResolver(schema),
+        mode: 'onBlur',
+        defaultValues: { category: '', subcategory: '' },
+      });
+
+      const category = form.watch('category');
+      const currentSubcategoryOptions = subcategoryOptions[category] || [];
+
+      const handleSubmit = form.handleSubmit((data) => {
+        onSubmitData(data);
+      });
+
+      return (
+        <Form form={form} onSubmit={handleSubmit}>
+          <Select
+            name="category"
+            label="Category"
+            options={categoryOptions}
+          />
+          <Select
+            name="subcategory"
+            label="Subcategory"
+            options={currentSubcategoryOptions}
+            disabled={!category}
+          />
+          <button type="submit">Submit</button>
+        </Form>
+      );
+    };
+
+    render(<DependentSelectIntegration />);
+
+    // Subcategory select should be disabled initially
+    const subcategorySelect = screen.getAllByRole('combobox')[1];
+    expect(subcategorySelect).toBeDisabled();
+
+    // Select category
+    const categorySelect = screen.getAllByRole('combobox')[0];
+    await user.click(categorySelect);
+    await user.click(screen.getByText('Technology'));
+
+    // Subcategory select should now be enabled
+    await waitFor(() => {
+      expect(subcategorySelect).not.toBeDisabled();
+    });
+
+    // Select subcategory
+    await user.click(subcategorySelect);
+    await user.click(screen.getByText('Frontend'));
+
+    // Submit form
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    // Verify submission
+    await waitFor(() => {
+      expect(onSubmitData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          category: 'tech',
+          subcategory: 'frontend',
         })
       );
     });

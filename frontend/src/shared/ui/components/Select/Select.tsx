@@ -134,6 +134,8 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
       }
       setSelectedValues(newValues);
       onChange?.(newValues as any);
+      // Close dropdown after selection in multiple mode
+      setIsOpen(false);
     } else {
       newValues = [optionValue];
       setSelectedValues(newValues);
@@ -226,13 +228,19 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
 
   // Scroll focused option into view
   useEffect(() => {
-    if (focusedIndex >= 0 && optionsRef.current[focusedIndex]) {
-      optionsRef.current[focusedIndex]?.scrollIntoView({
-        block: 'nearest',
-        behavior: 'smooth'
-      });
+    if (focusedIndex >= 0) {
+      // Scroll the focused visible option into view
+      const visibleOptions = filteredOptions.filter(opt => !opt.disabled);
+      if (focusedIndex < visibleOptions.length) {
+        const focusedOption = visibleOptions[focusedIndex];
+        const optionIndex = filteredOptions.findIndex(opt => opt.value === focusedOption.value);
+        const optionElement = optionsRef.current[optionIndex];
+        if (optionElement && typeof optionElement.scrollIntoView === 'function') {
+          optionElement.scrollIntoView({ block: 'nearest' });
+        }
+      }
     }
-  }, [focusedIndex]);
+  }, [focusedIndex, filteredOptions]);
 
   const wrapperClass = [
     'cyber-select-wrapper',
@@ -247,6 +255,12 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
     className
   ].filter(Boolean).join(' ');
 
+  // Determine aria-describedby value
+  const ariaDescribedBy = [
+    isInvalid ? `${triggerId}-error` : null,
+    helperText && !isInvalid ? `${triggerId}-helper` : null
+  ].filter(Boolean).join(' ') || undefined;
+
   // Render with React Hook Form Controller if control is provided
   if (control) {
     return (
@@ -254,7 +268,7 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
         name={name}
         control={control}
         rules={rules}
-        render={({ field: { onChange: controllerOnChange, value: controllerValue } }) => (
+        render={({ field: { onChange: controllerOnChange, value: controllerValue, onBlur } }) => (
           <div className={containerClass} ref={ref} {...props}>
             <div className={wrapperClass} ref={dropdownRef}>
               <SelectInput
@@ -272,7 +286,10 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
                 onRemoveOption={handleRemoveOption}
                 onKeyDown={handleKeyDown}
                 onFocus={handleFocus}
+                onBlur={onBlur}
                 triggerRef={triggerRef}
+                ariaDescribedBy={ariaDescribedBy}
+                required={required}
               />
 
               <SelectDropdown
@@ -292,17 +309,7 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
               />
             </div>
 
-            {isInvalid && (
-              <p id={`${triggerId}-error`} className="cyber-select__error" role="alert">
-                {error}
-              </p>
-            )}
-
-            {helperText && !isInvalid && (
-              <p id={`${triggerId}-helper`} className="cyber-select__helper">
-                {helperText}
-              </p>
-            )}
+            {/* Error message is rendered by the parent component, not here */}
           </div>
         )}
       />
@@ -329,6 +336,8 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           triggerRef={triggerRef}
+          ariaDescribedBy={ariaDescribedBy}
+          required={required}
         />
 
         <SelectDropdown

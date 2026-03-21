@@ -280,7 +280,9 @@ describe('Select Component', () => {
       await user.keyboard('{ArrowUp}');
 
       const options = screen.getAllByRole('option');
-      expect(options[options.length - 1]).toHaveClass('cyber-select-option--focused');
+      // The last non-disabled option should have focused class
+      const nonDisabledOptions = options.filter(opt => !opt.classList.contains('cyber-select-option--disabled'));
+      expect(nonDisabledOptions[nonDisabledOptions.length - 1]).toHaveClass('cyber-select-option--focused');
     });
 
     it('should select focused option on Enter key', async () => {

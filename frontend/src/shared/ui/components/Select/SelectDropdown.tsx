@@ -48,6 +48,14 @@ export const SelectDropdown = React.memo<SelectDropdownProps>(({
     position === 'up' && 'cyber-select-dropdown--up'
   ].filter(Boolean).join(' ');
 
+  // Calculate isFocused for each option based on visible (non-disabled) options
+  const getIsFocused = (option: SelectOptionType, index: number) => {
+    if (option.disabled) return false;
+    const visibleOptions = filteredOptions.filter(opt => !opt.disabled);
+    const visibleIndex = visibleOptions.findIndex(opt => opt.value === option.value);
+    return visibleIndex === focusedIndex;
+  };
+
   return (
     <div className={dropdownClass} role="listbox">
       {searchable && (
@@ -70,7 +78,7 @@ export const SelectDropdown = React.memo<SelectDropdownProps>(({
               key={option.value}
               option={option}
               isSelected={selectedValues.includes(option.value)}
-              isFocused={index === focusedIndex}
+              isFocused={getIsFocused(option, index)}
               multiple={multiple}
               onClick={onSelectOption}
               optionRef={(el) => {

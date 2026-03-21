@@ -84,11 +84,10 @@ const Form = forwardRef<HTMLFormElement, FormProps>(({
       return;
     }
     
-    // Get form data using react-hook-form's getValues
-    const formData = form.getValues();
-    
-    // Call onSubmit with form data
-    await onSubmit(formData);
+    // Call onSubmit with form data - use handleSubmit from react-hook-form to properly handle submission state
+    await form.handleSubmit(async (data) => {
+      await onSubmit(data);
+    })(event);
     
     // Reset form after successful submission if requested
     if (resetAfterSubmit) {
