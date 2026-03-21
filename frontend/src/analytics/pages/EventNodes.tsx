@@ -31,7 +31,7 @@ import FieldsListModal from "@event-builder/components/FieldsListModal";
 import { AdvancedFilterPanel } from "@event-builder/components/AdvancedFilterPanel";
 import { useDebounce } from "@shared/hooks/useDebounce";
 import { Button, ConfirmDialog } from "@shared/ui";
-import Table from "@shared/ui/Table";
+import Table from "@shared/ui/components/Table";
 import type {
   EventNode,
   EventNodeFilters,

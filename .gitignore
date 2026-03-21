@@ -16,34 +16,12 @@ REPORT.md
 *REPORT.md
 *IMPLEMENTATION-REPORT.md
 *PROGRESS*.md
-*_SUMMARY.md
+*SUMMARY.md
+*_TEST-*.md
+*TEST-*.md
 
 # 但保留output/reports/目录
 !output/reports/**/*.md
-
-# 测试输出（全部排除）
-output/test-results/
-output/screenshots/
-playwright-tests/test-results/
-playwright-tests/screenshots/
-frontend/test-results/
-test-results/
-test-reports/
-test-output/
-
-# 测试日志
-*.log
-console-error-*.log
-playwright-*.log
-test-*.log
-test-results.txt
-webkit-*.txt
-
-# 但保留关键报告
-!output/PLAYWRIGHT-IMPLEMENTATION-FINAL-SUMMARY.md
-!output/COMPREHENSIVE-TEST-ANALYSIS-2026-03-20.md
-!output/SUPPLEMENTARY-TEST-PLAN.md
-!output/WEBKIT-COMPATIBILITY-ANALYSIS.md
 
 # 日志文件
 ::log_file
@@ -107,28 +85,6 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
-
-# ==================== 测试文件管理 ====================
-# 测试输出目录
-frontend/test/e2e/output/
-frontend/test/e2e/test-results/
-backend/test/.pytest_cache/
-backend/test/__pycache__/
-backend/test/.coverage
-backend/test/htmlcov/
-frontend/test-results/
-playwright-tests/test-results/
-playwright-tests/screenshots/
-
-# 临时测试脚本（已归档）
-backend/test/verify_*.py
-frontend/test/e2e/verify-*.spec.ts
-frontend/test/e2e/*fix-verification*.spec.ts
-frontend/test/e2e/chrome-mcp*.spec.ts
-
-# 过时测试（已归档到docs/archive/testing/）
-frontend/test/e2e/deprecated/
-backend/test/deprecated/
 
 # ==================== Node.js ====================
 # Dependencies
@@ -211,22 +167,5 @@ Desktop.ini
 # Lock文件（保留package-lock.json和yarn.lock）
 *.lock
 
-# ==================== Claude Code相关 ====================
-# Agent输出目录
-.agents/
-
-# .claude目录的部分内容
-.claude/skills/*/output/
-.claude/skills/*/references/
-.claude/skills/*/scripts/detectors/
-.claude/skills/*/scripts/fixers/
-.claude/skills/*/scripts/utils/
-.claude/skills/*/tests/
-.claude/skills/*/config/test_configs/
-
-# Playwright测试输出（本地开发）
-playwright-tests/
-
-# Scripts临时文件（本地开发）
-scripts/temp/
-scripts/
+# ==================== Git Worktrees ====================
+.worktrees/

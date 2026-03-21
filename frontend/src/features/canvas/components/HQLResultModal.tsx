@@ -27,7 +27,7 @@
 import React, { useState, useEffect, useRef, useMemo, ChangeEvent, KeyboardEvent, Suspense } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { BaseModal, EmptyState, Spinner } from '@shared/ui';
+import { Modal, EmptyState, Spinner } from '@shared/ui';
 import { formatSQL, calculateSQLStats } from '@shared/utils/sqlFormatter';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import { LazyDataPreviewModal } from '@shared/utils/lazyModals';
@@ -366,7 +366,7 @@ const HQLResultModal: React.FC<HQLResultModalProps> = ({
   // Empty state when no HQL is provided
   if (!hql) {
     return (
-      <BaseModal
+      <Modal
         isOpen={isOpen}
         onClose={handleClose}
         title="HQL生成结果"
@@ -384,7 +384,7 @@ const HQLResultModal: React.FC<HQLResultModalProps> = ({
             </button>
           </div>
         </div>
-      </BaseModal>
+      </Modal>
     );
   }
 

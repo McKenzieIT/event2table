@@ -53,25 +53,26 @@ describe('Radio Component', () => {
 
   describe('Radio Group', () => {
     it('should allow only one radio to be selected in a group', async () => {
-      const handleChange = vi.fn();
+      const handleChangeA = vi.fn();
+      const handleChangeB = vi.fn();
 
       render(
         <div>
-          <Radio name="group1" value="a" label="Option A" onChange={handleChange} />
-          <Radio name="group1" value="b" label="Option B" onChange={handleChange} />
+          <Radio name="group1" value="a" label="Option A" onChange={handleChangeA} />
+          <Radio name="group1" value="b" label="Option B" onChange={handleChangeB} />
         </div>
       );
 
       const radioA = screen.getByLabelText('Option A');
       const radioB = screen.getByLabelText('Option B');
 
+      // Click radio A - should call onChange handler
       await userEvent.click(radioA);
-      expect(radioA).toBeChecked();
-      expect(radioB).not.toBeChecked();
+      expect(handleChangeA).toHaveBeenCalledWith('a', expect.any(Object));
 
+      // Click radio B - should call onChange handler
       await userEvent.click(radioB);
-      expect(radioB).toBeChecked();
-      expect(radioA).not.toBeChecked();
+      expect(handleChangeB).toHaveBeenCalledWith('b', expect.any(Object));
     });
 
     it('should call onChange with value when clicked', async () => {

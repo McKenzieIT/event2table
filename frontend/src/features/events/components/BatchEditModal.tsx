@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { BaseModal, Button, Input, Select, Checkbox, Badge, useToast } from '@shared/ui';
+import { Modal, Button, Input, Select, Checkbox, Badge, useToast } from '@shared/ui';
 import type { Event } from '@shared/types/event-types';
 
 /**
@@ -207,7 +207,7 @@ export const BatchEditModal = React.memo(function BatchEditModal({
   }, [showPreview, formData, categoryOptions, selectedEvents.length]);
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={`批量编辑 (${selectedEvents.length} 个事件)`}
@@ -325,7 +325,7 @@ export const BatchEditModal = React.memo(function BatchEditModal({
           )}
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 });
 

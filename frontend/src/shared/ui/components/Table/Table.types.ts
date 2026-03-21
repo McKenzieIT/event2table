@@ -91,6 +91,12 @@ export interface TableProps<TData extends RowData> {
   virtual?: boolean;
   rowHeight?: number;
   maxHeight?: number;
+  /** Number of extra rows to render above/below viewport (default: 10) */
+  overscan?: number;
+  /** Enable dynamic row height measurement */
+  dynamicRowHeight?: boolean;
+  /** Callback for virtual scroll performance metrics */
+  onVirtualScrollMetrics?: (metrics: VirtualScrollMetrics) => void;
   
   // Editing
   editable?: boolean;
@@ -118,6 +124,9 @@ export interface TableProps<TData extends RowData> {
   
   // Theme
   theme?: 'light' | 'dark' | 'auto';
+  
+  // Column grouping
+  enableColumnGrouping?: boolean;
 }
 
 // ============================================================================
@@ -217,6 +226,42 @@ export interface VirtualTableProps<TData extends RowData> extends TableProps<TDa
   rowHeight: number;
   maxHeight: number;
   overscan?: number;
+}
+
+// ============================================================================
+// Virtualization Performance Metrics
+// ============================================================================
+
+export interface VirtualScrollMetrics {
+  /** Total number of rows in dataset */
+  totalRows: number;
+  /** Number of visible rows in viewport */
+  visibleRows: number;
+  /** Current scroll position (pixels) */
+  scrollOffset: number;
+  /** Estimated row height */
+  estimatedRowHeight: number;
+  /** Actual rendered row height (if dynamic) */
+  actualRowHeight?: number;
+  /** Time to render visible rows (ms) */
+  renderTime?: number;
+  /** Memory usage estimate (MB) */
+  memoryUsage?: number;
+}
+
+export interface VirtualScrollConfig {
+  /** Enable virtual scrolling */
+  enabled: boolean;
+  /** Estimated row height for initial calculation */
+  estimateRowHeight: number | ((index: number) => number);
+  /** Number of extra rows to render above/below viewport */
+  overscan: number;
+  /** Enable dynamic row height measurement */
+  dynamicRowHeight: boolean;
+  /** Sticky header */
+  stickyHeader: boolean;
+  /** Performance target: max render time per frame (ms) */
+  targetFrameTime: number;
 }
 
 // ============================================================================

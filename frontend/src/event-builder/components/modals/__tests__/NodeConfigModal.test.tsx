@@ -6,26 +6,27 @@
  * Root Cause: nodeConfig initialized with empty strings, validation logic prevents enabling
  */
 
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import NodeConfigModal from '../NodeConfigModal';
 import { toast } from '@shared/ui';
 
 // Mock toast notifications
-jest.mock('@shared/ui', () => ({
-  ...jest.requireActual('@shared/ui'),
+vi.mock('@shared/ui', () => ({
+  ...vi.importActual('@shared/ui'),
   toast: {
-    error: jest.fn(),
-    success: jest.fn(),
+    error: vi.fn(),
+    success: vi.fn(),
   },
 }));
 
 describe('NodeConfigModal - First Time Creation Bug (P0 #1)', () => {
-  const mockOnChange = jest.fn();
-  const mockOnClose = jest.fn();
+  const mockOnChange = vi.fn();
+  const mockOnClose = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('When modal opens for new node (empty config)', () => {
@@ -127,7 +128,7 @@ describe('NodeConfigModal - First Time Creation Bug (P0 #1)', () => {
       const saveButton = screen.getByRole('button', { name: /保存/i });
 
       // If button is enabled, user can click it
-      if (!saveButton-beDisabled) {
+      if (!saveButton.hasAttribute('disabled')) {
         fireEvent.click(saveButton);
 
         // Assert: Toast error shown, onChange NOT called

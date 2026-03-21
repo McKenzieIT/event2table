@@ -71,6 +71,7 @@ export const FormCheckbox = <
       <Controller
         name={name}
         control={control}
+        defaultValue={false}
         render={({ field }) => (
           <label className="form-checkbox-label">
             <input

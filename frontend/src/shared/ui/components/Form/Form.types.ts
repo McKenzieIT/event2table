@@ -232,3 +232,169 @@ export interface FormHelperTextProps {
    */
   className?: string;
 }
+
+/**
+ * Date picker field specific props
+ */
+export interface DatePickerFieldProps<TFieldValues extends FieldValues = FieldValues>
+  extends FormFieldProps<TFieldValues> {
+  /**
+   * Date format
+   * @default 'YYYY-MM-DD'
+   */
+  format?: string;
+  
+  /**
+   * Show time picker
+   * @default false
+   */
+  showTime?: boolean;
+  
+  /**
+   * Time format
+   * @default 'HH:mm'
+   */
+  timeFormat?: string;
+  
+  /**
+   * Minimum date
+   */
+  minDate?: Date;
+  
+  /**
+   * Maximum date
+   */
+  maxDate?: Date;
+  
+  /**
+   * Placeholder text
+   */
+  placeholder?: string;
+}
+
+/**
+ * Upload file item
+ */
+export interface UploadFile {
+  /**
+   * File unique identifier
+   */
+  id: string;
+  
+  /**
+   * Original file
+   */
+  file: File;
+  
+  /**
+   * Upload progress (0-100)
+   */
+  progress?: number;
+  
+  /**
+   * Upload status
+   */
+  status?: 'pending' | 'uploading' | 'success' | 'error';
+  
+  /**
+   * Error message if upload failed
+   */
+  error?: string;
+  
+  /**
+   * Preview URL for images
+   */
+  previewUrl?: string;
+}
+
+/**
+ * Upload field specific props
+ */
+export interface UploadFieldProps<TFieldValues extends FieldValues = FieldValues>
+  extends FormFieldProps<TFieldValues> {
+  /**
+   * Accepted file types
+   * @example 'image/*,.pdf'
+   */
+  accept?: string;
+  
+  /**
+   * Allow multiple files
+   * @default false
+   */
+  multiple?: boolean;
+  
+  /**
+   * Maximum file size in bytes
+   * @default 5242880 (5MB)
+   */
+  maxSize?: number;
+  
+  /**
+   * Maximum number of files
+   * @default 10
+   */
+  maxFiles?: number;
+  
+  /**
+   * Enable drag and drop
+   * @default true
+   */
+  enableDragDrop?: boolean;
+  
+  /**
+   * Upload handler
+   */
+  onUpload?: (files: File[]) => Promise<UploadFile[]>;
+  
+  /**
+   * Custom upload button text
+   */
+  buttonText?: string;
+  
+  /**
+   * Show file preview
+   * @default true
+   */
+  showPreview?: boolean;
+}
+
+/**
+ * Rich text field specific props
+ */
+export interface RichTextFieldProps<TFieldValues extends FieldValues = FieldValues>
+  extends FormFieldProps<TFieldValues> {
+  /**
+   * Maximum character length
+   */
+  maxLength?: number;
+  
+  /**
+   * Show character count
+   * @default true
+   */
+  showCharCount?: boolean;
+  
+  /**
+   * Toolbar configuration
+   * @default ['bold', 'italic', 'underline', 'link', 'list']
+   */
+  toolbar?: ('bold' | 'italic' | 'underline' | 'link' | 'list' | 'heading')[];
+  
+  /**
+   * Placeholder text
+   */
+  placeholder?: string;
+  
+  /**
+   * Minimum height in pixels
+   * @default 150
+   */
+  minHeight?: number;
+  
+  /**
+   * Maximum height in pixels
+   * @default 400
+   */
+  maxHeight?: number;
+}

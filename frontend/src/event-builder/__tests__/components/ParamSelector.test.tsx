@@ -5,7 +5,7 @@
  * 测试 fetchParams 返回的数据是否能正确解析
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { fetchParams } from '@shared/api/eventNodeBuilderApi';
 
 // 类型定义
@@ -27,11 +27,11 @@ interface ApiResponse {
 }
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('ParamSelector - API 数据解析', () => {
   beforeEach(() => {
-    (jest.clearAllMocks as any)();
+    vi.clearAllMocks();
   });
 
   it('RED: 应正确解析 API 返回的参数数据', async () => {

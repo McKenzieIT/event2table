@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { BaseModal, Button, Badge, Spinner, useToast } from '@shared/ui';
+import { Modal, Button, Badge, Spinner, useToast } from '@shared/ui';
 import type { Event } from '@shared/types/event-types';
 
 /**
@@ -237,7 +237,7 @@ export const BatchValidateModal = React.memo(function BatchValidateModal({
   }, [validationResult]);
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={`批量验证 (${selectedEvents.length} 个事件)`}
@@ -367,7 +367,7 @@ export const BatchValidateModal = React.memo(function BatchValidateModal({
           )}
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 });
 

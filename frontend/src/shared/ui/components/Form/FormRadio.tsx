@@ -91,6 +91,7 @@ export const FormRadio = <
       <Controller
         name={name}
         control={control}
+        defaultValue=""
         render={({ field }) => (
           <div className={radioGroupClass} role="radiogroup" aria-required={required}>
             {options.map((option) => (

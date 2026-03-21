@@ -309,8 +309,8 @@ describe('CategoryManagementModal', () => {
       expect(screen.getByText('分类管理')).toBeInTheDocument();
     });
 
-    // Click close button (×)
-    const closeButton = screen.getByText('×').closest('button');
+    // Click close button (✕)
+    const closeButton = screen.getByText('✕').closest('button');
     fireEvent.click(closeButton as HTMLElement);
 
     expect(onClose).toHaveBeenCalled();

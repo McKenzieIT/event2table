@@ -125,6 +125,24 @@ export interface ModalProps {
   ariaDescribedby?: string;
   /** 自定义ARIA标签 */
   ariaLabelledby?: string;
+
+  // ========== 拖拽功能 ==========
+  /** 是否启用拖拽，或详细拖拽配置 */
+  draggable?: boolean | ModalDragConfig;
+}
+
+/**
+ * Modal拖拽配置
+ * 
+ * @description 配置Modal的拖拽行为
+ */
+export interface ModalDragConfig {
+  /** 是否启用拖拽，默认true */
+  enabled?: boolean;
+  /** 拖拽边界约束：'parent', 'window', 或自定义HTMLElement */
+  bounds?: 'parent' | 'window' | HTMLElement;
+  /** 网格对齐：[x, y] 步进值 */
+  grid?: [number, number];
 }
 
 /**

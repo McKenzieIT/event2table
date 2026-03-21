@@ -1,4 +1,7 @@
 /**
+ * @deprecated Use Select from '@/shared/ui/components/Select' instead.
+ * This component will be removed in v3.0.0
+ * 
  * Select Component - Cyberpunk Lab Theme
  *
  * A modern, tech-inspired dropdown selector with search functionality.

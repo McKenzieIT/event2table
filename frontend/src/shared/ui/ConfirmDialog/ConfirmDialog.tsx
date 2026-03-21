@@ -2,6 +2,7 @@
 // - Added React.memo with custom comparison for open state
 // - Added useCallback for event handlers to prevent re-renders
 // - Optimized conditional rendering (return null when closed)
+// - Added body scroll lock/unlock functionality
 // See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
 import React, { useEffect, useRef, useCallback } from 'react';
@@ -38,29 +39,69 @@ const ConfirmDialogComponent = ({
   onCancel,
 }: ConfirmDialogProps) => {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const previousOverflowRef = useRef<string>('');
+  const onCancelRef = useRef(onCancel);
+  const onConfirmRef = useRef(onConfirm);
 
-  // PERF: useCallback - 稳定ESC键处理器引用
+  // Keep refs updated with latest callbacks
+  useEffect(() => {
+    onCancelRef.current = onCancel;
+  }, [onCancel]);
+
+  useEffect(() => {
+    onConfirmRef.current = onConfirm;
+  }, [onConfirm]);
+
+  // PERF: Body scroll lock/unlock - 锁定body滚动
+  useEffect(() => {
+    if (open) {
+      // Save previous overflow style
+      previousOverflowRef.current = document.body.style.overflow;
+      // Lock body scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore previous overflow style
+      document.body.style.overflow = previousOverflowRef.current;
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = previousOverflowRef.current;
+    };
+  }, [open]);
+
+  // PERF: ESC键处理器 - 使用ref来获取最新的onCancel
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return;
 
       if (e.key === 'Escape') {
-        onCancel();
+        onCancelRef.current();
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, onCancel]);
+  }, [open]);
 
   // PERF: useCallback - 稳定背景点击回调引用
   const handleOverlayClick = useCallback(() => {
-    onCancel();
-  }, [onCancel]);
+    onCancelRef.current();
+  }, []);
 
   // PERF: useCallback - 稳定内容点击回调引用
   const handleContentClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
+  }, []);
+
+  // PERF: useCallback - 稳定确认按钮回调引用
+  const handleConfirm = useCallback(() => {
+    onConfirmRef.current();
+  }, []);
+
+  // PERF: useCallback - 稳定取消按钮回调引用
+  const handleCancel = useCallback(() => {
+    onCancelRef.current();
   }, []);
 
   // PERF: 条件渲染优化 - 对话框关闭时不渲染
@@ -90,13 +131,13 @@ const ConfirmDialogComponent = ({
         <div className="modal-footer">
           <Button
             variant="secondary"
-            onClick={onCancel}
+            onClick={handleCancel}
           >
             {cancelText}
           </Button>
           <Button
             variant={variant === 'danger' ? 'danger' : variant}
-            onClick={onConfirm}
+            onClick={handleConfirm}
           >
             {confirmText}
           </Button>

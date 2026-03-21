@@ -63,6 +63,13 @@ export interface CanvasComponentField {
   source?: string;
 }
 
+/**
+ * Re-export shared Field type for backward compatibility
+ * This allows components that import Field from './types' to work correctly
+ */
+export type { Field as SharedField } from '@/shared/types/hql-types';
+export { Field as SharedField } from '@/shared/types/hql-types';
+
 // ============================================================================
 // Node Types (ReactFlow)
 // ============================================================================

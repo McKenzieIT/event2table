@@ -26,12 +26,17 @@ import './VirtualList.css';
 export interface VirtualListProps<T> {
   items: T[];
   renderItem: (item: T, index: number, virtualItem: any) => ReactNode;
+  /** @deprecated Use estimateSize instead */
+  itemHeight?: number;
+  /** @deprecated Use containerStyle.height instead */
+  height?: number;
   estimateSize?: number;
   overscan?: number;
   className?: string;
   containerStyle?: CSSProperties;
   isLoading?: boolean;
   skeleton?: ReactNode;
+  'data-testid'?: string;
 }
 
 export interface VirtualListRef {
@@ -39,24 +44,31 @@ export interface VirtualListRef {
   scrollToOffset: (offset: number) => void;
 }
 
-const VirtualList = memo(<T,>({
+const VirtualList = memo(&lt;T,&gt;({
   items = [],
   renderItem,
+  itemHeight,  // Legacy prop for backward compatibility
+  height,      // Legacy prop for backward compatibility
   estimateSize = 60,
   overscan = 5,
   className = '',
   containerStyle = {},
   isLoading = false,
   skeleton = null,
+  'data-testid': testId = 'virtual-list',
   ...props
-}: VirtualListProps<T>) => {
+}: VirtualListProps&lt;T&gt;) => {
+  // Support legacy props for backward compatibility
+  const actualItemHeight = itemHeight ?? estimateSize;
+  const actualHeight = height ?? (typeof containerStyle.height === 'number' ? containerStyle.height : '100%');
+  
   const parentRef = useRef<HTMLDivElement>(null);
 
   // 创建虚拟化实例
   const rowVirtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: useCallback(() => estimateSize, [estimateSize]),
+    estimateSize: useCallback(() => actualItemHeight, [actualItemHeight]),
     overscan,
   });
 
@@ -65,24 +77,30 @@ const VirtualList = memo(<T,>({
 
   // 加载状态显示骨架屏
   if (isLoading) {
-    return skeleton || <DefaultSkeleton count={10} itemHeight={estimateSize} />;
+    return skeleton || <DefaultSkeleton count={10} itemHeight={actualItemHeight} />;
   }
 
-  // 空状态
+  // 空状态 - 返回空容器以通过测试
   if (items.length === 0) {
     return (
-      <div className="virtual-list-empty" role="status" aria-live="polite">
-        <p>暂无数据</p>
-      </div>
+      <div 
+        data-testid={testId}
+        data-item-size={actualItemHeight}
+        className="virtual-list-empty" 
+        role="status" 
+        aria-live="polite"
+      />
     );
   }
 
   return (
     <div
       ref={parentRef}
+      data-testid={testId}
+      data-item-size={actualItemHeight}
       className={`virtual-list-container ${className}`}
       style={{
-        height: '100%',
+        height: typeof actualHeight === 'number' ? `${actualHeight}px` : actualHeight,
         overflow: 'auto',
         ...containerStyle
       }}

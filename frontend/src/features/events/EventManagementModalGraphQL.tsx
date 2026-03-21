@@ -7,15 +7,14 @@
  */
 
 import React, { useState, useMemo, useCallback, useRef, useEffect, memo } from 'react';
-import { BaseModal, Button, Input, Select, useToast, SearchInput, Skeleton } from '@shared/ui';
+import { Modal, Button, Input, Select, useToast, SearchInput, Skeleton } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import {
   useEvents,
   useSearchEvents,
   useUpdateEvent,
   useDeleteEvent,
-} from '../../graphql/hooks';
-import './EventManagementModal.css';
+} from '../../shared/graphql/hooks';
 
 interface Event {
   id: number;
@@ -180,29 +179,29 @@ const EventManagementModalGraphQL: React.FC<EventManagementModalProps> = ({ isOp
   // Render loading state
   if (isLoading) {
     return (
-      <BaseModal isOpen={isOpen} onClose={onClose} title="事件管理" size="lg">
+      <Modal isOpen={isOpen} onClose={onClose} title="事件管理" size="lg">
         <div className="event-management-loading">
           <Skeleton height={40} count={5} />
         </div>
-      </BaseModal>
+      </Modal>
     );
   }
 
   // Render error state
   if (error) {
     return (
-      <BaseModal isOpen={isOpen} onClose={onClose} title="事件管理" size="lg">
+      <Modal isOpen={isOpen} onClose={onClose} title="事件管理" size="lg">
         <div className="event-management-error">
           <p>加载失败: {error.message}</p>
           <Button onClick={() => window.location.reload()}>重试</Button>
         </div>
-      </BaseModal>
+      </Modal>
     );
   }
 
   return (
     <>
-      <BaseModal isOpen={isOpen} onClose={onClose} title="事件管理" size="lg">
+      <Modal isOpen={isOpen} onClose={onClose} title="事件管理" size="lg">
         <div className="event-management-container">
           {/* Header */}
           <div className="event-management-header">
@@ -316,7 +315,7 @@ const EventManagementModalGraphQL: React.FC<EventManagementModalProps> = ({ isOp
             </div>
           </div>
         </div>
-      </BaseModal>
+      </Modal>
 
       {/* Confirm Dialog */}
       <ConfirmDialog

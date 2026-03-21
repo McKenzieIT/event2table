@@ -14,7 +14,8 @@
  */
 
 import React, { useState } from 'react';
-import { Button, Card, Input, Table, BaseModal, Badge, useToast, ToastProvider, TextArea, Select, Checkbox, Radio, Switch, Spinner } from '@shared/ui';
+import { Button, Card, Input, Modal, Badge, useToast, ToastProvider, TextArea, Select, Checkbox, Radio, Switch, Spinner } from '@shared/ui';
+import Table from '@shared/ui/components/Table';
 import './ComponentShowcase.css';
 
 interface SampleData {
@@ -264,7 +265,7 @@ function ComponentShowcaseContent(): React.JSX.Element {
         </div>
       </section>
 
-      <BaseModal
+      <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         title="Confirm Action"
@@ -278,7 +279,7 @@ function ComponentShowcaseContent(): React.JSX.Element {
         <p>
           Modals support different sizes (sm, md, lg, xl, full) and variants (default, danger, warning).
         </p>
-      </BaseModal>
+      </Modal>
 
       {/* Toast Section */}
       <section className="showcase-section">

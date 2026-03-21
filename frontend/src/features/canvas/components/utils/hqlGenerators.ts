@@ -3,7 +3,7 @@
  * 复用原node-executor.js的HQL生成逻辑
  */
 
-import type { GameData } from '../types';
+import type { GameData } from "@/shared/types/game-types";
 
 // ============================================
 // Type Definitions

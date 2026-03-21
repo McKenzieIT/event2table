@@ -4,6 +4,9 @@
  *
  * Glassmorphism table with subtle hover states and striped rows
  * Optimized with React.memo and functional setState patterns
+ * 
+ * @deprecated Use Table from '@/shared/ui/components/Table' instead.
+ * Will be removed in v3.0.0
  */
 
 import React from 'react';

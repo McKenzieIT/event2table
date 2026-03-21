@@ -6,7 +6,7 @@ import React, { useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
-import Table from '@shared/ui/Table';
+import Table from '@shared/ui/components/Table';
 import { useGameContext } from '@shared/hooks/useGameContext';
 import './EventDetail.css';
 

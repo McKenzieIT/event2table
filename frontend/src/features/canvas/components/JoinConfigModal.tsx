@@ -14,7 +14,7 @@
  */
 
 import React, { useState, useMemo, useCallback, memo } from 'react';
-import { BaseModal } from '@shared/ui/BaseModal';
+import { Modal } from '@shared/ui';
 import { Button, useToast, EmptyState } from '@shared/ui';
 import './JoinConfigModal.css';
 import type { JoinConfigModalProps, JoinConfig, JoinCondition, AvailableFields } from './types';
@@ -99,7 +99,7 @@ function JoinConfigModal({
 
   if (!hasFields) {
     return (
-      <BaseModal
+      <Modal
         isOpen={isOpen}
         onClose={onClose}
         title="JOIN节点配置"
@@ -117,12 +117,12 @@ function JoinConfigModal({
             </Button>
           </div>
         </div>
-      </BaseModal>
+      </Modal>
     );
   }
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onClose}
       title="JOIN节点配置"
@@ -250,7 +250,7 @@ function JoinConfigModal({
           </Button>
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 }
 

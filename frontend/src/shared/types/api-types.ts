@@ -17,6 +17,18 @@ import type { Parameter, EventParam } from './parameter-types';
 // Re-export types for external use
 export type { Event, Game, Field, Parameter, EventParam };
 
+// Export individual types for convenience
+export type { Event as EventType } from './event-types';
+export type { Game as GameType } from './game-types';
+export type { Field as FieldType } from './hql-types';
+export type { Parameter as ParameterType } from './parameter-types';
+
+// Export individual types for convenience
+export type { Event as EventType } from './event-types';
+export type { Game as GameType } from './game-types';
+export type { Field as FieldType } from './hql-types';
+export type { Parameter as ParameterType } from './parameter-types';
+
 // ========== 基础类型 ==========
 
 /** 通用API响应 */

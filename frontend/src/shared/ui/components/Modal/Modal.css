@@ -39,7 +39,7 @@
   --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(6, 182, 212, 0.1);
   --modal-radius: 12px;
   
-  --modal-transition-duration: 0.3s;
+  --modal-transition-duration: 0.15s;
   --modal-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -85,6 +85,10 @@
   box-shadow: var(--modal-shadow);
   outline: none;
   overflow: hidden;
+  /* GPU Acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .modal-content--glassmorphism {
@@ -127,16 +131,19 @@
 /* Slide Up Animation */
 .modal-content--slideUp {
   animation: modal-slide-up var(--modal-transition-duration) var(--modal-transition-timing);
+  will-change: transform, opacity;
 }
 
 /* Fade In Animation */
 .modal-content--fadeIn {
   animation: modal-fade-in var(--modal-transition-duration) var(--modal-transition-timing);
+  will-change: opacity;
 }
 
 /* Scale Animation */
 .modal-content--scale {
   animation: modal-scale var(--modal-transition-duration) var(--modal-transition-timing);
+  will-change: transform, opacity;
 }
 
 /* ========================================
@@ -481,6 +488,44 @@
 }
 
 /* ========================================
+   Drag Support
+   ======================================== */
+
+.modal-content--draggable {
+  /* 拖拽时使用will-change优化性能 */
+  will-change: transform;
+}
+
+.modal-content--draggable .modal-header {
+  cursor: move;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.modal-content--draggable .modal-header:active {
+  cursor: grabbing;
+}
+
+.modal-content--dragging {
+  /* 拖拽中禁用过渡动画，避免卡顿 */
+  transition: none !important;
+  /* 拖拽时提升层级 */
+  z-index: 10;
+}
+
+.modal-content--dragging .modal-header {
+  cursor: grabbing;
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  .modal-content--draggable .modal-header {
+    cursor: default;
+  }
+}
+
+/* ========================================
    Accessibility
    ======================================== */
 
@@ -491,6 +536,8 @@
   .modal-content--slideUp,
   .modal-content--fadeIn,
   .modal-content--scale,
+  .modal-content--draggable,
+  .modal-content--dragging,
   .modal-confirm-backdrop,
   .modal-confirm {
     animation: none;

@@ -1,13 +1,8 @@
-/**
- * TextArea Component Tests
- * 测试文本域组件的所有功能
- */
-
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TextArea, { type TextAreaProps } from './TextArea';
-
 describe('TextArea Component', () => {
   describe('Rendering', () => {
     it('should render textarea element', () => {
@@ -107,13 +102,27 @@ describe('TextArea Component', () => {
     });
 
     it('should update character count as value changes', async () => {
-      const { container } = render(<TextArea maxLength={100} showCount value="" onChange={() => {}} />);
+      const ControlledTextArea = () => {
+        const [value, setValue] = React.useState('');
+        return (
+          <TextArea
+            maxLength={100}
+            showCount
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+        );
+      };
+
+      const { container } = render(<ControlledTextArea />);
 
       const textarea = screen.getByRole('textbox');
       await userEvent.type(textarea, 'hello');
 
       // Wait for state update
-      expect(container.querySelector('.cyber-textarea__count')).toHaveTextContent('5/100');
+      await waitFor(() => {
+        expect(container.querySelector('.cyber-textarea__count')).toHaveTextContent('5/100');
+      });
     });
   });
 

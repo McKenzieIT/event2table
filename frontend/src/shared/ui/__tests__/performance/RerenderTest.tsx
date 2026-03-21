@@ -14,7 +14,7 @@ import '@testing-library/jest-dom';
 import { Button } from '../../index';
 import { Card } from '../../index';
 import { Input } from '../../index';
-import { Table } from '../../index';
+import Table from '../../components/Table';
 import { Badge } from '../../index';
 
 // Track render counts

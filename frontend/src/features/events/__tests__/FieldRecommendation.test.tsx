@@ -8,6 +8,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { FieldRecommendation } from '../components/FieldRecommendation';
 import { FieldRecommendationDropdown } from '../components/FieldRecommendationDropdown';
 import { FieldTypeSuggestion } from '../components/FieldTypeSuggestion';
@@ -30,22 +31,22 @@ const createWrapper = () => {
 };
 
 // Mock the API
-jest.mock('../api/fieldRecommendationApi', () => ({
-  getRecommendations: jest.fn(),
-  getCommonPatterns: jest.fn(),
-  inferFieldType: jest.fn(),
+vi.mock('../api/fieldRecommendationApi', () => ({
+  getRecommendations: vi.fn(),
+  getCommonPatterns: vi.fn(),
+  inferFieldType: vi.fn(),
 }));
 
 import { getRecommendations, getCommonPatterns, inferFieldType } from '../api/fieldRecommendationApi';
 
 describe('FieldRecommendation Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render recommendation buttons', () => {
-    const onApplyRecommendation = jest.fn();
-    const onApplyTypeInference = jest.fn();
+    const onApplyRecommendation = vi.fn();
+    const onApplyTypeInference = vi.fn();
 
     render(
       <FieldRecommendation
@@ -62,8 +63,8 @@ describe('FieldRecommendation Component', () => {
   });
 
   it('should disable buttons when paramName is empty', () => {
-    const onApplyRecommendation = jest.fn();
-    const onApplyTypeInference = jest.fn();
+    const onApplyRecommendation = vi.fn();
+    const onApplyTypeInference = vi.fn();
 
     render(
       <FieldRecommendation
@@ -93,8 +94,8 @@ describe('FieldRecommendation Component', () => {
 
     (getRecommendations as jest.Mock).mockResolvedValueOnce(mockRecommendation);
 
-    const onApplyRecommendation = jest.fn();
-    const onApplyTypeInference = jest.fn();
+    const onApplyRecommendation = vi.fn();
+    const onApplyTypeInference = vi.fn();
 
     render(
       <FieldRecommendation
@@ -122,11 +123,11 @@ describe('FieldRecommendation Component', () => {
 
 describe('FieldRecommendationDropdown Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render dropdown trigger', () => {
-    const onSelectPattern = jest.fn();
+    const onSelectPattern = vi.fn();
 
     render(
       <FieldRecommendationDropdown
@@ -140,7 +141,7 @@ describe('FieldRecommendationDropdown Component', () => {
   });
 
   it('should open dropdown when clicked', () => {
-    const onSelectPattern = jest.fn();
+    const onSelectPattern = vi.fn();
 
     render(
       <FieldRecommendationDropdown
@@ -169,7 +170,7 @@ describe('FieldRecommendationDropdown Component', () => {
 
     (getCommonPatterns as jest.Mock).mockResolvedValueOnce(mockPatterns);
 
-    const onSelectPattern = jest.fn();
+    const onSelectPattern = vi.fn();
 
     render(
       <FieldRecommendationDropdown
@@ -206,7 +207,7 @@ describe('FieldTypeSuggestion Component', () => {
       reasoning: 'Numeric values detected',
     };
 
-    const onApplyType = jest.fn();
+    const onApplyType = vi.fn();
 
     render(
       <FieldTypeSuggestion
@@ -232,7 +233,7 @@ describe('FieldTypeSuggestion Component', () => {
       reasoning: 'Numeric values detected',
     };
 
-    const onApplyType = jest.fn();
+    const onApplyType = vi.fn();
 
     render(
       <FieldTypeSuggestion
@@ -257,7 +258,7 @@ describe('FieldTypeSuggestion Component', () => {
       reasoning: 'Numeric values detected',
     };
 
-    const onApplyType = jest.fn();
+    const onApplyType = vi.fn();
 
     render(
       <FieldTypeSuggestion

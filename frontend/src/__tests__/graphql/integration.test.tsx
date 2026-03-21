@@ -26,7 +26,7 @@ import {
   CREATE_EVENT,
   UPDATE_EVENT,
   DELETE_EVENT,
-} from '../../graphql/mutations';
+} from '../../shared/graphql/mutations';
 
 // Mock数据
 const mockGames = [

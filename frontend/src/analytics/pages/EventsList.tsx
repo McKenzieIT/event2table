@@ -27,7 +27,7 @@ import {
 import { BatchEditModal } from '@features/events/components/BatchEditModal';
 import { BatchValidateModal } from '@features/events/components/BatchValidateModal';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
-import Table from '@shared/ui/Table';
+import Table from '@shared/ui/components/Table';
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
 import './EventsList.css';

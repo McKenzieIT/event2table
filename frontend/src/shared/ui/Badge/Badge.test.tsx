@@ -4,6 +4,7 @@
  * 测试徽章组件的所有功能
  */
 
+import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Badge from './Badge';
