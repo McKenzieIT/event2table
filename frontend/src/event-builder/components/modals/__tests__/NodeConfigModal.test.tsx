@@ -10,11 +10,15 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import NodeConfigModal from '../NodeConfigModal';
-import { toast } from '@shared/ui';
+import { toast } from 'react-hot-toast';
 
 // Mock toast notifications
-vi.mock('@shared/ui', () => ({
-  ...vi.importActual('@shared/ui'),
+vi.mock('react-hot-toast', () => ({
+  ...vi.importActual('react-hot-toast'),
+  default: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
   toast: {
     error: vi.fn(),
     success: vi.fn(),

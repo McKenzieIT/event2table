@@ -19,7 +19,7 @@
  */
 import React, { useCallback } from 'react';
 import { useMutation } from '@apollo/client/react';
-import { BATCH_ADD_FIELDS_TO_CANVAS } from '@/graphql/mutations';
+import { BATCH_ADD_FIELDS_TO_CANVAS } from '@shared/graphql/mutations';
 import { Button } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
 import { Field } from '@shared/types/fieldBuilder';

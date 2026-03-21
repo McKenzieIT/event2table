@@ -4,10 +4,10 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getTasks, getTask, cancelTask, getTaskStatistics } from '../taskApi';
-import type { Task } from '../taskApi';
+import type { Task, TaskFilters, TaskStatus } from '../taskApi';
 
 // Mock fetch
-global.fetch = vi.fn();
+(globalThis as any).fetch = vi.fn();
 
 describe('Task API', () => {
   beforeEach(() => {
@@ -32,32 +32,32 @@ describe('Task API', () => {
         },
       ];
 
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockTasks }),
       });
 
       const tasks = await getTasks();
       expect(tasks).toEqual(mockTasks);
-      expect(global.fetch).toHaveBeenCalledWith('/api/async-tasks');
+      expect((globalThis as any).fetch).toHaveBeenCalledWith('/api/async-tasks');
     });
 
     it('fetches tasks with filters', async () => {
-      const filters = { status: 'running', limit: 10 };
+      const filters: TaskFilters = { status: 'running' as TaskStatus, limit: 10 };
       
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: [] }),
       });
 
       await getTasks(filters);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect((globalThis as any).fetch).toHaveBeenCalledWith(
         '/api/async-tasks?status=running&limit=10'
       );
     });
 
     it('throws error when API response is not successful', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: false, message: 'Error' }),
       });
@@ -66,7 +66,7 @@ describe('Task API', () => {
     });
 
     it('throws error when fetch fails', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Not Found',
       });
@@ -92,18 +92,18 @@ describe('Task API', () => {
     };
 
     it('fetches a single task successfully', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockTask }),
       });
 
       const task = await getTask(taskId);
       expect(task).toEqual(mockTask);
-      expect(global.fetch).toHaveBeenCalledWith(`/api/async-tasks/${taskId}`);
+      expect((globalThis as any).fetch).toHaveBeenCalledWith(`/api/async-tasks/${taskId}`);
     });
 
     it('throws error when task is not found (404)', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -112,7 +112,7 @@ describe('Task API', () => {
     });
 
     it('throws error when API response is not successful', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: false, message: 'Error' }),
       });
@@ -125,13 +125,13 @@ describe('Task API', () => {
     const taskId = '550e8400-e29b-41d4-a716-446655440000';
 
     it('cancels a task successfully', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
       });
 
       await cancelTask(taskId);
-      expect(global.fetch).toHaveBeenCalledWith(`/api/async-tasks/${taskId}/cancel`, {
+      expect((globalThis as any).fetch).toHaveBeenCalledWith(`/api/async-tasks/${taskId}/cancel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ describe('Task API', () => {
     });
 
     it('throws error when task is not found (404)', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -149,7 +149,7 @@ describe('Task API', () => {
     });
 
     it('throws error when API response is not successful', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: false, message: 'Error' }),
       });
@@ -175,18 +175,18 @@ describe('Task API', () => {
     };
 
     it('fetches task statistics successfully', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockStatistics }),
       });
 
       const statistics = await getTaskStatistics();
       expect(statistics).toEqual(mockStatistics);
-      expect(global.fetch).toHaveBeenCalledWith('/api/async-tasks/statistics');
+      expect((globalThis as any).fetch).toHaveBeenCalledWith('/api/async-tasks/statistics');
     });
 
     it('throws error when API response is not successful', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: false, message: 'Error' }),
       });
@@ -195,7 +195,7 @@ describe('Task API', () => {
     });
 
     it('throws error when fetch fails', async () => {
-      (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Not Found',
       });

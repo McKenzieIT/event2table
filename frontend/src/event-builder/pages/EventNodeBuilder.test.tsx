@@ -9,6 +9,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import EventNodeBuilder from '@event-builder/pages/EventNodeBuilder';
+import { ToastProvider } from '@shared/ui/Toast/Toast';
 
 // Mock react-router-dom
 vi.mock('react-router-dom', async () => {
@@ -19,6 +20,15 @@ vi.mock('react-router-dom', async () => {
     useLocation: () => ({ search: '?game_gid=10000147', pathname: '/event-node-builder' }),
   };
 });
+
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+global.localStorage = localStorageMock as any;
 
 // Mock API calls
 vi.mock('@shared/api/eventNodeBuilderApi', () => ({
@@ -36,6 +46,96 @@ vi.mock('@shared/api/eventNodeBuilderApi', () => ({
   })),
 }));
 
+// Mock useGameContext
+vi.mock('@shared/hooks/useGameContext', () => ({
+  useGameContext: () => ({
+    currentGame: { gid: 10000147, name: 'Test Game' },
+    selectGame: vi.fn(),
+    currentGameGid: 10000147,
+  }),
+}));
+
+// Mock useEventNodeBuilder
+vi.mock('@shared/hooks/useEventNodeBuilder', () => ({
+  useEventNodeBuilder: () => ({
+    selectedEvent: null,
+    setSelectedEvent: vi.fn(),
+    canvasFields: [],
+    setCanvasFields: vi.fn(),
+    addFieldToCanvas: vi.fn(),
+    removeField: vi.fn(),
+    updateField: vi.fn(),
+    reorderFields: vi.fn(),
+    clearCanvas: vi.fn(),
+    whereConditions: [],
+    setWhereConditions: vi.fn(),
+    nodeConfig: {
+      nameEn: '',
+      nameCn: '',
+      description: '',
+    },
+    setNodeConfig: vi.fn(),
+    resetAll: vi.fn(),
+  }),
+}));
+
+// Mock useEventNodeBuilderData
+vi.mock('./hooks/useEventNodeBuilderData', () => ({
+  useEventNodeBuilderData: () => ({
+    saveMutation: {
+      mutate: vi.fn(),
+    },
+  }),
+}));
+
+// Mock child components
+vi.mock('./components/LoadingState', () => ({
+  LoadingState: () => <div data-testid="loading-state">Loading...</div>,
+}));
+
+vi.mock('./components/PerformancePanel', () => ({
+  PerformancePanel: ({ show, onClose }: { show: boolean; onClose: () => void }) => 
+    show ? <div data-testid="performance-panel">Performance Panel</div> : null,
+}));
+
+vi.mock('./components/DebugPanel', () => ({
+  DebugPanel: ({ show, onClose }: { show: boolean; onClose: () => void }) => 
+    show ? <div data-testid="debug-panel">Debug Panel</div> : null,
+}));
+
+vi.mock('../components/PageHeader', () => {
+  return {
+    __esModule: true,
+    default: ({ children, showPerformancePanel, setShowPerformancePanel, showDebugPanel, setShowDebugPanel }: any) => (
+      <header data-testid="page-header">
+        {setShowPerformancePanel && (
+          <button onClick={() => setShowPerformancePanel(!showPerformancePanel)} data-testid="performance-btn">
+            性能分析
+          </button>
+        )}
+        {setShowDebugPanel && (
+          <button onClick={() => setShowDebugPanel(!showDebugPanel)} data-testid="debug-btn">
+            调试模式
+          </button>
+        )}
+        {children}
+      </header>
+    ),
+  };
+});
+
+vi.mock('../components/LeftSidebar', () => ({
+  LeftSidebar: () => <div data-testid="left-sidebar">Left Sidebar</div>,
+}));
+
+vi.mock('../components/FieldCanvas', () => ({
+  default: () => <div data-testid="field-canvas">Field Canvas</div>,
+}));
+
+vi.mock('../components/RightSidebar', () => ({
+  RightSidebar: () => <div data-testid="right-sidebar">Right Sidebar</div>,
+}));
+
 const createTestQueryClient = () => new QueryClient({
   defaultOptions: {
     queries: { retry: false },
@@ -46,7 +146,9 @@ const createTestQueryClient = () => new QueryClient({
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={createTestQueryClient()}>
     <MemoryRouter initialEntries={['/event-node-builder?game_gid=10000147']}>
-      {children}
+      <ToastProvider>
+        {children}
+      </ToastProvider>
     </MemoryRouter>
   </QueryClientProvider>
 );

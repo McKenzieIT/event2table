@@ -83,7 +83,7 @@ export default function HQLHistory({
   onRestore,
   onCompare,
   apiBaseUrl = '/hql-preview-v2'
-}: HQLHistoryV2Props) {
+}: HQLHistoryProps) {
   const [selectedVersions, setSelectedVersions] = useState<(string | number)[]>([]);
   const [showCompare, setShowCompare] = useState<boolean>(false);
   const [expandedItems, setExpandedItems] = useState<Set<string | number>>(new Set());
@@ -130,8 +130,8 @@ export default function HQLHistory({
       return;
     }
 
-    const version1 = history.find(h => h.id === selectedVersions[0]);
-    const version2 = history.find(h => h.id === selectedVersions[1]);
+    const version1 = history.find((h: HistoryItem) => h.id === selectedVersions[0]);
+    const version2 = history.find((h: HistoryItem) => h.id === selectedVersions[1]);
 
     if (onCompare) {
       onCompare(version1, version2);
@@ -207,7 +207,7 @@ export default function HQLHistory({
             <p className="text-muted">生成HQL后将在此显示历史版本</p>
           </div>
         ) : (
-          history.map((item, index) => {
+          history.map((item: HistoryItem, index: number) => {
             const itemId = item.id || index;
             const isExpanded = expandedItems.has(itemId);
             const isSelected = selectedVersions.includes(itemId);
@@ -294,7 +294,7 @@ export default function HQLHistory({
                       <div className="performance-details">
                         <h5>性能问题</h5>
                         <ul className="issues-list">
-                          {item.performance.issues.map((issue, idx) => (
+                          {item.performance && item.performance.issues && item.performance.issues.map((issue: PerformanceIssue, idx: number) => (
                             <li key={idx} className={`issue-item issue-${issue.type}`}>
                               <span className="issue-message">{issue.message}</span>
                               {issue.suggestion && (
@@ -319,7 +319,7 @@ export default function HQLHistory({
                         {item.events && (
                           <div className="metadata-item">
                             <strong>事件列表:</strong>
-                            <span>{item.events.map(e => e.event_name || e.name).join(', ')}</span>
+                            <span>{item.events && item.events.map((e: HistoryEvent) => e.event_name || e.name).join(', ')}</span>
                           </div>
                         )}
                         {item.options && (
@@ -360,7 +360,7 @@ export default function HQLHistory({
             <div className="modal-body">
               <div className="compare-grid">
                 {selectedVersions.map((versionId, idx) => {
-                  const item = history.find(h => h.id === versionId);
+                  const item = history.find((h: HistoryItem) => h.id === versionId);
                   if (!item) return null;
 
                   return (

@@ -65,7 +65,15 @@ describe('CacheStats Component', () => {
 
     expect(screen.getByText('Hit Rate')).toBeInTheDocument();
     expect(screen.getByText('85.00')).toBeInTheDocument();
-    expect(screen.getByText('%')).toBeInTheDocument();
+    expect(screen.getByText('Miss Rate')).toBeInTheDocument();
+    expect(screen.getByText('15.00')).toBeInTheDocument();
+    expect(screen.getByText('Total Requests')).toBeInTheDocument();
+    expect(screen.getByText('10000.00')).toBeInTheDocument();
+    expect(screen.getByText('Cache Size')).toBeInTheDocument();
+    expect(screen.getByText('512.00')).toBeInTheDocument();
+    expect(screen.getByText('MB')).toBeInTheDocument();
+    expect(screen.getByText('Eviction Count')).toBeInTheDocument();
+    expect(screen.getByText('50.00')).toBeInTheDocument();
   });
 
   it('should render error state', async () => {

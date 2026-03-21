@@ -170,7 +170,7 @@ export default function FieldEventSelector({
 }: FieldEventSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
-  const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Group events by category
   const eventsByCategory = useMemo(() => {

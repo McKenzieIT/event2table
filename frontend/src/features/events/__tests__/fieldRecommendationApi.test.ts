@@ -34,7 +34,7 @@ describe('fieldRecommendationApi', () => {
         },
       };
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -47,7 +47,7 @@ describe('fieldRecommendationApi', () => {
       const result = await getRecommendations(request);
 
       expect(result).toEqual(mockResponse.data);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect((globalThis as any).fetch).toHaveBeenCalledWith(
         '/api/field-recommendations/recommend',
         expect.objectContaining({
           method: 'POST',
@@ -58,7 +58,7 @@ describe('fieldRecommendationApi', () => {
     });
 
     it('should throw error when API request fails', async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Internal Server Error',
       });
@@ -79,7 +79,7 @@ describe('fieldRecommendationApi', () => {
         message: 'Invalid parameter name',
       };
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -115,7 +115,7 @@ describe('fieldRecommendationApi', () => {
         ],
       };
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -123,13 +123,13 @@ describe('fieldRecommendationApi', () => {
       const result = await getCommonPatterns();
 
       expect(result).toEqual(mockResponse.data);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect((globalThis as any).fetch).toHaveBeenCalledWith(
         '/api/field-recommendations/patterns'
       );
     });
 
     it('should throw error when API request fails', async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Not Found',
       });
@@ -145,7 +145,7 @@ describe('fieldRecommendationApi', () => {
         data: 'not an array',
       };
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -171,7 +171,7 @@ describe('fieldRecommendationApi', () => {
         },
       };
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -185,7 +185,7 @@ describe('fieldRecommendationApi', () => {
       const result = await inferFieldType(request);
 
       expect(result).toEqual(mockResponse.data);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect((globalThis as any).fetch).toHaveBeenCalledWith(
         '/api/field-recommendations/types',
         expect.objectContaining({
           method: 'POST',
@@ -196,7 +196,7 @@ describe('fieldRecommendationApi', () => {
     });
 
     it('should throw error when API request fails', async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Bad Request',
       });
@@ -217,7 +217,7 @@ describe('fieldRecommendationApi', () => {
         message: 'Invalid sample values',
       };
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ((globalThis as any).fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });

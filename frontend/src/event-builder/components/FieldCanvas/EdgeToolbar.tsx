@@ -1,5 +1,5 @@
 import React from 'react';
-import { FieldType } from '../types/fieldTypes';
+import { FieldType } from '../../types/fieldTypes';
 import { Button } from '@shared/ui';
 
 /**
@@ -56,7 +56,7 @@ export const EdgeToolbar: React.FC<EdgeToolbarProps> = ({
           自定义字段
         </Button>
         <Button
-          variant="outline-warning"
+          variant="outline-secondary"
           size="sm"
           onClick={onAddFixedField}
           title="添加固定值"

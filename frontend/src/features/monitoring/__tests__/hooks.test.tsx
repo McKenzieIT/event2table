@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useCacheStats, useApiLatency, usePerformanceMetrics } from '../hooks';
+import { useCacheStats, useApiLatency, usePerformanceMetrics } from '../hooks/index';
 import * as monitoringApi from '../api/monitoringApi';
 
 // Mock API functions

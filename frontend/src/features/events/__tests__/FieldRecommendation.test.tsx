@@ -37,7 +37,13 @@ vi.mock('../api/fieldRecommendationApi', () => ({
   inferFieldType: vi.fn(),
 }));
 
+// Mock the hooks
+vi.mock('../hooks/useCommonPatterns', () => ({
+  useCommonPatterns: vi.fn(),
+}));
+
 import { getRecommendations, getCommonPatterns, inferFieldType } from '../api/fieldRecommendationApi';
+import { useCommonPatterns } from '../hooks/useCommonPatterns';
 
 describe('FieldRecommendation Component', () => {
   beforeEach(() => {
@@ -124,6 +130,14 @@ describe('FieldRecommendation Component', () => {
 describe('FieldRecommendationDropdown Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock useCommonPatterns to return empty data by default
+    (useCommonPatterns as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      isSuccess: true,
+      isError: false,
+    });
   });
 
   it('should render dropdown trigger', () => {
@@ -168,7 +182,14 @@ describe('FieldRecommendationDropdown Component', () => {
       },
     ];
 
-    (getCommonPatterns as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockPatterns);
+    // Mock useCommonPatterns to return patterns
+    (useCommonPatterns as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: mockPatterns,
+      isLoading: false,
+      error: null,
+      isSuccess: true,
+      isError: false,
+    });
 
     const onSelectPattern = vi.fn();
 

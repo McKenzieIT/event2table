@@ -22,7 +22,7 @@ import type { SearchBarProps } from './types';
 function SearchBar({ onSearch }: SearchBarProps): React.JSX.Element {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleToggle = useCallback((): void => {
     setIsExpanded(!isExpanded);

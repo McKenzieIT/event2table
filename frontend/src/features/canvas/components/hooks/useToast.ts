@@ -7,4 +7,4 @@
  * @date 2026-01-31
  */
 
-export { useToast } from '@shared/ui/Toast';
+export { useToast } from '@shared/ui';

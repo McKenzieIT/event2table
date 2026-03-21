@@ -1,103 +1,39 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
-
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-/**
- * EventNodeBuilder Component
- * 事件节点构建器主容器组件
- * 用于创建和管理事件节点配置
- */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
 
-// 组件导入
-import PageHeader from '@event-builder/components/PageHeader';
-import LeftSidebar from '@event-builder/components/LeftSidebar';
-import FieldCanvas from '@event-builder/components/FieldCanvas';
-import RightSidebar from '@event-builder/components/RightSidebar';
-import FieldConfigModal from '@event-builder/components/modals/FieldConfigModal';
-import ConfigListModal from '@event-builder/components/modals/ConfigListModal';
-import WhereConfigModal from '@event-builder/components/modals/WhereConfigModal';
-import WhereBuilderModal from '@event-builder/components/WhereBuilder/WhereBuilderModal';
-import HQLPreviewModal from '@event-builder/components/HQLPreview/HQLPreviewModal';
-import NodeConfigModal from '@event-builder/components/modals/NodeConfigModal';
-import EventNodeBuilderErrorBoundary from '@event-builder/components/ErrorBoundary';
-import PerformanceIndicator from '@event-builder/components/HQLPreviewV2/PerformanceIndicator';
-import DebugViewer from '@event-builder/components/HQLPreviewV2/DebugViewer';
-import FieldSelectionModal from '@event-builder/components/FieldSelectionModal';
-import QuickActionButtons from '@event-builder/components/QuickActionButtons';
-import { Button, useToast, ConfirmDialog } from '@shared/ui';
+// Components
+import { EventNodeBuilderErrorBoundary } from '../components/ErrorBoundary';
+import PageHeader from '../components/PageHeader';
+import { QuickActionButtons } from '../components/QuickActionButtons';
+import { LeftSidebar } from '../components/LeftSidebar';
+import { RightSidebar } from '../components/RightSidebar';
+import FieldCanvas from '../components/FieldCanvas';
+import { FieldConfigModal } from '../components/modals/FieldConfigModal';
+import { ConfigListModal } from '../components/modals/ConfigListModal';
+import { WhereBuilderModal } from '../components/WhereBuilder/WhereBuilderModal';
+import { HQLPreviewModal } from '../components/HQLPreview/HQLPreviewModal';
+import { NodeConfigModal } from '../components/modals/NodeConfigModal';
+import { FieldSelectionModal } from '../components/FieldSelectionModal';
+import { ConfirmDialog } from '@shared/ui';
+import { LoadingState } from './components/LoadingState';
+import { PerformancePanel } from './components/PerformancePanel';
+import { DebugPanel } from './components/DebugPanel';
+import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 
 // Hooks
-import { useEventNodeBuilder, CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
+import { useToast } from '@features/canvas/components/hooks/useToast';
 import { useGameContext } from '@shared/hooks/useGameContext';
-
-// API
-import { saveConfig, loadConfig } from '@shared/api/eventNodeBuilder';
+import { useEventNodeBuilder } from '@shared/hooks/useEventNodeBuilder';
+import { useEventNodeBuilderData } from "./hooks/useEventNodeBuilderData";
 
 // Types
 import type { Game } from '@shared/hooks/useGameContext';
 import type { Event } from '@shared/types/api-types';
+import type { CanvasField, WhereCondition } from '@shared/types/event-node-builder';
+import type { OutletContext, ConfigData, FieldUpdate, DragDropField, ConfirmState } from "./EventNodeBuilder.types";
 
 // 样式
 import './EventNodeBuilder.css';
-
-// ============================================
-// Type Definitions
-// ============================================
-
-interface OutletContext {
-  currentGame?: Game | null;
-}
-
-interface ConfirmState {
-  open: boolean;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-}
-
-interface ConfigData {
-  game_gid: number;
-  event_id: number;
-  name_en: string;
-  name_cn: string;
-  description: string;
-  base_fields: Array<{
-    field_type: string;
-    field_name: string;
-    display_name: string;
-    alias?: string;
-    order: number;
-    param_id?: number | null;
-  }>;
-  filter_conditions: string;
-}
-
-interface FieldUpdate {
-  fieldType?: string;
-  fieldName?: string;
-  displayName?: string;
-  alias?: string;
-  paramId?: number | null;
-  jsonPath?: string | null;
-}
-
-interface DragDropField {
-  fieldType?: string;
-  fieldName?: string;
-  displayName?: string;
-  paramId?: number | null;
-  type?: string;
-  name?: string;
-  alias?: string;
-  sourceId?: number | null;
-}
 
 const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Element {
   // 路由和上下文
@@ -139,6 +75,20 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
     resetAll,
   } = useEventNodeBuilder(gameData?.gid);
 
+  // 使用自定义 hook 处理数据加载和保存
+  const { saveMutation } = useEventNodeBuilderData({
+    gameData,
+    configIdParam,
+    selectedEvent,
+    canvasFields,
+    nodeConfig,
+    whereConditions,
+    onSetSelectedEvent: setSelectedEvent,
+    onSetCanvasFields: setCanvasFields,
+    onSetWhereConditions: setWhereConditions,
+    onSetNodeConfig: setNodeConfig,
+  });
+
   // UI状态
   const [editingField, setEditingField] = useState<CanvasField | null>(null);
   const [showConfigList, setShowConfigList] = useState<boolean>(false);
@@ -153,46 +103,6 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
 
   // V2 API功能切换（默认启用V2）
   const [useV2API, setUseV2API] = useState<boolean>(true);
-
-  // 保存配置 mutation
-  // ✅ BUGFIX #5: ConfigData → SaveConfigRequest转换
-  const saveMutation = useMutation({
-    mutationFn: async (configData: ConfigData) => {
-      // 解析filter_conditions JSON字符串
-      let whereConditions: WhereCondition[] = [];
-      try {
-        const filterObj = JSON.parse(configData.filter_conditions);
-        whereConditions = filterObj.conditions || [];
-      } catch (e) {
-        console.warn('Failed to parse filter_conditions:', e);
-      }
-
-      // 转换为后端期望的SaveConfigRequest格式
-      const requestData = {
-        game_gid: configData.game_gid,
-        event_id: configData.event_id,
-        name: configData.name_en,  // ✅ 使用name_en作为name
-        config: {
-          fields: configData.base_fields.map(f => ({
-            field_name: f.field_name,
-            display_name: f.display_name,
-            data_type: 'string',  // TODO: 从field_type映射
-            is_required: false,
-          })),
-          where_conditions: whereConditions,
-          name_cn: configData.name_cn,
-          description: configData.description,
-        },
-      };
-      return saveConfig(requestData as any);
-    },
-    onSuccess: (result: EventConfig) => {
-      success(`配置 "${result.name_en}" 保存成功！`);
-    },
-    onError: (err: Error) => {
-      error('保存失败: ' + (err.message || '未知错误'));
-    },
-  });
 
   // 加载游戏数据 - 简化版，使用统一useGameContext
   useEffect(() => {
@@ -240,54 +150,6 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
     }
   }, [selectedEvent, clearCanvas]);
 
-  // 加载配置（编辑模式）
-  useEffect(() => {
-    if (configIdParam && gameData) {
-      loadConfig(configIdParam).then(result => {
-        if (result.success && result.data) {
-          const config = result.data;
-          // 设置事件
-          if (config.event) {
-            setSelectedEvent(config.event);
-          }
-          // 设置字段
-          if (config.base_fields && Array.isArray(config.base_fields)) {
-            setCanvasFields(config.base_fields.map((f: any, index: number) => ({
-              id: String(Date.now() + index),
-              fieldType: f.field_type,
-              fieldName: f.field_name,
-              displayName: f.display_name,
-              alias: f.alias || '',
-              order: index + 1,
-              paramId: f.param_id,
-              type: f.field_type === 'param' ? 'parameter' : f.field_type,
-              name: f.field_name,
-              dataType: f.hive_type || 'STRING',
-              isEditable: true,
-            })));
-          }
-          // 设置WHERE条件
-          if (config.filter_conditions) {
-            try {
-              const where = typeof config.filter_conditions === 'string'
-                ? JSON.parse(config.filter_conditions)
-                : config.filter_conditions;
-              setWhereConditions(where);
-            } catch (e) {
-              console.error('[EventNodeBuilder] Failed to parse WHERE conditions:', e);
-            }
-          }
-          // 设置节点配置
-          setNodeConfig({
-            nameEn: config.name_en || '',
-            nameCn: config.name_cn || '',
-            description: config.description || '',
-          });
-        }
-      });
-    }
-  }, [configIdParam, gameData, setCanvasFields, setSelectedEvent, setWhereConditions, setNodeConfig]);
-
   // 处理保存配置
   const handleSaveConfig = useCallback(() => {
     if (!selectedEvent) {
@@ -307,7 +169,6 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
       return;
     }
 
-    // ✅ BUGFIX #5: 保留ConfigData格式，在mutationFn中转换
     const configData: ConfigData = {
       game_gid: gameData!.gid,
       event_id: (selectedEvent as Event).id,
@@ -356,7 +217,6 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
         onConfirm: async () => {
           setConfirmState(s => ({ ...s, open: false }));
           try {
-            // 调用API更新参数中文名称
             const response = await fetch('/event_node_builder/api/update-param-name', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
@@ -392,18 +252,16 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
    */
   const handleFieldsAdded = useCallback((fields: Array<{
     fieldType?: string;
-    type?: string;  // GraphQL enum value (PARAM, BASE, etc.)
+    type?: string;
     fieldName?: string;
-    name?: string;  // GraphQL field name
+    name?: string;
     displayName?: string;
     paramId?: number | null;
-    jsonPath?: string | null;  // ← FIX: Include jsonPath from GraphQL response
+    jsonPath?: string | null;
   }>) => {
     if (!Array.isArray(fields)) return;
 
-    // Add all fields to canvas
     fields.forEach((field) => {
-      // Handle both GraphQL response format (type, name) and internal format (fieldType, fieldName)
       const fieldType = field.fieldType || field.type || 'param';
       const fieldName = field.fieldName || field.name || '';
       const displayName = field.displayName || fieldName;
@@ -413,7 +271,7 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
         fieldName,
         displayName,
         field.paramId,
-        field.jsonPath  // ← FIX: Pass jsonPath to addFieldToCanvas
+        field.jsonPath
       );
     });
 
@@ -436,212 +294,167 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
 
   // 加载状态
   if (!gameData) {
-    return (
-      <div className="event-node-builder-loading" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>
-          <i className="bi bi-controller"></i>
-        </div>
-        <h2>请先选择游戏</h2>
-        <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem' }}>
-          事件节点构建器需要游戏上下文才能正常工作
-        </p>
-        <Button variant="primary" onClick={() => navigate('/')}>
-          前往仪表板
-        </Button>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (
     <EventNodeBuilderErrorBoundary>
-      <div className="event-node-builder" data-testid="event-node-builder">
-        <PageHeader
-          gameData={gameData}
-          onClearCanvas={handleClearCanvas}
-          onSaveConfig={handleSaveConfig}
-          onLoadConfig={() => setShowConfigList(true)}
-          onOpenNodeConfig={() => setShowNodeConfig(true)}
-          useV2API={useV2API}
-          setUseV2API={setUseV2API}
-          showPerformancePanel={showPerformancePanel}
-          setShowPerformancePanel={setShowPerformancePanel}
-          showDebugPanel={showDebugPanel}
-          setShowDebugPanel={setShowDebugPanel}
-        >
-          {/* Quick Action Buttons in Header */}
-          {selectedEvent && (
-            <QuickActionButtons
+      <ErrorBoundary>
+        <div className="event-node-builder" data-testid="event-node-builder">
+          <PageHeader
+            gameData={gameData}
+            onClearCanvas={handleClearCanvas}
+            onSaveConfig={handleSaveConfig}
+            onLoadConfig={() => setShowConfigList(true)}
+            onOpenNodeConfig={() => setShowNodeConfig(true)}
+            useV2API={useV2API}
+            setUseV2API={setUseV2API}
+            showPerformancePanel={showPerformancePanel}
+            setShowPerformancePanel={setShowPerformancePanel}
+            showDebugPanel={showDebugPanel}
+            setShowDebugPanel={setShowDebugPanel}
+          >
+            {/* Quick Action Buttons in Header */}
+            {selectedEvent && (
+              <QuickActionButtons
+                eventId={(selectedEvent as Event).id}
+                onFieldsAdded={handleFieldsAdded}
+              />
+            )}
+          </PageHeader>
+
+          <div className="workspace" data-testid="event-node-builder-workspace">
+            <LeftSidebar
+              gameGid={Number(gameData.gid)}
+              selectedEvent={selectedEvent}
+              onEventSelect={setSelectedEvent}
+              onAddField={addFieldToCanvas}
+            />
+
+            <FieldCanvas
+              fields={canvasFields}
+              onFieldsChange={reorderFields}
+              onUpdateField={handleFieldEdit}
+              onRemoveField={handleFieldDelete}
+              onReorderFields={reorderFields}
+              onAddField={(field: DragDropField) => {
+                // Handle drag-drop from canvas
+                if (field.fieldType) {
+                  // FieldSelectorPanel passes dataType, but drag-drop uses hive_type
+                  const hiveType = (field as any).dataType || field.hive_type;
+                  addFieldToCanvas(field.fieldType, field.fieldName!, field.displayName!, field.paramId, undefined, hiveType);
+                } else if (field.type) {
+                  // Handle from @dnd-kit system
+                  const fieldType = field.type === 'parameter' ? 'param' : field.type;
+                  addFieldToCanvas(fieldType, field.name!, field.alias || field.name!, field.sourceId, field.hive_type);
+                }
+              }}
+            />
+
+            <RightSidebar
+              gameGid={Number(gameData.gid)}
+              selectedEvent={selectedEvent}
+              fields={canvasFields}
+              whereConditions={whereConditions}
+              onWhereConditionsChange={setWhereConditions}
+              onShowWhereModal={() => setShowWhereConfig(true)}
+              onShowHQLDetails={() => setShowHQLDetails(true)}
+            />
+          </div>
+
+          {/* 模态框 */}
+          {editingField && (
+            <FieldConfigModal
+              field={editingField}
+              onSave={handleFieldSave}
+              onClose={() => setEditingField(null)}
+              data-testid="field-config-modal"
+            />
+          )}
+
+          {showConfigList && (
+            <ConfigListModal
+              gameGid={gameData.gid}
+              onSelect={(config) => {
+                navigate(`/event-node-builder?config_id=${config.id}&game_gid=${gameData.gid}`);
+              }}
+              onClose={() => setShowConfigList(false)}
+              data-testid="config-list-modal"
+            />
+          )}
+
+          {showWhereConfig && (
+            <WhereBuilderModal
+              isOpen={showWhereConfig}
+              onClose={() => setShowWhereConfig(false)}
+              conditions={whereConditions}
+              onConditionsChange={setWhereConditions} // ✅ 新增：实时更新
+              onApply={(conditions) => {
+                setWhereConditions(conditions);
+              }}
+              canvasFields={canvasFields}
+              selectedEvent={selectedEvent}
+              data-testid="where-builder-modal"
+            />
+          )}
+
+          {showHQLDetails && (
+            <HQLPreviewModal
+              isOpen={showHQLDetails}
+              onClose={() => setShowHQLDetails(false)}
+              canvasFields={canvasFields}
+              whereConditions={whereConditions}
+              gameData={gameData}
+              selectedEvent={selectedEvent}
+              useV2API={useV2API}
+              data-testid="hql-preview-modal"
+            />
+          )}
+
+          {showNodeConfig && (
+            <NodeConfigModal
+              config={nodeConfig}
+              onChange={setNodeConfig}
+              onClose={() => setShowNodeConfig(false)}
+              disabled={!selectedEvent || canvasFields.length === 0}
+              data-testid="node-config-modal"
+            />
+          )}
+
+          {/* Field Selection Modal */}
+          {showFieldSelection && selectedEvent && (
+            <FieldSelectionModal
+              isOpen={showFieldSelection}
+              onClose={() => setShowFieldSelection(false)}
               eventId={(selectedEvent as Event).id}
               onFieldsAdded={handleFieldsAdded}
             />
           )}
-        </PageHeader>
 
-        <div className="workspace" data-testid="event-node-builder-workspace">
-          <LeftSidebar
-            gameGid={Number(gameData.gid)}
-            selectedEvent={selectedEvent}
-            onEventSelect={setSelectedEvent}
-            onAddField={addFieldToCanvas}
+          <ConfirmDialog
+            open={confirmState.open}
+            title={confirmState.title}
+            message={confirmState.message}
+            confirmText="确认"
+            cancelText="取消"
+            variant="warning"
+            onConfirm={confirmState.onConfirm}
+            onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
           />
 
-          <FieldCanvas
-            fields={canvasFields}
-            onFieldsChange={reorderFields}
-            onUpdateField={handleFieldEdit}
-            onRemoveField={handleFieldDelete}
-            onReorderFields={reorderFields}
-            onAddField={(field: DragDropField) => {
-              // Handle drag-drop from canvas
-              if (field.fieldType) {
-                // FieldSelectorPanel passes dataType, but drag-drop uses hive_type
-                const hiveType = (field as any).dataType || field.hive_type;
-                addFieldToCanvas(field.fieldType, field.fieldName!, field.displayName!, field.paramId, undefined, hiveType);
-              } else if (field.type) {
-                // Handle from @dnd-kit system
-                const fieldType = field.type === 'parameter' ? 'param' : field.type;
-                addFieldToCanvas(fieldType, field.name!, field.alias || field.name!, field.sourceId, field.hive_type);
-              }
-            }}
+          {/* 性能分析面板 */}
+          <PerformancePanel
+            show={showPerformancePanel}
+            onClose={() => setShowPerformancePanel(false)}
           />
 
-          <RightSidebar
-            gameGid={Number(gameData.gid)}
-            selectedEvent={selectedEvent}
-            fields={canvasFields}
-            whereConditions={whereConditions}
-            onWhereConditionsChange={setWhereConditions}
-            onShowWhereModal={() => setShowWhereConfig(true)}
-            onShowHQLDetails={() => setShowHQLDetails(true)}
+          {/* 调试模式面板 */}
+          <DebugPanel
+            show={showDebugPanel}
+            onClose={() => setShowDebugPanel(false)}
           />
         </div>
-
-        {/* 模态框 */}
-        {editingField && (
-          <FieldConfigModal
-            field={editingField}
-            onSave={handleFieldSave}
-            onClose={() => setEditingField(null)}
-            data-testid="field-config-modal"
-          />
-        )}
-
-        {showConfigList && (
-          <ConfigListModal
-            gameGid={gameData.gid}
-            onSelect={(config) => {
-              navigate(`/event-node-builder?config_id=${config.id}&game_gid=${gameData.gid}`);
-            }}
-            onClose={() => setShowConfigList(false)}
-            data-testid="config-list-modal"
-          />
-        )}
-
-        {showWhereConfig && (
-          <WhereBuilderModal
-            isOpen={showWhereConfig}
-            onClose={() => setShowWhereConfig(false)}
-            conditions={whereConditions}
-            onConditionsChange={setWhereConditions} // ✅ 新增：实时更新
-            onApply={(conditions) => {
-              setWhereConditions(conditions);
-            }}
-            canvasFields={canvasFields}
-            selectedEvent={selectedEvent}
-            data-testid="where-builder-modal"
-          />
-        )}
-
-        {showHQLDetails && (
-          <HQLPreviewModal
-            isOpen={showHQLDetails}
-            onClose={() => setShowHQLDetails(false)}
-            canvasFields={canvasFields}
-            whereConditions={whereConditions}
-            gameData={gameData}
-            selectedEvent={selectedEvent}
-            useV2API={useV2API}
-            data-testid="hql-preview-modal"
-          />
-        )}
-
-        {showNodeConfig && (
-          <NodeConfigModal
-            config={nodeConfig}
-            onChange={setNodeConfig}
-            onClose={() => setShowNodeConfig(false)}
-            disabled={!selectedEvent || canvasFields.length === 0}
-            data-testid="node-config-modal"
-          />
-        )}
-
-        {/* Field Selection Modal */}
-        {showFieldSelection && selectedEvent && (
-          <FieldSelectionModal
-            isOpen={showFieldSelection}
-            onClose={() => setShowFieldSelection(false)}
-            eventId={(selectedEvent as Event).id}
-            onFieldsAdded={handleFieldsAdded}
-          />
-        )}
-
-        <ConfirmDialog
-          open={confirmState.open}
-          title={confirmState.title}
-          message={confirmState.message}
-          confirmText="确认"
-          cancelText="取消"
-          variant="warning"
-          onConfirm={confirmState.onConfirm}
-          onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
-        />
-
-        {/* 性能分析面板 */}
-        {showPerformancePanel && (
-          <div className="panel-overlay" onClick={() => setShowPerformancePanel(false)}>
-            <div className="panel-container performance-panel" onClick={(e) => e.stopPropagation()}>
-              <div className="panel-header">
-                <h3>
-                  <i className="bi bi-speedometer2"></i> 性能分析
-                </h3>
-                <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowPerformancePanel(false)}>
-                  <i className="bi bi-x"></i> 关闭
-                </button>
-              </div>
-              <div className="panel-body">
-                <div className="panel-placeholder">
-                  <i className="bi bi-info-circle"></i>
-                  <p>性能数据将在HQL生成后显示</p>
-                  <small>请先选择事件并添加字段，然后生成HQL以查看性能分析</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 调试模式面板 */}
-        {showDebugPanel && (
-          <div className="panel-overlay" onClick={() => setShowDebugPanel(false)}>
-            <div className="panel-container debug-panel" onClick={(e) => e.stopPropagation()}>
-              <div className="panel-header">
-                <h3>
-                  <i className="bi bi-bug"></i> 调试模式
-                </h3>
-                <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowDebugPanel(false)}>
-                  <i className="bi bi-x"></i> 关闭
-                </button>
-              </div>
-              <div className="panel-body">
-                <div className="panel-placeholder">
-                  <i className="bi bi-info-circle"></i>
-                  <p>调试信息将在HQL生成后显示</p>
-                  <small>请先选择事件并添加字段，然后生成HQL以查看调试信息</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      </ErrorBoundary>
     </EventNodeBuilderErrorBoundary>
   );
 });

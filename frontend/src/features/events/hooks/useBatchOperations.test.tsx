@@ -279,7 +279,7 @@ describe('useBatchValidate', () => {
         categoryName: '测试分类',
         sourceTable: 'test_source',
         targetTable: 'test_target',
-        fields: [],
+        fields: [{ name: 'param1', alias: '参数1', dataType: 'string', baseType: 'string' }],
       },
     ];
 
@@ -288,7 +288,7 @@ describe('useBatchValidate', () => {
       expect(validationResult.totalEvents).toBe(1);
       expect(validationResult.validEvents).toBe(0);
       expect(validationResult.invalidEvents).toBe(1);
-      expect(validationResult.issues).toHaveLength(1);
+      expect(validationResult.issues).toHaveLength(1); // 修改：只检测英文名称缺失
       expect(validationResult.issues[0].type).toBe('MISSING_NAME');
     });
 
@@ -316,9 +316,12 @@ describe('useBatchValidate', () => {
 
     act(() => {
       const validationResult = result.current.validateEvents(events);
-      expect(validationResult.issues).toHaveLength(1);
-      expect(validationResult.issues[0].type).toBe('INVALID_NAME_FORMAT');
-      expect(validationResult.issues[0].severity).toBe('warning');
+      expect(validationResult.issues).toHaveLength(2); // 修改：同时检测名称格式和缺少参数
+      const nameFormatIssue = validationResult.issues.find(
+        issue => issue.type === 'INVALID_NAME_FORMAT'
+      );
+      expect(nameFormatIssue).toBeDefined();
+      expect(nameFormatIssue?.severity).toBe('warning');
     });
   });
 
@@ -341,9 +344,12 @@ describe('useBatchValidate', () => {
 
     act(() => {
       const validationResult = result.current.validateEvents(events);
-      expect(validationResult.issues).toHaveLength(1);
-      expect(validationResult.issues[0].type).toBe('MISSING_CATEGORY');
-      expect(validationResult.issues[0].severity).toBe('warning');
+      expect(validationResult.issues).toHaveLength(2); // 修改：同时检测缺少分类和缺少参数
+      const categoryIssue = validationResult.issues.find(
+        issue => issue.type === 'MISSING_CATEGORY'
+      );
+      expect(categoryIssue).toBeDefined();
+      expect(categoryIssue?.severity).toBe('warning');
     });
   });
 
@@ -368,9 +374,12 @@ describe('useBatchValidate', () => {
 
     act(() => {
       const validationResult = result.current.validateEvents(events);
-      expect(validationResult.issues).toHaveLength(1);
-      expect(validationResult.issues[0].type).toBe('MISSING_SOURCE_TABLE');
-      expect(validationResult.issues[0].severity).toBe('error');
+      expect(validationResult.issues).toHaveLength(2); // 修改：同时检测缺少源表和缺少参数
+      const sourceTableIssue = validationResult.issues.find(
+        issue => issue.type === 'MISSING_SOURCE_TABLE'
+      );
+      expect(sourceTableIssue).toBeDefined();
+      expect(sourceTableIssue?.severity).toBe('error');
     });
   });
 
