@@ -883,14 +883,20 @@ Form/
 
 #### 任务 4.1: 提升测试覆盖率
 
-**目标**: 达到 80% 测试覆盖率
+**目标**: 达到 90% 测试覆盖率
 
 **策略**:
 
-1. **识别未覆盖的代码**
+1. **识别未覆盖的代码**（使用分组测试避免超时）
    ```bash
-   # 运行测试覆盖率报告
-   npm test -- --coverage --coverageReporters=html
+   # 方案 1: 只生成特定组件的覆盖率报告
+   npm test -- --testPathPattern="Table" --coverage --coverageReporters=html --maxWorkers=1
+   
+   # 方案 2: 只生成 shared/ui 的覆盖率报告
+   npm test -- --testPathPattern="shared/ui" --coverage --coverageReporters=html --maxWorkers=1
+   
+   # 方案 3: 分批生成覆盖率报告
+   npm test -- --testPathPattern="components" --coverage --coverageReporters=html --maxWorkers=1
    
    # 查看覆盖率报告
    open coverage/index.html
@@ -998,7 +1004,7 @@ Form/
    ```
 
 **验收标准**:
-- ✅ 测试覆盖率达到 80%
+- ✅ 测试覆盖率达到 90%
 - ✅ 所有核心组件有完整测试
 - ✅ 所有测试文件遵循"1个组件1个测试文件"原则
 - ✅ 所有测试文件有良好的代码组织
