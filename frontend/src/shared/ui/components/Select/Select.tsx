@@ -12,6 +12,9 @@ import React, {
 } from 'react';
 import { Controller } from 'react-hook-form';
 import type { SelectProps, SelectOption } from './Select.types';
+import { SelectInput } from './SelectInput';
+import { SelectDropdown } from './SelectDropdown';
+import { filterOptions, getSelectedOptions, calculateDropdownPosition } from './Select.utils';
 import './Select.css';
 
 /**
@@ -86,28 +89,18 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
     const triggerRect = trigger.getBoundingClientRect();
     const dropdownHeight = dropdown.offsetHeight || 240;
     const viewportHeight = window.innerHeight;
-    const spaceBelow = viewportHeight - triggerRect.bottom;
-    const spaceAbove = triggerRect.top;
 
-    // If not enough space below and more space above, flip up
-    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-      setDropdownPosition('up');
-    } else {
-      setDropdownPosition('down');
-    }
+    setDropdownPosition(calculateDropdownPosition(triggerRect, dropdownHeight, viewportHeight));
   }, [isOpen]);
 
   // Filter options based on search term
   const filteredOptions = useMemo(() => {
-    if (!searchable || !searchTerm) return options;
-    return options.filter(option =>
-      option.label?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return filterOptions(options, searchTerm, searchable);
   }, [options, searchTerm, searchable]);
 
   // Get selected option(s) label(s)
   const selectedOptions = useMemo(() => {
-    return options.filter(opt => selectedValues.includes(opt.value));
+    return getSelectedOptions(options, selectedValues);
   }, [options, selectedValues]);
 
   // Close dropdown when clicking outside
@@ -249,12 +242,6 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
     isOpen && 'cyber-select-wrapper--open'
   ].filter(Boolean).join(' ');
 
-  const dropdownClass = [
-    'cyber-select-dropdown',
-    isOpen && 'cyber-select-dropdown--open',
-    dropdownPosition === 'up' && 'cyber-select-dropdown--up'
-  ].filter(Boolean).join(' ');
-
   const containerClass = [
     'cyber-select',
     className
@@ -269,144 +256,40 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
         rules={rules}
         render={({ field: { onChange: controllerOnChange, value: controllerValue } }) => (
           <div className={containerClass} ref={ref} {...props}>
-            {label && (
-              <label id={labelId} className="cyber-select__label">
-                {label}
-                {required && <span className="cyber-select__required" aria-hidden="true"> *</span>}
-              </label>
-            )}
-
             <div className={wrapperClass} ref={dropdownRef}>
-              <div
-                ref={triggerRef}
+              <SelectInput
                 id={triggerId}
-                className="cyber-select-trigger"
-                tabIndex={disabled ? -1 : 0}
-                role="combobox"
-                aria-expanded={isOpen}
-                aria-haspopup="listbox"
-                aria-disabled={disabled}
-                aria-invalid={isInvalid}
-                aria-labelledby={label ? labelId : undefined}
-                aria-describedby={
-                  isInvalid ? `${triggerId}-error` : helperText ? `${triggerId}-helper` : undefined
-                }
-                aria-multiselectable={multiple}
-                onClick={handleTriggerClick}
+                label={label}
+                labelId={labelId}
+                placeholder={placeholder}
+                disabled={disabled}
+                multiple={multiple}
+                isOpen={isOpen}
+                isInvalid={isInvalid}
+                selectedOptions={selectedOptions}
+                searchable={searchable}
+                onTriggerClick={handleTriggerClick}
+                onRemoveOption={handleRemoveOption}
                 onKeyDown={handleKeyDown}
                 onFocus={handleFocus}
-              >
-                {multiple && selectedOptions.length > 0 ? (
-                  <div className="cyber-select-tags">
-                    {selectedOptions.map(option => (
-                      <span key={option.value} className="cyber-select-tag">
-                        {option.label}
-                        <button
-                          type="button"
-                          className="cyber-select-tag-remove"
-                          onClick={(e) => handleRemoveOption(e, option.value)}
-                          aria-label={`Remove ${option.label}`}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="cyber-select-value" data-placeholder={placeholder}>
-                    {selectedOptions.length > 0 ? selectedOptions[0].label : placeholder}
-                  </span>
-                )}
-                <span className="cyber-select-arrow" aria-hidden="true">
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path
-                      d="M2 4L6 8L10 4"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
+                triggerRef={triggerRef}
+              />
 
-              {isOpen && (
-                <div className={dropdownClass} role="listbox">
-                  {searchable && (
-                    <div className="cyber-select-search">
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        className="cyber-select-search-input"
-                        autoFocus
-                        onClick={handleSearchClick}
-                      />
-                    </div>
-                  )}
-
-                  <div className="cyber-select-options">
-                    {filteredOptions.length === 0 ? (
-                      <div className="cyber-select-option cyber-select-option--empty">
-                        No options found
-                      </div>
-                    ) : (
-                      filteredOptions.map((option, index) => {
-                        const isSelected = selectedValues.includes(option.value);
-                        const isFocused = index === focusedIndex;
-                        const optionClass = [
-                          'cyber-select-option',
-                          isSelected && 'cyber-select-option--selected',
-                          isFocused && 'cyber-select-option--focused',
-                          option.disabled && 'cyber-select-option--disabled'
-                        ].filter(Boolean).join(' ');
-
-                        return (
-                          <div
-                            key={option.value}
-                            ref={el => { if (el) optionsRef.current[index] = el; }}
-                            className={optionClass}
-                            role="option"
-                            aria-selected={isSelected}
-                            aria-disabled={option.disabled}
-                            onClick={() => !option.disabled && handleSelectOption(option.value)}
-                          >
-                            {multiple && isSelected && (
-                              <span className="cyber-select-check" aria-hidden="true">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                  <path
-                                    d="M3 8L6 11L13 4"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </span>
-                            )}
-                            {option.label}
-                            {!multiple && isSelected && (
-                              <span className="cyber-select-check" aria-hidden="true">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                  <path
-                                    d="M3 8L6 11L13 4"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-              )}
+              <SelectDropdown
+                isOpen={isOpen}
+                position={dropdownPosition}
+                searchable={searchable}
+                searchTerm={searchTerm}
+                filteredOptions={filteredOptions}
+                selectedValues={selectedValues}
+                focusedIndex={focusedIndex}
+                multiple={multiple}
+                onSearchChange={handleSearchChange}
+                onSearchClick={handleSearchClick}
+                onSelectOption={handleSelectOption}
+                searchInputRef={searchInputRef}
+                optionsRef={optionsRef}
+              />
             </div>
 
             {isInvalid && (
@@ -429,144 +312,40 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
   // Render without React Hook Form Controller
   return (
     <div className={containerClass} ref={ref} {...props}>
-      {label && (
-        <label id={labelId} className="cyber-select__label">
-          {label}
-          {required && <span className="cyber-select__required" aria-hidden="true"> *</span>}
-        </label>
-      )}
-
       <div className={wrapperClass} ref={dropdownRef}>
-        <div
-          ref={triggerRef}
+        <SelectInput
           id={triggerId}
-          className="cyber-select-trigger"
-          tabIndex={disabled ? -1 : 0}
-          role="combobox"
-          aria-expanded={isOpen}
-          aria-haspopup="listbox"
-          aria-disabled={disabled}
-          aria-invalid={isInvalid}
-          aria-labelledby={label ? labelId : undefined}
-          aria-describedby={
-            isInvalid ? `${triggerId}-error` : helperText ? `${triggerId}-helper` : undefined
-          }
-          aria-multiselectable={multiple}
-          onClick={handleTriggerClick}
+          label={label}
+          labelId={labelId}
+          placeholder={placeholder}
+          disabled={disabled}
+          multiple={multiple}
+          isOpen={isOpen}
+          isInvalid={isInvalid}
+          selectedOptions={selectedOptions}
+          searchable={searchable}
+          onTriggerClick={handleTriggerClick}
+          onRemoveOption={handleRemoveOption}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
-        >
-          {multiple && selectedOptions.length > 0 ? (
-            <div className="cyber-select-tags">
-              {selectedOptions.map(option => (
-                <span key={option.value} className="cyber-select-tag">
-                  {option.label}
-                  <button
-                    type="button"
-                    className="cyber-select-tag-remove"
-                    onClick={(e) => handleRemoveOption(e, option.value)}
-                    aria-label={`Remove ${option.label}`}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          ) : (
-            <span className="cyber-select-value" data-placeholder={placeholder}>
-              {selectedOptions.length > 0 ? selectedOptions[0].label : placeholder}
-            </span>
-          )}
-          <span className="cyber-select-arrow" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path
-                d="M2 4L6 8L10 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-        </div>
+          triggerRef={triggerRef}
+        />
 
-        {isOpen && (
-          <div className={dropdownClass} role="listbox">
-            {searchable && (
-              <div className="cyber-select-search">
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="cyber-select-search-input"
-                  autoFocus
-                  onClick={handleSearchClick}
-                />
-              </div>
-            )}
-
-            <div className="cyber-select-options">
-              {filteredOptions.length === 0 ? (
-                <div className="cyber-select-option cyber-select-option--empty">
-                  No options found
-                </div>
-              ) : (
-                filteredOptions.map((option, index) => {
-                  const isSelected = selectedValues.includes(option.value);
-                  const isFocused = index === focusedIndex;
-                  const optionClass = [
-                    'cyber-select-option',
-                    isSelected && 'cyber-select-option--selected',
-                    isFocused && 'cyber-select-option--focused',
-                    option.disabled && 'cyber-select-option--disabled'
-                  ].filter(Boolean).join(' ');
-
-                  return (
-                    <div
-                      key={option.value}
-                      ref={el => { if (el) optionsRef.current[index] = el; }}
-                      className={optionClass}
-                      role="option"
-                      aria-selected={isSelected}
-                      aria-disabled={option.disabled}
-                      onClick={() => !option.disabled && handleSelectOption(option.value)}
-                    >
-                      {multiple && isSelected && (
-                        <span className="cyber-select-check" aria-hidden="true">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path
-                              d="M3 8L6 11L13 4"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </span>
-                      )}
-                      {option.label}
-                      {!multiple && isSelected && (
-                        <span className="cyber-select-check" aria-hidden="true">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path
-                              d="M3 8L6 11L13 4"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </span>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        )}
+        <SelectDropdown
+          isOpen={isOpen}
+          position={dropdownPosition}
+          searchable={searchable}
+          searchTerm={searchTerm}
+          filteredOptions={filteredOptions}
+          selectedValues={selectedValues}
+          focusedIndex={focusedIndex}
+          multiple={multiple}
+          onSearchChange={handleSearchChange}
+          onSearchClick={handleSearchClick}
+          onSelectOption={handleSelectOption}
+          searchInputRef={searchInputRef}
+          optionsRef={optionsRef}
+        />
       </div>
 
       {isInvalid && (
