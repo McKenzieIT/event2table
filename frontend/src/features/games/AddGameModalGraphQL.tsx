@@ -171,7 +171,11 @@ const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClo
             {isSubmitting ? '创建中...' : '创建游戏'}
           </Button>
         </div>
+      </form>
       </Modal>
+    );
+};
+
 // ✅ 添加 React.memo 优化渲染性能
 const AddGameModalGraphQLMemo = memo(AddGameModalGraphQL);
 

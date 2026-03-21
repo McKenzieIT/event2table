@@ -162,6 +162,6 @@ export const TablePagination = React.memo(({
       )}
     </div>
   );
-};
+});
 
 TablePagination.displayName = 'TablePagination';

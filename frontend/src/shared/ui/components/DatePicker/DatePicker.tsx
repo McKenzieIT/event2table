@@ -514,6 +514,6 @@ export const DatePicker = React.memo(forwardRef<DatePickerRef, DatePickerProps>(
       </div>
     );
   }
-);
+));
 
 DatePicker.displayName = 'DatePicker';

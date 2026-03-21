@@ -1,14 +1,3 @@
-import React from 'react';
-import { TableSortProps } from './Table.types';
-
-/**
- * TableSort Component
- * 
- * Renders sort indicator and controls with support for:
- * - Ascending sort
- * - Descending sort
- * - Clear sort
- */
 export const TableSort = React.memo(({
   direction,
   onSort,
@@ -38,6 +27,4 @@ export const TableSort = React.memo(({
       <span className="table-sort-icon">{getSortIcon()}</span>
     </button>
   );
-};
-
-TableSort.displayName = 'TableSort';
+}) as (props: TableSortProps) => React.JSX.Element;

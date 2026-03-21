@@ -1,51 +1,16 @@
-/**
- * FieldCanvas Component
- *
- * Drop zone canvas for field management with drag-and-drop support.
- * Accepts dragged parameters from the event selector and manages field list.
- *
- * Features:
- * - Drop zone for dragging parameters/events
- * - Sortable field list with drag handles
- * - Field operations (add, edit, delete, reorder)
- * - Visual feedback for drag operations
- * - Empty state with call-to-action
- *
- * @component FieldCanvas
- */
-// @ts-nocheck - TypeScript检查暂禁用（dnd-kit和组件类型待完善）
-
-import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import {
-  DndContext,
-  useDroppable,
-  DragOverlay,
-  closestCenter,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  KeyboardSensor
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-  arrayMove,
-  sortableKeyboardCoordinates
-} from '@dnd-kit/sortable';
+import React, { useState, useCallback } from 'react';
+import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerSensor, KeyboardSensor, SortableContext, verticalListSortingStrategy, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Field, FieldType, DataType, Parameter } from '@shared/types/fieldBuilder';
-import { generateId } from '@shared/utils/fieldBuilder';
-import { Button, EmptyState } from '@shared/ui';
-import { DeleteConfirmModal } from '@shared/components/DeleteConfirmModal';
-import CanvasStatsDisplay from './CanvasStatsDisplay';
-import EdgeToolbar from './EdgeToolbar';
-import FieldContextMenu from './FieldContextMenu';
-import './FieldCanvas.css';
-import './CanvasHeader.css';
-import './EdgeToolbar/EdgeToolbar.css';
-import './FieldContextMenu.css';
+import PropTypes from 'prop-types';
+import { Button } from '@shared/ui';
+import { EmptyState } from '@shared/ui';
+import { FieldType, DataType } from '../types/fieldTypes';
+import { generateId } from '@shared/utils/idGenerator';
+import SortableFieldItem from './FieldCanvas/SortableFieldItem';
+import { DropZone } from './FieldCanvas/DropZone';
+import { EdgeToolbar } from './FieldCanvas/EdgeToolbar';
+import { CanvasStatsDisplay } from './FieldCanvas/CanvasStatsDisplay';
+import { FieldContextMenu } from './FieldCanvas/FieldContextMenu';
 
 /**
  * Drop zone component for accepting dragged items

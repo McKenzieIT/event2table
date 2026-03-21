@@ -49,200 +49,22 @@ import type {
   PaginationProps,
   VirtualScrollMetrics,
 } from './Table.types';
+import { TableHeader } from './TableHeader';
+import { TableBody } from './TableBody';
+import { TableFooter } from './TableFooter';
+import { TablePagination } from './TablePagination';
+import { TableRow } from './TableRow';
+import { TableCell } from './TableCell';
+import { TableFilter } from './TableFilter';
+import { TableSort } from './TableSort';
+import { useTableVirtualScroll } from './useTableVirtualScroll';
+import { useTableHandlers } from './useTableHandlers';
+import { useTableRender } from './useTableRender';
 import './Table.css';
 
 // ============================================================================
-// Sub-components
+// Main Table Component
 // ============================================================================
-
-const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(
-  ({ className = '', children, ...props }, ref) => {
-    return (
-      <thead ref={ref} className={`table-header ${className}`} {...props}>
-        {children}
-      </thead>
-    );
-  }
-);
-
-TableHeader.displayName = 'TableHeader';
-
-const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
-  ({ className = '', children, ...props }, ref) => {
-    return (
-      <tbody ref={ref} className={`table-body ${className}`} {...props}>
-        {children}
-      </tbody>
-    );
-  }
-);
-
-TableBody.displayName = 'TableBody';
-
-const TableFooter = forwardRef<HTMLTableSectionElement, TableFooterProps>(
-  ({ className = '', children, ...props }, ref) => {
-    return (
-      <tfoot ref={ref} className={`table-footer ${className}`} {...props}>
-        {children}
-      </tfoot>
-    );
-  }
-);
-
-TableFooter.displayName = 'TableFooter';
-
-// ============================================================================
-// Pagination Component
-// ============================================================================
-
-const TablePagination: React.FC<PaginationProps> = ({
-  currentPage,
-  pageSize,
-  total,
-  pageSizeOptions = [10, 20, 50, 100],
-  onPageChange,
-  showSizeChanger = true,
-  showQuickJumper = true,
-  showTotal,
-  className = '',
-}) => {
-  const totalPages = Math.ceil(total / pageSize);
-  const [jumpPage, setJumpPage] = useState('');
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      onPageChange(page, pageSize);
-    }
-  };
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    const newPage = Math.min(currentPage, Math.ceil(total / newPageSize));
-    onPageChange(newPage, newPageSize);
-  };
-
-  const handleJump = () => {
-    const page = parseInt(jumpPage, 10);
-    if (!isNaN(page)) {
-      handlePageChange(page);
-      setJumpPage('');
-    }
-  };
-
-  const renderPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxVisible = 7;
-
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-      
-      if (currentPage > 3) {
-        pages.push('...');
-      }
-      
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-      
-      if (currentPage < totalPages - 2) {
-        pages.push('...');
-      }
-      
-      pages.push(totalPages);
-    }
-
-    return pages;
-  };
-
-  const startItem = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(currentPage * pageSize, total);
-
-  return (
-    <div className={`table-pagination ${className}`}>
-      {showTotal && (
-        <div className="pagination-total">
-          {showTotal(total, [startItem, endItem])}
-        </div>
-      )}
-      
-      <div className="pagination-controls">
-        <button
-          className="pagination-button"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          aria-label="Previous page"
-        >
-          ‹
-        </button>
-
-        {renderPageNumbers().map((page, index) => (
-          <button
-            key={index}
-            className={`pagination-button ${page === currentPage ? 'active' : ''}`}
-            onClick={() => typeof page === 'number' && handlePageChange(page)}
-            disabled={page === '...'}
-          >
-            {page}
-          </button>
-        ))}
-
-        <button
-          className="pagination-button"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          aria-label="Next page"
-        >
-          ›
-        </button>
-      </div>
-
-      {showSizeChanger && (
-        <div className="pagination-size-changer">
-          <select
-            value={pageSize}
-            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            className="pagination-select"
-          >
-            {pageSizeOptions.map((size) => (
-              <option key={size} value={size}>
-                {size} / page
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {showQuickJumper && (
-        <div className="pagination-jumper">
-          <span>Go to</span>
-          <input
-            type="number"
-            min={1}
-            max={totalPages}
-            value={jumpPage}
-            onChange={(e) => setJumpPage(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleJump()}
-            className="pagination-input"
-          />
-          <button
-            className="pagination-button pagination-go-button"
-            onClick={handleJump}
-            disabled={!jumpPage}
-          >
-            Go
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
 // ============================================================================
 // Main Table Component
 // ============================================================================
@@ -850,5 +672,5 @@ const Table = React.memo(<TData extends Record<string, unknown>>({
 
 Table.displayName = 'Table';
 
-export { Table, TableHeader, TableBody, TableFooter, TablePagination, TableRow, TableCell, TableFilter, TableSort };
+export { Table };
 export type { TableProps, TableColumn, CellContext };

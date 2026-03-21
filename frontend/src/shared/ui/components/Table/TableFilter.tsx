@@ -74,6 +74,4 @@ export const TableFilter = React.memo(<TData extends RowData>({
       placeholder="Filter..."
     />
   );
-};
-
-TableFilter.displayName = 'TableFilter';
+}) as <TData extends RowData>(props: TableFilterProps<TData>) => React.JSX.Element;

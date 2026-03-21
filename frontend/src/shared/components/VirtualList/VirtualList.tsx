@@ -44,7 +44,7 @@ export interface VirtualListRef {
   scrollToOffset: (offset: number) => void;
 }
 
-const VirtualList = memo(&lt;T,&gt;({
+const VirtualList = memo(<T,>({
   items = [],
   renderItem,
   itemHeight,  // Legacy prop for backward compatibility
@@ -57,7 +57,7 @@ const VirtualList = memo(&lt;T,&gt;({
   skeleton = null,
   'data-testid': testId = 'virtual-list',
   ...props
-}: VirtualListProps&lt;T&gt;) => {
+}: VirtualListProps<T>) => {
   // Support legacy props for backward compatibility
   const actualItemHeight = itemHeight ?? estimateSize;
   const actualHeight = height ?? (typeof containerStyle.height === 'number' ? containerStyle.height : '100%');

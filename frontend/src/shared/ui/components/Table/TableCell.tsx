@@ -1,17 +1,3 @@
-import React from 'react';
-import { TableCellProps, RowData } from './Table.types';
-
-/**
- * TableCell Component
- * 
- * Renders a single table cell with support for:
- * - Custom rendering
- * - Editing
- * - Click events
- * - Double-click events
- * - Fixed columns
- * - Alignment
- */
 export const TableCell = React.memo(<TData extends RowData, TValue = unknown>({
   className = '',
   children,
@@ -42,6 +28,4 @@ export const TableCell = React.memo(<TData extends RowData, TValue = unknown>({
       {children}
     </td>
   );
-};
-
-TableCell.displayName = 'TableCell';
+}) as <TData extends RowData, TValue = unknown>(props: TableCellProps<TData, TValue>) => React.JSX.Element;

@@ -18,9 +18,9 @@ vi.mock('@/stores/gameStore', () => ({
 }));
 
 // Wrapper component to provide Router context
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <MemoryRouter>{children}</MemoryRouter>
-);
+const wrapper = ({ children }: { children: React.ReactNode }) => {
+  return <MemoryRouter>{children}</MemoryRouter>;
+};
 
 describe('useGameContext', () => {
   beforeEach(() => {

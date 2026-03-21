@@ -160,7 +160,76 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
     if (Object.keys(updates).length > 0) {
       setFormData(prev => ({ ...prev, ...updates }));
     }
-      </Modal>
+  }, [formData]);
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose} title="添加事件" size="md">
+      <form onSubmit={handleSubmit} className="add-event-form">
+        <div className="form-group">
+          <label htmlFor="eventName">事件名称（英文）</label>
+          <Input
+            id="eventName"
+            ref={eventNameRef}
+            type="text"
+            value={formData.eventName}
+            onChange={(e) => handleChange('eventName', e.target.value)}
+            placeholder="例如: player_login"
+            error={errors.eventName}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="eventNameCn">事件名称（中文）</label>
+          <Input
+            id="eventNameCn"
+            ref={eventNameCnRef}
+            type="text"
+            value={formData.eventNameCn}
+            onChange={(e) => handleChange('eventNameCn', e.target.value)}
+            placeholder="例如: 玩家登录"
+            error={errors.eventNameCn}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="categoryId">事件分类</label>
+          <Select
+            id="categoryId"
+            value={formData.categoryId}
+            onChange={(e) => handleChange('categoryId', e.target.value)}
+            error={errors.categoryId}
+          >
+            <option value="">请选择分类</option>
+            <option value="1">登录事件</option>
+            <option value="2">游戏事件</option>
+            <option value="3">支付事件</option>
+          </Select>
+        </div>
+
+        <div className="form-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={formData.includeInCommonParams}
+              onChange={(e) => handleChange('includeInCommonParams', e.target.checked)}
+            />
+            包含通用参数
+          </label>
+        </div>
+
+        <div className="form-actions">
+          <Button variant="outline-secondary" onClick={handleClose}>
+            取消
+          </Button>
+          <Button variant="primary" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? '提交中...' : '提交'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+};
+
 // ✅ 添加 React.memo 优化渲染性能
 const AddEventModalGraphQLMemo = memo(AddEventModalGraphQL);
 

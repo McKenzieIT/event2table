@@ -522,7 +522,7 @@ const FieldBuilder = React.memo(function FieldBuilder() {
       />
     </div>
   );
-}
+});
 
 FieldBuilder.displayName = 'FieldBuilder';
 

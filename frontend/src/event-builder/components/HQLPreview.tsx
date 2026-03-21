@@ -402,7 +402,7 @@ const HQLPreview = React.memo(forwardRef<HQLPreviewRef, HQLPreviewProps>(({
       <ConfirmDialogComponent />
     </div>
   );
-});
+}));
 
 HQLPreview.displayName = 'HQLPreview';
 

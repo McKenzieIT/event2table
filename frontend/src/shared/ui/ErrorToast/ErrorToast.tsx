@@ -141,7 +141,7 @@ export const ErrorToast = React.memo(({
   maxToasts = 5,
   position = 'top-right',
   style,
-}: ErrorToastProps): React.JSX.Element | null {
+}: ErrorToastProps) => {
   // 限制显示数量
   const visibleToasts = toasts.slice(-maxToasts);
 
@@ -162,13 +162,18 @@ export const ErrorToast = React.memo(({
     ...style,
   };
 
-  visibleToasts.map((toast) => (
+  return (
+    <div style={containerStyle}>
+      {visibleToasts.map((toast) => (
         <ErrorToastItem
           key={toast.id}
           toast={toast}
           onRemove={onRemove}
         />
-      ))}}
+      ))}
+    </div>
+  );
+});
 
 /**
  * 单个错误提示项组件
@@ -287,7 +292,7 @@ function ErrorToastItem({
       </button>
     </div>
   );
-});
+}
 
 ErrorToast.displayName = 'ErrorToast';
 
@@ -319,7 +324,7 @@ ErrorToast.displayName = 'ErrorToast';
  * }
  * ```
  */
-export const useErrorToast = () => {
+export function useErrorToast() {
   const [toasts, setToasts] = useState<ErrorToastItem[]>([]);
 
   /**

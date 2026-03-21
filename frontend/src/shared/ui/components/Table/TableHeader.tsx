@@ -17,8 +17,7 @@ export const TableHeader = React.memo(<TData extends RowData>({
   children,
 }: TableHeaderProps) => {
   return <thead className={`table-thead ${className}`}>{children}</thead>;
-};
-
+}) as <TData extends RowData>(props: TableHeaderProps) => React.JSX.Element;
 /**
  * TableHead Component
  * 
@@ -97,6 +96,11 @@ export const TableHead = React.memo(<TData extends RowData>({
       )}
     </th>
   );
-};
-
-TableHead.displayName = 'TableHead';
+}) as <TData extends RowData>(props: {
+  header: any;
+  column: TableColumn<TData>;
+  sortable?: boolean;
+  onSort?: (columnId: string) => void;
+  renderHeader?: (header: any) => React.ReactNode;
+  className?: string;
+}) => React.JSX.Element;

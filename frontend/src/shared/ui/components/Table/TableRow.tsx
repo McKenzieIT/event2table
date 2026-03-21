@@ -37,6 +37,4 @@ export const TableRow = React.memo(<TData extends RowData>({
       {children}
     </tr>
   );
-};
-
-TableRow.displayName = 'TableRow';
+}) as <TData extends RowData>(props: TableRowProps<TData>) => React.JSX.Element;
