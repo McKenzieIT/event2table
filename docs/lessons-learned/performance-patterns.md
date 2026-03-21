@@ -2297,3 +2297,20 @@ class CacheInvalidationMonitor:
 - context_value=lambda: {},  # ✅ NEW
 - ✅ **DataLoaders are now integrated into GraphQL context**
 
+
+### 来自 docs/superpowers/specs/agents/performance-audit-agent-prompt.md (2026-03-21)
+
+**关键主题**:
+- Performance-Audit Agent Prompt
+- 角色定义
+- 核心能力
+- 性能分析能力
+- 技术栈要求
+
+**重要经验**:
+- - **性能指标分析**：精通Core Web Vitals和其他关键性能指标
+- ### 其他关键指标
+- // 关键分析点：
+- # 关键审计类别：
+- ## 关键发现
+

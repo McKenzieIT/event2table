@@ -178,3 +178,27 @@ class ErrorSanitizer:
 
         # If not safe, return generic message
         return "An error occurred. Please try again or contact support."
+
+
+# Convenience function for backward compatibility
+def sanitize_error(error: Exception, context: str = "operation") -> str:
+    """
+    Convenience function to sanitize an error with context.
+
+    This is a convenience wrapper around ErrorSanitizer.sanitize_with_context.
+
+    Args:
+        error: The exception to sanitize
+        context: What operation was being performed
+
+    Returns:
+        A sanitized, user-friendly error message
+
+    Examples:
+        >>> try:
+        ...     raise Exception("Database connection failed")
+        ... except Exception as e:
+        ...     sanitize_error(e, "connect to database")
+        'Failed to connect to database. Please try again or contact support.'
+    """
+    return ErrorSanitizer.sanitize_with_context(error, context)

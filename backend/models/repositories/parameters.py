@@ -1552,3 +1552,105 @@ class ParameterRepository(GenericRepository):
         query = "SELECT COUNT(*) as count FROM event_params WHERE event_id = ?"
         row = fetch_one_as_dict(query, (event_id,))
         return row['count'] if row else 0
+
+    # ========== 新增方法: 修复测试失败 (2026-03-21) ==========
+
+    @cached(ttl=300)  # Cache for 5 minutes
+    def get_paginated_params(
+        self, page: int = 1, per_page: int = 50
+    ) -> Dict[str, Any]:
+        """
+        获取分页参数列表
+
+        Args:
+            page: 页码（从1开始）
+            per_page: 每页数量
+
+        Returns:
+            包含参数列表和分页信息的字典
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> result = repo.get_paginated_params(page=1, per_page=50)
+            >>> print(result['pagination']['total'])
+        """
+        # 获取总数
+        count_query = "SELECT COUNT(*) as total FROM event_params WHERE is_active = 1"
+        total_result = fetch_one_as_dict(count_query)
+        total_params = total_result["total"] if total_result else 0
+
+        # 计算偏移量
+        offset = (page - 1) * per_page
+
+        # 查询分页数据
+        query = """
+            SELECT
+                ep.*,
+                le.game_gid
+            FROM event_params ep
+            JOIN log_events le ON ep.event_id = le.id
+            WHERE ep.is_active = 1
+            ORDER BY ep.id DESC
+            LIMIT ? OFFSET ?
+        """
+        params = fetch_all_as_dict(query, (per_page, offset))
+
+        # 转换为Entity
+        entities = [self._row_to_entity(p) for p in params]
+
+        # 计算总页数
+        total_pages = max(1, (total_params + per_page - 1) // per_page)
+
+        return {
+            "params": entities,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": total_params,
+                "total_pages": total_pages,
+            },
+        }
+
+    @cached(ttl=180)  # Cache for 3 minutes
+    def get_params_by_event_id(self, event_id: int) -> List[ParameterEntity]:
+        """
+        根据事件ID获取参数列表
+
+        Args:
+            event_id: 事件数据库ID
+
+        Returns:
+            参数Entity列表
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> params = repo.get_params_by_event_id(event_id=100)
+        """
+        query = """
+            SELECT
+                ep.*,
+                le.game_gid
+            FROM event_params ep
+            JOIN log_events le ON ep.event_id = le.id
+            WHERE ep.event_id = ? AND ep.is_active = 1
+            ORDER BY ep.id
+        """
+        rows = fetch_all_as_dict(query, (event_id,))
+        return [self._row_to_entity(row) for row in rows]
+
+    @cached(ttl=1800)  # Cache for 30 minutes (same as get_common_parameters)
+    def get_common_params(self) -> List[Dict[str, Any]]:
+        """
+        获取通用参数列表（别名方法）
+
+        这是 get_common_parameters() 的别名方法，用于向后兼容。
+        直接调用 get_common_parameters() 方法。
+
+        Returns:
+            通用参数列表
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> params = repo.get_common_params()
+        """
+        return self.get_common_parameters()

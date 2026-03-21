@@ -2903,3 +2903,185 @@ pkill -f "agent-browser"
 - ### ✅ 优点
 - ### ⚠️ 问题
 
+
+---
+
+## TDD与E2E测试综合经验 ⭐ **2026-03-21新增**
+
+> **来源**: [GAMES-MODAL-TDD-FINAL-REPORT.md](../reports/2026-03/GAMES-MODAL-TDD-FINAL-REPORT.md), [E2E-WORKFLOW-TEST-REPORT.md](../reports/2026-03/E2E-WORKFLOW-TEST-REPORT.md)
+> **经验类型**: 测试方法论、问题定位、测试策略
+
+### TDD工作流程实战经验 ⭐⭐⭐
+
+**标准TDD流程**:
+```
+1. 🔴 RED: Write failing test
+2. 🟢 GREEN: Fix code to pass test
+3. 🔄 REFACTOR: Verify with E2E testing
+```
+
+**关键洞察**:
+1. **测试失败原因分析**
+   - 测试失败 ≠ 代码问题
+   - 可能是测试设置问题（GraphQL mocks缺失）
+   - 可能是环境问题（dev server未运行）
+
+2. **单元测试 vs E2E测试的取舍**
+   - 单元测试适合：纯函数、逻辑验证、组件隔离
+   - E2E测试适合：集成问题、用户工作流、运行时错误
+   - **对于UI/路由问题，E2E测试优先于单元测试**
+
+3. **TDD Red阶段经验**
+   - 测试必须失败（验证测试有效）
+   - 失败原因必须明确
+   - 如果测试立即通过，检查测试是否真的在测试正确的东西
+
+**案例：Games Management Modal问题分析**:
+- **问题报告**: "游戏管理模态框无法显示"
+- **TDD分析**: 路由配置 ✅、组件结构 ✅、状态管理 ✅、模态框渲染 ✅
+- **结论**: 不是路由问题，是运行时问题（需要E2E测试验证）
+- **教训**: "路由问题"很少是真正的路由问题
+
+### E2E测试流程经验 ⭐⭐⭐
+
+**标准E2E测试步骤**（使用Chrome DevTools MCP）:
+```javascript
+// 1. 列出所有页面
+mcp__chrome-devtools__list_pages()
+
+// 2. 导航到测试页面
+mcp__chrome-devtools__navigate_page({
+  type: "url",
+  url: "http://localhost:5173/#/games"
+})
+
+// 3. 获取页面快照
+mcp__chrome-devtools__take_snapshot()
+
+// 4. 检查控制台错误
+mcp__chrome-devtools__list_console_messages({
+  types: ["error", "warn"]
+})
+
+// 5. 截图记录
+mcp__chrome-devtools__take_screenshot({
+  filePath: "docs/reports/2026-03-21/screenshot.png",
+  fullPage: true
+})
+
+// 6. 点击交互元素
+mcp__chrome-devtools__click({ uid: "button-uid" })
+
+// 7. 验证结果
+mcp__chrome-devtools__await_text({
+  text: "Expected Text",
+  timeout: 5000
+})
+```
+
+**关键经验**:
+1. **E2E测试应该首先进行**
+   - 对于UI问题，E2E测试比单元测试更快发现问题
+   - 浏览器控制台检查比编写单元测试更直接
+   - E2E测试能捕获运行时错误（网络、状态、CSS等）
+
+2. **问题定位方法**
+   - 检查浏览器控制台（Console Errors）
+   - 检查网络请求（Network Tab）
+   - 检查DOM结构（Elements Tab）
+   - 检查React DevTools（组件树、props、state）
+
+3. **测试工作流设计**
+   - 测试完整用户工作流（而非单个页面）
+   - 测试关键路径（Create → Read → Update → Delete）
+   - 测试边界情况（空状态、错误状态、加载状态）
+
+### 问题分类与测试策略
+
+| 问题类型 | 优先级测试方法 | 示例 |
+|---------|-------------|------|
+| **路由/导航问题** | E2E测试 | 页面无法访问、404错误 |
+| **组件渲染问题** | E2E测试 | 模态框不显示、列表为空 |
+| **状态管理问题** | E2E测试 | 点击无反应、数据未更新 |
+| **业务逻辑问题** | 单元测试 | 计算错误、验证失败 |
+| **API调用问题** | 单元测试 + E2E | 参数错误、响应处理 |
+
+### 测试环境验证清单
+
+**测试前检查**:
+- [ ] 后端服务器运行 (`http://127.0.0.1:5001/api/health`)
+- [ ] 前端dev server运行 (`http://localhost:5173`)
+- [ ] 数据库可访问 (`data/dwd_generator.db`)
+- [ ] 测试数据准备（使用测试GID: 90000000+）
+- [ ] 浏览器DevTools可用
+
+**测试后验证**:
+- [ ] 所有测试通过
+- [ ] 无控制台错误
+- [ ] 无网络请求失败
+- [ ] 截图保存完整
+- [ ] 测试报告生成
+
+### 测试文档标准
+
+**必生成文档**:
+1. **测试计划** - 测试范围、测试用例、验收标准
+2. **测试报告** - 测试结果、发现问题、修复建议
+3. **修复报告** - 问题分析、修复方案、验证结果
+
+**必生成截图**:
+- 每个测试步骤的页面截图
+- 错误状态的截图
+- 修复后的验证截图
+
+### 常见错误及解决方案
+
+**错误1: 模态框不显示**
+```bash
+# 诊断步骤
+1. 检查浏览器控制台错误
+2. 检查DOM结构（开发者工具Elements）
+3. 检查CSS样式（display, visibility, opacity, z-index）
+4. 检查React DevTools（组件是否渲染）
+5. 检查状态管理（Zustand store状态）
+```
+
+**错误2: GraphQL查询失败**
+```bash
+# 诊断步骤
+1. 检查Network Tab（请求是否发送）
+2. 检查请求参数（是否正确）
+3. 检查响应状态（200 vs 400）
+4. 检查响应内容（错误信息）
+5. 检查GraphQL schema（字段是否存在）
+```
+
+**错误3: 测试数据污染**
+```bash
+# 预防措施
+1. 使用测试GID范围（90000000+）
+2. 保护生产数据（STAR001: GID 10000147）
+3. 每次测试后清理数据
+4. 使用独立测试数据库
+```
+
+---
+
+**经验总结**:
+- ✅ TDD确保代码质量（但需要正确使用）
+- ✅ E2E测试捕获集成问题（UI/路由问题优先用E2E）
+- ✅ 测试失败需要根因分析（不是所有失败都是代码问题）
+- ✅ 完整的测试流程（计划→执行→报告→修复→验证）
+
+**相关文档**:
+- [TDD实践经验](./test-fix-iteration.md) - TDD方法论完整实践
+- [Agent-Browser测试](./agent-browser-testing.md) - Agent-Browser测试方法论
+- [项目管理 - 并行开发策略](./project-management.md) - TDD + 并行执行
+
+---
+
+**文档统计更新**:
+- P0经验点：13个 (+2)
+- P1经验点：9个 (+2)
+- 总计：22个测试经验点 (+4)
+- 最后更新：2026-03-21 🆕 新增TDD与E2E测试综合经验
