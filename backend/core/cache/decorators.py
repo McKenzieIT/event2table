@@ -8,7 +8,8 @@ import logging
 from functools import wraps
 from typing import Any, Callable, Optional
 
-from backend.core.cache.cache_system import CacheInvalidator, HierarchicalCache
+from backend.core.cache.cache_system import CacheInvalidator, CacheKeyBuilder, HierarchicalCache
+from backend.core.cache.param_extractor import _extract_cache_params
 
 logger = logging.getLogger(__name__)
 
@@ -39,44 +40,72 @@ def cached(ttl: int = 300, key_prefix: str = None, add_response_headers: bool = 
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # 构建缓存键
-            if key_prefix:
-                cache_key = f"{key_prefix}:{func.__name__}:{args}:{kwargs}"
-            else:
-                cache_key = f"{func.__name__}:{args}:{kwargs}"
+            # === 新代码：使用CacheKeyBuilder ===
+            try:
+                # 1. 智能提取参数（跳过self，处理不可哈希）
+                cache_args, cache_kwargs = _extract_cache_params(func, args, kwargs)
 
-            # 尝试从缓存获取
-            cached_value = _cache.get(cache_key)
-            if cached_value is not None:
-                logger.debug(f"缓存命中: {cache_key}")
-                # 设置缓存上下文(用于HTTP响应头)
+                # 2. 构建pattern
+                pattern = key_prefix or func.__name__
+
+                # 3. 使用CacheKeyBuilder构建标准化键
+                cache_key = CacheKeyBuilder.build(pattern, **cache_kwargs)
+                logger.debug(f"缓存键构建: {pattern} + {cache_kwargs} -> {cache_key}")
+
+                # 4. 尝试从缓存获取（传入pattern和kwargs）
+                cached_value = _cache.get(pattern, **cache_kwargs)
+
+                if cached_value is not None:
+                    logger.debug(f"✅ 缓存命中: {cache_key}")
+                    # 设置缓存上下文(用于HTTP响应头)
+                    if add_response_headers:
+                        try:
+                            from backend.core.cache.middleware import set_cache_context
+                            set_cache_context('HIT', cache_key)
+                        except Exception:
+                            pass  # 中间件不可用时忽略
+                    return cached_value
+
+                # 5. 执行原函数
+                result = func(*args, **kwargs)
+
+                # 6. 写入缓存
+                if result is not None:
+                    _cache.set(pattern, result, ttl_l1=ttl, **cache_kwargs)
+                    logger.debug(f"💾 已缓存: {cache_key}")
+
+                # 7. 设置缓存上下文(用于HTTP响应头)
                 if add_response_headers:
                     try:
                         from backend.core.cache.middleware import set_cache_context
-
-                        set_cache_context('HIT', cache_key)
+                        set_cache_context('MISS', cache_key)
                     except Exception:
-                        pass  # 中间件不可用时忽略
-                return cached_value
+                        pass
 
-            # 执行原函数
-            result = func(*args, **kwargs)
+                return result
 
-            # 写入缓存
-            if result is not None:
-                _cache.set(cache_key, result, ttl_l1=ttl)
-                logger.debug(f"已缓存: {cache_key}")
+            except Exception as e:
+                # === Fallback：保持向后兼容 ===
+                logger.warning(f"⚠️ 缓存键构建失败，使用fallback方式: {e}")
+                logger.warning(f"   函数: {func.__name__}, args={args}, kwargs={kwargs}")
 
-            # 设置缓存上下文(用于HTTP响应头)
-            if add_response_headers:
-                try:
-                    from backend.core.cache.middleware import set_cache_context
+                # Fallback到旧的字符串键方式
+                if key_prefix:
+                    cache_key = f"{key_prefix}:{func.__name__}:{args}:{kwargs}"
+                else:
+                    cache_key = f"{func.__name__}:{args}:{kwargs}"
 
-                    set_cache_context('MISS', cache_key)
-                except Exception:
-                    pass  # 中间件不可用时忽略
+                # 尝试获取缓存
+                cached_value = _cache.get(cache_key)
+                if cached_value is not None:
+                    return cached_value
 
-            return result
+                # 执行函数并缓存
+                result = func(*args, **kwargs)
+                if result is not None:
+                    _cache.set(cache_key, result, ttl_l1=ttl)
+
+                return result
 
         return wrapper
 
