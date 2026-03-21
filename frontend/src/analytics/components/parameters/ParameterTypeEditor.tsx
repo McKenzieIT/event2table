@@ -29,7 +29,7 @@
  * />
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { BaseModal, Button, Select, Spinner, useToast } from '@shared/ui';
 import { CHANGE_PARAMETER_TYPE } from '@/graphql/mutations';
@@ -77,7 +77,7 @@ const ParameterTypeEditor: React.FC<ParameterTypeEditorProps> = ({
     { value: 'custom' as const, label: '自定义 (custom)' },
   ];
 
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = useCallback(async (): Promise<void> => {
     if (!parameter) return;
 
     // Validate
@@ -98,12 +98,12 @@ const ParameterTypeEditor: React.FC<ParameterTypeEditorProps> = ({
     } catch (err) {
       setIsSubmitting(false);
     }
-  };
+  }, [parameter, newType, showError, changeType, setIsSubmitting]);
 
-  const handleCancel = (): void => {
+  const handleCancel = useCallback((): void => {
     setNewType(parameter?.type || 'base');
     onClose();
-  };
+  }, [parameter, onClose]);
 
   // Reset form when parameter changes
   React.useEffect(() => {

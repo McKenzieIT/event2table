@@ -2,6 +2,10 @@ import { expect, afterEach, vi, beforeAll, afterAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 import '@testing-library/jest-dom';
+import React from 'react';
+
+// Make React globally available for components that use React.memo without explicit import
+(global as any).React = React;
 
 // Cleanup after each test
 afterEach(() => {

@@ -40,6 +40,7 @@ export interface EventNodeStats {
   total_nodes: number;
   unique_events: number;
   avg_fields: number;
+  today_modified?: number;
 }
 
 /**

@@ -22,7 +22,7 @@ import {
 } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import { GET_EVENTS, GET_CATEGORIES } from '@/graphql/queries';
-import { DELETE_EVENT } from '@/graphql/mutations';
+import { DELETE_EVENT } from '@shared/graphql/mutations';
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
 import './EventsList.css';

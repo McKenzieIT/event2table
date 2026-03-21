@@ -3,7 +3,6 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { MockedProvider } from '@apollo/client/testing';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { gql } from '@apollo/client';
@@ -65,12 +64,10 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('@apollo/client/testing', () => ({
-  MockedProvider: ({ children, mocks }: any) => {
-    // Simple mock that just renders children
-    return <div data-testid="mocked-provider">{children}</div>;
-  },
-}));
+// Create a simple MockedProvider mock
+const MockedProvider = ({ children }: any) => {
+  return <div data-testid="mocked-provider">{children}</div>;
+};
 
 // Create a simple mock component
 const SimpleComponent = () => {

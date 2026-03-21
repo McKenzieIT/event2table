@@ -15,7 +15,7 @@ import {
   useToast,
   SelectGamePrompt
 } from '@shared/ui';
-import { CREATE_EVENT, UPDATE_EVENT } from '@/graphql/mutations';
+import { CREATE_EVENT, UPDATE_EVENT } from '@shared/graphql/mutations';
 import { GET_EVENTS, GET_CATEGORIES, GET_EVENT } from '@/graphql/queries';
 import './EventForm.css';
 

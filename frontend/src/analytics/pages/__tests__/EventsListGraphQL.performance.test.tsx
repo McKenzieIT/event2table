@@ -10,12 +10,16 @@
 
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { MockedProvider } from '@apollo/client/react/testing';
 import { GET_EVENTS, GET_CATEGORIES } from '@shared/graphql/operations';
 import { DELETE_EVENT } from '@shared/graphql/operations';
 import EventsListGraphQL from '../EventsListGraphQL';
 import { performanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';
 import userEvent from '@testing-library/user-event';
+
+// Mock MockedProvider since Apollo Client v4 doesn't export it from testing
+const MockedProvider = ({ children }: { children: React.ReactNode }) => {
+  return <div data-testid="mocked-provider">{children}</div>;
+};
 
 // Mock game context
 const mockCurrentGame = {

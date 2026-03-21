@@ -148,7 +148,7 @@ export function batchPrefetch(queries: Array<{
  */
 export function getActiveQueries() {
   return queryClient.getQueryCache().findAll({
-    active: true,
+    fetchStatus: 'fetching',
   });
 }
 
@@ -172,7 +172,7 @@ export function getCacheHealth() {
   
   const active = queries.filter((q) => q.state.fetchStatus === 'fetching').length;
   const stale = queries.filter((q) => q.isStale()).length;
-  const inactive = queries.filter((q) => !q.hasObservers()).length;
+  const inactive = queries.filter((q) => q.observers.length === 0).length;
   
   return {
     total: queries.length,

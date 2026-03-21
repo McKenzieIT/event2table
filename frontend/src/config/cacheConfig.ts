@@ -6,7 +6,7 @@
  * Defines cache policies, invalidation strategies, and optimization rules
  */
 
-import type { QueryCache, MutationCache } from '@tanstack/react-query';
+import { QueryCache, MutationCache } from '@tanstack/react-query';
 
 /**
  * Cache time constants (in milliseconds)

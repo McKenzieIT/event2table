@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import React, { useState, useCallback, useMemo } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { MockedProvider } from '@apollo/client/testing';
+import userEvent from '@testing-library/user-event';
 import { GET_GAMES } from '@/graphql/queries';
 
 // Mock CSS imports
@@ -284,7 +284,6 @@ describe('GamesListGraphQL Performance Tests', () => {
     });
     
     const searchInput = screen.getByTestId('search-input');
-    const userEvent = require('@testing-library/user-event').default;
     const startTime = performance.now();
     
     // Type search query
@@ -326,7 +325,6 @@ describe('GamesListGraphQL Performance Tests', () => {
     });
     
     const searchInput = screen.getByTestId('search-input');
-    const userEvent = require('@testing-library/user-event').default;
     
     // Type search query that will result in empty state
     await userEvent.clear(searchInput);
@@ -364,7 +362,6 @@ describe('GamesListGraphQL Integration Tests', () => {
     });
 
     const searchInput = screen.getByTestId('search-input');
-    const userEvent = require('@testing-library/user-event').default;
 
     // Test search functionality
     await userEvent.type(searchInput, 'Game 5');

@@ -107,22 +107,16 @@ export const getPerformanceConfig = (env: 'development' | 'production' | 'test' 
 
 /**
  * Route-based code splitting configuration
+ * Note: These are placeholder imports for future implementation
  */
-export const routeChunks = {
-  dashboard: () => import('../pages/Dashboard'),
-  events: () => import('../pages/Events'),
-  tables: () => import('../pages/Tables'),
-  settings: () => import('../pages/Settings'),
-  analytics: () => import('../pages/Analytics'),
+export const routeChunks: Record<string, () => Promise<unknown>> = {
+  // Routes will be implemented as needed
 };
 
 /**
  * Component-based lazy loading configuration
+ * Note: These are placeholder imports for future implementation
  */
-export const componentChunks = {
-  Chart: () => import('../components/Chart'),
-  Table: () => import('../components/Table'),
-  Form: () => import('../components/Form'),
-  Modal: () => import('../components/Modal'),
-  Notification: () => import('../components/Notification'),
+export const componentChunks: Record<string, () => Promise<unknown>> = {
+  // Components will be implemented as needed
 };

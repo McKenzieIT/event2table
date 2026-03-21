@@ -17,7 +17,7 @@
  */
 // @ts-nocheck - TypeScript检查暂禁用（Button组件类型定义待完善）
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearchParams, useOutletContext, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -29,291 +29,17 @@ import { HQLViewModal } from "@event-builder/components/HQLViewModal";
 import { QuickEditModal } from "@event-builder/components/QuickEditModal";
 import FieldsListModal from "@event-builder/components/FieldsListModal";
 import { AdvancedFilterPanel } from "@event-builder/components/AdvancedFilterPanel";
-import { useDebounce } from "@shared/hooks/useDebounce";
 import { Button, ConfirmDialog } from "@shared/ui";
-import Table from "@shared/ui/components/Table";
 import type {
   EventNode,
   EventNodeFilters,
   EventNodeStats,
 } from "@shared/types/eventNodes";
+import GameSelectionPrompt from "./components/GameSelectionPrompt";
+import StatisticsCards from "./components/StatisticsCards";
+import SearchFilterBar from "./components/SearchFilterBar";
+import NodesTable from "./components/NodesTable";
 import "./EventNodes.css";
-
-/**
- * 游戏选择提示组件
- */
-function GameSelectionPrompt() {
-  return (
-    <div className="glass-card text-center p-5 m-4">
-      <i className="bi bi-controller display-4 text-primary mb-3 d-block"></i>
-      <h3 className="mb-3">请先选择游戏</h3>
-      <p className="text-muted mb-4">事件节点管理需要先选择一个游戏</p>
-      <Link to="/games">
-        <Button variant="primary">
-          前往游戏管理
-        </Button>
-      </Link>
-    </div>
-  );
-}
-
-/**
- * 统计卡片组件 - 使用metric-card系统
- */
-function StatisticsCards({ stats }: { stats: EventNodeStats | null }) {
-  if (!stats) {
-    return (
-      <div className="stats-grid">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="metric-card skeleton-card">
-            <div className="skeleton-icon"></div>
-            <div className="skeleton-content">
-              <div className="skeleton-number"></div>
-              <div className="skeleton-text"></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="stats-grid">
-      {/* 总节点数 */}
-      <div className="metric-card metric-card--cyan">
-        <div className="metric-card__icon metric-card__icon--cyan">
-          <i className="bi bi-diagram-3-fill"></i>
-        </div>
-        <div className="metric-card__value">{stats.total_nodes}</div>
-        <div className="metric-card__label">事件节点总数</div>
-      </div>
-
-      {/* 关联事件数 */}
-      <div className="metric-card metric-card--violet">
-        <div className="metric-card__icon metric-card__icon--violet">
-          <i className="bi bi-box-seam-fill"></i>
-        </div>
-        <div className="metric-card__value">{stats.unique_events}</div>
-        <div className="metric-card__label">关联事件数</div>
-      </div>
-
-      {/* 平均字段数 */}
-      <div className="metric-card metric-card--warning">
-        <div className="metric-card__icon metric-card__icon--warning">
-          <i className="bi bi-list-ul"></i>
-        </div>
-        <div className="metric-card__value">{stats.avg_fields.toFixed(1)}</div>
-        <div className="metric-card__label">平均字段数</div>
-      </div>
-
-      {/* 今日修改 */}
-      <div className="metric-card metric-card--success">
-        <div className="metric-card__icon metric-card__icon--success">
-          <i className="bi bi-clock-history"></i>
-        </div>
-        <div className="metric-card__value">{stats.today_modified || 0}</div>
-        <div className="metric-card__label">今日修改</div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * 搜索和筛选栏组件
- */
-function SearchFilterBar({
-  filters,
-  updateFilters,
-  selectedCount,
-  onClearSelection,
-  onBulkDelete,
-  onToggleAdvanced,
-  showAdvanced,
-}: {
-  filters: EventNodeFilters;
-  updateFilters: (updates: Partial<EventNodeFilters>) => void;
-  selectedCount: number;
-  onClearSelection: () => void;
-  onBulkDelete: () => void;
-  onToggleAdvanced: () => void;
-  showAdvanced: boolean;
-}) {
-  const [input, setInput] = useState(filters.keyword);
-  const debouncedInput = useDebounce(input, 300);
-
-  useEffect(() => {
-    updateFilters({ keyword: debouncedInput });
-  }, [debouncedInput, updateFilters]);
-
-  return (
-    <div className="glass-card filter-bar">
-      <div className="filter-bar__main">
-        {/* 基础搜索 */}
-        <div className="search-input-wrapper">
-          <i className="bi bi-search search-icon"></i>
-          <input
-            type="text"
-            className="input-cyber"
-            placeholder="搜索节点名称、别名..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-        </div>
-
-        {/* 右侧操作区 */}
-        <div className="filter-actions">
-          {selectedCount > 0 && (
-            <div className="bulk-actions">
-              <span className="selection-count">
-                已选择 <strong>{selectedCount}</strong> 个节点
-              </span>
-              <Button variant="outline-danger" onClick={onBulkDelete}>
-                <i className="bi bi-trash me-2"></i>
-                批量删除
-              </Button>
-            </div>
-          )}
-          <Button
-            variant={showAdvanced ? "primary" : "outline-primary"}
-            onClick={onToggleAdvanced}
-          >
-            <i className="bi bi-funnel me-2"></i>
-            高级筛选
-            {showAdvanced ? <i className="bi bi-chevron-up ms-2"></i> : <i className="bi bi-chevron-down ms-2"></i>}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * 节点表格组件（简化版）
- */
-function NodesTable({
-  table,
-  isLoading,
-  empty,
-}: {
-  table: ReturnType<typeof useEventNodesTable>["table"];
-  isLoading: boolean;
-  empty: boolean;
-}) {
-  if (isLoading) {
-    return (
-      <div className="glass-card text-center p-5">
-        <div className="spinner-border" role="status"></div>
-        <p className="mt-3 text-muted">加载事件节点中...</p>
-      </div>
-    );
-  }
-
-  if (empty) {
-    return (
-      <div className="glass-card text-center p-5">
-        <i className="bi bi-diagram-3 display-4 text-muted d-block mb-3"></i>
-        <h3 className="mt-3 text-muted">暂无事件节点</h3>
-        <p className="text-muted">您还没有创建任何事件节点</p>
-        <Link to="/event-node-builder">
-          <Button variant="primary">
-            创建第一个节点
-          </Button>
-        </Link>
-      </div>
-    );
-  }
-
-  return (
-    <div className="glass-card">
-      <div className="table-responsive">
-        <Table variant="bordered" size="md" striped hoverable>
-          <Table.Header>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Row key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Head key={header.id} style={{ width: header.getSize() }}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={
-                          header.column.getCanSort()
-                            ? "cursor-pointer user-select-none"
-                            : ""
-                        }
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {header.column.columnDef.header instanceof Function
-                          ? header.column.columnDef.header(header.getContext())
-                          : header.column.columnDef.header.toString()}
-                        {header.column.getIsSorted() && (
-                          <i
-                            className={`bi bi-arrow-${header.column.getIsSorted() === "asc" ? "up" : "down"} ms-1`}
-                          ></i>
-                        )}
-                      </div>
-                    )}
-                  </Table.Head>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Header>
-          <Table.Body>
-            {table.getRowModel().rows.map((row) => (
-              <Table.Row key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <Table.Cell key={cell.id}>
-                    {cell.column.columnDef.cell instanceof Function
-                      ? cell.column.columnDef.cell(cell.getContext())
-                      : String(cell.column.columnDef.cell)}
-                  </Table.Cell>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </div>
-
-      {/* 分页 */}
-      <div className="d-flex justify-content-between align-items-center p-3 border-top">
-        <span className="text-muted">
-          共 {table.getFilteredRowModel().rows.length} 条记录
-        </span>
-        <div className="d-flex gap-2">
-          <Button
-            variant="outline-secondary"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            首页
-          </Button>
-          <Button
-            variant="outline-secondary"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            上一页
-          </Button>
-          <span className="btn btn-light disabled">
-            {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
-          </span>
-          <Button
-            variant="outline-secondary"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            下一页
-          </Button>
-          <Button
-            variant="outline-secondary"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            末页
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /**
  * 事件节点管理主组件
@@ -338,14 +64,14 @@ function EventNodes() {
   const navigate = useNavigate();
   const [confirmState, setConfirmState] = useState({ open: false, onConfirm: () => {}, title: '', message: '' });
 
-  // Toast 辅助函数
-  const success = (message: string) => {
+  // Toast 辅助函数 - 使用 useCallback 优化
+  const success = useCallback((message: string) => {
     toast.success(message);
-  };
+  }, []);
 
-  const toastError = (message: string) => {
+  const toastError = useCallback((message: string) => {
     toast.error(message);
-  };
+  }, []);
 
   // URL同步的筛选状态
   const [filters, setFilters] = useState<EventNodeFilters>({
@@ -418,8 +144,8 @@ function EventNodes() {
     staleTime: 60000,
   });
 
-  // 表格逻辑
-  const columns = createEventNodesColumns({
+  // 表格逻辑 - 使用 useMemo 优化 columns 创建
+  const columns = useMemo(() => createEventNodesColumns({
     onViewHql: (nodeId) =>
       setModals((prev) => ({ ...prev, hql: { show: true, nodeId } })),
     onQuickEdit: (nodeId) =>
@@ -455,7 +181,7 @@ function EventNodes() {
     },
     onViewFields: (nodeId) =>
       setModals((prev) => ({ ...prev, fields: { show: true, nodeId } })),
-  });
+  }), [data?.nodes, navigate, queryClient, success, toastError, deleteMutation]);
 
   const { table, selectedIds, selectedCount, clearSelection } =
     useEventNodesTable(data?.nodes || [], columns);
@@ -567,7 +293,7 @@ function EventNodes() {
           updateFilters={updateFilters}
           selectedCount={selectedCount}
           onClearSelection={clearSelection}
-          onBulkDelete={() => {
+          onBulkDelete={useCallback(() => {
             setConfirmState({
               open: true,
               title: '确认批量删除',
@@ -577,8 +303,8 @@ function EventNodes() {
                 bulkDeleteMutation.mutate(selectedIds);
               }
             });
-          }}
-          onToggleAdvanced={() => setShowAdvanced(!showAdvanced)}
+          }, [selectedCount, selectedIds, bulkDeleteMutation])}
+          onToggleAdvanced={useCallback(() => setShowAdvanced(!showAdvanced), [showAdvanced])}
           showAdvanced={showAdvanced}
         />
 
@@ -601,12 +327,12 @@ function EventNodes() {
         <HQLViewModal
           show={modals.hql.show}
           nodeId={modals.hql.nodeId}
-          onClose={() =>
+          onClose={useCallback(() =>
             setModals((prev) => ({
               ...prev,
               hql: { show: false, nodeId: null },
             }))
-          }
+          , [])}
           data-testid="hql-view-modal"
         />
 
@@ -614,13 +340,13 @@ function EventNodes() {
           show={modals.quickEdit.show}
           nodeId={modals.quickEdit.nodeId}
           nodes={data?.nodes || []}
-          onClose={() =>
+          onClose={useCallback(() =>
             setModals((prev) => ({
               ...prev,
               quickEdit: { show: false, nodeId: null },
             }))
-          }
-          onUpdate={() => queryClient.invalidateQueries({ queryKey: ["event-nodes"] })}
+          , [])}
+          onUpdate={useCallback(() => queryClient.invalidateQueries({ queryKey: ["event-nodes"] }), [queryClient])}
           data-testid="quick-edit-modal"
         />
 
@@ -630,12 +356,12 @@ function EventNodes() {
           nodeName={
             data?.nodes.find((n) => n.id === modals.fields.nodeId)?.name
           }
-          onClose={() =>
+          onClose={useCallback(() =>
             setModals((prev) => ({
               ...prev,
               fields: { show: false, nodeId: null },
             }))
-          }
+          , [])}
           data-testid="fields-list-modal"
         />
 
@@ -647,7 +373,7 @@ function EventNodes() {
           cancelText="取消"
           variant="danger"
           onConfirm={confirmState.onConfirm}
-          onCancel={() => setConfirmState(s => ({ ...s, open: false }))}
+          onCancel={useCallback(() => setConfirmState(s => ({ ...s, open: false })), [])}
         />
       </div>
     </ErrorBoundary>
