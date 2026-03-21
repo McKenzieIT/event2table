@@ -28,14 +28,18 @@ class TestParameterRepositoryCache:
 
     @pytest.fixture
     def mock_param_data(self):
-        """Mock parameter data for testing"""
+        """Mock parameter data for testing (using database column names)"""
         return {
             'id': 1,
             'event_id': 100,
-            'name': 'test_param',
-            'field_type': 'string',
-            'description': 'Test parameter',
-            'game_gid': 90000001
+            'param_name': 'test_param',  # Database column name, not 'name'
+            'param_name_cn': '',
+            'param_description': 'Test parameter',
+            'game_gid': 90000001,
+            'json_path': None,
+            'is_active': 1,
+            'created_at': None,
+            'updated_at': None
         }
 
     def test_get_paginated_params_cache_hit(self, repo, mock_param_data):

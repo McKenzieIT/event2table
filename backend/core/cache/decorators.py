@@ -71,7 +71,7 @@ def cached(ttl: int = 300, key_prefix: str = None, add_response_headers: bool = 
 
                 # 6. 写入缓存
                 if result is not None:
-                    _cache.set(pattern, result, ttl_l1=ttl, **cache_kwargs)
+                    _cache.set(pattern, result, ttl=ttl, **cache_kwargs)
                     logger.debug(f"💾 已缓存: {cache_key}")
 
                 # 7. 设置缓存上下文(用于HTTP响应头)
