@@ -41,22 +41,6 @@ const roleOptions = [
   { value: 'guest', label: 'Guest' },
 ];
 
-// Table columns definition
-const userColumns: TableColumn<typeof initialUsers[0]>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Name',
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-  },
-  {
-    accessorKey: 'role',
-    header: 'Role',
-  },
-];
-
 describe('Form + Table Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -86,11 +70,24 @@ describe('Form + Table Integration', () => {
                 placeholder="Search by name or email"
               />
             </Form>
-            <Table
-              data={filteredUsers}
-              columns={userColumns}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {filteredUsers.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
@@ -110,6 +107,69 @@ describe('Form + Table Integration', () => {
         expect(screen.getByText('John Doe')).toBeInTheDocument();
         expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
         expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+      });
+    });
+
+    it('should filter by role using form select', async () => {
+      const user = userEvent.setup();
+
+      const RoleFilterableTable = () => {
+        const [roleFilter, setRoleFilter] = useState('');
+        const form = useForm({ defaultValues: { role: '' } });
+
+        const filteredUsers = roleFilter
+          ? initialUsers.filter((u) => u.role === roleFilter)
+          : initialUsers;
+
+        return (
+          <div>
+            <Form form={form} onSubmit={() => {}}>
+              <FormSelect
+                name="role"
+                label="Filter by Role"
+                options={[
+                  { value: '', label: 'All Roles' },
+                  ...roleOptions,
+                ]}
+                onChange={(e) => setRoleFilter(e.target.value)}
+              />
+            </Form>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {filteredUsers.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
+        );
+      };
+
+      render(<RoleFilterableTable />);
+
+      // Initially shows all users
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+
+      // Filter by admin role
+      const roleSelect = screen.getByLabelText('Filter by Role');
+      await user.selectOptions(roleSelect, 'admin');
+
+      await waitFor(() => {
+        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+        expect(screen.queryByText('Bob Johnson')).not.toBeInTheDocument();
       });
     });
   });
@@ -150,11 +210,24 @@ describe('Form + Table Integration', () => {
               <FormSelect name="role" label="Role" options={roleOptions} />
               <button type="submit">Add User</button>
             </Form>
-            <Table
-              data={users}
-              columns={userColumns}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {users.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
@@ -162,9 +235,7 @@ describe('Form + Table Integration', () => {
       render(<AddUserTable />);
 
       // Initially shows 3 users
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-      expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
+      expect(screen.getAllByRole('row').length - 1).toBe(3); // -1 for header row
 
       // Fill form
       await user.type(screen.getByLabelText('Name'), 'Alice Williams');
@@ -211,11 +282,24 @@ describe('Form + Table Integration', () => {
               <FormSelect name="role" label="Role" options={roleOptions} />
               <button type="submit">Add User</button>
             </Form>
-            <Table
-              data={users}
-              columns={userColumns}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {users.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
@@ -223,9 +307,7 @@ describe('Form + Table Integration', () => {
       render(<AddUserTable />);
 
       // Initially shows 3 users
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-      expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
+      expect(screen.getAllByRole('row').length - 1).toBe(3);
 
       // Submit empty form
       await user.click(screen.getByRole('button', { name: 'Add User' }));
@@ -238,9 +320,7 @@ describe('Form + Table Integration', () => {
       });
 
       // Should still show 3 users
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-      expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
+      expect(screen.getAllByRole('row').length - 1).toBe(3);
     });
   });
 
@@ -282,17 +362,6 @@ describe('Form + Table Integration', () => {
           }
         };
 
-        const columnsWithActions: TableColumn<typeof initialUsers[0]>[] = [
-          ...userColumns,
-          {
-            id: 'actions',
-            header: 'Actions',
-            cell: ({ row }) => (
-              <button onClick={() => startEdit(row.original.id)}>Edit</button>
-            ),
-          },
-        ];
-
         return (
           <div>
             {editingId && (
@@ -304,11 +373,28 @@ describe('Form + Table Integration', () => {
                 <button type="button" onClick={() => setEditingId(null)}>Cancel</button>
               </Form>
             )}
-            <Table
-              data={users}
-              columns={columnsWithActions}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                  <Table.Head>Actions</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {users.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                    <Table.Cell>
+                      <button onClick={() => startEdit(user.id)}>Edit</button>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
@@ -353,17 +439,6 @@ describe('Form + Table Integration', () => {
           }
         };
 
-        const columnsWithActions: TableColumn<typeof initialUsers[0]>[] = [
-          ...userColumns,
-          {
-            id: 'actions',
-            header: 'Actions',
-            cell: ({ row }) => (
-              <button onClick={() => startEdit(row.original.id)}>Edit</button>
-            ),
-          },
-        ];
-
         return (
           <div>
             {editingId && (
@@ -375,11 +450,28 @@ describe('Form + Table Integration', () => {
                 <button type="button" onClick={() => setEditingId(null)}>Cancel</button>
               </Form>
             )}
-            <Table
-              data={users}
-              columns={columnsWithActions}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                  <Table.Head>Actions</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {users.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                    <Table.Cell>
+                      <button onClick={() => startEdit(user.id)}>Edit</button>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
@@ -408,39 +500,122 @@ describe('Form + Table Integration', () => {
   // ========== Table Row Selection with Form ==========
 
   describe('Table Row Selection with Form', () => {
-    it('should render table with custom columns', () => {
-      const columnsWithAction: TableColumn<typeof initialUsers[0]>[] = [
-        {
-          accessorKey: 'name',
-          header: 'Name',
-        },
-        {
-          accessorKey: 'email',
-          header: 'Email',
-        },
-        {
-          id: 'actions',
-          header: 'Actions',
-          cell: () => <span>Action</span>,
-        },
-      ];
+    it('should show selected row data in form', async () => {
+      const user = userEvent.setup();
 
-      render(
-        <Table
-          data={initialUsers}
-          columns={columnsWithAction}
-          pagination={false}
-        />
-      );
+      const SelectableTable = () => {
+        const [selectedId, setSelectedId] = useState<number | null>(null);
+        const form = useForm({
+          defaultValues: { name: '', email: '', role: '' },
+        });
 
-      // Should render user data
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-      expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
+        const handleRowClick = (userId: number) => {
+          const user = initialUsers.find((u) => u.id === userId);
+          if (user) {
+            setSelectedId(userId);
+            form.reset(user);
+          }
+        };
 
-      // Should render action cells
-      const actionElements = screen.getAllByText('Action');
-      expect(actionElements).toHaveLength(3);
+        return (
+          <div>
+            <Form form={form} onSubmit={() => {}}>
+              <FormInput name="name" label="Name" disabled />
+              <FormInput name="email" label="Email" type="email" disabled />
+              <FormInput name="role" label="Role" disabled />
+            </Form>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {initialUsers.map((user) => (
+                  <Table.Row
+                    key={user.id}
+                    onClick={() => handleRowClick(user.id)}
+                  >
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
+        );
+      };
+
+      render(<SelectableTable />);
+
+      // Click on first row
+      await user.click(screen.getByText('John Doe'));
+
+      // Form should show selected user data
+      expect(screen.getByLabelText('Name')).toHaveValue('John Doe');
+      expect(screen.getByLabelText('Email')).toHaveValue('john@example.com');
+      expect(screen.getByLabelText('Role')).toHaveValue('admin');
+    });
+
+    it('should highlight selected row', async () => {
+      const user = userEvent.setup();
+
+      const SelectableTable = () => {
+        const [selectedId, setSelectedId] = useState<number | null>(null);
+        const form = useForm({
+          defaultValues: { name: '', email: '', role: '' },
+        });
+
+        const handleRowClick = (userId: number) => {
+          const user = initialUsers.find((u) => u.id === userId);
+          if (user) {
+            setSelectedId(userId);
+            form.reset(user);
+          }
+        };
+
+        return (
+          <div>
+            <Form form={form} onSubmit={() => {}}>
+              <FormInput name="name" label="Name" disabled />
+            </Form>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {initialUsers.map((user) => (
+                  <Table.Row
+                    key={user.id}
+                    onClick={() => handleRowClick(user.id)}
+                    style={{
+                      backgroundColor: selectedId === user.id ? '#e0f2fe' : undefined,
+                    }}
+                  >
+                    <Table.Cell>{user.name}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          </div>
+        );
+      };
+
+      render(<SelectableTable />);
+
+      // Click on first row
+      const firstRow = screen.getByText('John Doe').closest('tr');
+      await user.click(firstRow!);
+
+      // Row should be highlighted
+      await waitFor(() => {
+        expect(firstRow).toHaveStyle({ backgroundColor: '#e0f2fe' });
+      });
     });
   });
 
@@ -488,17 +663,6 @@ describe('Form + Table Integration', () => {
           }
         };
 
-        const columnsWithActions: TableColumn<typeof initialUsers[0]>[] = [
-          ...userColumns,
-          {
-            id: 'actions',
-            header: 'Actions',
-            cell: ({ row }) => (
-              <button onClick={() => startEdit(row.original.id)}>Edit</button>
-            ),
-          },
-        ];
-
         return (
           <div>
             <Form form={filterForm} onSubmit={() => {}}>
@@ -516,11 +680,28 @@ describe('Form + Table Integration', () => {
                 <button type="button" onClick={() => setEditingId(null)}>Cancel</button>
               </Form>
             )}
-            <Table
-              data={filteredUsers}
-              columns={columnsWithActions}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                  <Table.Head>Email</Table.Head>
+                  <Table.Head>Role</Table.Head>
+                  <Table.Head>Actions</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {filteredUsers.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.role}</Table.Cell>
+                    <Table.Cell>
+                      <button onClick={() => startEdit(user.id)}>Edit</button>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
@@ -577,18 +758,32 @@ describe('Form + Table Integration', () => {
               <FormInput name="name" label="Name" />
               <button type="submit">Add</button>
             </Form>
-            <Table
-              data={users}
-              columns={userColumns}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {users.length === 0 && (
+                  <Table.Row>
+                    <Table.Cell colSpan={1}>No data</Table.Cell>
+                  </Table.Row>
+                )}
+                {users.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
 
       render(<EmptyTableWithForm />);
 
-      expect(screen.getByText('No data available')).toBeInTheDocument();
+      expect(screen.getByText('No data')).toBeInTheDocument();
     });
 
     it('should handle form submission with empty table', async () => {
@@ -609,18 +804,32 @@ describe('Form + Table Integration', () => {
               <FormInput name="name" label="Name" />
               <button type="submit">Add</button>
             </Form>
-            <Table
-              data={users}
-              columns={userColumns}
-              pagination={false}
-            />
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.Head>Name</Table.Head>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {users.length === 0 && (
+                  <Table.Row>
+                    <Table.Cell colSpan={1}>No data</Table.Cell>
+                  </Table.Row>
+                )}
+                {users.map((user) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.name}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
           </div>
         );
       };
 
       render(<EmptyTableWithForm />);
 
-      expect(screen.getByText('No data available')).toBeInTheDocument();
+      expect(screen.getByText('No data')).toBeInTheDocument();
 
       // Add data
       await user.type(screen.getByLabelText('Name'), 'Test User');
@@ -628,7 +837,7 @@ describe('Form + Table Integration', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Test User')).toBeInTheDocument();
-        expect(screen.queryByText('No data available')).not.toBeInTheDocument();
+        expect(screen.queryByText('No data')).not.toBeInTheDocument();
       });
     });
   });
