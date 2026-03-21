@@ -850,5 +850,5 @@ const Table = <TData extends Record<string, unknown>>({
 
 Table.displayName = 'Table';
 
-export { Table, TableHeader, TableBody, TableFooter, TablePagination };
+export { Table, TableHeader, TableBody, TableFooter, TablePagination, TableRow, TableCell, TableFilter, TableSort };
 export type { TableProps, TableColumn, CellContext };
