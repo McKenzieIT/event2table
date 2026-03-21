@@ -15,16 +15,15 @@ import { render, screen, waitFor, act, renderHook } from '@testing-library/react
 import '@testing-library/jest-dom';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { performanceMonitor, usePerformanceMonitor } from '@shared/utils/performanceMonitor';
-import { reportError } from '@shared/utils/errorReporting';
 
 // Mock performance API
-global.performance = {
-  ...global.performance,
-  now: vi.fn(() => Date.now()),
-  mark: vi.fn(),
-  measure: vi.fn(),
-  clearMarks: vi.fn(),
-};
+if (typeof globalThis.performance === 'undefined') {
+  globalThis.performance = {} as Performance;
+}
+globalThis.performance.now = vi.fn(() => Date.now());
+globalThis.performance.mark = vi.fn();
+globalThis.performance.measure = vi.fn();
+globalThis.performance.clearMarks = vi.fn();
 
 describe('React Performance Tests', () => {
   beforeEach(() => {
@@ -56,7 +55,7 @@ describe('React Performance Tests', () => {
         '../../features/games/GameManagementModalGraphQL'
       );
 
-      const renderSpy = jest.fn();
+      const renderSpy = vi.fn();
       const MockComponent = React.memo(() => {
         renderSpy();
         return <GameManagementModalGraphQL isOpen={true} onClose={() => {}} />;
@@ -135,7 +134,7 @@ describe('React Performance Tests', () => {
         baseFields: []
       };
 
-      const renderSpy = jest.fn();
+      const renderSpy = vi.fn();
       const MockComponent = React.memo(() => {
         renderSpy();
         return <CustomNode data={mockData} selected={false} />;
@@ -203,7 +202,7 @@ describe('React Performance Tests', () => {
     test('Form input should not cause unnecessary re-renders', async () => {
       const { default: EventForm } = await import('../../analytics/pages/EventForm');
 
-      const renderSpy = jest.fn();
+      const renderSpy = vi.fn();
       const MockComponent = React.memo(() => {
         renderSpy();
         return <EventForm />;

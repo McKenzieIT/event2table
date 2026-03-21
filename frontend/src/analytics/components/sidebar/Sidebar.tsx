@@ -47,7 +47,7 @@ export function Sidebar(): React.JSX.Element {
 
   // Responsive handling: collapse by default on small screens
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
     const handleResize = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {

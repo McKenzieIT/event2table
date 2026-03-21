@@ -21,7 +21,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BaseModal, Button, Input, Spinner, useToast } from '@shared/ui';
+import { Modal, Button, Input, Spinner, useToast } from '@shared/ui';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
 import './CategoryManagementModal.css';
 
@@ -212,7 +212,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title="分类管理" animation="slideUp" glassmorphism size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="分类管理" animation="slideUp" glassmorphism size="lg">
       <div className="category-management-modal">
         {/* Left Panel: Category List */}
         <div className="category-list-panel">
@@ -303,7 +303,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
 
       {/* Promise-based confirm dialog */}
       <ConfirmDialogComponent />
-    </BaseModal>
+    </Modal>
   );
 };
 
