@@ -842,7 +842,7 @@ const Table = React.memo(<TData extends Record<string, unknown>>({
       )}
     </div>
   );
-};
+});
 
 // ============================================================================
 // Exports
