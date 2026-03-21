@@ -25,7 +25,8 @@ import { z } from 'zod';
 import Form from '../Form/Form';
 import FormInput from '../Form/FormInput';
 import FormSelect from '../Form/FormSelect';
-import Table from '../Table';
+import { Table } from '../Table/Table';
+import type { TableColumn } from '../Table/Table.types';
 
 // Mock data
 const initialUsers = [
