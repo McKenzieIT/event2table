@@ -76,13 +76,25 @@ const Form = forwardRef<HTMLFormElement, FormProps>(({
   // Handle form submission
   const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await onSubmit(event);
+    
+    // Trigger validation and get form data
+    const formIsValid = await form.trigger();
+    
+    if (!formIsValid) {
+      return;
+    }
+    
+    // Get form data using react-hook-form's getValues
+    const formData = form.getValues();
+    
+    // Call onSubmit with form data
+    await onSubmit(formData);
     
     // Reset form after successful submission if requested
     if (resetAfterSubmit) {
       reset();
     }
-  }, [onSubmit, resetAfterSubmit, reset]);
+  }, [form, onSubmit, resetAfterSubmit, reset]);
 
   // Create context value - memoized to prevent unnecessary re-renders
   const contextValue: FormContextValue = React.useMemo(
@@ -104,6 +116,7 @@ const Form = forwardRef<HTMLFormElement, FormProps>(({
           onSubmit={handleSubmit}
           className={className}
           noValidate
+          role="form"
           {...props}
         >
           {children}

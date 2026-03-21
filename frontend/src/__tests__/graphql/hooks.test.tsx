@@ -3,8 +3,9 @@
  * GraphQL Hooks 单元测试
  */
 
+import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
 import { describe, it, expect, vi } from 'vitest';
 import {
   useGames,
@@ -19,7 +20,7 @@ import {
   useCreateEvent,
   useUpdateEvent,
   useDeleteEvent,
-} from '../../graphql/hooks';
+} from '../../shared/graphql/hooks';
 import {
   GET_GAMES,
   GET_GAME,
@@ -27,15 +28,13 @@ import {
   GET_EVENTS,
   GET_EVENT,
   SEARCH_EVENTS,
-} from '../../graphql/queries';
-import {
   CREATE_GAME,
   UPDATE_GAME,
   DELETE_GAME,
   CREATE_EVENT,
   UPDATE_EVENT,
   DELETE_EVENT,
-} from '../../graphql/mutations';
+} from '../../shared/graphql/operations';
 
 // Mock数据
 const mockGames = [
@@ -63,7 +62,7 @@ const mockEvent = {
 };
 
 // 测试wrapper
-const wrapper = ({ children }) => (
+const wrapper = ({ children }: { children: React.ReactNode }) => (
   <MockedProvider mocks={[]} addTypename={false}>
     {children}
   </MockedProvider>

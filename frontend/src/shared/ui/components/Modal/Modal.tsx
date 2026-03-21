@@ -385,7 +385,7 @@ export const Modal = React.memo(function Modal({
         className={overlayClasses}
         style={{ zIndex }}
         onClick={handleBackdropClick}
-        aria-hidden="true"
+        data-testid="modal-overlay"
       >
         {/* Modal内容 */}
         <div

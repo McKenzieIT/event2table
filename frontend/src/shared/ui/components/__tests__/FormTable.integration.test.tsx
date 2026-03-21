@@ -25,7 +25,7 @@ import { z } from 'zod';
 import Form from '../Form/Form';
 import FormInput from '../Form/FormInput';
 import FormSelect from '../Form/FormSelect';
-import Table from '../../Table/Table';
+import Table from '../Table';
 
 // Mock data
 const initialUsers = [
@@ -52,12 +52,12 @@ describe('Form + Table Integration', () => {
       const user = userEvent.setup();
 
       const FilterableTable = () => {
-        const [filter, setFilter] = useState('');
         const form = useForm({ defaultValues: { search: '' } });
+        const searchValue = form.watch('search');
 
         const filteredUsers = initialUsers.filter(
-          (u) => u.name.toLowerCase().includes(filter.toLowerCase()) ||
-                   u.email.toLowerCase().includes(filter.toLowerCase())
+          (u) => u.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+                   u.email.toLowerCase().includes(searchValue.toLowerCase())
         );
 
         return (
@@ -67,7 +67,6 @@ describe('Form + Table Integration', () => {
                 name="search"
                 label="Search"
                 placeholder="Search by name or email"
-                onChange={(e) => setFilter(e.target.value)}
               />
             </Form>
             <Table>
@@ -632,7 +631,6 @@ describe('Form + Table Integration', () => {
 
       const ComplexTable = () => {
         const [users, setUsers] = useState(initialUsers);
-        const [filter, setFilter] = useState('');
         const [editingId, setEditingId] = useState<number | null>(null);
         const filterForm = useForm({ defaultValues: { search: '' } });
         const editForm = useForm({
@@ -640,8 +638,10 @@ describe('Form + Table Integration', () => {
           defaultValues: { name: '', email: '', role: '' },
         });
 
+        const searchValue = filterForm.watch('search');
+
         const filteredUsers = users.filter(
-          (u) => u.name.toLowerCase().includes(filter.toLowerCase())
+          (u) => u.name.toLowerCase().includes(searchValue.toLowerCase())
         );
 
         const startEdit = (userId: number) => {
@@ -668,7 +668,6 @@ describe('Form + Table Integration', () => {
               <FormInput
                 name="search"
                 label="Search"
-                onChange={(e) => setFilter(e.target.value)}
               />
             </Form>
             {editingId && (
@@ -718,7 +717,7 @@ describe('Form + Table Integration', () => {
       });
 
       // Edit John Doe
-      await user.click(screen.getByText('Edit'));
+      await user.click(screen.getAllByText('Edit')[0]);
 
       // Update name
       const nameInput = screen.getByLabelText('Name');

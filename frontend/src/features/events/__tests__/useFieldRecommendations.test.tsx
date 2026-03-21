@@ -6,15 +6,15 @@
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {
-  useFieldRecommendations,
-  useCommonPatterns,
-  useFieldTypeInference,
-} from '../hooks/useFieldRecommendations';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import React from 'react';
+import { useFieldRecommendations } from '../hooks/useFieldRecommendations';
+import { useCommonPatterns } from '../hooks/useCommonPatterns';
+import { useFieldTypeInference } from '../hooks/useFieldTypeInference';
 import { getRecommendations, getCommonPatterns as fetchPatterns, inferFieldType as fetchTypeInference } from '../api/fieldRecommendationApi';
 
 // Mock the API functions
-jest.mock('../api/fieldRecommendationApi');
+vi.mock('../api/fieldRecommendationApi');
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -35,7 +35,7 @@ const createWrapper = () => {
 
 describe('useFieldRecommendations', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call getRecommendations when mutate is invoked', async () => {
@@ -71,7 +71,7 @@ describe('useFieldRecommendations', () => {
 
   it('should handle errors correctly', async () => {
     const mockError = new Error('API Error');
-    (getRecommendations as jest.Mock).mockRejectedValueOnce(mockError);
+    (getRecommendations as any).mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useFieldRecommendations(), {
       wrapper: createWrapper(),
@@ -92,7 +92,7 @@ describe('useFieldRecommendations', () => {
 
 describe('useCommonPatterns', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch common patterns on mount', async () => {
@@ -105,7 +105,7 @@ describe('useCommonPatterns', () => {
       },
     ];
 
-    (fetchPatterns as jest.Mock).mockResolvedValueOnce(mockPatterns);
+    (fetchPatterns as any).mockResolvedValueOnce(mockPatterns);
 
     const { result } = renderHook(() => useCommonPatterns(), {
       wrapper: createWrapper(),
@@ -121,7 +121,7 @@ describe('useCommonPatterns', () => {
 
   it('should handle errors correctly', async () => {
     const mockError = new Error('Failed to fetch');
-    (fetchPatterns as jest.Mock).mockRejectedValueOnce(mockError);
+    (fetchPatterns as any).mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useCommonPatterns(), {
       wrapper: createWrapper(),
@@ -137,7 +137,7 @@ describe('useCommonPatterns', () => {
 
 describe('useFieldTypeInference', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call inferFieldType when mutate is invoked', async () => {
@@ -151,7 +151,7 @@ describe('useFieldTypeInference', () => {
       reasoning: 'Numeric values',
     };
 
-    (fetchTypeInference as jest.Mock).mockResolvedValueOnce(mockInference);
+    (fetchTypeInference as any).mockResolvedValueOnce(mockInference);
 
     const { result } = renderHook(() => useFieldTypeInference(), {
       wrapper: createWrapper(),
@@ -177,7 +177,7 @@ describe('useFieldTypeInference', () => {
 
   it('should handle errors correctly', async () => {
     const mockError = new Error('Inference failed');
-    (fetchTypeInference as jest.Mock).mockRejectedValueOnce(mockError);
+    (fetchTypeInference as any).mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useFieldTypeInference(), {
       wrapper: createWrapper(),

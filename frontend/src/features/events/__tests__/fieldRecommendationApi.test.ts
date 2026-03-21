@@ -4,6 +4,7 @@
  * Unit tests for field recommendation API client
  */
 
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import {
   getRecommendations,
   getCommonPatterns,
@@ -13,11 +14,11 @@ import {
 } from '../api/fieldRecommendationApi';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('fieldRecommendationApi', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getRecommendations', () => {

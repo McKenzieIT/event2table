@@ -10,7 +10,8 @@ import { useReactFlow } from "reactflow";
 import { Button, useToast } from "@shared/ui";
 import ConfirmDialog from "@shared/ui/ConfirmDialog/ConfirmDialog";
 import "./Toolbar.css";
-import type { ToolbarProps, GameData } from "./types";
+import type { ToolbarProps } from "./types";
+import type { GameData } from "@/shared/types/game-types";
 
 function Toolbar({ gameData, onExecute, onLocateNodes }: ToolbarProps): React.JSX.Element {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();

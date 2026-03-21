@@ -10,7 +10,7 @@ import { MockedProvider } from '@apollo/client/testing';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import DashboardGraphQL from '../DashboardGraphQL';
-import { GET_GAMES } from '@/graphql/queries';
+import { GET_GAMES } from '@shared/graphql/operations';
 
 // Mock useGameStore
 vi.mock('@/stores/gameStore', () => ({

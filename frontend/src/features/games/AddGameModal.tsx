@@ -6,7 +6,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { BaseModal } from '@shared/ui/BaseModal/BaseModal';
+import { Modal } from '@shared/ui';
 import { GameForm } from '@shared/components/GameForm';
 import './AddGameModal.css';
 
@@ -39,7 +39,7 @@ const AddGameModal: React.FC<AddGameModalProps> = ({ isOpen, onClose }) => {
   }, [handleClose]);
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={handleClose}
       title="添加游戏"
@@ -70,7 +70,7 @@ const AddGameModal: React.FC<AddGameModalProps> = ({ isOpen, onClose }) => {
         submitButtonText="保存"
         cancelButtonText="取消"
       />
-    </BaseModal>
+    </Modal>
   );
 };
 

@@ -17,7 +17,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Input } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
-import { BaseModal } from '@shared/ui/BaseModal';
+import { Modal } from '@shared/ui';
 import './CategoryModal.css';
 
 interface CategoryFormData {
@@ -203,7 +203,7 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
   };
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={handleClose}
       title={
@@ -284,7 +284,7 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
           </form>
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 }
 

@@ -1552,3 +1552,27 @@ class ParameterRepository(GenericRepository):
         query = "SELECT COUNT(*) as count FROM event_params WHERE event_id = ?"
         row = fetch_one_as_dict(query, (event_id,))
         return row['count'] if row else 0
+
+    @cached(ttl=1800)  # Cache for 30 minutes
+    def get_event_game_gid(self, event_id: int) -> Optional[int]:
+        """
+        Get the game GID for a specific event.
+
+        Args:
+            event_id: Event database ID
+
+        Returns:
+            Game GID if found, None otherwise
+
+        Example:
+            >>> repo = ParameterRepository()
+            >>> game_gid = repo.get_event_game_gid(1)
+            >>> print(f"Event belongs to game {game_gid}")
+        """
+        query = """
+            SELECT game_gid
+            FROM log_events
+            WHERE id = ?
+        """
+        row = fetch_one_as_dict(query, (event_id,))
+        return row['game_gid'] if row else None

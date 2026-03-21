@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Button, SearchInput, Spinner, useToast, EmptyState } from '@shared/ui';
 import ConfirmDialog from '@shared/ui/ConfirmDialog/ConfirmDialog';
-import Table from '@shared/ui/Table';
+import Table from '@shared/ui/components/Table';
 import './HqlManage.css';
 
 /**

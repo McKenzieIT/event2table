@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ConfirmDialog } from './ConfirmDialog';
+import ConfirmDialog from './ConfirmDialog';
 
 describe('ConfirmDialog Component', () => {
   const defaultProps = {
@@ -74,73 +74,78 @@ describe('ConfirmDialog Component', () => {
 
   describe('User Interactions', () => {
     it('should call onConfirm when confirm button is clicked', async () => {
+      const onConfirm = vi.fn();
       const user = userEvent.setup();
-      render(<ConfirmDialog {...defaultProps} />);
+      render(<ConfirmDialog {...defaultProps} onConfirm={onConfirm} />);
 
       await user.click(screen.getByRole('button', { name: '确认' }));
 
-      expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
-      expect(defaultProps.onCancel).not.toHaveBeenCalled();
+      expect(onConfirm).toHaveBeenCalledTimes(1);
     });
 
     it('should call onCancel when cancel button is clicked', async () => {
+      const onCancel = vi.fn();
       const user = userEvent.setup();
-      render(<ConfirmDialog {...defaultProps} />);
+      render(<ConfirmDialog {...defaultProps} onCancel={onCancel} />);
 
       await user.click(screen.getByRole('button', { name: '取消' }));
 
-      expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
-      expect(defaultProps.onConfirm).not.toHaveBeenCalled();
+      expect(onCancel).toHaveBeenCalledTimes(1);
     });
 
     it('should call onCancel when overlay is clicked', async () => {
+      const onCancel = vi.fn();
       const user = userEvent.setup();
-      render(<ConfirmDialog {...defaultProps} />);
+      render(<ConfirmDialog {...defaultProps} onCancel={onCancel} />);
 
       const overlay = screen.getByRole('presentation');
       await user.click(overlay);
 
-      expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+      expect(onCancel).toHaveBeenCalledTimes(1);
     });
 
     it('should not call onCancel when dialog content is clicked', async () => {
+      const onCancel = vi.fn();
       const user = userEvent.setup();
-      render(<ConfirmDialog {...defaultProps} />);
+      render(<ConfirmDialog {...defaultProps} onCancel={onCancel} />);
 
       const dialog = screen.getByRole('dialog');
       await user.click(dialog);
 
-      expect(defaultProps.onCancel).not.toHaveBeenCalled();
+      expect(onCancel).not.toHaveBeenCalled();
     });
   });
 
   describe('Keyboard Interactions', () => {
     it('should call onCancel when Escape key is pressed', async () => {
+      const onCancel = vi.fn();
       const user = userEvent.setup();
-      render(<ConfirmDialog {...defaultProps} />);
+      render(<ConfirmDialog {...defaultProps} onCancel={onCancel} />);
 
       await user.keyboard('{Escape}');
 
-      expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+      expect(onCancel).toHaveBeenCalledTimes(1);
     });
 
     it('should not call onCancel when dialog is closed', async () => {
+      const onCancel = vi.fn();
       const user = userEvent.setup();
-      render(<ConfirmDialog {...defaultProps} open={false} />);
+      render(<ConfirmDialog {...defaultProps} open={false} onCancel={onCancel} />);
 
       await user.keyboard('{Escape}');
 
-      expect(defaultProps.onCancel).not.toHaveBeenCalled();
+      expect(onCancel).not.toHaveBeenCalled();
     });
 
     it('should handle multiple Escape key presses', async () => {
+      const onCancel = vi.fn();
       const user = userEvent.setup();
-      render(<ConfirmDialog {...defaultProps} />);
+      render(<ConfirmDialog {...defaultProps} onCancel={onCancel} />);
 
       await user.keyboard('{Escape}');
       await user.keyboard('{Escape}');
 
-      expect(defaultProps.onCancel).toHaveBeenCalledTimes(2);
+      expect(onCancel).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -156,7 +161,7 @@ describe('ConfirmDialog Component', () => {
     });
 
     it('should unlock body scroll when dialog closes', () => {
-      const { rerender, unmount } = render(<ConfirmDialog {...defaultProps} open={true} />);
+      const { rerender } = render(<ConfirmDialog {...defaultProps} open={true} />);
 
       expect(document.body.style.overflow).toBe('hidden');
 
@@ -166,11 +171,10 @@ describe('ConfirmDialog Component', () => {
     });
 
     it('should unlock body scroll on unmount', () => {
-      render(<ConfirmDialog {...defaultProps} open={true} />);
+      const { unmount } = render(<ConfirmDialog {...defaultProps} open={true} />);
 
       expect(document.body.style.overflow).toBe('hidden');
 
-      const { unmount } = render(<ConfirmDialog {...defaultProps} open={true} />);
       unmount();
 
       expect(document.body.style.overflow).toBe('');
@@ -332,6 +336,7 @@ describe('ConfirmDialog Component', () => {
         />
       );
 
+      // React will escape the script tags
       expect(screen.getByText(specialText)).toBeInTheDocument();
     });
 

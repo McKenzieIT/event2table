@@ -28,7 +28,7 @@ import React from 'react';
 import { Badge } from '@shared/ui';
 import type { Parameter } from '@shared/types/parameter-types';
 
-interface ParameterCardProps {
+export interface ParameterCardProps {
   parameter: Parameter;
   onEdit: (parameter: Parameter) => void;
 }

@@ -10,8 +10,8 @@ import { MockedProvider } from '@apollo/client/testing';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import EventsListGraphQL from '../EventsListGraphQL';
-import { GET_EVENTS, GET_CATEGORIES } from '@/graphql/queries';
-import { DELETE_EVENT } from '@/graphql/mutations';
+import { GET_EVENTS, GET_CATEGORIES } from '@shared/graphql/operations';
+import { DELETE_EVENT } from '@shared/graphql/operations';
 
 // Mock useOutletContext
 vi.mock('react-router-dom', async () => {

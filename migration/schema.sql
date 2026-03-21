@@ -399,3 +399,16 @@ CREATE TABLE sql_optimizations (
 
 CREATE TABLE sqlite_sequence(name,seq);
 
+CREATE TABLE canvas_flows (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            flow_name TEXT NOT NULL,
+            flow_graph TEXT NOT NULL,
+            game_gid INTEGER NOT NULL,
+            game_id INTEGER,
+            description TEXT,
+            is_active INTEGER DEFAULT 1,
+            created_by TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+        );

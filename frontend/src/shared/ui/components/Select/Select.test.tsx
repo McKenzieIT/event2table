@@ -1,13 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import Select from './Select';
 import type { SelectOption } from './Select.types';
-
-import { describe, it, expect, vi } from 'vitest';
 
 describe('Select Component', () => {
   const mockOptions: SelectOption[] = [
@@ -17,9 +14,7 @@ describe('Select Component', () => {
     { value: 'option4', label: 'Option 4', disabled: true },
   ];
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Rendering', () => {
+  describe('Rendering', () => {
     it('should render without crashing', () => {
       render(<Select name="test" options={mockOptions} />);
       expect(screen.getByRole('combobox')).toBeInTheDocument();
@@ -73,9 +68,7 @@ describe('Rendering', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Selection Functionality', () => {
+  describe('Selection Functionality', () => {
     it('should open dropdown on click', async () => {
       const user = userEvent.setup();
       render(<Select name="test" options={mockOptions} />);
@@ -183,9 +176,7 @@ describe('Selection Functionality', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Search Functionality', () => {
+  describe('Search Functionality', () => {
     it('should show search input when searchable', async () => {
       const user = userEvent.setup();
       render(<Select name="test" options={mockOptions} searchable />);
@@ -225,9 +216,7 @@ describe('Search Functionality', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Keyboard Navigation', () => {
+  describe('Keyboard Navigation', () => {
     it('should open dropdown on Enter key', async () => {
       const user = userEvent.setup();
       render(<Select name="test" options={mockOptions} />);
@@ -325,9 +314,7 @@ describe('Keyboard Navigation', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Error States', () => {
+  describe('Error States', () => {
     it('should display error message', () => {
       render(<Select name="test" error="Required field" options={mockOptions} />);
       expect(screen.getByText('Required field')).toBeInTheDocument();
@@ -353,9 +340,7 @@ describe('Error States', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('React Hook Form Integration', () => {
+  describe('React Hook Form Integration', () => {
     it('should work with React Hook Form Controller', async () => {
       const user = userEvent.setup();
       const TestForm = () => {
@@ -425,9 +410,7 @@ describe('React Hook Form Integration', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Accessibility', () => {
+  describe('Accessibility', () => {
     it('should have proper ARIA attributes', () => {
       render(
         <Select
@@ -488,9 +471,7 @@ describe('Accessibility', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Click Outside', () => {
+  describe('Click Outside', () => {
     it('should close dropdown when clicking outside', async () => {
       const user = userEvent.setup();
       render(
@@ -514,9 +495,7 @@ describe('Click Outside', () => {
     });
   });
 
-  import { describe, it, expect, vi } from 'vitest';
-
-describe('Controlled Component', () => {
+  describe('Controlled Component', () => {
     it('should update when value prop changes', () => {
       const { rerender } = render(
         <Select name="test" options={mockOptions} value="option1" />

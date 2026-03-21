@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import Table from '@shared/ui/Table';
+import Table from '@shared/ui/components/Table';
 import './AlterSql.css';
 
 /**

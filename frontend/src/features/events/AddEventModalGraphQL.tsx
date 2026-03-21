@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useRef, useEffect, ChangeEvent, FormEvent, useCallback, memo } from 'react';
-import { BaseModal, Button, Input, Select, useToast } from '@shared/ui';
+import { Modal, Button, Input, Select, useToast } from '@shared/ui';
 import { useCreateEvent } from '../../graphql/hooks';
 import './AddEventModal.css';
 
@@ -160,80 +160,7 @@ const AddEventModalGraphQL: React.FC<AddEventModalProps> = ({ isOpen, onClose, g
     if (Object.keys(updates).length > 0) {
       setFormData(prev => ({ ...prev, ...updates }));
     }
-  }, [formData.eventName, formData.eventNameCn]);
-
-  return (
-    <BaseModal isOpen={isOpen} onClose={handleClose} title="添加事件" size="md">
-      <form onSubmit={handleSubmit} className="add-event-form">
-        <Input
-          id="eventName"
-          label="事件名称（英文）"
-          required
-          type="text"
-          value={formData.eventName}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange('eventName', e.target.value)}
-          placeholder="例如: user_login"
-          error={errors.eventName}
-          ref={eventNameRef}
-        />
-        {errors.eventName && <span className="error-message">{errors.eventName}</span>}
-        <span className="hint">只能包含小写字母和下划线</span>
-
-        <Input
-          id="eventNameCn"
-          label="事件名称（中文）"
-          required
-          type="text"
-          value={formData.eventNameCn}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange('eventNameCn', e.target.value)}
-          placeholder="例如: 用户登录"
-          error={errors.eventNameCn}
-          ref={eventNameCnRef}
-        />
-        {errors.eventNameCn && <span className="error-message">{errors.eventNameCn}</span>}
-
-        <div className="form-group">
-          <Select
-            id="categoryId"
-            label="事件分类"
-            required
-            value={formData.categoryId}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => handleChange('categoryId', e.target.value)}
-            options={[
-              { value: '', label: '请选择分类' },
-              { value: '1', label: '用户行为' },
-              { value: '2', label: '支付相关' },
-              { value: '3', label: '游戏逻辑' },
-              { value: '4', label: '系统事件' }
-            ]}
-          />
-          {errors.categoryId && <span className="error-message">{errors.categoryId}</span>}
-        </div>
-
-        <div className="form-group checkbox-group">
-          <label>
-            <input
-              type="checkbox"
-              checked={formData.includeInCommonParams}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange('includeInCommonParams', e.target.checked)}
-            />
-            包含在通用参数中
-          </label>
-        </div>
-
-        <div className="form-actions">
-          <Button type="button" onClick={handleClose} variant="secondary">
-            取消
-          </Button>
-          <Button type="submit" variant="primary" loading={isSubmitting}>
-            {isSubmitting ? '创建中...' : '创建事件'}
-          </Button>
-        </div>
-      </form>
-    </BaseModal>
-  );
-};
-
+      </Modal>
 // ✅ 添加 React.memo 优化渲染性能
 const AddEventModalGraphQLMemo = memo(AddEventModalGraphQL);
 

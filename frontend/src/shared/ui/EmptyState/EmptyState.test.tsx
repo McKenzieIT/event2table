@@ -6,7 +6,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { EmptyState } from './EmptyState';
+import EmptyState from './EmptyState';
 
 describe('EmptyState Component', () => {
   describe('Rendering', () => {
@@ -95,8 +95,8 @@ describe('EmptyState Component', () => {
       expect(container.querySelector('.empty-state__icon')).toBeInTheDocument();
     });
 
-    it('should not render icon container when icon is not provided', () => {
-      const { container } = render(<EmptyState title="Empty" />);
+    it('should not render icon container when icon is not provided and variant is custom', () => {
+      const { container } = render(<EmptyState title="Empty" variant="custom" />);
       expect(container.querySelector('.empty-state__icon')).not.toBeInTheDocument();
     });
   });

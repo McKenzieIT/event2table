@@ -118,7 +118,7 @@ class EventParameterBase(BaseModel):
             v = v.strip()
             # JSON路径应该以$.开头
             if not v.startswith("$."):
-                raise ValueError("json_path必须以'$.'开头（例如: '$.zoneId'）")
+                raise ValueError("json_path必须以'$.'开头 (例如: '$.zoneId')")
         return v
 
 

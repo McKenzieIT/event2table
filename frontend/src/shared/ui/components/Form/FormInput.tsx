@@ -86,7 +86,8 @@ export const FormInput = <
       <Controller
         name={name}
         control={control}
-        render={({ field }) => (
+        defaultValue=""
+        render={({ field, fieldState: { invalid } }) => (
           <input
             id={name as string}
             type={type}
@@ -104,6 +105,11 @@ export const FormInput = <
                   : undefined
             }
             {...field}
+            value={field.value ?? ''}
+            onChange={(e) => {
+              field.onChange(e);
+            }}
+            onBlur={field.onBlur}
             {...props}
           />
         )}

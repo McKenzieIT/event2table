@@ -17,7 +17,7 @@
 import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { BaseModal } from '@shared/ui';
+import { Modal } from '@shared/ui';
 import type { HqlVersion, VersionDiff } from '../api/hqlVersionApi';
 import './HqlVersionCompare.css';
 
@@ -49,7 +49,7 @@ const HqlVersionCompare: React.FC<HqlVersionCompareProps> = ({
   };
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onClose}
       title="HQL版本对比"
@@ -155,7 +155,7 @@ const HqlVersionCompare: React.FC<HqlVersionCompareProps> = ({
           </button>
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 };
 

@@ -16,7 +16,7 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import { fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Modal } from '../../index';
-import { Table } from '../../index';
+import Table from '../../components/Table';
 import { Card } from '../../index';
 
 // Mock WeakMap to track component instances

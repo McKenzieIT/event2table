@@ -88,6 +88,7 @@ export const FormSelect = <
       <Controller
         name={name}
         control={control}
+        defaultValue=""
         render={({ field }) => (
           <select
             id={name as string}

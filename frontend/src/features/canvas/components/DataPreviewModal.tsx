@@ -14,7 +14,7 @@
  */
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { BaseModal, Pagination, Button, Spinner } from '@shared/ui';
+import { Modal, Pagination, Button, Spinner } from '@shared/ui';
 import './DataPreviewModal.css';
 import type { DataPreviewModalProps, PreviewDataResponse } from './types';
 
@@ -137,7 +137,7 @@ function DataPreviewModal({
   if (!isOpen) return null;
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onClose}
       title="数据预览"
@@ -265,7 +265,7 @@ function DataPreviewModal({
           </div>
         )}
       </div>
-    </BaseModal>
+    </Modal>
   );
 }
 

@@ -20,7 +20,7 @@ import {
   Skeleton,
   EmptyState
 } from '@shared/ui';
-import Table from '@shared/ui/Table';
+import Table from '@shared/ui/components/Table';
 import { fetchAllParameters } from '@shared/api/parameters';
 import ParameterDetailDrawer from '@analytics/components/parameters/ParameterDetailDrawer';
 import { NavLinkWithGameContext } from '@shared/components';

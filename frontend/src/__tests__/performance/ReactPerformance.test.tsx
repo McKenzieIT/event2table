@@ -11,25 +11,25 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { renderHook } from '@testing-library/react-hooks';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { performanceMonitor, usePerformanceMonitor } from '@shared/utils/performanceMonitor';
 import { reportError } from '@shared/utils/errorReporting';
 
 // Mock performance API
 global.performance = {
   ...global.performance,
-  now: jest.fn(() => Date.now()),
-  mark: jest.fn(),
-  measure: jest.fn(),
-  clearMarks: jest.fn(),
+  now: vi.fn(() => Date.now()),
+  mark: vi.fn(),
+  measure: vi.fn(),
+  clearMarks: vi.fn(),
 };
 
 describe('React Performance Tests', () => {
   beforeEach(() => {
     performanceMonitor.reset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Modal Component Performance', () => {

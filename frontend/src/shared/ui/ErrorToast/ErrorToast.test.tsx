@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ErrorToast, useErrorToast, ErrorLevel } from './ErrorToast';
+import ErrorToast, { useErrorToast, ErrorLevel } from './ErrorToast';
 
 // Mock timers
 jest.useFakeTimers();

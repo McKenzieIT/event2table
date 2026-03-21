@@ -1,6 +1,7 @@
 // @ts-nocheck - TypeScript strict mode disabled for test files
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { useGameContext } from '../useGameContext';
 
 // Mock zustand store
@@ -16,6 +17,11 @@ vi.mock('@/stores/gameStore', () => ({
   }))
 }));
 
+// Wrapper component to provide Router context
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <MemoryRouter>{children}</MemoryRouter>
+);
+
 describe('useGameContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -23,7 +29,7 @@ describe('useGameContext', () => {
   });
 
   it('should update store when selectGame is called', () => {
-    const { result } = renderHook(() => useGameContext());
+    const { result } = renderHook(() => useGameContext(), { wrapper });
     const testGame = { id: 1, gid: 10000147, name: 'Test', ods_db: 'ieu_ods' };
 
     act(() => {
@@ -34,7 +40,7 @@ describe('useGameContext', () => {
   });
 
   it('should NOT update window.gameData when selectGame is called', () => {
-    const { result } = renderHook(() => useGameContext());
+    const { result } = renderHook(() => useGameContext(), { wrapper });
     const testGame = { id: 1, gid: 10000147, name: 'Test', ods_db: 'ieu_ods' };
 
     act(() => {
@@ -46,7 +52,7 @@ describe('useGameContext', () => {
   });
 
   it('should clear all game state when clearGame is called', () => {
-    const { result } = renderHook(() => useGameContext());
+    const { result } = renderHook(() => useGameContext(), { wrapper });
 
     act(() => {
       result.current.clearGame();
@@ -56,7 +62,7 @@ describe('useGameContext', () => {
   });
 
   it('should NOT update window.gameData when clearGame is called', () => {
-    const { result } = renderHook(() => useGameContext());
+    const { result } = renderHook(() => useGameContext(), { wrapper });
 
     act(() => {
       result.current.clearGame();
@@ -67,14 +73,14 @@ describe('useGameContext', () => {
   });
 
   it('should return currentGame and gameGid from store', () => {
-    const { result } = renderHook(() => useGameContext());
+    const { result } = renderHook(() => useGameContext(), { wrapper });
     
     expect(result.current.currentGame).toBeNull();
     expect(result.current.currentGameGid).toBeNull();
   });
 
   it('should return gameData as alias for currentGame', () => {
-    const { result } = renderHook(() => useGameContext());
+    const { result } = renderHook(() => useGameContext(), { wrapper });
     
     expect(result.current.gameData).toBeNull();
   });

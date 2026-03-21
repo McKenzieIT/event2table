@@ -11,8 +11,8 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
-import { GET_EVENTS, GET_CATEGORIES } from '@/graphql/queries';
-import { DELETE_EVENT } from '@/graphql/mutations';
+import { GET_EVENTS, GET_CATEGORIES } from '@shared/graphql/operations';
+import { DELETE_EVENT } from '@shared/graphql/operations';
 import EventsListGraphQL from '../EventsListGraphQL';
 import { performanceMonitor } from '@shared/utils/performanceMonitor';
 

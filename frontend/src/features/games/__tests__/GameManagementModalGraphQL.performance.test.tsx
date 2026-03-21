@@ -17,25 +17,23 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import React from 'react';
 import { render, waitFor, screen } from '@testing-library/react';
-import { GameManagementModal } from '../GameManagementModalGraphQL';
-import * as Apollo from '@apollo/client';
+import { MockedProvider } from '@apollo/client/testing/react';
+import GameManagementModalGraphQL from '../GameManagementModalGraphQL';
 import { performance } from 'perf_hooks';
+// Use the component with its actual name
+const GameManagementModal = GameManagementModalGraphQL;
 
-// Mock GraphQL operations
-vi.mock('@apollo/client/react', () => ({
+// Mock Apollo Client hooks
+vi.mock('@apollo/client', () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),
+  gql: (strings: TemplateStringsArray) => strings.join(''),
 }));
 
-vi.mock('../../shared/graphql/operations', () => ({
-  GET_GAMES: 'GET_GAMES',
-  GET_GAME: 'GET_GAME',
-  CREATE_GAME: 'CREATE_GAME',
-  UPDATE_GAME: 'UPDATE_GAME',
-  DELETE_GAME: 'DELETE_GAME',
-  SEARCH_GAMES: 'SEARCH_GAMES',
-}));
+// Import after mocking
+import { useQuery, useMutation } from '@apollo/client';
 
 describe('GameManagementModalGraphQL - Performance Tests', () => {
   const mockGames = [
@@ -48,18 +46,18 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
     vi.clearAllMocks();
 
     // Mock useQuery
-    vi.spyOn(Apollo, 'useQuery').mockReturnValue({
+    (useQuery as any).mockReturnValue({
       loading: false,
       error: null,
       data: { games: mockGames },
       refetch: vi.fn(),
-    } as any);
+    });
 
     // Mock useMutation
-    vi.spyOn(Apollo, 'useMutation').mockReturnValue([
+    (useMutation as any).mockReturnValue([
       vi.fn(),
       { loading: false },
-    ] as any);
+    ]);
   });
 
   afterEach(() => {
@@ -70,7 +68,11 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
     it('should render initially in under 100ms', async () => {
       const startTime = performance.now();
 
-      render(<GameManagementModal />);
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       await waitFor(() => {
         expect(screen.getByText('游戏管理')).toBeInTheDocument();
@@ -95,16 +97,19 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         parameterCount: Math.floor(Math.random() * 15),
       }));
 
-      vi.spyOn(Apollo, 'useQuery').mockReturnValue({
+      (useQuery as any).mockReturnValue({
         loading: false,
         error: null,
         data: { games: largeMockGames },
         refetch: vi.fn(),
-      } as any);
-
+      });
       const startTime = performance.now();
 
-      render(<GameManagementModal />);
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       await waitFor(() => {
         expect(screen.getByText('游戏管理')).toBeInTheDocument();
@@ -125,14 +130,16 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
       let renderCount = 0;
 
       const TestWrapper = () => {
-        const [, forceUpdate] = useState({});
+        const [, forceUpdate] = React.useState({});
         renderCount++;
 
         return (
-          <div>
-            <button onClick={() => forceUpdate({})}>Force Update</button>
-            <GameManagementModal />
-          </div>
+          <MockedProvider mocks={[]} addTypename={false}>
+            <div>
+              <button onClick={() => forceUpdate({})}>Force Update</button>
+              <GameManagementModal />
+            </div>
+          </MockedProvider>
         );
       };
 
@@ -150,12 +157,16 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
 
     it('should use useCallback for event handlers', async () => {
       const createGameSpy = vi.fn();
-      vi.spyOn(Apollo, 'useMutation').mockReturnValue([
+      (useMutation as any).mockReturnValue([
         createGameSpy,
         { loading: false },
-      ] as any);
+      ]);
 
-      render(<GameManagementModal />);
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       // Click "创建游戏" button
       const createButton = await screen.findByText('创建游戏');
@@ -172,34 +183,47 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
       const functionRefs = new Set<any>();
 
       // Mock to capture function references
-      const originalUseMutation = vi.spyOn(Apollo, 'useMutation');
+      const originalUseMutation = useMutation as any;
 
       let renderCount = 0;
-      originalUseMutation.mockImplementation(() => {
+      (useMutation as any).mockImplementation(() => {
         renderCount++;
 
         const mutationFn = vi.fn();
         functionRefs.add(mutationFn);
 
-        return [mutationFn, { loading: false }] as any;
+        return [mutationFn, { loading: false }];
       });
 
-      const { rerender } = render(<GameManagementModal />);
+      const { rerender } = render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       // Force multiple re-renders
       for (let i = 0; i < 5; i++) {
-        rerender(<GameManagementModal />);
+        rerender(
+          <MockedProvider mocks={[]} addTypename={false}>
+            <GameManagementModal />
+          </MockedProvider>
+        );
       }
 
       // With useCallback, we should have minimal unique function references
       // Without useCallback, we'd have 6 (initial + 5 re-renders)
       expect(functionRefs.size).toBeLessThan(3);
 
-      originalUseMutation.mockRestore();
+      // Restore original mock
+      (useMutation as any).mockImplementation(originalUseMutation);
     });
 
     it('should clean up event listeners on unmount', async () => {
-      const { unmount } = render(<GameManagementModal />);
+      const { unmount } = render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       // Unmount component
       unmount();
@@ -221,16 +245,19 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         parameterCount: Math.floor(Math.random() * 15),
       }));
 
-      vi.spyOn(Apollo, 'useQuery').mockReturnValue({
+      (useQuery as any).mockReturnValue({
         loading: false,
         error: null,
         data: { games: largeMockGames },
         refetch: vi.fn(),
-      } as any);
-
+      });
       const startTime = performance.now();
 
-      render(<GameManagementModal />);
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       await waitFor(() => {
         expect(screen.getByText('游戏管理')).toBeInTheDocument();
@@ -256,21 +283,25 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         parameterCount: Math.floor(Math.random() * 15),
       }));
 
-      vi.spyOn(Apollo, 'useQuery')
+      (useQuery as any)
         .mockReturnValueOnce({
           loading: false,
           error: null,
           data: { games: largeMockGames },
           refetch: vi.fn(),
-        } as any)
+        })
         .mockReturnValueOnce({
           loading: false,
           error: null,
           data: { searchGames: [largeMockGames[0]] },
           refetch: vi.fn(),
-        } as any);
+        });
 
-      render(<GameManagementModal />);
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       const searchInput = await screen.findByPlaceholderText('搜索游戏...');
 
@@ -301,7 +332,11 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
     it('should use useCallback for event handlers', async () => {
       // This is verified by the re-render test above
       // If useCallback is used, handlers maintain stable references
-      render(<GameManagementModal />);
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       const createButton = await screen.findByText('创建游戏');
       expect(createButton).toBeInTheDocument();
@@ -318,16 +353,19 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         parameterCount: Math.floor(Math.random() * 15),
       }));
 
-      vi.spyOn(Apollo, 'useQuery').mockReturnValue({
+      (useQuery as any).mockReturnValue({
         loading: false,
         error: null,
         data: { games: largeMockGames },
         refetch: vi.fn(),
-      } as any);
-
+      });
       const startTime = performance.now();
 
-      render(<GameManagementModal />);
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <GameManagementModal />
+        </MockedProvider>
+      );
 
       await waitFor(() => {
         expect(screen.getByText('游戏管理')).toBeInTheDocument();

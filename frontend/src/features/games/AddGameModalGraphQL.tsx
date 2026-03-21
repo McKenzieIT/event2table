@@ -10,7 +10,7 @@
  */
 
 import React, { useRef, useEffect, ChangeEvent, FormEvent, memo } from 'react';
-import { BaseModal, Button, Input, Select, useToast } from '@shared/ui';
+import { Modal, Button, Input, Select, useToast } from '@shared/ui';
 import { useCreateGame } from '../../graphql/hooks';
 import { useFormValidation } from '@shared/hooks/useFormValidation';
 import { gameValidationRules } from '@shared/utils/validationUtils';
@@ -115,7 +115,7 @@ const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClo
   }, [formData.gid, formData.name, setFormData]);
 
   return (
-    <BaseModal isOpen={isOpen} onClose={handleClose} title="添加游戏" size="md">
+      <Modal isOpen={isOpen} onClose={handleClose} title="添加游戏" size="md">
       <form onSubmit={handleSubmit} className="add-game-form">
         <Input
             id="gid"
@@ -171,11 +171,7 @@ const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClo
             {isSubmitting ? '创建中...' : '创建游戏'}
           </Button>
         </div>
-      </form>
-    </BaseModal>
-  );
-};
-
+      </Modal>
 // ✅ 添加 React.memo 优化渲染性能
 const AddGameModalGraphQLMemo = memo(AddGameModalGraphQL);
 

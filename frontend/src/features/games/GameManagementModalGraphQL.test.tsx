@@ -19,8 +19,8 @@
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MockedProvider } from '@apollo/client/testing';
-import GameManagementModal from './GameManagementModalGraphQL'; // ✅ Fixed: Use default import
+import { MockedProvider } from '@apollo/client/testing/react';
+import GameManagementModalGraphQL, { GameManagementModal } from './GameManagementModalGraphQL';
 import { GET_GAMES, CREATE_GAME } from '../../shared/graphql/operations';
 
 // Mock GraphQL operations
