@@ -1,4 +1,4 @@
-from backend.core.cache.decorators import cached
+from backend.core.cache.decorators import cached, cache_invalidate
 
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
@@ -100,6 +100,7 @@ class ParameterRepository(GenericRepository):
 
         return ParameterEntity(**entity_data)
 
+    @cache_invalidate
     def create(self, data: Dict[str, Any]) -> Optional[ParameterEntity]:
         """
         创建参数
@@ -115,6 +116,7 @@ class ParameterRepository(GenericRepository):
             创建的ParameterEntity, 失败返回None
         """
         from backend.core.utils.converters import get_db_connection
+        from backend.core.cache.cache_system import clear_cache_pattern
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -146,6 +148,11 @@ class ParameterRepository(GenericRepository):
             cursor.execute(query, tuple(db_data.values()))
             param_id = cursor.lastrowid
             conn.commit()
+
+            # Clear all parameter-related caches
+            clear_cache_pattern("parameters:*")
+            clear_cache_pattern("parameter:*")
+            clear_cache_pattern("event_params:*")
 
             return self.find_by_id(param_id)
 
@@ -646,6 +653,7 @@ class ParameterRepository(GenericRepository):
 
         return [self._row_to_entity(row) for row in rows]
 
+    @cache_invalidate
     def update(self, param_id: int, data: Dict[str, Any]) -> Optional[ParameterEntity]:
         """
         根据参数ID更新参数
@@ -689,6 +697,7 @@ class ParameterRepository(GenericRepository):
         values = list(db_data.values()) + [param_id]
 
         from backend.core.utils.converters import get_db_connection
+        from backend.core.cache.cache_system import clear_cache_pattern
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -696,9 +705,15 @@ class ParameterRepository(GenericRepository):
         conn.commit()
         conn.close()
 
+        # Clear all parameter-related caches
+        clear_cache_pattern("parameters:*")
+        clear_cache_pattern("parameter:*")
+        clear_cache_pattern("event_params:*")
+
         # 返回更新后的参数
         return self.find_by_id(param_id)
 
+    @cache_invalidate
     def delete(self, param_id: int) -> bool:
         """
         根据参数ID删除参数
