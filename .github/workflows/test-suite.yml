@@ -37,13 +37,16 @@ jobs:
           pip install pytest pytest-xdist pytest-cov
 
       - name: 运行Backend单元测试 (Shard ${{ matrix.shard }}/4)
+        env:
+          PYTEST_XDIST_WORKER: ${{ matrix.shard }}
+          PYTEST_XDIST_NUM_WORKERS: 4
         run: |
           pytest backend/test/unit/ \
             --cov=backend \
             --cov-report=xml \
             --cov-report=term-missing \
-            --shard-id=${{ matrix.shard }} \
-            --num-shards=4 \
+            -n auto \
+            --dist loadscope \
             --maxfail=10 \
             -q
 
