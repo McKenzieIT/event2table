@@ -22,7 +22,7 @@ import { Card, Spinner } from '@shared/ui';
 import { useGameStore } from '@/stores/gameStore';
 import { useGames, useFlows } from '@/graphql/hooks';
 import { usePollingInterval } from '@/hooks/usePageVisibility';  // ⚡ PERF: Phase 2
-import BaseModal from '@shared/ui/BaseModal/BaseModal';
+import { Modal } from '@shared/ui';
 import GameManagementModal from '@/features/games/GameManagementModalGraphQL';
 import './Dashboard.css';
 
@@ -319,14 +319,14 @@ function DashboardGraphQL() {
         )}
 
         {/* 游戏管理模态框 */}
-        <BaseModal
+        <Modal
           isOpen={isGameManagementModalOpen}
           onClose={closeGameManagementModal}
           title="游戏管理"
           size="full"
         >
           <GameManagementModal />
-        </BaseModal>
+        </Modal>
       </div>
       </Suspense>
   );

@@ -130,13 +130,6 @@ export { default as Spinner } from './Spinner/Spinner';
 export { Select } from './components/Select/Select';
 export type { SelectProps, SelectOption } from './components/Select/Select.types';
 
-// Backward compatibility - Old Table alias
-/**
- * @deprecated Use Table from '@/shared/ui/components/Table' instead.
- * Will be removed in v3.0.0
- */
-export { default as LegacyTable } from './Table/Table';
-
 // 基础组件类型导出
 export type { InputProps } from './Input/Input';
 export type { TextAreaProps } from './TextArea/TextArea';
@@ -173,11 +166,6 @@ export { default as Pagination } from './Pagination/Pagination';
 export { Modal } from './components/Modal/Modal';
 export type { ModalProps, ModalSize, ModalAnimation, ModalVariant } from './components/Modal/Modal.types';
 
-// Backward compatibility - BaseModal alias
-/**
- * @deprecated Use Modal instead. Will be removed in v3.0.0
- */
-export { Modal as BaseModal } from './components/Modal/Modal';
 
 // 布局组件类型导出
 export type { PaginationProps } from './Pagination/Pagination';

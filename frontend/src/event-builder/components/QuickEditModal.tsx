@@ -20,7 +20,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import { eventNodesApi } from "@shared/api/eventNodes";
 import type { EventNode } from "@shared/types/eventNodes";
-import { BaseModal } from "@shared/ui/BaseModal";
+import { Modal } from '@shared/ui';
 import { Button } from "@shared/ui";
 
 /**
@@ -138,7 +138,7 @@ export function QuickEditModal({
   };
 
   return (
-    <BaseModal
+    <Modal
       isOpen={show}
       onClose={onClose}
       enableEscClose={true}
@@ -290,6 +290,6 @@ export function QuickEditModal({
           </div>
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 }

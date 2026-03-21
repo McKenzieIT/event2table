@@ -16,7 +16,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import CodeMirror from '@uiw/react-codemirror';
 import toast from 'react-hot-toast';
 import './HQLPreviewModal.css';
-import { BaseModal } from '@shared/ui/BaseModal';
+import { Modal } from '@shared/ui';
 import PerformanceIndicator from '../HQLPreviewPanel/PerformanceIndicator';
 import DebugViewer from '../HQLPreviewPanel/DebugViewer';
 import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
@@ -268,7 +268,7 @@ export default function HQLPreviewModal({
   if (!isOpen) return null;
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onClose}
       size="xl"
@@ -484,7 +484,7 @@ export default function HQLPreviewModal({
           </div>
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 }
 

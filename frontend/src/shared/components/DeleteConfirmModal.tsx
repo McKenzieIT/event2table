@@ -7,7 +7,7 @@
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React from 'react';
-import { BaseModal } from '@shared/ui/BaseModal';
+import { Modal } from '@shared/ui';
 import { Button } from '@shared/ui';
 
 export interface DeleteConfirmModalProps {
@@ -30,7 +30,7 @@ export function DeleteConfirmModal({
   onCancel
 }: DeleteConfirmModalProps) {
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onCancel}
       enableEscClose={true}
@@ -53,6 +53,6 @@ export function DeleteConfirmModal({
           </Button>
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 }

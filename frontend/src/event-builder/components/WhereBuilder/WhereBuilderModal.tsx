@@ -16,7 +16,7 @@ import { WhereItem } from '@shared/types/whereBuilder';
 import { Field } from '@shared/types/fieldBuilder';
 import WhereBuilderCanvas from './WhereBuilderCanvas';
 import './WhereBuilderModal.css';
-import { BaseModal } from '@shared/ui/BaseModal';
+import { Modal } from '@shared/ui';
 import toast from 'react-hot-toast';
 
 /**
@@ -120,7 +120,7 @@ export default function WhereBuilderModal({
   if (!isOpen) return null;
 
   return (
-    <BaseModal
+    <Modal
       isOpen={isOpen}
       onClose={onClose}
       size="xl"
@@ -195,6 +195,6 @@ export default function WhereBuilderModal({
           </div>
         </div>
       </div>
-    </BaseModal>
+    </Modal>
   );
 }
