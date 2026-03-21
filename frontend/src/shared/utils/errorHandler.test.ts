@@ -4,6 +4,7 @@
  * 测试错误分类、消息格式化和错误上报功能
  */
 
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import {
   classifyError,
   determineErrorLevel,
@@ -18,11 +19,11 @@ import {
 } from './errorHandler';
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('errorHandler', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // 重置错误上报配置
     configureErrorReporting({ enabled: false });
   });
@@ -142,7 +143,7 @@ describe('errorHandler', () => {
 
   describe('错误处理', () => {
     it('应该记录错误到控制台', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const error = new Error('Test error');
 
       await handleError(error, { report: false });
@@ -152,7 +153,7 @@ describe('errorHandler', () => {
     });
 
     it('应该调用自定义处理函数', async () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       const error = new Error('Test error');
 
       await handleError(error, {
@@ -173,7 +174,7 @@ describe('errorHandler', () => {
         reportUrl: 'https://example.com/api/errors',
       });
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
       });
 
@@ -205,14 +206,14 @@ describe('errorHandler', () => {
     });
 
     it('应该调用afterSend回调', async () => {
-      const afterSend = jest.fn();
+      const afterSend = vi.fn();
       configureErrorReporting({
         enabled: true,
         reportUrl: 'https://example.com/api/errors',
         afterSend,
       });
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
       });
 

@@ -92,7 +92,7 @@ describe('FieldRecommendation Component', () => {
       reason: 'Matches pattern',
     };
 
-    (getRecommendations as jest.Mock).mockResolvedValueOnce(mockRecommendation);
+    (getRecommendations as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockRecommendation);
 
     const onApplyRecommendation = vi.fn();
     const onApplyTypeInference = vi.fn();
@@ -168,7 +168,7 @@ describe('FieldRecommendationDropdown Component', () => {
       },
     ];
 
-    (getCommonPatterns as jest.Mock).mockResolvedValueOnce(mockPatterns);
+    (getCommonPatterns as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockPatterns);
 
     const onSelectPattern = vi.fn();
 

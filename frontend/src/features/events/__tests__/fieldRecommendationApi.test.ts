@@ -34,7 +34,7 @@ describe('fieldRecommendationApi', () => {
         },
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -58,7 +58,7 @@ describe('fieldRecommendationApi', () => {
     });
 
     it('should throw error when API request fails', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Internal Server Error',
       });
@@ -79,7 +79,7 @@ describe('fieldRecommendationApi', () => {
         message: 'Invalid parameter name',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -115,7 +115,7 @@ describe('fieldRecommendationApi', () => {
         ],
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -129,7 +129,7 @@ describe('fieldRecommendationApi', () => {
     });
 
     it('should throw error when API request fails', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Not Found',
       });
@@ -145,7 +145,7 @@ describe('fieldRecommendationApi', () => {
         data: 'not an array',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -171,7 +171,7 @@ describe('fieldRecommendationApi', () => {
         },
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -196,7 +196,7 @@ describe('fieldRecommendationApi', () => {
     });
 
     it('should throw error when API request fails', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,
         statusText: 'Bad Request',
       });
@@ -217,7 +217,7 @@ describe('fieldRecommendationApi', () => {
         message: 'Invalid sample values',
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });

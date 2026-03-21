@@ -15,6 +15,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { Modal } from '../../index';
 import Table from '../../components/Table';
 import { Card } from '../../index';
@@ -324,8 +325,8 @@ describe('Memory Leak Tests', () => {
   describe('Event Listener Cleanup', () => {
     test('should remove all event listeners on unmount', () => {
       // Spy on addEventListener and removeEventListener
-      const addSpy = jest.spyOn(document, 'addEventListener');
-      const removeSpy = jest.spyOn(document, 'removeEventListener');
+      const addSpy = vi.spyOn(document, 'addEventListener');
+      const removeSpy = vi.spyOn(document, 'removeEventListener');
 
       function ModalTest() {
         const [isOpen, setIsOpen] = useState(true);

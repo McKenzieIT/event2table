@@ -47,7 +47,7 @@ describe('useFieldRecommendations', () => {
       reason: 'Matches pattern',
     };
 
-    (getRecommendations as jest.Mock).mockResolvedValueOnce(mockRecommendation);
+    (getRecommendations as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockRecommendation);
 
     const { result } = renderHook(() => useFieldRecommendations(), {
       wrapper: createWrapper(),
@@ -71,7 +71,7 @@ describe('useFieldRecommendations', () => {
 
   it('should handle errors correctly', async () => {
     const mockError = new Error('API Error');
-    (getRecommendations as any).mockRejectedValueOnce(mockError);
+    (getRecommendations as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useFieldRecommendations(), {
       wrapper: createWrapper(),
@@ -105,7 +105,7 @@ describe('useCommonPatterns', () => {
       },
     ];
 
-    (fetchPatterns as any).mockResolvedValueOnce(mockPatterns);
+    (fetchPatterns as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockPatterns);
 
     const { result } = renderHook(() => useCommonPatterns(), {
       wrapper: createWrapper(),
@@ -121,7 +121,7 @@ describe('useCommonPatterns', () => {
 
   it('should handle errors correctly', async () => {
     const mockError = new Error('Failed to fetch');
-    (fetchPatterns as any).mockRejectedValueOnce(mockError);
+    (fetchPatterns as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useCommonPatterns(), {
       wrapper: createWrapper(),
@@ -151,7 +151,7 @@ describe('useFieldTypeInference', () => {
       reasoning: 'Numeric values',
     };
 
-    (fetchTypeInference as any).mockResolvedValueOnce(mockInference);
+    (fetchTypeInference as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockInference);
 
     const { result } = renderHook(() => useFieldTypeInference(), {
       wrapper: createWrapper(),
@@ -177,7 +177,7 @@ describe('useFieldTypeInference', () => {
 
   it('should handle errors correctly', async () => {
     const mockError = new Error('Inference failed');
-    (fetchTypeInference as any).mockRejectedValueOnce(mockError);
+    (fetchTypeInference as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useFieldTypeInference(), {
       wrapper: createWrapper(),

@@ -5,21 +5,22 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act, renderHook } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import ErrorToast, { useErrorToast, ErrorLevel } from './ErrorToast';
 
 // Mock timers
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('ErrorToast Component', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
-    jest.clearAllMocks();
+    vi.clearAllTimers();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   describe('基本渲染', () => {
@@ -186,7 +187,7 @@ describe('ErrorToast Component', () => {
 
   describe('交互功能', () => {
     it('应该在点击关闭按钮时移除错误', () => {
-      const onRemove = jest.fn();
+      const onRemove = vi.fn();
       const toasts = [
         {
           id: '1',
@@ -211,7 +212,7 @@ describe('ErrorToast Component', () => {
     });
 
     it('应该在自动消失时调用onRemove', async () => {
-      const onRemove = jest.fn();
+      const onRemove = vi.fn();
       const toasts = [
         {
           id: '1',
@@ -230,8 +231,8 @@ describe('ErrorToast Component', () => {
       );
 
       // 快进时间
-      jest.advanceTimersByTime(1000);
-      jest.advanceTimersByTime(300); // 等待退出动画
+      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(300); // 等待退出动画
 
       await waitFor(() => {
         expect(onRemove).toHaveBeenCalledWith('1');
@@ -239,7 +240,7 @@ describe('ErrorToast Component', () => {
     });
 
     it('应该不自动移除duration为0的错误', () => {
-      const onRemove = jest.fn();
+      const onRemove = vi.fn();
       const toasts = [
         {
           id: '1',
@@ -321,13 +322,13 @@ describe('ErrorToast Component', () => {
 
 describe('useErrorToast Hook', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
-    jest.clearAllMocks();
+    vi.clearAllTimers();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   it('应该提供showError方法', () => {
@@ -443,8 +444,8 @@ describe('useErrorToast Hook', () => {
     expect(result.current.toasts).toHaveLength(1);
 
     // 快进时间
-    jest.advanceTimersByTime(1000);
-    jest.advanceTimersByTime(300); // 等待退出动画
+    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(300); // 等待退出动画
 
     expect(result.current.toasts).toHaveLength(0);
   });
