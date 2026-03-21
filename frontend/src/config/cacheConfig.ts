@@ -137,27 +137,15 @@ export function getInvalidationKeys(mutationType: keyof typeof CACHE_INVALIDATIO
 
 /**
  * Default React Query cache configuration
+ * Note: QueryCache and MutationCache don't support onError/onSuccess in v5
+ * Error handling is done at the query/mutation level instead
  */
-export const DEFAULT_QUERY_CACHE_CONFIG: QueryCache = {
-  onError: (error) => {
-    console.error('[Query Cache Error]', error);
-  },
-  onSuccess: () => {
-    // Track cache hits if needed
-  },
-};
+export const DEFAULT_QUERY_CACHE_CONFIG: QueryCache = new QueryCache({});
 
 /**
  * Default React Query mutation cache configuration
  */
-export const DEFAULT_MUTATION_CACHE_CONFIG: MutationCache = {
-  onError: (error) => {
-    console.error('[Mutation Cache Error]', error);
-  },
-  onSuccess: () => {
-    // Track successful mutations
-  },
-};
+export const DEFAULT_MUTATION_CACHE_CONFIG: MutationCache = new MutationCache({});
 
 /**
  * Cache configuration for specific query keys

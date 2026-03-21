@@ -18,7 +18,7 @@
 
 import { useEffect, useRef } from 'react';
 
-interface PerformanceMetrics {
+export interface PerformanceMetrics {
   componentName: string;
   renderCount: number;
   totalRenderTime: number;

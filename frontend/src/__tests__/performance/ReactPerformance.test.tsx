@@ -14,7 +14,8 @@ import React, { useState, useEffect } from 'react';
 import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { performanceMonitor, usePerformanceMonitor } from '@shared/utils/performanceMonitor';
+import { performanceMonitor, usePerformanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';
+import type { CanvasComponentField } from '@features/canvas/components/types';
 
 // Mock performance API
 if (typeof globalThis.performance === 'undefined') {
@@ -105,9 +106,9 @@ describe('React Performance Tests', () => {
         label: 'Test Node',
         fieldCount: 5,
         baseFields: Array.from({ length: 5 }, (_, i) => ({
-          name: `field_${i}`,
-          alias: `Field ${i}`,
-          type: 'param'
+          field_name: `field_${i}`,
+          field_type: 'param' as const,
+          alias: `Field ${i}`
         }))
       };
 
@@ -128,7 +129,7 @@ describe('React Performance Tests', () => {
         '../../features/canvas/components/CustomNode'
       );
 
-      const mockData = {
+      const mockData: { label: string; fieldCount: number; baseFields: CanvasComponentField[] } = {
         label: 'Test Node',
         fieldCount: 5,
         baseFields: []
@@ -159,7 +160,7 @@ describe('React Performance Tests', () => {
         data: {
           label: `Node ${i}`,
           fieldCount: 5,
-          baseFields: []
+          baseFields: [] as CanvasComponentField[]
         },
         selected: false
       }));
@@ -404,7 +405,7 @@ describe('React Performance Tests', () => {
       const metrics = performanceMonitor.getMetrics('TestComponent');
 
       expect(metrics).toBeDefined();
-      expect(metrics?.renderCount).toBeGreaterThan(0);
+      expect((metrics as PerformanceMetrics | undefined)?.renderCount).toBeGreaterThan(0);
       console.log('✅ usePerformanceMonitor tracking verified');
     });
   });

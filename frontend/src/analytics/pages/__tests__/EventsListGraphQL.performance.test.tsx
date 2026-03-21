@@ -10,11 +10,12 @@
 
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/react/testing';
 import { GET_EVENTS, GET_CATEGORIES } from '@shared/graphql/operations';
 import { DELETE_EVENT } from '@shared/graphql/operations';
 import EventsListGraphQL from '../EventsListGraphQL';
-import { performanceMonitor } from '@shared/utils/performanceMonitor';
+import { performanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';
+import userEvent from '@testing-library/user-event';
 
 // Mock game context
 const mockCurrentGame = {
@@ -113,16 +114,17 @@ describe('EventsListGraphQL Performance Tests', () => {
     const metrics = performanceMonitor.getMetrics('EventsListGraphQL');
 
     // Verify metrics are being tracked
-    expect(metrics?.componentName).toBe('EventsListGraphQL');
-    expect(metrics?.renderCount).toBeGreaterThan(0);
-    expect(metrics?.averageRenderTime).toBeGreaterThan(0);
+    const typedMetrics = metrics as PerformanceMetrics | undefined;
+    expect(typedMetrics?.componentName).toBe('EventsListGraphQL');
+    expect(typedMetrics?.renderCount).toBeGreaterThan(0);
+    expect(typedMetrics?.averageRenderTime).toBeGreaterThan(0);
 
     // Log metrics for analysis
     console.log('EventsListGraphQL Performance Metrics:', {
-      renderCount: metrics?.renderCount,
-      avgRenderTime: `${metrics?.averageRenderTime?.toFixed(2)}ms`,
-      lastRenderTime: `${metrics?.lastRenderTime?.toFixed(2)}ms`,
-      memoryUsage: metrics?.memoryUsage ? `${metrics.memoryUsage.toFixed(2)}MB` : 'N/A'
+      renderCount: typedMetrics?.renderCount,
+      avgRenderTime: `${typedMetrics?.averageRenderTime?.toFixed(2)}ms`,
+      lastRenderTime: `${typedMetrics?.lastRenderTime?.toFixed(2)}ms`,
+      memoryUsage: typedMetrics?.memoryUsage ? `${typedMetrics.memoryUsage.toFixed(2)}MB` : 'N/A'
     });
   });
 
@@ -136,7 +138,7 @@ describe('EventsListGraphQL Performance Tests', () => {
     const metrics = performanceMonitor.getMetrics('EventsListGraphQL');
 
     // 60fps = 16.67ms per frame
-    expect(metrics?.lastRenderTime).toBeLessThan(33);
+    expect((metrics as PerformanceMetrics | undefined)?.lastRenderTime).toBeLessThan(33);
   });
 
   test('should filter events efficiently', async () => {
@@ -153,7 +155,6 @@ describe('EventsListGraphQL Performance Tests', () => {
     const startTime = performance.now();
 
     // Type search query
-    const userEvent = require('@testing-library/user-event').default;
     await userEvent.type(searchInput, 'test_event_1');
 
     const filterTime = performance.now() - startTime;
@@ -176,7 +177,6 @@ describe('EventsListGraphQL Performance Tests', () => {
     const startTime = performance.now();
 
     // Change category
-    const userEvent = require('@testing-library/user-event').default;
     await userEvent.selectOptions(categorySelect, 'Login');
 
     const filterTime = performance.now() - startTime;
@@ -199,7 +199,6 @@ describe('EventsListGraphQL Performance Tests', () => {
     const startTime = performance.now();
 
     // Click select all
-    const userEvent = require('@testing-library/user-event').default;
     await userEvent.click(selectAllCheckbox);
 
     const selectTime = performance.now() - startTime;
@@ -217,9 +216,10 @@ describe('EventsListGraphQL Performance Tests', () => {
 
     const metrics = performanceMonitor.getMetrics('EventsListGraphQL');
 
-    if (metrics?.memoryUsage) {
+    const typedMetrics = metrics as PerformanceMetrics | undefined;
+    if (typedMetrics?.memoryUsage) {
       // Memory usage should be reasonable (<100MB for virtual list)
-      expect(metrics.memoryUsage).toBeLessThan(100);
+      expect(typedMetrics.memoryUsage).toBeLessThan(100);
     }
   });
 });
@@ -249,7 +249,6 @@ describe('EventsListGraphQL Integration Tests', () => {
     expect(pageSizeSelect).toBeInTheDocument();
 
     // Change page size
-    const userEvent = require('@testing-library/user-event').default;
     await userEvent.selectOptions(pageSizeSelect, '20');
 
     // Verify page size changed
