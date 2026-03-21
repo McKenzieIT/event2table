@@ -1,4 +1,43 @@
-# 缓存系统增强模块
+# 缓存系统使用指南
+
+## 快速开始
+
+### 使用@cached装饰器
+
+```python
+from backend.core.cache.decorators import cached
+
+@cached(ttl=1800)  # 缓存30分钟
+def get_expensive_data(game_gid: int):
+    """
+    获取昂贵的数据
+
+    Args:
+        game_gid: 游戏GID
+
+    Returns:
+        数据字典
+    """
+    return fetch_from_db(game_gid)
+```
+
+### 缓存键生成规则
+
+**自动跳过self参数**:
+```python
+class Repository:
+    @cached(ttl=60)
+    def get_data(self, page=1):  # self自动跳过
+        return data
+```
+
+**不可哈希参数自动序列化**:
+```python
+@cached(ttl=60)
+def process_data(filters: dict, items: list):
+    # dict和list自动转为JSON字符串
+    return result
+```
 
 ## 概述
 
@@ -162,6 +201,7 @@ trend = cache_statistics.get_performance_trend(hours=24)
 - `test_protection_enhanced.py` - 缓存防护测试
 - `test_invalidator_enhanced.py` - 缓存失效器测试
 - `test_statistics_enhanced.py` - 缓存统计测试
+- `cache_performance_test.py` - 缓存性能测试
 
 ### 运行测试
 
@@ -171,6 +211,24 @@ pytest backend/test/unit/cache/test_*_enhanced.py -v
 
 # 运行单个测试文件
 pytest backend/test/unit/cache/test_protection_enhanced.py -v
+
+# 运行性能测试
+python backend/test/performance/cache_performance_test.py
+```
+
+### 性能测试
+
+运行性能测试验证缓存效果:
+
+```bash
+python backend/test/performance/cache_performance_test.py
+```
+
+预期输出:
+```
+✅ 1000次缓存命中耗时: 1.XXX秒
+   平均响应时间: X.XX毫秒
+   性能: 良好 (<5秒)
 ```
 
 ## 依赖
@@ -239,6 +297,18 @@ thread.start()
 
 ## 性能指标
 
+### 实测性能（2026-03-21）
+
+**性能测试结果** (1000次缓存命中):
+- 1000次缓存命中耗时: 1.164秒
+- 平均响应时间: 1.16毫秒
+- 性能评级: 良好 (<5秒)
+
+**性能基准**:
+- L1缓存命中: <1ms
+- L2缓存命中: 5-10ms
+- 缓存未命中: 50-200ms（数据库查询）
+
 ### 预期效果
 - 缓存命中率提升至 85%+
 - 缓存穿透减少 90%+
@@ -254,6 +324,41 @@ thread.start()
 - 布隆过滤器拦截次数
 - 锁等待次数
 - 空值缓存命中次数
+
+## 监控
+
+```python
+from backend.core.cache.cache_system import hierarchical_cache
+
+# 获取缓存统计
+stats = hierarchical_cache.get_stats()
+print(f"命中率: {(stats['l1_hits'] + stats['l2_hits']) / stats['misses'] * 100:.2f}%")
+
+# 获取详细统计
+from backend.core.cache.statistics import cache_statistics
+
+# 记录访问
+cache_statistics.record_access(
+    key="games:detail:gid:10000147",
+    hit=True,
+    level="l1",
+    response_time=0.5
+)
+
+# 获取命中率统计
+hit_rate = cache_statistics.get_hit_rate_stats()
+print(f"L1命中率: {hit_rate['l1_hit_rate']:.2f}%")
+print(f"L2命中率: {hit_rate['l2_hit_rate']:.2f}%")
+print(f"总体命中率: {hit_rate['overall_hit_rate']:.2f}%")
+
+# 获取热点键
+hot_keys = cache_statistics.get_hot_keys(limit=10)
+print(f"Top 10热点键: {hot_keys}")
+
+# 获取性能趋势
+trend = cache_statistics.get_performance_trend(hours=24)
+print(f"24小时性能趋势: {trend}")
+```
 
 ## 版本历史
 
