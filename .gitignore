@@ -23,6 +23,35 @@ REPORT.md
 # 但保留output/reports/目录
 !output/reports/**/*.md
 
+# ==================== 测试输出（全部排除）====================
+frontend/test-results/
+output/screenshots/
+output/test-results/
+test-output/
+test-reports/
+test-results/
+playwright-tests/
+
+# 但保留总结性Markdown报告
+!output/reports/*.md
+!docs/testing/reports/*.md
+
+# ==================== Claude Skills输出 ====================
+# event2table-universal-test：保留配置，忽略输出
+.claude/skills/event2table-universal-test/output/
+.claude/skills/event2table-universal-test/config/test_configs/
+
+# performance-audit：全部忽略（本地开发工具）
+.claude/skills/performance-audit/
+
+# update-docs：忽略输出
+.claude/skills/update-docs/output/
+
+# ==================== Scripts临时文件 ====================
+scripts/temp/
+scripts/temp/*.py
+scripts/temp/*.txt
+
 # 日志文件
 ::log_file
 *.log
