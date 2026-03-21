@@ -887,16 +887,10 @@ Form/
 
 **策略**:
 
-1. **识别未覆盖的代码**（使用分组测试避免超时）
+1. **识别未覆盖的代码**
    ```bash
-   # 方案 1: 只生成特定组件的覆盖率报告
-   npm test -- --testPathPattern="Table" --coverage --coverageReporters=html --maxWorkers=1
-   
-   # 方案 2: 只生成 shared/ui 的覆盖率报告
-   npm test -- --testPathPattern="shared/ui" --coverage --coverageReporters=html --maxWorkers=1
-   
-   # 方案 3: 分批生成覆盖率报告
-   npm test -- --testPathPattern="components" --coverage --coverageReporters=html --maxWorkers=1
+   # 运行测试覆盖率报告
+   npm test -- --coverage --coverageReporters=html
    
    # 查看覆盖率报告
    open coverage/index.html
@@ -1034,15 +1028,23 @@ Form/
 - 建立功能回归测试套件
 - 使用 Git 分支进行隔离开发，随时可以回滚
 
-**具体措施**:
+**具体措施**（考虑 60s 时间限制）:
 ```bash
-# 每个阶段完成后运行完整测试
-npm test
+# 方案 1: 按组件分组测试（推荐）
+npm test -- --testPathPattern="Table" --maxWorkers=1
+npm test -- --testPathPattern="Select" --maxWorkers=1
+npm test -- --testPathPattern="Modal" --maxWorkers=1
 
-# 运行 E2E 测试
-npm run test:e2e
+# 方案 2: 只测试修改的文件
+npm test -- --onlyChanged --maxWorkers=1
 
-# 运行性能测试
+# 方案 3: 快速验证（跳过慢速测试）
+npm test -- --testPathIgnorePatterns=["e2e","integration"] --maxWorkers=1
+
+# 运行 E2E 测试（分批执行）
+npm run test:e2e -- --testPathPattern="login" --maxWorkers=1
+
+# 运行性能测试（单独执行）
 npm run test:performance
 ```
 
