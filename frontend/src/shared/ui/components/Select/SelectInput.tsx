@@ -25,7 +25,7 @@ export interface SelectInputProps {
  *
  * Renders the trigger/input area of the Select component
  */
-export const SelectInput: React.FC<SelectInputProps> = ({
+export const SelectInput = React.memo<SelectInputProps>(({
   id,
   label,
   labelId,
@@ -101,4 +101,6 @@ export const SelectInput: React.FC<SelectInputProps> = ({
       </div>
     </>
   );
-};
+});
+
+SelectInput.displayName = 'SelectInput';

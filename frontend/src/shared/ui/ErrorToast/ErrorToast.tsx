@@ -135,7 +135,7 @@ const POSITION_STYLES: Record<
  * );
  * ```
  */
-export function ErrorToast({
+export const ErrorToast = React.memo(({
   toasts,
   onRemove,
   maxToasts = 5,
@@ -162,18 +162,13 @@ export function ErrorToast({
     ...style,
   };
 
-  return (
-    <div style={containerStyle}>
-      {visibleToasts.map((toast) => (
+  visibleToasts.map((toast) => (
         <ErrorToastItem
           key={toast.id}
           toast={toast}
           onRemove={onRemove}
         />
-      ))}
-    </div>
-  );
-}
+      ))}}
 
 /**
  * 单个错误提示项组件
@@ -292,7 +287,9 @@ function ErrorToastItem({
       </button>
     </div>
   );
-}
+});
+
+ErrorToast.displayName = 'ErrorToast';
 
 // ============================================================================
 // Hook
@@ -322,7 +319,7 @@ function ErrorToastItem({
  * }
  * ```
  */
-export function useErrorToast() {
+export const useErrorToast = () => {
   const [toasts, setToasts] = useState<ErrorToastItem[]>([]);
 
   /**

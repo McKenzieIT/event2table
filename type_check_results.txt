@@ -1,0 +1,271 @@
+
+> dwd-generator-app-shell@1.0.0 type-check
+> tsc --noEmit --pretty
+
+[96msrc/event-builder/components/HQLPreview.tsx[0m:[93m405[0m:[93m3[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m405[0m });
+[7m   [0m [91m  ~[0m
+
+[96msrc/event-builder/pages/FieldBuilder.tsx[0m:[93m527[0m:[93m1[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m527[0m FieldBuilder.displayName = 'FieldBuilder';
+[7m   [0m [91m~~~~~~~~~~~~[0m
+
+[96msrc/event-builder/pages/FieldBuilder.tsx[0m:[93m527[0m:[93m42[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m527[0m FieldBuilder.displayName = 'FieldBuilder';
+[7m   [0m [91m                                         ~[0m
+
+[96msrc/features/events/AddEventModalGraphQL.tsx[0m:[93m163[0m:[93m7[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m163[0m       </Modal>
+[7m   [0m [91m      ~~[0m
+
+[96msrc/features/events/AddEventModalGraphQL.tsx[0m:[93m165[0m:[93m1[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m165[0m const AddEventModalGraphQLMemo = memo(AddEventModalGraphQL);
+[7m   [0m [91m~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m67[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m'>' expected.
+
+[7m67[0m           <QueryClientProvider client={queryClient}>
+[7m  [0m [91m                               ~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m67[0m:[93m38[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m67[0m           <QueryClientProvider client={queryClient}>
+[7m  [0m [91m                                     ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m69[0m:[93m12[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m69[0m           </QueryClientProvider>
+[7m  [0m [91m           ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m70[0m:[93m9[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m70[0m         ),
+[7m  [0m [91m        ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m110[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m'>' expected.
+
+[7m110[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                               ~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m110[0m:[93m38[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m110[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                                     ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m112[0m:[93m12[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m112[0m           </QueryClientProvider>
+[7m   [0m [91m           ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m113[0m:[93m9[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m113[0m         ),
+[7m   [0m [91m        ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m134[0m:[93m3[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m134[0m   });
+[7m   [0m [91m  ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m134[0m:[93m4[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m134[0m   });
+[7m   [0m [91m   ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m135[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m135[0m });
+[7m   [0m [91m~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m135[0m:[93m2[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m135[0m });
+[7m   [0m [91m ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m173[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m'>' expected.
+
+[7m173[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                               ~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m173[0m:[93m38[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m173[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                                     ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m175[0m:[93m12[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m175[0m           </QueryClientProvider>
+[7m   [0m [91m           ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m176[0m:[93m9[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m176[0m         ),
+[7m   [0m [91m        ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m208[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m'>' expected.
+
+[7m208[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                               ~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m208[0m:[93m38[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m208[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                                     ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m210[0m:[93m12[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m210[0m           </QueryClientProvider>
+[7m   [0m [91m           ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m211[0m:[93m9[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m211[0m         ),
+[7m   [0m [91m        ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m225[0m:[93m3[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m225[0m   });
+[7m   [0m [91m  ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m225[0m:[93m4[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m225[0m   });
+[7m   [0m [91m   ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m226[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m226[0m });
+[7m   [0m [91m~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m226[0m:[93m2[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m226[0m });
+[7m   [0m [91m ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m430[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m'>' expected.
+
+[7m430[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                               ~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m430[0m:[93m38[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m430[0m           <QueryClientProvider client={queryClient}>
+[7m   [0m [91m                                     ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m432[0m:[93m12[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m432[0m           </QueryClientProvider>
+[7m   [0m [91m           ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m433[0m:[93m9[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m433[0m         ),
+[7m   [0m [91m        ~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m441[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m441[0m });
+[7m   [0m [91m~[0m
+
+[96msrc/features/events/hooks/useBatchOperations.test.ts[0m:[93m441[0m:[93m2[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m441[0m });
+[7m   [0m [91m ~[0m
+
+[96msrc/features/games/AddGameModalGraphQL.tsx[0m:[93m119[0m:[93m8[0m - [91merror[0m[90m TS17008: [0mJSX element 'form' has no corresponding closing tag.
+
+[7m119[0m       <form onSubmit={handleSubmit} className="add-game-form">
+[7m   [0m [91m       ~~~~[0m
+
+[96msrc/features/games/AddGameModalGraphQL.tsx[0m:[93m176[0m:[93m1[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m176[0m const AddGameModalGraphQLMemo = memo(AddGameModalGraphQL);
+[7m   [0m [91m~~~~~[0m
+
+[96msrc/features/games/AddGameModalGraphQL.tsx[0m:[93m179[0m:[93m1[0m - [91merror[0m[90m TS1005: [0m'}' expected.
+
+[7m179[0m 
+[7m   [0m [91m[0m
+
+  [96msrc/features/games/AddGameModalGraphQL.tsx[0m:[93m30[0m:[93m90[0m
+    [7m30[0m const AddGameModalGraphQL: React.FC<AddGameModalGraphQLProps> = ({ isOpen, onClose }) => {
+    [7m  [0m [96m                                                                                         ~[0m
+    The parser expected to find a '}' to match the '{' token here.
+
+[96msrc/features/games/GameManagementModal.tsx[0m:[93m401[0m:[93m7[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m401[0m       </Modal>
+[7m   [0m [91m      ~~[0m
+
+[96msrc/features/games/GameManagementModal.tsx[0m:[93m401[0m:[93m15[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m401[0m       </Modal>
+[7m   [0m [91m              [0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m47[0m:[93m26[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m47[0m const VirtualList = memo(&lt;T,&gt;({
+[7m  [0m [91m                         ~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m47[0m:[93m29[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m47[0m const VirtualList = memo(&lt;T,&gt;({
+[7m  [0m [91m                            ~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m47[0m:[93m32[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m47[0m const VirtualList = memo(&lt;T,&gt;({
+[7m  [0m [91m                               ~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m60[0m:[93m2[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m60[0m }: VirtualListProps&lt;T&gt;) => {
+[7m  [0m [91m ~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m60[0m:[93m29[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m60[0m }: VirtualListProps&lt;T&gt;) => {
+[7m  [0m [91m                            ~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m60[0m:[93m31[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m60[0m }: VirtualListProps&lt;T&gt;) => {
+[7m  [0m [91m                              ~~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m134[0m:[93m2[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m134[0m }) as <T>(props: VirtualListProps<T>) => React.JSX.Element;
+[7m   [0m [91m ~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m134[0m:[93m16[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m134[0m }) as <T>(props: VirtualListProps<T>) => React.JSX.Element;
+[7m   [0m [91m               ~[0m
+
+[96msrc/shared/components/VirtualList/VirtualList.tsx[0m:[93m134[0m:[93m39[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m134[0m }) as <T>(props: VirtualListProps<T>) => React.JSX.Element;
+[7m   [0m [91m                                      ~~[0m
+
+[96msrc/shared/hooks/__tests__/useGameContext.test.ts[0m:[93m22[0m:[93m28[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m22[0m   <MemoryRouter>{children}</MemoryRouter>
+[7m  [0m [91m                           ~~~~~~~~~~~~~~[0m
+
+
+Found 50 errors in 8 files.
+
+Errors  Files
+     1  src/event-builder/components/HQLPreview.tsx[90m:405[0m
+     2  src/event-builder/pages/FieldBuilder.tsx[90m:527[0m
+     2  src/features/events/AddEventModalGraphQL.tsx[90m:163[0m
+    30  src/features/events/hooks/useBatchOperations.test.ts[90m:67[0m
+     3  src/features/games/AddGameModalGraphQL.tsx[90m:119[0m
+     2  src/features/games/GameManagementModal.tsx[90m:401[0m
+     9  src/shared/components/VirtualList/VirtualList.tsx[90m:47[0m
+     1  src/shared/hooks/__tests__/useGameContext.test.ts[90m:22[0m

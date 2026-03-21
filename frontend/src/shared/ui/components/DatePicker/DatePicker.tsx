@@ -59,7 +59,7 @@ const isDateInRange = (date: Date, minDate?: Date, maxDate?: Date): boolean => {
   return true;
 };
 
-export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
+export const DatePicker = React.memo(forwardRef<DatePickerRef, DatePickerProps>(
   (
     {
       value,

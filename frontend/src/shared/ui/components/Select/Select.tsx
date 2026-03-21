@@ -34,7 +34,7 @@ type DropdownPosition = 'down' | 'up';
  * - Accessibility attributes (ARIA)
  * - React Hook Form integration
  */
-const Select = forwardRef<HTMLDivElement, SelectProps>(({
+const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
   name,
   label,
   options = [],
@@ -361,7 +361,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(({
       )}
     </div>
   );
-});
+}));
 
 // Set display name for debugging
 Select.displayName = 'Select';

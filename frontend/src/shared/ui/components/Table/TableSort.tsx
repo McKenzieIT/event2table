@@ -9,7 +9,7 @@ import { TableSortProps } from './Table.types';
  * - Descending sort
  * - Clear sort
  */
-export const TableSort = ({
+export const TableSort = React.memo(({
   direction,
   onSort,
 }: TableSortProps) => {

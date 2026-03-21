@@ -247,7 +247,7 @@ const TablePagination: React.FC<PaginationProps> = ({
 // Main Table Component
 // ============================================================================
 
-const Table = <TData extends Record<string, unknown>>({
+const Table = React.memo(<TData extends Record<string, unknown>>({
   data,
   columns,
   variant = 'default',

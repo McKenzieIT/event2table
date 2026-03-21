@@ -16,7 +16,7 @@ export interface SelectOptionProps {
  *
  * Renders a single option in the dropdown
  */
-export const SelectOption: React.FC<SelectOptionProps> = ({
+export const SelectOption = React.memo<SelectOptionProps>(({
   option,
   isSelected,
   isFocused,
@@ -69,4 +69,6 @@ export const SelectOption: React.FC<SelectOptionProps> = ({
       )}
     </div>
   );
-};
+});
+
+SelectOption.displayName = 'SelectOption';

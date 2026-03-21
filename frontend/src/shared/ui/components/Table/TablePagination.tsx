@@ -10,7 +10,7 @@ import { TablePaginationProps } from './Table.types';
  * - Quick jumper
  * - Total count display
  */
-export const TablePagination = ({
+export const TablePagination = React.memo(({
   currentPage,
   pageSize,
   total,

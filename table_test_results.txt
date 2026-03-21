@@ -1,0 +1,112 @@
+
+> dwd-generator-app-shell@1.0.0 test:unit
+> vitest run --run Table
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/linjiacong/Documents/event2table/frontend[39m
+
+[90mstderr[2m | src/shared/ui/components/Table/Table.migration.test.tsx[2m > [22m[2mTable Migration[2m > [22m[2mnew Table should render data correctly
+[22m[39mWarning: `NaN` is an invalid value for the `width` css style property.
+    at th
+    at tr
+    at thead
+    at /Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:18:6
+    at table
+    at div
+    at div
+    at Table (/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:250:3)
+
+ [31m❯[39m src/shared/ui/components/Table/Table.migration.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 68[2mms[22m[39m
+     [32m✓[39m new Table should render data correctly[32m 41[2mms[22m[39m
+[31m     [31m×[31m new Table should support virtual scrolling[39m[32m 25[2mms[22m[39m
+[90mstderr[2m | src/shared/ui/components/Table/__tests__/Table.grouping.test.tsx[2m > [22m[2mTable Column Grouping[2m > [22m[2mshould handle mixed grouped and ungrouped columns
+[22m[39mWarning: `NaN` is an invalid value for the `width` css style property.
+    at th
+    at tr
+    at thead
+    at /Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:18:6
+    at table
+    at div
+    at div
+    at Table (/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:250:3)
+
+ [32m✓[39m src/shared/ui/components/Table/__tests__/Table.grouping.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+[90mstderr[2m | src/shared/ui/components/__tests__/FormTable.integration.test.tsx[2m > [22m[2mForm + Table Integration[2m > [22m[2mForm Filtering Table Data[2m > [22m[2mshould filter table data based on form input
+[22m[39mWarning: `NaN` is an invalid value for the `width` css style property.
+    at th
+    at tr
+    at thead
+    at /Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:18:6
+    at table
+    at div
+    at div
+    at Table (/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:250:3)
+    at div
+    at FilterableTable (/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/__tests__/FormTable.integration.test.tsx:58:55)
+
+[90mstderr[2m | src/shared/ui/components/Table/__tests__/Table.performance.test.tsx[2m > [22m[2mTable Virtual Scrolling Performance[2m > [22m[2mVirtual Scrolling Enabled[2m > [22m[2mshould maintain smooth scrolling performance
+[22m[39mWarning: An update to Table inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at Table (/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:250:3)
+
+[90mstderr[2m | src/shared/ui/components/Table/__tests__/Table.performance.test.tsx[2m > [22m[2mTable Virtual Scrolling Performance[2m > [22m[2mMemory Efficiency[2m > [22m[2mshould not leak memory when scrolling through large datasets
+[22m[39mWarning: An update to Table inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at Table (/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Table/Table.tsx:250:3)
+
+ [32m✓[39m src/shared/ui/components/Table/__tests__/Table.performance.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 480[2mms[22m[39m
+[90mstderr[2m | src/shared/ui/components/__tests__/FormTable.integration.test.tsx[2m > [22m[2mForm + Table Integration[2m > [22m[2mEdge Cases[2m > [22m[2mshould handle empty table with form
+[22m[39mWarning: An update to EmptyTableWithForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at EmptyTableWithForm (/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/__tests__/FormTable.integration.test.tsx:705:69)
+
+ [32m✓[39m src/shared/ui/components/__tests__/FormTable.integration.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 564[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/shared/ui/components/Table/Table.migration.test.tsx[2m > [22mTable Migration[2m > [22mnew Table should support virtual scrolling
+[31m[1mError[22m: [2mexpect([22m[31mreceived[31m[2m).toBeInTheDocument()[22m
+
+[31mreceived[31m value must be an HTMLElement or an SVGElement.
+Received has type:  Null
+Received has value: [31mnull[31m[39m
+[36m [2m❯[22m src/shared/ui/components/Table/Table.migration.test.tsx:[2m31:59[22m[39m
+    [90m 29| [39m    )[33m;[39m
+    [90m 30| [39m    
+    [90m 31| [39m    expect(container.querySelector('[data-virtualizer]')).toBeInTheDoc…
+    [90m   | [39m                                                          [31m^[39m
+    [90m 32| [39m  })[33m;[39m
+    [90m 33| [39m})[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m29 passed[39m[22m[90m (30)[39m
+[2m   Start at [22m 18:03:18
+[2m   Duration [22m 1.49s[2m (transform 307ms, setup 584ms, import 394ms, tests 1.22s, environment 1.83s)[22m
+

@@ -20,7 +20,7 @@ export interface SelectOptionGroupProps {
  * Renders a group of options with a label
  * (Optional component for future use)
  */
-export const SelectOptionGroup: React.FC<SelectOptionGroupProps> = ({
+export const SelectOptionGroup = React.memo<SelectOptionGroupProps>(({
   label,
   options,
   selectedValues,
@@ -48,4 +48,6 @@ export const SelectOptionGroup: React.FC<SelectOptionGroupProps> = ({
       ))}
     </div>
   );
-};
+});
+
+SelectOptionGroup.displayName = 'SelectOptionGroup';

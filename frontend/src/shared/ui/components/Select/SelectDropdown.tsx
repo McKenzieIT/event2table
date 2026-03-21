@@ -25,7 +25,7 @@ export interface SelectDropdownProps {
  *
  * Renders the dropdown with search and options
  */
-export const SelectDropdown: React.FC<SelectDropdownProps> = ({
+export const SelectDropdown = React.memo<SelectDropdownProps>(({
   isOpen,
   position,
   searchable,
@@ -82,4 +82,6 @@ export const SelectDropdown: React.FC<SelectDropdownProps> = ({
       </div>
     </div>
   );
-};
+});
+
+SelectDropdown.displayName = 'SelectDropdown';

@@ -12,7 +12,7 @@ export interface SelectClearButtonProps {
  * Renders a clear button for the Select component
  * (Optional component for future use)
  */
-export const SelectClearButton: React.FC<SelectClearButtonProps> = ({
+export const SelectClearButton = React.memo<SelectClearButtonProps>(({
   onClear,
   disabled = false
 }) => {
@@ -35,4 +35,6 @@ export const SelectClearButton: React.FC<SelectClearButtonProps> = ({
       </svg>
     </button>
   );
-};
+});
+
+SelectClearButton.displayName = 'SelectClearButton';

@@ -12,7 +12,7 @@ import { TableHeaderProps, TableColumn, RowData } from './Table.types';
  * - Fixed columns
  * - Custom header rendering
  */
-export const TableHeader = <TData extends RowData>({
+export const TableHeader = React.memo(<TData extends RowData>({
   className = '',
   children,
 }: TableHeaderProps) => {
@@ -24,7 +24,7 @@ export const TableHeader = <TData extends RowData>({
  * 
  * Individual table header cell with sorting and resizing support
  */
-export const TableHead = <TData extends RowData>({
+export const TableHead = React.memo(<TData extends RowData>({
   header,
   column,
   sortable = false,

@@ -10,7 +10,7 @@ import { TableFilterProps, RowData } from './Table.types';
  * - Date filtering
  * - Number filtering
  */
-export const TableFilter = <TData extends RowData>({
+export const TableFilter = React.memo(<TData extends RowData>({
   column,
   value,
   onChange,

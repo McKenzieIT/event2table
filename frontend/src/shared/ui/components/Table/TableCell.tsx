@@ -12,7 +12,7 @@ import { TableCellProps, RowData } from './Table.types';
  * - Fixed columns
  * - Alignment
  */
-export const TableCell = <TData extends RowData, TValue = unknown>({
+export const TableCell = React.memo(<TData extends RowData, TValue = unknown>({
   className = '',
   children,
   align = 'left',

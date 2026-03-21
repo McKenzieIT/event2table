@@ -13,7 +13,7 @@ export interface SelectSearchProps {
  *
  * Renders the search input for filtering options
  */
-export const SelectSearch: React.FC<SelectSearchProps> = ({
+export const SelectSearch = React.memo<SelectSearchProps>(({
   searchTerm,
   onSearchChange,
   onSearchClick,
@@ -33,4 +33,6 @@ export const SelectSearch: React.FC<SelectSearchProps> = ({
       />
     </div>
   );
-};
+});
+
+SelectSearch.displayName = 'SelectSearch';

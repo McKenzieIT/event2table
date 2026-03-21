@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   bulkDeleteEvents,
   bulkExportEvents,
@@ -28,7 +28,7 @@ interface BulkOperationsToolbarProps {
  * @param onValidateSuccess - 验证成功回调
  * @param disabled - 是否禁用
  */
-export const BulkOperationsToolbar: React.FC<BulkOperationsToolbarProps> = ({
+export const BulkOperationsToolbar = memo<BulkOperationsToolbarProps>(({
   selectedIds,
   selectedCount,
   onDeleteSuccess,
@@ -194,6 +194,8 @@ export const BulkOperationsToolbar: React.FC<BulkOperationsToolbarProps> = ({
       )}
     </>
   );
-};
+});
+
+BulkOperationsToolbar.displayName = 'BulkOperationsToolbar';
 
 export default BulkOperationsToolbar;

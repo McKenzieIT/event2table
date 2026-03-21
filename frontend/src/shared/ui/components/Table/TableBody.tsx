@@ -11,7 +11,7 @@ import { TableBodyProps } from './Table.types';
  * - Row selection
  * - Row click events
  */
-export const TableBody = <TData extends Record<string, unknown>>({
+export const TableBody = React.memo(<TData extends Record<string, unknown>>({
   className = '',
   children,
 }: TableBodyProps) => {

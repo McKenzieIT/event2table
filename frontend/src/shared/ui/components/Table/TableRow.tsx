@@ -11,7 +11,7 @@ import { TableRowProps, RowData } from './Table.types';
  * - Virtual scrolling
  * - Fixed columns
  */
-export const TableRow = <TData extends RowData>({
+export const TableRow = React.memo(<TData extends RowData>({
   className = '',
   children,
   onClick,
