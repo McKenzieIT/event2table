@@ -3,7 +3,7 @@
 > **🎯 目标**: 避免重复经验，提供集中的知识库
 > **📊 来源**: 整合了492个文档的精华经验（+46个archive报告）
 > **🔄 更新**: 持续更新，每次问题修复后立即更新
-> **📈 最新**: 2026-03-18 - 大型文档整合完成（11个文档，11843行）⭐
+> **📈 最新**: 2026-03-21 - 文档管理与代码质量经验文档创建（2个新文档，18个报告归档）⭐⭐
 > - **Entity架构经验**: 从architecture.md (2491行) 提取 → [api-design-patterns.md](./api-design-patterns.md) ⭐
 > - **TypeScript类型规范**: 从TYPESCRIPT_TYPE_STANDARDS.md (2003行) 提取 → [typescript-migration.md](./typescript-migration.md) ⭐
 > - **Chrome MCP兼容性**: 从4个Chrome MCP文档 (2861行) 提取 → [react-best-practices.md](./react-best-practices.md) ⭐
@@ -96,6 +96,20 @@
 ### API设计模式
 - [分层架构](./api-design-patterns.md#分层架构) - API → Service → Repository → Schema
 - [错误处理](./api-design-patterns.md#错误处理) - 具体可操作的错误消息
+
+### 文档管理 (2026-03-21更新) ⭐
+- [文档管理经验](./project-management.md#文档管理经验-⭐⭐⭐--p0重要) - Agent辅助分析、经验文档系统、根目录清理、完整实现原则 ⭐⭐⭐
+  - Agent辅助分析的价值（时间节省80%）
+  - 经验文档系统的威力（查找效率提升10倍）
+  - 根目录清理的重要性（减少94.6%）
+  - 完整实现原则的实践（禁止简化实现）
+
+### 代码质量改进 (2026-03-21更新) ⭐
+- [代码质量改进经验](./project-management.md#代码质量改进-⭐⭐⭐--p0重要) - 代码重复识别、通用工具模块设计、重构实施策略 ⭐⭐⭐
+  - 代码重复识别与量化（~9,500行重复代码）
+  - 后端通用工具模块（错误处理装饰器、分页、验证）
+  - 前端通用工具模块（Modal状态管理、表单验证、API错误处理）
+  - 重构实施策略（Phase 1-3，风险缓解）
 
 ---
 
