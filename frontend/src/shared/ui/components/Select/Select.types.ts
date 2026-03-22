@@ -10,8 +10,8 @@ export interface SelectProps<TFieldValues extends FieldValues = FieldValues> {
   name: FieldPath<TFieldValues>;
   label?: string;
   options: SelectOption[];
-  value?: string | number;
-  onChange?: (value: string | number) => void;
+  value?: string | number | (string | number)[];
+  onChange?: (value: string | number | (string | number)[]) => void;
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
@@ -21,6 +21,6 @@ export interface SelectProps<TFieldValues extends FieldValues = FieldValues> {
   helperText?: string;
   className?: string;
   size?: 'small' | 'medium' | 'large';
-  control?: any;
-  rules?: any;
+  control?: unknown;
+  rules?: unknown;
 }

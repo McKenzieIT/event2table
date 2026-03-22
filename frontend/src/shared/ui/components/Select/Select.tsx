@@ -133,7 +133,7 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
         newValues = [...selectedValues, optionValue];
       }
       setSelectedValues(newValues);
-      onChange?.(newValues as any);
+      onChange?.(newValues);
       // Close dropdown after selection in multiple mode
       setIsOpen(false);
     } else {
@@ -151,7 +151,7 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
     event.stopPropagation();
     const newValues = selectedValues.filter(v => v !== optionValue);
     setSelectedValues(newValues);
-    onChange?.(newValues as any);
+    onChange?.(newValues);
   }, [selectedValues, onChange]);
 
   // Handle search term change
@@ -268,7 +268,7 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
         name={name}
         control={control}
         rules={rules}
-        render={({ field: { onChange: controllerOnChange, value: controllerValue, onBlur } }) => (
+        render={({ field: { onChange: controllerOnChange, value: controllerValue, onBlur }, fieldState: { error: fieldError } }) => (
           <div className={containerClass} ref={ref} {...props}>
             <div className={wrapperClass} ref={dropdownRef}>
               <SelectInput
@@ -309,7 +309,17 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
               />
             </div>
 
-            {/* Error message is rendered by the parent component, not here */}
+            {fieldError && (
+              <p id={`${triggerId}-error`} className="cyber-select__error" role="alert">
+                {fieldError.message}
+              </p>
+            )}
+
+            {helperText && !fieldError && (
+              <p id={`${triggerId}-helper`} className="cyber-select__helper">
+                {helperText}
+              </p>
+            )}
           </div>
         )}
       />

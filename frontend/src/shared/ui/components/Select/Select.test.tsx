@@ -378,10 +378,11 @@ describe('Select Component', () => {
     it('should validate with React Hook Form rules', async () => {
       const user = userEvent.setup();
       const TestForm = () => {
-        const { control, formState: { errors } } = useForm({
+        const { control, trigger, formState: { errors } } = useForm({
           defaultValues: {
             testField: '',
           },
+          mode: 'onBlur',
         });
 
         return (
@@ -393,9 +394,6 @@ describe('Select Component', () => {
               options={mockOptions}
               label="Test Field"
             />
-            {errors.testField && (
-              <span role="alert">{errors.testField.message}</span>
-            )}
           </form>
         );
       };
@@ -407,7 +405,7 @@ describe('Select Component', () => {
       await user.click(document.body); // Blur to trigger validation
 
       await waitFor(() => {
-        expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
+        expect(screen.getByText('This field is required')).toBeInTheDocument();
       });
     });
   });
