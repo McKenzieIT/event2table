@@ -48,7 +48,7 @@ export interface ModalProps extends BaseComponentProps {
 }
 
 /** 表格列定义 */
-export interface ColumnDef&lt;T = unknown&gt; {
+export interface ColumnDef<T = unknown> {
   key: keyof T | string;
   title: string;
   width?: number | string;
@@ -58,15 +58,14 @@ export interface ColumnDef&lt;T = unknown&gt; {
 }
 
 /** 表格属性 */
-export interface TableProps&lt;T extends { id: Id }&gt; extends BaseComponentProps {
+export interface TableProps<T extends { id: Id }> extends BaseComponentProps {
   data: T[];
-  columns: ColumnDef&lt;T&gt;[];
+  columns: ColumnDef<T>[];
   loading?: boolean;
   emptyMessage?: string;
   onRowClick?: (row: T) => void;
 }
 
-/** 表单字段定义 */
 export interface FieldDef<T = unknown> {
   name: string;
   label: string;
@@ -78,11 +77,10 @@ export interface FieldDef<T = unknown> {
   options?: Option<T>[];
   validate?: (value: T) => string | undefined;
 }
-
 /** 表单属性 */
 export interface FormProps extends BaseComponentProps {
   fields: FieldDef[];
-  initialValues?: Record&lt;string, unknown&gt;;
-  onSubmit: (values: Record&lt;string, unknown&gt;) => void | Promise&lt;void&gt;;
+  initialValues?: Record<string, unknown>;
+  onSubmit: (values: Record<string, unknown>) => void | Promise<void>;
   submitLabel?: string;
 }

@@ -35,12 +35,10 @@ import React, {
   forwardRef,
   useId,
 } from 'react';
-import type {
-  IconComponent,
-  LabeledComponentProps,
-  ChangeEventHandler,
-  FocusEventHandler,
-} from '@/types/common';
+import type { IconComponent } from '@/shared/ui/types/common';
+import type { LabeledComponentProps } from '@/shared/ui/types/common';
+import type { ChangeEventHandler } from '@/shared/ui/types/common';
+import type { FocusEventHandler } from '@/shared/ui/types/common';
 import './Input.css';
 
 /**
@@ -117,12 +115,12 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   /**
    * Blur event handler
    */
-  onBlur?: FocusEventHandler;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
 
   /**
    * Focus event handler
    */
-  onFocus?: FocusEventHandler;
+  onFocus?: FocusEventHandler<HTMLInputElement>;
 
   /**
    * Custom ID for the input (auto-generated if not provided)

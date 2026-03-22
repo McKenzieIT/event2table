@@ -16,7 +16,7 @@ export type Variant = "primary" | "secondary" | "outline" | "ghost" | "danger";
 export type Status = "idle" | "loading" | "success" | "error";
 
 /** 通用响应类型 */
-export interface ApiResponse&lt;T&gt; {
+export interface ApiResponse<T> {
   data: T;
   message: string;
   success: boolean;
@@ -46,4 +46,29 @@ export interface Option<T = unknown> {
   value: T;
   label: string;
   disabled?: boolean;
+}
+
+/** 图标组件类型 */
+export type IconComponent = React.ComponentType<{ className?: string }>;
+
+
+/** 鼠标事件处理器类型 */
+export type MouseEventHandler = (event: React.MouseEvent) => void;
+
+/** 变更事件处理器类型 */
+export type ChangeEventHandler<T = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> = (
+  event: React.ChangeEvent<T>
+) => void;
+
+/** 焦点事件处理器类型 */
+export type FocusEventHandler<T = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> = (
+  event: React.FocusEvent<T>
+) => void;
+
+/** 带标签的组件属性 */
+export interface LabeledComponentProps extends BaseComponentProps {
+  label?: string;
+  error?: string;
+  required?: boolean;
+  helperText?: string;
 }

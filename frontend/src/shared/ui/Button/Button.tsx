@@ -19,13 +19,9 @@
  */
 
 import React from 'react';
-import type {
-  Variant,
-  Size,
-  IconComponent,
-  BaseComponentProps,
-  MouseEventHandler,
-} from '@/types/common';
+import type { BaseComponentProps } from '@/shared/ui/types/common';
+import type { MouseEventHandler } from '@/shared/ui/types/common';
+import type { IconComponent } from '@/shared/ui/types/common';
 import './Button.css';
 
 /**

@@ -135,6 +135,18 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
     }
   }, [disabled, onChange]);
 
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!disabled && event.key === 'Enter') {
+      event.preventDefault();
+      // Create a synthetic change event for Enter key
+      const syntheticEvent = {
+        target: event.target,
+        currentTarget: event.currentTarget,
+      } as React.ChangeEvent<HTMLInputElement>;
+      onChange?.(!checked, syntheticEvent);
+    }
+  }, [disabled, onChange, checked]);
+
   // PERFORMANCE: useMemo to cache CSS class computations
   // Prevents re-creation of class strings on every render
   const wrapperClass = useMemo(() => {
@@ -169,6 +181,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
           checked={checked}
           disabled={disabled}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           aria-invalid={isInvalid}
           aria-required={required}
           className="cyber-switch-input"
