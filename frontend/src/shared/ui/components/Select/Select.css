@@ -411,11 +411,7 @@
 }
 
 /* ===== Dark Mode Support ===== */
-@media (prefers-color-scheme: dark) {
-  .cyber-select {
-    /* Already optimized for dark mode */
-  }
-}
+/* 组件已默认为深色主题，通过 data-theme 属性支持主题切换 */
 
 /* ===== Print Styles ===== */
 @media print {

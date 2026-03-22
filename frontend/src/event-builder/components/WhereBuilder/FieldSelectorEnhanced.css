@@ -139,22 +139,39 @@
   }
 }
 
-/* 暗色模式支持（可选） */
-@media (prefers-color-scheme: dark) {
-  .field-selector-enhanced {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #f1f5f9;
-  }
+/* 暗色模式支持 - 通过 data-theme 属性切换 */
+[data-theme='dark'] .field-selector-enhanced,
+.field-selector-enhanced {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
 
-  .field-selector-enhanced option {
-    color: #e2e8f0;
-  }
+[data-theme='dark'] .field-selector-enhanced option,
+.field-selector-enhanced option {
+  color: #e2e8f0;
+}
 
-  .field-selector-enhanced optgroup {
-    background-color: #0f172a;
-    color: #94a3b8;
-  }
+[data-theme='dark'] .field-selector-enhanced optgroup,
+.field-selector-enhanced optgroup {
+  background-color: #0f172a;
+  color: #94a3b8;
+}
+
+/* 亮色模式 */
+[data-theme='light'] .field-selector-enhanced {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  color: var(--where-primary);
+}
+
+[data-theme='light'] .field-selector-enhanced option {
+  color: var(--where-primary);
+}
+
+[data-theme='light'] .field-selector-enhanced optgroup {
+  background-color: #f8fafc;
+  color: var(--where-secondary);
 }
 
 /* 高对比度模式支持 */
