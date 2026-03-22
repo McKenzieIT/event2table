@@ -27,6 +27,7 @@
 - Modify: `frontend/src/shared/ui/Checkbox/Checkbox.tsx`
 - Modify: `frontend/src/shared/ui/Radio/Radio.tsx`
 - Modify: `frontend/src/shared/ui/Switch/Switch.tsx`
+- Modify: `frontend/src/shared/ui/components/Select/Select.tsx`
 
 - [ ] **Step 1: 统计当前any类型数量**
 
@@ -84,21 +85,39 @@ interface InputProps {
 
 检查Switch.tsx中的any类型，替换为具体类型
 
-- [ ] **Step 8: 运行TypeScript编译检查**
+- [ ] **Step 8: 消除Select组件any类型**
+
+检查Select.tsx中的any类型，替换为具体类型：
+
+```typescript
+// 示例：Select Props类型定义
+interface SelectProps<T = string> {
+  value: T;
+  onChange: (value: T) => void;
+  options: Array<{ label: string; value: T }>;
+  placeholder?: string;
+  disabled?: boolean;
+  error?: string;
+  multiple?: boolean;
+  className?: string;
+}
+```
+
+- [ ] **Step 10: 运行TypeScript编译检查**
 
 Run: `cd frontend && npm run type-check`
 Expected: 无类型错误
 
-- [ ] **Step 9: 运行测试确保功能正常**
+- [ ] **Step 11: 运行测试确保功能正常**
 
 Run: `cd frontend && npm test -- --run`
 Expected: 所有测试通过
 
-- [ ] **Step 10: 提交更改**
+- [ ] **Step 12: 提交更改**
 
 ```bash
-git add frontend/src/shared/ui/Button frontend/src/shared/ui/Input frontend/src/shared/ui/TextArea frontend/src/shared/ui/Checkbox frontend/src/shared/ui/Radio frontend/src/shared/ui/Switch
-git commit -m "feat(ui): eliminate any types in basic components (Button, Input, TextArea, Checkbox, Radio, Switch)"
+git add frontend/src/shared/ui/Button frontend/src/shared/ui/Input frontend/src/shared/ui/TextArea frontend/src/shared/ui/Checkbox frontend/src/shared/ui/Radio frontend/src/shared/ui/Switch frontend/src/shared/ui/components/Select
+git commit -m "feat(ui): eliminate any types in basic components (Button, Input, TextArea, Checkbox, Radio, Switch, Select)"
 ```
 
 ---
@@ -209,6 +228,11 @@ git commit -m "feat(ui): eliminate any types in business components (Modal, Card
 
 Run: `mkdir -p frontend/src/shared/ui/types`
 Expected: 目录创建成功
+
+- [ ] **Step 1.1: 检查当前any类型分布**
+
+Run: `grep -r ": any" frontend/src/shared/ui --include="*.tsx" --include="*.ts" -l | head -20`
+Expected: 列出包含any类型的文件，了解分布情况
 
 - [ ] **Step 2: 创建common.ts - 通用类型定义**
 
@@ -387,6 +411,7 @@ git push origin v1.0.0-phase1-types
 - Modify: `frontend/src/shared/ui/ErrorBoundary.tsx`
 - Modify: `frontend/src/shared/ui/CanvasErrorBoundary.tsx`
 - Create: `frontend/src/shared/ui/ErrorBoundary/types.ts`
+- Create: `frontend/src/shared/ui/ErrorBoundary/ErrorBoundary.test.tsx`
 
 - [ ] **Step 1: 创建Error Boundary类型定义**
 
@@ -587,6 +612,8 @@ git commit -m "feat(ui): add unified form validation error handling"
 
 **Files:**
 - Create: `frontend/src/shared/hooks/useErrorHandler.ts`
+- Create: `frontend/src/shared/hooks/useAsyncAction.ts`
+- Create: `frontend/src/shared/hooks/index.ts`
 - Modify: `frontend/src/shared/ui/Toast/Toast.tsx`
 
 - [ ] **Step 1: 创建useErrorHandler Hook**
@@ -1099,11 +1126,45 @@ Expected: 了解当前复杂度情况
 
 将Table组件拆分为更小的子组件：
 
+**Files:**
+- Create: `frontend/src/shared/ui/components/Table/TableHeader.tsx`
+- Create: `frontend/src/shared/ui/components/Table/TableBody.tsx`
+- Create: `frontend/src/shared/ui/components/Table/TableRow.tsx`
+- Create: `frontend/src/shared/ui/components/Table/TableFooter.tsx`
+- Modify: `frontend/src/shared/ui/components/Table/Table.tsx`
+
 ```typescript
 // frontend/src/shared/ui/components/Table/TableHeader.tsx
+export function TableHeader<T>({ columns }: { columns: ColumnDef<T>[] }) {
+  return (
+    <thead>
+      <tr>
+        {columns.map((col) => (
+          <th key={String(col.key)}>{col.title}</th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
 // frontend/src/shared/ui/components/Table/TableBody.tsx
-// frontend/src/shared/ui/components/Table/TableRow.tsx
-// frontend/src/shared/ui/components/Table/TableFooter.tsx
+export function TableBody<T extends { id: string | number }>({
+  data,
+  columns,
+  onRowClick,
+}: {
+  data: T[];
+  columns: ColumnDef<T>[];
+  onRowClick?: (row: T) => void;
+}) {
+  return (
+    <tbody>
+      {data.map((row) => (
+        <TableRow key={row.id} row={row} columns={columns} onRowClick={onRowClick} />
+      ))}
+    </tbody>
+  );
+}
 ```
 
 - [ ] **Step 3: 拆分Form组件**
