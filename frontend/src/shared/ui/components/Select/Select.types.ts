@@ -1,4 +1,5 @@
 import { FieldValues, FieldPath } from 'react-hook-form';
+import type { Size } from '@/shared/ui/types/common';
 
 export interface SelectOption {
   value: string | number;
@@ -20,7 +21,7 @@ export interface SelectProps<TFieldValues extends FieldValues = FieldValues> {
   error?: string;
   helperText?: string;
   className?: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: Size;
   control?: unknown;
   rules?: unknown;
 }
