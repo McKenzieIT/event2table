@@ -18,11 +18,13 @@
  * <Button disabled>Processing...</Button>
  */
 
-import React from 'react';
+import React, { forwardRef } from 'react';
+import './Button.css';
+import { buildCompoundClasses } from '../utils/classNames';
+import { compareButtonProps } from '../utils/memoComparators';
 import type { BaseComponentProps } from '@/shared/ui/types/common';
 import type { MouseEventHandler } from '@/shared/ui/types/common';
 import type { IconComponent } from '@/shared/ui/types/common';
-import './Button.css';
 
 /**
  * Button variant types (extended to support all used variants)
@@ -71,14 +73,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   className = '',
   ...props
 }, ref) => {
-  const buttonClass = [
+  // 使用工具函数构建 CSS 类名
+  const buttonClass = buildCompoundClasses(
     'cyber-button',
-    `cyber-button--${variant}`,
-    `cyber-button--${size}`,
-    disabled && 'cyber-button--disabled',
-    loading && 'cyber-button--loading',
+    variant,
+    size,
+    { disabled, loading },
     className
-  ].filter(Boolean).join(' ');
+  );
 
   return (
     <button
@@ -102,22 +104,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   );
 });
 
-// Memoize to prevent unnecessary re-renders
-// Only re-render if props actually change
 Button.displayName = 'Button';
 
-const MemoizedButton = React.memo(Button, (prevProps, nextProps) => {
-  // Custom comparison for better performance
-  return (
-    prevProps.variant === nextProps.variant &&
-    prevProps.size === nextProps.size &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.loading === nextProps.loading &&
-    prevProps.className === nextProps.className &&
-    prevProps.children === nextProps.children &&
-    prevProps.onClick === nextProps.onClick
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedButton = React.memo(Button, compareButtonProps);
 
 MemoizedButton.displayName = 'MemoizedButton';
 

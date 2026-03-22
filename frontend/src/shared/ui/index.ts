@@ -164,8 +164,8 @@ export { default as Pagination } from './Pagination/Pagination';
 
 // Modal exports
 export { Modal } from './components/Modal/Modal';
+export { Modal as BaseModal } from './components/Modal/Modal';
 export type { ModalProps, ModalSize, ModalAnimation, ModalVariant } from './components/Modal/Modal.types';
-
 
 // 布局组件类型导出
 export type { PaginationProps } from './Pagination/Pagination';

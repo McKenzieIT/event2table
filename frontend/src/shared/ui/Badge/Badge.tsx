@@ -7,6 +7,8 @@
 
 import React from 'react';
 import './Badge.css';
+import { buildConditionalClasses } from '../utils/classNames';
+import { compareBadgeProps } from '../utils/memoComparators';
 
 /**
  * Badge variant types
@@ -48,14 +50,12 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(({
   className = '',
   ...props
 }, ref) => {
-  const badgeClass = [
+  // 使用工具函数构建 CSS 类名
+  const badgeClass = buildConditionalClasses(
     'cyber-badge',
-    `cyber-badge--${variant}`,
-    `cyber-badge--${size}`,
-    dot && 'cyber-badge--dot',
-    pill && 'cyber-badge--pill',
-    className
-  ].filter(Boolean).join(' ');
+    { dot, pill },
+    [className, `cyber-badge--${variant}`, `cyber-badge--${size}`]
+  );
 
   return (
     <span ref={ref} className={badgeClass} {...props}>
@@ -68,17 +68,8 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(({
 
 Badge.displayName = 'Badge';
 
-// Memoize Badge - simple component with primitive props
-const MemoizedBadge = React.memo(Badge, (prevProps, nextProps) => {
-  return (
-    prevProps.variant === nextProps.variant &&
-    prevProps.size === nextProps.size &&
-    prevProps.dot === nextProps.dot &&
-    prevProps.pill === nextProps.pill &&
-    prevProps.className === nextProps.className &&
-    prevProps.children === nextProps.children
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedBadge = React.memo(Badge, compareBadgeProps);
 
 MemoizedBadge.displayName = 'MemoizedBadge';
 

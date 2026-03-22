@@ -33,6 +33,8 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo, ReactNode, KeyboardEvent, ChangeEvent } from 'react';
 import './SearchInput.css';
+import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
+import { compareSearchInputProps } from '../utils/memoComparators';
 
 /**
  * SearchInput Props Interface
@@ -78,7 +80,6 @@ function SearchInput({
     </svg>
   );
 
-  // Handle both function components and JSX elements
   const searchIcon = icon !== undefined ? icon : defaultSearchIcon;
   const renderedIcon = typeof searchIcon === 'function' ? React.createElement(searchIcon) : searchIcon;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -109,14 +110,12 @@ function SearchInput({
     };
   }, [internalValue, debounceMs, onChange]);
 
-  // 处理输入变化
   const handleChange = useCallback((newValue: string) => {
     console.log('[SearchInput] handleChange called with newValue:', newValue);
     setInternalValue(newValue);
     setShowClearButton(newValue.length > 0);
   }, []);
 
-  // 处理清除操作
   const handleClear = useCallback(() => {
     setInternalValue('');
     setShowClearButton(false);
@@ -125,7 +124,6 @@ function SearchInput({
     inputRef.current?.focus();
   }, [onClear, onChange]);
 
-  // 处理焦点变化
   const handleFocus = useCallback(() => {
     setIsFocused(true);
   }, []);
@@ -134,7 +132,6 @@ function SearchInput({
     setIsFocused(false);
   }, []);
 
-  // 处理快捷键
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
@@ -142,32 +139,21 @@ function SearchInput({
     }
   }, []);
 
-  // 同步内部value和外部value
   useEffect(() => {
     setInternalValue(value || '');
     setShowClearButton((value || '').length > 0);
   }, [value]);
 
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const wrapperClass = useMemo(() => {
-    return [
-      'search-input-wrapper',
-      disabled && 'search-input-wrapper--disabled',
-      className
-    ].filter(Boolean).join(' ');
-  }, [disabled, className]);
+  // 使用工具函数构建 CSS 类名
+  const wrapperClass = buildWrapperClasses('search-input-wrapper', {
+    disabled
+  }, [className]);
 
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const inputClass = useMemo(() => {
-    return [
-      'search-input',
-      isFocused && 'search-input--focused',
-      showClearButton && 'search-input--has-clear',
-      disabled && 'search-input--disabled'
-    ].filter(Boolean).join(' ');
-  }, [isFocused, showClearButton, disabled]);
+  const inputClass = buildConditionalClasses('search-input', {
+    focused: isFocused,
+    'has-clear': showClearButton,
+    disabled
+  });
 
   return (
     <div className={wrapperClass}>
@@ -175,7 +161,6 @@ function SearchInput({
         {renderedIcon}
       </div>
 
-      {/* 输入框 */}
       <input
         ref={inputRef}
         type="text"
@@ -192,7 +177,6 @@ function SearchInput({
         aria-describedby={!disabled ? "search-shortcut-hint" : undefined}
       />
 
-      {/* 清除按钮 */}
       {showClearButton && !disabled && (
         <button
           type="button"
@@ -204,7 +188,6 @@ function SearchInput({
         </button>
       )}
 
-      {/* 快捷键提示 */}
       {!isFocused && !disabled && (
         <div className="shortcut-hint" id="search-shortcut-hint">
           <span>⌘K</span>
@@ -214,19 +197,8 @@ function SearchInput({
   );
 }
 
-// PERFORMANCE: React.memo with custom comparison
-// Prevents re-renders when only irrelevant props change
-const MemoizedSearchInput = React.memo(SearchInput, (prevProps, nextProps) => {
-  return (
-    prevProps.value === nextProps.value &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.onChange === nextProps.onChange &&
-    prevProps.onClear === nextProps.onClear &&
-    prevProps.placeholder === nextProps.placeholder &&
-    prevProps.debounceMs === nextProps.debounceMs &&
-    prevProps.className === nextProps.className
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedSearchInput = React.memo(SearchInput, compareSearchInputProps);
 
 MemoizedSearchInput.displayName = 'MemoizedSearchInput';
 
