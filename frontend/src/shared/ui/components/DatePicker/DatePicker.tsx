@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect, useCallback, forwardRef, useMemo } 
 import { DatePickerProps, DatePickerRef } from './DatePicker.types';
 import './DatePicker.css';
 
-// Date formatting utilities
+// ============================================================================
+// Date Formatting Utilities
+// ============================================================================
+
 const formatDate = (date: Date | null, format: string = 'YYYY-MM-DD'): string => {
   if (!date) return '';
   
@@ -24,7 +27,6 @@ const parseDate = (dateString: string, format: string = 'YYYY-MM-DD'): Date | nu
   if (!dateString) return null;
   
   try {
-    // Simple parsing for YYYY-MM-DD format
     const parts = dateString.split('-');
     if (parts.length === 3) {
       const year = parseInt(parts[0], 10);
@@ -57,6 +59,107 @@ const isDateInRange = (date: Date, minDate?: Date, maxDate?: Date): boolean => {
   if (minDate && date < minDate) return false;
   if (maxDate && date > maxDate) return false;
   return true;
+};
+
+// ============================================================================
+// Calendar Day Generation - Extracted complex logic
+// ============================================================================
+
+interface CalendarDay {
+  date: Date;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  isSelected: boolean;
+  isDisabled: boolean;
+}
+
+const generateCalendarDays = (
+  viewDate: Date,
+  value: Date | null,
+  firstDayOfWeek: number,
+  minDate?: Date,
+  maxDate?: Date,
+  disableDate?: (date: Date) => boolean
+): CalendarDay[] => {
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month, firstDayOfWeek);
+  
+  const days: CalendarDay[] = [];
+  
+  // Previous month days
+  const prevMonth = month === 0 ? 11 : month - 1;
+  const prevYear = month === 0 ? year - 1 : year;
+  const daysInPrevMonth = getDaysInMonth(prevYear, prevMonth);
+  
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const date = new Date(prevYear, prevMonth, daysInPrevMonth - i);
+    days.push({
+      date,
+      isCurrentMonth: false,
+      isToday: isSameDay(date, new Date()),
+      isSelected: value ? isSameDay(date, value) : false,
+      isDisabled: !isDateInRange(date, minDate, maxDate) || (disableDate ? disableDate(date) : false),
+    });
+  }
+  
+  // Current month days
+  for (let i = 1; i <= daysInMonth; i++) {
+    const date = new Date(year, month, i);
+    days.push({
+      date,
+      isCurrentMonth: true,
+      isToday: isSameDay(date, new Date()),
+      isSelected: value ? isSameDay(date, value) : false,
+      isDisabled: !isDateInRange(date, minDate, maxDate) || (disableDate ? disableDate(date) : false),
+    });
+  }
+  
+  // Next month days
+  const nextMonth = month === 11 ? 0 : month + 1;
+  const nextYear = month === 11 ? year + 1 : year;
+  const remainingDays = 42 - days.length;
+  
+  for (let i = 1; i <= remainingDays; i++) {
+    const date = new Date(nextYear, nextMonth, i);
+    days.push({
+      date,
+      isCurrentMonth: false,
+      isToday: isSameDay(date, new Date()),
+      isSelected: value ? isSameDay(date, value) : false,
+      isDisabled: !isDateInRange(date, minDate, maxDate) || (disableDate ? disableDate(date) : false),
+    });
+  }
+  
+  return days;
+};
+
+// ============================================================================
+// Week Day Names - Extracted helper
+// ============================================================================
+
+const getWeekDayNames = (firstDayOfWeek: number): string[] => {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return Array.from({ length: 7 }, (_, i) => days[(i + firstDayOfWeek) % 7]);
+};
+
+// ============================================================================
+// Month Names - Extracted constant
+// ============================================================================
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+// ============================================================================
+// Year Range - Extracted helper
+// ============================================================================
+
+const generateYearRange = (): number[] => {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: 100 }, (_, i) => currentYear - 50 + i);
 };
 
 export const DatePicker = React.memo(forwardRef<DatePickerRef, DatePickerProps>(
@@ -213,79 +316,21 @@ export const DatePicker = React.memo(forwardRef<DatePickerRef, DatePickerProps>(
       blur: () => inputRef.current?.blur(),
     }), [handleClear]);
     
-    // Generate calendar days
+    // Generate calendar days - using extracted helper function
     const calendarDays = useMemo(() => {
-      const year = viewDate.getFullYear();
-      const month = viewDate.getMonth();
-      const daysInMonth = getDaysInMonth(year, month);
-      const firstDay = getFirstDayOfMonth(year, month, firstDayOfWeek);
-      
-      const days: Array<{ date: Date; isCurrentMonth: boolean; isToday: boolean; isSelected: boolean; isDisabled: boolean }> = [];
-      
-      // Previous month days
-      const prevMonth = month === 0 ? 11 : month - 1;
-      const prevYear = month === 0 ? year - 1 : year;
-      const daysInPrevMonth = getDaysInMonth(prevYear, prevMonth);
-      
-      for (let i = firstDay - 1; i >= 0; i--) {
-        const date = new Date(prevYear, prevMonth, daysInPrevMonth - i);
-        days.push({
-          date,
-          isCurrentMonth: false,
-          isToday: isSameDay(date, new Date()),
-          isSelected: value ? isSameDay(date, value) : false,
-          isDisabled: !isDateInRange(date, minDate, maxDate) || (disableDate ? disableDate(date) : false),
-        });
-      }
-      
-      // Current month days
-      for (let i = 1; i <= daysInMonth; i++) {
-        const date = new Date(year, month, i);
-        days.push({
-          date,
-          isCurrentMonth: true,
-          isToday: isSameDay(date, new Date()),
-          isSelected: value ? isSameDay(date, value) : false,
-          isDisabled: !isDateInRange(date, minDate, maxDate) || (disableDate ? disableDate(date) : false),
-        });
-      }
-      
-      // Next month days
-      const nextMonth = month === 11 ? 0 : month + 1;
-      const nextYear = month === 11 ? year + 1 : year;
-      const remainingDays = 42 - days.length; // 6 rows × 7 days = 42
-      
-      for (let i = 1; i <= remainingDays; i++) {
-        const date = new Date(nextYear, nextMonth, i);
-        days.push({
-          date,
-          isCurrentMonth: false,
-          isToday: isSameDay(date, new Date()),
-          isSelected: value ? isSameDay(date, value) : false,
-          isDisabled: !isDateInRange(date, minDate, maxDate) || (disableDate ? disableDate(date) : false),
-        });
-      }
-      
-      return days;
+      return generateCalendarDays(viewDate, value, firstDayOfWeek, minDate, maxDate, disableDate);
     }, [viewDate, firstDayOfWeek, value, minDate, maxDate, disableDate]);
     
-    // Week day names
+    // Week day names - using extracted helper function
     const weekDayNames = useMemo(() => {
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      return Array.from({ length: 7 }, (_, i) => days[(i + firstDayOfWeek) % 7]);
+      return getWeekDayNames(firstDayOfWeek);
     }, [firstDayOfWeek]);
     
-    // Month names
-    const monthNames = useMemo(() => [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ], []);
+    // Month names - using extracted constant
+    const monthNames = useMemo(() => MONTH_NAMES, []);
     
-    // Generate years for year selection
-    const years = useMemo(() => {
-      const currentYear = new Date().getFullYear();
-      return Array.from({ length: 100 }, (_, i) => currentYear - 50 + i);
-    }, []);
+    // Generate years for year selection - using extracted helper function
+    const years = useMemo(() => generateYearRange(), []);
     
     // Classes
     const containerClasses = [
