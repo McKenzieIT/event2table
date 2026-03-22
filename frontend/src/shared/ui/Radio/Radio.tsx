@@ -40,8 +40,10 @@
  * />
  */
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+
 import './Radio.css';
+
 import { useRadioField } from '../hooks/useToggleField';
 import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
 import { compareToggleProps } from '../utils/memoComparators';
@@ -49,7 +51,7 @@ import { compareToggleProps } from '../utils/memoComparators';
 /**
  * Props for the Radio component
  */
-export interface RadioProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
+export interface RadioProps extends Omit<ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
   /**
    * Label text displayed next to the radio button
    */
@@ -197,5 +199,5 @@ const MemoizedRadio = React.memo(Radio, compareToggleProps);
 
 MemoizedRadio.displayName = 'MemoizedRadio';
 
-export default MemoizedRadio;
+export { MemoizedRadio as Radio };
 export type { RadioProps };

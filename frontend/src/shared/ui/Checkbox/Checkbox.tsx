@@ -29,8 +29,10 @@
  * />
  */
 
-import React, { useEffect, forwardRef, useMemo } from 'react';
+import React, { useEffect, forwardRef, useMemo, type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+
 import './Checkbox.css';
+
 import { useCheckboxField } from '../hooks/useToggleField';
 import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
 import { compareCheckboxProps } from '../utils/memoComparators';
@@ -38,7 +40,7 @@ import { compareCheckboxProps } from '../utils/memoComparators';
 /**
  * Props for the Checkbox component
  */
-export interface CheckboxProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
+export interface CheckboxProps extends Omit<ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
   /**
    * Label text displayed next to the checkbox
    */
@@ -216,5 +218,5 @@ const MemoizedCheckbox = React.memo(Checkbox, compareCheckboxProps);
 
 MemoizedCheckbox.displayName = 'MemoizedCheckbox';
 
-export default MemoizedCheckbox;
+export { MemoizedCheckbox as Checkbox };
 export type { CheckboxProps };

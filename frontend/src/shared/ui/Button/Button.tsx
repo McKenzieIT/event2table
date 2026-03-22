@@ -18,13 +18,13 @@
  * <Button disabled>Processing...</Button>
  */
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, type ComponentPropsWithoutRef, type ForwardedRef } from 'react';
+
 import './Button.css';
+
 import { buildCompoundClasses } from '../utils/classNames';
 import { compareButtonProps } from '../utils/memoComparators';
-import type { BaseComponentProps } from '@/shared/ui/types/common';
-import type { MouseEventHandler } from '@/shared/ui/types/common';
-import type { IconComponent } from '@/shared/ui/types/common';
+import type { BaseComponentProps, IconComponent, MouseEventHandler } from '@/shared/ui/types/common';
 
 /**
  * Button variant types (extended to support all used variants)
@@ -46,7 +46,7 @@ type ButtonVariant =
 /**
  * Button component props - extends common base props
  */
-export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'size' | 'onClick'>, BaseComponentProps {
+export interface ButtonProps extends Omit<ComponentPropsWithoutRef<'button'>, 'size' | 'onClick'>, BaseComponentProps {
   /** Button variant */
   variant?: ButtonVariant;
   /** Button size */
@@ -112,4 +112,3 @@ const MemoizedButton = React.memo(Button, compareButtonProps);
 MemoizedButton.displayName = 'MemoizedButton';
 
 export { MemoizedButton as Button };
-export default MemoizedButton;

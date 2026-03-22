@@ -30,7 +30,14 @@
  * </Card>
  */
 
-import React, { forwardRef, ForwardRefRenderFunction, memo, HTMLAttributes, ReactNode } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  memo,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
+
 import './Card.css';
 
 /**
@@ -178,4 +185,4 @@ CardComponent.Content = CardBody;
 // Export sub-components as named exports
 export { CardHeader, CardBody, CardFooter, CardTitle };
 
-export default CardComponent;
+export { CardComponent as Card };

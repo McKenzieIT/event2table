@@ -29,8 +29,10 @@
  * />
  */
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+
 import './Switch.css';
+
 import { useSwitchField } from '../hooks/useToggleField';
 import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
 import { compareToggleProps } from '../utils/memoComparators';
@@ -38,7 +40,7 @@ import { compareToggleProps } from '../utils/memoComparators';
 /**
  * Props for the Switch component
  */
-export interface SwitchProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'type' | 'onChange'> {
+export interface SwitchProps extends Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'onChange'> {
   /**
    * Label text for the switch
    */
@@ -211,4 +213,4 @@ const MemoizedSwitch = React.memo(Switch, compareToggleProps);
 
 MemoizedSwitch.displayName = 'MemoizedSwitch';
 
-export default MemoizedSwitch;
+export { MemoizedSwitch as Switch };

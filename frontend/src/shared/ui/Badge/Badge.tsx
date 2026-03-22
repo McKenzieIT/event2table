@@ -5,8 +5,10 @@
  * Optimized with React.memo for performance
  */
 
-import React from 'react';
+import React, { type ComponentPropsWithoutRef } from 'react';
+
 import './Badge.css';
+
 import { buildConditionalClasses } from '../utils/classNames';
 import { compareBadgeProps } from '../utils/memoComparators';
 
@@ -23,7 +25,7 @@ type BadgeSize = 'sm' | 'md' | 'lg';
 /**
  * Badge component props
  */
-export interface BadgeProps extends React.ComponentPropsWithoutRef<'span'> {
+export interface BadgeProps extends ComponentPropsWithoutRef<'span'> {
   /** Badge content */
   children: React.ReactNode;
   /** Badge variant */
@@ -73,4 +75,4 @@ const MemoizedBadge = React.memo(Badge, compareBadgeProps);
 
 MemoizedBadge.displayName = 'MemoizedBadge';
 
-export default MemoizedBadge;
+export { MemoizedBadge as Badge };
