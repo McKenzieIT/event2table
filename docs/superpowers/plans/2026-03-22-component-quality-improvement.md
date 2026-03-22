@@ -223,7 +223,6 @@ git commit -m "feat(ui): eliminate any types in business components (Modal, Card
 - Create: `frontend/src/shared/ui/types/components.ts`
 - Create: `frontend/src/shared/ui/types/utils.ts`
 - Create: `frontend/src/shared/ui/types/index.ts`
-
 - [ ] **Step 1: 创建types目录**
 
 Run: `mkdir -p frontend/src/shared/ui/types`
@@ -235,7 +234,6 @@ Run: `grep -r ": any" frontend/src/shared/ui --include="*.tsx" --include="*.ts" 
 Expected: 列出包含any类型的文件，了解分布情况
 
 - [ ] **Step 2: 创建common.ts - 通用类型定义**
-
 ```typescript
 // frontend/src/shared/ui/types/common.ts
 
@@ -1301,10 +1299,17 @@ git push origin v1.0.0-phase4-quality
 - Modify: `frontend/.prettierrc`
 - Create: `.husky/pre-commit`
 
-- [ ] **Step 1: 检查当前ESLint错误数量**
+**注意:** 此任务涉及修复大量ESLint错误（2654个）和警告（1438个），工作量较大。建议分多次完成，每次处理一个模块或组件目录。
 
-Run: `cd frontend && npm run lint 2>&1 | grep -E "error|warning" | tail -5`
-Expected: 了解当前错误数量（2654个错误，1438个警告）
+- [ ] **Step 1: 检查当前ESLint错误数量和分布**
+
+Run: `cd frontend && npm run lint 2>&1 | tee /tmp/eslint-report.txt && grep -E "error|warning" /tmp/eslint-report.txt | tail -10`
+Expected: 了解当前错误数量（2654个错误，1438个警告）和分布
+
+- [ ] **Step 2: 按模块统计错误数量**
+
+Run: `cd frontend && npm run lint -- --format json 2>/dev/null | jq -r '.[] | .filePath + ": " + (.errorCount + .warningCount | tostring)' | sort -t: -k2 -rn | head -20`
+Expected: 识别错误最多的文件，优先处理
 
 - [ ] **Step 2: 修复ESLint错误（批量）**
 
@@ -1485,6 +1490,8 @@ git commit -m "ci: add quality gate workflow with coverage threshold"
 ---
 
 ### 阶段 5 验收
+
+**注意:** 此阶段预计耗时4-6小时，ESLint修复工作量较大。
 
 - [ ] **验收 1: ESLint零错误零警告**
 
@@ -1822,7 +1829,17 @@ Expected: CONTRIBUTING.md, CODING_STANDARDS.md, TESTING_GUIDE.md 存在
 Run: `ls frontend/src/shared/ui/__showcase__/`
 Expected: 每个组件都有示例
 
-- [ ] **验收 4: 创建最终版本tag**
+- [ ] **验收 4: API文档链接有效性检查**
+
+Run: `find frontend/src/shared/ui/docs -name "*.md" -exec grep -l "](./" {} \; | head -5`
+Expected: 检查相对链接是否有效
+
+- [ ] **验收 5: 示例代��语法检查**
+
+Run: `cd frontend && npx tsc --noEmit frontend/src/shared/ui/__showcase__/*.tsx 2>&1 | head -20`
+Expected: 示例代码无语法错误
+
+- [ ] **验收 6: 创建最终版本tag**
 
 ```bash
 git tag -a v1.0.0 -m "Component Quality Improvement Complete"
