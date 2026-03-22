@@ -722,25 +722,49 @@ Expected: 列出所有使用位置
 
 - [ ] **Step 3: 迁移 Modal.css**
 
+读取现有 Modal.css 文件，将 `@media (prefers-color-scheme: dark)` 内的样式迁移到使用 CSS 变量：
+
 ```css
 /* frontend/src/shared/ui/Modal/Modal.css */
-/* 替换前 */
-@media (prefers-color-scheme: dark) { ... }
+/* 迁移前示例 */
+@media (prefers-color-scheme: dark) {
+  .modal {
+    background: #1e293b;
+    color: #f8fafc;
+  }
+}
 
-/* 替换后 */
-.modal { /* 使用 CSS 变量 */ }
+/* 迁移后 */
+.modal {
+  background: var(--color-bg-secondary, #1e293b);
+  color: var(--color-text-primary, #f8fafc);
+}
 ```
+
+Run: `cat frontend/src/shared/ui/Modal/Modal.css` 查看当前实现
 
 - [ ] **Step 4: 迁移 Card.css**
 
+读取现有 Card.css 文件，将 `@media (prefers-color-scheme: dark)` 内的样式迁移到使用 CSS 变量：
+
 ```css
 /* frontend/src/shared/ui/Card/Card.css */
-/* 替换前 */
-@media (prefers-color-scheme: dark) { ... }
+/* 迁移前示例 */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+}
 
-/* 替换后 */
-.card { /* 使用 CSS 变量 */ }
+/* 迁移后 */
+.card {
+  background: var(--color-bg-secondary, #1e293b);
+  border-color: var(--color-border-default, #334155);
+}
 ```
+
+Run: `cat frontend/src/shared/ui/Card/Card.css` 查看当前实现
 
 - [ ] **Step 5: 验证迁移完成**
 
@@ -846,17 +870,340 @@ Expected: FAIL - 新测试用例失败
 
 - [ ] **Step 4: 实现 Select 增强**
 
-参考设计文档 5.3 节的完整实现，添加：
-- `mode` 属性（'default' | 'autocomplete'）
-- `allowCreate` 属性
-- `onSearch` 回调
-- `loading` 状态
-- `searchDebounce` 防抖
-- 键盘导航
+```typescript
+// frontend/src/shared/ui/Select/Select.tsx
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import debounce from 'lodash.debounce';
+import './Select.css';
+
+interface SelectOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+interface SelectProps {
+  /** 选项列表 */
+  options: SelectOption[];
+  /** 当前值 */
+  value?: string;
+  /** 值变化回调 */
+  onChange?: (value: string) => void;
+  /** 占位符 */
+  placeholder?: string;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 选择模式 */
+  mode?: 'default' | 'autocomplete';
+  /** 是否允许创建新选项 */
+  allowCreate?: boolean;
+  /** 远程搜索回调 */
+  onSearch?: (value: string) => void;
+  /** 是否正在加载 */
+  loading?: boolean;
+  /** 搜索防抖延迟（毫秒） */
+  searchDebounce?: number;
+  /** 无匹配选项时的提示 */
+  noOptionsMessage?: string;
+  /** 创建新选项回调 */
+  onCreate?: (label: string) => void;
+  /** 自定义类名 */
+  className?: string;
+}
+
+export const Select: React.FC<SelectProps> = ({
+  options,
+  value,
+  onChange,
+  placeholder = '请选择',
+  disabled = false,
+  mode = 'default',
+  allowCreate = false,
+  onSearch,
+  loading = false,
+  searchDebounce = 300,
+  noOptionsMessage = '无匹配选项',
+  onCreate,
+  className,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 防抖搜索
+  const debouncedSearch = useMemo(
+    () => debounce((val: string) => onSearch?.(val), searchDebounce),
+    [onSearch, searchDebounce]
+  );
+
+  // 清理防抖
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  // 获取当前选中项
+  const selectedOption = options.find(opt => opt.value === value);
+
+  // 过滤选项（本地搜索模式）
+  const filteredOptions = mode === 'default' && searchValue
+    ? options.filter(opt => 
+        opt.label.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    : options;
+
+  // 是否显示"创建新选项"
+  const showCreateOption = allowCreate && 
+    searchValue && 
+    !options.some(opt => opt.label === searchValue);
+
+  // 处理输入变化
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearchValue(newValue);
+    if (mode === 'autocomplete') {
+      debouncedSearch(newValue);
+    }
+  };
+
+  // 处理选项选择
+  const handleSelect = useCallback((option: SelectOption) => {
+    onChange?.(option.value);
+    setSearchValue('');
+    setIsOpen(false);
+  }, [onChange]);
+
+  // 处理创建新选项
+  const handleCreate = useCallback(() => {
+    onCreate?.(searchValue);
+    setSearchValue('');
+    setIsOpen(false);
+  }, [onCreate, searchValue]);
+
+  // 键盘导航
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(prev => 
+          prev < filteredOptions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(prev => prev > 0 ? prev - 1 : prev);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+          handleSelect(filteredOptions[highlightedIndex]);
+        } else if (showCreateOption) {
+          handleCreate();
+        }
+        break;
+      case 'Escape':
+        setIsOpen(false);
+        break;
+    }
+  };
+
+  // 点击外部关闭
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div 
+      ref={containerRef}
+      className={`select ${disabled ? 'select--disabled' : ''} ${className || ''}`}
+    >
+      {/* 输入框 */}
+      <div 
+        className="select__input-wrapper"
+        onClick={() => !disabled && setIsOpen(true)}
+      >
+        {mode === 'autocomplete' || isOpen ? (
+          <input
+            ref={inputRef}
+            type="text"
+            className="select__input"
+            value={isOpen ? searchValue : (selectedOption?.label || '')}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            disabled={disabled}
+            autoFocus={isOpen}
+          />
+        ) : (
+          <span className={`select__display ${!selectedOption ? 'select__display--placeholder' : ''}`}>
+            {selectedOption?.label || placeholder}
+          </span>
+        )}
+        
+        {/* 加载指示器 */}
+        {loading && <span className="select__loading">...</span>}
+        
+        {/* 下拉箭头 */}
+        <span className="select__arrow">{isOpen ? '▲' : '▼'}</span>
+      </div>
+
+      {/* 下拉选项 */}
+      {isOpen && (
+        <ul className="select__options" role="listbox">
+          {filteredOptions.map((opt, index) => (
+            <li
+              key={opt.value}
+              className={`select__option ${
+                index === highlightedIndex ? 'select__option--highlighted' : ''
+              } ${opt.disabled ? 'select__option--disabled' : ''}`}
+              onClick={() => !opt.disabled && handleSelect(opt)}
+              role="option"
+              aria-selected={opt.value === value}
+            >
+              {opt.label}
+            </li>
+          ))}
+          
+          {/* 创建新选项 */}
+          {showCreateOption && (
+            <li 
+              className="select__option select__option--create"
+              onClick={handleCreate}
+            >
+              创建 "{searchValue}"
+            </li>
+          )}
+          
+          {/* 无选项提示 */}
+          {!loading && filteredOptions.length === 0 && !showCreateOption && (
+            <li className="select__empty">{noOptionsMessage}</li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+};
+```
 
 - [ ] **Step 5: 创建 Select.css**
 
-参考设计文档 5.3 节的 CSS 实现。
+```css
+/* frontend/src/shared/ui/Select/Select.css */
+
+.select {
+  position: relative;
+  width: 100%;
+}
+
+.select--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select__input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  background: var(--color-bg-secondary, #1e293b);
+  border: 1px solid var(--color-border-default, #334155);
+  border-radius: var(--radius-md, 6px);
+  cursor: pointer;
+  transition: border-color var(--transition-fast, 150ms);
+}
+
+.select__input-wrapper:hover {
+  border-color: var(--color-border-focus, #3b82f6);
+}
+
+.select__input-wrapper:focus-within {
+  border-color: var(--color-border-focus, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.select__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary, #f8fafc);
+  font-size: var(--font-size-base, 1rem);
+}
+
+.select__display {
+  flex: 1;
+  color: var(--color-text-primary, #f8fafc);
+}
+
+.select__display--placeholder {
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.select__loading {
+  color: var(--color-text-muted, #94a3b8);
+  margin-right: var(--space-sm, 0.5rem);
+}
+
+.select__arrow {
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 0.75rem;
+}
+
+.select__options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  background: var(--color-bg-secondary, #1e293b);
+  border: 1px solid var(--color-border-default, #334155);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: var(--shadow-lg);
+  max-height: 256px;
+  overflow-y: auto;
+  z-index: var(--z-dropdown, 100);
+}
+
+.select__option {
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  cursor: pointer;
+  color: var(--color-text-primary, #f8fafc);
+  transition: background var(--transition-fast, 150ms);
+}
+
+.select__option:hover,
+.select__option--highlighted {
+  background: var(--color-bg-tertiary, #334155);
+}
+
+.select__option--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select__option--create {
+  color: var(--color-border-focus, #3b82f6);
+  font-style: italic;
+}
+
+.select__empty {
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  color: var(--color-text-muted, #94a3b8);
+  text-align: center;
+}
+```
 
 - [ ] **Step 6: 运行测试确认通过**
 
