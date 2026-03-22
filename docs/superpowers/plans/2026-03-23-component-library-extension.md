@@ -197,12 +197,13 @@ git commit -m "feat(tokens): add light theme variables and token mapping"
 - Create: `frontend/src/shared/ui/Theme/index.ts`
 - Create: `frontend/src/shared/ui/__tests__/ThemeProvider.test.tsx`
 
-- [ ] **Step 1: 编写 ThemeProvider 测试**
+- [ ] **Step 1: 编写 ThemeProvider 和 ThemeToggle 测试**
 
 ```typescript
 // frontend/src/shared/ui/__tests__/ThemeProvider.test.tsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, useTheme } from '../Theme/ThemeProvider';
+import { ThemeToggle } from '../Theme/ThemeToggle';
 
 const TestComponent = () => {
   const { theme, setTheme } = useTheme();
@@ -243,6 +244,30 @@ describe('ThemeProvider', () => {
     );
     fireEvent.click(screen.getByText('Light'));
     expect(localStorage.getItem('theme')).toBe('light');
+  });
+});
+
+describe('ThemeToggle', () => {
+  it('should toggle theme when clicked', () => {
+    render(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>
+    );
+    const button = screen.getByRole('button');
+    expect(button).toHaveTextContent('亮色模式');
+    fireEvent.click(button);
+    expect(button).toHaveTextContent('暗色模式');
+  });
+
+  it('should have correct aria-label', () => {
+    render(
+      <ThemeProvider defaultTheme="dark">
+        <ThemeToggle />
+      </ThemeProvider>
+    );
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-label', '切换到亮色主题');
   });
 });
 ```
@@ -381,7 +406,7 @@ export { ThemeToggle } from './ThemeToggle';
 - [ ] **Step 6: 运行测试确认通过**
 
 Run: `cd frontend && npm test -- --testPathPattern="ThemeProvider" --passWithNoTests`
-Expected: PASS - 3 tests passed
+Expected: PASS - 5 tests passed (3 ThemeProvider + 2 ThemeToggle)
 
 - [ ] **Step 7: 提交**
 
@@ -717,8 +742,37 @@ Expected: 列出所有使用位置
 
 - [ ] **Step 2: 替换 design-tokens.css 中的 prefers-color-scheme**
 
-将 `@media (prefers-color-scheme: dark)` 替换为 `:root`（暗色默认）
-将 `@media (prefers-color-scheme: light)` 替换为 `[data-theme='light']`
+**替换前示例**:
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-primary: #0f172a;
+    --color-bg-secondary: #1e293b;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f8fafc;
+  }
+}
+```
+
+**替换后**:
+```css
+/* 暗色主题（默认） */
+:root {
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+}
+
+/* 亮色主题 */
+[data-theme='light'] {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc;
+}
+```
 
 - [ ] **Step 3: 迁移 Modal.css**
 
@@ -741,7 +795,8 @@ Expected: 列出所有使用位置
 }
 ```
 
-Run: `cat frontend/src/shared/ui/Modal/Modal.css` 查看当前实现
+Run: `cat frontend/src/shared/ui/Modal/Modal.css`
+Expected: 文件中不再包含 `@media (prefers-color-scheme: dark)` 或 `@media (prefers-color-scheme: light)`
 
 - [ ] **Step 4: 迁移 Card.css**
 
@@ -764,7 +819,8 @@ Run: `cat frontend/src/shared/ui/Modal/Modal.css` 查看当前实现
 }
 ```
 
-Run: `cat frontend/src/shared/ui/Card/Card.css` 查看当前实现
+Run: `cat frontend/src/shared/ui/Card/Card.css`
+Expected: 文件中不再包含 `@media (prefers-color-scheme: dark)` 或 `@media (prefers-color-scheme: light)`
 
 - [ ] **Step 5: 验证迁移完成**
 
@@ -893,6 +949,8 @@ interface SelectProps {
   placeholder?: string;
   /** 是否禁用 */
   disabled?: boolean;
+  /** 是否允许搜索 */
+  searchable?: boolean;
   /** 选择模式 */
   mode?: 'default' | 'autocomplete';
   /** 是否允许创建新选项 */
