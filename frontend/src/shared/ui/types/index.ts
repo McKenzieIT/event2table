@@ -8,12 +8,14 @@ export type {
   SortParams,
   Id,
   OptionalId,
+  Option,
 } from "./common";
 
 export type {
   ClickHandler,
   KeyboardHandler,
   ChangeHandler,
+  FocusHandler,
   SubmitHandler,
   AsyncClickHandler,
   AsyncSubmitHandler,

@@ -40,3 +40,10 @@ export type Id = string | number;
 
 /** 可选ID类型 */
 export type OptionalId = Id | undefined | null;
+
+/** 选项类型 */
+export interface Option<T = unknown> {
+  value: T;
+  label: string;
+  disabled?: boolean;
+}

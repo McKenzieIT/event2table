@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import type { BaseComponentProps, Size, Variant, Id } from "./common";
+import type { BaseComponentProps, Size, Variant, Id, Option } from "./common";
+import type { ClickHandler, ChangeHandler, FocusHandler } from "./events";
 
 /** 按钮属性 */
 export interface ButtonProps extends BaseComponentProps {
@@ -8,7 +9,7 @@ export interface ButtonProps extends BaseComponentProps {
   disabled?: boolean;
   loading?: boolean;
   type?: "button" | "submit" | "reset";
-  onClick?: (event: React.MouseEvent) => void;
+  onClick?: ClickHandler;
 }
 
 /** 输入框属性 */
@@ -20,16 +21,16 @@ export interface InputProps extends BaseComponentProps {
   readOnly?: boolean;
   error?: string;
   type?: "text" | "password" | "email" | "number" | "tel" | "url";
-  onChange?: (event: React.ChangeEvent&lt;HTMLInputElement&gt;) => void;
-  onFocus?: (event: React.FocusEvent&lt;HTMLInputElement&gt;) => void;
-  onBlur?: (event: React.FocusEvent&lt;HTMLInputElement&gt;) => void;
+  onChange?: ChangeHandler<HTMLInputElement>;
+  onFocus?: FocusHandler<HTMLInputElement>;
+  onBlur?: FocusHandler<HTMLInputElement>;
 }
 
 /** 选择框属性 */
-export interface SelectProps&lt;T = unknown&gt; extends BaseComponentProps {
+export interface SelectProps<T = unknown> extends BaseComponentProps {
   value?: T;
   defaultValue?: T;
-  options: Array&lt;{ value: T; label: string; disabled?: boolean }&gt;;
+  options: Option<T>[];
   placeholder?: string;
   disabled?: boolean;
   error?: string;
@@ -66,7 +67,7 @@ export interface TableProps&lt;T extends { id: Id }&gt; extends BaseComponentPro
 }
 
 /** 表单字段定义 */
-export interface FieldDef&lt;T = unknown&gt; {
+export interface FieldDef<T = unknown> {
   name: string;
   label: string;
   type: "text" | "password" | "email" | "number" | "select" | "textarea" | "checkbox";
@@ -74,7 +75,7 @@ export interface FieldDef&lt;T = unknown&gt; {
   disabled?: boolean;
   placeholder?: string;
   defaultValue?: T;
-  options?: Array&lt;{ value: T; label: string }&gt;;
+  options?: Option<T>[];
   validate?: (value: T) => string | undefined;
 }
 
