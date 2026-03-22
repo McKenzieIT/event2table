@@ -39,7 +39,7 @@ Event2Table项目的前端组件库已经经过多轮优化，包括：
 | **类型安全** | ✅ TypeScript严格模式已启用，但有107处any类型 | 零any类型 |
 | **测试质量** | 覆盖率约80% | 覆盖率>90% |
 | **代码检查** | 2654个ESLint错误、1438个警告 | 零错误、零警告 |
-| **CI/CD** | ❌ 无GitHub Actions配置 | 质量门禁通过率100% |
+| **CI/CD** | ⚠️ 有GitHub Actions（6个workflow），需优化质量门禁 | 质量门禁通过率100% |
 | **代码复杂度** | 未测量 | 圈复杂度<10、代码重复率<5% |
 | **文档完整性** | API文档覆盖约60% | API文档覆盖100%、最佳实践指南完善 |
 
@@ -374,17 +374,23 @@ Event2Table项目的前端组件库已经经过多轮优化，包括：
 **范围**：
 - 整个项目
 
+**现状**：
+- ESLint配置位于`config/.eslintrc.yml`（非frontend目录）
+- Prettier配置：`config/.prettierrc`和`frontend/.prettierrc`均已存在
+- Husky未配置（无.husky目录）
+
 **任务清单**：
 1. 修复现有ESLint错误（2654个错误）
 2. 修复现有ESLint警告（1438个警告）
-3. 优化ESLint规则配置
-4. 配置Prettier规则（如不存在）
-5. 配置Husky pre-commit hooks（需新建.husky目录）
+3. 优化ESLint规则配置（`config/.eslintrc.yml`）
+4. 统一Prettier配置（合并config和frontend的配置）
+5. 配置Husky pre-commit hooks（在项目根目录新建.husky目录）
 
 **关键文件**：
-- `frontend/.eslintrc.js`（已存在，需优化）
-- `frontend/.prettierrc`（需检查是否存在）
-- `frontend/.husky/pre-commit`（需新建.husky目录）
+- `config/.eslintrc.yml`（主ESLint配置）
+- `config/.prettierrc`（主Prettier配置）
+- `frontend/.prettierrc`（前端Prettier配置）
+- `.husky/pre-commit`（新建，项目根目录）
 
 #### Subagent 2：测试覆盖率提升
 
@@ -401,22 +407,32 @@ Event2Table项目的前端组件库已经经过多轮优化，包括：
 **关键文件**：
 - 所有`__tests__`目录下的测试文件
 
-#### Subagent 3：CI/CD集成
+#### Subagent 3：CI/CD集成优化
 
 **范围**：
 - 整个项目
 
+**现状**：
+- `.github/workflows/`目录已存在
+- 现有6个workflow文件：
+  - `ci-cd.yml` - 主CI/CD流程
+  - `component-tests.yml` - 组件测试
+  - `frontend-ci.yml` - 前端CI
+  - `lighthouse-ci.yml` - Lighthouse CI
+  - `test-suite.yml` - 测试套件
+  - `README.md` - 说明文档
+
 **任务清单**：
-1. 创建.github/workflows目录（当前不存在）
-2. 配置GitHub Actions质量检查
-3. 添加质量门禁
-4. 配置自动发布
-5. 添加代码质量报告和测试报告
+1. 分析现有workflow文件的功能和覆盖范围
+2. 添加质量门禁（ESLint、测试覆盖率检查）
+3. 优化现有workflow配置
+4. 添加代码质量报告生成
+5. 配置测试报告上传
 
 **关键文件**：
-- `.github/workflows/quality-check.yml`（新建目录和文件）
-- `.github/workflows/test.yml`（新建）
-- `.github/workflows/ci.yml`（新建）
+- `.github/workflows/ci-cd.yml`（优化）
+- `.github/workflows/frontend-ci.yml`（优化）
+- `.github/workflows/quality-check.yml`（新建，添加质量门禁）
 
 **验收标准**：
 - ✅ ESLint零警告
@@ -557,7 +573,7 @@ Event2Table项目的前端组件库已经经过多轮优化，包括：
 | 指标 | 当前值 | 目标值 | 验证方法 |
 |------|-------|-------|---------|
 | pre-commit hooks | ❌ 无.husky目录 | ✅ 配置 | ls frontend/.husky/ |
-| CI/CD质量门禁 | ❌ 无.github/workflows | ✅ 配置 | ls .github/workflows/ |
+| CI/CD质量门禁 | ⚠️ 有6个workflow，无质量门禁 | ✅ 配置 | ls .github/workflows/ |
 | 自动化测试 | ✅ Vitest配置存在 | ✅ 完整配置 | CI/CD流程检查 |
 | 代码质量报告 | ❌ 未生成 | ✅ 生成 | CI/CD产物检查 |
 
