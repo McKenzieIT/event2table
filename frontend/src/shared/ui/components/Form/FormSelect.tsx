@@ -104,12 +104,17 @@ export const FormSelect = <
                   : undefined
             }
             {...field}
+            value={field.value ?? ''}
+            onChange={(e) => {
+              field.onChange(e);
+            }}
+            onBlur={field.onBlur}
             {...props}
           >
             {placeholder && (
               <option value="">{placeholder}</option>
             )}
-            {options.map((option) => (
+            {(options || []).map((option) => (
               <option
                 key={option.value}
                 value={option.value}

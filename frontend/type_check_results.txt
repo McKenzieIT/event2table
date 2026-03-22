@@ -1,0 +1,76 @@
+
+> dwd-generator-app-shell@1.0.0 type-check
+> tsc --noEmit --pretty
+
+[96msrc/analytics/pages/components/EventsList/hooks.test.ts[0m:[93m37[0m:[93m26[0m - [91merror[0m[90m TS1005: [0m'>' expected.
+
+[7m37[0m     <QueryClientProvider client={queryClient}>
+[7m  [0m [91m                         ~~~~~~[0m
+
+[96msrc/analytics/pages/components/EventsList/hooks.test.ts[0m:[93m37[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m37[0m     <QueryClientProvider client={queryClient}>
+[7m  [0m [91m                               ~[0m
+
+[96msrc/analytics/pages/components/EventsList/hooks.test.ts[0m:[93m39[0m:[93m6[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m39[0m     </QueryClientProvider>
+[7m  [0m [91m     ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/analytics/pages/components/EventsList/hooks.test.ts[0m:[93m40[0m:[93m3[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m40[0m   );
+[7m  [0m [91m  ~[0m
+
+[96msrc/analytics/pages/components/EventsList/hooks.test.ts[0m:[93m398[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m398[0m });
+[7m   [0m [91m~[0m
+
+[96msrc/analytics/pages/components/EventsList/hooks.test.ts[0m:[93m398[0m:[93m2[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m398[0m });
+[7m   [0m [91m ~[0m
+
+[96msrc/features/canvas/hooks/useEventConfigs.test.ts[0m:[93m24[0m:[93m26[0m - [91merror[0m[90m TS1005: [0m'>' expected.
+
+[7m24[0m     <QueryClientProvider client={queryClient}>
+[7m  [0m [91m                         ~~~~~~[0m
+
+[96msrc/features/canvas/hooks/useEventConfigs.test.ts[0m:[93m24[0m:[93m32[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m24[0m     <QueryClientProvider client={queryClient}>
+[7m  [0m [91m                               ~[0m
+
+[96msrc/features/canvas/hooks/useEventConfigs.test.ts[0m:[93m26[0m:[93m6[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m26[0m     </QueryClientProvider>
+[7m  [0m [91m     ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/features/canvas/hooks/useEventConfigs.test.ts[0m:[93m27[0m:[93m3[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m27[0m   );
+[7m  [0m [91m  ~[0m
+
+[96msrc/features/canvas/hooks/useEventConfigs.test.ts[0m:[93m219[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m219[0m });
+[7m   [0m [91m~[0m
+
+[96msrc/features/canvas/hooks/useEventConfigs.test.ts[0m:[93m219[0m:[93m2[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m219[0m });
+[7m   [0m [91m ~[0m
+
+[96msrc/shared/hooks/useGameContext.test.ts[0m:[93m20[0m:[93m29[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m20[0m   <BrowserRouter>{children}</BrowserRouter>
+[7m  [0m [91m                            ~~~~~~~~~~~~~~~[0m
+
+
+Found 13 errors in 3 files.
+
+Errors  Files
+     6  src/analytics/pages/components/EventsList/hooks.test.ts[90m:37[0m
+     6  src/features/canvas/hooks/useEventConfigs.test.ts[90m:24[0m
+     1  src/shared/hooks/useGameContext.test.ts[90m:20[0m

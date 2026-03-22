@@ -173,6 +173,9 @@ export const FormUpload = <
     const allFiles = [...currentFiles, ...newFiles];
     onChange(allFiles);
     
+    // Trigger validation to clear errors when files are added
+    // This is handled by React Hook Form's automatic re-validation
+    
     // If custom upload handler provided, execute it
     if (onUpload) {
       setUploadingFiles(newFiles.map(f => ({ ...f, status: 'uploading' as const })));

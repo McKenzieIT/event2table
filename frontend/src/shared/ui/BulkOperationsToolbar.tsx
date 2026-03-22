@@ -25,7 +25,7 @@ interface AsyncOperationResult {
   data?: unknown;
 }
 
-const handleAsyncOperation = async <T>(
+const handleAsyncOperation = async <T,>(
   operation: () => Promise<T>,
   setLoading: (loading: boolean) => void,
   onSuccess?: (data: T) => void,

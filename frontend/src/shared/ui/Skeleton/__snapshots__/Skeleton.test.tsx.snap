@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Skeleton Component > Memoization > should be memoized and not re-render with same props 1`] = `
+<div>
+  <div
+    class="skeleton-wrapper skeleton-inline"
+  >
+    <div
+      class="skeleton-line skeleton-animate"
+    />
+    <div
+      class="skeleton-line skeleton-animate"
+    />
+    <div
+      class="skeleton-line skeleton-animate"
+    />
+    <div
+      class="skeleton-line skeleton-animate"
+    />
+    <div
+      class="skeleton-line skeleton-animate"
+    />
+  </div>
+</div>
+`;

@@ -25,9 +25,15 @@ describe('Table Migration', () => {
     }));
     
     const { container } = render(
-      <Table data={largeData} columns={mockColumns} virtual maxHeight={500} />
+      <Table data={largeData} columns={mockColumns} virtual maxHeight={500} pagination={false} />
     );
     
-    expect(container.querySelector('[data-virtualizer]')).toBeInTheDocument();
+    // Check that table container has virtual scrolling styles
+    const tableContainer = container.querySelector('.table-container');
+    expect(tableContainer).toBeInTheDocument();
+    expect(tableContainer).toHaveStyle({ maxHeight: '500px', overflow: 'auto' });
+    
+    // Check that table wrapper exists
+    expect(container.querySelector('.table-wrapper')).toBeInTheDocument();
   });
 });

@@ -42,15 +42,13 @@ export const SEARCH_GAMES = gql`
 `;
 
 export const CREATE_GAME = gql`
-  mutation CreateGame($gid: Int!, $name: String!, $ods_db: String!) {
-    createGame(gid: $gid, name: $name, ods_db: $ods_db) {
+  mutation CreateGame($gid: Int!, $name: String!, $odsDb: String!) {
+    createGame(gid: $gid, name: $name, odsDb: $odsDb) {
       ok
       game {
-        id
         gid
         name
-        ods_db
-        createdAt
+        odsDb
       }
       errors
     }
@@ -58,15 +56,13 @@ export const CREATE_GAME = gql`
 `;
 
 export const UPDATE_GAME = gql`
-  mutation UpdateGame($gid: Int!, $name: String, $ods_db: String) {
-    updateGame(gid: $gid, name: $name, ods_db: $ods_db) {
+  mutation UpdateGame($gid: Int!, $name: String, $odsDb: String) {
+    updateGame(gid: $gid, name: $name, odsDb: $odsDb) {
       ok
       game {
-        id
         gid
         name
-        ods_db
-        updatedAt
+        odsDb
       }
       errors
     }
@@ -137,14 +133,13 @@ export const SEARCH_EVENTS = gql`
 `;
 
 export const CREATE_EVENT = gql`
-  mutation CreateEvent($game_gid: Int!, $event_name: String!, $event_name_cn: String, $category_id: Int) {
-    createEvent(game_gid: $game_gid, event_name: $event_name, event_name_cn: $event_name_cn, category_id: $category_id) {
+  mutation CreateEvent($gameGid: Int!, $eventName: String!, $eventNameCn: String!, $categoryId: Int!, $includeInCommonParams: Boolean) {
+    createEvent(gameGid: $gameGid, eventName: $eventName, eventNameCn: $eventNameCn, categoryId: $categoryId, includeInCommonParams: $includeInCommonParams) {
       ok
       event {
         id
         eventName
         eventNameCn
-        gameGid
       }
       errors
     }
@@ -152,12 +147,11 @@ export const CREATE_EVENT = gql`
 `;
 
 export const UPDATE_EVENT = gql`
-  mutation UpdateEvent($id: Int!, $event_name: String, $event_name_cn: String, $category_id: Int) {
-    updateEvent(id: $id, event_name: $event_name, event_name_cn: $event_name_cn, category_id: $category_id) {
+  mutation UpdateEvent($id: Int!, $eventNameCn: String, $categoryId: Int, $includeInCommonParams: Boolean) {
+    updateEvent(id: $id, eventNameCn: $eventNameCn, categoryId: $categoryId, includeInCommonParams: $includeInCommonParams) {
       ok
       event {
         id
-        eventName
         eventNameCn
       }
       errors
@@ -391,13 +385,12 @@ export const SEARCH_CATEGORIES = gql`
 `;
 
 export const CREATE_CATEGORY = gql`
-  mutation CreateCategory($name: String!, $description: String) {
-    createCategory(name: $name, description: $description) {
+  mutation CreateCategory($name: String!, $color: String) {
+    createCategory(name: $name, color: $color) {
       ok
       category {
         id
         name
-        description
       }
       errors
     }
@@ -405,13 +398,12 @@ export const CREATE_CATEGORY = gql`
 `;
 
 export const UPDATE_CATEGORY = gql`
-  mutation UpdateCategory($id: Int!, $name: String, $description: String) {
-    updateCategory(id: $id, name: $name, description: $description) {
+  mutation UpdateCategory($id: Int!, $name: String, $color: String) {
+    updateCategory(id: $id, name: $name, color: $color) {
       ok
       category {
         id
         name
-        description
       }
       errors
     }

@@ -106,16 +106,16 @@ vi.mock('../../hooks/useFlowExecute', () => ({
 }));
 
 vi.mock('../../api/canvasApi', () => ({
-  loadEventConfig: vi.fn(() => ({
+  loadEventConfig: vi.fn((configId: number) => ({
     success: true,
     data: {
       config: {
-        id: 1,
-        name: 'Test Config',
-        event_name: 'test_event',
+        id: configId,
+        name: `Test Config ${configId}`,
+        event_name: `test_event_${configId}`,
         fieldList: [
-          { name: 'field1', type: 'string' },
-          { name: 'field2', type: 'number' },
+          { name: `field1_${configId}`, type: 'string' },
+          { name: `field2_${configId}`, type: 'number' },
         ],
       },
     },
@@ -124,7 +124,7 @@ vi.mock('../../api/canvasApi', () => ({
 
 vi.mock('./utils/nodeConverter', () => ({
   configToReactFlowNode: (config: any, position: any) => ({
-    id: 'node-1',
+    id: `node-${config.id}-${Date.now()}-${Math.random()}`,
     type: 'event',
     position,
     data: {
@@ -312,8 +312,7 @@ describe('CanvasFlow', () => {
 
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      // Create mock drag event with proper dataTransfer implementation
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -324,23 +323,22 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
       dragEvent.clientX = 100;
       dragEvent.clientY = 100;
       
-      // Mock the target element's getBoundingClientRect
       Object.defineProperty(dragEvent, 'target', {
         value: wrapper,
         writable: false,
       });
       
-      // Ensure wrapper has getBoundingClientRect method
-      wrapper.getBoundingClientRect = vi.fn(() => ({
-        left: 0,
-        top: 0,
-      }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -355,7 +353,7 @@ describe('CanvasFlow', () => {
       // Add a node first
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -366,6 +364,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
@@ -377,7 +376,10 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -400,7 +402,7 @@ describe('CanvasFlow', () => {
       // Add a node
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -411,6 +413,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
@@ -422,7 +425,10 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -453,7 +459,7 @@ describe('CanvasFlow', () => {
       // Add a node
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -464,6 +470,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
@@ -475,7 +482,10 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -505,7 +515,8 @@ describe('CanvasFlow', () => {
       // Add two nodes
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent1 = new Event('drop', { bubbles: true }) as any;
+      // First node drop
+      const dragEvent1 = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent1.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -516,6 +527,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent1.preventDefault = vi.fn();
@@ -527,11 +539,20 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent1);
 
-      const dragEvent2 = new Event('drop', { bubbles: true }) as any;
+      // Wait for first node to appear
+      await waitFor(() => {
+        expect(screen.getByTestId('event-node')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
+      // Second node drop
+      const dragEvent2 = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent2.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -542,6 +563,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent2.preventDefault = vi.fn();
@@ -552,9 +574,15 @@ describe('CanvasFlow', () => {
         value: wrapper,
         writable: false,
       });
+      
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent2);
 
+      // Wait for both nodes to appear
       await waitFor(() => {
         expect(screen.getAllByTestId('event-node')).toHaveLength(2);
       }, { timeout: 3000 });
