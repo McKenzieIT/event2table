@@ -572,7 +572,7 @@ Event2Table项目的前端组件库已经经过多轮优化，包括：
 
 | 指标 | 当前值 | 目标值 | 验证方法 |
 |------|-------|-------|---------|
-| pre-commit hooks | ❌ 无.husky目录 | ✅ 配置 | ls frontend/.husky/ |
+| pre-commit hooks | ❌ 无.husky目录 | ✅ 配置 | ls .husky/ |
 | CI/CD质量门禁 | ⚠️ 有6个workflow，无质量门禁 | ✅ 配置 | ls .github/workflows/ |
 | 自动化测试 | ✅ Vitest配置存在 | ✅ 完整配置 | CI/CD流程检查 |
 | 代码质量报告 | ❌ 未生成 | ✅ 生成 | CI/CD产物检查 |
