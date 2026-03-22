@@ -51,6 +51,8 @@ export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button
   size?: Size;
   /** Icon component */
   icon?: IconComponent;
+  /** Loading state */
+  loading?: boolean;
   /** Click handler */
   onClick?: MouseEventHandler;
 }
@@ -61,7 +63,7 @@ export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   children,
   variant = 'primary',
-  size = 'md',
+  size = 'medium',
   disabled = false,
   loading = false,
   icon: Icon,
