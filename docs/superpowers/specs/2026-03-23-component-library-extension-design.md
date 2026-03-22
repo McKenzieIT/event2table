@@ -27,6 +27,32 @@
 - 支持远程搜索的 Select 组件
 - 预计工期：1.5 天
 
+### 1.4 成功标准
+
+| 标准 | 验收条件 | 验证方式 |
+|------|----------|----------|
+| 主题切换 | 暗色/亮色切换响应时间 < 100ms | 性能测试 |
+| 主题持久化 | 刷新页面后主题状态保持 | E2E 测试 |
+| Drawer 组件 | 所有尺寸和位置正常工作 | 单元测试 |
+| Drawer 无障碍 | 键盘导航、ARIA 属性正确 | 无障碍测试 |
+| Select 增强 | 远程搜索防抖正常，创建选项功能正常 | 单元测试 |
+| 样式迁移 | 无 `prefers-color-scheme` 遗漏 | grep 检查 |
+| 回归测试 | 所有现有功能正常 | E2E 测试 |
+
+### 1.5 依赖项
+
+| 依赖 | 版本 | 用途 | 是否已安装 |
+|------|------|------|------------|
+| lodash.debounce | ^4.17.21 | Select 搜索防抖 | 需确认 |
+| @testing-library/react | ^14.x | 组件单元测试 | 已安装 |
+| @testing-library/user-event | ^14.x | 用户交互测试 | 已安装 |
+
+**安装命令**：
+```bash
+npm install lodash.debounce
+npm install -D @types/lodash.debounce
+```
+
 ---
 
 ## 2. 架构设计
@@ -644,74 +670,339 @@ interface SelectProps {
 />
 ```
 
-### 5.3 实现要点
+### 5.3 完整实现
 
 ```typescript
-// 核心逻辑片段
-const Select: React.FC<SelectProps> = ({
+// frontend/src/shared/ui/Select/Select.tsx
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import debounce from 'lodash.debounce';
+import './Select.css';
+
+interface SelectOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+interface SelectProps {
+  /** 选项列表 */
+  options: SelectOption[];
+  /** 当前值 */
+  value?: string;
+  /** 值变化回调 */
+  onChange?: (value: string) => void;
+  /** 占位符 */
+  placeholder?: string;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 选择模式 */
+  mode?: 'default' | 'autocomplete';
+  /** 是否允许创建新选项 */
+  allowCreate?: boolean;
+  /** 远程搜索回调 */
+  onSearch?: (value: string) => void;
+  /** 是否正在加载 */
+  loading?: boolean;
+  /** 搜索防抖延迟（毫秒） */
+  searchDebounce?: number;
+  /** 无匹配选项时的提示 */
+  noOptionsMessage?: string;
+  /** 创建新选项回调 */
+  onCreate?: (label: string) => void;
+  /** 自定义类名 */
+  className?: string;
+}
+
+export const Select: React.FC<SelectProps> = ({
+  options,
+  value,
+  onChange,
+  placeholder = '请选择',
+  disabled = false,
   mode = 'default',
   allowCreate = false,
   onSearch,
-  searchDebounce = 300,
   loading = false,
+  searchDebounce = 300,
   noOptionsMessage = '无匹配选项',
-  // ...
+  onCreate,
+  className,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   // 防抖搜索
   const debouncedSearch = useMemo(
-    () => debounce((value: string) => onSearch?.(value), searchDebounce),
+    () => debounce((val: string) => onSearch?.(val), searchDebounce),
     [onSearch, searchDebounce]
   );
 
-  const handleInputChange = (value: string) => {
-    setSearchValue(value);
-    if (mode === 'autocomplete') {
-      debouncedSearch(value);
-    }
-  };
+  // 清理防抖
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  // 获取当前选中项
+  const selectedOption = options.find(opt => opt.value === value);
+
+  // 过滤选项（本地搜索模式）
+  const filteredOptions = mode === 'default' && searchValue
+    ? options.filter(opt => 
+        opt.label.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    : options;
 
   // 是否显示"创建新选项"
   const showCreateOption = allowCreate && 
     searchValue && 
     !options.some(opt => opt.label === searchValue);
 
+  // 处理输入变化
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearchValue(newValue);
+    if (mode === 'autocomplete') {
+      debouncedSearch(newValue);
+    }
+  };
+
+  // 处理选项选择
+  const handleSelect = useCallback((option: SelectOption) => {
+    onChange?.(option.value);
+    setSearchValue('');
+    setIsOpen(false);
+  }, [onChange]);
+
+  // 处理创建新选项
+  const handleCreate = useCallback(() => {
+    onCreate?.(searchValue);
+    setSearchValue('');
+    setIsOpen(false);
+  }, [onCreate, searchValue]);
+
+  // 键盘导航
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(prev => 
+          prev < filteredOptions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(prev => prev > 0 ? prev - 1 : prev);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+          handleSelect(filteredOptions[highlightedIndex]);
+        } else if (showCreateOption) {
+          handleCreate();
+        }
+        break;
+      case 'Escape':
+        setIsOpen(false);
+        break;
+    }
+  };
+
+  // 点击外部关闭
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className="select">
+    <div 
+      ref={containerRef}
+      className={`select ${disabled ? 'select--disabled' : ''} ${className || ''}`}
+    >
       {/* 输入框 */}
-      <input
-        value={searchValue}
-        onChange={(e) => handleInputChange(e.target.value)}
-        placeholder={placeholder}
-      />
-      
-      {/* 加载指示器 */}
-      {loading && <LoadingSpinner />}
-      
+      <div 
+        className="select__input-wrapper"
+        onClick={() => !disabled && setIsOpen(true)}
+      >
+        {mode === 'autocomplete' || isOpen ? (
+          <input
+            ref={inputRef}
+            type="text"
+            className="select__input"
+            value={isOpen ? searchValue : (selectedOption?.label || '')}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            disabled={disabled}
+            autoFocus={isOpen}
+          />
+        ) : (
+          <span className={`select__display ${!selectedOption ? 'select__display--placeholder' : ''}`}>
+            {selectedOption?.label || placeholder}
+          </span>
+        )}
+        
+        {/* 加载指示器 */}
+        {loading && <span className="select__loading">...</span>}
+        
+        {/* 下拉箭头 */}
+        <span className="select__arrow">{isOpen ? '▲' : '▼'}</span>
+      </div>
+
       {/* 下拉选项 */}
-      <ul className="select__options">
-        {options.map(opt => (
-          <li key={opt.value} onClick={() => handleSelect(opt)}>
-            {opt.label}
-          </li>
-        ))}
-        
-        {/* 创建新选项 */}
-        {showCreateOption && (
-          <li className="select__create" onClick={handleCreate}>
-            创建 "{searchValue}"
-          </li>
-        )}
-        
-        {/* 无选项提示 */}
-        {!loading && options.length === 0 && (
-          <li className="select__empty">{noOptionsMessage}</li>
-        )}
-      </ul>
+      {isOpen && (
+        <ul className="select__options" role="listbox">
+          {filteredOptions.map((opt, index) => (
+            <li
+              key={opt.value}
+              className={`select__option ${
+                index === highlightedIndex ? 'select__option--highlighted' : ''
+              } ${opt.disabled ? 'select__option--disabled' : ''}`}
+              onClick={() => !opt.disabled && handleSelect(opt)}
+              role="option"
+              aria-selected={opt.value === value}
+            >
+              {opt.label}
+            </li>
+          ))}
+          
+          {/* 创建新选项 */}
+          {showCreateOption && (
+            <li 
+              className="select__option select__option--create"
+              onClick={handleCreate}
+            >
+              创建 "{searchValue}"
+            </li>
+          )}
+          
+          {/* 无选项提示 */}
+          {!loading && filteredOptions.length === 0 && !showCreateOption && (
+            <li className="select__empty">{noOptionsMessage}</li>
+          )}
+        </ul>
+      )}
     </div>
   );
 };
+```
+
+```css
+/* frontend/src/shared/ui/Select/Select.css */
+
+.select {
+  position: relative;
+  width: 100%;
+}
+
+.select--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select__input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md, 6px);
+  cursor: pointer;
+  transition: border-color var(--transition-fast, 150ms);
+}
+
+.select__input-wrapper:hover {
+  border-color: var(--border-focus);
+}
+
+.select__input-wrapper:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.select__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: var(--text-base, 1rem);
+}
+
+.select__display {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.select__display--placeholder {
+  color: var(--text-muted);
+}
+
+.select__loading {
+  color: var(--text-muted);
+  margin-right: var(--space-sm, 0.5rem);
+}
+
+.select__arrow {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.select__options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: var(--shadow-lg);
+  max-height: 256px;
+  overflow-y: auto;
+  z-index: var(--z-dropdown, 100);
+}
+
+.select__option {
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background var(--transition-fast, 150ms);
+}
+
+.select__option:hover,
+.select__option--highlighted {
+  background: var(--bg-tertiary);
+}
+
+.select__option--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select__option--create {
+  color: var(--interactive-primary);
+  font-style: italic;
+}
+
+.select__empty {
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  color: var(--text-muted);
+  text-align: center;
+}
 ```
 
 ---
@@ -748,6 +1039,25 @@ const Select: React.FC<SelectProps> = ({
 3. **渐进式迁移**：新组件直接使用主令牌
 4. **向后兼容**：现有代码无需立即修改
 
+### 6.3 迁移文件清单
+
+**需要迁移 `prefers-color-scheme` 的文件**（按优先级排序）：
+
+| 优先级 | 文件路径 | 当前实现 | 迁移目标 |
+|--------|----------|----------|----------|
+| P0 | `frontend/src/styles/design-tokens.css` | `@media (prefers-color-scheme: dark)` | `:root` + `[data-theme='light']` |
+| P1 | `frontend/src/shared/ui/Modal/Modal.css` | `@media (prefers-color-scheme: dark)` | 使用 CSS 变量 |
+| P1 | `frontend/src/shared/ui/Card/Card.css` | `@media (prefers-color-scheme: dark)` | 使用 CSS 变量 |
+| P2 | `frontend/src/features/canvas/components/*.css` | 硬编码颜色值 | 使用设计令牌 |
+
+**验证命令**：
+```bash
+# 检查是否还有 prefers-color-scheme 遗漏
+grep -r "prefers-color-scheme" frontend/src --include="*.css"
+
+# 预期输出：空（所有文件已迁移）
+```
+
 ---
 
 ## 7. 实施计划
@@ -755,28 +1065,42 @@ const Select: React.FC<SelectProps> = ({
 ### 7.1 执行时间线
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ 轮次 │ 时间    │ 任务                          │ 执行方式   │
-├──────┼─────────┼────────────────────────────────┼────────────┤
-│ 1    │ 0-0.5h  │ teach-impeccable              │ 串行       │
-│      │         │ 收集设计上下文                 │            │
-├──────┼─────────┼────────────────────────────────┼────────────┤
-│ 2    │ 0.5h-4h │ 设计令牌整合                   │ 3 Subagent │
-│      │         │ 主题系统实现                   │ 并行       │
-│      │         │ Drawer 组件抽象                │            │
-├──────┼─────────┼────────────────────────────────┼────────────┤
-│ 3    │ 4h-8h   │ 组件样式迁移                   │ 串行       │
-│      │         │ prefers-color-scheme → data-theme │        │
-├──────┼─────────┼────────────────────────────────┼────────────┤
-│ 4    │ 8h-10h  │ Select 增强                   │ 串行       │
-│      │         │ autocomplete 模式              │            │
-├──────┼─────────┼────────────────────────────────┼────────────┤
-│ 5    │ 10h-12h │ 质量保证                      │ 串行       │
-│      │         │ extract → normalize → audit   │            │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 轮次 │ 时间      │ 任务                              │ 执行方式   │ 预估  │
+├──────┼───────────┼────────────────────────────────────┼────────────┼───────┤
+│ 1    │ 0-1h      │ teach-impeccable                  │ 串行       │ 1h    │
+│      │           │ 收集设计上下文                     │            │       │
+├──────┼───────────┼────────────────────────────────────┼────────────┼───────┤
+│ 2    │ 1h-5h     │ 设计令牌整合                       │ 3 Subagent │ 4h    │
+│      │           │ 主题系统实现                       │ 并行       │       │
+│      │           │ Drawer 组件抽象                    │            │       │
+│      │           │ 【每个 Subagent 独立完成一个任务】  │            │       │
+├──────┼───────────┼────────────────────────────────────┼────────────┼───────┤
+│ 3    │ 5h-9h     │ 组件样式迁移                       │ 串行       │ 4h    │
+│      │           │ prefers-color-scheme → data-theme  │            │       │
+│      │           │ 【包含迁移清单中的所有文件】        │            │       │
+├──────┼───────────┼────────────────────────────────────┼────────────┼───────┤
+│ 4    │ 9h-12h    │ Select 增强                       │ 串行       │ 3h    │
+│      │           │ autocomplete 模式                  │            │       │
+│      │           │ 【完整实现 + 单元测试】             │            │       │
+├──────┼───────────┼────────────────────────────────────┼────────────┼───────┤
+│ 5    │ 12h-14h   │ 质量保证                          │ 串行       │ 2h    │
+│      │           │ extract → normalize → audit       │            │       │
+├──────┼───────────┼────────────────────────────────────┼────────────┼───────┤
+│ 6    │ 14h-16h   │ 集成测试 + 回归验证                │ 串行       │ 2h    │
+│      │           │ E2E 测试 + 视觉回归                │            │       │
+└─────────────────────────────────────────────────────────────────────────┘
 
-总工期：约 1.5 天
+总工期：约 2 天（含缓冲时间）
 ```
+
+**Subagent 职责分配（轮次 2）**：
+
+| Subagent | 任务 | 具体职责 | 产出物 |
+|----------|------|----------|--------|
+| Agent A | 设计令牌整合 | 1. 扩展 design-tokens.css 亮色主题<br>2. 建立 event-builder-tokens.css 映射<br>3. 添加缺失的 CSS 变量 | 修改后的 CSS 文件 |
+| Agent B | 主题系统实现 | 1. 实现 ThemeProvider.tsx<br>2. 实现 ThemeToggle.tsx<br>3. 编写单元测试 | ThemeProvider + 测试 |
+| Agent C | Drawer 组件抽象 | 1. 实现 Drawer.tsx<br>2. 实现 Drawer.css<br>3. 迁移 ParameterDetailDrawer | Drawer 组件 + 迁移示例 |
 
 ### 7.2 技能使用时机
 
@@ -806,6 +1130,49 @@ const Select: React.FC<SelectProps> = ({
 | 主题切换闪烁 | 低 | 在 `<html>` 上设置 `data-theme` 属性 |
 | Drawer 动画性能 | 低 | 使用 `transform` 而非 `left/right` |
 | Select 搜索防抖 | 低 | 使用成熟的 debounce 实现 |
+
+### 8.1 回滚计划
+
+**版本控制策略**：
+1. 每个轮次完成后创建 Git 标签
+2. 保留 feature 分支直到生产验证通过
+
+**回滚步骤**：
+
+```
+场景 1：主题系统问题
+├── 回滚到标签：v-theme-before
+├── 恢复文件：
+│   ├── frontend/src/styles/design-tokens.css
+│   └── frontend/src/app/App.tsx (移除 ThemeProvider)
+└── 验证：运行 E2E 测试确认功能正常
+
+场景 2：Drawer 组件问题
+├── 回滚到标签：v-drawer-before
+├── 恢复文件：
+│   └── frontend/src/analytics/components/parameters/ParameterDetailDrawer.tsx
+└── 删除：frontend/src/shared/ui/Drawer/
+
+场景 3：Select 增强问题
+├── 回滚到标签：v-select-before
+├── 恢复文件：
+│   └── frontend/src/shared/ui/Select/
+└── 验证：运行 Select 单元测试
+```
+
+**回滚命令**：
+```bash
+# 创建标签（每个轮次完成后）
+git tag v-theme-impl round-2-complete
+
+# 回滚到特定标签
+git checkout v-theme-before
+git checkout -b rollback/theme-fix
+```
+
+**数据备份**：
+- localStorage 主题偏好：无需备份（用户可重新设置）
+- 无数据库变更
 
 ---
 
