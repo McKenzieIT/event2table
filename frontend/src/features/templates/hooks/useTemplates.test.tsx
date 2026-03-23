@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@test/test-utils';
 import { ApolloProvider } from '@apollo/client/react';
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 import { useTemplates } from '@shared/apollo/hooks';

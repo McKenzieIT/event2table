@@ -234,6 +234,7 @@
 .cyber-select-search {
   padding: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 .cyber-select-search-input {
@@ -255,6 +256,36 @@
 .cyber-select-search-input:focus {
   border-color: #00ffff;
   box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.2);
+}
+
+/* ===== Loading Indicator ===== */
+.cyber-select-search-loading {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cyber-select-spinner {
+  animation: cyber-spin 1s linear infinite;
+  color: #00ffff;
+}
+
+.cyber-select-spinner-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+}
+
+@keyframes cyber-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== Options List ===== */
@@ -298,7 +329,7 @@
   user-select: none;
 }
 
-.cyber-select-option:hover:not(.cyber-select-option--disabled) {
+.cyber-select-option:hover:not(.cyber-select-option--disabled):not(.cyber-select-option--empty):not(.cyber-select-option--loading) {
   background: rgba(0, 255, 255, 0.1);
   color: #00ffff;
   transform: translateX(0.125rem);
@@ -325,6 +356,37 @@
   text-align: center;
   color: rgba(255, 255, 255, 0.4);
   cursor: default;
+}
+
+.cyber-select-option--loading {
+  padding: 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: default;
+}
+
+.cyber-select-option--create {
+  color: #00ffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 0.25rem;
+  padding-top: 0.625rem;
+}
+
+.cyber-select-option--create:hover {
+  background: rgba(0, 255, 255, 0.15);
+}
+
+.cyber-select-create-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  background: rgba(0, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  font-weight: bold;
+  font-size: 0.875rem;
 }
 
 /* ===== Check Icon ===== */

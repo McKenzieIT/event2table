@@ -76,3 +76,4 @@ const MemoizedBadge = React.memo(Badge, compareBadgeProps);
 MemoizedBadge.displayName = 'MemoizedBadge';
 
 export { MemoizedBadge as Badge };
+export default MemoizedBadge;

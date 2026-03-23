@@ -5,8 +5,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { render, screen } from '@test/test-utils';
 import Breadcrumb, { Breadcrumb as BreadcrumbComponent } from './Breadcrumb';
 
 describe('Breadcrumb Component', () => {
@@ -17,24 +16,23 @@ describe('Breadcrumb Component', () => {
     { label: 'Product Details', active: true }
   ];
 
-  const renderWithRouter = (component: React.ReactElement) => {
-    return render(<BrowserRouter>{component}</BrowserRouter>);
-  };
+  // Note: render from @test/test-utils already wraps with AllProviders (includes BrowserRouter)
+  // No need for manual BrowserRouter wrapper
 
   describe('Rendering', () => {
     it('should render breadcrumb navigation', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
+      render(<BreadcrumbComponent items={mockItems} />);
       expect(screen.getByRole('navigation')).toBeInTheDocument();
     });
 
     it('should render breadcrumb label', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
+      render(<BreadcrumbComponent items={mockItems} />);
       expect(screen.getByLabelText('面包屑导航')).toBeInTheDocument();
     });
 
     it('should render all breadcrumb items', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       expect(screen.getByText('Home')).toBeInTheDocument();
       expect(screen.getByText('Products')).toBeInTheDocument();
       expect(screen.getByText('Category')).toBeInTheDocument();
@@ -44,31 +42,31 @@ describe('Breadcrumb Component', () => {
 
   describe('Breadcrumb Items', () => {
     it('should render links for non-active items', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const homeLink = screen.getByText('Home').closest('a');
       expect(homeLink).toBeInTheDocument();
       expect(homeLink).toHaveAttribute('href', '/');
     });
 
     it('should not render link for active item', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const activeItem = screen.getByText('Product Details');
       expect(activeItem.closest('a')).not.toBeInTheDocument();
       expect(activeItem).toHaveClass('breadcrumb-current');
     });
 
     it('should render active item with active class', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const activeItem = screen.getByText('Product Details');
       expect(activeItem).toHaveClass('breadcrumb-current');
     });
 
     it('should render non-active items as links', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const links = screen.getAllByRole('link');
       expect(links).toHaveLength(3); // Home, Products, Category
     });
@@ -79,7 +77,7 @@ describe('Breadcrumb Component', () => {
         { label: 'Page', to: '/page' }
       ];
 
-      renderWithRouter(<BreadcrumbComponent items={itemsWithoutActive} />);
+      render(<BreadcrumbComponent items={itemsWithoutActive} />);
 
       const lastItemLi = screen.getByText('Page').closest('li');
       expect(lastItemLi).toHaveClass('active');
@@ -88,30 +86,30 @@ describe('Breadcrumb Component', () => {
 
   describe('Separators', () => {
     it('should render default separator (>)', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const separators = screen.getAllByText('>');
       expect(separators).toHaveLength(3);
     });
 
     it('should render custom separator', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} separator="/" />);
-      
+      render(<BreadcrumbComponent items={mockItems} separator="/" />);
+
       const separators = screen.getAllByText('/');
       expect(separators).toHaveLength(3);
     });
 
     it('should not render separator after last item', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const activeItem = screen.getByText('Product Details');
       const parent = activeItem.parentElement;
-      
+
       expect(parent?.textContent).not.toContain('>');
     });
 
     it('should render separator between items', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
+      render(<BreadcrumbComponent items={mockItems} />);
 
       const breadcrumb = screen.getByRole('navigation');
       expect(breadcrumb.textContent).toContain('Home>Products>Category>Product Details');
@@ -121,25 +119,25 @@ describe('Breadcrumb Component', () => {
   describe('Single Item', () => {
     it('should render single breadcrumb item', () => {
       const singleItem = [{ label: 'Home', active: true }];
-      
-      renderWithRouter(<BreadcrumbComponent items={singleItem} />);
-      
+
+      render(<BreadcrumbComponent items={singleItem} />);
+
       expect(screen.getByText('Home')).toBeInTheDocument();
       expect(screen.getByText('Home')).toHaveClass('breadcrumb-current');
     });
 
     it('should not render separator for single item', () => {
       const singleItem = [{ label: 'Home', active: true }];
-      
-      renderWithRouter(<BreadcrumbComponent items={singleItem} />);
-      
+
+      render(<BreadcrumbComponent items={singleItem} />);
+
       expect(screen.queryByText('>')).not.toBeInTheDocument();
     });
   });
 
   describe('Empty Items', () => {
     it('should render empty breadcrumb when items is empty', () => {
-      const { container } = renderWithRouter(<BreadcrumbComponent items={[]} />);
+      const { container } = render(<BreadcrumbComponent items={[]} />);
 
       const breadcrumbList = container.querySelector('.breadcrumb-list');
       expect(breadcrumbList).toBeInTheDocument();
@@ -153,9 +151,9 @@ describe('Breadcrumb Component', () => {
         { label: 'Section 1' },
         { label: 'Section 2', active: true }
       ];
-      
-      renderWithRouter(<BreadcrumbComponent items={itemsWithoutTo} />);
-      
+
+      render(<BreadcrumbComponent items={itemsWithoutTo} />);
+
       const section1 = screen.getByText('Section 1');
       expect(section1.closest('a')).not.toBeInTheDocument();
     });
@@ -165,50 +163,50 @@ describe('Breadcrumb Component', () => {
         { label: 'Section 1' },
         { label: 'Section 2' }
       ];
-      
-      renderWithRouter(<BreadcrumbComponent items={itemsWithoutTo} />);
-      
+
+      render(<BreadcrumbComponent items={itemsWithoutTo} />);
+
       expect(screen.getByText('>')).toBeInTheDocument();
     });
   });
 
   describe('Custom ClassName', () => {
     it('should apply custom className to breadcrumb', () => {
-      const { container } = renderWithRouter(
+      const { container } = render(
         <div className="custom-breadcrumb">
           <BreadcrumbComponent items={mockItems} />
         </div>
       );
-      
+
       expect(container.querySelector('.custom-breadcrumb')).toBeInTheDocument();
     });
   });
 
   describe('Accessibility', () => {
     it('should have proper ARIA attributes', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const nav = screen.getByRole('navigation');
       expect(nav).toHaveAttribute('aria-label', '面包屑导航');
     });
 
     it('should have ordered list structure', () => {
-      const { container } = renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      const { container } = render(<BreadcrumbComponent items={mockItems} />);
+
       expect(container.querySelector('ol')).toBeInTheDocument();
       expect(container.querySelector('.breadcrumb-list')).toBeInTheDocument();
     });
 
     it('should have list items', () => {
-      const { container } = renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      const { container } = render(<BreadcrumbComponent items={mockItems} />);
+
       const listItems = container.querySelectorAll('li');
       expect(listItems).toHaveLength(4);
     });
 
     it('should have breadcrumb-item class on list items', () => {
-      const { container } = renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      const { container } = render(<BreadcrumbComponent items={mockItems} />);
+
       const listItems = container.querySelectorAll('li');
       listItems.forEach(item => {
         expect(item).toHaveClass('breadcrumb-item');
@@ -218,11 +216,11 @@ describe('Breadcrumb Component', () => {
 
   describe('Navigation', () => {
     it('should navigate when clicking breadcrumb links', () => {
-      renderWithRouter(<BreadcrumbComponent items={mockItems} />);
-      
+      render(<BreadcrumbComponent items={mockItems} />);
+
       const homeLink = screen.getByText('Home').closest('a');
       expect(homeLink).toHaveAttribute('href', '/');
-      
+
       const productsLink = screen.getByText('Products').closest('a');
       expect(productsLink).toHaveAttribute('href', '/products');
     });
@@ -234,7 +232,7 @@ describe('Breadcrumb Component', () => {
     });
 
     it('should render default export correctly', () => {
-      renderWithRouter(<Breadcrumb items={mockItems} />);
+      render(<Breadcrumb items={mockItems} />);
       expect(screen.getByRole('navigation')).toBeInTheDocument();
     });
   });
@@ -245,9 +243,9 @@ describe('Breadcrumb Component', () => {
         { label: 'Home & Away', to: '/' },
         { label: 'Product > Details', active: true }
       ];
-      
-      renderWithRouter(<BreadcrumbComponent items={itemsWithSpecialChars} />);
-      
+
+      render(<BreadcrumbComponent items={itemsWithSpecialChars} />);
+
       expect(screen.getByText('Home & Away')).toBeInTheDocument();
       expect(screen.getByText('Product > Details')).toBeInTheDocument();
     });
@@ -257,9 +255,9 @@ describe('Breadcrumb Component', () => {
       const itemsWithLongText = [
         { label: longText, to: '/' }
       ];
-      
-      renderWithRouter(<BreadcrumbComponent items={itemsWithLongText} />);
-      
+
+      render(<BreadcrumbComponent items={itemsWithLongText} />);
+
       expect(screen.getByText(longText)).toBeInTheDocument();
     });
   });

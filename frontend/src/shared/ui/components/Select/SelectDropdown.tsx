@@ -18,12 +18,21 @@ export interface SelectDropdownProps {
   onSelectOption: (value: string | number) => void;
   searchInputRef: React.RefObject<HTMLInputElement>;
   optionsRef: React.MutableRefObject<(HTMLDivElement | null)[]>;
+  /** Allow creating new options */
+  allowCreate?: boolean;
+  /** Callback when creating a new option */
+  onCreate?: (label: string) => void;
+  /** Custom message when no options match */
+  noOptionsMessage?: string;
+  /** Loading state for autocomplete mode */
+  loading?: boolean;
 }
 
 /**
  * SelectDropdown Component
  *
- * Renders the dropdown with search and options
+ * Renders the dropdown with search and options.
+ * Supports allowCreate for creating new options and loading state.
  */
 export const SelectDropdown = React.memo<SelectDropdownProps>(({
   isOpen,
@@ -38,7 +47,11 @@ export const SelectDropdown = React.memo<SelectDropdownProps>(({
   onSearchClick,
   onSelectOption,
   searchInputRef,
-  optionsRef
+  optionsRef,
+  allowCreate = false,
+  onCreate,
+  noOptionsMessage = 'No options found',
+  loading = false
 }) => {
   if (!isOpen) return null;
 
@@ -56,6 +69,23 @@ export const SelectDropdown = React.memo<SelectDropdownProps>(({
     return visibleIndex === focusedIndex;
   };
 
+  // Check if we should show "Create" option
+  const showCreateOption = allowCreate && searchTerm.trim() && !loading;
+  const exactMatch = filteredOptions.some(
+    opt => opt.label.toLowerCase() === searchTerm.toLowerCase()
+  );
+  const shouldShowCreate = showCreateOption && !exactMatch;
+
+  // Handle create option click
+  const handleCreate = () => {
+    if (onCreate && searchTerm.trim()) {
+      onCreate(searchTerm.trim());
+    }
+  };
+
+  // Calculate total options count for refs array
+  const totalOptions = filteredOptions.length + (shouldShowCreate ? 1 : 0);
+
   return (
     <div className={dropdownClass} role="listbox">
       {searchable && (
@@ -64,28 +94,49 @@ export const SelectDropdown = React.memo<SelectDropdownProps>(({
           onSearchChange={onSearchChange}
           onSearchClick={onSearchClick}
           searchInputRef={searchInputRef}
+          loading={loading}
         />
       )}
 
       <div className="cyber-select-options">
-        {filteredOptions.length === 0 ? (
+        {loading ? (
+          <div className="cyber-select-option cyber-select-option--loading">
+            <span className="cyber-select-spinner-text">Loading...</span>
+          </div>
+        ) : filteredOptions.length === 0 && !shouldShowCreate ? (
           <div className="cyber-select-option cyber-select-option--empty">
-            No options found
+            {noOptionsMessage}
           </div>
         ) : (
-          filteredOptions.map((option, index) => (
-            <SelectOption
-              key={option.value}
-              option={option}
-              isSelected={selectedValues.includes(option.value)}
-              isFocused={getIsFocused(option, index)}
-              multiple={multiple}
-              onClick={onSelectOption}
-              optionRef={(el) => {
-                if (el) optionsRef.current[index] = el;
-              }}
-            />
-          ))
+          <>
+            {filteredOptions.map((option, index) => (
+              <SelectOption
+                key={option.value}
+                option={option}
+                isSelected={selectedValues.includes(option.value)}
+                isFocused={getIsFocused(option, index)}
+                multiple={multiple}
+                onClick={onSelectOption}
+                optionRef={(el) => {
+                  if (el) optionsRef.current[index] = el;
+                }}
+              />
+            ))}
+            {shouldShowCreate && (
+              <div
+                className="cyber-select-option cyber-select-option--create"
+                onClick={handleCreate}
+                role="option"
+                aria-selected={false}
+                ref={(el) => {
+                  if (el) optionsRef.current[totalOptions - 1] = el;
+                }}
+              >
+                <span className="cyber-select-create-icon">+</span>
+                Create &quot;{searchTerm}&quot;
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

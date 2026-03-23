@@ -5,11 +5,153 @@
  * 提供统一的测试工具函数和包装器
  */
 
-import { ReactElement } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { ReactNode } from 'react';
+import { ApolloProvider } from '@apollo/client/react';
+import { ToastProvider } from '@shared/ui';
+import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
+import client from '@shared/apollo/client';
+import { ReactFlowWrapper } from '@/test-utils/ReactFlowWrapper';
+import { vi } from 'vitest';
+
+// ============================================================================
+// Mock Outlet Context Types
+// ============================================================================
+
+/**
+ * Mock游戏数据类型
+ * 匹配MainLayout中的GameData接口
+ */
+export interface MockGameData {
+  id: number;
+  gid: number;
+  name: string;
+  ods_db?: string;
+}
+
+/**
+ * Mock Outlet Context类型
+ * 匹配MainLayout中的OutletContextType接口
+ */
+export interface MockOutletContext {
+  currentGame: MockGameData | null;
+  setCurrentGame: (game: MockGameData) => void;
+}
+
+/**
+ * 默认mock游戏数据
+ */
+export const DEFAULT_MOCK_GAME: MockGameData = {
+  id: 1,
+  gid: 10000147,
+  name: 'Test Game',
+  ods_db: 'ieu_ods',
+};
+
+/**
+ * 创建mock游戏上下文
+ * 
+ * 用于在测试中模拟useOutletContext返回值
+ * 
+ * @param overrides - 覆盖默认值的属性
+ * @returns MockOutletContext对象
+ * 
+ * @example
+ * // 在测试文件中使用vi.mock
+ * vi.mock('react-router-dom', async () => {
+ *   const actual = await vi.importActual('react-router-dom');
+ *   return {
+ *     ...actual,
+ *     useOutletContext: () => createMockGameContext(),
+ *   };
+ * });
+ * 
+ * @example
+ * // 模拟无游戏上下文
+ * vi.mock('react-router-dom', async () => {
+ *   const actual = await vi.importActual('react-router-dom');
+ *   return {
+ *     ...actual,
+ *     useOutletContext: () => createMockGameContext({ currentGame: null }),
+ *   };
+ * });
+ */
+export function createMockGameContext(
+  overrides: Partial<MockOutletContext> = {}
+): MockOutletContext {
+  const setCurrentGame = vi.fn();
+  return {
+    currentGame: DEFAULT_MOCK_GAME,
+    setCurrentGame,
+    ...overrides,
+  };
+}
+
+/**
+ * 创建mock游戏数据
+ * @param overrides - 覆盖默认值的属性
+ * @returns MockGameData对象
+ */
+export function createMockGameData(
+  overrides: Partial<MockGameData> = {}
+): MockGameData {
+  return {
+    ...DEFAULT_MOCK_GAME,
+    ...overrides,
+  };
+}
+
+// ============================================================================
+// useOutletContext Mock Helper
+// ============================================================================
+
+/**
+ * 创建可变的useOutletContext mock
+ * 
+ * 用于需要在测试中动态修改context的场景
+ * 
+ * @returns 包含mockOutletContext函数和mock对象的对象
+ * 
+ * @example
+ * // 在测试文件顶部
+ * const { mockOutletContext, mockOutletContextFn } = createMutableOutletContext();
+ * 
+ * vi.mock('react-router-dom', async () => {
+ *   const actual = await vi.importActual('react-router-dom');
+ *   return {
+ *     ...actual,
+ *     useOutletContext: () => mockOutletContextFn(),
+ *   };
+ * });
+ * 
+ * // 在测试中修改context
+ * mockOutletContext({ currentGame: null });
+ */
+export function createMutableOutletContext() {
+  const mockFn = vi.fn();
+  
+  // 默认返回有游戏上下文
+  mockFn.mockReturnValue(createMockGameContext());
+  
+  return {
+    /** 调用mockFn获取当前context */
+    mockOutletContextFn: mockFn,
+    /** 设置新的context值 */
+    mockOutletContext: (overrides: Partial<MockOutletContext> = {}) => {
+      mockFn.mockReturnValue(createMockGameContext(overrides));
+    },
+    /** 重置为默认context */
+    resetOutletContext: () => {
+      mockFn.mockReturnValue(createMockGameContext());
+    },
+  };
+}
+
+// ============================================================================
+// Provider Components
+// ============================================================================
 
 /**
  * 创建测试用的QueryClient
@@ -41,18 +183,27 @@ interface WrapperProps {
 
 /**
  * 全局Provider包装器
+ * Provider 顺序与 main.tsx 保持一致
  */
 export function AllProviders({ 
   children, 
   queryClient = createTestQueryClient(),
-  initialRoute = '/'
+  initialRoute = '/',
 }: WrapperProps) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
       <BrowserRouter>
-        {children}
+        <ApolloProvider client={client}>
+          <QueryClientProvider client={queryClient}>
+            <ReactFlowWrapper>
+              <ToastProvider>
+                {children}
+              </ToastProvider>
+            </ReactFlowWrapper>
+          </QueryClientProvider>
+        </ApolloProvider>
       </BrowserRouter>
-    </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

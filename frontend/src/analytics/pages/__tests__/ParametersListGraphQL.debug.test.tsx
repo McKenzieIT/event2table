@@ -2,7 +2,7 @@
  * Minimal test to debug the rendering issue
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@test/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock all dependencies first

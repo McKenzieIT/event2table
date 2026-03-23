@@ -312,3 +312,4 @@ const MemoizedInput = React.memo(Input, (prevProps, nextProps) => {
 MemoizedInput.displayName = 'MemoizedInput';
 
 export { MemoizedInput as Input };
+export default MemoizedInput;

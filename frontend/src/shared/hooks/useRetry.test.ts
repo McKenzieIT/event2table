@@ -5,7 +5,7 @@
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@test/test-utils';
 import { useRetry, useAsyncRetry } from './useRetry';
 
 // Mock setTimeout 和 clearTimeout

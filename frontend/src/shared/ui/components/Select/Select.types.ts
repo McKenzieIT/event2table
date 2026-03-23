@@ -7,6 +7,9 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
+/** Select mode - default for local filtering, autocomplete for remote search */
+export type SelectMode = 'default' | 'autocomplete';
+
 export interface SelectProps<TFieldValues extends FieldValues = FieldValues> {
   name: FieldPath<TFieldValues>;
   label?: string;
@@ -24,4 +27,18 @@ export interface SelectProps<TFieldValues extends FieldValues = FieldValues> {
   size?: Size;
   control?: unknown;
   rules?: unknown;
+  /** Select mode - 'default' for local filtering, 'autocomplete' for remote search */
+  mode?: SelectMode;
+  /** Allow creating new options (only for single select) */
+  allowCreate?: boolean;
+  /** Callback when searching (for autocomplete mode) */
+  onSearch?: (searchTerm: string) => void;
+  /** Callback when creating a new option */
+  onCreate?: (label: string) => void;
+  /** Loading state (for autocomplete mode) */
+  loading?: boolean;
+  /** Debounce delay for search in milliseconds (default: 300) */
+  searchDebounce?: number;
+  /** Custom message when no options match */
+  noOptionsMessage?: string;
 }

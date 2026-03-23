@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { renderHook, act } from '@test/test-utils';
 import { useGameContext } from './useGameContext';
 
 // Mock useGameStore
@@ -16,9 +15,8 @@ vi.mock('@/stores/gameStore', () => ({
 // Mock fetch
 global.fetch = vi.fn();
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <BrowserRouter>{children}</BrowserRouter>
-);
+// Note: renderHook from @test/test-utils already wraps with AllProviders (includes BrowserRouter)
+// No need for manual wrapper
 
 describe('useGameContext', () => {
   beforeEach(() => {
@@ -32,7 +30,7 @@ describe('useGameContext', () => {
 
   describe('initial state', () => {
     it('should initialize with null current game', () => {
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       expect(result.current.currentGame).toBeNull();
       expect(result.current.currentGameGid).toBeNull();
@@ -42,7 +40,7 @@ describe('useGameContext', () => {
 
   describe('selectGame', () => {
     it('should select game and save to localStorage', () => {
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       const game = {
         id: 1,
@@ -62,7 +60,7 @@ describe('useGameContext', () => {
 
     it('should dispatch game changed event', () => {
       const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       const game = {
         id: 1,
@@ -83,7 +81,7 @@ describe('useGameContext', () => {
 
   describe('clearGame', () => {
     it('should clear current game', () => {
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       act(() => {
         result.current.clearGame();
@@ -112,7 +110,7 @@ describe('useGameContext', () => {
 
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
       
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -137,7 +135,7 @@ describe('useGameContext', () => {
 
       window.history.pushState({}, 'Test', '/?game_id=10000147');
       
-      renderHook(() => useGameContext(), { wrapper });
+      renderHook(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -162,7 +160,7 @@ describe('useGameContext', () => {
         }),
       });
 
-      renderHook(() => useGameContext(), { wrapper });
+      renderHook(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -174,7 +172,7 @@ describe('useGameContext', () => {
       
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
       
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -199,7 +197,7 @@ describe('useGameContext', () => {
 
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
       
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -213,7 +211,7 @@ describe('useGameContext', () => {
 
   describe('game changed event', () => {
     it('should listen to game changed event', async () => {
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       const game = {
         id: 1,
@@ -232,7 +230,7 @@ describe('useGameContext', () => {
 
   describe('window.gameData', () => {
     it('should set window.gameData on select', () => {
-      const { result } = renderHook(() => useGameContext(), { wrapper });
+      const { result } = renderHook(() => useGameContext());
       
       const game = {
         id: 1,

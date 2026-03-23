@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { describe, it, expect } from 'vitest';
 import {

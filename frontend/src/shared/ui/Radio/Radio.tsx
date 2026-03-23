@@ -201,3 +201,4 @@ MemoizedRadio.displayName = 'MemoizedRadio';
 
 export { MemoizedRadio as Radio };
 export type { RadioProps };
+export default MemoizedRadio;

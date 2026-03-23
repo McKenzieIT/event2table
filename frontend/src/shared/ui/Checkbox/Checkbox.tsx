@@ -220,3 +220,4 @@ MemoizedCheckbox.displayName = 'MemoizedCheckbox';
 
 export { MemoizedCheckbox as Checkbox };
 export type { CheckboxProps };
+export default MemoizedCheckbox;

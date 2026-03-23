@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@test/test-utils';
 import { ErrorBoundary, ErrorFallback } from './ErrorBoundary';
 
 // 创建一个会抛出错误的组件

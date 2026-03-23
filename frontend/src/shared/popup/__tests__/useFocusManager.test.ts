@@ -2,7 +2,7 @@
  * useFocusManager单元测试 - 简化版
  */
 
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useFocusManager } from '../hooks/useFocusManager';
 import { PopupType } from '../ZIndexManager';

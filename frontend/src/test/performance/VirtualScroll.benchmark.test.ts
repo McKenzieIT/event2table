@@ -9,7 +9,7 @@
  * - Scroll performance: 60fps
  */
 
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@test/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 
 describe('Virtual Scrolling Performance Benchmarks', () => {

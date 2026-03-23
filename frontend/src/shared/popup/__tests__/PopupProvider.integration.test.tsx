@@ -2,7 +2,7 @@
  * PopupProvider集成测试
  */
 
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PopupProvider, usePopupContext } from '../PopupProvider';
 import { PopupType } from '../ZIndexManager';

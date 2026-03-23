@@ -341,3 +341,4 @@ const MemoizedTextArea = React.memo(TextArea, (prevProps, nextProps) => {
 MemoizedTextArea.displayName = 'MemoizedTextArea';
 
 export { MemoizedTextArea as TextArea };
+export default MemoizedTextArea;

@@ -15,6 +15,7 @@ import type { SelectProps, SelectOption } from './Select.types';
 import { SelectInput } from './SelectInput';
 import { SelectDropdown } from './SelectDropdown';
 import { filterOptions, getSelectedOptions, calculateDropdownPosition } from './Select.utils';
+import { useDebounce } from '@/shared/ui/hooks/useDebounce';
 import './Select.css';
 
 /**
@@ -33,6 +34,10 @@ type DropdownPosition = 'down' | 'up';
  * - Click outside to close
  * - Accessibility attributes (ARIA)
  * - React Hook Form integration
+ * - Autocomplete mode with remote search
+ * - Create new options
+ * - Loading state
+ * - Debounced search
  */
 const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
   name,
@@ -51,6 +56,13 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
   size = 'medium',
   control,
   rules,
+  mode = 'default',
+  allowCreate = false,
+  onSearch,
+  onCreate,
+  loading = false,
+  searchDebounce = 300,
+  noOptionsMessage = 'No options found',
   ...props
 }, ref) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -93,10 +105,33 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
     setDropdownPosition(calculateDropdownPosition(triggerRect, dropdownHeight, viewportHeight));
   }, [isOpen]);
 
+  // Debounce search term for autocomplete mode
+  const debouncedSearchTerm = useDebounce(searchTerm, searchDebounce);
+
+  // Call onSearch when debounced search term changes (autocomplete mode)
+  useEffect(() => {
+    if (mode === 'autocomplete' && onSearch && debouncedSearchTerm !== undefined) {
+      onSearch(debouncedSearchTerm);
+    }
+  }, [mode, onSearch, debouncedSearchTerm]);
+
   // Filter options based on search term
+  // In autocomplete mode, we don't filter locally - the parent controls options
   const filteredOptions = useMemo(() => {
+    if (mode === 'autocomplete') {
+      return options;
+    }
     return filterOptions(options, searchTerm, searchable);
-  }, [options, searchTerm, searchable]);
+  }, [mode, options, searchTerm, searchable]);
+
+  // Handle creating a new option
+  const handleCreateOption = useCallback((label: string) => {
+    if (onCreate && label.trim()) {
+      onCreate(label.trim());
+    }
+    setSearchTerm('');
+    setFocusedIndex(-1);
+  }, [onCreate]);
 
   // Get selected option(s) label(s)
   const selectedOptions = useMemo(() => {
@@ -306,6 +341,10 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
                 onSelectOption={handleSelectOption}
                 searchInputRef={searchInputRef}
                 optionsRef={optionsRef}
+                allowCreate={allowCreate && !multiple}
+                onCreate={handleCreateOption}
+                noOptionsMessage={noOptionsMessage}
+                loading={loading}
               />
             </div>
 
@@ -364,6 +403,10 @@ const Select = React.memo(forwardRef<HTMLDivElement, SelectProps>(({
           onSelectOption={handleSelectOption}
           searchInputRef={searchInputRef}
           optionsRef={optionsRef}
+          allowCreate={allowCreate && !multiple}
+          onCreate={handleCreateOption}
+          noOptionsMessage={noOptionsMessage}
+          loading={loading}
         />
       </div>
 

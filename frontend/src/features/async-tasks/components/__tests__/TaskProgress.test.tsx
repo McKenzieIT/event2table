@@ -2,7 +2,7 @@
  * TaskProgress Component Tests
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@test/test-utils';
 import { TaskProgress } from '../TaskProgress';
 import type { TaskStatus } from '../../api/taskApi';
 

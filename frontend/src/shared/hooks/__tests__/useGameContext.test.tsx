@@ -1,6 +1,6 @@
 // @ts-nocheck - TypeScript strict mode disabled for test files
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@test/test-utils';
 import { MemoryRouter } from 'react-router-dom';
 import { useGameContext } from '../useGameContext';
 
@@ -30,7 +30,7 @@ describe('useGameContext', () => {
 
   it('should update store when selectGame is called', () => {
     const { result } = renderHook(() => useGameContext(), { wrapper });
-    const testGame = { id: 1, gid: 10000147, name: 'Test', ods_db: 'ieu_ods' };
+    const testGame = { id: 1, gid: 10000147, name: 'Test', odsDb: 'ieu_ods' };
 
     act(() => {
       result.current.selectGame(testGame);
@@ -41,7 +41,7 @@ describe('useGameContext', () => {
 
   it('should NOT update window.gameData when selectGame is called', () => {
     const { result } = renderHook(() => useGameContext(), { wrapper });
-    const testGame = { id: 1, gid: 10000147, name: 'Test', ods_db: 'ieu_ods' };
+    const testGame = { id: 1, gid: 10000147, name: 'Test', odsDb: 'ieu_ods' };
 
     act(() => {
       result.current.selectGame(testGame);

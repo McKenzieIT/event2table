@@ -3,11 +3,13 @@
  * ParametersListGraphQL Virtual Scrolling Performance Tests
  */
 
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing';
-import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
+
+// Note: render from @test/test-utils already wraps with AllProviders (includes BrowserRouter)
+// No need for manual BrowserRouter wrapper
 
 // Global variable to control mock behavior
 let mockParamCount = 1000;
@@ -23,8 +25,8 @@ vi.mock('../ParametersListGraphQL', () => ({
             <div className="stat-label">总参数数</div>
           </div>
         </div>
-        <input 
-          placeholder="搜索参数名..." 
+        <input
+          placeholder="搜索参数名..."
           data-testid="search-input"
         />
         <div data-testid="virtual-list">
@@ -45,11 +47,7 @@ describe('ParametersListGraphQL - Virtual Scrolling Performance', () => {
   });
 
   it('should render 1000 parameters efficiently', async () => {
-    render(
-      <BrowserRouter>
-        <ParametersListGraphQL />
-      </BrowserRouter>
-    );
+    render(<ParametersListGraphQL />);
 
     await waitFor(() => {
       expect(screen.getByText(/总参数数/)).toBeInTheDocument();
@@ -60,12 +58,8 @@ describe('ParametersListGraphQL - Virtual Scrolling Performance', () => {
 
   it('should render 5000 parameters efficiently', async () => {
     mockParamCount = 5000;
-    
-    render(
-      <BrowserRouter>
-        <ParametersListGraphQL />
-      </BrowserRouter>
-    );
+
+    render(<ParametersListGraphQL />);
 
     await waitFor(() => {
       expect(screen.getByTestId('total-params')).toHaveTextContent('5000');
@@ -73,11 +67,7 @@ describe('ParametersListGraphQL - Virtual Scrolling Performance', () => {
   });
 
   it('should handle search efficiently', async () => {
-    render(
-      <BrowserRouter>
-        <ParametersListGraphQL />
-      </BrowserRouter>
-    );
+    render(<ParametersListGraphQL />);
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText('搜索参数名...')).toBeInTheDocument();
@@ -90,11 +80,7 @@ describe('ParametersListGraphQL - Virtual Scrolling Performance', () => {
   });
 
   it('should use virtual scrolling', async () => {
-    render(
-      <BrowserRouter>
-        <ParametersListGraphQL />
-      </BrowserRouter>
-    );
+    render(<ParametersListGraphQL />);
 
     await waitFor(() => {
       expect(screen.getByTestId('virtual-list')).toBeInTheDocument();
@@ -102,11 +88,7 @@ describe('ParametersListGraphQL - Virtual Scrolling Performance', () => {
   });
 
   it('should handle type filter', async () => {
-    render(
-      <BrowserRouter>
-        <ParametersListGraphQL />
-      </BrowserRouter>
-    );
+    render(<ParametersListGraphQL />);
 
     await waitFor(() => {
       expect(screen.getByTestId('type-filter')).toBeInTheDocument();
@@ -114,11 +96,7 @@ describe('ParametersListGraphQL - Virtual Scrolling Performance', () => {
   });
 
   it('should calculate statistics quickly', async () => {
-    render(
-      <BrowserRouter>
-        <ParametersListGraphQL />
-      </BrowserRouter>
-    );
+    render(<ParametersListGraphQL />);
 
     await waitFor(() => {
       expect(screen.getByTestId('total-params')).toHaveTextContent('1000');

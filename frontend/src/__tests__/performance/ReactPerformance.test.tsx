@@ -11,11 +11,23 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
+import { render, screen, waitFor, act, renderHook, createMockGameContext } from '@test/test-utils';
 import '@testing-library/jest-dom';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { performanceMonitor, usePerformanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';
 import type { CanvasComponentField } from '@features/canvas/components/types';
+
+// Mock useOutletContext for components that require game context
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useOutletContext: () => createMockGameContext(),
+    useNavigate: () => vi.fn(),
+    useParams: () => ({}),
+    useSearchParams: () => [new URLSearchParams(), vi.fn()],
+  };
+});
 
 // Mock performance API
 if (typeof globalThis.performance === 'undefined') {

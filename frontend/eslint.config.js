@@ -100,6 +100,13 @@ export default tseslint.config(
       'no-unused-vars': 'off',
       'no-hardcoded-colors/no-hardcoded-colors': 'warn',
       'basemodal-migration/use-content-class-name': 'error',
+      // 测试文件必须使用 test-utils 而非直接导入 @testing-library/react
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['@testing-library/react'],
+          message: 'Use @/test/test-utils instead for component tests. This provides automatic Provider wrapping and better test isolation.'
+        }]
+      }],
     },
     settings: {
       react: {

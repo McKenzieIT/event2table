@@ -4,10 +4,8 @@
  *
  * 测试GraphQL版本的Dashboard页面功能
  */
-
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, createMockGameContext } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing';
-import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import DashboardGraphQL from '../DashboardGraphQL';
 import { GET_GAMES } from '@shared/graphql/operations';
@@ -19,17 +17,14 @@ vi.mock('@/stores/gameStore', () => ({
   }),
 }));
 
-// Mock useOutletContext
+// Mock useOutletContext using the new unified mock approach
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useOutletContext: () => ({
-      currentGame: { gid: 1, name: 'Test Game' },
-    }),
+    useOutletContext: () => createMockGameContext(),
   };
 });
-
 const mocks = [
   {
     request: {
@@ -58,50 +53,37 @@ const mocks = [
     },
   },
 ];
-
 describe('DashboardGraphQL', () => {
   it('should render dashboard with loading state', () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <BrowserRouter>
           <DashboardGraphQL />
-        </BrowserRouter>
       </MockedProvider>
     );
-
     // 检查加载状态
     expect(screen.getByText('正在加载仪表板...')).toBeInTheDocument();
   });
-
   it('should render dashboard with games data', async () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <BrowserRouter>
           <DashboardGraphQL />
-        </BrowserRouter>
       </MockedProvider>
     );
-
     // 等待数据加载
     await waitFor(() => {
       expect(screen.getByText('Event2Table')).toBeInTheDocument();
     });
-
     // 检查统计数据
     await waitFor(() => {
       expect(screen.getByText('2')).toBeInTheDocument(); // 游戏总数
     });
   });
-
   it('should display correct statistics', async () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <BrowserRouter>
           <DashboardGraphQL />
-        </BrowserRouter>
       </MockedProvider>
     );
-
     await waitFor(() => {
       // 检查统计卡片
       expect(screen.getByText('游戏总数')).toBeInTheDocument();
@@ -109,16 +91,12 @@ describe('DashboardGraphQL', () => {
       expect(screen.getByText('参数总数')).toBeInTheDocument();
     });
   });
-
   it('should render quick actions', async () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <BrowserRouter>
           <DashboardGraphQL />
-        </BrowserRouter>
       </MockedProvider>
     );
-
     await waitFor(() => {
       expect(screen.getByText('快速操作')).toBeInTheDocument();
       expect(screen.getByText('管理游戏')).toBeInTheDocument();
@@ -127,7 +105,6 @@ describe('DashboardGraphQL', () => {
       expect(screen.getByText('流程管理')).toBeInTheDocument();
     });
   });
-
   it('should handle error state', async () => {
     const errorMocks = [
       {
@@ -138,15 +115,11 @@ describe('DashboardGraphQL', () => {
         error: new Error('Network error'),
       },
     ];
-
     render(
       <MockedProvider mocks={errorMocks} addTypename={false}>
-        <BrowserRouter>
           <DashboardGraphQL />
-        </BrowserRouter>
       </MockedProvider>
     );
-
     // 等待错误状态
     await waitFor(() => {
       expect(screen.getByText('Event2Table')).toBeInTheDocument();

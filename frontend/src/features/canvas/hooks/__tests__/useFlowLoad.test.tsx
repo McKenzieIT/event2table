@@ -5,7 +5,7 @@
  */
 
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFlowLoad } from '../useFlowLoad';
 import type { SavedFlow } from '../../types';

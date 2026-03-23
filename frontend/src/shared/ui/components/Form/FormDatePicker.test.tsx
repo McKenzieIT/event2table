@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,7 +55,8 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" />
         </TestFormWrapper>
       );
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      // Date inputs don't have role="textbox", use getByLabelText instead
+      expect(screen.getByLabelText('Birth Date')).toBeInTheDocument();
     });
 
     it('should render label', () => {
@@ -73,13 +74,15 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" />
         </TestFormWrapper>
       );
-      expect(screen.getByRole('img', { hidden: true })).toBeInTheDocument();
+      // The calendar icon is in a span with class form-datepicker-icon
+      const iconContainer = document.querySelector('.form-datepicker-icon');
+      expect(iconContainer).toBeInTheDocument();
     });
 
     it('should render helper text when provided', () => {
       render(
         <TestFormWrapper>
-          <FormDatePicker name="birthDate" helperText="Select your birth date" />
+          <FormDatePicker name="birthDate" label="Birth Date" helperText="Select your birth date" />
         </TestFormWrapper>
       );
       expect(screen.getByText('Select your birth date')).toBeInTheDocument();
@@ -97,10 +100,10 @@ describe('FormDatePicker Component', () => {
     it('should apply custom className', () => {
       render(
         <TestFormWrapper>
-          <FormDatePicker name="birthDate" className="custom-datepicker" />
+          <FormDatePicker name="birthDate" label="Birth Date" className="custom-datepicker" />
         </TestFormWrapper>
       );
-      const wrapper = screen.getByRole('textbox').closest('.form-field-wrapper');
+      const wrapper = screen.getByLabelText('Birth Date').closest('.form-field-wrapper');
       expect(wrapper).toHaveClass('custom-datepicker');
     });
   });
@@ -114,7 +117,7 @@ describe('FormDatePicker Component', () => {
         </TestFormWrapper>
       );
 
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       await user.type(input, '2024-01-15');
       expect(input).toHaveValue('2024-01-15');
     });
@@ -125,7 +128,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="meetingDate" label="Meeting Date" showTime />
         </TestFormWrapper>
       );
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Meeting Date');
       expect(input).toHaveAttribute('type', 'datetime-local');
     });
 
@@ -136,7 +139,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" />
         </TestFormWrapper>
       );
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveValue('2024-01-15');
     });
 
@@ -146,7 +149,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" />
         </TestFormWrapper>
       );
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveValue('');
     });
 
@@ -156,7 +159,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" />
         </TestFormWrapper>
       );
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveValue('');
     });
   });
@@ -168,7 +171,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" disabled />
         </TestFormWrapper>
       );
-      expect(screen.getByRole('textbox')).toBeDisabled();
+      expect(screen.getByLabelText('Birth Date')).toBeDisabled();
     });
 
     it('should respect minDate constraint', () => {
@@ -178,7 +181,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" minDate={minDate} />
         </TestFormWrapper>
       );
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveAttribute('min', '2024-01-01');
     });
 
@@ -189,7 +192,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" maxDate={maxDate} />
         </TestFormWrapper>
       );
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveAttribute('max', '2024-12-31');
     });
 
@@ -199,7 +202,7 @@ describe('FormDatePicker Component', () => {
           <FormDatePicker name="birthDate" label="Birth Date" />
         </TestFormWrapper>
       );
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveValue('');
     });
 
@@ -256,7 +259,7 @@ describe('FormDatePicker Component', () => {
 
       render(
         <TestFormWrapper schema={schema}>
-          <FormDatePicker name="birthDate" className="custom-datepicker" />
+          <FormDatePicker name="birthDate" label="Birth Date" className="custom-datepicker" />
           <button type="submit">Submit</button>
         </TestFormWrapper>
       );
@@ -264,7 +267,7 @@ describe('FormDatePicker Component', () => {
       await user.click(screen.getByRole('button', { name: /submit/i }));
 
       await waitFor(() => {
-        const input = screen.getByRole('textbox');
+        const input = screen.getByLabelText('Birth Date');
         expect(input).toHaveClass('form-input--error');
       });
     });
@@ -290,7 +293,7 @@ describe('FormDatePicker Component', () => {
         expect(screen.getByText(/required/i)).toBeInTheDocument();
       });
 
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       await user.type(input, '2024-01-15');
 
       await waitFor(() => {
@@ -308,7 +311,7 @@ describe('FormDatePicker Component', () => {
 
       render(
         <TestFormWrapper schema={schema}>
-          <FormDatePicker name="birthDate" helperText="Select your birth date" />
+          <FormDatePicker name="birthDate" label="Birth Date" helperText="Select your birth date" />
           <button type="submit">Submit</button>
         </TestFormWrapper>
       );
@@ -332,7 +335,7 @@ describe('FormDatePicker Component', () => {
         </TestFormWrapper>
       );
 
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveAttribute('aria-required', 'true');
     });
 
@@ -343,7 +346,7 @@ describe('FormDatePicker Component', () => {
         </TestFormWrapper>
       );
 
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       expect(input).toHaveAttribute('disabled');
     });
 
@@ -365,7 +368,7 @@ describe('FormDatePicker Component', () => {
       await user.click(screen.getByRole('button', { name: /submit/i }));
 
       await waitFor(() => {
-        const input = screen.getByRole('textbox');
+        const input = screen.getByLabelText('Birth Date');
         expect(input).toHaveAttribute('aria-invalid', 'true');
       });
     });
@@ -399,7 +402,7 @@ describe('FormDatePicker Component', () => {
       await user.click(screen.getByRole('button', { name: /submit/i }));
 
       await waitFor(() => {
-        const input = screen.getByRole('textbox');
+        const input = screen.getByLabelText('Birth Date');
         const errorId = input.getAttribute('aria-describedby');
         expect(errorId).toContain('error');
       });
@@ -408,11 +411,11 @@ describe('FormDatePicker Component', () => {
     it('should associate helper text with input', () => {
       render(
         <TestFormWrapper>
-          <FormDatePicker name="birthDate" helperText="Helper text" />
+          <FormDatePicker name="birthDate" label="Birth Date" helperText="Helper text" />
         </TestFormWrapper>
       );
 
-      const input = screen.getByRole('textbox');
+      const input = screen.getByLabelText('Birth Date');
       const helperId = input.getAttribute('aria-describedby');
       expect(helperId).toContain('helper');
     });

@@ -13,8 +13,29 @@
  * - 焦点陷阱（focus trap）
  */
 
-import React, { useEffect, useRef, useCallback, type ReactNode } from 'react';
+import React, { useEffect, useRef, useCallback, useState, type ReactNode } from 'react';
 import { type DrawerDirection, type DrawerSize } from './types';
+
+/**
+ * 检测用户是否偏好减少动画
+ */
+const usePrefersReducedMotion = (): boolean => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReducedMotion;
+};
 
 /**
  * Drawer 组件属性
@@ -87,6 +108,10 @@ export const Drawer = React.memo(({
 }: DrawerProps) => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  
+  // 动画持续时间：用户偏好减少动画时为 0ms，否则为 250ms
+  const transitionDuration = prefersReducedMotion ? '0ms' : '250ms';
 
   /**
    * 处理 ESC 键关闭
@@ -239,7 +264,7 @@ export const Drawer = React.memo(({
       WebkitBackdropFilter: 'blur(4px)',
       zIndex,
       opacity: open ? 1 : 0,
-      transition: 'opacity 250ms ease-out',
+      transition: `opacity ${transitionDuration} ease-out`,
       pointerEvents: open ? 'auto' : 'none',
     };
   };
@@ -311,7 +336,7 @@ export const Drawer = React.memo(({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 150ms ease',
+                transition: `all ${transitionDuration} ease`,
                 fontSize: '20px',
                 lineHeight: 1,
               }}

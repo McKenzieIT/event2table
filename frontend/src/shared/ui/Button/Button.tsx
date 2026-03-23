@@ -112,3 +112,4 @@ const MemoizedButton = React.memo(Button, compareButtonProps);
 MemoizedButton.displayName = 'MemoizedButton';
 
 export { MemoizedButton as Button };
+export default MemoizedButton;

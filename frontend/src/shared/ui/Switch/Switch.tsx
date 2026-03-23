@@ -214,3 +214,4 @@ const MemoizedSwitch = React.memo(Switch, compareToggleProps);
 MemoizedSwitch.displayName = 'MemoizedSwitch';
 
 export { MemoizedSwitch as Switch };
+export default MemoizedSwitch;

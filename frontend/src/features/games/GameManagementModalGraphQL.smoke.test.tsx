@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing';
 import GameManagementModal from './GameManagementModalGraphQL';
 import { GET_GAMES } from '../../shared/graphql/operations';
@@ -14,7 +14,7 @@ const mockGames = [
     id: 1,
     gid: 10000147,
     name: 'STAR001',
-    ods_db: 'ieu_ods',
+    odsDb: 'ieu_ods',
     eventCount: 5,
     parameterCount: 10,
     createdAt: '2026-01-01T00:00:00Z',
