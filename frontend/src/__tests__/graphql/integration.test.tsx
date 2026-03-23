@@ -21,11 +21,9 @@ import {
 } from '../../graphql/queries';
 import {
   CREATE_GAME,
-  UPDATE_GAME,
-  DELETE_GAME,
   CREATE_EVENT,
-  UPDATE_EVENT,
-  DELETE_EVENT,
+  DELETE_GAME,
+  UPDATE_GAME,
 } from '../../shared/graphql/mutations';
 
 // Mock数据

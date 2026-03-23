@@ -10,10 +10,10 @@
  * Run: npm test -- ReactPerformance.test.tsx
  */
 
-import React, { useState, useEffect } from 'react';
-import { render, screen, waitFor, act, renderHook, createMockGameContext } from '@test/test-utils';
+import React, { useState } from 'react';
+import { render, act, renderHook, createMockGameContext } from '@test/test-utils';
 import '@testing-library/jest-dom';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, expect, beforeEach } from 'vitest';
 import { performanceMonitor, usePerformanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';
 import type { CanvasComponentField } from '@features/canvas/components/types';
 
@@ -59,7 +59,7 @@ describe('React Performance Tests', () => {
       const renderTime = endTime - startTime;
 
       expect(renderTime).toBeLessThan(100);
-      console.log(`✅ GameManagementModalGraphQL render time: ${renderTime.toFixed(2)}ms`);
+      // Performance test passed - render time acceptable
     });
 
     // Test 2: Modal should not re-render when props unchanged
@@ -79,8 +79,7 @@ describe('React Performance Tests', () => {
 
       rerender(<MockComponent />);
       expect(renderSpy).toHaveBeenCalledTimes(1); // Should not re-render
-
-      console.log('✅ GameManagementModalGraphQL correctly memoized');
+      // Memoization test passed
     });
 
     // Test 3: EventManagementModalGraphQL render performance
@@ -103,7 +102,7 @@ describe('React Performance Tests', () => {
       const renderTime = endTime - startTime;
 
       expect(renderTime).toBeLessThan(100);
-      console.log(`✅ EventManagementModalGraphQL render time: ${renderTime.toFixed(2)}ms`);
+      // EventManagementModalGraphQL render time acceptable
     });
   });
 
@@ -132,7 +131,7 @@ describe('React Performance Tests', () => {
       const renderTime = endTime - startTime;
 
       expect(renderTime).toBeLessThan(50);
-      console.log(`✅ CustomNode render time: ${renderTime.toFixed(2)}ms`);
+      // CustomNode render time acceptable
     });
 
     // Test 5: CustomNode should not re-render when props unchanged
@@ -158,8 +157,7 @@ describe('React Performance Tests', () => {
 
       rerender(<MockComponent />);
       expect(renderSpy).toHaveBeenCalledTimes(1); // Should not re-render
-
-      console.log('✅ CustomNode correctly memoized');
+      // CustomNode memoization test passed
     });
 
     // Test 6: Canvas with 100 nodes should render in < 2000ms
@@ -191,7 +189,7 @@ describe('React Performance Tests', () => {
       const renderTime = endTime - startTime;
 
       expect(renderTime).toBeLessThan(2000);
-      console.log(`✅ Canvas with 100 nodes render time: ${renderTime.toFixed(2)}ms`);
+      // Canvas with 100 nodes render time acceptable
     });
   });
 
@@ -208,7 +206,7 @@ describe('React Performance Tests', () => {
       const renderTime = endTime - startTime;
 
       expect(renderTime).toBeLessThan(80);
-      console.log(`✅ EventForm render time: ${renderTime.toFixed(2)}ms`);
+      // EventForm render time acceptable
     });
 
     // Test 8: Form input should not cause unnecessary re-renders
@@ -228,7 +226,7 @@ describe('React Performance Tests', () => {
       rerender(<MockComponent />);
 
       expect(renderSpy.mock.calls.length).toBe(initialRenderCount);
-      console.log('✅ EventForm correctly optimized');
+      // EventForm optimization test passed
     });
   });
 
@@ -255,7 +253,7 @@ describe('React Performance Tests', () => {
       const renderTime = endTime - startTime;
 
       expect(renderTime).toBeLessThan(500);
-      console.log(`✅ GamesListGraphQL render time (100 games): ${renderTime.toFixed(2)}ms`);
+      // GamesListGraphQL render time acceptable
     });
 
     // Test 10: Search filtering should be fast
@@ -329,7 +327,7 @@ describe('React Performance Tests', () => {
       const renderTime = endTime - startTime;
 
       expect(renderTime).toBeLessThan(400);
-      console.log(`✅ CategoriesListGraphQL render time (100 categories): ${renderTime.toFixed(2)}ms`);
+      // CategoriesListGraphQL render time acceptable
     });
   });
 
@@ -348,7 +346,7 @@ describe('React Performance Tests', () => {
 
       rerender(<GameManagementModalGraphQL isOpen={true} onClose={() => {}} />);
 
-      console.log('✅ GameManagementModalGraphQL callbacks stability verified');
+      // Callbacks stability test passed
     });
   });
 
@@ -386,7 +384,7 @@ describe('React Performance Tests', () => {
       });
 
       expect(result.current.filteredGames).toBe(firstResult);
-      console.log('✅ GamesListGraphQL useMemo caching verified');
+      // useMemo caching test passed
     });
   });
 
@@ -409,7 +407,7 @@ describe('React Performance Tests', () => {
       if (initialMemory && finalMemory) {
         const memoryLeak = finalMemory - initialMemory;
         expect(memoryLeak).toBeLessThan(1048576); // Less than 1MB
-        console.log(`✅ Memory leak check: ${(memoryLeak / 1024).toFixed(2)}KB`);
+        // Memory leak check passed
       }
     });
   });
@@ -431,7 +429,7 @@ describe('React Performance Tests', () => {
 
       expect(metrics).toBeDefined();
       expect((metrics as PerformanceMetrics | undefined)?.renderCount).toBeGreaterThan(0);
-      console.log('✅ usePerformanceMonitor tracking verified');
+      // usePerformanceMonitor tracking test passed
     });
   });
 });
@@ -462,8 +460,8 @@ describe('Performance Regression Tests', () => {
     const avgLastFive = lastFive.reduce((a, b) => a + b, 0) / lastFive.length;
 
     expect(avgLastFive).toBeLessThan(avgFirstFive * 1.5); // Less than 50% increase
-    console.log(`✅ Performance regression check: ${avgFirstFive.toFixed(2)}ms → ${avgLastFive.toFixed(2)}ms`);
+    // Performance regression check passed
   });
 });
 
-console.log('🚀 React Performance Test Suite Loaded');
+// Test suite loaded

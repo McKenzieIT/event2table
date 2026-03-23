@@ -46,11 +46,6 @@ const mockGames = [
 
 const mockGame = { __typename: 'Game', gid: 1001, name: 'Game 1', odsDb: 'ieu_ods', eventCount: 10, parameterCount: 50 };
 
-const mockEvents = [
-  { __typename: 'Event', id: 1, eventName: 'login', eventNameCn: '登录', categoryId: 1, categoryName: '用户行为', sourceTable: 'log_events', targetTable: 'dwd_events', paramCount: 5 },
-  { __typename: 'Event', id: 2, eventName: 'purchase', eventNameCn: '购买', categoryId: 2, categoryName: '支付相关', sourceTable: 'log_events', targetTable: 'dwd_events', paramCount: 10 },
-];
-
 const mockEvent = {
   __typename: 'Event',
   id: 1,
