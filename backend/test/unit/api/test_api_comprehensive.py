@@ -1,5 +1,3 @@
-from backend.core.cache.decorators import cached
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
