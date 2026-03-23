@@ -6,7 +6,7 @@
  */
 
 import { ReactElement, ReactNode } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import { render, RenderOptions, renderHook } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client/react';
@@ -251,6 +251,29 @@ export function renderWithProviders(
     ),
     ...renderOptions,
   });
+}
+
+/**
+ * 自定义renderHook函数，自动包装Provider
+ * 
+ * 解决useLocation等hooks需要Router上下文的问题
+ */
+export function renderHookWithProviders<Result, Props>(
+  hook: (props: Props) => Result,
+  options?: {
+    queryClient?: QueryClient;
+    initialRoute?: string;
+  }
+) {
+  const { queryClient, initialRoute } = options || {};
+  
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <AllProviders queryClient={queryClient} initialRoute={initialRoute}>
+      {children}
+    </AllProviders>
+  );
+  
+  return renderHook(hook, { wrapper });
 }
 
 /**

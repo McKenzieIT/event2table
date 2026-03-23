@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@test/test-utils';
+import { act, waitFor } from '@test/test-utils';
+import { renderHookWithProviders } from '@test/test-utils';
 import { useGameContext } from './useGameContext';
 
 // Mock useGameStore
@@ -15,8 +16,8 @@ vi.mock('@/stores/gameStore', () => ({
 // Mock fetch
 global.fetch = vi.fn();
 
-// Note: renderHook from @test/test-utils already wraps with AllProviders (includes BrowserRouter)
-// No need for manual wrapper
+// Note: renderHookWithProviders wraps with AllProviders (includes BrowserRouter)
+// This is required because useGameContext uses useLocation() from react-router-dom
 
 describe('useGameContext', () => {
   beforeEach(() => {
@@ -30,7 +31,7 @@ describe('useGameContext', () => {
 
   describe('initial state', () => {
     it('should initialize with null current game', () => {
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       expect(result.current.currentGame).toBeNull();
       expect(result.current.currentGameGid).toBeNull();
@@ -40,7 +41,7 @@ describe('useGameContext', () => {
 
   describe('selectGame', () => {
     it('should select game and save to localStorage', () => {
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       const game = {
         id: 1,
@@ -53,14 +54,16 @@ describe('useGameContext', () => {
         result.current.selectGame(game);
       });
       
-      expect(localStorage.getItem('selectedGameGid')).toBe('10000147');
-      expect(localStorage.getItem('selectedGameId')).toBe('1');
-      expect(localStorage.getItem('selectedGameName')).toBe('Test Game');
+      // Verify localStorage.setItem was called with correct arguments
+      // (localStorage is mocked in setup.ts, so we check mock calls)
+      expect(localStorage.setItem).toHaveBeenCalledWith('selectedGameGid', '10000147');
+      expect(localStorage.setItem).toHaveBeenCalledWith('selectedGameId', '1');
+      expect(localStorage.setItem).toHaveBeenCalledWith('selectedGameName', 'Test Game');
     });
 
     it('should dispatch game changed event', () => {
       const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       const game = {
         id: 1,
@@ -81,7 +84,7 @@ describe('useGameContext', () => {
 
   describe('clearGame', () => {
     it('should clear current game', () => {
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       act(() => {
         result.current.clearGame();
@@ -110,7 +113,7 @@ describe('useGameContext', () => {
 
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
       
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -135,7 +138,7 @@ describe('useGameContext', () => {
 
       window.history.pushState({}, 'Test', '/?game_id=10000147');
       
-      renderHook(() => useGameContext());
+      renderHookWithProviders(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -143,7 +146,8 @@ describe('useGameContext', () => {
     });
 
     it('should load game from localStorage', async () => {
-      localStorage.setItem('selectedGameGid', '10000147');
+      // Mock localStorage.getItem to return the game GID
+      (localStorage.getItem as any).mockReturnValue('10000147');
       
       (global.fetch as any).mockResolvedValue({
         ok: true,
@@ -160,7 +164,7 @@ describe('useGameContext', () => {
         }),
       });
 
-      renderHook(() => useGameContext());
+      renderHookWithProviders(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -172,7 +176,7 @@ describe('useGameContext', () => {
       
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
       
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -197,7 +201,7 @@ describe('useGameContext', () => {
 
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
       
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       await new Promise(resolve => setTimeout(resolve, 0));
       
@@ -211,7 +215,7 @@ describe('useGameContext', () => {
 
   describe('game changed event', () => {
     it('should listen to game changed event', async () => {
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       const game = {
         id: 1,
@@ -230,7 +234,7 @@ describe('useGameContext', () => {
 
   describe('window.gameData', () => {
     it('should set window.gameData on select', () => {
-      const { result } = renderHook(() => useGameContext());
+      const { result } = renderHookWithProviders(() => useGameContext());
       
       const game = {
         id: 1,
