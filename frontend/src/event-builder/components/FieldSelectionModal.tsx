@@ -121,7 +121,7 @@ interface BatchAddFieldsResponse {
 /**
  * FieldSelectionModal Component
  */
-export default function FieldSelectionModal({
+export function FieldSelectionModal({
   isOpen,
   onClose,
   eventId,

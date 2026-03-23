@@ -49,7 +49,7 @@ export interface WhereBuilderModalProps {
 /**
  * WhereBuilderModal Component
  */
-export default function WhereBuilderModal({
+export function WhereBuilderModal({
   isOpen,
   onClose,
   conditions,

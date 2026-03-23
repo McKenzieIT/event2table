@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Table } from '../Table/Table';
-import { Form } from '../Form/Form';
+import Form from '../Form/Form';
 import { FormInput, FormSelect, FormCheckbox } from '../Form/index';
 
 describe('Table + Form Integration', () => {

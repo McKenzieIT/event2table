@@ -58,7 +58,7 @@ type ConfigListModalComponent = React.FC<ConfigListModalProps>;
  * - 支持分页加载
  * - 支持选择、复制、删除配置
  */
-function ConfigListModal({ gameGid, onSelect, onClose }: ConfigListModalProps) {
+export function ConfigListModal({ gameGid, onSelect, onClose }: ConfigListModalProps) {
   const [page, setPage] = useState(1);
   const [selectedConfigId, setSelectedConfigId] = useState<number | null>(null);
 
@@ -220,6 +220,3 @@ function ConfigListModal({ gameGid, onSelect, onClose }: ConfigListModalProps) {
   );
 }
 
-// ⚡️ REACT PERF: Export with React.memo optimization
-const ConfigListModalMemo = memo(ConfigListModal);
-export default ConfigListModalMemo;

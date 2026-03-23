@@ -55,7 +55,7 @@ type FieldConfigModalComponent = React.FC<FieldConfigModalProps>;
  * - 改进键盘事件处理
  * - 确保表单状态正确更新
  */
-const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose }) => {
+export const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose }) => {
   const [formData, setFormData] = useState<FieldFormData>({
     displayName: '',
     alias: '',
@@ -202,4 +202,3 @@ const FieldConfigModal: FieldConfigModalComponent = ({ field, onSave, onClose })
   );
 };
 
-export default FieldConfigModal;

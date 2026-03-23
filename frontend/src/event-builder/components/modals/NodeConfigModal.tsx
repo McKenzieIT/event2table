@@ -45,7 +45,7 @@ type NodeConfigModalComponent = React.FC<NodeConfigModalProps>;
  * - 保存时验证必填字段
  * - 支持禁用状态
  */
-const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, disabled = false }) => {
+export const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, disabled = false }) => {
   const [localConfig, setLocalConfig] = useState<NodeConfig>({
     nameEn: '',
     nameCn: '',
@@ -251,4 +251,3 @@ const NodeConfigModal: NodeConfigModalComponent = ({ config, onChange, onClose, 
   );
 };
 
-export default NodeConfigModal;

@@ -115,7 +115,7 @@ interface HQLOutputs {
 
 // ========== 组件 ==========
 
-export default function HQLPreviewModal({
+export function HQLPreviewModal({
   isOpen,
   onClose,
   canvasFields = [],
