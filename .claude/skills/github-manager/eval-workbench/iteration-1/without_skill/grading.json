@@ -1,0 +1,32 @@
+{
+  "run_id": "eval-0-without_skill",
+  "eval_name": "branch-diverged-teaching",
+  "expectations": [
+    {
+      "name": "explains_why_rebase_vs_merge",
+      "text": "解释了为什么选择 rebase 而不是 merge，或者解释了两种方案的优缺点",
+      "passed": true,
+      "evidence": "输出中提到了 '优点' 和 '缺点'，但解释较简略"
+    },
+    {
+      "name": "provides_best_practice_reasoning",
+      "text": "提供了最佳实践的理由说明（WHY）",
+      "passed": false,
+      "evidence": "没有专门的 '为什么' 章节，只列出了方案但没有深入解释 WHY"
+    },
+    {
+      "name": "explains_tradeoffs",
+      "text": "解释了方案的权衡/优缺点",
+      "passed": true,
+      "evidence": "每个方案都有 '优点' 和 '缺点' 说明"
+    },
+    {
+      "name": "teaches_github_knowledge",
+      "text": "教授了 GitHub 相关知识",
+      "passed": false,
+      "evidence": "没有明确的 '最佳实践'、'经验' 或 '建议' 教学，只是列出方案"
+    }
+  ],
+  "overall_passed": false,
+  "pass_rate": "50%"
+}
