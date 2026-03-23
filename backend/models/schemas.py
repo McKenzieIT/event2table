@@ -4,7 +4,7 @@ import html
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator, validator
+from pydantic import BaseModel, Field, field_validator
 
 # ============================================================================
 # Game 相关 Schema
@@ -18,14 +18,16 @@ class GameBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
     ods_db: Literal["ieu_ods", "overseas_ods"] = Field(..., description="ODS数据库名称")
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def sanitize_name(cls, v):
             # 防止XSS攻击: 转义HTML字符
         if v:
             return html.escape(v.strip())
         return v
 
-    @validator("gid")
+    @field_validator("gid")
+    @classmethod
     def validate_gid(cls, v):
             # 验证gid格式 - 必须是正整数
         if not isinstance(v, int):
@@ -47,16 +49,15 @@ class GameUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
     ods_db: Optional[Literal["ieu_ods", "overseas_ods"]] = None
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def sanitize_name(cls, v):
             # 防止XSS攻击: 转义HTML字符
         if v:
             return html.escape(v.strip())
         return v
 
-
-class GameResponse(GameBase):
-        # 游戏响应模型
+class GameResponse(GameBase):        # 游戏响应模型
 
     id: int
     created_at: Optional[datetime] = None
@@ -84,8 +85,8 @@ class EventParameterBase(BaseModel):
         None, max_length=200, description="JSON路径, 用于从事件JSON中提取参数值"
     )
 
-    @validator("param_name", pre=True)
-    # 
+    @field_validator("param_name", mode="before")
+    @classmethod
     def sanitize_param_name(cls, v):
             # 验证并清理参数名(snake_case), 防止XSS攻击
         if isinstance(v, str):
@@ -97,21 +98,24 @@ class EventParameterBase(BaseModel):
         # 转义HTML特殊字符, 防止XSS攻击
         return html.escape(v) if isinstance(v, str) else v
 
-    @validator("param_name_cn")
+    @field_validator("param_name_cn")
+    @classmethod
     def sanitize_param_name_cn(cls, v):
             # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
-    @validator("param_description")
+    @field_validator("param_description")
+    @classmethod
     def sanitize_description(cls, v):
             # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
-    @validator("json_path")
+    @field_validator("json_path")
+    @classmethod
     def validate_json_path(cls, v):
             # 验证JSON路径格式
         if v:
@@ -160,8 +164,8 @@ class EventBase(BaseModel):
     target_table: Optional[str] = Field(None, max_length=200, description="目标表名")
     include_in_common_params: bool = False
 
-    @validator("event_name", pre=True)
-    # 
+    @field_validator("event_name", mode="before")
+    @classmethod
     def sanitize_event_name(cls, v):
             # 验证并清理事件名, 防止XSS攻击
         if isinstance(v, str):
@@ -173,14 +177,16 @@ class EventBase(BaseModel):
         # 转义HTML特殊字符, 防止XSS攻击
         return html.escape(v) if isinstance(v, str) else v
 
-    @validator("event_name_cn")
+    @field_validator("event_name_cn")
+    @classmethod
     def sanitize_event_name_cn(cls, v):
             # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
-    @validator("source_table", "target_table", pre=True)
+    @field_validator("source_table", "target_table", mode="before")
+    @classmethod
     def sanitize_table_names(cls, v):
             # 防止XSS攻击: 转义HTML字符
         if v:
@@ -195,7 +201,8 @@ class EventCreate(EventBase):
         default_factory=list, description="事件参数列表"
     )
 
-    @validator("parameters")
+    @field_validator("parameters")
+    @classmethod
     def validate_parameters(cls, v):
             # 验证至少有一个参数
         if not v or len(v) == 0:
@@ -210,7 +217,8 @@ class EventUpdate(BaseModel):
     category_id: Optional[int] = None
     include_in_common_params: Optional[bool] = None
 
-    @validator("event_name_cn")
+    @field_validator("event_name_cn")
+    @classmethod
     def sanitize_event_name_cn(cls, v):
             # 防止XSS攻击
         if v:
@@ -253,7 +261,8 @@ class FieldDefinition(BaseModel):
         Literal["COUNT", "SUM", "AVG", "MAX", "MIN", "GROUP_CONCAT"]
     ] = Field(None, description="聚合函数")
 
-    @validator("field_name")
+    @field_validator("field_name")
+    @classmethod
     def sanitize_field_name(cls, v):
             # 验证字段名并防止XSS攻击
         v = v.strip()
@@ -261,7 +270,8 @@ class FieldDefinition(BaseModel):
             raise ValueError("field_name不能为空")
         return html.escape(v)
 
-    @validator("field_alias")
+    @field_validator("field_alias")
+    @classmethod
     def sanitize_field_alias(cls, v):
             # 防止XSS攻击
         if v:
@@ -279,7 +289,8 @@ class ConditionDefinition(BaseModel):
     value: Any = Field(..., description="条件值")
     logical_op: Literal["AND", "OR"] = Field("AND", description="逻辑操作符")
 
-    @validator("field")
+    @field_validator("field")
+    @classmethod
     def sanitize_field(cls, v):
             # 防止XSS攻击
         if v:
@@ -301,7 +312,8 @@ class HQLGenerationRequest(BaseModel):
     )
     limit: Optional[int] = Field(None, ge=1, le=10000, description="限制数量")
 
-    @validator("event_ids")
+    @field_validator("event_ids")
+    @classmethod
     def validate_event_ids(cls, v):
             # 验证事件ID列表
         if not v or len(v) == 0:
@@ -453,25 +465,28 @@ class HQLHistorySaveRequest(BaseModel):
     session_id: Optional[str] = Field(None, description="会话ID")
     metadata: Optional[Dict[str, Any]] = Field(None, description="额外元数据")
 
-    @validator("name_en")
+    @field_validator("name_en")
+    @classmethod
     def sanitize_name_en(cls, v):
             # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
-    @validator("name_cn")
+    @field_validator("name_cn")
+    @classmethod
     def sanitize_name_cn(cls, v):
             # 防止XSS攻击
         if v:
             return html.escape(v.strip())
         return v
 
-    @validator("hql_type")
-    def validate_hql_for_canvas(cls, v, values):
+    @field_validator("hql_type")
+    @classmethod
+    def validate_hql_for_canvas(cls, v, info):
             # 验证canvas类型时hql格式
         if v == "canvas":
-            hql = values.get("hql")
+            hql = info.data.get("hql")
             if hql:
                 try:
                     hql_obj = json.loads(hql) if isinstance(hql, str) else hql
@@ -507,7 +522,8 @@ class HQLHistorySearchRequest(BaseModel):
     limit: int = Field(50, ge=1, le=500, description="返回数量限制")
     offset: int = Field(0, ge=0, description="偏移量")
 
-    @validator("date_from", "date_to")
+    @field_validator("date_from", "date_to")
+    @classmethod
     def validate_iso_date(cls, v):
             # 验证ISO 8601日期格式
         if v:

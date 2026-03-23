@@ -22,7 +22,18 @@
 
 import hashlib
 import json
-from typing import Any, Union
+import logging
+from pathlib import Path
+from typing import Any, Optional, Union
+
+# Setup logger
+logger = logging.getLogger(__name__)
+
+# Optional import for path validation (may not be available in all environments)
+try:
+    from backend.core.security.path_validator import PathValidator
+except ImportError:
+    PathValidator = None  # type: ignore
 
 
 class SecureHasher:
