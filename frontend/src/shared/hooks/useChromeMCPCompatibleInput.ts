@@ -275,11 +275,15 @@ export function useChromeMCPCompatibleInput<
 
   /**
    * Register a field and get its ref
+   * Note: Uses createRef() instead of useRef() because this is called dynamically
+   * inside a callback, and useRef() can only be called at the top level of a component.
    */
   const register = useCallback(
     (field: keyof T): React.RefObject<HTMLInputElement | HTMLTextAreaElement> => {
       if (!refsRef.current[field]) {
-        refsRef.current[field] = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+        // Use createRef() instead of useRef() because we're inside a callback
+        // useRef() can only be called at the top level of a component
+        refsRef.current[field] = React.createRef<HTMLInputElement | HTMLTextAreaElement>();
       }
       return refsRef.current[field];
     },
@@ -314,8 +318,14 @@ export function useChromeMCPCompatibleInput<
 
   /**
    * Manually trigger DOM synchronization for all fields
+   * Note: Respects the enableDomSync option - will not sync if disabled
    */
   const syncFromDom = useCallback((): void => {
+    // Respect the enableDomSync option
+    if (!enableDomSync) {
+      return;
+    }
+
     const refs = refsRef.current;
     const fieldNames = Object.keys(refs) as Array<keyof T>;
 
@@ -338,7 +348,7 @@ export function useChromeMCPCompatibleInput<
     if (hasChanges) {
       setValues((prev) => ({ ...prev, ...updates }));
     }
-  }, [values]);
+  }, [values, enableDomSync]);
 
   return {
     refs: refsRef.current,
