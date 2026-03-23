@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { renderHook, waitFor } from '@test/test-utils';
+import { renderHook, waitFor, act } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { describe, it, expect } from 'vitest';
 import {
@@ -329,9 +329,12 @@ describe('GraphQL Hooks', () => {
         expect(result.current[0]).toBeDefined();
       });
 
-      const [createGame] = result.current;
-      const response = await createGame({
-        variables: { gid: 1003, name: 'Game 3', odsDb: 'ieu_ods' },
+      let response;
+      await act(async () => {
+        const [createGame] = result.current;
+        response = await createGame({
+          variables: { gid: 1003, name: 'Game 3', odsDb: 'ieu_ods' },
+        });
       });
 
       expect(response.data?.createGame?.ok).toBe(true);
@@ -366,9 +369,12 @@ describe('GraphQL Hooks', () => {
         expect(result.current[0]).toBeDefined();
       });
 
-      const [updateGame] = result.current;
-      const response = await updateGame({
-        variables: { gid: 1001, name: 'Updated Game 1', odsDb: 'ieu_ods' },
+      let response;
+      await act(async () => {
+        const [updateGame] = result.current;
+        response = await updateGame({
+          variables: { gid: 1001, name: 'Updated Game 1', odsDb: 'ieu_ods' },
+        });
       });
 
       expect(response.data?.updateGame?.ok).toBe(true);
@@ -404,9 +410,12 @@ describe('GraphQL Hooks', () => {
         expect(result.current[0]).toBeDefined();
       });
 
-      const [deleteGame] = result.current;
-      const response = await deleteGame({
-        variables: { gid: 1001, confirm: false },
+      let response;
+      await act(async () => {
+        const [deleteGame] = result.current;
+        response = await deleteGame({
+          variables: { gid: 1001, confirm: false },
+        });
       });
 
       expect(response.data?.deleteGame?.ok).toBe(true);
@@ -446,14 +455,17 @@ describe('GraphQL Hooks', () => {
         expect(result.current[0]).toBeDefined();
       });
 
-      const [createEvent] = result.current;
-      const response = await createEvent({
-        variables: {
-          gameGid: 1001,
-          eventName: 'logout',
-          eventNameCn: '登出',
-          categoryId: 1,
-        },
+      let response;
+      await act(async () => {
+        const [createEvent] = result.current;
+        response = await createEvent({
+          variables: {
+            gameGid: 1001,
+            eventName: 'logout',
+            eventNameCn: '登出',
+            categoryId: 1,
+          },
+        });
       });
 
       expect(response.data?.createEvent?.ok).toBe(true);
@@ -492,13 +504,16 @@ describe('GraphQL Hooks', () => {
         expect(result.current[0]).toBeDefined();
       });
 
-      const [updateEvent] = result.current;
-      const response = await updateEvent({
-        variables: {
-          id: 1,
-          eventNameCn: '用户登录',
-          categoryId: 1,
-        },
+      let response;
+      await act(async () => {
+        const [updateEvent] = result.current;
+        response = await updateEvent({
+          variables: {
+            id: 1,
+            eventNameCn: '用户登录',
+            categoryId: 1,
+          },
+        });
       });
 
       expect(response.data?.updateEvent?.ok).toBe(true);
@@ -534,9 +549,12 @@ describe('GraphQL Hooks', () => {
         expect(result.current[0]).toBeDefined();
       });
 
-      const [deleteEvent] = result.current;
-      const response = await deleteEvent({
-        variables: { id: 1 },
+      let response;
+      await act(async () => {
+        const [deleteEvent] = result.current;
+        response = await deleteEvent({
+          variables: { id: 1 },
+        });
       });
 
       expect(response.data?.deleteEvent?.ok).toBe(true);
