@@ -1,6 +1,7 @@
-import React from 'react';
-import { FieldType } from '../../types/fieldTypes';
 import { Button } from '@shared/ui';
+import React from 'react';
+
+import { FieldType } from '../../types/fieldTypes';
 
 /**
  * Props for EdgeToolbar component

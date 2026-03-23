@@ -14,10 +14,11 @@
  * ```
  */
 
+import { Modal } from '@shared/ui';
 import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Modal } from '@shared/ui';
+
 import type { HqlVersion, VersionDiff } from '../api/hqlVersionApi';
 import './HqlVersionCompare.css';
 

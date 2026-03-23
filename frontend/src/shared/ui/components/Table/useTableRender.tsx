@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
 import { flexRender } from '@tanstack/react-table';
+import { useCallback } from 'react';
 
 import type { TableColumn, CellContext } from './Table.types';
 

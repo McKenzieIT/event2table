@@ -7,12 +7,15 @@
  * @module ParameterFormWithRecommendations
  */
 
-import React, { useState, useCallback } from 'react';
 import { Input, Select, Button, Card, useToast } from '@shared/ui';
-import { ParameterInputWithRecommendation } from './ParameterInputWithRecommendation';
+import React, { useState, useCallback } from 'react';
+
+import type { FieldRecommendationData, FieldTypeInferenceData, FieldPattern } from '../api/fieldRecommendationApi';
+
 import { FieldRecommendationDropdown } from './FieldRecommendationDropdown';
 import { FieldTypeSuggestion } from './FieldTypeSuggestion';
-import type { FieldRecommendationData, FieldTypeInferenceData, FieldPattern } from '../api/fieldRecommendationApi';
+import { ParameterInputWithRecommendation } from './ParameterInputWithRecommendation';
+
 
 interface ParameterFormWithRecommendationsProps {
   /** Game GID */

@@ -18,7 +18,9 @@
  * />
  */
 import React from 'react';
+
 import { useEventAllParams } from '../../hooks/useEventAllParams';
+
 import { FieldSelectorEnhancedProps } from './types';
 import './FieldSelectorEnhanced.css';
 

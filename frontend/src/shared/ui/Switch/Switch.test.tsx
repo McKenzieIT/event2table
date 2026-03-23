@@ -4,9 +4,10 @@
  * 测试开关组件的所有功能
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
 import Switch, { SwitchProps } from './Switch';
 
 describe('Switch Component', () => {

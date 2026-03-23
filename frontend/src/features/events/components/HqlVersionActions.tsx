@@ -15,10 +15,11 @@
  * ```
  */
 
-import React, { useState, useCallback } from 'react';
-import { useSaveHqlVersion, useRollbackHqlVersion } from '../hooks';
-import type { HqlVersion } from '../api/hqlVersionApi';
 import { Button, useToast } from '@shared/ui';
+import React, { useState, useCallback } from 'react';
+
+import type { HqlVersion } from '../api/hqlVersionApi';
+import { useSaveHqlVersion, useRollbackHqlVersion } from '../hooks';
 import './HqlVersionActions.css';
 
 interface HqlVersionActionsProps {

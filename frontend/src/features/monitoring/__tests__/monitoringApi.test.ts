@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { getCacheStats, getApiLatency, getPerformanceMetrics } from '../api/monitoringApi';
 
 // Mock fetch

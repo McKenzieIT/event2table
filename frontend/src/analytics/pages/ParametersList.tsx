@@ -5,10 +5,9 @@
 // - Preserved React.memo, useCallback, useMemo optimizations
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
-import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useGameStore } from '@/stores/gameStore';
+import ParameterDetailDrawer from '@analytics/components/parameters/ParameterDetailDrawer';
+import { fetchAllParameters } from '@shared/api/parameters';
+import { NavLinkWithGameContext } from '@shared/components';
 import {
   SelectGamePrompt,
   Input,
@@ -21,11 +20,13 @@ import {
   EmptyState
 } from '@shared/ui';
 import Table from '@shared/ui/components/Table';
-import { fetchAllParameters } from '@shared/api/parameters';
-import ParameterDetailDrawer from '@analytics/components/parameters/ParameterDetailDrawer';
-import { NavLinkWithGameContext } from '@shared/components';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { Link } from 'react-router-dom';
+
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
+import { useGameStore } from '@/stores/gameStore';
 import './ParametersList.css';
 import './VirtualTable.css';
 

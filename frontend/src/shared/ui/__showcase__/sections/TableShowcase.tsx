@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
 import { Card, Badge } from '@shared/ui';
 import Table from '@shared/ui/components/Table';
+import React, { useMemo } from 'react';
 
 interface SampleData {
   id: number;

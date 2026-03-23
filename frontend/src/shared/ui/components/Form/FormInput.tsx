@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { FieldValues, FieldPath } from 'react-hook-form';
-import type { InputFieldProps } from './Form.types';
+
 import { FormErrorMessage, FormHelperText } from './Form';
+import type { InputFieldProps } from './Form.types';
 
 /**
  * FormInput Component

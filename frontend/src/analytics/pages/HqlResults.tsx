@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 import { Button, Input, Card, Badge, Spinner, SearchInput } from '@shared/ui';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import './HqlResults.css';
 
 /**

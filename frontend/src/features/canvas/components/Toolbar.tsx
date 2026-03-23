@@ -5,12 +5,14 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useCallback, memo } from "react";
-import { useReactFlow } from "reactflow";
 import { Button, useToast } from "@shared/ui";
 import ConfirmDialog from "@shared/ui/ConfirmDialog/ConfirmDialog";
+import React, { useCallback, memo } from "react";
+import { useReactFlow } from "reactflow";
+
 import "./Toolbar.css";
 import type { ToolbarProps } from "./types";
+
 import type { GameData } from "@/shared/types/game-types";
 
 function Toolbar({ gameData, onExecute, onLocateNodes }: ToolbarProps): React.JSX.Element {

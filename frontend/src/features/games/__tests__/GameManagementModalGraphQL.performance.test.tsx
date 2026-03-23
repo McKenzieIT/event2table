@@ -16,12 +16,15 @@
  * - Render count reduction: ≥ 70% vs unoptimized version
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import React from 'react';
-import { render, waitFor, screen } from '@test/test-utils';
-import { MockedProvider } from '@apollo/client/testing/react';
-import GameManagementModalGraphQL from '../GameManagementModalGraphQL';
 import { performance } from 'perf_hooks';
+
+import { MockedProvider } from '@apollo/client/testing/react';
+import { render, waitFor, screen } from '@test/test-utils';
+import React from 'react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+import GameManagementModalGraphQL from '../GameManagementModalGraphQL';
+
 // Use the component with its actual name
 const GameManagementModal = GameManagementModalGraphQL;
 

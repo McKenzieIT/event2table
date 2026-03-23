@@ -6,9 +6,9 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React from 'react';
 import { Modal } from '@shared/ui';
 import { Button } from '@shared/ui';
+import React from 'react';
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;

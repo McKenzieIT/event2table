@@ -3,10 +3,10 @@
  * ParametersListGraphQL Virtual Scrolling Performance Tests
  */
 
-import { render, screen, waitFor, fireEvent } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor, fireEvent } from '@test/test-utils';
 import React from 'react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Note: render from @test/test-utils already wraps with AllProviders (includes BrowserRouter)
 // No need for manual BrowserRouter wrapper

@@ -1,5 +1,6 @@
-import React from 'react';
 import { SearchInput, Button, Checkbox, Badge } from '@shared/ui';
+import React from 'react';
+
 import { EventsFiltersProps } from './types';
 
 /**

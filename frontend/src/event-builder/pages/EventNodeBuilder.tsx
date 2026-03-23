@@ -1,36 +1,40 @@
+import { useToast } from '@features/canvas/components/hooks/useToast';
+import ErrorBoundary from '@shared/components/ErrorBoundary';
+import { useEventNodeBuilder } from '@shared/hooks/useEventNodeBuilder';
+import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
+import { useGameContext } from '@shared/hooks/useGameContext';
+import type { Game } from '@shared/hooks/useGameContext';
+import type { Event } from '@shared/types/api-types';
+import { ConfirmDialog } from '@shared/ui';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
 
 // Components
 import EventNodeBuilderErrorBoundary from '../components/ErrorBoundary';
+import FieldCanvas from '../components/FieldCanvas';
+import { LeftSidebar } from '../components/LeftSidebar';
 import PageHeader from '../components/PageHeader';
 import { QuickActionButtons } from '../components/QuickActionButtons';
-import { LeftSidebar } from '../components/LeftSidebar';
 import { RightSidebar } from '../components/RightSidebar';
-import FieldCanvas from '../components/FieldCanvas';
-import { FieldConfigModal } from '../components/modals/FieldConfigModal';
 import { ConfigListModal } from '../components/modals/ConfigListModal';
+import { FieldConfigModal } from '../components/modals/FieldConfigModal';
 import { WhereBuilderModal } from '../components/WhereBuilder/WhereBuilderModal';
 import { HQLPreviewModal } from '../components/HQLPreview/HQLPreviewModal';
 import { NodeConfigModal } from '../components/modals/NodeConfigModal';
 import { FieldSelectionModal } from '../components/FieldSelectionModal';
-import { ConfirmDialog } from '@shared/ui';
+
+import type { OutletContext, ConfigData, FieldUpdate, DragDropField, ConfirmState } from "./EventNodeBuilder.types";
+import { DebugPanel } from './components/DebugPanel';
 import { LoadingState } from './components/LoadingState';
 import { PerformancePanel } from './components/PerformancePanel';
-import { DebugPanel } from './components/DebugPanel';
-import ErrorBoundary from '@shared/components/ErrorBoundary';
+
 
 // Hooks
-import { useToast } from '@features/canvas/components/hooks/useToast';
-import { useGameContext } from '@shared/hooks/useGameContext';
-import { useEventNodeBuilder } from '@shared/hooks/useEventNodeBuilder';
+
 import { useEventNodeBuilderData } from "./hooks/useEventNodeBuilderData";
 
 // Types
-import type { Game } from '@shared/hooks/useGameContext';
-import type { Event } from '@shared/types/api-types';
-import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
-import type { OutletContext, ConfigData, FieldUpdate, DragDropField, ConfirmState } from "./EventNodeBuilder.types";
+
 
 // 样式
 import './EventNodeBuilder.css';

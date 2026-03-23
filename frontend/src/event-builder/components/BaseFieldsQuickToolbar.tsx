@@ -9,8 +9,8 @@
  * BaseFieldsQuickToolbar Component
  * 基础字段快速添加工具栏（紧凑型）
  */
-import React, { useState, useCallback, useMemo } from 'react';
 import { FieldType } from '@shared/types/fieldBuilder';
+import React, { useState, useCallback, useMemo } from 'react';
 
 /**
  * 画布字段接口

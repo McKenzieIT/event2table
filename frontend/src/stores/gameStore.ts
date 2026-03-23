@@ -1,6 +1,6 @@
+import type { Game } from '@shared/types/game-types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Game } from '@shared/types/game-types';
 
 /**
  * Re-exporting Game type for backward compatibility

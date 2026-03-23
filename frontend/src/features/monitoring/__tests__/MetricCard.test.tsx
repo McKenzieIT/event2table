@@ -4,8 +4,9 @@
  * Tests for MetricCard component
  */
 
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@test/test-utils';
+import { describe, it, expect } from 'vitest';
+
 import { MetricCard } from '../components/MetricCard';
 
 describe('MetricCard Component', () => {

@@ -3,8 +3,9 @@
  * 测试表单字段通用 Hook
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
+import { describe, it, expect, vi } from 'vitest';
+
 import { useFormField } from './useFormField';
 
 describe('useFormField hook', () => {

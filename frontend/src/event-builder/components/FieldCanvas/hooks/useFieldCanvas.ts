@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from 'react';
 import { useSensors, useSensor, PointerSensor, KeyboardSensor } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { arrayMove } from '@dnd-kit/sortable';
 import type { UniqueIdentifier, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
-import { Field, Parameter, createBasicField, createCustomField, createFixedField, createFieldFromParameter, createBaseField, COMMON_BASE_FIELDS, ALL_BASE_FIELDS, calculateFieldStats } from '../utils/fieldUtils';
+import { sortableKeyboardCoordinates , arrayMove } from '@dnd-kit/sortable';
+import { useState, useCallback, useMemo } from 'react';
+
 import { FieldType } from '../../../types/fieldTypes';
+import { Field, Parameter, createBasicField, createCustomField, createFixedField, createFieldFromParameter, createBaseField, COMMON_BASE_FIELDS, ALL_BASE_FIELDS, calculateFieldStats } from '../utils/fieldUtils';
 
 interface UseFieldCanvasProps {
   fields: Field[];

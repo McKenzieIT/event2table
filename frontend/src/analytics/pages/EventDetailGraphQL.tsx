@@ -3,11 +3,12 @@
 // See: docs/reports/2026-03-06/PHASE-2-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useCallback, useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
 import { useGameContext } from '@shared/hooks/useGameContext';
+import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
+import React, { useCallback, useMemo } from 'react';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
+
 import { GET_EVENT, GET_PARAMETERS } from '@/graphql/queries';
 import './EventDetail.css';
 

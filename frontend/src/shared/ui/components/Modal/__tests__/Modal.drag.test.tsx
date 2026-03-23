@@ -4,9 +4,10 @@
  * 测试Modal组件的拖拽功能
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { Modal } from '../Modal';
 
 describe('Modal拖拽功能', () => {

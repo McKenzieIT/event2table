@@ -4,14 +4,15 @@
  * Unit tests for field recommendation React Query hooks
  */
 
-import { renderHook, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { renderHook, waitFor } from '@test/test-utils';
 import React from 'react';
-import { useFieldRecommendations } from '../hooks/useFieldRecommendations';
-import { useCommonPatterns } from '../hooks/useCommonPatterns';
-import { useFieldTypeInference } from '../hooks/useFieldTypeInference';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+
 import { getRecommendations, getCommonPatterns as fetchPatterns, inferFieldType as fetchTypeInference } from '../api/fieldRecommendationApi';
+import { useCommonPatterns } from '../hooks/useCommonPatterns';
+import { useFieldRecommendations } from '../hooks/useFieldRecommendations';
+import { useFieldTypeInference } from '../hooks/useFieldTypeInference';
 
 // Mock the API functions
 vi.mock('../api/fieldRecommendationApi');

@@ -1,7 +1,8 @@
+import type { CanvasField } from '@shared/hooks/useEventNodeBuilder';
 import { render, screen } from '@test/test-utils';
 import { describe, it, expect, vi } from 'vitest';
+
 import FieldCanvas from './FieldCanvas';
-import type { CanvasField } from '@shared/hooks/useEventNodeBuilder';
 
 describe('FieldCanvas Component', () => {
   const mockProps = {

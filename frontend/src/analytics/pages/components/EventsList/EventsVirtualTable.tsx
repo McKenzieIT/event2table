@@ -1,7 +1,10 @@
-import React from 'react';
 import { Button, Checkbox, Badge, Spinner, EmptyState } from '@shared/ui';
-import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
+import React from 'react';
+
 import { EventData, EventsVirtualTableProps } from './types';
+
+import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
+
 
 /**
  * EventsVirtualTable 组件

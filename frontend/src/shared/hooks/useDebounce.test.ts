@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { useDebounce } from './useDebounce';
 
 describe('useDebounce', () => {

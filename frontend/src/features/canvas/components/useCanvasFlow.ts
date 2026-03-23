@@ -1,19 +1,16 @@
 // ⚡️ REACT PERF - Canvas: Custom hook for canvas flow logic
 // Extracted from CanvasFlow.tsx for better testability and reusability
 
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+import { useToast } from '@shared/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { useNodesState, useEdgesState, addEdge, Connection, Edge, OnSelectionChangeParams } from 'reactflow';
-import { useToast } from '@shared/ui';
-import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+
 import { loadEventConfig } from '../api/canvasApi';
-import { configToReactFlowNode } from './utils/nodeConverter';
-import { calculateAffectedCount, deleteMultipleNodesCascade } from './utils/cascadeDelete';
-import { useCanvasHistory } from './utils/useCanvasHistory';
+import { useFlowExecute } from '../hooks/useFlowExecute';
 import { useFlowLoad } from '../hooks/useFlowLoad';
 import { useFlowSave } from '../hooks/useFlowSave';
-import { useFlowExecute } from '../hooks/useFlowExecute';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import type { GameData } from '@/shared/types/game-types';
+
 import {
     CanvasNode,
     CanvasNodeData,
@@ -21,6 +18,15 @@ import {
     SavedConfig,
     FlowDataPayload,
 } from './CanvasFlow.types';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { calculateAffectedCount, deleteMultipleNodesCascade } from './utils/cascadeDelete';
+import { configToReactFlowNode } from './utils/nodeConverter';
+import { useCanvasHistory } from './utils/useCanvasHistory';
+
+
+
+import type { GameData } from '@/shared/types/game-types';
+
 
 /**
  * useCanvasFlow Hook

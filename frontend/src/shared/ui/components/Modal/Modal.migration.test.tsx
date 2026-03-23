@@ -1,5 +1,7 @@
 import { render, screen } from '@test/test-utils';
+
 import { Modal } from '../Modal';
+
 import { BaseModal } from '@/shared/ui';
 
 describe('Modal Migration', () => {

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { SelectOption as SelectOptionType } from './Select.types';
 import './Select.css';
 

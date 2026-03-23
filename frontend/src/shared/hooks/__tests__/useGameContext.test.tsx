@@ -1,7 +1,8 @@
 // @ts-nocheck - TypeScript strict mode disabled for test files
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
 import { MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { useGameContext } from '../useGameContext';
 
 // Mock zustand store

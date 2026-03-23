@@ -4,11 +4,13 @@
  *
  * 测试GraphQL版本的Dashboard页面功能
  */
-import { render, screen, waitFor, createMockGameContext } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { describe, it, expect, vi } from 'vitest';
-import DashboardGraphQL from '../DashboardGraphQL';
 import { GET_GAMES } from '@shared/graphql/operations';
+import { render, screen, waitFor, createMockGameContext } from '@test/test-utils';
+import { describe, it, expect, vi } from 'vitest';
+
+import DashboardGraphQL from '../DashboardGraphQL';
+
 
 // Mock useGameStore
 vi.mock('@/stores/gameStore', () => ({

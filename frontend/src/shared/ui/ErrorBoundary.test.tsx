@@ -3,8 +3,9 @@
  * 测试错误边界组件
  */
 
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { render, screen, fireEvent } from '@test/test-utils';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
+
 import { ErrorBoundary, ErrorFallback } from './ErrorBoundary';
 
 // 创建一个会抛出错误的组件

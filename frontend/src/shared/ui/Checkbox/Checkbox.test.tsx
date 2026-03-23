@@ -3,9 +3,10 @@
  * 测试复选框组件的所有功能
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
 import Checkbox, { type CheckboxProps } from './Checkbox';
 
 describe('Checkbox Component', () => {

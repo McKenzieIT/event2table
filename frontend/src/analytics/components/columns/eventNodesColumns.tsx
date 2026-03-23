@@ -10,9 +10,9 @@
  * Event Nodes Table Column Definitions
  */
 
-import { createColumnHelper } from '@tanstack/react-table';
-import type { EventNode } from '@shared/types/eventNodes';
 import type { EventNodesColumnDef } from '@shared/hooks/useEventNodesTable';
+import type { EventNode } from '@shared/types/eventNodes';
+import { createColumnHelper } from '@tanstack/react-table';
 
 const columnHelper = createColumnHelper<EventNode>();
 

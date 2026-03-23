@@ -176,7 +176,7 @@ export function calculateAffectedCount(
   nodes: CanvasNode[],
   edges: CanvasEdge[]
 ): AffectedCount {
-  let affectedNodes = selectedNodeIds.length;
+  const affectedNodes = selectedNodeIds.length;
   let affectedEdges = 0;
   let cascadingNodes = 0;
 

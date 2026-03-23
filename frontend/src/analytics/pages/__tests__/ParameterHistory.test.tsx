@@ -6,6 +6,7 @@
  */
 import { render, screen, createMockGameContext } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import ParameterHistory from '../ParameterHistory';
 
 // 创建可变的mock函数，允许在测试中动态修改返回值

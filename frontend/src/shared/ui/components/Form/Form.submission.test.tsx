@@ -4,14 +4,16 @@
  * Tests for Form component submission behavior.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
+
 import Form from './Form';
+
 import { FormInput } from './index';
 
 // Test schema

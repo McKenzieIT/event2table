@@ -5,8 +5,8 @@
  * 测试 fetchParams 返回的数据是否能正确解析
  */
 
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { fetchParams } from '@shared/api/eventNodeBuilderApi';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // 类型定义
 interface ParamData {

@@ -4,12 +4,12 @@
  * Tests for the useTemplates hook which manages template data fetching
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@test/test-utils';
-import { ApolloProvider } from '@apollo/client/react';
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 import { useTemplates } from '@shared/apollo/hooks';
 import { GET_TEMPLATES } from '@shared/graphql/operations';
+import { renderHook, waitFor } from '@test/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock Apollo Client
 const createMockClient = () => {

@@ -4,8 +4,9 @@
 
 import { renderHook, act } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useFocusManager } from '../hooks/useFocusManager';
+
 import { PopupType } from '../ZIndexManager';
+import { useFocusManager } from '../hooks/useFocusManager';
 
 describe('useFocusManager', () => {
   let containerRef: any;

@@ -13,8 +13,9 @@
  * @date 2026-01-29
  */
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Modal, Pagination, Button, Spinner } from '@shared/ui';
+import React, { useState, useEffect, useCallback, memo } from 'react';
+
 import './DataPreviewModal.css';
 import type { DataPreviewModalProps, PreviewDataResponse } from './types';
 

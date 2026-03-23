@@ -4,9 +4,10 @@
  * 测试 useFlowExecute hook 的功能
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, act, waitFor } from '@test/test-utils';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { useFlowExecute } from '../useFlowExecute';
 
 // Mock fetch

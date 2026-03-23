@@ -6,6 +6,7 @@
  */
 
 import { ApolloProvider } from '@apollo/client/react';
+
 import { client } from './client';
 
 // Export ApolloProvider for wrapping the app

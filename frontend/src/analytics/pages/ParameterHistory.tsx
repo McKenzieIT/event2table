@@ -3,9 +3,9 @@
 // - Component is pure and only depends on context
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
+import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
 import './ParameterHistory.css';
 
 /**

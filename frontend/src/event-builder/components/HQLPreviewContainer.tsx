@@ -20,9 +20,10 @@
  * @module HQLPreviewContainer
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
 import { previewHQL } from '@shared/api/eventNodeBuilder';
 import type { Event, WhereCondition } from '@shared/api/eventNodeBuilderApi';
+import React, { useState, useEffect, useCallback } from 'react';
+
 import HQLPreview from './HQLPreview';
 
 // ============================================

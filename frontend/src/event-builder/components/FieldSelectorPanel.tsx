@@ -9,8 +9,8 @@
  * FieldSelectorPanel Component
  * 基础字段选择面板 - 从底部向上弹出
  */
-import React, { useCallback, useMemo } from "react";
 import { FieldType } from '@shared/types/fieldBuilder';
+import React, { useCallback, useMemo } from "react";
 import './FieldSelectorPanel.css';
 
 /**

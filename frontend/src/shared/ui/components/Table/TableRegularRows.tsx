@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react';
 import { Row, RowData } from '@tanstack/react-table';
+import React, { useCallback } from 'react';
+
 import { TableColumn, CellContext } from './Table.types';
 
 interface TableRegularRowsProps<TData extends RowData> {

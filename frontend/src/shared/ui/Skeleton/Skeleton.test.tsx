@@ -3,8 +3,9 @@
  * 测试骨架屏组件的所有功能
  */
 
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@test/test-utils';
+import { describe, it, expect } from 'vitest';
+
 import Skeleton, {
   SkeletonTable,
   SkeletonForm,

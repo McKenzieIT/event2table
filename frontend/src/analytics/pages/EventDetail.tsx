@@ -2,12 +2,12 @@
 // ✅ Performance optimization: Prevent unnecessary re-renders
 // See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
-import React, { useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useGameContext } from '@shared/hooks/useGameContext';
 import { Button, Spinner, ErrorState, EmptyState } from '@shared/ui';
 import Table from '@shared/ui/components/Table';
-import { useGameContext } from '@shared/hooks/useGameContext';
+import { useQuery } from '@tanstack/react-query';
+import React, { useMemo, useCallback } from 'react';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import './EventDetail.css';
 
 /**

@@ -1,4 +1,5 @@
 import { FieldValues, FieldPath } from 'react-hook-form';
+
 import type { Size } from '@/shared/ui/types/common';
 
 export interface SelectOption {

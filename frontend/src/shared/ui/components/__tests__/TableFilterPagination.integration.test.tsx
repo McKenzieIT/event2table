@@ -4,10 +4,11 @@
  * Tests for Table, TableFilter and TablePagination component integration scenarios.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import React, { useState } from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { Table } from '../Table/Table';
 
 describe('Table + TableFilter + TablePagination Integration', () => {

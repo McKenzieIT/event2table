@@ -1,9 +1,9 @@
 // ⚡️ REACT PERF: React.memo + useCallback optimization
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
+import { Input } from '@shared/ui';
 import React, { useState, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { Input } from '@shared/ui';
 import './AlterSql.css';
 
 /**

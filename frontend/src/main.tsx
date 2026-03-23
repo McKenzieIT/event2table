@@ -1,13 +1,14 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { ApolloProvider } from "@apollo/client/react";
-import { Toaster } from "react-hot-toast";
+import { client } from "@shared/apollo/client";
 import { ToastProvider } from "@shared/ui";
 import { ErrorBoundary } from "@shared/ui/ErrorBoundary";
-import { client } from "@shared/apollo/client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { Toaster } from "react-hot-toast";
+import { BrowserRouter } from "react-router-dom";
+
 import App from "./App";
 
 // CSS imports - Order is critical for Vite

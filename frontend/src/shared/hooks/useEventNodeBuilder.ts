@@ -3,8 +3,8 @@
  * 事件节点构建器状态管理Hook
  */
 
-import { useState, useCallback, Dispatch, SetStateAction } from 'react';
 import type { Event } from '@shared/types/event-types';
+import { useState, useCallback, Dispatch, SetStateAction } from 'react';
 
 // ============================================
 // Type Definitions

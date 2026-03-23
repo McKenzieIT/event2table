@@ -29,11 +29,13 @@
  * />
  */
 
-import React, { useState, useCallback } from 'react';
 import { useMutation } from '@apollo/client/react';
-import { BaseModal, Button, Select, Spinner, useToast } from '@shared/ui';
-import { CHANGE_PARAMETER_TYPE } from '@/graphql/mutations';
 import type { Parameter } from '@shared/types/parameter-types';
+import { BaseModal, Button, Select, Spinner, useToast } from '@shared/ui';
+import React, { useState, useCallback } from 'react';
+
+import { CHANGE_PARAMETER_TYPE } from '@/graphql/mutations';
+
 
 interface ParameterTypeEditorProps {
   isOpen: boolean;

@@ -24,9 +24,9 @@
  * </RequireGameContext>
  */
 
+import { Button } from '@shared/ui';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@shared/ui';
 import './RequireGameContext.css';
 
 interface RequireGameContextProps {

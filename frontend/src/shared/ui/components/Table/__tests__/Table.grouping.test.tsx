@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@test/test-utils';
+import { describe, it, expect, vi } from 'vitest';
+
 import { Table } from '../Table';
 import type { TableColumn } from '../Table.types';
 

@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
 import { Card, Checkbox, Radio } from '@shared/ui';
+import React, { useState, useCallback, useMemo } from 'react';
 
 interface RadioOption {
   value: string;

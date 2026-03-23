@@ -4,14 +4,15 @@
  * This test verifies that the games route correctly renders the GamesListGraphQL component
  * with the game management modal functionality.
  */
-import { render, screen, waitFor } from '@test/test-utils';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ApolloProvider } from '@apollo/client/react';
-import { renderHook } from '@test/test-utils';
-import { useGameStore } from '@/stores/gameStore';
-import { client } from '@/graphql/client';
 import GamesListGraphQL from '@analytics/pages/GamesListGraphQL';
+import { ApolloProvider } from '@apollo/client/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen, waitFor , renderHook } from '@test/test-utils';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import { client } from '@/graphql/client';
+import { useGameStore } from '@/stores/gameStore';
+
 // Helper function to create a fresh QueryClient for each test
 function createQueryClient() {
   return new QueryClient({

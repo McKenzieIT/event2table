@@ -7,9 +7,10 @@
  * 通过读取 CSS 文件内容验证令牌定义
  */
 
-import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+
+import { describe, it, expect, beforeAll } from 'vitest';
 
 // 读取 CSS 文件内容
 let cssContent: string;

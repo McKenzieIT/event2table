@@ -10,8 +10,8 @@
  * - TypeScript类型安全
  */
 
-import { useState, useCallback } from 'react';
 import type { UseModalReturn } from '@shared/ui/components/Modal/Modal.types';
+import { useState, useCallback } from 'react';
 
 /**
  * useModal Hook选项

@@ -3,8 +3,9 @@
  */
 
 import { render, screen } from '@test/test-utils';
-import { TaskProgress } from '../TaskProgress';
+
 import type { TaskStatus } from '../../api/taskApi';
+import { TaskProgress } from '../TaskProgress';
 
 describe('TaskProgress', () => {
   it('renders progress correctly', () => {

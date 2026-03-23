@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { useChromeMCPCompatibleInput } from './useChromeMCPCompatibleInput';
 
 describe('useChromeMCPCompatibleInput', () => {

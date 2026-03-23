@@ -3,10 +3,11 @@
  * Categories Hooks 单元测试
  */
 
-import React from 'react';
-import { renderHook, waitFor, act } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
+import { renderHook, waitFor, act } from '@test/test-utils';
+import React from 'react';
 import { describe, it, expect } from 'vitest';
+
 import {
   useCategories,
   useCategory,
@@ -15,14 +16,14 @@ import {
   useDeleteCategory,
 } from '../../../shared/graphql/hooks';
 import {
-  GET_CATEGORIES,
-  GET_CATEGORY,
-} from '../../../shared/graphql/queries';
-import {
   CREATE_CATEGORY,
   UPDATE_CATEGORY,
   DELETE_CATEGORY,
 } from '../../../shared/graphql/mutations';
+import {
+  GET_CATEGORIES,
+  GET_CATEGORY,
+} from '../../../shared/graphql/queries';
 
 // Mock数据
 const mockCategories = [

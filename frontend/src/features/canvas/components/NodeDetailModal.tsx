@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+
 import "./NodeDetailModal.css";
 import type { NodeDetailModalProps, CanvasNode } from "./types";
 

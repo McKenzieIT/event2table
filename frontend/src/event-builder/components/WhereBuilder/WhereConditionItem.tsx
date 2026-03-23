@@ -3,13 +3,14 @@
  * WhereConditionItem Component
  * 单个WHERE条件项
  */
-import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { WhereConditionItemProps } from './types';
+import React from 'react';
+
 import FieldSelector from './FieldSelector';
 import OperatorSelector from './OperatorSelector';
 import ValueInput from './ValueInput';
+import { WhereConditionItemProps } from './types';
 import './WhereConditionItem.css';
 
 const WhereConditionItem: React.FC<WhereConditionItemProps> = ({

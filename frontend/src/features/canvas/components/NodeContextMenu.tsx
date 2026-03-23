@@ -6,6 +6,7 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 import React from "react";
+
 import "./NodeContextMenu.css";
 import type { NodeContextMenuProps, CanvasNode } from "./types";
 

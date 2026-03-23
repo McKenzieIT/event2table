@@ -3,8 +3,9 @@
  * 测试切换字段通用 Hook
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
+import { describe, it, expect, vi } from 'vitest';
+
 import { useCheckboxField, useRadioField, useSwitchField } from './useToggleField';
 
 describe('useToggleField hooks', () => {

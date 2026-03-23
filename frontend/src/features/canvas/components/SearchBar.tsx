@@ -5,8 +5,9 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Button } from '@shared/ui';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+
 import './SearchBar.css';
 import type { SearchBarProps } from './types';
 

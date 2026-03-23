@@ -12,9 +12,11 @@
  */
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { generateWhereClause, validateWhereConditions, WhereValidationResult } from '@shared/utils/whereGenerator';
-import { WhereItem } from '@shared/types/whereBuilder';
 import { Field } from '@shared/types/fieldBuilder';
+import { WhereItem } from '@shared/types/whereBuilder';
+
 import WhereBuilderCanvas from './WhereBuilderCanvas';
+
 import './WhereBuilderModal.css';
 import { Modal } from '@shared/ui';
 import toast from 'react-hot-toast';

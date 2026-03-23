@@ -5,9 +5,9 @@
  * Two-layer slide-out animation (on top of game management modal)
  */
 
-import React, { useCallback } from 'react';
-import { Modal } from '@shared/ui';
 import { GameForm } from '@shared/components/GameForm';
+import { Modal } from '@shared/ui';
+import React, { useCallback } from 'react';
 import './AddGameModal.css';
 
 interface AddGameModalProps {

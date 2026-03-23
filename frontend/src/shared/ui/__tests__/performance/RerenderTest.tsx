@@ -8,14 +8,12 @@
  * Run with: npm test -- RerenderTest
  */
 
-import React, { useState, useEffect, useRef } from 'react';
 import { render, fireEvent } from '@testing-library/react';
+import React, { useState, useEffect, useRef } from 'react';
+
 import '@testing-library/jest-dom';
-import { Button } from '../../index';
-import { Card } from '../../index';
-import { Input } from '../../index';
 import Table from '../../components/Table';
-import { Badge } from '../../index';
+import { Button , Card , Input , Badge } from '../../index';
 
 // Track render counts
 interface RenderTracker {

@@ -5,8 +5,10 @@
  */
 
 import React from 'react';
-import { TaskProgress } from './TaskProgress';
+
 import type { Task } from '../api/taskApi';
+
+import { TaskProgress } from './TaskProgress';
 
 interface TaskDetailProps {
   task: Task;

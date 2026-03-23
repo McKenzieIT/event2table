@@ -5,7 +5,7 @@
  * 使用TanStack Table管理事件节点表格状态
  */
 
-import { useState, useMemo } from 'react';
+import type { EventNode } from '@shared/types/eventNodes';
 import {
   useReactTable,
   getCoreRowModel,
@@ -16,7 +16,7 @@ import {
   ColumnFiltersState,
   Table,
 } from '@tanstack/react-table';
-import type { EventNode } from '@shared/types/eventNodes';
+import { useState, useMemo } from 'react';
 
 /**
  * 列定义类型

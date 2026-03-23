@@ -10,15 +10,17 @@
  * HQLPreviewModal Component
  * HQL预览全屏模态框（支持编辑和多模式切换）
  */
+import CodeMirror from '@uiw/react-codemirror';
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import CodeMirror from '@uiw/react-codemirror';
-import toast from 'react-hot-toast';
 import './HQLPreviewModal.css';
 import { Modal } from '@shared/ui';
-import PerformanceIndicator from '../HQLPreviewPanel/PerformanceIndicator';
+
 import DebugViewer from '../HQLPreviewPanel/DebugViewer';
+import PerformanceIndicator from '../HQLPreviewPanel/PerformanceIndicator';
+
 import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
 
 // ========== 类型定义 ==========

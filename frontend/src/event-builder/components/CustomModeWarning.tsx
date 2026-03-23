@@ -10,8 +10,8 @@
  * CustomModeWarning Component
  * 自定义编辑模式智能提醒对话框组件
  */
-import React from 'react';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import React from 'react';
 
 type ActionsetType = 'add' | 'modify';
 type ItemType = 'field' | 'condition';

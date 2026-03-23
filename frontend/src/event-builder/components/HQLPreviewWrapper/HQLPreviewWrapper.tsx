@@ -8,10 +8,11 @@
  * - 保持向后兼容
  */
 
+import type { Event, Field, ConditionValue } from '@shared/types/api-types';
 import React, { useState } from 'react';
+
 import HQLPreview from '../HQLPreview';
 import { HQLPreviewPanel, MultiEventConfig, HQLHistory } from '../HQLPreviewPanel';
-import type { Event, Field, ConditionValue } from '@shared/types/api-types';
 import './HQLPreviewWrapper.css';
 
 interface V1Props {

@@ -5,6 +5,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
+
 import { ZIndexManager } from './ZIndexManager';
 import { PopupConfig, PopupContextValue, PopupState } from './types';
 

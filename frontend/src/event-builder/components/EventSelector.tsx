@@ -10,11 +10,11 @@
  * EventSelector Component
  * 事件选择器组件
  */
-import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { fetchEvents } from '@shared/api/events';
-import { SearchInput, Skeleton, ErrorState } from '@shared/ui';
 import type { Event } from '@shared/types/event-types';
+import { SearchInput, Skeleton, ErrorState } from '@shared/ui';
+import { useQuery } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
 
 /**
  * 组件Props接口

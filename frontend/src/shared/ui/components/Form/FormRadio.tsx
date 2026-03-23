@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { FieldValues, FieldPath } from 'react-hook-form';
-import type { RadioFieldProps } from './Form.types';
+
 import { FormErrorMessage, FormHelperText } from './Form';
+import type { RadioFieldProps } from './Form.types';
 
 /**
  * FormRadio Component

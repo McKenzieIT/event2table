@@ -4,8 +4,8 @@
  * 展示 Table 组件的各种用法
  */
 
-import React, { useState } from 'react';
 import { Table, type TableColumn } from '@shared/ui';
+import React, { useState } from 'react';
 
 interface User {
   id: number;

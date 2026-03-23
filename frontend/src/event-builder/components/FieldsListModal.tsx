@@ -12,11 +12,11 @@
  */
 // @ts-nocheck - TypeScript检查暂禁用
 
+import { eventNodesApi } from "@shared/api/eventNodes";
+import type { Field } from "@shared/types/api-types";
+import type { EventNodeField } from "@shared/types/eventNodes";
 import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
 import toast from "react-hot-toast";
-import { eventNodesApi } from "@shared/api/eventNodes";
-import type { EventNodeField } from "@shared/types/eventNodes";
-import type { Field } from "@shared/types/api-types";
 
 /**
  * Props接口

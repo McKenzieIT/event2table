@@ -5,9 +5,9 @@
  * 验证事件配置的完整性，展示验证结果和修复建议
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { Modal, Button, Badge, Spinner, useToast } from '@shared/ui';
 import type { Event } from '@shared/types/event-types';
+import { Modal, Button, Badge, Spinner, useToast } from '@shared/ui';
+import React, { useState, useMemo, useCallback } from 'react';
 
 /**
  * 验证问题类型

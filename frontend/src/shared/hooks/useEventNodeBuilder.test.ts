@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
+import { describe, it, expect } from 'vitest';
+
 import { useEventNodeBuilder } from './useEventNodeBuilder';
 
 describe('useEventNodeBuilder', () => {

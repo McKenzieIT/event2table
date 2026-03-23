@@ -2,9 +2,9 @@
 // ✅ Performance optimization: Prevent unnecessary re-renders
 // See: docs/reports/2026-03-06/PHASE-2-OPTIMIZATION-REPORT.md
 
+import { Card, Button } from '@shared/ui';
 import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Button } from '@shared/ui';
 import './NotFound.css';
 
 /**

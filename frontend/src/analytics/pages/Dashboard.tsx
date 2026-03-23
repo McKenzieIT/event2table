@@ -2,10 +2,11 @@
 // Note: React.memo intentionally removed to avoid Suspense conflicts (experimental)
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useMemo, Suspense, useState, useEffect, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 import { Card, Spinner } from '@shared/ui';
+import { useQuery } from '@tanstack/react-query';
+import React, { useMemo, Suspense, useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
 import { useGameStore } from '@/stores/gameStore';
 import './Dashboard.css';
 

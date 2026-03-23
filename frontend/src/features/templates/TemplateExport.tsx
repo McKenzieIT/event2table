@@ -1,6 +1,6 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState } from "react";
 import { useToast } from "@shared/ui";
+import React, { useState } from "react";
 
 /**
  * Template Export Component

@@ -17,12 +17,12 @@
  * - Base only: only base fields
  * - Skip: close modal without adding fields
  */
-import React, { useCallback } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { BATCH_ADD_FIELDS_TO_CANVAS } from '@shared/graphql/mutations';
+import { Field } from '@shared/types/fieldBuilder';
 import { Button } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
-import { Field } from '@shared/types/fieldBuilder';
+import React, { useCallback } from 'react';
 import './FieldSelectionModal.css';
 
 /**

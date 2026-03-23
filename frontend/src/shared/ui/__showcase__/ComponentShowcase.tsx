@@ -13,22 +13,23 @@
  * }
  */
 
-import React from 'react';
 import { ToastProvider } from '@shared/ui';
+import React from 'react';
+
+import AnimationDemo from './sections/AnimationDemo';
+import BadgeShowcase from './sections/BadgeShowcase';
 import ButtonShowcase from './sections/ButtonShowcase';
 import CardShowcase from './sections/CardShowcase';
-import InputShowcase from './sections/InputShowcase';
-import BadgeShowcase from './sections/BadgeShowcase';
-import TableShowcase from './sections/TableShowcase';
-import ModalShowcase from './sections/ModalShowcase';
-import ToastShowcase from './sections/ToastShowcase';
-import TextAreaShowcase from './sections/TextAreaShowcase';
-import SelectShowcase from './sections/SelectShowcase';
 import CheckboxRadioShowcase from './sections/CheckboxRadioShowcase';
-import SwitchShowcase from './sections/SwitchShowcase';
-import SpinnerShowcase from './sections/SpinnerShowcase';
+import InputShowcase from './sections/InputShowcase';
 import InteractiveExample from './sections/InteractiveExample';
-import AnimationDemo from './sections/AnimationDemo';
+import ModalShowcase from './sections/ModalShowcase';
+import SelectShowcase from './sections/SelectShowcase';
+import SpinnerShowcase from './sections/SpinnerShowcase';
+import SwitchShowcase from './sections/SwitchShowcase';
+import TableShowcase from './sections/TableShowcase';
+import TextAreaShowcase from './sections/TextAreaShowcase';
+import ToastShowcase from './sections/ToastShowcase';
 import './ComponentShowcase.css';
 
 function ComponentShowcaseContent(): React.JSX.Element {

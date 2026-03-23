@@ -24,9 +24,9 @@
  * />
  */
 
-import React from 'react';
-import { Badge } from '@shared/ui';
 import type { Parameter } from '@shared/types/parameter-types';
+import { Badge } from '@shared/ui';
+import React from 'react';
 
 export interface ParameterCardProps {
   parameter: Parameter;

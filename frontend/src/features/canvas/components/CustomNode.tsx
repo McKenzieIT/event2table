@@ -7,8 +7,10 @@
 
 import React from "react";
 import { Handle, Position } from "reactflow";
+
 import "./CustomNode.css";
 import type { CustomNodeProps, CustomNodeData } from "./types";
+
 import type { Field } from "@/shared/types/hql-types";
 
 export default function CustomNode({ data, selected }: CustomNodeProps): React.JSX.Element {

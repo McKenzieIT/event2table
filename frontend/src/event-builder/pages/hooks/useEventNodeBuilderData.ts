@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import type { Game } from '@shared/hooks/useGameContext';
-import type { Event } from '@shared/types/api-types';
-import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
-import type { ConfigData } from '../EventNodeBuilder.types';
 import { loadEventConfig } from '@features/canvas/api/canvasApi';
 import { useToast } from '@features/canvas/components/hooks/useToast';
+import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
+import type { Game } from '@shared/hooks/useGameContext';
+import type { Event } from '@shared/types/api-types';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
+
+import type { ConfigData } from '../EventNodeBuilder.types';
+
 
 /**
  * LocalEventConfig interface for type safety (extended from canvas EventConfig)

@@ -19,8 +19,9 @@
  * />
  */
 
-import React, { useState } from 'react';
 import { Button } from '@shared/ui';
+import React, { useState } from 'react';
+
 import { BindToLibraryModal } from './BindToLibraryModal';
 
 export interface BindToLibraryButtonProps {

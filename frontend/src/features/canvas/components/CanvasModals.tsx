@@ -1,9 +1,10 @@
 // ⚡️ REACT PERF - Canvas: Modals component with lazy loading
 // Extracted from CanvasFlow.tsx for better maintainability
 
-import React, { Suspense, memo } from 'react';
 import { Spinner } from '@shared/ui';
 import { LazyJoinConfigModal, LazyHQLResultModal } from '@shared/utils/lazyModals';
+import React, { Suspense, memo } from 'react';
+
 import { CanvasModalsProps } from './CanvasFlow.types';
 
 /**

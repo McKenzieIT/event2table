@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { act, waitFor } from '@testing-library/react';
 import { renderHookWithProviders } from '@test/test-utils';
+import { act, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { useGameContext } from './useGameContext';
 
 // Mock useGameStore

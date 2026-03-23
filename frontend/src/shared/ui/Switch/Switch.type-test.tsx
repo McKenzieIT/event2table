@@ -6,8 +6,9 @@
  * It will be compiled by TypeScript during the build process.
  */
 
-import { Switch } from './Switch';
 import React from 'react';
+
+import { Switch } from './Switch';
 
 // Test 1: Basic usage with minimal props
 const test1 = () => {

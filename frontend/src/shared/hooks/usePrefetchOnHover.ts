@@ -1,5 +1,5 @@
-import { useRef, useCallback } from 'react';
 import { useQueryClient, QueryClient, QueryKey, QueryFunction } from '@tanstack/react-query';
+import { useRef, useCallback } from 'react';
 
 interface PrefetchOptions {
   delay?: number;

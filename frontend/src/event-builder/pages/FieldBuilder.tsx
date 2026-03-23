@@ -6,9 +6,9 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript检查暂禁用
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import FieldCanvas from '@event-builder/components/FieldCanvas';
+import FieldEventSelector from '@event-builder/components/FieldEventSelector';
+import HQLPreview from '@event-builder/components/HQLPreview';
 import {
   fetchEvents,
   fetchEventParameters,
@@ -17,13 +17,13 @@ import {
   previewHQL
 } from '@shared/api/fieldBuilder';
 import { Field, FieldType, DataType, FieldConfig, SQLMode } from '@shared/types/fieldBuilder';
-import { generateId, validateField } from '@shared/utils/fieldBuilder';
-import FieldEventSelector from '@event-builder/components/FieldEventSelector';
-import FieldCanvas from '@event-builder/components/FieldCanvas';
-import HQLPreview from '@event-builder/components/HQLPreview';
 import { Button, EmptyState } from '@shared/ui';
-import { useToast } from '@shared/ui/Toast/Toast';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { useToast } from '@shared/ui/Toast/Toast';
+import { generateId, validateField } from '@shared/utils/fieldBuilder';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import './FieldBuilder.css';
 
 /**

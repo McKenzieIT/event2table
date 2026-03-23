@@ -9,11 +9,13 @@
  * 使用GraphQL Mutation替代REST API
  */
 
-import React, { useRef, useEffect, ChangeEvent, FormEvent, memo } from 'react';
-import { Modal, Button, Input, Select, useToast } from '@shared/ui';
-import { useCreateGame } from '../../shared/graphql/hooks';
 import { useFormValidation } from '@shared/hooks/useFormValidation';
+import { Modal, Button, Input, Select, useToast } from '@shared/ui';
 import { gameValidationRules } from '@shared/utils/validationUtils';
+import React, { useRef, useEffect, ChangeEvent, FormEvent, memo } from 'react';
+
+import { useCreateGame } from '../../shared/graphql/hooks';
+
 import './AddGameModal.css';
 
 interface AddGameModalGraphQLProps {

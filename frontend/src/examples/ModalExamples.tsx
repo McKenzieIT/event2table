@@ -4,8 +4,8 @@
  * 展示 Modal 组件的各种用法
  */
 
-import React, { useState } from 'react';
 import { Modal, Button, Input } from '@shared/ui';
+import React, { useState } from 'react';
 
 export function ModalBasicExample() {
   const [isOpen, setIsOpen] = useState(false);

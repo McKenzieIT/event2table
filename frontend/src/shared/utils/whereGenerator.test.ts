@@ -4,14 +4,15 @@
  * Unit tests for WHERE clause generator
  */
 
+import { WhereCondition, WhereGroup, isWhereCondition, isWhereGroup } from '@shared/types/whereBuilder';
 import { describe, it, expect } from 'vitest';
+
 import {
   generateWhereClause,
   calculateWhereComplexity,
   validateWhereConditions,
   WhereValidationResult
 } from './whereGenerator';
-import { WhereCondition, WhereGroup, isWhereCondition, isWhereGroup } from '@shared/types/whereBuilder';
 
 describe('whereGenerator', () => {
   describe('generateWhereClause', () => {

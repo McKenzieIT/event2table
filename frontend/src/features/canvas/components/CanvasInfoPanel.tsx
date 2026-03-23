@@ -3,6 +3,7 @@
 
 import React, { memo } from 'react';
 import { Panel } from 'reactflow';
+
 import { CanvasInfoPanelProps } from './CanvasFlow.types';
 
 /**

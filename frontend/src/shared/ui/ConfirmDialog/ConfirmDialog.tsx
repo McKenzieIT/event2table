@@ -5,8 +5,8 @@
 // - Added body scroll lock/unlock functionality
 // See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
-import React, { useEffect, useRef, useCallback } from 'react';
 import { Button } from '@shared/ui';
+import React, { useEffect, useRef, useCallback } from 'react';
 import './ConfirmDialog.css';
 
 interface ConfirmDialogProps {

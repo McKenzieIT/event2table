@@ -4,9 +4,10 @@
  * Displays API latency data in a table format with metrics
  */
 
-import React from 'react';
-import { useApiLatency } from '../hooks';
 import { Spinner } from '@shared/ui';
+import React from 'react';
+
+import { useApiLatency } from '../hooks';
 import type { ApiLatencyData, ApiLatencyDataPoint } from '../types';
 
 /**

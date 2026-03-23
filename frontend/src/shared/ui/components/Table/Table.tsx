@@ -14,14 +14,6 @@
  * - Responsive design with theme customization
  */
 
-import React, { 
-  useMemo, 
-  useCallback, 
-  useState, 
-  useRef, 
-  useEffect,
-  forwardRef 
-} from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -36,6 +28,15 @@ import {
   ColumnPinningState,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import React, { 
+  useMemo, 
+  useCallback, 
+  useState, 
+  useRef, 
+  useEffect,
+  forwardRef 
+} from 'react';
+
 import type {
   TableProps,
   TableColumn,
@@ -49,21 +50,21 @@ import type {
   PaginationProps,
   VirtualScrollMetrics,
 } from './Table.types';
-import { TableHeader } from './TableHeader';
 import { TableBody } from './TableBody';
-import { TableFooter } from './TableFooter';
-import { TablePagination } from './TablePagination';
-import { TableRow } from './TableRow';
 import { TableCell } from './TableCell';
+import { TableEmptyState } from './TableEmptyState';
 import { TableFilter } from './TableFilter';
+import { TableFooter } from './TableFooter';
+import { TableHeader } from './TableHeader';
+import { TableLoadingState } from './TableLoadingState';
+import { TablePagination } from './TablePagination';
+import { TableRegularRows } from './TableRegularRows';
+import { TableRow } from './TableRow';
 import { TableSort } from './TableSort';
-import { useTableVirtualScroll } from './useTableVirtualScroll';
+import { TableVirtualizedRows } from './TableVirtualizedRows';
 import { useTableHandlers } from './useTableHandlers';
 import { useTableRender } from './useTableRender';
-import { TableVirtualizedRows } from './TableVirtualizedRows';
-import { TableRegularRows } from './TableRegularRows';
-import { TableLoadingState } from './TableLoadingState';
-import { TableEmptyState } from './TableEmptyState';
+import { useTableVirtualScroll } from './useTableVirtualScroll';
 import './Table.css';
 
 // ============================================================================

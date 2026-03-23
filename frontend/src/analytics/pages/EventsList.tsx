@@ -4,24 +4,24 @@
 // - Preserved all React.memo, useCallback, useMemo optimizations
 // - Each component file < 500 lines
 
-import React, { useState, useCallback } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@shared/ui';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
-import { SelectGamePrompt, Pagination, ConfirmDialog } from '@shared/ui';
+
 import { BatchEditModal } from '@features/events/components/BatchEditModal';
 import { BatchValidateModal } from '@features/events/components/BatchValidateModal';
+import { SelectGamePrompt, Pagination, ConfirmDialog , useToast } from '@shared/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import React, { useState, useCallback } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import './EventsList.css';
 import './VirtualTable.css';
 
 // 导入类型和子组件
-import { LayoutContext, ConfirmState } from './components/EventsList/types';
-import { useEventsList } from './components/EventsList/hooks';
+import EventsFilters from './components/EventsList/EventsFilters';
 import EventsListHeader from './components/EventsList/EventsListHeader';
 import EventsStats from './components/EventsList/EventsStats';
-import EventsFilters from './components/EventsList/EventsFilters';
 import EventsVirtualTable from './components/EventsList/EventsVirtualTable';
+import { useEventsList } from './components/EventsList/hooks';
+import { LayoutContext, ConfirmState } from './components/EventsList/types';
 
 /**
  * EventsList 主组件

@@ -32,6 +32,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, useMemo, ReactNode, KeyboardEvent, ChangeEvent } from 'react';
+
 import './SearchInput.css';
 import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
 import { compareSearchInputProps } from '../utils/memoComparators';

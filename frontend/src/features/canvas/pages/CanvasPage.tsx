@@ -9,12 +9,15 @@
 import React, { useMemo, useCallback, memo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ReactFlowProvider } from 'reactflow';
+
 import 'reactflow/dist/style.css';
 import './CanvasPage.css';
 import CanvasFlow from '../components/CanvasFlow';
+
 import '../components/CanvasFlow.css';
 import { Button, Spinner } from '@shared/ui';
 import { useGameContext } from '@shared/hooks/useGameContext';
+
 import { useGameData } from '../hooks/useGameData';
 
 /**

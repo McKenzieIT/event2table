@@ -5,8 +5,8 @@
  * 测试GraphQL版本的EventsList页面功能
  */
 
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // 创建可变的mock函数，允许在测试中动态修改返回值
 const mockOutletContext = vi.fn();
@@ -40,7 +40,9 @@ vi.mock('react-router-dom', async () => {
 // 现在可以安全地导入其他模块
 import { renderWithMockedApollo, screen, waitFor, fireEvent, createMockGameContext } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
+
 import EventsListGraphQL from '../EventsListGraphQL';
+
 import { GET_EVENTS, GET_CATEGORIES, DELETE_EVENT } from '@shared/graphql/operations';
 
 // 默认返回有游戏上下文

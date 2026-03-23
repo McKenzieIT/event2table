@@ -4,10 +4,11 @@
  * 测试主题提供者组件的功能
  */
 
+import { renderHook, act , render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { render, screen } from '@testing-library/react';
+
 import { ThemeProvider, useTheme, getThemeStore, resetThemeStore } from '../ThemeProvider';
+
 import {
   DEFAULT_THEME,
   THEME_STORAGE_KEY,

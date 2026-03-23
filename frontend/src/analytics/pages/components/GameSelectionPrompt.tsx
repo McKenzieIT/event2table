@@ -1,6 +1,6 @@
+import { Button } from "@shared/ui";
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@shared/ui";
 
 /**
  * 游戏选择提示组件

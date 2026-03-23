@@ -1,5 +1,5 @@
-import React from 'react';
 import { EmptyState } from '@shared/ui';
+import React from 'react';
 
 /**
  * Props for DropZone component

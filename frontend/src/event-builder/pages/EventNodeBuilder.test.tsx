@@ -3,13 +3,13 @@
  * EventNodeBuilder Component Tests
  * 阶段3：V2 API默认启用 + 可折叠面板
  */
-import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, createMockGameContext } from '@test/test-utils';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import EventNodeBuilder from '@event-builder/pages/EventNodeBuilder';
 import { ToastProvider } from '@shared/ui/Toast/Toast';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen, fireEvent, createMockGameContext } from '@test/test-utils';
+import React from 'react';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock react-router-dom
 vi.mock('react-router-dom', async () => {

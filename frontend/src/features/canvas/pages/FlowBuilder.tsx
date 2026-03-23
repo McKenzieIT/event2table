@@ -1,10 +1,10 @@
 // ✅ React Performance Optimization: Added React.memo, useMemo
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
+import { useGameContext } from '@shared/hooks/useGameContext';
+import { Card } from '@shared/ui';
 import React, { useMemo, memo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card } from '@shared/ui';
-import { useGameContext } from '@shared/hooks/useGameContext';
 import './FlowBuilder.css';
 
 /**

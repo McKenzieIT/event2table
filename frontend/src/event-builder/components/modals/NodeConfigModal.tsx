@@ -9,9 +9,9 @@
  * NodeConfigModal Component
  * 节点配置模态框组件
  */
+import { Input } from '@shared/ui';
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { Input } from '@shared/ui';
 
 /**
  * 节点配置接口

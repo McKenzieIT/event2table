@@ -8,10 +8,13 @@
  * @module ParameterInputWithRecommendation
  */
 
-import React, { useState, useCallback } from 'react';
 import { Input } from '@shared/ui';
-import { FieldRecommendation } from './FieldRecommendation';
+import React, { useState, useCallback } from 'react';
+
 import type { FieldRecommendationData, FieldTypeInferenceData } from '../api/fieldRecommendationApi';
+
+import { FieldRecommendation } from './FieldRecommendation';
+
 
 interface ParameterInputWithRecommendationProps {
   /** Current parameter name value */

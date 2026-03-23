@@ -4,15 +4,16 @@
  * Tests for Select and Form component integration scenarios.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
-import Select from '../Select/Select';
+
 import { Form, FormInput, FormCheckbox } from '../Form';
+import Select from '../Select/Select';
 
 describe('Select + Form Integration', () => {
   beforeEach(() => {

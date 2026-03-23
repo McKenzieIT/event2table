@@ -1,8 +1,9 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
+import { useGameContext } from "@shared/hooks/useGameContext";
+import { Button, Card, useToast } from "@shared/ui";
 import React, { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Card, useToast } from "@shared/ui";
-import { useGameContext } from "@shared/hooks/useGameContext";
+
 import { ImportPreviewModal } from "../components/ImportPreviewModal";
 import "./ImportEvents.css";
 

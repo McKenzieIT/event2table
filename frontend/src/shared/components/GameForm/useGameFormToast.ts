@@ -8,8 +8,8 @@
  * - 自动管理loading状态
  */
 
-import { useRef, useCallback } from 'react';
 import { useToast } from '@shared/ui';
+import { useRef, useCallback } from 'react';
 
 interface ToastOptions {
   duration?: number;

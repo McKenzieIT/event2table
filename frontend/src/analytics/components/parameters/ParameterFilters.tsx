@@ -25,9 +25,10 @@
  * />
  */
 
-import React from 'react';
 import { useQuery } from '@apollo/client/react';
 import { Select } from '@shared/ui';
+import React from 'react';
+
 import { GET_EVENTS } from '@/graphql/queries';
 
 interface EventData {

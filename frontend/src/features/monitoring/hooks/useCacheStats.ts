@@ -8,6 +8,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
+
 import { getCacheStats } from '../api/monitoringApi';
 import type { CacheStats } from '../types';
 

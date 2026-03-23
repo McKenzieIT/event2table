@@ -4,8 +4,9 @@
  * 测试面包屑导航组件的所有功能
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@test/test-utils';
+import { describe, it, expect, vi } from 'vitest';
+
 import Breadcrumb, { Breadcrumb as BreadcrumbComponent } from './Breadcrumb';
 
 describe('Breadcrumb Component', () => {

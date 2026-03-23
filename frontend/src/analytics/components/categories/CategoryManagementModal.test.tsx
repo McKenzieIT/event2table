@@ -13,10 +13,11 @@
  * - Toast通知显示
  * - game_gid参数保留
  */
-import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
-import React from 'react';
-import { render, screen, fireEvent, waitFor, cleanup } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen, fireEvent, waitFor, cleanup } from '@test/test-utils';
+import React from 'react';
+import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
+
 import CategoryManagementModal from './CategoryManagementModal';
 // 类型定义
 interface MockCategory {

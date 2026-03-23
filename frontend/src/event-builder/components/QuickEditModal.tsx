@@ -13,15 +13,14 @@
  * @description 快速编辑事件节点的基本信息（名称、描述）
  */
 
-import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import toast from "react-hot-toast";
 import { eventNodesApi } from "@shared/api/eventNodes";
 import type { EventNode } from "@shared/types/eventNodes";
-import { Modal } from '@shared/ui';
-import { Button } from "@shared/ui";
+import { Modal , Button } from '@shared/ui';
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { z } from "zod";
 
 /**
  * Zod验证schema

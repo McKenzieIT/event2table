@@ -6,6 +6,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
+
 import {
   DEFAULT_QUERY_CACHE_CONFIG,
   DEFAULT_MUTATION_CACHE_CONFIG,

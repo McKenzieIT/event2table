@@ -6,6 +6,7 @@
  */
 
 import { useSubscription } from '@apollo/client/react';
+
 import {
   ON_EVENT_UPDATED,
   ON_PARAMETER_UPDATED,

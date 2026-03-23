@@ -4,13 +4,14 @@
 // - Added performance monitoring for render metrics
 // - Preserved React.memo, useCallback, useMemo optimizations
 
+import { useQueryParam } from '@shared/hooks/useQueryParams';
+import { Button, SearchInput, Skeleton, ErrorState, EmptyState } from '@shared/ui';
+import ConfirmDialog from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { useToast } from '@shared/ui/Toast/Toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, SearchInput, Skeleton, ErrorState, EmptyState } from '@shared/ui';
-import { useToast } from '@shared/ui/Toast/Toast';
-import ConfirmDialog from '@shared/ui/ConfirmDialog/ConfirmDialog';
-import { useQueryParam } from '@shared/hooks/useQueryParams';
+
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
 import './CommonParamsList.css';

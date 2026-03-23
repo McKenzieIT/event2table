@@ -4,11 +4,12 @@
  * Tests for CacheStats component
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { CacheStats } from '../components/CacheStats';
+import { render, screen, waitFor } from '@test/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import * as monitoringApi from '../api/monitoringApi';
+import { CacheStats } from '../components/CacheStats';
 
 // Mock API functions
 vi.mock('../api/monitoringApi');

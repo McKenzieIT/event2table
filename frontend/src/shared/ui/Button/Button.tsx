@@ -24,6 +24,7 @@ import './Button.css';
 
 import { buildCompoundClasses } from '../utils/classNames';
 import { compareButtonProps } from '../utils/memoComparators';
+
 import type { BaseComponentProps, IconComponent, MouseEventHandler } from '@/shared/ui/types/common';
 
 /**

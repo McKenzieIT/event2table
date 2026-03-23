@@ -1,5 +1,5 @@
-import { useState, useCallback, ReactElement } from 'react';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import { useState, useCallback, ReactElement } from 'react';
 
 export interface ConfirmOptions {
   title?: string;

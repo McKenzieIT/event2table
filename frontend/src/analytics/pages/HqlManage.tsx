@@ -2,12 +2,12 @@
 // ✅ Performance optimization: Prevent unnecessary re-renders
 // See: docs/reports/2026-03-06/PHASE-2-OPTIMIZATION-REPORT.md
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 import { Button, SearchInput, Spinner, useToast, EmptyState } from '@shared/ui';
 import ConfirmDialog from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import Table from '@shared/ui/components/Table';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import './HqlManage.css';
 
 /**

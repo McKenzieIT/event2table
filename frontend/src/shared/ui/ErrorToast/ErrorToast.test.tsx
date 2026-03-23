@@ -4,9 +4,10 @@
  * 测试错误提示组件的渲染、交互和自动消失功能
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act, renderHook } from '@test/test-utils';
+import React from 'react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 import ErrorToast, { useErrorToast, ErrorLevel } from './ErrorToast';
 
 describe('ErrorToast Component', () => {

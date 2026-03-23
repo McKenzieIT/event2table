@@ -17,12 +17,12 @@
  * 使用TypeScript提供类型安全
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
-import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
 import { BindToLibraryButton } from '@shared/components/BindToLibraryButton';
 import { useParametersManagement } from '@shared/graphql/hooks';
+import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
+import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
+import React, { useState, useMemo, useCallback } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
 import './ParametersEnhanced.css';
 
 interface Parameter {

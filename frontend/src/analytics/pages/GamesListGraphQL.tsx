@@ -5,10 +5,7 @@
 // - Preserved React.memo, useCallback, useMemo optimizations
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useCallback, useMemo, memo } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { Link } from 'react-router-dom';
-import { GET_GAMES } from '@/graphql/queries';
 import {
   Input,
   Badge,
@@ -19,10 +16,14 @@ import {
   EmptyState,
   Button
 } from '@shared/ui';
-import { useGameStore } from '@/stores/gameStore';
-import { useGameContext } from '@/shared/hooks/useGameContext';
+import React, { useState, useCallback, useMemo, memo } from 'react';
+import { Link } from 'react-router-dom';
+
+import { GET_GAMES } from '@/graphql/queries';
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
+import { useGameContext } from '@/shared/hooks/useGameContext';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
+import { useGameStore } from '@/stores/gameStore';
 import './ParametersList.css';
 import './VirtualTable.css';
 

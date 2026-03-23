@@ -4,11 +4,12 @@
  * Tests for the useFlowLoad React Query hook
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { renderHook, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useFlowLoad } from '../useFlowLoad';
+import { renderHook, waitFor } from '@test/test-utils';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
+
 import type { SavedFlow } from '../../types';
+import { useFlowLoad } from '../useFlowLoad';
 
 // Mock fetch
 global.fetch = vi.fn();

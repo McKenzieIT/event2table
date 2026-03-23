@@ -4,8 +4,8 @@
  * 展示 Select 组件的各种用法
  */
 
-import React, { useState } from 'react';
 import { Select, type SelectOption } from '@shared/ui';
+import React, { useState } from 'react';
 
 const basicOptions: SelectOption[] = [
   { value: 'apple', label: '苹果' },

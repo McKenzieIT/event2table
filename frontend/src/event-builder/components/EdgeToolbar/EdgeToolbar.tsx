@@ -11,9 +11,11 @@
  * 底部边缘激活栏 - 鼠标靠近底部时从底部滑入
  */
 import React, { useState, useCallback } from "react";
+
+import FieldSelectorPanel from "../FieldSelectorPanel";
+
 import EdgeToolbarButton from "./EdgeToolbarButton";
 import QuickFieldTools from "./QuickFieldTools";
-import FieldSelectorPanel from "../FieldSelectorPanel";
 
 /**
  * Canvas Field interface

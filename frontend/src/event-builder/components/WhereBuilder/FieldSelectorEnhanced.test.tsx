@@ -9,12 +9,14 @@
  * 3. Refactor - 重构代码，保持测试通过
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@test/test-utils';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fetchParams } from '@shared/api/eventNodeBuilderApi';
-import FieldSelectorEnhanced from './FieldSelectorEnhanced';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen, waitFor } from '@test/test-utils';
 import type { ReactNode } from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+import FieldSelectorEnhanced from './FieldSelectorEnhanced';
+
 
 // Mock fetchParams API
 vi.mock('@shared/api/eventNodeBuilderApi', () => ({

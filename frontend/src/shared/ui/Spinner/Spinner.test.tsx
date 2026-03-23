@@ -3,9 +3,10 @@
  * 测试加载动画组件的所有功能
  */
 
+import { render, screen } from '@test/test-utils';
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@test/test-utils';
+
 import Spinner from './Spinner';
 
 describe('Spinner Component', () => {

@@ -8,15 +8,12 @@
  * Run with: npm test -- RenderingPerformanceTest
  */
 
-import React, { useState, useEffect } from 'react';
 import { render, fireEvent } from '@testing-library/react';
+import React, { useState, useEffect } from 'react';
+
 import '@testing-library/jest-dom';
-import { Button } from '../../index';
-import { Card } from '../../index';
-import { Input } from '../../index';
 import Table from '../../components/Table';
-import { Badge } from '../../index';
-import { Modal } from '../../index';
+import { Button , Card , Input , Badge , Modal } from '../../index';
 
 interface PerformanceMetrics {
   componentName: string;

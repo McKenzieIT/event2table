@@ -3,8 +3,9 @@
  * 测试页面加载组件的所有功能
  */
 
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@test/test-utils';
+import { describe, it, expect } from 'vitest';
+
 import PageLoader from './PageLoader';
 
 describe('PageLoader Component', () => {

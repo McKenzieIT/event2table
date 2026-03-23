@@ -11,9 +11,10 @@
  * - 拖放功能
  */
 
-import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
-import React from 'react';
 import { render, screen, fireEvent, waitFor, cleanup } from '@test/test-utils';
+import React from 'react';
+import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
+
 import CanvasFlow from '../components/CanvasFlow';
 
 // Note: render from @test/test-utils already wraps with AllProviders (includes BrowserRouter, QueryClientProvider, ReactFlowWrapper)

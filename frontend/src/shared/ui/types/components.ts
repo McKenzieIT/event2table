@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import type { BaseComponentProps, Size, Variant, Id, Option } from "./common";
 import type { ClickHandler, ChangeHandler, FocusHandler } from "./events";
 

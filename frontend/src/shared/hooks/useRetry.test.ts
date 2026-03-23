@@ -4,8 +4,9 @@
  * 测试重试机制、指数退避策略和错误处理
  */
 
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 import { useRetry, useAsyncRetry } from './useRetry';
 
 // Helper to create a rejected promise that won't trigger unhandled rejection warnings

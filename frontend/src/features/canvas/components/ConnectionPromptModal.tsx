@@ -5,8 +5,9 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useState, useCallback, memo } from "react";
 import { Button, Checkbox } from "@shared/ui";
+import React, { useState, useCallback, memo } from "react";
+
 import "./ConnectionPromptModal.css";
 import type { ConnectionPromptModalProps } from "./types";
 

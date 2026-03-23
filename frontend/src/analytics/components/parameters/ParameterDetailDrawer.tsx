@@ -12,9 +12,9 @@
  * Similar to a modal, slides in from the right side.
  */
 
+import { fetchParameterDetails } from '@shared/api/parameters';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchParameterDetails } from '@shared/api/parameters';
 import './ParameterDetailDrawer.css';
 
 interface ParameterDetails {

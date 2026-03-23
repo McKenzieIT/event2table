@@ -3,8 +3,9 @@
  * 遵循TDD开发模式：先写测试，看测试失败，再编写实现
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@test/test-utils';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { CoordinationDashboard } from '../CoordinationDashboard';
 
 describe('CoordinationDashboard', () => {

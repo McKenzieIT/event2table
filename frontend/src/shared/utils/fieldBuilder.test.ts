@@ -4,9 +4,10 @@
  * Unit tests for field builder utilities
  */
 
-import { describe, it, expect } from 'vitest';
-import { generateId, generateHQL, validateField } from './fieldBuilder';
 import { Field } from '@shared/types/fieldBuilder';
+import { describe, it, expect } from 'vitest';
+
+import { generateId, generateHQL, validateField } from './fieldBuilder';
 
 describe('fieldBuilder', () => {
   describe('generateId', () => {

@@ -1,6 +1,6 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import { useQuery } from '@tanstack/react-query';
 import { fetchParams } from '@shared/api/eventNodeBuilderApi';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 interface BaseField {

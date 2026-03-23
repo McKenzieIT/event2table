@@ -1,5 +1,5 @@
-import React from 'react';
 import { Badge } from '@shared/ui';
+import React from 'react';
 
 const BadgeShowcase: React.FC = React.memo(() => {
   return (

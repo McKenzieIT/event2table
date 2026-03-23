@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect, useMemo, useCallback, ChangeEvent, memo } from 'react';
 import { Button, Input, EmptyState } from '@shared/ui';
+import React, { useState, useEffect, useMemo, useCallback, ChangeEvent, memo } from 'react';
+
 import { FlowNode, FlowEdge } from '../types';
 import './PropertiesPanel.css';
 

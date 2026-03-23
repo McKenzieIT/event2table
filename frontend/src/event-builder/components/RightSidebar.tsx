@@ -2,11 +2,12 @@
  * RightSidebar Component
  * 右侧栏组件（HQL预览、WHERE条件、统计信息）
  */
-import React, { memo } from 'react';
-import HQLPreviewContainer from './HQLPreviewContainer';
-import WhereBuilder, { type WhereCondition as BuilderWhereCondition } from './WhereBuilder';
-import StatsPanel from './StatsPanel';
 import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
+import React, { memo } from 'react';
+
+import HQLPreviewContainer from './HQLPreviewContainer';
+import StatsPanel from './StatsPanel';
+import WhereBuilder, { type WhereCondition as BuilderWhereCondition } from './WhereBuilder';
 
 interface EventData {
   id: number;

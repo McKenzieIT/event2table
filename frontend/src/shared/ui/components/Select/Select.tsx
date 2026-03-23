@@ -11,10 +11,12 @@ import React, {
   FocusEvent
 } from 'react';
 import { Controller } from 'react-hook-form';
+
 import type { SelectProps, SelectOption } from './Select.types';
-import { SelectInput } from './SelectInput';
-import { SelectDropdown } from './SelectDropdown';
 import { filterOptions, getSelectedOptions, calculateDropdownPosition } from './Select.utils';
+import { SelectDropdown } from './SelectDropdown';
+import { SelectInput } from './SelectInput';
+
 import { useDebounce } from '@/shared/ui/hooks/useDebounce';
 import './Select.css';
 

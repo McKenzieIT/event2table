@@ -16,8 +16,8 @@
  * }
  */
 
-import React, { Suspense, lazy, ComponentType } from 'react';
 import { Spinner } from '@shared/ui';
+import React, { Suspense, lazy, ComponentType } from 'react';
 
 interface LazyModalWrapperProps {
   isOpen: boolean;

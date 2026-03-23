@@ -1,4 +1,5 @@
 import { render, screen } from '@test/test-utils';
+
 import { Table } from '../Table';
 
 describe('Table Migration', () => {

@@ -17,11 +17,13 @@
  * 3. REFACTOR: 重构并保持测试通过
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
-import GameManagementModalGraphQL, { GameManagementModal } from './GameManagementModalGraphQL';
+import { render, screen, fireEvent, waitFor } from '@test/test-utils';
+import React from 'react';
+
 import { GET_GAMES, CREATE_GAME } from '../../shared/graphql/operations';
+
+import GameManagementModalGraphQL, { GameManagementModal } from './GameManagementModalGraphQL';
 
 // Mock GraphQL operations - must match GET_GAMES query fields exactly
 // Query fields: gid, name, odsDb, eventCount, parameterCount

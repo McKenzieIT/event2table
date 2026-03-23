@@ -3,8 +3,9 @@
  * 测试搜索输入组件的所有功能
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import SearchInput from './SearchInput';
 
 describe('SearchInput Component', () => {

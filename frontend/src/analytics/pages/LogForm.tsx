@@ -3,11 +3,11 @@
 // See: docs/reports/2026-03-06/REACT-PERFORMANCE-OPTIMIZATION-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { Button, Input , Spinner } from '@shared/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Button, Input } from '@shared/ui';
-import { Spinner } from '@shared/ui';
+
 import { useFormValidation } from '../../shared/hooks/useFormValidation';
 import './LogForm.css';
 

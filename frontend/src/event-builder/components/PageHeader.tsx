@@ -10,9 +10,9 @@
  * PageHeader Component
  * 页面头部组件
  */
+import { Button } from '@shared/ui';
 import React, { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@shared/ui';
 
 interface GameData {
   name: string;

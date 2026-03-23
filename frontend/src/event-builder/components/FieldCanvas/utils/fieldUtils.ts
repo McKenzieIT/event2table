@@ -1,5 +1,6 @@
-import { FieldType, DataType } from '../../../types/fieldTypes';
 import { generateId } from '@shared/utils/idGenerator';
+
+import { FieldType, DataType } from '../../../types/fieldTypes';
 
 /**
  * Field type definition

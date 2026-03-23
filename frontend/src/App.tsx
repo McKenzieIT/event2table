@@ -2,11 +2,12 @@
 // TODO: Add appropriate React optimization
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
+import { ThemeProvider } from '@shared/ui';
+import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
 import React from 'react';
 import { useRoutes, Navigate } from 'react-router-dom';
+
 import { routes } from './routes/routes';
-import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
-import { ThemeProvider } from '@shared/ui';
 
 /**
  * App Component

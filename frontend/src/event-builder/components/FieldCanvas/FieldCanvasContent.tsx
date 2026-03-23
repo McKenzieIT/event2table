@@ -1,15 +1,16 @@
-import React from 'react';
 import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import type { UniqueIdentifier, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { EmptyState } from '@shared/ui';
-import SortableFieldItem from './SortableFieldItem';
+import React from 'react';
+
+import { FieldType } from '../../types/fieldTypes';
+
 import { DropZone } from './DropZone';
 import { EdgeToolbar } from './EdgeToolbar';
 import { FieldContextMenu } from './FieldContextMenu';
-import { Field } from './utils/fieldUtils';
-import { FieldType } from '../../types/fieldTypes';
-import { getDeleteMessage } from './utils/fieldUtils';
+import SortableFieldItem from './SortableFieldItem';
+import { Field , getDeleteMessage } from './utils/fieldUtils';
 
 interface FieldCanvasContentProps {
   fields: Field[];

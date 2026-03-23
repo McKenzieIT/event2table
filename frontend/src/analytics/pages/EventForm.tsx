@@ -2,9 +2,8 @@
 // Verified: All event handlers use useCallback, component wrapped with React.memo
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { memo } from 'react';
-import { useNavigate, useParams, useSearchParams, useOutletContext } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client/react';
+import { CREATE_EVENT, UPDATE_EVENT } from '@shared/graphql/mutations';
 import {
   Input,
   Select,
@@ -15,7 +14,9 @@ import {
   useToast,
   SelectGamePrompt
 } from '@shared/ui';
-import { CREATE_EVENT, UPDATE_EVENT } from '@shared/graphql/mutations';
+import React, { memo } from 'react';
+import { useNavigate, useParams, useSearchParams, useOutletContext } from 'react-router-dom';
+
 import { GET_EVENTS, GET_CATEGORIES, GET_EVENT } from '@/graphql/queries';
 import './EventForm.css';
 

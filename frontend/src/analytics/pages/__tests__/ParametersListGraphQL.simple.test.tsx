@@ -2,11 +2,11 @@
  * 简化的测试文件 - 用于调试渲染问题
  */
 
+import { gql } from '@apollo/client';
 import { render, screen } from '@test/test-utils';
+import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
-import { gql } from '@apollo/client';
-import React from 'react';
 
 // Mock all dependencies FIRST
 vi.mock('@/stores/gameStore', () => ({

@@ -6,10 +6,10 @@
  * @date 2026-03-19
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
 import type { Template } from '@shared/api/templateApi';
 import { fetchTemplate, createTemplate, updateTemplate, deleteTemplate } from '@shared/api/templateApi';
 import { Button, Input, TextArea, Modal, ConfirmDialog } from '@shared/ui';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import './TemplateEditor.css';
 

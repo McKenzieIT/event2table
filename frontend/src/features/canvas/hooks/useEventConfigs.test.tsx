@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@test/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { useEventConfigs } from './useEventConfigs';
 
 // Mock fetch

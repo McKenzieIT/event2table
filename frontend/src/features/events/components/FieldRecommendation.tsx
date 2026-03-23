@@ -7,9 +7,10 @@
  */
 
 import React, { useState, useCallback } from 'react';
+
+import type { FieldRecommendationData, FieldTypeInferenceData } from '../api/fieldRecommendationApi';
 import { useFieldRecommendations } from '../hooks/useFieldRecommendations';
 import { useFieldTypeInference } from '../hooks/useFieldTypeInference';
-import type { FieldRecommendationData, FieldTypeInferenceData } from '../api/fieldRecommendationApi';
 
 interface FieldRecommendationProps {
   /** Current parameter name */

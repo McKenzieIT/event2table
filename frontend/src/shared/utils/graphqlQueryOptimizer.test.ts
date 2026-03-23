@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
+
 import { GraphQLQueryOptimizer } from './graphqlQueryOptimizer';
 
 describe('GraphQLQueryOptimizer', () => {

@@ -18,6 +18,7 @@
  */
 
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+
 import { getCommonPatterns, type FieldPattern } from '../api/fieldRecommendationApi';
 
 /**

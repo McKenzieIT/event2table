@@ -9,9 +9,9 @@
  * FieldConfigModal Component
  * 字段配置模态框组件
  */
+import { Input } from '@shared/ui';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { Input } from '@shared/ui';
 
 /**
  * 字段接口

@@ -24,13 +24,13 @@
  * @migrated-to-typescript 2026-02-27
  */
 
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+import { Modal, EmptyState, Spinner } from '@shared/ui';
+import { LazyDataPreviewModal } from '@shared/utils/lazyModals';
+import { formatSQL, calculateSQLStats } from '@shared/utils/sqlFormatter';
 import React, { useState, useEffect, useRef, useMemo, ChangeEvent, KeyboardEvent, Suspense } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Modal, EmptyState, Spinner } from '@shared/ui';
-import { formatSQL, calculateSQLStats } from '@shared/utils/sqlFormatter';
-import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
-import { LazyDataPreviewModal } from '@shared/utils/lazyModals';
 import './HQLResultModal.css';
 
 // ============================================

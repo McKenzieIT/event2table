@@ -1,5 +1,6 @@
-import React from 'react';
 import { Button } from '@shared/ui';
+import React from 'react';
+
 import { EventsListHeaderProps } from './types';
 
 /**

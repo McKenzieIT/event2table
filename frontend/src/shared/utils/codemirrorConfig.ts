@@ -1,8 +1,9 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { sql, SQLDialect } from '@codemirror/lang-sql';
-import { EditorView, Extension } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
 import { linter } from '@codemirror/lint';
+import { EditorState } from '@codemirror/state';
+import { EditorView, Extension } from '@codemirror/view';
+
 import { createHiveLinter } from './hiveLinter';
 
 const hiveKeywords = [

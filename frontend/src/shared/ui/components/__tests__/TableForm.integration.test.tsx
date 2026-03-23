@@ -4,16 +4,17 @@
  * Tests for Table and Form component integration scenarios.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
-import { Table } from '../Table/Table';
+
 import Form from '../Form/Form';
 import { FormInput, FormSelect, FormCheckbox } from '../Form/index';
+import { Table } from '../Table/Table';
 
 describe('Table + Form Integration', () => {
   beforeEach(() => {

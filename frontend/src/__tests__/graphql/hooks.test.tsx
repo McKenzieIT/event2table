@@ -3,10 +3,11 @@
  * GraphQL Hooks 单元测试
  */
 
-import React from 'react';
-import { renderHook, waitFor, act } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
+import { renderHook, waitFor, act } from '@test/test-utils';
+import React from 'react';
 import { describe, it, expect } from 'vitest';
+
 import {
   useGames,
   useGame,
@@ -22,14 +23,6 @@ import {
   useDeleteEvent,
 } from '../../shared/graphql/hooks';
 import {
-  GET_GAMES,
-  GET_GAME,
-  SEARCH_GAMES,
-  GET_EVENTS,
-  GET_EVENT,
-  SEARCH_EVENTS,
-} from '../../shared/graphql/queries';
-import {
   CREATE_GAME,
   UPDATE_GAME,
   DELETE_GAME,
@@ -37,6 +30,14 @@ import {
   UPDATE_EVENT,
   DELETE_EVENT,
 } from '../../shared/graphql/operations';
+import {
+  GET_GAMES,
+  GET_GAME,
+  SEARCH_GAMES,
+  GET_EVENTS,
+  GET_EVENT,
+  SEARCH_EVENTS,
+} from '../../shared/graphql/queries';
 
 // Mock数据
 const mockGames = [

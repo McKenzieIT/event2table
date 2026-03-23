@@ -12,10 +12,10 @@
  * This version demonstrates the use of the useChromeMCPCompatibleInput hook
  * to simplify Chrome MCP compatibility handling.
  */
+import { useChromeMCPCompatibleInput } from '@shared/hooks';
+import { Input } from '@shared/ui';
 import { useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { Input } from '@shared/ui';
-import { useChromeMCPCompatibleInput } from '@shared/hooks';
 
 /**
  * 节点配置接口

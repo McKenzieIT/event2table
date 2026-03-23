@@ -4,10 +4,11 @@
  * Tests for Form filtering table data scenarios.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import Form from '../Form/Form';
 import FormInput from '../Form/FormInput';
 import { Table } from '../Table/Table';

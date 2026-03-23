@@ -28,6 +28,7 @@
  */
 
 import React from 'react';
+
 import './Spinner.css';
 import { buildConditionalClasses } from '../utils/classNames';
 import { compareSpinnerProps } from '../utils/memoComparators';

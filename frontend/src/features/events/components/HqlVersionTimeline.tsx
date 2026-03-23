@@ -12,10 +12,11 @@
  * ```
  */
 
-import React, { useCallback } from 'react';
-import { useHqlVersionHistory } from '../hooks/useHqlVersionHistory';
-import type { HqlVersion } from '../api/hqlVersionApi';
 import { Spinner, EmptyState } from '@shared/ui';
+import React, { useCallback } from 'react';
+
+import type { HqlVersion } from '../api/hqlVersionApi';
+import { useHqlVersionHistory } from '../hooks/useHqlVersionHistory';
 import './HqlVersionTimeline.css';
 
 interface HqlVersionTimelineProps {

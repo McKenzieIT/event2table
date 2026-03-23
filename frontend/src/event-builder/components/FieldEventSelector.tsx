@@ -19,9 +19,9 @@
  * - Selected state highlighting
  */
 
-import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useDraggable, UseDraggableArguments } from '@dnd-kit/core';
 import { Input, EmptyState } from '@shared/ui';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import './FieldEventSelector.css';
 
 /**

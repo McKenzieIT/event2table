@@ -1,7 +1,7 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
+import { Button, Card, Badge, Spinner, useToast } from "@shared/ui";
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Badge, Spinner, useToast } from "@shared/ui";
 import "./TemplateGallery.css";
 
 /**

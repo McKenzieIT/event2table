@@ -5,10 +5,9 @@
 // - Preserved React.memo, useCallback, useMemo optimizations
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-/* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState, useMemo, useCallback, memo } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+ 
 import { useQuery, useMutation } from '@apollo/client/react';
+import { DELETE_EVENT } from '@shared/graphql/mutations';
 import {
   Button,
   Input,
@@ -21,8 +20,10 @@ import {
   SelectGamePrompt
 } from '@shared/ui';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import React, { useState, useMemo, useCallback, memo } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+
 import { GET_EVENTS, GET_CATEGORIES } from '@/graphql/queries';
-import { DELETE_EVENT } from '@shared/graphql/mutations';
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
 import './EventsList.css';

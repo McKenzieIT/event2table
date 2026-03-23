@@ -6,6 +6,7 @@
  */
 
 import { useCallback, useState } from 'react';
+
 import type { ErrorHandler, ErrorType, StandardizedError } from '../ui/ErrorBoundary/types';
 
 export interface ErrorHandlerOptions {

@@ -4,12 +4,14 @@
  * Main monitoring dashboard that aggregates all performance metrics
  */
 
-import React from 'react';
-import { CacheStats } from './CacheStats';
-import { ApiLatencyChart } from './ApiLatencyChart';
-import { usePerformanceMetrics } from '../hooks';
-import { MetricCard } from './MetricCard';
 import { Spinner } from '@shared/ui';
+import React from 'react';
+
+import { usePerformanceMetrics } from '../hooks';
+
+import { ApiLatencyChart } from './ApiLatencyChart';
+import { CacheStats } from './CacheStats';
+import { MetricCard } from './MetricCard';
 
 /**
  * PerformanceDashboard component for displaying all performance metrics

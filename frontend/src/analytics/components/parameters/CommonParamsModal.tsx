@@ -20,9 +20,10 @@
  * />
  */
 
-import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { BaseModal, Button, Badge, Spinner, Input } from '@shared/ui';
+import React, { useState, useRef, useEffect } from 'react';
+
 import { GET_COMMON_PARAMETERS } from '@/graphql/queries';
 
 interface CommonParameter {

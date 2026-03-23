@@ -1,5 +1,5 @@
-import React from 'react';
 import { Button } from '@shared/ui';
+import React from 'react';
 import './EmptyState.css';
 
 interface EmptyStateProps {

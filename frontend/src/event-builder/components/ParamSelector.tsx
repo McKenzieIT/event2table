@@ -10,10 +10,10 @@
  * ParamSelector Component
  * 参数字段选择器组件
  */
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { fetchParams } from "@shared/api/eventNodeBuilder";
 import { SearchInput, Skeleton, ErrorState } from "@shared/ui";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
 
 /**
  * 参数接口

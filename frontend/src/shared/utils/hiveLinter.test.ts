@@ -4,9 +4,10 @@
  * Unit tests for Hive SQL linter
  */
 
-import { describe, it, expect } from 'vitest';
-import { lintHQL, createHiveLinter, validateHQLQuick } from './hiveLinter';
 import { Diagnostic } from '@codemirror/lint';
+import { describe, it, expect } from 'vitest';
+
+import { lintHQL, createHiveLinter, validateHQLQuick } from './hiveLinter';
 
 describe('hiveLinter', () => {
   describe('lintHQL', () => {

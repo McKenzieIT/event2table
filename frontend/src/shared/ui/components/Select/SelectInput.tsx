@@ -1,4 +1,5 @@
 import React, { MouseEvent, FocusEvent, useRef, KeyboardEvent } from 'react';
+
 import { SelectOption } from './Select.types';
 import './Select.css';
 

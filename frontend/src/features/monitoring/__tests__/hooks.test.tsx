@@ -4,11 +4,12 @@
  * Tests for monitoring React Query hooks
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useCacheStats, useApiLatency, usePerformanceMetrics } from '../hooks/index';
+import { renderHook, waitFor } from '@test/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import * as monitoringApi from '../api/monitoringApi';
+import { useCacheStats, useApiLatency, usePerformanceMetrics } from '../hooks/index';
 
 // Mock API functions
 vi.mock('../api/monitoringApi');

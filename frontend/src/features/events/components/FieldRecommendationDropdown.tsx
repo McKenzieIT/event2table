@@ -7,8 +7,9 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { useCommonPatterns } from '../hooks/useCommonPatterns';
+
 import type { FieldPattern } from '../api/fieldRecommendationApi';
+import { useCommonPatterns } from '../hooks/useCommonPatterns';
 
 interface FieldRecommendationDropdownProps {
   /** Currently selected pattern */

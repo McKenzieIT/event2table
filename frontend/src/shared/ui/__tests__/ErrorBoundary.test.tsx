@@ -5,9 +5,10 @@
  * in child component tree and displays a fallback UI.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@test/test-utils';
 import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { ErrorBoundary, ErrorFallback } from '../ErrorBoundary';
 
 // Mock console.error to suppress error logs in tests

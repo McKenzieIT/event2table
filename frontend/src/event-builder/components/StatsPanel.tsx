@@ -9,8 +9,8 @@
  * StatsPanel Component
  * 统计信息面板组件
  */
-import React, { useMemo } from 'react';
 import { ensureArray, safeFilter, safeLength } from '@shared/utils/componentUtils';
+import React, { useMemo } from 'react';
 
 type FieldType = 'base' | 'param' | 'basic' | 'custom' | 'fixed';
 

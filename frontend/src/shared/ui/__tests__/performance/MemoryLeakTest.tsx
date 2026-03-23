@@ -11,14 +11,14 @@
  * Run with: npm test -- MemoryLeakTest
  */
 
+import { fireEvent, act } from '@testing-library/react';
 import React, { useState, useEffect, useRef } from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
-import { fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
-import { Modal } from '../../index';
+
 import Table from '../../components/Table';
-import { Card } from '../../index';
+import { Modal , Card } from '../../index';
 
 // Mock WeakMap to track component instances
 const componentInstances = new WeakMap();

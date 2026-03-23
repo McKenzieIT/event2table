@@ -6,17 +6,20 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import { Outlet, useLocation } from 'react-router-dom';
-import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
-import { Sidebar } from '@analytics/components/sidebar/Sidebar';
 import { GameSelectionSheet } from '@analytics/components/game-selection/GameSelectionSheet';
-import GameManagementModal from '../../../features/games/GameManagementModalGraphQL';
-import AddGameModal from '../../../features/games/AddGameModal';
-import { useGameStore } from '../../../stores/gameStore';
-import { useGameContext } from '@/shared/hooks/useGameContext';
-import Loading from '@shared/ui/Loading';
-import Breadcrumb from '@shared/ui/Breadcrumb/Breadcrumb';
+import { Sidebar } from '@analytics/components/sidebar/Sidebar';
 import { generateBreadcrumbs } from '@shared/config/breadcrumbConfig';
+import Breadcrumb from '@shared/ui/Breadcrumb/Breadcrumb';
+import Loading from '@shared/ui/Loading';
+import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+
+import AddGameModal from '../../../features/games/AddGameModal';
+import GameManagementModal from '../../../features/games/GameManagementModalGraphQL';
+import { useGameStore } from '../../../stores/gameStore';
+
+import { useGameContext } from '@/shared/hooks/useGameContext';
+
 import './MainLayout.css';
 
 interface GameData {

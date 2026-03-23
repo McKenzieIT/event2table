@@ -4,11 +4,13 @@
  *
  * 测试GraphQL版本的ParametersList页面功能
  */
-import { render, screen, waitFor, fireEvent } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { describe, it, expect, vi } from 'vitest';
-import ParametersListGraphQL from '../ParametersListGraphQL';
 import { GET_PARAMETERS_MANAGEMENT } from '@shared/graphql/operations';
+import { render, screen, waitFor, fireEvent } from '@test/test-utils';
+import { describe, it, expect, vi } from 'vitest';
+
+import ParametersListGraphQL from '../ParametersListGraphQL';
+
 // Mock useGameStore
 vi.mock('@/stores/gameStore', () => ({
   useGameStore: () => ({

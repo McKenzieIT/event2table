@@ -3,11 +3,13 @@
  * Smoke test: Verify the component has the create button
  */
 
-import React from 'react';
-import { render, screen } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
-import GameManagementModal from './GameManagementModalGraphQL';
+import { render, screen } from '@test/test-utils';
+import React from 'react';
+
 import { GET_GAMES } from '../../shared/graphql/operations';
+
+import GameManagementModal from './GameManagementModalGraphQL';
 
 const mockGames = [
   {

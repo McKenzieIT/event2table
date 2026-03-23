@@ -14,6 +14,7 @@
 
 import { render, screen, waitFor } from '@test/test-utils';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { VirtualList } from '../index';
 
 describe('VirtualList Component (TDD)', () => {

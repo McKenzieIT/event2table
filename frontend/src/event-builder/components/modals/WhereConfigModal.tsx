@@ -9,9 +9,9 @@
  * WhereConfigModal Component
  * WHERE条件配置模态框组件
  */
-import { useState } from 'react';
-import { Input } from '@shared/ui';
 import type { WhereCondition } from '@shared/types/whereBuilder';
+import { Input } from '@shared/ui';
+import { useState } from 'react';
 
 /**
  * WHERE条件项接口（简化版，用于模态框内部）

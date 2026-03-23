@@ -10,14 +10,15 @@
  * WhereBuilderCanvas Component
  * WHERE条件构建器画布（支持拖拽、性能优化）
  */
-import React, { useState, useMemo, useCallback } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { arrayMove } from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy , arrayMove } from '@dnd-kit/sortable';
+import React, { useState, useMemo, useCallback } from 'react';
+
 import WhereConditionItem from './WhereConditionItem';
-import { WhereItem, WhereCondition, WhereGroup } from '@/shared/types/whereBuilder';
-import { Field } from '@/shared/types/fieldBuilder';
+
 import { Event } from '@/shared/types/api-types';
+import { Field } from '@/shared/types/fieldBuilder';
+import { WhereItem, WhereCondition, WhereGroup } from '@/shared/types/whereBuilder';
 import './WhereBuilderCanvas.css';
 
 // 虚拟渲染阈值（使用CSS优化而非react-window）

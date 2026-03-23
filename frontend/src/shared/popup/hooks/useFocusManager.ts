@@ -4,8 +4,8 @@
  * 统一管理弹窗组件的焦点行为
  */
 
-import { useEffect, useCallback, RefObject } from 'react';
-import React from 'react';
+import React, { useEffect, useCallback, RefObject } from 'react';
+
 import { PopupType } from '../ZIndexManager';
 import { FOCUS_STRATEGIES } from '../types';
 

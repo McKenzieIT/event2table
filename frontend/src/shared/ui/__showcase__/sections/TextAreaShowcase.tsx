@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
 import { TextArea } from '@shared/ui';
+import React, { useState, useCallback } from 'react';
 
 const TextAreaShowcase: React.FC = () => {
   const [textAreaValue, setTextAreaValue] = useState('');

@@ -13,9 +13,9 @@
  * @date 2026-01-29
  */
 
+import { Modal , Button, useToast, EmptyState } from '@shared/ui';
 import React, { useState, useMemo, useCallback, memo } from 'react';
-import { Modal } from '@shared/ui';
-import { Button, useToast, EmptyState } from '@shared/ui';
+
 import './JoinConfigModal.css';
 import type { JoinConfigModalProps, JoinConfig, JoinCondition, AvailableFields } from './types';
 

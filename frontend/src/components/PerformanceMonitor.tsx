@@ -12,9 +12,9 @@
  * 监控GraphQL查询性能、缓存命中率等指标
  */
 
-import React, { useState, useEffect } from 'react';
 import { useApolloClient } from '@apollo/client/react';
 import { Card, Button, Badge } from '@shared/ui';
+import React, { useState, useEffect } from 'react';
 import './PerformanceMonitor.css';
 
 interface QueryPerformance {

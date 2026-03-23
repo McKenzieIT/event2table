@@ -10,9 +10,10 @@
  * 4. Large dataset handling
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, waitFor } from '@test/test-utils';
 import { performance } from 'perf_hooks';
+
+import { render, waitFor } from '@test/test-utils';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('React Components Performance Benchmark', () => {
   describe('GameManagementModalGraphQL', () => {

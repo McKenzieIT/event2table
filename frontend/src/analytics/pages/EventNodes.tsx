@@ -17,28 +17,29 @@
  */
 // @ts-nocheck - TypeScript检查暂禁用（Button组件类型定义待完善）
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useSearchParams, useOutletContext, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { useEventNodesTable } from "@shared/hooks/useEventNodesTable";
 import { createEventNodesColumns } from "@analytics/components/columns/eventNodesColumns";
-import { eventNodesApi } from "@shared/api/eventNodes";
-import { ErrorBoundary, ErrorFallback } from "@shared/ui/ErrorBoundary";
+import { AdvancedFilterPanel } from "@event-builder/components/AdvancedFilterPanel";
+import FieldsListModal from "@event-builder/components/FieldsListModal";
 import { HQLViewModal } from "@event-builder/components/HQLViewModal";
 import { QuickEditModal } from "@event-builder/components/QuickEditModal";
-import FieldsListModal from "@event-builder/components/FieldsListModal";
-import { AdvancedFilterPanel } from "@event-builder/components/AdvancedFilterPanel";
-import { Button, ConfirmDialog } from "@shared/ui";
+import { eventNodesApi } from "@shared/api/eventNodes";
+import { useEventNodesTable } from "@shared/hooks/useEventNodesTable";
 import type {
   EventNode,
   EventNodeFilters,
   EventNodeStats,
 } from "@shared/types/eventNodes";
+import { Button, ConfirmDialog } from "@shared/ui";
+import { ErrorBoundary, ErrorFallback } from "@shared/ui/ErrorBoundary";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import toast from "react-hot-toast";
+import { Link, useSearchParams, useOutletContext, useNavigate } from "react-router-dom";
+
 import GameSelectionPrompt from "./components/GameSelectionPrompt";
-import StatisticsCards from "./components/StatisticsCards";
-import SearchFilterBar from "./components/SearchFilterBar";
 import NodesTable from "./components/NodesTable";
+import SearchFilterBar from "./components/SearchFilterBar";
+import StatisticsCards from "./components/StatisticsCards";
 import "./EventNodes.css";
 
 /**

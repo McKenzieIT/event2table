@@ -5,10 +5,10 @@
  * 提供批量编辑、批量验证、批量删除等功能
  */
 
-import { useCallback } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@shared/ui';
 import type { Event } from '@shared/types/event-types';
+import { useToast } from '@shared/ui';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 /**
  * 批量编辑表单数据

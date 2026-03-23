@@ -2,12 +2,13 @@
  * FormRichText Component Unit Tests
  */
 
-import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import FormRichText from '../FormRichText';
+import { describe, it, expect, vi } from 'vitest';
+
 import Form from '../Form';
+import FormRichText from '../FormRichText';
 
 // Test wrapper component
 const TestFormWrapper = ({ children, defaultValues = {} }: { children: React.ReactNode; defaultValues?: Record<string, any> }) => {

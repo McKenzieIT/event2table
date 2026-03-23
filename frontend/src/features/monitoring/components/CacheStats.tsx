@@ -4,11 +4,13 @@
  * Displays cache statistics including hit rate, miss rate, and cache size
  */
 
-import React from 'react';
-import { useCacheStats } from '../hooks';
-import { MetricCard } from './MetricCard';
 import { Spinner } from '@shared/ui';
+import React from 'react';
+
+import { useCacheStats } from '../hooks';
 import type { CacheStats } from '../types';
+
+import { MetricCard } from './MetricCard';
 
 /**
  * CacheStats component for displaying cache performance metrics

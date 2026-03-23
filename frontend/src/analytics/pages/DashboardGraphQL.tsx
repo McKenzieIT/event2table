@@ -16,14 +16,15 @@
  * 使用TypeScript提供类型安全
  */
 
-import React, { useMemo, useCallback, Suspense } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Spinner } from '@shared/ui';
-import { useGameStore } from '@/stores/gameStore';
 import { useGames, useFlows } from '@shared/graphql/hooks';
 import { usePollingInterval } from '@shared/hooks/usePageVisibility';  // ⚡ PERF: Phase 2
+import { Card, Spinner } from '@shared/ui';
 import { Modal } from '@shared/ui';
+import React, { useMemo, useCallback, Suspense } from 'react';
+import { Link } from 'react-router-dom';
+
 import GameManagementModal from '@/features/games/GameManagementModalGraphQL';
+import { useGameStore } from '@/stores/gameStore';
 import './Dashboard.css';
 
 interface Game {

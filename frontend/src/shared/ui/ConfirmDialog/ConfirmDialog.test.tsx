@@ -3,9 +3,10 @@
  * 测试确认对话框组件的所有功能
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import ConfirmDialog from './ConfirmDialog';
 
 describe('ConfirmDialog Component', () => {

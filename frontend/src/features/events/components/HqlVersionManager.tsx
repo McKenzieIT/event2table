@@ -14,14 +14,17 @@
  * ```
  */
 
-import React, { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { HqlVersionHistory } from './HqlVersionHistory';
-import { HqlVersionTimeline } from './HqlVersionTimeline';
+import React, { useState, useCallback } from 'react';
+
+import type { HqlVersion, VersionDiff } from '../api/hqlVersionApi';
+import { useHqlVersionCompare } from '../hooks';
+
 import { HqlVersionActions } from './HqlVersionActions';
 import { HqlVersionCompare } from './HqlVersionCompare';
-import { useHqlVersionCompare } from '../hooks';
-import type { HqlVersion, VersionDiff } from '../api/hqlVersionApi';
+import { HqlVersionHistory } from './HqlVersionHistory';
+import { HqlVersionTimeline } from './HqlVersionTimeline';
+
 import './HqlVersionManager.css';
 
 interface HqlVersionManagerProps {

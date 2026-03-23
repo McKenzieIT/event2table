@@ -3,11 +3,11 @@
 // - useMemo: Caches stats grid rendering
 // - useCallback: Stabilizes retry handler
 
+import { NavLinkWithGameContext } from '@shared/components';
+import { SelectGamePrompt, ErrorState } from '@shared/ui';
+import { useQuery } from '@tanstack/react-query';
 import React, { useMemo, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { SelectGamePrompt, ErrorState } from '@shared/ui';
-import { NavLinkWithGameContext } from '@shared/components';
 import './ParameterAnalysis.css';
 
 /**

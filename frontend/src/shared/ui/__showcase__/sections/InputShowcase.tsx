@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
 import { Input } from '@shared/ui';
+import React, { useState, useCallback } from 'react';
 
 const InputShowcase: React.FC = () => {
   const [inputValue, setInputValue] = useState('');

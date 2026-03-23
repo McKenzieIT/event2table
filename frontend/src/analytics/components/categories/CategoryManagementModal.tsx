@@ -19,10 +19,10 @@
  * - Preserve game_gid URL parameter
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Modal, Button, Input, Spinner, useToast } from '@shared/ui';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+import { Modal, Button, Input, Spinner, useToast } from '@shared/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import './CategoryManagementModal.css';
 
 interface Category {

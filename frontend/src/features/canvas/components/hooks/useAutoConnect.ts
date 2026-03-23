@@ -1,6 +1,7 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Node, Edge, OnEdgesChange } from "reactflow";
+
 import { useNodeConnections, CanvasNodeType } from "./useNodeConnections";
 
 export type ToastType = "info" | "success" | "warning" | "error";
@@ -139,7 +140,7 @@ export function useAutoConnect(
         return false;
       }
 
-      let possibleConnections: {
+      const possibleConnections: {
         sourceId: string;
         targetId: string;
         sourceNode: Node;

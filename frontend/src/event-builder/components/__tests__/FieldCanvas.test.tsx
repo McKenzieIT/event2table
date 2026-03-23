@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import React from 'react';
+
 import FieldCanvas from '../FieldCanvas';
 
 // Mock dnd-kit dependencies

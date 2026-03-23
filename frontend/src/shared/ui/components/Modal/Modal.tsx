@@ -14,6 +14,9 @@
  * - 性能优化（useCallback, useMemo, React.memo）
  */
 
+import { MODAL_ANIMATION_DELAY } from '@shared/constants/timeouts';
+import { Z_INDICES } from '@shared/constants/zIndices';
+import { useDraggable } from '@shared/hooks/useDraggable';
 import React, { 
   useState, 
   useEffect, 
@@ -22,6 +25,7 @@ import React, {
   useMemo,
   type ReactNode 
 } from 'react';
+
 import type { 
   ModalProps, 
   ModalSize, 
@@ -30,9 +34,6 @@ import type {
   ModalConfirmConfig,
   ModalDragConfig 
 } from './Modal.types';
-import { MODAL_ANIMATION_DELAY } from '@shared/constants/timeouts';
-import { Z_INDICES } from '@shared/constants/zIndices';
-import { useDraggable } from '@shared/hooks/useDraggable';
 import './Modal.css';
 
 // 默认确认对话框配置

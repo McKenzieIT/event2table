@@ -3,10 +3,11 @@
  */
 
 import { renderHook, act } from '@test/test-utils';
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { PopupProvider, usePopupContext } from '../PopupProvider';
 import { PopupType } from '../ZIndexManager';
-import React from 'react';
 
 describe('PopupProvider集成测试', () => {
   let wrapper: ({ children }: { children: React.ReactNode }) => JSX.Element;

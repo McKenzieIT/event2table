@@ -5,11 +5,11 @@
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt, Button, SearchInput, Spinner } from '@shared/ui';
 import { BindToLibraryButton } from '@shared/components/BindToLibraryButton';
+import { SelectGamePrompt, Button, SearchInput, Spinner } from '@shared/ui';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState, useMemo, useCallback } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
 import './ParametersEnhanced.css';
 
 /**

@@ -4,8 +4,9 @@
  * 测试加载组件的所有功能
  */
 
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@test/test-utils';
+import { describe, it, expect } from 'vitest';
+
 import Loading from './Loading';
 
 describe('Loading Component', () => {

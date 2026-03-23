@@ -8,10 +8,11 @@
  * 4. Memory usage is acceptable
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import React, { useState, useCallback, useMemo } from 'react';
 import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import React, { useState, useCallback, useMemo } from 'react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { GET_GAMES } from '@/graphql/queries';
 
 // Mock CSS imports

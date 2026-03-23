@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { FieldValues, FieldPath } from 'react-hook-form';
-import type { CheckboxFieldProps } from './Form.types';
+
 import { FormErrorMessage } from './Form';
+import type { CheckboxFieldProps } from './Form.types';
 
 /**
  * FormCheckbox Component

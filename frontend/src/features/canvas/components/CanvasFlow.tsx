@@ -11,19 +11,20 @@ import ReactFlow, {
     MiniMap,
     Panel,
 } from 'reactflow';
+
 import 'reactflow/dist/style.css';
-import CustomNode from './CustomNode';
-import EventNode from './nodes/EventNode';
-import UnionAllNode from './nodes/UnionAllNode';
-import JoinNode from './nodes/JoinNode';
-import OutputNode from './nodes/OutputNode';
-import NodeSidebar from './NodeSidebar';
-import Toolbar from './Toolbar';
-import PropertiesPanel from './PropertiesPanel';
+import { CanvasFlowProps } from './CanvasFlow.types';
 import CanvasInfoPanel from './CanvasInfoPanel';
 import CanvasModals from './CanvasModals';
+import CustomNode from './CustomNode';
+import NodeSidebar from './NodeSidebar';
+import PropertiesPanel from './PropertiesPanel';
+import Toolbar from './Toolbar';
+import EventNode from './nodes/EventNode';
+import JoinNode from './nodes/JoinNode';
+import OutputNode from './nodes/OutputNode';
+import UnionAllNode from './nodes/UnionAllNode';
 import { useCanvasFlow } from './useCanvasFlow';
-import { CanvasFlowProps } from './CanvasFlow.types';
 import './CanvasFlow.css';
 
 // ============================================

@@ -3,9 +3,10 @@
  * 测试单选框组件的所有功能
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
 import Radio, { RadioProps } from './Radio';
 
 describe('Radio Component', () => {

@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
 import { Button, Card, Input } from '@shared/ui';
+import React, { useState, useCallback } from 'react';
 
 const InteractiveExample: React.FC = () => {
   const [isloading, setIsLoading] = useState(false);

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { CanvasStatsDisplay } from './CanvasStatsDisplay';
 
 interface FieldCanvasHeaderProps {

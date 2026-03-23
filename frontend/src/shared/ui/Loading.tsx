@@ -5,8 +5,8 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React from 'react';
 import { Spinner } from '@shared/ui';
+import React from 'react';
 import './Loading.css';
 
 /**

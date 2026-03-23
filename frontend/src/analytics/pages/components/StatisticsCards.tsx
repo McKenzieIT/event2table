@@ -1,5 +1,5 @@
-import React from "react";
 import type { EventNodeStats } from "@shared/types/eventNodes";
+import React from "react";
 
 /**
  * 统计卡片组件 - 使用metric-card系统

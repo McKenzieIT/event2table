@@ -8,6 +8,7 @@
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 import React, { useState } from "react";
 import { ReactFlowProvider } from "reactflow";
+
 import CanvasFlow from "./CanvasFlow";
 import "./App.css";
 import type { AppProps, GameData } from "./types";

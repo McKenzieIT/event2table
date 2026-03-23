@@ -8,14 +8,14 @@
  * 4. Scrolling performance is maintained
  */
 
-import React from 'react';
-import { render, screen, waitFor, createMockGameContext } from '@test/test-utils';
-import { GET_EVENTS, GET_CATEGORIES } from '@shared/graphql/operations';
-import { DELETE_EVENT } from '@shared/graphql/operations';
-import EventsListGraphQL from '../EventsListGraphQL';
+import { GET_EVENTS, GET_CATEGORIES , DELETE_EVENT } from '@shared/graphql/operations';
 import { performanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';
+import { render, screen, waitFor, createMockGameContext } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { vi, beforeEach, describe, test, expect } from 'vitest';
+
+import EventsListGraphQL from '../EventsListGraphQL';
 
 // Mock MockedProvider since Apollo Client v4 doesn't export it from testing
 const MockedProvider = ({ children }: { children: React.ReactNode; mocks?: unknown[]; addTypename?: boolean }) => {

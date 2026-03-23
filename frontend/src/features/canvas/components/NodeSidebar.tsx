@@ -5,9 +5,11 @@
 // - Stabilized event handler functions with useCallback
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
-import { useEventConfigs } from '../hooks/useEventConfigs';
 import { Button, Spinner } from '@shared/ui';
+import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
+
+import { useEventConfigs } from '../hooks/useEventConfigs';
+
 import SearchBar from "./SearchBar";
 import "./NodeSidebar.css";
 import type { NodeSidebarProps, EventConfig, GameData } from "./types";

@@ -24,8 +24,8 @@
  * />
  */
 
-import React from 'react';
 import { Button } from '@shared/ui';
+import React from 'react';
 
 export interface LibraryParamInfo {
   param_name: string;

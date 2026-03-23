@@ -5,10 +5,11 @@
  */
 // @ts-nocheck - TypeScript检查暂禁用
 
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import React, { useState, useEffect, useCallback } from 'react';
+
 import { hqlApi } from '../../../shared/api/hqlApi';
 import type { CacheStatsResponse } from '../../../shared/types';
-import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import './CacheIndicator.css';
 
 interface CacheIndicatorProps {

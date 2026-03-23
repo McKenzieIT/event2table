@@ -5,11 +5,12 @@
  */
 
 import React, { useState } from 'react';
+
 import ButtonExamples from './ButtonExamples';
 import InputExamples from './InputExamples';
+import ModalExamples from './ModalExamples';
 import SelectExamples from './SelectExamples';
 import TableExamples from './TableExamples';
-import ModalExamples from './ModalExamples';
 import './ComponentShowcase.css';
 
 type ComponentType = 'button' | 'input' | 'select' | 'table' | 'modal';

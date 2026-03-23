@@ -10,13 +10,14 @@
  * - 实时验证 (touched 机制)
  */
 
-import React, { useState, useCallback } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Input } from '@shared/ui';
-import { ODSSelector } from './ODSSelector';
-import { useGameFormValidation } from './useGameFormValidation';
-import { useGameFormToast } from './useGameFormToast';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useCallback } from 'react';
+
 import styles from './GameForm.module.css';
+import { ODSSelector } from './ODSSelector';
+import { useGameFormToast } from './useGameFormToast';
+import { useGameFormValidation } from './useGameFormValidation';
 
 export type GameFormMode = 'modal' | 'page';
 

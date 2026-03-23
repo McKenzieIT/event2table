@@ -4,11 +4,13 @@
  * Unit tests for field recommendation UI components
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
+import React from 'react';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+
+import { getRecommendations, getCommonPatterns, inferFieldType } from '../api/fieldRecommendationApi';
 import { FieldRecommendation } from '../components/FieldRecommendation';
 import { FieldRecommendationDropdown } from '../components/FieldRecommendationDropdown';
 import { FieldTypeSuggestion } from '../components/FieldTypeSuggestion';
@@ -42,7 +44,6 @@ vi.mock('../hooks/useCommonPatterns', () => ({
   useCommonPatterns: vi.fn(),
 }));
 
-import { getRecommendations, getCommonPatterns, inferFieldType } from '../api/fieldRecommendationApi';
 import { useCommonPatterns } from '../hooks/useCommonPatterns';
 
 describe('FieldRecommendation Component', () => {

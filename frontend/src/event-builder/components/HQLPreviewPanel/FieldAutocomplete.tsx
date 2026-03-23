@@ -14,8 +14,8 @@
  * - 显示字段类型标签
  */
 
-import React, { useState, useEffect } from 'react';
 import { Input } from '@shared/ui';
+import React, { useState, useEffect } from 'react';
 import './FieldAutocomplete.css';
 
 // ========== 类型定义 ==========

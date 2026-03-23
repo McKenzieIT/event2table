@@ -2,6 +2,7 @@
 // Extracted from CanvasFlow.tsx for better maintainability
 
 import { Node, Edge } from 'reactflow';
+
 import type { GameData } from '@/shared/types/game-types';
 
 /**

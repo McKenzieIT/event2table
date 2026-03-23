@@ -12,8 +12,8 @@
  */
 // @ts-nocheck - TypeScript检查暂禁用
 
-import React from 'react';
 import type { Event, Field } from '@shared/types/api-types';
+import React from 'react';
 import './DebugViewer.css';
 
 interface DebugStep {

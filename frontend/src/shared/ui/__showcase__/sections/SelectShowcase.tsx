@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
 import { Select } from '@shared/ui';
+import React, { useState, useCallback, useMemo } from 'react';
 
 interface GameOption {
   value: string;

@@ -3,8 +3,9 @@
  */
 
 import { render, screen } from '@test/test-utils';
-import { TaskList } from '../TaskList';
+
 import type { Task } from '../../api/taskApi';
+import { TaskList } from '../TaskList';
 
 describe('TaskList', () => {
   const mockTasks: Task[] = [

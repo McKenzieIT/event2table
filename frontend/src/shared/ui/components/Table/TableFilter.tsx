@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { TableFilterProps, RowData } from './Table.types';
 
 /**

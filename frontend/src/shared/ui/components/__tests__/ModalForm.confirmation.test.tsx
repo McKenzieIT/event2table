@@ -4,16 +4,17 @@
  * Tests for Modal close confirmation with unsaved form data.
  */
 
-import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
-import { Modal } from '../Modal/Modal';
+
 import Form from '../Form/Form';
 import FormInput from '../Form/FormInput';
+import { Modal } from '../Modal/Modal';
 
 vi.mock('@shared/constants/timeouts', () => ({ MODAL_ANIMATION_DELAY: 50 }));
 vi.mock('@shared/constants/zIndices', () => ({ Z_INDICES: { MODAL: 1000 } }));

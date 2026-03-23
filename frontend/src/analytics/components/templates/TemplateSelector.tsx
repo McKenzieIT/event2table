@@ -14,10 +14,11 @@
  * @date 2026-01-29
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
 import { fetchTemplates, type Template } from '@shared/api/templateApi';
-import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import { Input, EmptyState } from '@shared/ui';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import React, { useState, useEffect, useCallback } from 'react';
+
 import TemplateEditor from './TemplateEditor';
 
 import './TemplateSelector.css';

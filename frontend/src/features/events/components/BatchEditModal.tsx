@@ -5,9 +5,9 @@
  * 支持批量修改事件的名称、分类、描述等属性
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { Modal, Button, Input, Select, Checkbox, Badge, useToast } from '@shared/ui';
 import type { Event } from '@shared/types/event-types';
+import { Modal, Button, Input, Select, Checkbox, Badge, useToast } from '@shared/ui';
+import React, { useState, useMemo, useCallback } from 'react';
 
 /**
  * 批量编辑表单数据

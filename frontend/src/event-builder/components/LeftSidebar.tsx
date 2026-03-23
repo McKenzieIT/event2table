@@ -11,8 +11,10 @@
  * 优化：移除BaseFieldsList，释放空间给ParamSelector
  */
 import React from 'react';
+
 import EventSelector from './EventSelector';
 import ParamSelector from './ParamSelector';
+
 import type { Event } from '@/shared/types/event-types';
 
 /**

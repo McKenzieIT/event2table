@@ -13,13 +13,13 @@
  * @description 显示事件节点生成的HQL代码，支持语法高亮和复制
  */
 
+import { eventNodesApi } from "@shared/api/eventNodes";
+import { COPY_NOTIFICATION_DURATION } from "@shared/constants/timeouts";
+import { Button } from "@shared/ui";
 import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import toast from "react-hot-toast";
-import { eventNodesApi } from "@shared/api/eventNodes";
-import { Button } from "@shared/ui";
-import { COPY_NOTIFICATION_DURATION } from "@shared/constants/timeouts";
 
 /**
  * Props接口

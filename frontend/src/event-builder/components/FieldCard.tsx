@@ -9,8 +9,8 @@
  * FieldCard Component
  * 字段卡片组件
  */
-import React from 'react';
 import { FieldType } from '@shared/types/fieldBuilder';
+import React from 'react';
 
 /**
  * 字段数据接口

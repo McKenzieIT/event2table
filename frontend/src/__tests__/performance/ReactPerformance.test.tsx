@@ -10,8 +10,8 @@
  * Run: npm test -- ReactPerformance.test.tsx
  */
 
-import React, { useState } from 'react';
 import { render, act, renderHook, createMockGameContext } from '@test/test-utils';
+import React, { useState } from 'react';
 import '@testing-library/jest-dom';
 import { vi, describe, expect, beforeEach } from 'vitest';
 import { performanceMonitor, usePerformanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';

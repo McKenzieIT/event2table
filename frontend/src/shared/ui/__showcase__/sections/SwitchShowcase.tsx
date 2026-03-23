@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
 import { Card, Switch } from '@shared/ui';
+import React, { useState, useCallback } from 'react';
 
 const SwitchShowcase: React.FC = () => {
   const [switchEnabled, setSwitchEnabled] = useState(false);

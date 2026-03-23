@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { FieldValues, FieldPath } from 'react-hook-form';
-import type { RichTextFieldProps } from './Form.types';
+
 import { FormErrorMessage, FormHelperText } from './Form';
+import type { RichTextFieldProps } from './Form.types';
 
 /**
  * Default toolbar configuration

@@ -5,17 +5,19 @@
 // - Preserved React.memo, useCallback, useMemo optimizations
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
+import { useQueryParam } from '@shared/hooks/useQueryParams';
+import { Button, SearchInput, Skeleton, ErrorState, useToast } from '@shared/ui';
+import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
+import EmptyState from '@shared/ui/EmptyState/EmptyState';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, SearchInput, Skeleton, ErrorState, useToast } from '@shared/ui';
-import EmptyState from '@shared/ui/EmptyState/EmptyState';
-import { useGameStore } from '@/stores/gameStore';
-import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
-import { useQueryParam } from '@shared/hooks/useQueryParams';
+
 import CategoryModal from '../components/categories/CategoryModal';
+
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
+import { useGameStore } from '@/stores/gameStore';
 import './CategoriesList.css';
 
 /**

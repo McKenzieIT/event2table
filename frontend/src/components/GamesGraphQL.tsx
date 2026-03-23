@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+
 import { useGames, useDeleteGame } from '../graphql';
 
 interface GamesGraphQLProps {

@@ -1,5 +1,5 @@
-import React from 'react';
 import { Button, Card, useToast } from '@shared/ui';
+import React from 'react';
 
 const ToastShowcase: React.FC = () => {
   const { success, error, warning, info } = useToast();

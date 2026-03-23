@@ -1,6 +1,6 @@
+import { flexRender , Row, RowData } from '@tanstack/react-table';
 import React, { useCallback } from 'react';
-import { flexRender } from '@tanstack/react-table';
-import { Row, RowData } from '@tanstack/react-table';
+
 import { TableColumn, CellContext } from './Table.types';
 
 interface TableVirtualizedRowsProps<TData extends RowData> {

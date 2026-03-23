@@ -7,8 +7,9 @@
  */
 
 import { Node, Edge } from 'reactflow';
-import type { Field } from '@/shared/types/hql-types';
+
 import type { Game as GameData } from '@/shared/types/game-types';
+import type { Field } from '@/shared/types/hql-types';
 
 // Re-export types for use in other canvas components
 export type { Field, GameData };

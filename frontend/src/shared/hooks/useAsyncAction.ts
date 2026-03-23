@@ -6,6 +6,7 @@
  */
 
 import { useCallback, useState, useRef } from 'react';
+
 import type { ErrorType } from '../ui/ErrorBoundary/types';
 
 export interface AsyncState<T> {

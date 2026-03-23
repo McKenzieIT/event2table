@@ -3,9 +3,10 @@
  * WhereBuilderModal Component Tests
  * 阶段2：模式融合 - 移除简单/高级模式切换
  */
+import { render, screen, fireEvent } from '@test/test-utils';
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@test/test-utils';
+
 import { WhereBuilderModal } from './WhereBuilderModal';
 
 // 类型定义

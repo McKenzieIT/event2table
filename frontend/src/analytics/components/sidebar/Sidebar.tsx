@@ -5,12 +5,14 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import { useEffect, useRef } from 'react';
-import { useSidebar } from '@shared/hooks/useSidebar';
 import { SIDEBAR_GROUPS, GAME_CHIP_CONFIG } from '@shared/config/sidebarConfig';
+import { useSidebar } from '@shared/hooks/useSidebar';
+import { useEffect, useRef } from 'react';
+
+import { useGameStore } from '../../../stores/gameStore';
+
 import { SidebarGroup } from './SidebarGroup';
 import { SidebarMenuItemMemo } from './SidebarMenuItem';
-import { useGameStore } from '../../../stores/gameStore';
 import './Sidebar.css';
 
 interface GameData {

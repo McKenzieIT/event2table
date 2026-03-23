@@ -6,8 +6,8 @@
  */
 
 import { Event as BaseEvent } from './event-types';
-import { Parameter as BaseParameter } from './parameter-types';
 import { Field as BaseField, FieldType as BaseFieldType } from './hql-types';
+import { Parameter as BaseParameter } from './parameter-types';
 
 // 字段类型枚举
 export enum FieldType {

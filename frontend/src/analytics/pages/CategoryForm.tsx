@@ -2,10 +2,10 @@
 // Optimized: Stable callbacks for form handlers
 
 // @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
-import React, { useState, useCallback, memo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Button, Spinner, Input } from '@shared/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useCallback, memo } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import './CategoryForm.css';
 
 /**

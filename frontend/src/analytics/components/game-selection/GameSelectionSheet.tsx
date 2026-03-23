@@ -5,9 +5,9 @@
 //   - useEffect dependencies: Add useCallback()
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
+import { SearchInput, EmptyState } from '@shared/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { SearchInput, EmptyState } from '@shared/ui';
 import './GameSelectionSheet.css';
 
 interface Game {

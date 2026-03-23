@@ -5,10 +5,11 @@
  * Target: 10000+ rows, scroll latency <16ms, memory <50MB
  */
 
-import React from 'react';
 import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { vi } from 'vitest';
+
 import { Table } from '../Table';
 import type { TableColumn } from '../Table.types';
 

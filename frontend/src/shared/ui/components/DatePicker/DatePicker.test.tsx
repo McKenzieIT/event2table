@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { DatePicker } from './DatePicker';
 
 describe('DatePicker', () => {

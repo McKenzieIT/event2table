@@ -1,8 +1,9 @@
-import React, { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FieldType } from '../../types/fieldTypes';
 import { Button } from '@shared/ui';
+import React, { memo } from 'react';
+
+import { FieldType } from '../../types/fieldTypes';
 
 /**
  * Props for SortableFieldItem component

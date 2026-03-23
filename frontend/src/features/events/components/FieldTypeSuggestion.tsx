@@ -7,6 +7,7 @@
  */
 
 import React, { useMemo } from 'react';
+
 import type { FieldTypeInferenceData } from '../api/fieldRecommendationApi';
 
 interface FieldTypeSuggestionProps {

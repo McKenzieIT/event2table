@@ -3,10 +3,10 @@
 // - Component is pure and only depends on context
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
+import { NavLinkWithGameContext } from '@shared/components';
+import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
 import React from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
-import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
-import { NavLinkWithGameContext } from '@shared/components';
 import './ParameterNetwork.css';
 
 /**

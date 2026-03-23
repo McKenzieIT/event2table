@@ -5,10 +5,11 @@
  * 测试GraphQL查询和变更的完整流程
  */
 
-import { render, screen, waitFor } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
+import { render, screen, waitFor } from '@test/test-utils';
 import React from 'react';
 import { describe, it, expect } from 'vitest';
+
 import GameManagementModalGraphQL from '../../features/games/GameManagementModalGraphQL';
 // ⚠️ FIX: Import from shared/graphql/queries to match what components use
 import { GET_GAMES } from '../../shared/graphql/queries';

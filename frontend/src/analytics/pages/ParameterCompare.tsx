@@ -2,11 +2,11 @@
 // TODO: Add appropriate React optimization
 // See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt, SearchInput, Spinner } from '@shared/ui';
 import EmptyState from '@shared/ui/EmptyState/EmptyState';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback, useMemo } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
 import './ParameterCompare.css';
 
 /**

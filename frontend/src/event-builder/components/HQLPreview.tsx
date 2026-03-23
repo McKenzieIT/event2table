@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+import { Spinner, EmptyState } from '@shared/ui';
 import { getBasicExtensions } from '@shared/utils/codemirrorConfig';
 import { formatSQL as formatHQL } from '@shared/utils/sqlFormatter';
-import { Spinner, EmptyState } from '@shared/ui';
-import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
+import CodeMirror from '@uiw/react-codemirror';
+import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './HQLPreview.css';
 
 /**

@@ -2,8 +2,8 @@
 // Optimized: Low-frequency page, memoized to prevent unnecessary re-renders
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useParams, Link } from 'react-router-dom';
 import './AlterSql.css';
 
 /**

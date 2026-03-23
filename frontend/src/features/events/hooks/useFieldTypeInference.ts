@@ -20,6 +20,7 @@
  */
 
 import { useMutation, type UseMutationResult } from '@tanstack/react-query';
+
 import { inferFieldType, type FieldTypeInferenceRequest, type FieldTypeInferenceData } from '../api/fieldRecommendationApi';
 
 /**

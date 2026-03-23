@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
 import { Button, Modal } from '@shared/ui';
+import React, { useState, useCallback } from 'react';
 
 const ModalShowcase: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);

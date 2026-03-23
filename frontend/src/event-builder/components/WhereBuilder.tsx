@@ -9,8 +9,8 @@
  * WhereBuilder Component
  * WHERE条件构建器组件
  */
-import { useState } from 'react';
 import { ensureArray, safeLength } from '@shared/utils/componentUtils';
+import { useState } from 'react';
 
 // WHERE条件接口
 export interface WhereCondition {

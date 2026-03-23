@@ -9,8 +9,8 @@
  * NodeConfigForm Component
  * 节点配置表单组件
  */
-import React from 'react';
 import { Input } from '@shared/ui';
+import React from 'react';
 
 /**
  * 节点配置接口

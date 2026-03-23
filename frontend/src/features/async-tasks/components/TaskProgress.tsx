@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+
 import type { TaskStatus } from '../api/taskApi';
 
 interface TaskProgressProps {

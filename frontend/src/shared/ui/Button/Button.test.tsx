@@ -3,10 +3,11 @@
  * 测试按钮组件的所有功能
  */
 
-import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { describe, it, expect, vi } from 'vitest';
+
 import Button from './Button';
 
 describe('Button Component', () => {

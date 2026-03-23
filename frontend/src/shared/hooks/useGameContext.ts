@@ -1,6 +1,7 @@
-import { useGameStore } from '@/stores/gameStore';
 import { useCallback, useEffect, useRef, useTransition } from 'react';
 import { useLocation } from 'react-router-dom';
+
+import { useGameStore } from '@/stores/gameStore';
 
 export interface Game {
   id: number;

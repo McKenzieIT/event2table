@@ -20,6 +20,7 @@
  */
 
 import { useMutation, type UseMutationResult } from '@tanstack/react-query';
+
 import { getRecommendations, type FieldRecommendationRequest, type FieldRecommendationData } from '../api/fieldRecommendationApi';
 
 /**

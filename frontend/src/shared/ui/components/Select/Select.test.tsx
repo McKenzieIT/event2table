@@ -1,8 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { useForm } from 'react-hook-form';
+import { describe, it, expect, vi } from 'vitest';
+
 import Select from './Select';
 import type { SelectOption } from './Select.types';
 

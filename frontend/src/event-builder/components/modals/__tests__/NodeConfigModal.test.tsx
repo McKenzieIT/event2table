@@ -6,10 +6,12 @@
  * Root Cause: nodeConfig initialized with empty strings, validation logic prevents enabling
  */
 
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+
 import '@testing-library/jest-dom';
 import { NodeConfigModal } from '../NodeConfigModal';
+
 import toast from 'react-hot-toast';
 
 // Mock toast notifications

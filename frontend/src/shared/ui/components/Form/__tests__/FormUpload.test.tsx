@@ -2,11 +2,12 @@
  * FormUpload Component Unit Tests
  */
 
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import { useForm } from 'react-hook-form';
-import FormUpload from '../FormUpload';
+import { describe, it, expect, vi } from 'vitest';
+
 import Form from '../Form';
+import FormUpload from '../FormUpload';
 
 // Test wrapper component
 const TestFormWrapper = ({ children, defaultValues = {} }: { children: React.ReactNode; defaultValues?: Record<string, any> }) => {

@@ -1,11 +1,13 @@
-import React, { memo } from 'react';
-import { FieldType } from '../types/fieldTypes';
-import { useFieldCanvas } from './FieldCanvas/hooks/useFieldCanvas';
-import FieldCanvasHeader from './FieldCanvas/FieldCanvasHeader';
-import FieldCanvasContent from './FieldCanvas/FieldCanvasContent';
-import FieldCanvasLoading from './FieldCanvas/FieldCanvasLoading';
-import FieldCanvasError from './FieldCanvas/FieldCanvasError';
 import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
+import React, { memo } from 'react';
+
+import { FieldType } from '../types/fieldTypes';
+
+import FieldCanvasContent from './FieldCanvas/FieldCanvasContent';
+import FieldCanvasError from './FieldCanvas/FieldCanvasError';
+import FieldCanvasHeader from './FieldCanvas/FieldCanvasHeader';
+import FieldCanvasLoading from './FieldCanvas/FieldCanvasLoading';
+import { useFieldCanvas } from './FieldCanvas/hooks/useFieldCanvas';
 import type { Field, Parameter } from './FieldCanvas/utils/fieldUtils';
 
 // Re-export CanvasField for backward compatibility

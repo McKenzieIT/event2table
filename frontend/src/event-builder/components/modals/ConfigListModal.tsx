@@ -8,12 +8,12 @@
  * ConfigListModal Component
  * 配置列表模态框组件
  */
-import React, { useState, useCallback, memo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { fetchConfigList, deleteConfig, copyNode } from '@shared/api/eventNodeBuilder';
 import { usePromiseConfirm } from '@shared/hooks/usePromiseConfirm';
-import toast from 'react-hot-toast';
 import type { EventNode } from '@shared/types/eventNodes';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback, memo } from 'react';
+import toast from 'react-hot-toast';
 
 /**
  * 组件Props接口

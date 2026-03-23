@@ -10,6 +10,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
+
 import { getTask } from '../api/taskApi';
 import type { Task, TaskStatus } from '../api/taskApi';
 

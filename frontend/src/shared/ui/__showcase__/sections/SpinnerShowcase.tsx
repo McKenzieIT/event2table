@@ -1,5 +1,5 @@
-import React from 'react';
 import { Card, Spinner } from '@shared/ui';
+import React from 'react';
 
 const SpinnerShowcase: React.FC = React.memo(() => {
   return (

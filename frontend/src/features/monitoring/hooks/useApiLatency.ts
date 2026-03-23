@@ -8,6 +8,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
+
 import { getApiLatency } from '../api/monitoringApi';
 import type { ApiLatencyData } from '../types';
 

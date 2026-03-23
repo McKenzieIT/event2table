@@ -13,11 +13,13 @@
  */
 // @ts-nocheck - TypeScript检查暂禁用
 
+import { HQL_PREVIEW_DEBOUNCE } from '@shared/constants/timeouts';
+import type { HQLGenerateResponse } from '@shared/types/api-types';
 import React, { useState, useEffect } from 'react';
+
 import { hqlApi } from '../../../shared/api/hqlApi';
 import type { GenerateRequest } from '../../../shared/types';
-import type { HQLGenerateResponse } from '@shared/types/api-types';
-import { HQL_PREVIEW_DEBOUNCE } from '@shared/constants/timeouts';
+
 import { DebugViewer } from './DebugViewer';
 import { PerformanceIndicator } from './PerformanceIndicator';
 import { WhereConditionBuilder } from './WhereConditionBuilder';
