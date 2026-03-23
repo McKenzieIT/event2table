@@ -54,6 +54,17 @@ export interface HQLPreviewContainerField {
 }
 
 /**
+ * HQL预览容器专用的WHERE条件接口
+ */
+export interface HQLWhereCondition {
+  id: string;
+  field: string;
+  operator: string;
+  value: unknown;
+  logical_operator?: string;
+}
+
+/**
  * API请求字段配置
  */
 interface APIField {
@@ -103,7 +114,7 @@ export interface HQLPreviewContainerProps {
   /** 字段数组 */
   fields?: Field[];
   /** WHERE条件数组 */
-  whereConditions?: WhereCondition[];
+  whereConditions?: HQLWhereCondition[];
   /** 显示详情回调 */
   onShowDetails?: () => void;
 }

@@ -14,9 +14,24 @@ import GameManagementModalGraphQL from '../../features/games/GameManagementModal
 import { GET_GAMES } from '../../shared/graphql/queries';
 
 // Mock数据 - match actual GraphQL response structure
+// Note: Using odsDb (camelCase) to match GraphQL query
 const mockGames = [
-  { gid: 1001, name: 'Game 1', odsDb: 'ieu_ods', eventCount: 10, parameterCount: 50 },
-  { gid: 1002, name: 'Game 2', odsDb: 'ieu_ods', eventCount: 20, parameterCount: 100 },
+  {
+    id: 1,
+    gid: 1001,
+    name: 'Game 1',
+    odsDb: 'ieu_ods',
+    eventCount: 10,
+    parameterCount: 50,
+  },
+  {
+    id: 2,
+    gid: 1002,
+    name: 'Game 2',
+    odsDb: 'ieu_ods',
+    eventCount: 20,
+    parameterCount: 100,
+  },
 ];
 
 describe('GraphQL Integration Tests', () => {

@@ -16,14 +16,44 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
 };
 
 // Suppress console.error for all error boundary tests
+// This prevents React's error boundary logs from cluttering test output
 const originalError = console.error;
+const originalWarn = console.warn;
 
 beforeAll(() => {
-  console.error = vi.fn();
+  // Mock console.error to suppress React error boundary logs
+  console.error = vi.fn((...args: unknown[]) => {
+    // Filter out React error boundary logs and unhandled promise rejection warnings
+    const message = args[0];
+    if (
+      typeof message === 'string' &&
+      (message.includes('ErrorBoundary caught an error') ||
+        message.includes('Error: Test error') ||
+        message.includes('unhandledRejection') ||
+        message.includes('The above error occurred in the'))
+    ) {
+      return; // Suppress these expected error messages
+    }
+    // For other errors, still log them (but they'll be captured by the mock)
+    return originalError.call(console, ...args);
+  });
+
+  // Mock console.warn to suppress React Router warnings
+  console.warn = vi.fn((...args: unknown[]) => {
+    const message = args[0];
+    if (
+      typeof message === 'string' &&
+      message.includes('React Router Future Flag Warning')
+    ) {
+      return; // Suppress React Router warnings
+    }
+    return originalWarn.call(console, ...args);
+  });
 });
 
 afterAll(() => {
   console.error = originalError;
+  console.warn = originalWarn;
 });
 
 describe('ErrorBoundary component', () => {

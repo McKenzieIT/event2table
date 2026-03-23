@@ -18,12 +18,21 @@ export type SortDirection = 'asc' | 'desc';
 // Column Configuration
 // ============================================================================
 
-export interface TableColumn<TData extends RowData, TValue = unknown> extends ColumnDef<TData, TValue> {
+export interface TableColumn<TData = any, TValue = unknown> {
+  // Column identifier
+  id?: string;
+  // Accessor key for data binding
+  accessorKey?: string;
+  // Accessor function for complex data access
+  accessorFn?: (row: any) => TValue;
+  // Cell renderer function - uses any to be flexible with different data types
+  cell?: (info: { getValue: () => unknown; row: { original: any; id: string }; column: { id: string } }) => React.ReactNode;
   // Display properties
   header?: string | React.ReactNode;
   width?: number | string;
   minWidth?: number;
   maxWidth?: number;
+  size?: number;
   
   // Alignment
   align?: TextAlign;
@@ -42,18 +51,18 @@ export interface TableColumn<TData extends RowData, TValue = unknown> extends Co
   
   // Editing
   editable?: boolean;
-  editComponent?: (props: CellEditProps<TData, TValue>) => React.ReactNode;
+  editComponent?: (props: CellEditProps<any, TValue>) => React.ReactNode;
   
   // Custom rendering
-  cellRenderer?: (props: CellRenderProps<TData, TValue>) => React.ReactNode;
-  headerRenderer?: (props: HeaderRenderProps<TData, TValue>) => React.ReactNode;
+  cellRenderer?: (props: CellRenderProps<any, TValue>) => React.ReactNode;
+  headerRenderer?: (props: HeaderRenderProps<any, TValue>) => React.ReactNode;
 }
 
 // ============================================================================
 // Table Props
 // ============================================================================
 
-export interface TableProps<TData extends RowData> {
+export interface TableProps<TData = any> {
   // Data
   data: TData[];
   columns: TableColumn<TData>[];

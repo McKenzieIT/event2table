@@ -1,4 +1,4 @@
-import type { CanvasField, WhereCondition, GameData, SelectedEvent } from '../types';
+import type { CanvasField, WhereCondition, GameData, SelectedEvent } from './types';
 
 /**
  * Generate SELECT HQL

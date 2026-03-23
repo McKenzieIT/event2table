@@ -1,7 +1,7 @@
 import { useState, useCallback, ReactElement } from 'react';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 
-interface ConfirmOptions {
+export interface ConfirmOptions {
   title?: string;
   variant?: 'warning' | 'danger' | 'info' | 'success';
 }
@@ -13,7 +13,7 @@ interface DialogState {
   variant: ConfirmOptions['variant'];
 }
 
-interface UsePromiseConfirmReturn {
+export interface UsePromiseConfirmReturn {
   confirm: (message: string, options?: ConfirmOptions) => Promise<boolean>;
   ConfirmDialogComponent: () => ReactElement;
 }

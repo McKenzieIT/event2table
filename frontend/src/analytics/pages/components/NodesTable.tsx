@@ -2,10 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@shared/ui";
 import Table from "@shared/ui/components/Table";
+import type { TableColumn } from "@shared/ui/components/Table";
+
+/**
+ * 节点数据类型
+ */
+interface NodeData {
+  id: string;
+  [key: string]: unknown;
+}
 
 /**
  * 节点表格组件
  * 展示事件节点列表，支持分页和排序
+ * 
+ * 注意：此组件接收 TanStack Table 实例，用于高级表格功能
+ * 如果只需要简单展示数据，可以使用 data + columns props
  */
 function NodesTable({
   table,
@@ -40,53 +52,48 @@ function NodesTable({
     );
   }
 
+  // 从 TanStack Table 实例提取数据和列定义
+  const data = table.getRowModel().rows.map((row: any) => {
+    const rowData: Record<string, unknown> = { id: row.id };
+    row.getVisibleCells().forEach((cell: any) => {
+      rowData[cell.column.id] = cell.getValue();
+    });
+    return rowData;
+  });
+
+  const columns: TableColumn<NodeData>[] = table.getAllColumns().map((column: any) => ({
+    id: column.id,
+    header: column.columnDef.header,
+    accessorKey: column.id,
+    size: column.getSize(),
+    cell: (info: { getValue: () => unknown; row: { id: string } }) => {
+      const cellDef = column.columnDef.cell;
+      if (cellDef instanceof Function) {
+        // 对于函数类型的 cell，需要从原始 table 实例渲染
+        const row = table.getRowModel().rows.find((r: any) => r.id === info.row.id);
+        if (row) {
+          const cell = row.getVisibleCells().find((c: any) => c.column.id === column.id);
+          if (cell) {
+            return cellDef(cell.getContext());
+          }
+        }
+      }
+      return String(info.getValue() ?? '');
+    },
+  }));
+
   return (
     <div className="glass-card">
       <div className="table-responsive">
-        <Table variant="bordered" size="md" striped hoverable>
-          <Table.Header>
-            {table.getHeaderGroups().map((headerGroup: any) => (
-              <Table.Row key={headerGroup.id}>
-                {headerGroup.headers.map((header: any) => (
-                  <Table.Head key={header.id} style={{ width: header.getSize() }}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={
-                          header.column.getCanSort()
-                            ? "cursor-pointer user-select-none"
-                            : ""
-                        }
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {header.column.columnDef.header instanceof Function
-                          ? header.column.columnDef.header(header.getContext())
-                          : header.column.columnDef.header.toString()}
-                        {header.column.getIsSorted() && (
-                          <i
-                            className={`bi bi-arrow-${header.column.getIsSorted() === "asc" ? "up" : "down"} ms-1`}
-                          ></i>
-                        )}
-                      </div>
-                    )}
-                  </Table.Head>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Header>
-          <Table.Body>
-            {table.getRowModel().rows.map((row: any) => (
-              <Table.Row key={row.id}>
-                {row.getVisibleCells().map((cell: any) => (
-                  <Table.Cell key={cell.id}>
-                    {cell.column.columnDef.cell instanceof Function
-                      ? cell.column.columnDef.cell(cell.getContext())
-                      : String(cell.column.columnDef.cell)}
-                  </Table.Cell>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
+        <Table
+          data={data}
+          columns={columns}
+          variant="bordered"
+          size="md"
+          striped
+          hoverable
+          pagination={false}
+        />
       </div>
 
       {/* 分页 */}

@@ -164,101 +164,109 @@ function HqlManage(): React.JSX.Element {
       {/* HQL Table */}
       <div className="hql-table-card glass-card">
         <Table
+          data={filteredHql}
+          columns={[
+            {
+              id: 'hql_type',
+              header: '类型',
+              accessorKey: 'hql_type',
+              cell: (info: { getValue: () => unknown }) => {
+                const type = info.getValue() as string;
+                return (
+                  <span className={`badge badge-${type === 'create' ? 'primary' : 'success'}`}>
+                    {type === 'create' ? '📊' : '🔗'}
+                    {type?.toUpperCase()}
+                  </span>
+                );
+              }
+            },
+            {
+              id: 'event_name',
+              header: '事件名',
+              cell: (info: { row: { original: { event_name: string; event_name_cn: string } } }) => (
+                <>
+                  <div className="event-name">{info.row.original.event_name}</div>
+                  <div className="event-name-cn">{info.row.original.event_name_cn}</div>
+                </>
+              )
+            },
+            {
+              id: 'game_name',
+              header: '游戏',
+              accessorKey: 'game_name',
+              cell: (info: { getValue: () => unknown }) => (
+                <>
+                  <span className="text-muted">🎮</span>
+                  {info.getValue() as string}
+                </>
+              )
+            },
+            {
+              id: 'hql_version',
+              header: '版本',
+              accessorKey: 'hql_version',
+              cell: (info: { getValue: () => unknown }) => (
+                <span className="badge badge-secondary">v{info.getValue() as number}</span>
+              )
+            },
+            {
+              id: 'is_active',
+              header: '状态',
+              accessorKey: 'is_active',
+              cell: (info: { getValue: () => unknown }) => info.getValue() ? (
+                <span className="badge badge-success">✅ 激活</span>
+              ) : (
+                <span className="badge badge-secondary">⏸️ 停用</span>
+              )
+            },
+            {
+              id: 'is_user_edited',
+              header: '编辑状态',
+              accessorKey: 'is_user_edited',
+              cell: (info: { getValue: () => unknown }) => info.getValue() ? (
+                <span className="badge badge-info">✏️ 已编辑</span>
+              ) : null
+            },
+            {
+              id: 'updated_at',
+              header: '最后更新',
+              accessorKey: 'updated_at',
+              cell: (info: { getValue: () => unknown }) => new Date(info.getValue() as string).toLocaleString('zh-CN')
+            },
+            {
+              id: 'actions',
+              header: '操作',
+              cell: (info: { row: { original: { id: number } } }) => (
+                <div className="action-buttons">
+                  <Link to={`/hql/${info.row.original.id}/edit`}>
+                    <Button variant="outline-primary" size="sm">
+                      编辑
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() => handleToggleActive(info.row.original.id)}
+                  >
+                    切换
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => handleDelete(info.row.original.id)}
+                  >
+                    删除
+                  </Button>
+                </div>
+              )
+            }
+          ]}
           variant="bordered"
           size="md"
           striped
           hoverable
           className="hql-table"
-        >
-          <Table.Header>
-            <Table.Row>
-              <Table.Head>类型</Table.Head>
-              <Table.Head>事件名</Table.Head>
-              <Table.Head>游戏</Table.Head>
-              <Table.Head>版本</Table.Head>
-              <Table.Head>状态</Table.Head>
-              <Table.Head>编辑状态</Table.Head>
-              <Table.Head>最后更新</Table.Head>
-              <Table.Head>操作</Table.Head>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {filteredHql.length === 0 ? (
-              <Table.Row>
-                <Table.Cell style={{ textAlign: 'center', padding: '2rem' }}>
-                  <EmptyState
-                    icon={<span style={{ fontSize: '48px' }}>📥</span>}
-                    title="未找到HQL记录"
-                  />
-                </Table.Cell>
-              </Table.Row>
-            ) : (
-              filteredHql.map(hql => (
-                <Table.Row key={hql.id} className={hql.is_user_edited ? 'user-edited-row' : ''}>
-                  <Table.Cell>
-                    <span className={`badge badge-\${hql.hql_type === 'create' ? 'primary' : 'success'}`}>
-                      {hql.hql_type === 'create' ? '📊' : '🔗'}
-                      {hql.hql_type?.toUpperCase()}
-                    </span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <div className="event-name">{hql.event_name}</div>
-                    <div className="event-name-cn">{hql.event_name_cn}</div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="text-muted">🎮</span>
-                    {hql.game_name}
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="badge badge-secondary">v{hql.hql_version}</span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    {hql.is_active ? (
-                      <span className="badge badge-success">
-                        ✅ 激活
-                      </span>
-                    ) : (
-                      <span className="badge badge-secondary">
-                        ⏸️ 停用
-                      </span>
-                    )}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {hql.is_user_edited && (
-                      <span className="badge badge-info">
-                        ✏️ 已编辑
-                      </span>
-                    )}
-                  </Table.Cell>
-                  <Table.Cell>{new Date(hql.updated_at).toLocaleString('zh-CN')}</Table.Cell>
-                  <Table.Cell>
-                    <div className="action-buttons">
-                      <Link to={`/hql/\${hql.id}/edit`}>
-                        <Button variant="outline-primary" size="sm">
-                          编辑
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => handleToggleActive(hql.id)}
-                      >
-                        切换
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => handleDelete(hql.id)}
-                      >
-                        删除
-                      </Button>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              ))
-            )}
-          </Table.Body>
-        </Table>
+        />
       </div>
 
       <ConfirmDialog

@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@test/test-utils';
 import { useChromeMCPCompatibleInput } from './useChromeMCPCompatibleInput';
 
 describe('useChromeMCPCompatibleInput', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+  // Cleanup after each test to prevent state leakage
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('initial state', () => {

@@ -73,7 +73,7 @@ import './Table.css';
 // Main Table Component
 // ============================================================================
 
-const Table = React.memo(<TData extends Record<string, unknown>>({
+const Table = React.memo(<TData extends object = any>({
   data,
   columns,
   variant = 'default',

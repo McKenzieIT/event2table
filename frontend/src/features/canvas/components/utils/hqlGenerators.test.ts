@@ -110,7 +110,8 @@ describe('HQLGenerators Utility', () => {
       expect(hql).toContain('-- Input 1: event1');
       expect(hql).toContain('-- Input 2: event2');
       expect(hql).toContain('-- Input 3: event3');
-      expect(hql.split('UNION ALL')).toHaveLength(2);
+      // 3个输入源 → 2个UNION ALL → split后得到3个部分
+      expect(hql.split('UNION ALL')).toHaveLength(3);
     });
   });
 

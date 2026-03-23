@@ -4,33 +4,46 @@
  */
 
 import { useState, useCallback, Dispatch, SetStateAction } from 'react';
+import type { Event } from '@shared/types/event-types';
 
 // ============================================
 // Type Definitions
 // ============================================
 
+/**
+ * CanvasField - Unified field type for canvas components
+ * Compatible with Field from hql-types
+ */
 export interface CanvasField {
   id: string;
+  /** Field type - using string to allow 'basic' | 'parameter' | 'custom' | 'fixed' for backward compatibility */
   type: 'basic' | 'parameter' | 'custom' | 'fixed';
   name: string;
-  displayName: string;
-  alias: string;
+  displayName?: string;
+  alias?: string;
   dataType: string;
-  isEditable: boolean;
-  fieldType: string;
-  order: number;
+  isEditable?: boolean;
+  /** Internal field type for HQL generation - maps to FieldType enum */
+  fieldType: 'base' | 'param' | 'fixed' | 'custom' | string;
+  fieldName?: string;  // 字段名称（与 name 相同，用于兼容性）
+  order?: number;
   paramId?: number | null;
   jsonPath?: string | null;
 }
 
+/**
+ * WhereCondition - Unified WHERE condition type
+ * Compatible with WhereCondition from whereBuilder.ts
+ */
 export interface WhereCondition {
   id: string;
   type: 'condition' | 'group';
   field?: string;
   operator?: string;
-  value?: string;
-  logicalOp?: string;
+  value?: string | number | unknown;
+  logicalOp?: 'AND' | 'OR';
   children?: WhereCondition[];
+  dataType?: string;
   [key: string]: unknown;
 }
 
@@ -50,9 +63,12 @@ export interface SidebarCollapsed {
   statsSection: boolean;
 }
 
+// Re-export Event from event-types for convenience
+export type { Event } from '@shared/types/event-types';
+
 export interface UseEventNodeBuilderReturn {
-  selectedEvent: unknown;
-  setSelectedEvent: Dispatch<SetStateAction<unknown>>;
+  selectedEvent: Event | null;
+  setSelectedEvent: Dispatch<SetStateAction<Event | null>>;
   canvasFields: CanvasField[];
   setCanvasFields: Dispatch<SetStateAction<CanvasField[]>>;
   addFieldToCanvas: (
@@ -94,7 +110,7 @@ export interface UseEventNodeBuilderReturn {
 // ============================================
 
 export function useEventNodeBuilder(gameGid?: number): UseEventNodeBuilderReturn {
-  const [selectedEvent, setSelectedEvent] = useState<unknown>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [canvasFields, setCanvasFields] = useState<CanvasField[]>([]);
   const [whereConditions, setWhereConditions] = useState<WhereCondition[]>([]);
   const [whereBuilderOpen, setWhereBuilderOpen] = useState<boolean>(false);

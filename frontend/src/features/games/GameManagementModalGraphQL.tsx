@@ -253,7 +253,7 @@ export const GameManagementModal: React.FC<GameManagementModalProps> = ({ isOpen
       {/* 游戏列表 */}
       <div className="game-list">
         {filteredGames?.map((game: Game) => (
-          <div key={game.id} className="game-item">
+          <div key={game.gid} className="game-item">
             <input
               type="checkbox"
               checked={selectedGames.includes(game.gid)}

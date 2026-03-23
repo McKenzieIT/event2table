@@ -48,14 +48,17 @@
       "@ui-components/*": ["./src/shared/ui/components/*"],
       "@ui-hooks/*": ["./src/shared/ui/hooks/*"],
       "@ui-utils/*": ["./src/shared/ui/utils/*"],
-      "@ui-types": ["./src/shared/ui/types"]
+      "@ui-types": ["./src/shared/ui/types"],
+      "@test/*": ["./test/*"]
     }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/**/*.js",  // 包含JS文件以支持JSDoc检查
-    "src/**/*.jsx"
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "test/**/*.ts",
+    "test/**/*.tsx"
   ],
   "exclude": [
     "node_modules",

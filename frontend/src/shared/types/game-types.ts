@@ -117,3 +117,10 @@ export interface GameContext {
   odsDb: string;
   dwdPrefix?: string;
 }
+
+/**
+ * GameData - Alias for Game type
+ * Used by canvas components and HQL generators
+ * This is the same as Game, provided for backward compatibility
+ */
+export type GameData = Game;

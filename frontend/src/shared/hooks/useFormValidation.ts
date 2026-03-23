@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-interface ValidationRules {
+export interface ValidationRules {
   required?: boolean;
   minLength?: number;
   maxLength?: number;
@@ -8,7 +8,7 @@ interface ValidationRules {
   message?: string;
 }
 
-interface UseFormValidationReturn<T extends Record<string, unknown>> {
+export interface UseFormValidationReturn<T extends Record<string, unknown>> {
   errors: Record<keyof T, string | null>;
   touched: Record<keyof T, boolean>;
   handleBlur: (name: keyof T) => void;

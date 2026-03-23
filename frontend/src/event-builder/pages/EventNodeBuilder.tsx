@@ -29,7 +29,7 @@ import { useEventNodeBuilderData } from "./hooks/useEventNodeBuilderData";
 // Types
 import type { Game } from '@shared/hooks/useGameContext';
 import type { Event } from '@shared/types/api-types';
-import type { CanvasField, WhereCondition } from '@shared/types/event-node-builder';
+import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
 import type { OutletContext, ConfigData, FieldUpdate, DragDropField, ConfirmState } from "./EventNodeBuilder.types";
 
 // 样式

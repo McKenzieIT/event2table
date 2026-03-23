@@ -319,6 +319,18 @@ describe('GraphQL Hooks', () => {
             },
           },
         },
+        // Refetch query mock for refetchQueries
+        {
+          request: {
+            query: GET_GAMES,
+            variables: { limit: 20, offset: 0 },
+          },
+          result: {
+            data: {
+              games: mockGames,
+            },
+          },
+        },
       ];
 
       const { result } = renderHook(() => useCreateGame(), {
@@ -397,6 +409,18 @@ describe('GraphQL Hooks', () => {
                 message: 'Game deleted successfully',
                 errors: null,
               },
+            },
+          },
+        },
+        // Refetch query mock for refetchQueries
+        {
+          request: {
+            query: GET_GAMES,
+            variables: { limit: 20, offset: 0 },
+          },
+          result: {
+            data: {
+              games: mockGames,
             },
           },
         },

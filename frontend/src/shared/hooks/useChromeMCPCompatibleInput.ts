@@ -25,12 +25,12 @@
  * ```
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, RefObject } from 'react';
 
 /**
  * Hook configuration options
  */
-export interface UseChromeMCPCompatibleInputOptions<T extends Record<string, string>> {
+export interface UseChromeMCPCompatibleInputOptions<T extends Record<string, string> = Record<string, string>> {
   /**
    * Initial values for the form fields
    */
@@ -52,7 +52,7 @@ export interface UseChromeMCPCompatibleInputOptions<T extends Record<string, str
 /**
  * Hook return value
  */
-export interface UseChromeMCPCompatibleInputReturn<T extends Record<string, string>> {
+export interface UseChromeMCPCompatibleInputReturn<T extends Record<string, string> = Record<string, string>> {
   /**
    * React ref objects for each registered field
    * Use these to attach to input/textarea elements

@@ -9,8 +9,8 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import '@testing-library/jest-dom';
-import NodeConfigModal from '../NodeConfigModal';
-import { toast } from 'react-hot-toast';
+import { NodeConfigModal } from '../NodeConfigModal';
+import toast from 'react-hot-toast';
 
 // Mock toast notifications
 vi.mock('react-hot-toast', () => ({
@@ -94,7 +94,8 @@ describe('NodeConfigModal - First Time Creation Bug (P0 #1)', () => {
       // Act: Fill form
       const nameEnInput = screen.getByLabelText(/节点英文名称/i);
       const nameCnInput = screen.getByLabelText(/节点中文名称/i);
-      const descInput = screen.getByLabelText(/描述/i);
+      // Description textarea uses placeholder since label is not associated with for/id
+      const descInput = screen.getByPlaceholderText(/简要描述/i);
 
       fireEvent.change(nameEnInput, { target: { value: '  Test Node  ' } });
       fireEvent.change(nameCnInput, { target: { value: '  测试节点  ' } });
@@ -166,7 +167,8 @@ describe('NodeConfigModal - First Time Creation Bug (P0 #1)', () => {
       // Assert: Form fields populated with existing values
       expect(screen.getByLabelText(/节点英文名称/i)).toHaveValue('Existing Node');
       expect(screen.getByLabelText(/节点中文名称/i)).toHaveValue('现有节点');
-      expect(screen.getByLabelText(/描述/i)).toHaveValue('Existing description');
+      // Description textarea uses placeholder query since label is not associated
+      expect(screen.getByPlaceholderText(/简要描述/i)).toHaveValue('Existing description');
     });
 
     it('should enable save button with valid existing config', () => {
@@ -207,7 +209,8 @@ describe('NodeConfigModal - First Time Creation Bug (P0 #1)', () => {
       // Assert: All inputs disabled
       expect(screen.getByLabelText(/节点英文名称/i)).toBeDisabled();
       expect(screen.getByLabelText(/节点中文名称/i)).toBeDisabled();
-      expect(screen.getByLabelText(/描述/i)).toBeDisabled();
+      // Description textarea uses placeholder query since label is not associated
+      expect(screen.getByPlaceholderText(/简要描述/i)).toBeDisabled();
 
       // Assert: Save button disabled
       expect(screen.getByRole('button', { name: /保存/i })).toBeDisabled();

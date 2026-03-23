@@ -105,25 +105,27 @@ describe('GameManagementModalGraphQL', () => {
 
       fireEvent.click(createButton);
 
-      // 应该显示创建表单标题
+      // 应该显示创建表单标题（使用更具体的选择器：h3标题）
       await waitFor(() => {
-        const formTitle = screen.queryByText(/创建游戏/i) || screen.queryByText(/添加游戏/i);
+        const formTitle = screen.getByRole('heading', { level: 3, name: /创建游戏/i });
         expect(formTitle).toBeInTheDocument();
       });
     });
 
-    it('创建按钮应该有正确的data-testid属性', async () => {
+    it('创建按钮应该可点击', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
           <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 
+      // 使用 role 查找按钮
       const createButton = await waitFor(() => {
-        return screen.getByTestId('create-game-button');
+        return screen.getByRole('button', { name: /创建游戏/i });
       });
 
       expect(createButton).toBeInTheDocument();
+      expect(createButton).toBeEnabled();
     });
   });
 

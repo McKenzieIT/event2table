@@ -26,16 +26,21 @@ const categoryOptions: SelectOption[] = [
 export function SelectBasicExample() {
   const [value, setValue] = useState<string | undefined>();
 
+  const handleChange = (newValue: string | number | (string | number)[]) => {
+    setValue(newValue === '' ? undefined : String(newValue));
+  };
+
   return (
     <div className="example-section">
       <h3>基础用法</h3>
       <div className="select-group">
         <Select
+          name="basic-fruit"
           label="选择水果"
           placeholder="请选择水果"
           options={basicOptions}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
         />
         <div className="selected-value">
           <strong>已选择：</strong>
@@ -49,16 +54,21 @@ export function SelectBasicExample() {
 export function SelectMultipleExample() {
   const [values, setValues] = useState<(string | number)[]>([]);
 
+  const handleChange = (newValue: string | number | (string | number)[]) => {
+    setValues(Array.isArray(newValue) ? newValue : [newValue]);
+  };
+
   return (
     <div className="example-section">
       <h3>多选模式</h3>
       <div className="select-group">
         <Select
+          name="multiple-categories"
           label="选择分类（多选）"
           placeholder="选择多个分类"
           options={categoryOptions}
           value={values}
-          onChange={setValues}
+          onChange={handleChange}
           multiple
         />
         <div className="selected-value">
@@ -91,16 +101,21 @@ export function SelectSearchableExample() {
     { value: 'elixir', label: 'Elixir' },
   ];
 
+  const handleChange = (newValue: string | number | (string | number)[]) => {
+    setValue(newValue === '' ? undefined : String(newValue));
+  };
+
   return (
     <div className="example-section">
       <h3>可搜索</h3>
       <div className="select-group">
         <Select
+          name="searchable-language"
           label="编程语言"
           placeholder="搜索并选择编程语言"
           options={largeOptions}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
           searchable
         />
         <div className="selected-value">
@@ -115,32 +130,39 @@ export function SelectSearchableExample() {
 export function SelectStatesExample() {
   const [value, setValue] = useState<string | undefined>();
 
+  const handleChange = (newValue: string | number | (string | number)[]) => {
+    setValue(newValue === '' ? undefined : String(newValue));
+  };
+
   return (
     <div className="example-section">
       <h3>状态示例</h3>
       <div className="select-group">
         <Select
+          name="states-disabled"
           label="禁用状态"
           placeholder="无法选择"
           options={basicOptions}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
           disabled
         />
         <Select
+          name="states-required"
           label="必填字段"
           placeholder="请选择"
           options={basicOptions}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
           required
         />
         <Select
+          name="states-error"
           label="错误状态"
           placeholder="请选择"
           options={basicOptions}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
           error="请选择一个选项"
         />
       </div>
@@ -151,24 +173,30 @@ export function SelectStatesExample() {
 export function SelectWithHelperExample() {
   const [value, setValue] = useState<string | undefined>();
 
+  const handleChange = (newValue: string | number | (string | number)[]) => {
+    setValue(newValue === '' ? undefined : String(newValue));
+  };
+
   return (
     <div className="example-section">
       <h3>辅助文本</h3>
       <div className="select-group">
         <Select
+          name="helper-fruit"
           label="选择水果"
           placeholder="请选择你喜欢的水果"
           options={basicOptions}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
           helperText="选择后可以查看详细信息"
         />
         <Select
+          name="helper-category"
           label="选择分类"
           placeholder="请选择商品分类"
           options={categoryOptions}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
           helperText="最多选择3个分类"
         />
       </div>
@@ -181,33 +209,48 @@ export function SelectSizeExample() {
   const [mediumValue, setMediumValue] = useState<string | undefined>();
   const [largeValue, setLargeValue] = useState<string | undefined>();
 
+  const handleSmallChange = (newValue: string | number | (string | number)[]) => {
+    setSmallValue(newValue === '' ? undefined : String(newValue));
+  };
+
+  const handleMediumChange = (newValue: string | number | (string | number)[]) => {
+    setMediumValue(newValue === '' ? undefined : String(newValue));
+  };
+
+  const handleLargeChange = (newValue: string | number | (string | number)[]) => {
+    setLargeValue(newValue === '' ? undefined : String(newValue));
+  };
+
   return (
     <div className="example-section">
       <h3>不同尺寸</h3>
       <div className="select-group">
         <Select
+          name="size-small"
           label="小尺寸"
           size="small"
           placeholder="小尺寸选择器"
           options={basicOptions}
           value={smallValue}
-          onChange={setSmallValue}
+          onChange={handleSmallChange}
         />
         <Select
+          name="size-medium"
           label="中尺寸"
           size="medium"
           placeholder="中尺寸选择器"
           options={basicOptions}
           value={mediumValue}
-          onChange={setMediumValue}
+          onChange={handleMediumChange}
         />
         <Select
+          name="size-large"
           label="大尺寸"
           size="large"
           placeholder="大尺寸选择器"
           options={basicOptions}
           value={largeValue}
-          onChange={setLargeValue}
+          onChange={handleLargeChange}
         />
       </div>
     </div>
@@ -225,16 +268,21 @@ export function SelectDisabledOptionsExample() {
     { value: 'option5', label: '选项 5' },
   ];
 
+  const handleChange = (newValue: string | number | (string | number)[]) => {
+    setValue(newValue === '' ? undefined : String(newValue));
+  };
+
   return (
     <div className="example-section">
       <h3>禁用选项</h3>
       <div className="select-group">
         <Select
+          name="disabled-options"
           label="选择选项"
           placeholder="请选择可用选项"
           options={optionsWithDisabled}
           value={value}
-          onChange={setValue}
+          onChange={handleChange}
         />
       </div>
     </div>
@@ -256,6 +304,7 @@ export function SelectControlledExample() {
       <h3>受控组件</h3>
       <div className="select-group">
         <Select
+          name="controlled-fruit"
           label="选择水果"
           placeholder="请选择水果"
           options={basicOptions}
@@ -287,6 +336,7 @@ export function SelectBestPractices() {
         <div className="practice-item">
           <h4>1. 提供清晰的标签和占位符</h4>
           <Select
+            name="practice-label"
             label="选择水果"
             placeholder="请选择你喜欢的水果"
             options={basicOptions}
@@ -295,6 +345,7 @@ export function SelectBestPractices() {
         <div className="practice-item">
           <h4>2. 为大量选项启用搜索功能</h4>
           <Select
+            name="practice-search"
             label="编程语言"
             placeholder="搜索并选择"
             options={basicOptions}
@@ -304,6 +355,7 @@ export function SelectBestPractices() {
         <div className="practice-item">
           <h4>3. 使用辅助文本提供额外信息</h4>
           <Select
+            name="practice-helper"
             label="选择分类"
             placeholder="请选择"
             options={categoryOptions}
@@ -313,6 +365,7 @@ export function SelectBestPractices() {
         <div className="practice-item">
           <h4>4. 禁用不可用的选项</h4>
           <Select
+            name="practice-disabled"
             label="选择选项"
             placeholder="请选择"
             options={[
@@ -324,6 +377,7 @@ export function SelectBestPractices() {
         <div className="practice-item">
           <h4>5. 多选时明确提示用户</h4>
           <Select
+            name="practice-multiple"
             label="选择分类"
             placeholder="可以选择多个"
             options={categoryOptions}

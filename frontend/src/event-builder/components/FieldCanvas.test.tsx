@@ -1,10 +1,11 @@
 import { render, screen } from '@test/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import FieldCanvas from './FieldCanvas';
+import type { CanvasField } from '@shared/hooks/useEventNodeBuilder';
 
 describe('FieldCanvas Component', () => {
   const mockProps = {
-    fields: [],
+    fields: [] as CanvasField[],
     parameters: [],
     whereConditions: [],
     onFieldsChange: vi.fn(),
@@ -40,7 +41,7 @@ describe('FieldCanvas Component', () => {
     });
 
     it('应该显示字段统计信息', () => {
-      const fields = [
+      const fields: CanvasField[] = [
         {
           id: '1',
           type: 'parameter',
@@ -69,7 +70,7 @@ describe('FieldCanvas Component', () => {
 
   describe('字段显示测试', () => {
     it('应该正确显示参数字段', () => {
-      const fields = [
+      const fields: CanvasField[] = [
         {
           id: '1',
           type: 'parameter',
@@ -92,7 +93,7 @@ describe('FieldCanvas Component', () => {
     });
 
     it('应该正确显示基础字段', () => {
-      const fields = [
+      const fields: CanvasField[] = [
         {
           id: '1',
           type: 'basic',
@@ -113,7 +114,7 @@ describe('FieldCanvas Component', () => {
     });
 
     it('应该正确显示自定义字段', () => {
-      const fields = [
+      const fields: CanvasField[] = [
         {
           id: '1',
           type: 'custom',
@@ -135,7 +136,7 @@ describe('FieldCanvas Component', () => {
     });
 
     it('应该正确显示固定字段', () => {
-      const fields = [
+      const fields: CanvasField[] = [
         {
           id: '1',
           type: 'fixed',
@@ -147,7 +148,7 @@ describe('FieldCanvas Component', () => {
           isEditable: true,
           fieldType: 'fixed',
           fixedValue: 'test'
-        }
+        } as CanvasField
       ];
 
       render(<FieldCanvas {...mockProps} fields={fields} />);

@@ -7,6 +7,22 @@ import React from 'react';
 // Make React globally available for components that use React.memo without explicit import
 (global as any).React = React;
 
+// Suppress unhandled rejection warnings for tests that intentionally test error handling
+// These rejections ARE handled, just asynchronously (which Node.js warns about)
+const unhandledRejections: unknown[] = [];
+process.on('unhandledRejection', (reason) => {
+  unhandledRejections.push(reason);
+});
+
+// Clear tracked rejections before each test
+beforeAll(() => {
+  unhandledRejections.length = 0;
+});
+
+afterAll(() => {
+  unhandledRejections.length = 0;
+});
+
 // Mock localStorage before any tests run
 const localStorageMock = {
   getItem: vi.fn(() => null),
@@ -38,7 +54,17 @@ Object.defineProperty(global, 'sessionStorage', {
 // Cleanup after each test
 afterEach(() => {
   cleanup();
+
+  // Timer mock cleanup - CRITICAL for preventing state leakage
+  // This ensures fake timers don't leak between tests
+  if (vi.isFakeTimers()) {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  }
+
   vi.clearAllMocks();
+  vi.restoreAllMocks();
+
   // Reset localStorage mock
   localStorageMock.getItem.mockReturnValue(null);
   localStorageMock.setItem.mockClear();

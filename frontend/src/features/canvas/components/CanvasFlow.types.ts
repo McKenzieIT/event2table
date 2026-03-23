@@ -2,7 +2,7 @@
 // Extracted from CanvasFlow.tsx for better maintainability
 
 import { Node, Edge } from 'reactflow';
-import { GameData } from './utils/hqlGenerators';
+import type { GameData } from '@/shared/types/game-types';
 
 /**
  * Extended Node data interface for Canvas nodes

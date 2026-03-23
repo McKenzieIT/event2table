@@ -5,7 +5,7 @@ interface DebugPanelProps {
   onClose: () => void;
 }
 
-export const DebugPanel = React.memo(function DebugPanel({ show, onClose }: DebugPanelProps): React.JSX.Element {
+export const DebugPanel = React.memo(function DebugPanel({ show, onClose }: DebugPanelProps): React.JSX.Element | null {
   if (!show) return null;
 
   return (

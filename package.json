@@ -40,8 +40,7 @@
     "@graphql-codegen/typescript-react-apollo": "^4.4.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "terser": "^5.46.0",
-    "husky": "^9.1.7",
-    "pre-commit": "^3.0.1"
+    "husky": "^9.1.7"
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",

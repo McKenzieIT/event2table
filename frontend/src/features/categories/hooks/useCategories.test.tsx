@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { renderHook, waitFor } from '@test/test-utils';
+import { renderHook, waitFor, act } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { describe, it, expect } from 'vitest';
 import {
@@ -33,7 +33,7 @@ const mockCategories = [
 
 const mockCategory = { __typename: 'Category', id: 1, name: '用户行为', eventCount: 10 };
 
-// 测试wrapper
+// 测试wrapper - 使用 addTypename={false} 避免类型名不匹配问题
 const createWrapper = (mocks: any[] = []) => {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return (
@@ -147,6 +147,19 @@ describe('Categories Hooks', () => {
 
   describe('useCreateCategory', () => {
     it('should create a category', async () => {
+      // Mock for the refetch query triggered by refetchQueries in useCreateCategory
+      const refetchMock = {
+        request: {
+          query: GET_CATEGORIES,
+          variables: { limit: 50, offset: 0 },
+        },
+        result: {
+          data: {
+            categories: [...mockCategories, { id: 4, name: '新分类', eventCount: 0 }],
+          },
+        },
+      };
+
       const mocks = [
         {
           request: {
@@ -164,19 +177,26 @@ describe('Categories Hooks', () => {
             },
           },
         },
+        refetchMock,
       ];
 
       const { result } = renderHook(() => useCreateCategory(), {
         wrapper: createWrapper(mocks),
       });
 
+      // Wait for the mutation hook to be ready
       await waitFor(() => {
         expect(result.current[0]).toBeDefined();
       });
 
       const [createCategory] = result.current;
-      const response = await createCategory({
-        variables: { name: '新分类' },
+
+      // Execute mutation within act() to properly handle state updates
+      let response;
+      await act(async () => {
+        response = await createCategory({
+          variables: { name: '新分类' },
+        });
       });
 
       expect(response.data?.createCategory?.ok).toBe(true);
@@ -214,8 +234,13 @@ describe('Categories Hooks', () => {
       });
 
       const [updateCategory] = result.current;
-      const response = await updateCategory({
-        variables: { id: 1, name: '更新后的分类' },
+
+      // Execute mutation within act() to properly handle state updates
+      let response;
+      await act(async () => {
+        response = await updateCategory({
+          variables: { id: 1, name: '更新后的分类' },
+        });
       });
 
       expect(response.data?.updateCategory?.ok).toBe(true);
@@ -225,6 +250,19 @@ describe('Categories Hooks', () => {
 
   describe('useDeleteCategory', () => {
     it('should delete a category', async () => {
+      // Mock for the refetch query triggered by refetchQueries in useDeleteCategory
+      const refetchMock = {
+        request: {
+          query: GET_CATEGORIES,
+          variables: { limit: 50, offset: 0 },
+        },
+        result: {
+          data: {
+            categories: mockCategories.filter(c => c.id !== 1),
+          },
+        },
+      };
+
       const mocks = [
         {
           request: {
@@ -242,6 +280,7 @@ describe('Categories Hooks', () => {
             },
           },
         },
+        refetchMock,
       ];
 
       const { result } = renderHook(() => useDeleteCategory(), {
@@ -253,8 +292,13 @@ describe('Categories Hooks', () => {
       });
 
       const [deleteCategory] = result.current;
-      const response = await deleteCategory({
-        variables: { id: 1 },
+
+      // Execute mutation within act() to properly handle state updates
+      let response;
+      await act(async () => {
+        response = await deleteCategory({
+          variables: { id: 1 },
+        });
       });
 
       expect(response.data?.deleteCategory?.ok).toBe(true);

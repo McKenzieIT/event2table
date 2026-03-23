@@ -54,11 +54,22 @@ const mockEventsData = Array.from({ length: 50 }, (_, i) => ({
 
 // Mock GraphQL hooks - must be at module scope for hoisting
 vi.mock('../../shared/graphql/hooks', () => ({
+  // Query hooks
   useEvents: () => ({
     data: { events: mockEventsData },
     loading: false,
     error: null,
     refetch: vi.fn()
+  }),
+  useSearchEvents: () => ({
+    data: { searchEvents: mockEventsData },
+    loading: false,
+    error: null
+  }),
+  useEvent: () => ({
+    data: { event: null },
+    loading: false,
+    error: null
   }),
   useCategories: () => ({
     data: { categories: mockCategoriesData },
@@ -66,9 +77,16 @@ vi.mock('../../shared/graphql/hooks', () => ({
     error: null,
     refetch: vi.fn()
   }),
-  useDeleteCategory: () => [vi.fn()],
-  useCreateCategory: () => [vi.fn()],
-  useUpdateCategory: () => [vi.fn()],
+  useSearchCategories: () => ({
+    data: { searchCategories: [] },
+    loading: false,
+    error: null
+  }),
+  useCategory: () => ({
+    data: { category: null },
+    loading: false,
+    error: null
+  }),
   useGames: () => ({
     data: { games: [] },
     loading: false,
@@ -80,15 +98,83 @@ vi.mock('../../shared/graphql/hooks', () => ({
     loading: false,
     error: null
   }),
+  useSearchGames: () => ({
+    data: { searchGames: [] },
+    loading: false,
+    error: null
+  }),
   useParameters: () => ({
     data: { parameters: [] },
     loading: false,
     error: null,
     refetch: vi.fn()
   }),
+  useSearchParameters: () => ({
+    data: { searchParameters: [] },
+    loading: false,
+    error: null
+  }),
+  useParameter: () => ({
+    data: { parameter: null },
+    loading: false,
+    error: null
+  }),
+  useDashboardStats: () => ({
+    data: { dashboardStats: null },
+    loading: false,
+    error: null
+  }),
+  useGameStats: () => ({
+    data: { gameStats: null },
+    loading: false,
+    error: null
+  }),
+  useAllGameStats: () => ({
+    data: { allGameStats: [] },
+    loading: false,
+    error: null
+  }),
+  useFlows: () => ({
+    data: { flows: [] },
+    loading: false,
+    error: null
+  }),
+  useFlow: () => ({
+    data: { flow: null },
+    loading: false,
+    error: null
+  }),
+  useCategoriesByGame: () => ({
+    data: { categories: [] },
+    loading: false,
+    error: null
+  }),
+  useAllParametersByGame: () => ({
+    data: { parameters: [] },
+    loading: false,
+    error: null
+  }),
+  useParametersManagement: () => ({
+    data: { parametersManagement: null },
+    loading: false,
+    error: null
+  }),
+  // Mutation hooks
+  useDeleteCategory: () => [vi.fn()],
+  useCreateCategory: () => [vi.fn()],
+  useUpdateCategory: () => [vi.fn()],
   useCreateEvent: () => [vi.fn()],
   useUpdateEvent: () => [vi.fn()],
-  useDeleteEvent: () => [vi.fn()]
+  useDeleteEvent: () => [vi.fn()],
+  useCreateGame: () => [vi.fn()],
+  useUpdateGame: () => [vi.fn()],
+  useDeleteGame: () => [vi.fn()],
+  useCreateParameter: () => [vi.fn()],
+  useUpdateParameter: () => [vi.fn()],
+  useDeleteParameter: () => [vi.fn()],
+  useGenerateHQL: () => [vi.fn()],
+  useSaveHQLTemplate: () => [vi.fn()],
+  useDeleteHQLTemplate: () => [vi.fn()]
 }));
 
 describe('React Performance Tests', () => {
@@ -300,7 +386,8 @@ describe('React Performance Tests', () => {
 
       const startTime = performance.now();
 
-      render(<GamesListGraphQL games={mockGames} />);
+      // GamesListGraphQL fetches data via GraphQL, not props
+      render(<GamesListGraphQL />);
 
       const endTime = performance.now();
       const renderTime = endTime - startTime;
@@ -452,8 +539,10 @@ describe('React Performance Tests', () => {
       // Skip if PerformanceObserver is not available (jsdom doesn't have it)
       if (typeof window === 'undefined' || !window.PerformanceObserver) {
         // Manually record metrics to test the monitor functionality
-        performanceMonitor.recordRender('TestComponent')();
-        performanceMonitor.recordRender('TestComponent')();
+        const stopRecording1 = performanceMonitor.recordRender('TestComponent');
+        if (stopRecording1) stopRecording1();
+        const stopRecording2 = performanceMonitor.recordRender('TestComponent');
+        if (stopRecording2) stopRecording2();
       }
 
       const TestComponent = () => {

@@ -291,36 +291,58 @@ function EventDetail(): React.JSX.Element {
             <div className="card-content">
               {parameters.length > 0 ? (
                 <div className="table-responsive-wrapper">
-                  <Table variant="bordered" size="md" striped hoverable>
-                    <Table.Header>
-                      <Table.Row>
-                        <Table.Head>参数名</Table.Head>
-                        <Table.Head>参数中文名</Table.Head>
-                        <Table.Head>类型</Table.Head>
-                        <Table.Head>描述</Table.Head>
-                        <Table.Head style={{ width: '80px' }}>公参</Table.Head>
-                      </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                      {parameters.map(param => (
-                        <Table.Row key={param.id}>
-                          <Table.Cell><code>{param.param_name}</code></Table.Cell>
-                          <Table.Cell>{param.param_name_cn}</Table.Cell>
-                          <Table.Cell><span className="badge badge-secondary text-xs">{param.param_type}</span></Table.Cell>
-                          <Table.Cell className="text-muted text-sm">{param.param_description || '-'}</Table.Cell>
-                          <Table.Cell>
-                            {param.is_common_param ? (
-                              <span className="badge badge-success text-xs">
-                                ✓ 是
-                              </span>
-                            ) : (
-                              <span className="badge badge-secondary text-xs">否</span>
-                            )}
-                          </Table.Cell>
-                        </Table.Row>
-                      ))}
-                    </Table.Body>
-                  </Table>
+                  <Table
+                    data={parameters}
+                    columns={[
+                      {
+                        id: 'param_name',
+                        header: '参数名',
+                        accessorKey: 'param_name',
+                        cell: (info: { getValue: () => unknown }) => <code>{String(info.getValue())}</code>
+                      },
+                      {
+                        id: 'param_name_cn',
+                        header: '参数中文名',
+                        accessorKey: 'param_name_cn'
+                      },
+                      {
+                        id: 'param_type',
+                        header: '类型',
+                        accessorKey: 'param_type',
+                        cell: (info: { getValue: () => unknown }) => (
+                          <span className="badge badge-secondary text-xs">
+                            {String(info.getValue() || '-')}
+                          </span>
+                        )
+                      },
+                      {
+                        id: 'param_description',
+                        header: '描述',
+                        accessorKey: 'param_description',
+                        cell: (info: { getValue: () => unknown }) => (
+                          <span className="text-muted text-sm">
+                            {String(info.getValue() || '-')}
+                          </span>
+                        )
+                      },
+                      {
+                        id: 'is_common_param',
+                        header: '公参',
+                        accessorKey: 'is_common_param',
+                        size: 80,
+                        cell: (info: { getValue: () => unknown }) => info.getValue() ? (
+                          <span className="badge badge-success text-xs">✓ 是</span>
+                        ) : (
+                          <span className="badge badge-secondary text-xs">否</span>
+                        )
+                      }
+                    ]}
+                    variant="bordered"
+                    size="md"
+                    striped
+                    hoverable
+                    pagination={false}
+                  />
                 </div>
               ) : (
                 <EmptyState

@@ -6,7 +6,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@test/test-utils';
-import WhereBuilderModal from './WhereBuilderModal';
+import { WhereBuilderModal } from './WhereBuilderModal';
 
 // 类型定义
 interface WhereCondition {

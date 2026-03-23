@@ -1,19 +1,12 @@
-// ⚠️ REACT PERF: Missing React.memo/useMemo/useCallback
-// TODO: Add appropriate React optimization:
-//   - Large components (>500 chars): Add React.memo()
-//   - Expensive computations: Add useMemo()
-//   - useEffect dependencies: Add useCallback()
-// See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
-
-// @ts-nocheck - TypeScript strict mode temporarily disabled for gradual migration
 /**
  * RightSidebar Component
  * 右侧栏组件（HQL预览、WHERE条件、统计信息）
  */
-import React from 'react';
+import React, { memo } from 'react';
 import HQLPreviewContainer from './HQLPreviewContainer';
-import WhereBuilder from './WhereBuilder';
+import WhereBuilder, { type WhereCondition as BuilderWhereCondition } from './WhereBuilder';
 import StatsPanel from './StatsPanel';
+import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
 
 interface EventData {
   id: number;
@@ -22,36 +15,17 @@ interface EventData {
   display_name?: string;  // 显示名称
 }
 
-type FieldType = 'base' | 'param' | 'basic' | 'custom' | 'fixed';
-
-interface Field {
-  id: string;
-  fieldType: FieldType;
-  name: string;
-  fieldName?: string;
-  displayName?: string;
-  alias?: string;
-  dataType: string;
-}
-
-interface WhereCondition {
-  id: string;
-  field: string;
-  operator: string;
-  value: unknown;
-}
-
 interface RightSidebarProps {
   gameGid: number;
   selectedEvent?: EventData | null;
-  fields?: Field[];
+  fields?: CanvasField[];
   whereConditions?: WhereCondition[];
   onWhereConditionsChange: (conditions: WhereCondition[]) => void;
   onShowWhereModal: () => void;
   onShowHQLDetails?: () => void;
 }
 
-export function RightSidebar({
+function RightSidebarInner({
   gameGid,
   selectedEvent = null,
   fields = [],
@@ -60,24 +34,85 @@ export function RightSidebar({
   onShowWhereModal,
   onShowHQLDetails,
 }: RightSidebarProps) {
+  // Convert CanvasField[] to HQLPreviewContainerField[] format
+  const hqlFields = fields.map(f => ({
+    paramId: f.paramId ?? undefined,
+    fieldName: f.fieldName || f.name || '',
+    name: f.name,
+    fieldType: f.fieldType,
+    type: f.type,
+    alias: f.alias,
+    jsonPath: f.jsonPath ?? undefined,
+  }));
+
+  // Convert WhereCondition to HQLPreviewContainer format
+  const hqlWhereConditions = whereConditions.map(c => ({
+    id: c.id,
+    field: c.field || '',
+    operator: c.operator || '=',
+    value: c.value,
+    logical_operator: c.logicalOp,
+  }));
+
+  // Convert WhereCondition to WhereBuilder format (simplified - no nested conditions)
+  const builderConditions: BuilderWhereCondition[] = whereConditions.map(c => ({
+    id: c.id,
+    field: c.field || '',
+    operator: c.operator || '=',
+    value: c.value,
+    logicalOperator: c.logicalOp,
+    type: c.type,
+  }));
+
+  const handleWhereChange = (conditions: BuilderWhereCondition[]) => {
+    const converted: WhereCondition[] = conditions.map(c => ({
+      id: c.id,
+      type: (c.type || 'condition') as 'condition' | 'group',
+      field: c.field,
+      operator: c.operator,
+      value: c.value,
+      logicalOp: c.logicalOperator as 'AND' | 'OR' | undefined,
+    }));
+    onWhereConditionsChange(converted);
+  };
+
+  // Convert CanvasField[] to StatsPanel Field[] format
+  const statsFields = fields.map(f => ({
+    id: f.id,
+    fieldType: f.fieldType as 'base' | 'param' | 'basic' | 'custom' | 'fixed',
+    name: f.name,
+    alias: f.alias,
+    dataType: f.dataType,
+  }));
+
+  // Convert WhereCondition to StatsPanel format
+  const statsWhereConditions = whereConditions.map(c => ({
+    id: c.id,
+    field: c.field || '',
+    operator: c.operator || '=',
+    value: c.value,
+  }));
+
   return (
     <aside className="sidebar-right">
       <HQLPreviewContainer
         gameGid={gameGid}
         event={selectedEvent}
-        fields={fields}
-        whereConditions={whereConditions}
+        fields={hqlFields}
+        whereConditions={hqlWhereConditions}
         onShowDetails={onShowHQLDetails}
       />
       <WhereBuilder
-        conditions={whereConditions}
-        onChange={onWhereConditionsChange}
+        conditions={builderConditions}
+        onChange={handleWhereChange}
         onOpenModal={onShowWhereModal}
       />
       <StatsPanel
-        fields={fields}
-        whereConditions={whereConditions}
+        fields={statsFields}
+        whereConditions={statsWhereConditions}
       />
     </aside>
   );
 }
+
+export const RightSidebar = memo(RightSidebarInner);

@@ -127,7 +127,7 @@ export function ModalAnimationExample() {
         isOpen={zoomOpen}
         onClose={() => setZoomOpen(false)}
         title="缩放动画"
-        animation="zoom"
+        animation="scale"
       >
         <p>对话框缩放显示。</p>
       </Modal>

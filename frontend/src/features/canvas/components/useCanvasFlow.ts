@@ -13,7 +13,7 @@ import { useFlowLoad } from '../hooks/useFlowLoad';
 import { useFlowSave } from '../hooks/useFlowSave';
 import { useFlowExecute } from '../hooks/useFlowExecute';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { GameData } from './utils/hqlGenerators';
+import type { GameData } from '@/shared/types/game-types';
 import {
     CanvasNode,
     CanvasNodeData,

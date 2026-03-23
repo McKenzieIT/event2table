@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { act, waitFor } from '@test/test-utils';
+import { act, waitFor } from '@testing-library/react';
 import { renderHookWithProviders } from '@test/test-utils';
 import { useGameContext } from './useGameContext';
 
@@ -112,12 +112,12 @@ describe('useGameContext', () => {
       });
 
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
-      
+
       const { result } = renderHookWithProviders(() => useGameContext());
-      
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      expect(global.fetch).toHaveBeenCalledWith('/api/games');
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('/api/games');
+      });
     });
 
     it('should load game from game_id parameter', async () => {
@@ -137,18 +137,18 @@ describe('useGameContext', () => {
       });
 
       window.history.pushState({}, 'Test', '/?game_id=10000147');
-      
+
       renderHookWithProviders(() => useGameContext());
-      
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      expect(global.fetch).toHaveBeenCalledWith('/api/games');
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('/api/games');
+      });
     });
 
     it('should load game from localStorage', async () => {
       // Mock localStorage.getItem to return the game GID
       (localStorage.getItem as any).mockReturnValue('10000147');
-      
+
       (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
@@ -165,22 +165,22 @@ describe('useGameContext', () => {
       });
 
       renderHookWithProviders(() => useGameContext());
-      
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      expect(global.fetch).toHaveBeenCalledWith('/api/games');
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('/api/games');
+      });
     });
 
     it('should handle API errors gracefully', async () => {
       (global.fetch as any).mockRejectedValue(new Error('Network error'));
-      
+
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
-      
+
       const { result } = renderHookWithProviders(() => useGameContext());
-      
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      expect(result.current.currentGame).toBeNull();
+
+      await waitFor(() => {
+        expect(result.current.currentGame).toBeNull();
+      });
     });
 
     it('should not load game if already loaded', async () => {
@@ -200,15 +200,20 @@ describe('useGameContext', () => {
       });
 
       window.history.pushState({}, 'Test', '/?game_gid=10000147');
-      
+
       const { result } = renderHookWithProviders(() => useGameContext());
-      
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('/api/games');
+      });
+
       const fetchCalls = (global.fetch as any).mock.calls.length;
-      
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
+
+      // Wait a bit to ensure no additional fetch calls
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      });
+
       expect((global.fetch as any).mock.calls.length).toBe(fetchCalls);
     });
   });

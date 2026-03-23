@@ -76,7 +76,7 @@ const NodeConfigModalRefactored: NodeConfigModalComponent = ({
    * - 提供handleChange统一处理字段变更
    */
   const { values, handleChange, register, resetValues } =
-    useChromeMCPCompatibleInput<NodeConfig>({
+    useChromeMCPCompatibleInput({
       initialValues: {
         nameEn: '',
         nameCn: '',
@@ -188,7 +188,7 @@ const NodeConfigModalRefactored: NodeConfigModalComponent = ({
             onChange={(e) => handleChange('nameEn', e.target.value)}
             disabled={disabled}
             helperText="用于标识节点的唯一英文名称"
-            ref={register('nameEn')}
+            ref={register('nameEn') as React.RefObject<HTMLInputElement>}
           />
 
           <Input
@@ -199,7 +199,7 @@ const NodeConfigModalRefactored: NodeConfigModalComponent = ({
             onChange={(e) => handleChange('nameCn', e.target.value)}
             disabled={disabled}
             helperText="节点的中文显示名称"
-            ref={register('nameCn')}
+            ref={register('nameCn') as React.RefObject<HTMLInputElement>}
           />
 
           <div className="form-group">
@@ -211,7 +211,7 @@ const NodeConfigModalRefactored: NodeConfigModalComponent = ({
               value={values.description}
               onChange={(e) => handleChange('description', e.target.value)}
               disabled={disabled}
-              ref={register('description')}
+              ref={register('description') as React.RefObject<HTMLTextAreaElement>}
             />
             <small className="help-text">可选，用于说明节点的用途</small>
           </div>

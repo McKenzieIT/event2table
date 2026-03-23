@@ -40,12 +40,12 @@ describe('GameManagementModalGraphQL Smoke Test', () => {
   it('should render the create game button', async () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <GameManagementModal />
+        <GameManagementModal isOpen={true} onClose={() => {}} />
       </MockedProvider>
     );
 
     // Wait for the component to load
-    const button = await screen.findByText('创建游戏', { exact: false });
+    const button = await screen.findByRole('button', { name: /创建游戏/i });
     expect(button).toBeInTheDocument();
     expect(button.tagName).toBe('BUTTON');
   });

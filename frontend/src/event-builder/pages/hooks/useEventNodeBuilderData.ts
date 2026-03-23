@@ -2,10 +2,34 @@ import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import type { Game } from '@shared/hooks/useGameContext';
 import type { Event } from '@shared/types/api-types';
-import type { CanvasField, WhereCondition } from '@shared/types/event-node-builder';
+import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuilder';
 import type { ConfigData } from '../EventNodeBuilder.types';
 import { loadEventConfig } from '@features/canvas/api/canvasApi';
 import { useToast } from '@features/canvas/components/hooks/useToast';
+
+/**
+ * LocalEventConfig interface for type safety (extended from canvas EventConfig)
+ */
+interface LocalEventConfig {
+  id: number;
+  game_gid: number;
+  event_id: number;
+  name: string;
+  name_en?: string;
+  name_cn?: string;
+  description?: string;
+  event?: Event;
+  base_fields?: Array<{
+    field_type: string;
+    field_name: string;
+    display_name: string;
+    alias?: string;
+    order: number;
+    param_id?: number | null;
+    hive_type?: string;
+  }>;
+  filter_conditions?: string | WhereCondition[];
+}
 
 // TODO: Create saveEventConfig function in canvasApi.ts
 // For now, we'll create a temporary implementation
@@ -93,8 +117,8 @@ export function useEventNodeBuilderData({
       };
       return saveEventConfig(requestData as any);
     },
-    onSuccess: (result: EventConfig) => {
-      success(`配置 "${result.name_en}" 保存成功！`);
+    onSuccess: (result) => {
+      success(`配置 "${result.name_en || '配置'}" 保存成功！`);
     },
     onError: (err: Error) => {
       error('保存失败: ' + (err.message || '未知错误'));
@@ -107,12 +131,12 @@ export function useEventNodeBuilderData({
       loadEventConfig(Number(configIdParam), Number(gameData.gid)).then(config => {
         if (config) {
           // 设置事件
-          if (config.event) {
-            onSetSelectedEvent(config.event);
+          if ((config as LocalEventConfig).event) {
+            onSetSelectedEvent((config as LocalEventConfig).event!);
           }
           // 设置字段
-          if (config.base_fields && Array.isArray(config.base_fields)) {
-            onSetCanvasFields(config.base_fields.map((f: any, index: number) => ({
+          if ((config as LocalEventConfig).base_fields && Array.isArray((config as LocalEventConfig).base_fields)) {
+            onSetCanvasFields((config as LocalEventConfig).base_fields!.map((f: any, index: number) => ({
               id: String(Date.now() + index),
               fieldType: f.field_type,
               fieldName: f.field_name,
@@ -127,21 +151,21 @@ export function useEventNodeBuilderData({
             })));
           }
           // 设置WHERE条件
-          if (config.filter_conditions) {
+          if ((config as LocalEventConfig).filter_conditions) {
             try {
-              const where = typeof config.filter_conditions === 'string'
-                ? JSON.parse(config.filter_conditions)
-                : config.filter_conditions;
-              onSetWhereConditions(where);
+              const where = typeof (config as LocalEventConfig).filter_conditions === 'string'
+                ? JSON.parse((config as LocalEventConfig).filter_conditions as string)
+                : (config as LocalEventConfig).filter_conditions;
+              onSetWhereConditions(where as WhereCondition[]);
             } catch (e) {
               console.error('[EventNodeBuilder] Failed to parse WHERE conditions:', e);
             }
           }
           // 设置节点配置
           onSetNodeConfig({
-            nameEn: config.name_en || '',
-            nameCn: config.name_cn || '',
-            description: config.description || '',
+            nameEn: (config as LocalEventConfig).name_en || '',
+            nameCn: (config as LocalEventConfig).name_cn || '',
+            description: (config as LocalEventConfig).description || '',
           });
         }
       }).catch(err => {

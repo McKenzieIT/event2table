@@ -119,8 +119,11 @@ describe('WhereBuilder Component', () => {
         {
           id: '1',
           type: 'group',
+          field: '',  // Required by type
+          operator: '', // Required by type
+          value: '', // Required by type
           conditions: [
-            { id: '1-1', field: 'role_id', operator: '=', value: '12345' } as any
+            { id: '1-1', field: 'role_id', operator: '=', value: '12345' }
           ]
         }
       ];

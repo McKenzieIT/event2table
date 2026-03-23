@@ -5,7 +5,7 @@ interface PerformancePanelProps {
   onClose: () => void;
 }
 
-export const PerformancePanel = React.memo(function PerformancePanel({ show, onClose }: PerformancePanelProps): React.JSX.Element {
+export const PerformancePanel = React.memo(function PerformancePanel({ show, onClose }: PerformancePanelProps): React.JSX.Element | null {
   if (!show) return null;
 
   return (

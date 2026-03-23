@@ -10,11 +10,14 @@ import SearchInput from './SearchInput';
 describe('SearchInput Component', () => {
   // Use fake timers for debounce tests
   beforeEach(() => {
+    // Ensure real timers are used before setting up fake timers
+    vi.useRealTimers();
     vi.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.runOnlyPendingTimers();
+    // Ensure all timers are flushed and restored
+    vi.runAllTimers();
     vi.useRealTimers();
     vi.restoreAllMocks();
   });

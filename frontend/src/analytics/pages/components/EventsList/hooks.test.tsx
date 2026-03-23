@@ -19,6 +19,9 @@ vi.mock('@shared/ui', () => ({
   })
 }));
 
+// Test data - complete game object with all required fields
+const currentGame = { id: 1, gid: 10000147, name: 'Test Game', ods_db: 'ieu_ods' };
+
 describe('useEventsList Hook', () => {
   let queryClient: QueryClient;
 
@@ -49,12 +52,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 2, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -62,18 +64,17 @@ describe('useEventsList Hook', () => {
       });
 
       expect(result.current.filteredEvents).toHaveLength(2);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/events?')
       );
     });
 
     it('应该处理 API 错误', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: false,
         json: async () => ({ message: 'Network error' })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -88,13 +89,12 @@ describe('useEventsList Hook', () => {
 
       expect(result.current.hasGameContext).toBe(false);
       expect(result.current.filteredEvents).toHaveLength(0);
-      expect(global.fetch).not.toHaveBeenCalled();
+      expect(globalThis.fetch).not.toHaveBeenCalled();
     });
   });
 
   describe('状态管理测试', () => {
     it('应该管理搜索词状态', () => {
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       expect(result.current.searchTerm).toBe('');
@@ -104,7 +104,6 @@ describe('useEventsList Hook', () => {
     });
 
     it('应该管理分页状态', () => {
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       expect(result.current.currentPage).toBe(1);
@@ -112,14 +111,12 @@ describe('useEventsList Hook', () => {
     });
 
     it('应该管理分类选择状态', () => {
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       expect(result.current.selectedCategory).toBe('all');
     });
 
     it('应该管理选中事件状态', () => {
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       expect(result.current.selectedEvents).toEqual([]);
@@ -136,12 +133,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 2, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -164,12 +160,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 3, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -185,12 +180,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 100, total_pages: 10, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -205,7 +199,7 @@ describe('useEventsList Hook', () => {
 
   describe('业务流程测试', () => {
     it('应该处理批量删除', async () => {
-      (global.fetch as any)
+      (globalThis.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ success: true, data: { events: [], pagination: { total: 0, total_pages: 1, page: 1, per_page: 10 } } })
@@ -215,7 +209,6 @@ describe('useEventsList Hook', () => {
           json: async () => ({ success: true, data: { deleted_count: 2 } })
         });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -237,7 +230,7 @@ describe('useEventsList Hook', () => {
     });
 
     it('应该处理单个删除', async () => {
-      (global.fetch as any)
+      (globalThis.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ success: true, data: { events: [{ id: 1, name: 'event1', category_name: 'game' }], pagination: { total: 1, total_pages: 1, page: 1, per_page: 10 } } })
@@ -247,7 +240,6 @@ describe('useEventsList Hook', () => {
           json: async () => ({ success: true, data: { deleted_count: 1 } })
         });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -270,12 +262,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 2, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -299,12 +290,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 1, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -328,12 +318,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 1, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -355,12 +344,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 0, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
@@ -380,12 +368,11 @@ describe('useEventsList Hook', () => {
         pagination: { total: 2, total_pages: 1, page: 1, per_page: 10 }
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockData })
       });
 
-      const currentGame = { gid: 10000147, name: 'Test Game' };
       const { result } = renderHook(() => useEventsList(currentGame), { wrapper });
 
       await waitFor(() => {
