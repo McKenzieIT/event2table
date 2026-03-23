@@ -6,7 +6,7 @@
  */
 
 import { render, screen, waitFor, fireEvent } from '@test/test-utils';
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import GameManagementModalGraphQL from '../../features/games/GameManagementModalGraphQL';

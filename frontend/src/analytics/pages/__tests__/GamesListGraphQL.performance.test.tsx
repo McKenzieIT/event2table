@@ -20,9 +20,13 @@ vi.mock('../VirtualTable.css', () => ({}));
 vi.mock('@/shared/components/VirtualList/OptimizedVirtualList.css', () => ({}));
 
 // Mock react-router-dom
-vi.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>
+  };
+});
 
 // Mock @shared/ui components
 vi.mock('@shared/ui', () => ({
@@ -112,10 +116,14 @@ vi.mock('@/shared/utils/performanceMonitor', () => ({
 }));
 
 // Mock @apollo/client/react hooks
-vi.mock('@apollo/client/react', () => ({
-  useQuery: vi.fn(),
-  useMutation: vi.fn(() => [vi.fn(), { loading: false, error: null }])
-}));
+vi.mock('@apollo/client/react', async () => {
+  const actual = await vi.importActual('@apollo/client/react');
+  return {
+    ...actual,
+    useQuery: vi.fn(),
+    useMutation: vi.fn(() => [vi.fn(), { loading: false, error: null }])
+  };
+});
 
 // Mock OptimizedVirtualList component
 vi.mock('@/shared/components/VirtualList/OptimizedVirtualList', () => ({

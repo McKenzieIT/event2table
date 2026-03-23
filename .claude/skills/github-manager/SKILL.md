@@ -1,3 +1,4 @@
+## Here's my code: 
 ---
 name: github-manager
 description: |
@@ -102,8 +103,8 @@ git fetch origin --dry-run 2>/dev/null
 # PR状态
 gh pr list --state all --limit 10 --json number,title,state,author,headRefName,baseRefName 2>/dev/null
 
-# CI状态
-gh run list --limit 3 --json conclusion,status,name,createdAt 2>/dev/null
+# CI状态（获取最近5次运行）
+gh run list --limit 5 --json conclusion,status,name,createdAt,databaseId,headBranch 2>/dev/null
 ```
 
 **降级处理**：
@@ -132,9 +133,10 @@ gh repo view --json branchProtectionRules 2>/dev/null || echo "无法获取分�
 | 🔴 P0 | BRANCH_DIVERGED | 本地与远程有不同提交 | ahead >0 且 behind >0 |
 | 🔴 P0 | MAIN_BRANCH_DEV | 在main分支上有未提交修改 | 分支名 = main/master |
 | 🔴 P0 | NO_BRANCH_PROTECTION | main分支无保护规则 | 无保护规则配置 |
+| 🟡 P1 | CI_FAILURE | 最近CI构建失败 | conclusion = failure |
+| 🟡 P1 | CI_IN_PROGRESS | CI正在运行中 | status = in_progress |
 | 🟡 P1 | UNCOMMITTED_CHANGES | 工作区有未提交文件 | 文件数 >10 |
 | 🟡 P1 | LARGE_UNCOMMITTED | 工作区有大量未提交文件 | 文件数 >50 |
-| 🟡 P1 | CI_FAILURE | 最近CI构建失败 | conclusion = failure |
 | 🟡 P1 | MERGE_CONFLICT | PR存在合并冲突 | mergeable = false |
 | 🟢 P2 | BEHIND_REMOTE | 本地落后远程多个提交 | behind >5 |
 | 🟢 P2 | AHEAD_REMOTE | 本地领先远程多个提交 | ahead >10 |
@@ -152,6 +154,98 @@ gh repo view --json branchProtectionRules 2>/dev/null || echo "无法获取分�
 - BRANCH_DIVERGED → 阻塞所有push/pull操作
 - MAIN_BRANCH_DEV → 阻塞push操作
 - LARGE_UNCOMMITTED → 建议分批提交
+- CI_FAILURE → 触发自动诊断（见 Step 2.1）
+```
+
+---
+
+### Step 2.1: CI 失败自动诊断 **[NEW]**
+
+**当检测到 CI_FAILURE 时，自动执行以下诊断流程**：
+
+#### 2.1.1 获取失败日志
+
+```bash
+# 获取失败的 workflow run ID
+FAILED_RUN_ID=$(gh run list --limit 5 --json conclusion,databaseId --jq '.[] | select(.conclusion == "failure") | .databaseId' | head -1)
+
+# 获取失败的 job 列表
+gh run view $FAILED_RUN_ID --json jobs --jq '.jobs[] | select(.conclusion == "failure") | {name: .name, databaseId: .databaseId}'
+
+# 获取失败日志（关键部分）
+gh run view $FAILED_RUN_ID --log-failed 2>&1 | head -200
+```
+
+#### 2.1.2 常见 CI 失败模式识别
+
+| 失败模式 | 关键词匹配 | 根因分析 | 修复建议 |
+|---------|-----------|---------|---------|
+| **依赖缺失** | `ModuleNotFoundError`, `ImportError`, `Cannot find module` | 依赖未声明或路径错误 | 检查 requirements.txt/package.json，添加缺失依赖 |
+| **配置路径错误** | `No such file or directory`, `File not found` | CI 配置中的路径不正确 | 检查 .github/workflows/*.yml 中的路径配置 |
+| **测试失败** | `AssertionError`, `FAIL`, `Test failed` | 测试用例断言失败 | 查看具体测试失败原因，修复代码或测试 |
+| **语法错误** | `SyntaxError`, `ParseError` | 代码语法问题 | 修复语法错误 |
+| **类型错误** | `TypeError`, `type error` | 类型不匹配 | 添加类型转换或修复类型定义 |
+| **权限问题** | `Permission denied`, `EACCES` | 文件或命令权限不足 | 添加执行权限或调整 CI 配置 |
+| **超时** | `Timeout`, `timed out` | 操作耗时过长 | 增加超时时间或优化操作 |
+| **环境变量缺失** | `env var`, `environment variable` | 必需的环境变量未设置 | 在 CI 配置或 secrets 中添加环境变量 |
+| **Runner 问题** | `Runner`, `self-hosted` | CI Runner 配置问题 | 检查 Runner 状态和配置 |
+
+#### 2.1.3 CI 配置文件检查
+
+**自动检查常见 CI 配置问题**：
+
+```bash
+# 检查 requirements.txt 路径
+if grep -r "backend/requirements.txt" .github/workflows/*.yml 2>/dev/null; then
+  if [ ! -f "backend/requirements.txt" ] && [ -f "requirements.txt" ]; then
+    echo "⚠️ CI 配置使用 backend/requirements.txt 但文件在根目录"
+  fi
+fi
+
+# 检查测试目录路径
+if grep -r "backend/tests/" .github/workflows/*.yml 2>/dev/null; then
+  if [ -d "backend/test" ] && [ ! -d "backend/tests" ]; then
+    echo "⚠️ CI 配置使用 backend/tests/ 但实际目录是 backend/test/"
+  fi
+fi
+
+# 检查 Node 版本一致性
+grep -r "node-version" .github/workflows/*.yml 2>/dev/null
+
+# 检查 Python 版本一致性
+grep -r "python-version" .github/workflows/*.yml 2>/dev/null
+```
+
+#### 2.1.4 输出格式
+
+**CI 失败诊断报告格式**：
+
+```markdown
+### 🔍 CI 失败诊断报告
+
+**Workflow**: {workflow_name}
+**Run ID**: {run_id}
+**失败时间**: {created_at}
+
+**失败的 Jobs**:
+- {job_name_1}: ❌ 失败
+- {job_name_2}: ❌ 失败
+
+**根本原因分析**:
+{根据日志分析得出的根因}
+
+**关键错误信息**:
+\`\`\`
+{提取的关键错误日志}
+\`\`\`
+
+**修复建议**:
+1. {具体修复步骤}
+2. {具体修复步骤}
+
+**相关文件**:
+- {需要修改的文件路径}
+- {CI 配置文件路径}
 ```
 
 ### Step 3: 设计解决方案
@@ -314,12 +408,21 @@ gh repo view --json branchProtectionRules 2>/dev/null || echo "无法获取分�
 
 ---
 
-**Skill版本**: 1.2.0
+**Skill版本**: 1.3.0
 **最后更新**: 2026-03-23
 **本次更新**:
-- **新增教学目标章节**：明确 skill 的教学目的（教授 WHY、传授经验、培养思维）
-- **强化 Step 3 强制标记**：使用 [REQUIRED] 和 [MUST] 标记确保最佳实践说明和优缺点分析
-- **新增优缺点分析要求**：要求提供结构化的优缺点对比
-- 改进远程扫描降级处理（明确的用户提示）
-- 添加问题识别具体阈值（>10文件、>50文件、>5提交等）
-- 添加问题处理顺序逻辑（P0→P1→P2）
+- **新增 CI 失败自动诊断功能（Step 2.1）**：
+  - 自动获取失败日志
+  - 常见 CI 失败模式识别（依赖缺失、配置路径错误、测试失败等）
+  - CI 配置文件检查
+  - 结构化诊断报告格式
+- 新增 CI_FAILURE 和 CI_IN_PROGRESS 问题类型
+- 改进远程扫描：获取最近 5 次 CI 运行状态
+- **v1.2.0 更新**：
+  - 新增教学目标章节
+  - 强化 Step 3 强制标记
+  - 新增优缺点分析要求
+  - 改进远程扫描降级处理
+  - 添加问题识别具体阈值
+  - 添加问题处理顺序逻辑
+

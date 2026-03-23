@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { render, screen } from '@test/test-utils';
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
 import GameManagementModal from './GameManagementModalGraphQL';
 import { GET_GAMES } from '../../shared/graphql/operations';
 

@@ -10,10 +10,10 @@ import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client/react';
-import { ToastProvider } from '@shared/ui';
-import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
+import { ToastProvider } from '@shared/ui/Toast/Toast';
+import { ErrorBoundary } from '@shared/ui/ErrorBoundary/ErrorBoundary';
 import client from '@shared/apollo/client';
-import { ReactFlowWrapper } from '@/test-utils/ReactFlowWrapper';
+import { ReactFlowProvider } from 'reactflow';
 import { vi } from 'vitest';
 
 // ============================================================================
@@ -195,13 +195,37 @@ export function AllProviders({
       <BrowserRouter>
         <ApolloProvider client={client}>
           <QueryClientProvider client={queryClient}>
-            <ReactFlowWrapper>
+            <ReactFlowProvider>
               <ToastProvider>
                 {children}
               </ToastProvider>
-            </ReactFlowWrapper>
+            </ReactFlowProvider>
           </QueryClientProvider>
         </ApolloProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
+}
+
+/**
+ * Provider包装器（不包含ApolloProvider）
+ * 用于需要使用MockedProvider的GraphQL测试
+ */
+export function ProvidersWithoutApollo({ 
+  children, 
+  queryClient = createTestQueryClient(),
+  initialRoute = '/',
+}: WrapperProps) {
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <ReactFlowProvider>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </ReactFlowProvider>
+        </QueryClientProvider>
       </BrowserRouter>
     </ErrorBoundary>
   );
@@ -224,6 +248,29 @@ export function renderWithProviders(
       <AllProviders queryClient={queryClient} initialRoute={initialRoute}>
         {children}
       </AllProviders>
+    ),
+    ...renderOptions,
+  });
+}
+
+/**
+ * 用于GraphQL测试的render函数（不包含ApolloProvider）
+ * 需要配合MockedProvider使用
+ */
+export function renderWithMockedApollo(
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'> & {
+    queryClient?: QueryClient;
+    initialRoute?: string;
+  }
+) {
+  const { queryClient, initialRoute, ...renderOptions } = options || {};
+  
+  return render(ui, {
+    wrapper: ({ children }) => (
+      <ProvidersWithoutApollo queryClient={queryClient} initialRoute={initialRoute}>
+        {children}
+      </ProvidersWithoutApollo>
     ),
     ...renderOptions,
   });

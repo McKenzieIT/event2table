@@ -190,13 +190,8 @@ export const GameManagementModal: React.FC<GameManagementModalProps> = ({ isOpen
     }
   }, [selectedGames, batchDeleteGames]);
 
-  // 如果模态框未打开，不渲染任何内容
-  if (!isOpen) return null;
-
-  if (loading) return <div className="loading">加载中...</div>;
-  if (error) return <div className="error">错误: {error.message}</div>;
-
   // ✅ 使用 useMemo 优化 - 缓存游戏列表计算
+  // 注意：必须在条件返回之前调用所有Hooks
   const games = useMemo(() => {
     return debouncedSearchQuery ? searchData?.searchGames : data?.games;
   }, [debouncedSearchQuery, searchData, data]);
@@ -209,6 +204,12 @@ export const GameManagementModal: React.FC<GameManagementModalProps> = ({ isOpen
       game.gid?.toString().includes(searchQuery)
     );
   }, [games, searchQuery]);
+
+  // 如果模态框未打开，不渲染任何内容
+  if (!isOpen) return null;
+
+  if (loading) return <div className="loading">加载中...</div>;
+  if (error) return <div className="error">错误: {error.message}</div>;
 
   return (
     <div className="modal-overlay" onClick={onClose}>

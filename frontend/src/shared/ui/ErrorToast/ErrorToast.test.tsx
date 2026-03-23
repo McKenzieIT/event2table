@@ -9,12 +9,9 @@ import { render, screen, fireEvent, waitFor, act, renderHook } from '@test/test-
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import ErrorToast, { useErrorToast, ErrorLevel } from './ErrorToast';
 
-// Mock timers
-vi.useFakeTimers();
-
 describe('ErrorToast Component', () => {
   beforeEach(() => {
-    vi.clearAllTimers();
+    vi.useFakeTimers();
     vi.clearAllMocks();
   });
 
@@ -322,7 +319,7 @@ describe('ErrorToast Component', () => {
 
 describe('useErrorToast Hook', () => {
   beforeEach(() => {
-    vi.clearAllTimers();
+    vi.useFakeTimers();
     vi.clearAllMocks();
   });
 

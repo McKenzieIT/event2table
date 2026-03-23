@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
 
 // Components
-import { EventNodeBuilderErrorBoundary } from '../components/ErrorBoundary';
+import EventNodeBuilderErrorBoundary from '../components/ErrorBoundary';
 import PageHeader from '../components/PageHeader';
 import { QuickActionButtons } from '../components/QuickActionButtons';
 import { LeftSidebar } from '../components/LeftSidebar';
@@ -18,7 +18,7 @@ import { ConfirmDialog } from '@shared/ui';
 import { LoadingState } from './components/LoadingState';
 import { PerformancePanel } from './components/PerformancePanel';
 import { DebugPanel } from './components/DebugPanel';
-import { ErrorBoundary } from '@shared/components/ErrorBoundary';
+import ErrorBoundary from '@shared/components/ErrorBoundary';
 
 // Hooks
 import { useToast } from '@features/canvas/components/hooks/useToast';

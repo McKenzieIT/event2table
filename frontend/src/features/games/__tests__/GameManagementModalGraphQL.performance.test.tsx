@@ -26,11 +26,14 @@ import { performance } from 'perf_hooks';
 const GameManagementModal = GameManagementModalGraphQL;
 
 // Mock Apollo Client hooks
-vi.mock('@apollo/client', () => ({
-  useQuery: vi.fn(),
-  useMutation: vi.fn(),
-  gql: (strings: TemplateStringsArray) => strings.join(''),
-}));
+vi.mock('@apollo/client', async () => {
+  const actual = await vi.importActual('@apollo/client');
+  return {
+    ...actual,
+    useQuery: vi.fn(),
+    useMutation: vi.fn(),
+  };
+});
 
 // Import after mocking
 import { useQuery, useMutation } from '@apollo/client';

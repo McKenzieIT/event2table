@@ -37,20 +37,31 @@ export function buildConditionalClasses(
  * 构建包装器类名
  * @param wrapperBaseClass 包装器基础类名
  * @param modifiers 修饰符对象
+ * @param additionalClasses 额外的类名数组（可选）
  * @returns 拼接后的包装器类名字符串
- * 
+ *
  * @example
  * const wrapperClass = buildWrapperClasses(
  *   'cyber-checkbox-wrapper',
  *   { invalid: hasError, disabled: isDisabled }
  * );
  * // 结果: 'cyber-checkbox-wrapper cyber-checkbox-wrapper--invalid'
+ *
+ * @example
+ * // 带额外类名
+ * const wrapperClass = buildWrapperClasses(
+ *   'search-input-wrapper',
+ *   { disabled: isDisabled },
+ *   ['custom-class']
+ * );
+ * // 结果: 'search-input-wrapper custom-class search-input-wrapper--disabled'
  */
 export function buildWrapperClasses(
   wrapperBaseClass: string,
-  modifiers: Record<string, boolean>
+  modifiers: Record<string, boolean>,
+  additionalClasses: string[] = []
 ): string {
-  return buildConditionalClasses(wrapperBaseClass, modifiers);
+  return buildConditionalClasses(wrapperBaseClass, modifiers, additionalClasses);
 }
 
 /**

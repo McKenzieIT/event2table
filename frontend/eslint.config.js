@@ -3,6 +3,7 @@ import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import importPlugin from 'eslint-plugin-import';
 import { plugin as noHardcodedColorsPlugin } from './eslint-plugin-no-hardcoded-colors.js';
 import basemodalMigration from './eslint-plugin-basemodal-migration.js';
 
@@ -73,6 +74,7 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
       'no-hardcoded-colors': noHardcodedColorsPlugin,
       'basemodal-migration': basemodalMigration,
+      import: importPlugin,
     },
     rules: {
       ...react.configs.recommended.rules,
@@ -106,6 +108,28 @@ export default tseslint.config(
           group: ['@testing-library/react'],
           message: 'Use @/test/test-utils instead for component tests. This provides automatic Provider wrapping and better test isolation.'
         }]
+      }],
+      // ============================================================================
+      // Import/Export 规范 - 确保导入导出一致性
+      // 参考: docs/testing/test-specification.md
+      // ============================================================================
+      'import/export': 'error',           // 检查重复导出
+      'import/named': 'error',            // 检查 named import 是否存在
+      'import/default': 'error',          // 检查 default import 是否存在
+      'import/namespace': 'error',        // 检查 namespace import 是否存在
+      'import/no-duplicates': 'error',    // 禁止重复导入
+      // 导入顺序规范
+      'import/order': ['warn', {
+        groups: [
+          'builtin',   // Node.js 内置模块
+          'external',  // 外部依赖
+          'internal',  // 内部模块 (@/ 别名)
+          'parent',    // 父目录
+          'sibling',   // 同级目录
+          'index',     // 当前目录 index
+        ],
+        'newlines-between': 'always',
+        alphabetize: { order: 'asc' },
       }],
     },
     settings: {

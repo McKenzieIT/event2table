@@ -18,7 +18,7 @@ import "./styles/components.css";
 // 3. Base styles (depends on both above)
 import "./index.css";
 
-import { queryClient } from "@analytics/components/lib/queryClient";
+import { queryClient } from "@/config/queryClient";
 
 // ✅ E2E Testing: Add diagnostic logging
 console.log('[main.tsx] 🔵 Starting React app mount...');

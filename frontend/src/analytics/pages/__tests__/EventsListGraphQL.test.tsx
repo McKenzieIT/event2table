@@ -4,15 +4,28 @@
  *
  * 测试GraphQL版本的EventsList页面功能
  */
-import { render, screen, waitFor, fireEvent, createMockGameContext } from '@test/test-utils';
-import { MockedProvider } from '@apollo/client/testing';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import EventsListGraphQL from '../EventsListGraphQL';
-import { GET_EVENTS, GET_CATEGORIES } from '@shared/graphql/operations';
-import { DELETE_EVENT } from '@shared/graphql/operations';
+
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import React from 'react';
 
 // 创建可变的mock函数，允许在测试中动态修改返回值
 const mockOutletContext = vi.fn();
+
+// Mock usePerformanceMonitor - 避免在测试环境中执行性能监控
+vi.mock('@/shared/utils/performanceMonitor', () => ({
+  usePerformanceMonitor: vi.fn(),
+}));
+
+// Mock OptimizedVirtualList - 简化虚拟列表渲染
+vi.mock('@/shared/components/VirtualList/OptimizedVirtualList', () => ({
+  default: ({ items, renderItem }: any) => {
+    return React.createElement('div', { 'data-testid': 'virtual-list' },
+      items?.map((item: any, index: number) =>
+        React.createElement('div', { key: item.id || index }, renderItem(item, index))
+      )
+    );
+  },
+}));
 
 // Mock useOutletContext using the new unified mock approach
 vi.mock('react-router-dom', async () => {
@@ -24,18 +37,11 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock useToast
-vi.mock('@shared/ui', async () => {
-  const actual = await vi.importActual('@shared/ui');
-  return {
-    ...actual,
-    useToast: () => ({
-      success: vi.fn(),
-      error: vi.fn(),
-      warning: vi.fn(),
-    }),
-  };
-});
+// 现在可以安全地导入其他模块
+import { renderWithMockedApollo, screen, waitFor, fireEvent, createMockGameContext } from '@test/test-utils';
+import { MockedProvider } from '@apollo/client/testing/react';
+import EventsListGraphQL from '../EventsListGraphQL';
+import { GET_EVENTS, GET_CATEGORIES, DELETE_EVENT } from '@shared/graphql/operations';
 
 // 默认返回有游戏上下文
 beforeEach(() => {
@@ -89,6 +95,7 @@ const mocks = [
     },
   },
 ];
+
 const deleteMocks = [
   ...mocks,
   {
@@ -107,19 +114,21 @@ const deleteMocks = [
     },
   },
 ];
+
 describe('EventsListGraphQL', () => {
   it('should render events list with loading state', () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     expect(screen.getByText('加载中...')).toBeInTheDocument();
   });
+
   it('should render events list with data', async () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     await waitFor(() => {
@@ -132,10 +141,11 @@ describe('EventsListGraphQL', () => {
       expect(screen.getByText('事件2')).toBeInTheDocument();
     });
   });
+
   it('should display statistics cards', async () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     await waitFor(() => {
@@ -144,10 +154,11 @@ describe('EventsListGraphQL', () => {
       expect(screen.getByText('未分类')).toBeInTheDocument();
     });
   });
+
   it('should render action buttons', async () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     await waitFor(() => {
@@ -155,10 +166,11 @@ describe('EventsListGraphQL', () => {
       expect(screen.getByTestId('add-event-button')).toBeInTheDocument();
     });
   });
+
   it('should handle search input', async () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     await waitFor(() => {
@@ -168,20 +180,22 @@ describe('EventsListGraphQL', () => {
     fireEvent.change(searchInput, { target: { value: 'event_1' } });
     expect(searchInput.value).toBe('event_1');
   });
+
   it('should handle category filter', async () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     await waitFor(() => {
       expect(screen.getByText('全部分类')).toBeInTheDocument();
     });
   });
+
   it('should render events table', async () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     await waitFor(() => {
@@ -192,10 +206,11 @@ describe('EventsListGraphQL', () => {
       expect(screen.getByText('操作')).toBeInTheDocument();
     });
   });
+
   it('should handle event deletion', async () => {
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={deleteMocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     await waitFor(() => {
@@ -205,13 +220,14 @@ describe('EventsListGraphQL', () => {
     const deleteButtons = screen.getAllByText('删除');
     expect(deleteButtons.length).toBeGreaterThan(0);
   });
+
   it('should handle no game context', () => {
     // 动态修改mock返回值为null
     mockOutletContext.mockReturnValue(createMockGameContext({ currentGame: null }));
     
-    render(
+    renderWithMockedApollo(
       <MockedProvider mocks={mocks} addTypename={false}>
-          <EventsListGraphQL />
+        <EventsListGraphQL />
       </MockedProvider>
     );
     expect(screen.getByText('查看事件列表需要先选择游戏')).toBeInTheDocument();
