@@ -1409,7 +1409,6 @@ class MigrationRunner:
         self.db_path = db_path
         self.registry = get_migration_registry()
 
-    @cached(ttl=1800)  # Cache for 30 minutes
     def get_current_version(self) -> int:
         """
         获取当前数据库版本
@@ -1425,7 +1424,6 @@ class MigrationRunner:
 
         return version
 
-    @cached(ttl=1800)  # Cache for 30 minutes
     def migrate_to_version(self, target_version: int):
         """
         迁移到指定版本
