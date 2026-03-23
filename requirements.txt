@@ -5,6 +5,7 @@ openpyxl==3.1.2
 PyYAML==6.0.1
 redis==5.0.1
 Flask-Caching==2.1.0
+pydantic>=2.0.0
 
 # GraphQL依赖
 graphene==2.1.9
