@@ -105,7 +105,7 @@ jobs:
         run: npm ci
 
       - name: Run unit tests
-        run: npm run test:unit -- --coverage --coverage.threshold.lines=70 --coverage.threshold.functions=70 --coverage.threshold.branches=70 --coverage.threshold.statements=70 --reporter=json --reporter=text
+        run: npm run test:unit -- --coverage --coverage.threshold.lines=70 --coverage.threshold.functions=70 --coverage.threshold.branches=70 --coverage.threshold.statements=70
 
       - name: Check coverage threshold
         run: |
