@@ -26,7 +26,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { ConfirmDialog } from '@shared/ui/ConfirmDialog/ConfirmDialog';
 import { useQueryParam } from '@shared/hooks/useQueryParams';
 import CategoryModal from '../components/categories/CategoryModal';
-import { useCategories, useDeleteCategory, useCreateCategory, useUpdateCategory } from '@/graphql/hooks';
+import { useCategories, useDeleteCategory, useCreateCategory, useUpdateCategory } from '@shared/graphql/hooks';
 import OptimizedVirtualList from '@/shared/components/VirtualList/OptimizedVirtualList';
 import { usePerformanceMonitor } from '@/shared/utils/performanceMonitor';
 import './CategoriesList.css';

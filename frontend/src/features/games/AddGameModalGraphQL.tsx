@@ -11,7 +11,7 @@
 
 import React, { useRef, useEffect, ChangeEvent, FormEvent, memo } from 'react';
 import { Modal, Button, Input, Select, useToast } from '@shared/ui';
-import { useCreateGame } from '../../graphql/hooks';
+import { useCreateGame } from '../../shared/graphql/hooks';
 import { useFormValidation } from '@shared/hooks/useFormValidation';
 import { gameValidationRules } from '@shared/utils/validationUtils';
 import './AddGameModal.css';

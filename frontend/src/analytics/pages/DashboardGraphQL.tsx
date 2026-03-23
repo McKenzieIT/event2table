@@ -20,7 +20,7 @@ import React, { useMemo, useCallback, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Spinner } from '@shared/ui';
 import { useGameStore } from '@/stores/gameStore';
-import { useGames, useFlows } from '@/graphql/hooks';
+import { useGames, useFlows } from '@shared/graphql/hooks';
 import { usePollingInterval } from '@/hooks/usePageVisibility';  // ⚡ PERF: Phase 2
 import { Modal } from '@shared/ui';
 import GameManagementModal from '@/features/games/GameManagementModalGraphQL';

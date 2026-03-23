@@ -22,7 +22,7 @@ import { Link, useOutletContext } from 'react-router-dom';
 import { SelectGamePrompt } from '@shared/ui/SelectGamePrompt';
 import { Button, SearchInput, Spinner, EmptyState } from '@shared/ui';
 import { BindToLibraryButton } from '@shared/components/BindToLibraryButton';
-import { useParametersManagement } from '@/graphql/hooks';
+import { useParametersManagement } from '@shared/graphql/hooks';
 import './ParametersEnhanced.css';
 
 interface Parameter {

@@ -11,7 +11,7 @@
 
 import React, { useState, useRef, useEffect, ChangeEvent, FormEvent, useCallback, memo } from 'react';
 import { Modal, Button, Input, Select, useToast } from '@shared/ui';
-import { useCreateEvent } from '../../graphql/hooks';
+import { useCreateEvent } from '../../shared/graphql/hooks';
 import './AddEventModal.css';
 
 interface FormData {
