@@ -208,7 +208,9 @@ describe('cacheUtils', () => {
     it('should invalidate multiple mutation types', () => {
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
       batchInvalidate(queryClient, ['events', 'games']);
-      expect(invalidateSpy).toHaveBeenCalledTimes(2);
+      // Each mutation type calls invalidateQueries for each key returned by getInvalidationKeys
+      // Mock returns ['events', 'games'] for each type, so 2 types × 2 keys = 4 calls
+      expect(invalidateSpy).toHaveBeenCalledTimes(4);
     });
   });
 });

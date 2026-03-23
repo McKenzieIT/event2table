@@ -499,7 +499,7 @@ describe('FieldCanvas Component', () => {
   describe('Field Editing', () => {
     it('should call onUpdateField when clicking edit button', async () => {
       const fields = [
-        { id: 'field-1', type: 'basic' as const, name: 'ds', alias: 'ds', displayName: '分区', dataType: 'STRING', isEditable: true, fieldType: 'base' as const, fieldName: 'ds' },
+        { id: 'field-1', type: 'basic' as const, name: 'ds', alias: 'ds', displayName: '分区', dataType: 'STRING', isEditable: true, fieldType: 'base' as const, fieldName: 'ds', paramId: null, jsonPath: null },
       ];
       render(<FieldCanvas {...mockProps} fields={fields} />);
       

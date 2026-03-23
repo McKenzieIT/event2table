@@ -15,6 +15,9 @@ import {
   configureErrorReporting,
   shouldRetry,
   getUserFriendlyMessage,
+  handleNetworkError,
+  handleApiError,
+  handleBusinessError,
   ErrorType,
   ErrorLevel,
 } from './errorHandler';

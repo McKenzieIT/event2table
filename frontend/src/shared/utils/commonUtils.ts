@@ -124,7 +124,12 @@ export const formatDateTime = (date: Date | string): string => {
  */
 export const parseDate = (dateStr: string): Date | null => {
   try {
-    return new Date(dateStr);
+    const date = new Date(dateStr);
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+    return date;
   } catch {
     return null;
   }
@@ -213,7 +218,9 @@ export const handleApiError = (error: any): string => {
     return error.message;
   }
   if (error?.errors?.[0]) {
-    return error.errors[0];
+    // Handle both string and object formats
+    const firstError = error.errors[0];
+    return typeof firstError === 'string' ? firstError : firstError.message || String(firstError);
   }
   if (typeof error === 'string') {
     return error;
