@@ -28,4 +28,4 @@ export type {
   CellEditProps,
 } from './Table.types';
 
-export { default } from './Table';
+export { Table as default } from './Table';
