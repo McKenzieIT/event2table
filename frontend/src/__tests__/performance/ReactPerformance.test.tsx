@@ -298,19 +298,32 @@ describe('React Performance Tests', () => {
 
     // Test 11: CategoriesListGraphQL render performance
     test('CategoriesListGraphQL should render 100 categories in < 400ms', async () => {
-      const { default: CategoriesListGraphQL } = await import(
-        '../../analytics/pages/CategoriesListGraphQL'
-      );
-
+      // Mock useCategories hook to return test data
       const mockCategories = Array.from({ length: 100 }, (_, i) => ({
         id: i,
         name: `Category ${i}`,
         eventCount: 10
       }));
 
+      vi.mock('../../shared/graphql/hooks', () => ({
+        useCategories: () => ({
+          data: { categories: mockCategories },
+          loading: false,
+          error: null,
+          refetch: vi.fn()
+        }),
+        useDeleteCategory: () => [vi.fn()],
+        useCreateCategory: () => [vi.fn()],
+        useUpdateCategory: () => [vi.fn()]
+      }));
+
+      const { default: CategoriesListGraphQL } = await import(
+        '../../analytics/pages/CategoriesListGraphQL'
+      );
+
       const startTime = performance.now();
 
-      render(<CategoriesListGraphQL categories={mockCategories} />);
+      render(<CategoriesListGraphQL />);
 
       const endTime = performance.now();
       const renderTime = endTime - startTime;
