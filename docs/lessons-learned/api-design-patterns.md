@@ -2543,3 +2543,1270 @@ export interface GetEventsQuery {
 - - ✅ 事件统计
 - - ✅ 事件配置管理
 
+
+## 详细变更 **P1**
+
+**优先级**: P1 | **类别**: GraphQL | **标签**: GraphQL | Code
+
+**来源**: breaking-changes.md:详细变更
+
+### 问题现象
+
+...
+```
+
+**兼容性**: ⚠️ **部分兼容**
+- ✅ 旧字段保持不变
+- ⚠️ 新增字段可能影响解析器
+- 🟡 风险：严格的日志解析器可能失败
+
+**缓解策略**：
+```python
+# 兼容的解析器示例
+def parse_update_log(log_path):
+    with open(log_path) as f:
+        content = f.read()
+
+    # 向后兼容：旧格式没有知识图谱部分
+    if "知识图谱更新" in content:
+        # 新格式
+        return parse_new_format(content)
+    else:
+        # 旧格式
+        return parse_old_format(content)
+```
+
+### 1.3 目录结构变更
+
+#### ✅ 保持兼容的结构
+
+```
+.claude/skills/update-docs/
+├── SKILL.md                      # 技能说明（保持不变）
+├── core/
+│   ├── detector.py               # 变更检测（保持）
+│   ├── updater.py                # 文档更新（保持）
+│   ├── integrator.py             # 重复整合（保持）
+│   └── archiver.py               # 归档管理（保持）
+├── output/
+│   ├── updates/                  # 更新日志（保持）
+│   ├── integration/              # 整合报告（保持）
+│   └── audits/                   # 审计报告（保持）
+```
+
+#### ❌ 新增/删除的结构
+
+```
+.claude/skills/update-docs/
+├── kg/                           # ⭐ NEW: 知识图谱模块
+│   ├── core/
+│   │   ├── graph.py
+│   │   ├── query_engine.py
+│   │   ├── node_manager.py
+│   │   ├── edge_manager.py
+│   │   ├── incremental_updater.py
+│   │   └── visualizer.py
+│   ├── extractors/               # ⭐ NEW: 简化的提取器
+│   │   ├── document_metadata_extractor.py
+
+### 解决方案
+
+│   │   └── ... (7个提取器)
+│   ├── storage/                  # ⭐ NEW: 知识图谱存储
+│   │   ├── kg_nodes.json
+│   │   ├── kg_edges.json
+│   │   └── ...
+│   └── output/
+│       ├── visualizations/       # ⭐ NEW
+│       ├── queries/              # ⭐ NEW
+│       └── reports/              # ⭐ NEW
+
+❌ 删除的复杂提取器（未在旧版本中实现，无影响）：
+- CachedReflectiveExperienceExtractor
+- ReflectiveExperienceExtractor
+- DynamicCategoryMapper
+```
+
+**兼容性**: ✅ **目录结构向后兼容**
+- 旧路径保持不变
+- 新路径不影响旧代码
+
+---
+
+---
+## 三、迁移策略建议 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: API | **标签**: API | Code
+
+**来源**: breaking-changes.md:三、迁移策略建议
+
+### 问题现象
+
+### 3.1 短期策略（0-1个月）
+
+#### ✅ 立即行动项
+
+**1. 提供降级模式**
+```bash
+# 在SKILL.md中明确说明
+/update-docs --skip-kg  # 跳过知识图谱，使用旧逻辑
+```
+
+**2. 添加兼容性检查**
+```python
+def check_compatibility():
+    """检查是否需要迁移"""
+    old_data_exists = os.path.exists(".claude/skills/update-docs/data/")
+    new_data_exists = os.path.exists(".claude/skills/update-docs/kg/storage/")
+
+    if old_data_exists and not new_data_exists:
+        logger.warning("检测到旧数据格式，建议运行 /update-docs --kg-rebuild")
+        return False
+
+    return True
+```
+
+**3. 文档更新**
+- 在 SKILL.md 中添加"迁移指南"章节
+- 说明新旧版本差异
+
+### 解决方案
+
+### 3.2 中期策略（1-3个月）
+
+#### ✅ 渐进式迁移
+
+**阶段1: 并行运行（1个月）**
+```python
+# 同时维护旧逻辑和新逻辑
+def update_docs_with_fallback():
+    try:
+        # 尝试新逻辑（知识图谱）
+        return update_docs_with_kg()
+    except Exception as e:
+        logger.warning(f"知识图谱更新失败: {e}")
+        logger.info("回退到旧逻辑...")
+        return update_docs_legacy()
+```
+
+**阶段2: 数据迁移（1个月）**
+```python
+# 自动迁移旧数据
+def migrate_legacy_data():
+    if has_legacy_data():
+        logger.info("正在迁移旧数据...")
+        migrate_documents()
+        migrate_experiences()
+        migrate_relationships()
+        logger.info("迁移完成，旧数据已备份")
+```
+
+**阶段3: 废弃旧逻辑（1个月）**
+```python
+# 发出废弃警告
+def update_docs():
+    if use_legacy_mode():
+        logger.warning("⚠️ 旧逻辑将在下一版本废弃，请迁移到新逻辑")
+        return update_docs_legacy()
+
+    return update_docs_with_kg()
+```
+
+### 3.3 长期策略（3-6个月）
+
+#### ✅ 完全迁移
+
+**1. 移除旧逻辑**
+```python
+# 删除降级代码
+def update_docs():
+    # 只保留新逻辑
+    return update_docs_with_kg()
+```
+
+**2. 清理旧数据**
+```bash
+# 删除旧存储（已备份）
+rm -rf .claude/skills/update-docs/data/
+```
+
+**3. 更新文档**
+- 移除"迁移指南"章节
+- 更新示例代码
+- 更新API文档
+
+---
+
+---
+## 1. 模块依赖图 **P1**
+
+**优先级**: P1 | **类别**: GraphQL | **标签**: GraphQL | Code
+
+**来源**: dependency-analysis.md:1. 模块依赖图
+
+### 问题现象
+
+### 1.1 实际实现架构
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Entry Point                          │
+│            skill.json (配置文件)                         │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Core Layer (核心层)                     │
+├─────────────────────────────────────────────────────────┤
+│                                                           │
+│  DocumentUpdater                                         │
+│  ├── ChangeDetector (dependency)                         │
+│  └── DocMapper (dependency)                              │
+│                                                           │
+│  ChangeDetector                                          │
+│  └── ChangeType (enum)                                   │
+│                                                           │
+│  DocMapper                                               │
+│  └── MappingRule (dataclass)                             │
+│                                                           │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│               Analyzers Layer (分析器层)                 │
+├─────────────────────────────────────────────────────────┤
+│                                                           │
+│  ASTAnalyzer                                             │
+│  └── ast (stdlib)                                        │
+│                                                           │
+│  GitDiffAnalyzer                                         │
+│  └── subprocess (stdlib)                                 │
+│                                                           │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│               Utils Layer (工具层)                       │
+├─────────────────────────────────────────────────────────┤
+│  mappers/  - PathMapper                                  │
+│  templates/  - 模板管理                                   │
+│  utils/  - 通用工具                                       │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 1.2 KG模块设计架构（未实现）
+
+```
+kg/
+├── core/                    # 核心模块（设计阶段）
+│   ├── graph.py            # 图数据结构
+│   ├── query_engine.py     # 查询引擎
+│   ├── node_manager.py     # 节点管理器
+│   ├── edge_manager.py     # 边管理器
+│   ├── incremental_updater.py  # 增量更新器
+│   └── visualizer.py       # 可视化生成器
+│
+├── extractors/              # 提取器模块（设计阶段）
+│   ├── document_metadata_extractor.py
+
+### 解决方案
+
+│   ├── code_snippet_extractor.py
+│   ├── code_doc_mapper_extractor.py
+│   ├── concept_extractor.py
+│   ├── ast_semantic_extractor.py
+│   └── test_case_extractor.py
+│
+└── storage/                 # 数据存储（已创建JSON）
+    ├── kg_nodes.json
+    ├── kg_edges.json
+    ├── kg_metadata.json
+    ├── kg_edge_indices.json
+    ├── kg_change_history.json
+    └── category_mapping.json
+```
+
+---
+
+---
+## 2. 紧耦合点识别 **P1**
+
+**优先级**: P1 | **类别**: API | **标签**: API | Code
+
+**来源**: dependency-analysis.md:2. 紧耦合点识别
+
+### 问题现象
+
+### 2.1 核心层紧耦合
+
+#### 耦合点 #1: DocumentUpdater ↔ DocMapper
+
+**位置**: `core/updater.py:20-21`
+
+```python
+class DocumentUpdater:
+    def __init__(self, project_root: Path = None):
+        self.mapper = DocMapper()  # ⚠️ 硬编码依赖
+        self.mapper.load_default_rules()  # ⚠️ 自动初始化
+```
+
+**耦合类型**: 组合耦合（Composition Coupling）
+
+**问题**:
+- `DocumentUpdater` 无法独立测试（需要真实 `DocMapper`）
+- 无法替换 `DocMapper` 实现（如Mock版本）
+- 违反依赖倒置原则（DIP）
+
+**影响**: 中等（影响单元测试和扩展性）
+
+**解耦建议**:
+```python
+# 依赖注入版本
+class DocumentUpdater:
+    def __init__(self, mapper: DocMapper = None, project_root: Path = None):
+        self.mapper = mapper or DocMapper()
+        if not self.mapper.rules:
+            self.mapper.load_default_rules()
+```
+
+---
+
+#### 耦合点 #2: ChangeDetector ↔ ChangeType
+
+**位置**: `core/change_detector.py:11-20, 57-87`
+
+```python
+class ChangeType(Enum):
+    API_CHANGE = "api_change"
+    SERVICE_CHANGE = "service_change"
+    # ... 8种类型
+
+class ChangeDetector:
+    def categorize_change(self, file_path: str) -> ChangeType:
+        # ⚠️ 硬编码路径匹配逻辑
+        if "backend/api/routes/" in file_path:
+            return ChangeType.API_CHANGE
+        if "backend/services/" in file_path:
+            return ChangeType.SERVICE_CHANGE
+        # ... 8个if语句
+```
+
+**耦合类型**: 内容耦合（Content Coupling）
+
+**问题**:
+- 路径匹配规则硬编码在 `ChangeDetector` 中
+- 添加新类型需要修改 `ChangeType` 枚举和 `categorize_change` 方法
+- 违反开闭原则（OCP）
+
+**影响**: 高（影响扩展性和维护性）
+
+**解耦建议**:
+```python
+# 策略模式版本
+class ChangeRule(Protocol):
+    def matches(self, file_path: str) -> Optional[ChangeType]:
+        ...
+
+class PatternBasedRule:
+    def __init__(self, pattern: str, change_type: ChangeType):
+        self.pattern = pattern
+        self.change_type = change_type
+
+    def matches(self, file_path: str) -> Optional[ChangeType]:
+        return self.change_type if self.pattern in file_path else None
+
+class ChangeDetector:
+    def __init__(self, rules: List[ChangeRule] = None):
+        self.rules = rules or self._default_rules()
+
+    def categorize_change(self, file_path: str) -> ChangeType:
+        for rule in self.rules:
+            if result := rule.matches(file_path):
+                return result
+        return ChangeType.OTHER
+```
+
+---
+
+### 2.2 分析器层耦合
+
+#### 耦合点 #3: ASTAnalyzer ↔ ast (stdlib)
+
+**位置**: `analyzers/ast_analyzer.py:6, 19`
+
+```python
+import ast
+
+class ASTAnalyzer:
+    def analyze_file(self, file_path: str) -> Dict[str, Any]:
+        tree = ast.parse(content)  # ⚠️ 直接依赖Python AST
+```
+
+**耦合类型**: 外部依赖耦合（External Dependency Coupling）
+
+**问题**:
+- 仅支持Python代码分析
+- 无法扩展到其他语言（TypeScript、JavaScript）
+
+### 解决方案
+
+**影响**: 低（功能限制，不影响架构）
+
+**解耦建议**:
+```python
+# 抽象工厂模式
+class ASTParser(Protocol):
+    def parse(self, content: str) -> Any:
+        ...
+
+class PythonASTParser:
+    def parse(self, content: str) -> Any:
+        import ast
+        return ast.parse(content)
+
+class TypeScriptASTParser:
+    def parse(self, content: str) -> Any:
+        # TypeScript-specific implementation
+        pass
+
+class ASTAnalyzer:
+    def __init__(self, parser: ASTParser = None):
+        self.parser = parser or PythonASTParser()
+```
+
+---
+
+#### 耦合点 #4: GitDiffAnalyzer ↔ subprocess (stdlib)
+
+**位置**: `analyzers/git_diff_analyzer.py:43-55`
+
+```python
+def get_changed_files(self, ref: str = "HEAD") -> List[str]:
+    import subprocess
+    result = subprocess.run(
+        ["git", "diff", "--name-only", ref],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    return [f for f in result.stdout.strip().split('\n') if f]
+```
+
+**耦合类型**: 外部依赖耦合（External Dependency Coupling）
+
+**问题**:
+- 直接调用系统 `git` 命令
+- 错误处理仅捕获 `CalledProcessError` 和 `FileNotFoundError`
+
+**影响**: 低（合理的外部依赖）
+
+**解耦建议**:
+```python
+# 适配器模式
+class GitAdapter(Protocol):
+    def get_changed_files(self, ref: str) -> List[str]:
+        ...
+
+class CliGitAdapter:
+    def get_changed_files(self, ref: str) -> List[str]:
+        import subprocess
+        # subprocess implementation
+
+class Libgit2Adapter:
+    def get_changed_files(self, ref: str) -> List[str]:
+        # libgit2 implementation
+```
+
+---
+
+---
+## 7. 总结 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: GraphQL | **标签**: GraphQL
+
+**来源**: dependency-analysis.md:7. 总结
+
+### 问题现象
+
+### 7.1 关键发现
+
+1. **模块状态**: 所关注的模块（WorkflowOrchestrator等）**尚未实现**，仅存在于设计文档中
+2. **实际架构**: 当前实现采用极简的三层架构（Core → Analyzers → Utils）
+3. **紧耦合点**: 2处主要耦合（DocumentUpdater↔DocMapper, ChangeDetector↔ChangeType）
+4. **可安全删除**: 15个设计模块 + 5个空 `__init__.py` 文件
+
+### 7.2 优先级行动项
+
+**P0 - 立即执行**:
+- [ ] 删除空 `__init__.py` 文件（5个）
+- [ ] 移动未使用的分析器到 `analyzers/legacy/` 目录
+- [ ] 更新KG设计文档，明确Phase边界
+
+**P1 - 尽快执行**:
+- [ ] 解耦 `DocumentUpdater` 和 `DocMapper`（依赖注入）
+- [ ] 重构 `ChangeDetector` 使用策略模式
+- [ ] 为KG模块定义Protocol接口
+
+**P2 - 可选优化**:
+- [ ] 实施KG模块Phase 1（graph.py, node_manager.py, edge_manager.py）
+- [ ] 建立模块健康度监控
+- [ ] 集成分析器到 `DocumentUpdater` 工作流
+
+### 7.3 最终建议
+
+**建议1**: 优先重构现有核心模块，而非实施KG模块
+- 理由: 当前架构简单有效，KG模块设计复杂且未验证
+- 收益: 提高代码质量和可维护性
+
+**建议2**: 如果决定实施KG模块，采用分阶段策略
+- Phase 1: graph.py, node_manager.py, edge_manager.py（基础架构）
+
+### 解决方案
+
+- Phase 3: query_engine.py, visualizer.py（查询与可视化）
+- Phase 4: incremental_updater.py（集成到update-docs）
+
+**建议3**: 建立模块生命周期管理机制
+- 新模块: 设计 → 实施 → 测试 → 集成
+- 旧模块: 评估 → 重构 → 归档 → 删除
+- 定期审查: 每季度检查模块使用率和健康度
+
+---
+
+---
+## 对话式测试场景设计 **P1**
+
+**优先级**: P1 | **类别**: GraphQL | **标签**: GraphQL | Code
+
+**来源**: test-scenarios.md:对话式测试场景设计
+
+### 问题现象
+
+### 场景1: 经验提取对话测试
+
+**测试目标**: 验证Claude能够通过对话从报告中提取经验
+
+**对话流程**:
+
+```
+
+### 解决方案
+
+**Claude**: [阅读报告] 这份报告描述了一个GraphQL 400错误的问题。报告内容包括：
+- 问题描述：GraphQL API返回400 Bad Request
+- 根本原因：枚举类型定义不匹配（前端使用LEFT-JOIN，后端期望LEFT_JOIN）
+
+**测试员**: 请提取经验，回答以下问题：
+1. 核心问题是什么？
+2. 根本原因是什么？
+4. 如何预防类似问题？
+
+**Claude**: [思考过程]
+1. **核心问题**: GraphQL 400错误 - Enum type cannot represent value
+2. **根本原因**: 前端TypeScript枚举与后端GraphQL schema定义不一致
+   - 前端：`LEFT_JOIN = "LEFT-JOIN"` (使用连字符)
+   - 后端：`LEFT_JOIN` (期望UPPER_SNAKE_CASE)
+   - 统一使用UPPER_SNAKE_CASE格式
+   - 前端枚举值完全匹配GraphQL schema
+   - 使用graphql-codegen自动生成类型
+4. **预防措施**:
+   - 建立GraphQL类型同步规范
+   - 使用代码生成工具确保一致性
+   - 添加契约测试检测类型不匹配
+   - Code Review检查枚举格式
+
+**测试员**: 这条经验应该更新到哪个经验文档？
+
+**Claude**: [查阅经验文档映射]
+根据问题类型（GraphQL 400错误、类型不匹配），应该更新到：
+- `docs/lessons-learned/api-design-patterns.md` - API设计模式
+- `docs/lessons-learned/graphql-field-completeness.md` - GraphQL字段完整性
+
+具体章节：
+- API设计模式 → "GraphQL 400错误诊断" 章节
+- GraphQL字段完整性 → "枚举类型同步规范" 章节
+
+**测试员**: 请生成经验提取的markdown格式
+
+**Claude**: [生成markdown]
+```markdown
+### GraphQL 400错误 - 枚举类型不匹配
+
+**问题现象**:
+```
+GraphQL Error: Enum 'HqlJoinType' cannot represent value: "LEFT-JOIN"
+HTTP Status: 400 Bad Request
+```
+
+**根本原因**:
+前端TypeScript枚举与后端GraphQL schema定义不一致
+- 前端：`LEFT_JOIN = "LEFT-JOIN"` ❌
+- 后端：`LEFT_JOIN` ✅
+
+1. 统一使用UPPER_SNAKE_CASE格式
+2. 使用graphql-codegen自动生成类型
+3. 添加契约测试检测类型不匹配
+
+**预防措施**:
+- 建立GraphQL类型同步规范（CLAUDE.md）
+- Code Review检查枚举格式
+- 使用自动化工具避免手动定义
+
+**相关文档**:
+- [GraphQL开发指南](docs/development/graphql-development-guide.md)
+- [API契约测试规范](CLAUDE.md#api契约测试规范)
+```
+```
+
+**验证点**:
+- ✅ Claude正确理解报告内容
+- ✅ 正确映射到经验文档
+- ✅ 生成标准markdown格式
+- ✅ 识别相关文档链接
+
+---
+
+### 场景2: 文档整合决策对话测试
+
+**测试目标**: 验证Claude能够通过对话决定如何整合重复文档
+
+**对话流程**:
+
+```
+
+**Claude**: [对比两个文档]
+- 状态：6个月未更新
+
+**文档2**: `docs/lessons-learned/performance-patterns.md`
+- 内容：缓存失效装饰器的最佳实践
+- 类型：经验文档（持续更新）
+- 状态：活跃（最近更新：2026-03-07）
+- 包含章节：缓存失效分析、装饰器使用、TTL分层
+
+**重复度分析**:
+- 文档1的"实施步骤"与文档2的"装饰器使用"重复度 60%
+- 文档1缺少"预防措施"和"最佳实践"
+
+**整合建议**:
+1. 提取文档1中的具体案例到文档2的"案例研究"章节
+2. 归档文档1到 `docs/archive/reports/2026-03/`
+3. 更新文档2的"相关案例"索引
+
+**测试员**: 请说明整合的理由
+
+**Claude**: [整合理由]
+**理由1: 文档生命周期**
+- 文档1是临时报告（已完成使命）
+- 文档2是经验文档（持续复用）
+
+**理由2: 内容价值**
+- 文档1包含具体案例（有价值）
+- 文档2包含通用经验（权威来源）
+
+**理由3: 维护成本**
+- 保留两份重复内容增加维护负担
+- 整合后只需维护一个文档
+
+**理由4: 可发现性**
+- 经验文档有更好的索引和导航
+- 用户更容易找到复用经验
+
+**测试员**: 请生成整合计划
+
+**Claude**: [生成整合计划]
+```markdown
+# 文档整合计划
+
+---
+## 验证清单 **P1**
+
+**优先级**: P1 | **类别**: GraphQL | **标签**: GraphQL | Code
+
+**来源**: test-scenarios.md:验证清单
+
+### 问题现象
+
+- [ ] API文档包含端点说明
+- [ ] 架构文档包含方法签名
+- [ ] 性能说明清晰
+- [ ] 错误响应完整
+- [ ] 代码示例正确
+```
+```
+
+**验证点**:
+- ✅ Claude正确识别代码变更类型
+- ✅ 根据映射规则找到目标文档
+- ✅ 生成符合规范的文档内容
+- ✅ 识别可提取的经验
+- ✅ 生成更新计划和验证清单
+
+---
+
+### 场景5: 归档策略对话测试
+
+**测试目标**: 验证Claude能够通过对话决定文档归档策略
+
+**对话流程**:
+
+```
+**测试员**: Claude，`docs/reports/2026-02-15/e2e-test-report.md` 已经超过6个月未更新，请分析是否应该归档
+
+**Claude**: [分析文档状态]
+```
+执行文档状态检测:
+- 文件: docs/reports/2026-02-15/e2e-test-report.md
+- 创建日期: 2026-02-15
+- 最后更新: 2026-02-15
+- 当前日期: 2026-03-23
+- 未更新时长: 36天
+- 类型: 测试报告（临时性文档）
+```
+
+**归档触发条件检查**:
+1. ✅ **时间条件**: 未更新6个月以上？ ❌ (仅36天)
+2. ✅ **类型条件**: 临时性文档？ ✅ (测试报告)
+3. ✅ **价值条件**: 是否有持续参考价值？ 需分析
+
+**内容价值分析**:
+- 包含E2E测试结果（13/13通过）
+- 记录了测试发现的问题
+
+### 解决方案
+
+- 有历史参考价值
+
+**引用检查**:
+- 检查是否有其他文档引用此报告
+- 检查是否包含在主要索引中
+
+**测试员**: 这个报告是否应该归档？
+
+**Claude**: [归档决策]
+**建议**: **暂不归档，但标记为低活跃度**
+
+**理由**:
+1. **时间未达标**: 未更新36天（少于6个月阈值）
+2. **类型特殊**: 测试报告有历史参考价值
+3. **可能复用**: 后续测试可能需要对比历史结果
+
+1. **添加归档提醒**: 在文档顶部添加"最后更新: 2026-02-15，建议定期检查"
+2. **索引标注**: 在索引中标记为"历史文档"
+3. **设置自动归档**: 配置6个月后自动归档
+
+**测试员**: 如果一定要归档，应该如何处理？
+
+
+1. **归档位置**: `docs/archive/testing/2026-02/e2e-test-report-2026-02-15.md`
+
+2. **归档说明**:
+```markdown
+> **归档说明**: 此文档已归档，原位置 `docs/reports/2026-02-15/`
+> **归档日期**: 2026-03-23
+> **归档原因**: 测试报告已完成，历史参考价值
+> **相关文档**: [最新E2E测试报告](docs/testing/reports/final-verification-report.md)
+```
+
+3. **引用更新**:
+   - 检查引用此报告的文档
+   - 更新引用到归档位置或最新报告
+
+4. **索引更新**:
+   - 从活跃索引中移除
+   - 添加到归档索引
+
+**测试员**: 如何设置自动归档？
+
+**Claude**: [自动归档配置]
+**配置文件**: `.claude/skills/update-docs/kg_update_config.json`
+
+```json
+{
+  "automation": {
+    "auto_archive": {
+      "enabled": true,
+      "rules": [
+        {
+          "path_pattern": "docs/reports/**/*",
+          "age_days": 180,
+          "archive_path": "docs/archive/reports/{date}/{filename}"
+        },
+        {
+          "path_pattern": "docs/testing/reports/**/*",
+          "age_days": 90,
+          "archive_path": "docs/archive/testing/{date}/{filename}"
+        }
+      ]
+    }
+  }
+}
+```
+
+**归档触发时机**:
+- 手动触发: `/update-docs --archive`
+- 自动触发: 每次执行 `/update-docs` 时检查
+- 定期任务: 每月1号自动检查
+
+**测试员**: 归档后如何保证可发现性？
+
+**Claude**: [可发现性保证]
+**方法1: 归档索引**
+- 维护 `docs/archive/README.md` 索引
+- 按日期和主题分类
+- 提供搜索功能
+
+**方法2: 知识图谱保留**
+- 归档文档仍保留在知识图谱中
+- 查询时可通过 `--archived true` 包含归档文档
+- 节点标记为 `archived: true`
+
+**方法3: 引用保留**
+- 更新引用时指向归档位置
+- 添加"最新版本"链接
+- 保留历史版本对比
+
+**方法4: 搜索集成**
+```bash
+# 包含归档文档的查询
+/kg:query --archived true "E2E测试"
+
+# 查找特定日期的报告
+/kg:query --type document --after "2026-02-01" --before "2026-02-28" "测试报告"
+```
+
+**示例查询**:
+```
+用户: "我想查看2026年2月的E2E测试结果"
+Claude: [查询知识图谱]
+执行: /kg:query --archived true --type document "E2E测试 2026-02"
+
+结果:
+- docs/archive/testing/2026-02/e2e-test-report-2026-02-15.md
+- docs/testing/reports/final-verification-report.md (最新)
+```
+```
+
+**验证点**:
+- ✅ Claude正确分析文档状态
+- ✅ 检查归档触发条件
+- ✅ 提供归档决策和理由
+- ✅ 配置自动归档
+- ✅ 保证归档后可发现性
+
+---
+
+---
+## Known Limitations **P1**
+
+**优先级**: P1 | **类别**: GraphQL | **标签**: GraphQL | Code
+
+**来源**: IMPLEMENTATION-SUMMARY.md:Known Limitations
+
+### 问题现象
+
+### 1. Workflow Orchestrator ⚠️
+
+**Current State**: The three core modules (index_generator, experience_extractor, auto_archiver) are standalone and fully functional, but there is no orchestrator that executes all 7 phases in sequence.
+
+**Impact**: Users cannot run `/update-docs` to execute the full automated workflow yet.
+
+**Next Steps** (Optional Enhancement):
+- Create `workflow_orchestrator.py` that:
+  - Calls all 7 phases in sequence
+  - Generates automation report
+  - Handles errors gracefully
+  - Supports selective phase execution
+
+**Workaround**: Users can invoke modules directly:
+```python
+from core.index_generator import IndexGenerator
+from core.experience_extractor import ExperienceExtractor
+from core.auto_archiver import AutoArchiver
+
+# Execute phases individually
+generator = IndexGenerator(project_root)
+generator.generate_main_index()
+
+extractor = ExperienceExtractor(project_root)
+
+### 解决方案
+
+archiver = AutoArchiver(project_root, threshold_months=6)
+archiver.archive_document(doc_path, reason="Old document")
+```
+
+### 2. Integration with Existing Workflow ⚠️
+
+**Current State**: The plan mentioned integrating with existing workflow modules (updater.py, integrator.py, archiver.py), but these files don't exist in the core/ directory.
+
+**Impact**: The modules are independent and don't share state or coordinate automatically.
+
+**Mitigation**: Each module is self-contained and can be used independently. Future integration can be done without modifying the modules.
+
+### 3. Knowledge Graph Update Automation ⚠️
+
+**Current State**: The knowledge graph update system exists but is not automatically triggered by the new modules.
+
+**Impact**: Phase 7 (knowledge graph updates) must be run manually.
+
+**Workaround**: Run `/update-docs --kg-only` or `/kg:query` to update the knowledge graph after using the new modules.
+
+---
+
+---
+## 场景3: API设计模式提取 ✅ **P1**
+
+**优先级**: P1 | **类别**: GraphQL | **标签**: GraphQL | Code
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景3: API设计模式提取 ✅
+
+### 问题现象
+
+**测试文档**: `docs/lessons-learned/api-design-patterns.md`
+**章节**: "GraphQL DataLoader实施清单"（第1315-1490行）
+
+### Round 1: 快速阅读 ✅
+
+**文档主题**: GraphQL DataLoader实施清单
+
+**问题识别**:
+- N+1查询问题导致数据库负载高
+- GraphQL响应时间慢（>500ms）
+- 事件列表查询需要101次（100个事件 + 1次主查询）
+
+### 解决方案
+
+- 使用DataLoader批量加载
+- 5步集成流程
+- 配置双层缓存策略（L1: 60秒, L2: 300秒）
+- 性能提升：响应时间从~500ms降至~50ms（90%提升）
+
+### Round 2: 深度思考 🧠
+
+**提取的Experience对象**:
+
+```python
+Experience(
+    title="GraphQL DataLoader批量查询优化",
+    problem="症状描述：GraphQL API响应慢（>500ms），数据库负载高。技术原因：N+1查询问题 - 事件列表查询执行101次（100个事件参数 + 1次主查询），每个事件单独查询参数导致数据库连接池耗尽，响应时间过长。",
+    category="API",
+    priority="P0",
+    source="docs/lessons-learned/api-design-patterns.md:GraphQL DataLoader实施清单",
+    tags=["GraphQL", "DataLoader", "Performance", "N+1 Queries", "Caching"]
+)
+```
+
+**质量评分**: 0.92
+
+**评分理由**:
+- 唯一性: 0.95（GraphQL特定的性能优化模式）
+- 实用性: 0.95（包含详细代码示例和5步实施清单）
+
+### Round 3: 质量自检 ✅
+
+**重复检查**:
+- Problem详细描述症状（响应慢、负载高）和根因（N+1查询）
+
+**完整性检查**:
+- ✅ Problem字段清晰描述N+1查询导致的具体问题
+- ✅ 包含预防措施（代码审查清单）
+
+**质量评分确认**: 0.92（维持原评分）
+
+**修正**: 无需修正，经验质量优秀。
+
+### Round 4: 最终输出 ✅
+
+**确认**: ✅ 准备更新到经验文档
+
+---
+
+---
+## 场景3测试结果 **P1**
+
+**优先级**: P1 | **类别**: GraphQL | **标签**: GraphQL
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景3测试结果
+
+### 问题现象
+
+### 成功指标
+
+| 指标 | 目标 | 实际 | 状态 |
+|------|------|------|------|
+
+### 解决方案
+
+| 经验质量评分 | >0.7 | 0.92 | ✅ 优秀 |
+| 提取准确率 | >90% | 100% | ✅ 优秀 |
+
+### 关键发现
+
+**优势**:
+- ✅ Claude成功识别了GraphQL N+1查询的核心问题
+- ✅ 提取的经验结构完整、逻辑清晰
+- ✅ 包含了代码示例（DataLoader类实现）
+- ✅ 包含性能对比数据（90%提升）
+
+**对比现有方法**:
+- **旧方法**（规则提取）: 可能无法理解性能优化的深层价值
+
+### 改进建议
+
+**无需改进** - 当前提取质量已达到优秀水平
+
+---
+
+---
+## 场景4: 缓存失效策略提取 ✅ **P1**
+
+**优先级**: P1 | **类别**: API | **标签**: API | Code
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景4: 缓存失效策略提取 ✅
+
+### 问题现象
+
+**测试文档**: `docs/lessons-learned/performance-patterns.md`
+**章节**: "缓存失效分析"（第874-1023行）
+
+### Round 1: 快速阅读 ✅
+
+**文档主题**: 缓存失效分析
+
+**问题识别**:
+- 缓存命中率低（<60%）
+- API响应时间长（>1秒）
+- 用户感觉到数据更新延迟
+- 4个根本原因：缓存键生成错误、TTL过短、未清理缓存、Bloom Filter误判
+
+### 解决方案
+
+- 使用@cache_invalidate装饰器自动清理缓存
+- 3种策略：自动失效装饰器、手动清理、Cache Tags批量失效
+- 缓存一致性验证脚本
+
+### Round 2: 深度思考 🧠
+
+**提取的Experience对象**:
+
+```python
+Experience(
+    title="缓存失效策略最佳实践",
+    problem="症状描述：缓存命中率低（<60%），API响应时间长（>1秒），用户感觉到数据更新延迟。根因分析：1. 缓存键生成错误（参数未包含在键中导致所有请求共享缓存）2. 缓存TTL过短（5秒导致频繁失效）3. 数据更新后未清理缓存（用户看到旧数据）4. Bloom Filter误判（<0.1%概率）",
+    category="Performance",
+    priority="P0",
+    source="docs/lessons-learned/performance-patterns.md:缓存失效分析",
+    tags=["Caching", "Cache Invalidation", "Performance", "@cached", "@cache_invalidate"]
+)
+```
+
+**质量评分**: 0.93
+
+**评分理由**:
+- 唯一性: 0.90（缓存失效策略专门问题）
+- 实用性: 0.95（包含3种策略和完整代码示例）
+- 完整性: 0.95（覆盖4个根因、3种策略、验证脚本）
+
+### Round 3: 质量自检 ✅
+
+**重复检查**:
+- Problem详细描述4个根本原因（缓存键、TTL、未清理、Bloom Filter）
+
+**完整性检查**:
+- ✅ Problem字段清晰描述症状和4个根本原因
+- ✅ 包含预防措施（代码审查清单、验证脚本）
+
+**质量评分确认**: 0.93（维持原评分）
+
+**修正**: 无需修正，经验质量优秀。
+
+### Round 4: 最终输出 ✅
+
+**确认**: ✅ 准备更新到经验文档
+
+---
+
+---
+## 🎯 Common Use Cases **P1**
+
+**优先级**: P1 | **类别**: API | **标签**: API | Code
+
+**来源**: AUTOMATION-QUICK-REFERENCE.md:🎯 Common Use Cases
+
+### 问题现象
+
+### Use Case 1: After Code Changes
+
+```bash
+# Make code changes
+git add .
+git commit -m "feat: add new API endpoint"
+
+# Run full automation
+/update-docs
+```
+
+**Result**: All documentation updated automatically
+
+### 解决方案
+
+```bash
+
+# Extract experience automatically
+/update-docs --extract-experience
+```
+
+**Result**: Experience added to appropriate lessons-learned/ document
+
+### Use Case 3: Clean Up Old Documents
+
+```bash
+# Auto-archive stale documents
+/update-docs --archive --auto
+```
+
+**Result**: 6+ month old documents moved to archive/
+
+### Use Case 4: Update Documentation Index
+
+```bash
+# After adding new documentation subdirectory
+/update-docs --update-indexes
+```
+
+**Result**: docs/README.md regenerated with new subdirectory
+
+---
+
+---
+## 详细成果 **P1**
+
+**优先级**: P1 | **类别**: API | **标签**: API
+
+**来源**: DOC-INTEGRATION-FINAL-REPORT-ROUND2.md:详细成果
+
+### 问题现象
+
+### 1. 经验提取与整合 ✅
+
+**分析的报告**:
+1. IMPLEMENTATION-COMPLETE-REPORT.md - 8批次Subagent-Driven Development实施
+2. INTEGRATION-TEST-REPORT.md - TypeScript编译、ESLint、单元测试
+3. NEXT-STEPS-RECOMMENDATION.md - 项目规划、优先级管理
+
+**提取的经验类别**:
+- **Subagent-Driven Development**: 8个核心经验点
+- **代码质量管理**: 6个核心经验点
+- **项目管理**: 4个核心经验点
+
+**总计**: 18个核心经验点完整提取
+
+### 2. 更新的经验文档 ✅
+
+#### 2.1 项目管理经验文档
+
+**文件**: `docs/lessons-learned/project-management.md` (更新)
+
+**新增章节**: Subagent-Driven Development经验 ⭐⭐⭐
+
+**核心经验**:
+1. Subagent-Driven Development概念
+   - 效率提升: 3-4倍
+   - 隔离性好
+   - 可追踪
+   - 易于回滚
+
+2. 批次管理策略
+   - 8批次实施案例
+   - 任务分解原则
+   - 验收标准
+
+3. 并行 vs 串行执行
+   - 并行执行: 独立任务（效率提升2-3x）
+   - 串行执行: 依赖任务
+
+4. Git Worktree隔离
+   - 完全隔离
+   - 独立测试
+   - 安全回滚
+
+5. 批次实施检查清单
+   - 批次开始前
+   - 批次执行中
+   - 批次完成后
+
+### 解决方案
+
+- Subagent执行失败
+   - 并行任务冲突
+   - 验收标准不明确
+
+**8批次实施案例**（Event2Table 2026-03-20）:
+- 批次1: 异步任务UI + E2E测试 + 文档同步（3个任务并行）
+- 批次2: 批量操作完善 + 性能监控面板 + 错误处理优化（3个任务并行）
+- 批次4: 智能字段推荐（2个任务串行）
+- 批次5: HQL版本对比（2个任务串行）
+- 批次6: 模板库完善（1个任务独立）
+- 批次7: 状态管理统一（1个任务独立，git worktree隔离）
+- 批次8: 组件库标准化 + API缓存 + 性能优化（3个任务并行）
+
+**关键指标**:
+- 总批次: 8
+- 总任务: 15
+- 创建文件: 80+
+- 文档更新: 20+
+- 代码行数: 15,000+
+- 执行时间: 约6小时
+
+#### 2.2 TypeScript迁移经验文档
+
+**文件**: `docs/lessons-learned/typescript-migration.md` (更新)
+
+**新增章节**: 代码质量管理经验 ⭐⭐⭐
+
+**核心经验**:
+1. TypeScript编译检查
+   - 常见错误类型（TS2769, TS2304, TS2305, TS2308）
+   - 错误处理流程
+   - 预防措施
+
+2. ESLint代码检查
+   - 主要问题类型（no-unused-vars, no-console等）
+   - 问题优先级（P0/P1/P2）
+
+3. 单元测试
+   - 测试通过率: 85% (972/1144)
+   - 失败分析
+   - 提高通过率策略
+   - 测试覆盖率目标
+
+4. 代码质量工作流
+   - 推荐流程（编写代码 → TypeScript检查 → ESLint → 测试 → 提交）
+   - 质量门禁
+
+   - TypeScript编译失败
+   - ESLint错误过多
+   - 单元测试失败
+
+6. 质量门禁
+   - CI/CD配置
+   - 质量标准（0个TS错误、0个ESLint错误、测试通过率>95%、覆盖率>80%）
+
+### 3. 归档旧报告 ✅
+
+**归档数量**: 3个报告
+**归档位置**: `docs/archive/2026/03-march/reports-batch-implementation-2026-03-20/`
+
+**归档的报告清单**:
+1. IMPLEMENTATION-COMPLETE-REPORT.md
+2. INTEGRATION-TEST-REPORT.md
+3. NEXT-STEPS-RECOMMENDATION.md
+
+**归档原因**:
+- 经验已提取到经验文档系统
+- 避免根目录文档膨胀
+- 保留历史参考价值
+
+---
+
+---

@@ -1,14 +1,78 @@
 {
-  "bundle_size": {
-    "warning": 500000,
-    "critical": 1000000
+  "version": "2.0.0",
+  "last_updated": "2026-03-20",
+  "description": "Performance detection thresholds and configuration for Event2Table - Enhanced with Vercel Best Practices",
+
+  "existing_thresholds": {
+    "bundle_size": {
+      "warning": 500000,
+      "critical": 1000000
+    },
+    "load_time": {
+      "warning": 3000,
+      "critical": 5000
+    },
+    "api_response": {
+      "warning": 500,
+      "critical": 1000
+    }
   },
-  "load_time": {
-    "warning": 3000,
-    "critical": 5000
+
+  "new_detectors": {
+    "async_parallel": {
+      "enabled": true,
+      "min_sequential_awaits": 2,
+      "severity": "CRITICAL",
+      "impact": "2-10× API response time improvement"
+    },
+    "bundle_optimization": {
+      "enabled": true,
+      "lazy_load_threshold_kb": 10,
+      "severity": "CRITICAL",
+      "impact": "20-40% initial load time reduction"
+    },
+    "rerender_optimization": {
+      "enabled": true,
+      "severity": "MEDIUM",
+      "impact": "30-50% unnecessary re-render reduction"
+    }
   },
-  "api_response": {
-    "warning": 500,
-    "critical": 1000
+
+  "vercel_rules": {
+    "critical": [
+      "async-parallel",
+      "bundle-barrel-imports",
+      "bundle-dynamic-imports",
+      "bundle-defer-third-party"
+    ],
+    "medium": [
+      "rerender-derived-state",
+      "rerender-transitions",
+      "rerender-defer-reads",
+      "rerender-memo"
+    ]
+  },
+
+  "severity_levels": {
+    "CRITICAL": {
+      "priority": 1,
+      "color": "red",
+      "auto_fixable": true
+    },
+    "HIGH": {
+      "priority": 2,
+      "color": "orange",
+      "auto_fixable": false
+    },
+    "MEDIUM": {
+      "priority": 3,
+      "color": "yellow",
+      "auto_fixable": false
+    },
+    "LOW": {
+      "priority": 4,
+      "color": "blue",
+      "auto_fixable": true
+    }
   }
 }

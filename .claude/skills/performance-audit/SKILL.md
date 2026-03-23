@@ -15,7 +15,14 @@ Comprehensive performance analysis tool that combines **static code analysis** (
 
 Detects performance anti-patterns in code before they reach production:
 
-**Frontend Detectors:**
+**Frontend Detectors (Enhanced with Vercel Best Practices):**
+
+**CRITICAL Priority (2-10× improvement):**
+- **Async parallelization**: Sequential `await` → `Promise.all()` for independent operations
+- **Bundle optimization**: Barrel imports, missing lazy loading for large components (>10KB)
+- **Re-render optimization**: Derived state from continuous values, missing `startTransition`
+
+**Existing Detection:**
 - React optimization: Missing `React.memo`, `useMemo`, `useCallback`
 - Bundle analysis: Large files, missing lazy-loading, code splitting
 - Image optimization: Missing `loading="lazy"`, unoptimized images
@@ -61,6 +68,9 @@ Measures actual performance to identify existing bottlenecks:
 Automatically applies safe performance optimizations:
 
 **Auto-Fixed (Safe):**
+- ✅ **NEW**: Parallelize sequential async operations with `Promise.all()`
+- ✅ **NEW**: Replace barrel imports with direct imports
+- ✅ **NEW**: Add lazy loading to large components (>10KB)
 - ✅ Add `React.memo`, `useMemo`, `useCallback` to components
 - ✅ Enable Vite code splitting and compression
 - ✅ Add `@cached` decorators to query functions
@@ -94,11 +104,13 @@ Automatically updates project documentation:
 - Backend N+1 query detection
 - Basic configuration validation
 
-**Standard Mode** (`--standard`): Static + targeted runtime (~15 minutes)
+**Standard Mode** (`--standard`): Static + CRITICAL detectors (~15 minutes)
 - All quick mode checks
-- Lighthouse audit on critical pages
-- API response time sampling
-- Cache hit rate analysis
+- **NEW**: Async parallelization detection (CRITICAL)
+- **NEW**: Bundle optimization detection (CRITICAL)
+- **NEW**: Re-render optimization detection (MEDIUM)
+- Lighthouse audit on critical pages (planned)
+- API response time sampling (planned)
 
 **Deep Mode** (`--deep` or default): Complete analysis (~30-60 minutes)
 - All standard mode checks
@@ -143,11 +155,13 @@ Reports are generated in:
 - `run_audit.py` - Orchestrates all detectors and analyzers
 
 **Static Detectors:**
-- `detectors/static/frontend_react.py` - React optimization detection
-- `detectors/static/backend_queries.py` - N+1 query detection
-- `detectors/static/database_index.py` - Index analysis
-- `detectors/static/config_optimization.py` - Build configuration detection
-- `detectors/static/network_optimization.py` - HTTP/compression detection
+- `detectors/static/frontend_react.py` - React optimization detection (existing)
+- `detectors/static/backend_queries.py` - N+1 query detection (existing)
+- `detectors/static/config_optimization.py` - Build configuration detection (existing)
+- `detectors/static/detector_async.py` - **NEW**: Async parallelization detection (Promise.all)
+- `detectors/static/detector_bundle.py` - **NEW**: Bundle optimization detection
+- `detectors/static/detector_rerender.py` - **NEW**: Re-render optimization detection
+- `scripts/utils/ast_helpers.py` - **NEW**: AST analysis utilities
 
 **Runtime Analyzers:**
 - `detectors/runtime/lighthouse_runner.py` - Lighthouse integration

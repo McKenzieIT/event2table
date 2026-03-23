@@ -26,7 +26,14 @@ import json
 SKILL_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SKILL_DIR))
 
-from detectors.static import frontend_react, backend_queries, config_optimization
+from detectors.static import (
+    frontend_react,
+    backend_queries,
+    config_optimization,
+    detector_async,
+    detector_bundle,
+    detector_rerender
+)
 from reporters.markdown_reporter import MarkdownReporter
 from reporters.html_reporter import HtmlReporter
 
@@ -56,20 +63,40 @@ class PerformanceAuditRunner:
         """Run static code analysis"""
         print("🔍 Running static code analysis...")
 
-        # Frontend React optimization
+        # Frontend React optimization (existing)
         print("  ├── Frontend React optimization...")
         react_issues = frontend_react.detect(self.project_root / "frontend" / "src")
         self.issues.extend(react_issues)
 
-        # Backend N+1 queries
+        # Backend N+1 queries (existing)
         print("  ├── Backend query optimization...")
         query_issues = backend_queries.detect(self.project_root / "backend")
         self.issues.extend(query_issues)
 
-        # Configuration optimization
-        print("  └── Build configuration optimization...")
+        # Configuration optimization (existing)
+        print("  ├── Build configuration optimization...")
         config_issues = config_optimization.detect(self.project_root / "frontend" / "vite.config.ts")
         self.issues.extend(config_issues)
+
+        # NEW: Async parallelization detection (CRITICAL)
+        if self.mode in ["standard", "deep"]:
+            print("  ├── Async parallelization detection (CRITICAL)...")
+            async_issues = detector_async.detect(self.project_root / "frontend" / "src")
+            self.issues.extend(async_issues)
+
+        # NEW: Bundle optimization detection (CRITICAL)
+        if self.mode in ["standard", "deep"]:
+            print("  ├── Bundle optimization detection (CRITICAL)...")
+            bundle_issues = detector_bundle.detect(self.project_root / "frontend" / "src")
+            self.issues.extend(bundle_issues)
+
+        # NEW: Re-render optimization detection (MEDIUM)
+        if self.mode in ["standard", "deep"]:
+            print("  └── Re-render optimization detection (MEDIUM)...")
+            rerender_issues = detector_rerender.detect(self.project_root / "frontend" / "src")
+            self.issues.extend(rerender_issues)
+        else:
+            print("  └── Skipping CRITICAL detectors (use --standard or --deep mode)")
 
         print(f"✅ Static analysis complete: {len(self.issues)} issues found")
 

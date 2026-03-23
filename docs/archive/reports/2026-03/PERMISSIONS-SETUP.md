@@ -26,3 +26,10 @@
 ## 下一步
 
 权限配置完成，可以开始实施自动化系统。
+---
+
+> **Archived**: 2026-03-24
+> **Reason**: 临时报告，经验已提取到lessons-learned
+> **Original Location**: docs/reports/2026-03-23/PERMISSIONS-SETUP.md
+
+---

@@ -419,3 +419,11 @@ Quality Score: 0.93
 **测试负责人**: Claude (update-docs refactoring)
 **审核状态**: ✅ 对话式测试指南已创建
 **下一步**: 执行5个场景的对话式测试
+
+---
+
+> **Archived**: 2026-03-24
+> **Reason**: 临时报告，经验已提取到lessons-learned
+> **Original Location**: docs/reports/2026-03-23/CONVERSATION-TESTING-GUIDE.md
+
+---

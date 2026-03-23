@@ -1144,3 +1144,552 @@ git worktree remove ../event2table-state-management
 - P1经验点：7个 (+0)
 - 总计：17个项目管理经验点 (+1)
 - 最后更新：2026-03-21 🆕 新增Subagent-Driven Development经验
+
+## 7-Phase Automation Workflow **P1**
+
+**优先级**: P1 | **类别**: Project Management | **标签**: Project Management
+
+**来源**: IMPLEMENTATION-SUMMARY.md:7-Phase Automation Workflow
+
+### 问题现象
+
+The complete automation workflow is now documented and ready for integration:
+
+### Phase 1: 变更检测 (2-3秒)
+- Git diff analysis
+- AST semantic analysis
+- Commit message keyword matching
+
+### Phase 2: 文档更新 (3-5秒)
+- Identify target documents
+- Generate update content
+- Apply updates
+- Update metadata
+
+### Phase 3: 重复检测 (5-10秒)
+- Cross-document similarity analysis (TF-IDF + cosine similarity)
+- Threshold: 0.7 similarity
+- Identify semantic duplicates
+- Generate integration report
+
+### Phase 4: 经验提取 (5-8秒)
+- Identify reusable patterns
+- Extract to lessons-learned/
+- Update experience indexes
+
+### 解决方案
+
+### Phase 5: 自动归档 (2-3秒)
+- Detect 6-month stale documents
+- Move to archive/{topic}/{date}/
+- Update document references
+- Clean broken links
+
+### Phase 6: 索引更新 (3-5秒)
+- Regenerate docs/README.md
+- Update lessons-learned/README.md
+- Update CLAUDE.md references
+- Validate internal links
+
+### Phase 7: 知识图谱更新 (5-30秒)
+- Incremental: Update changed documents
+- Full check (every 10 updates): Node integrity, similarity recalculation, orphan detection
+- Save knowledge graph
+
+**Total Estimated Time**: 25-64 seconds (average 35 seconds)
+
+---
+
+---
+## 4. 架构对比 **P1**
+
+**优先级**: P1 | **类别**: Project Management | **标签**: Project Management | Code
+
+**来源**: REFACTORING-STATUS-REPORT.md:4. 架构对比
+
+### 问题现象
+
+### 4.1 当前架构（实施前）
+
+**实际代码结构**:
+```
+.claude/skills/update-docs/
+├── core/
+│   ├── change_detector.py      # 8个硬编码if语句 ✅ 已重构
+│   ├── updater.py              # 硬编码DocMapper依赖 ✅ 已重构
+│   ├── doc_mapper.py           # 文档映射规则
+│   ├── experience_extractor.py # 规则提取器（未使用）
+│   └── knowledge_graph.py      # 知识图谱管理
+├── extractors/
+│   ├── document_metadata_extractor.py
+
+### 解决方案
+
+│   ├── code_snippet_extractor.py
+│   └── ... (8个提取器)
+└── analyzers/
+    ├── ast_analyzer.py         # 未使用 ❌ 已归档
+    └── git_diff_analyzer.py    # 未使用 ❌ 已归档
+```
+
+**问题**:
+- ⚠️ 过度工程化（设计了21个模块，仅实现3个）
+- ⚠️ 规则提取器（`_intelligent_content_analysis`产生低质量提取）
+- ⚠️ 未利用Claude思考能力
+
+### 4.2 目标架构（设计文档）
+
+**2层简化架构**:
+```
+Layer 1: 简化编排器 + 图谱定位器
+├── WorkflowOrchestrator (简化版)
+│   ├── 执行7阶段工作流
+│   ├── 使用知识图谱快速定位文档
+│   └── 调用Claude Semantic ExperienceExtractor
+└── 知识图谱定位器
+    ├── 仅用于文档发现
+    └── 不参与经验提取
+
+Layer 2: Claude思考提取器
+└── Claude Semantic ExperienceExtractor
+    ├── 直接阅读文档内容
+    ├── 使用Claude语义理解提取经验
+    └── 简单类别映射（11个固定类别）
+```
+
+**核心原则**:
+- ✅ 利用Claude深度思考（而非规则）
+- ✅ 简化架构（2层而非5层）
+- ✅ 对话式测试（而非脚本）
+
+### 4.3 架构迁移路径
+
+**阶段0: 代码清理** ✅ 已完成
+- 归档空文件和未使用代码
+- 核心模块重构（Strategy Pattern + DI）
+
+**阶段1: Claude提取器** ⏳ 待实施（1-2周）
+- 实现Claude Semantic ExperienceExtractor
+- 对话式测试（5个场景）
+- 验证提取质量
+
+**阶段2: 编排器简化** ⏳ 待实施（2-3周）
+- 移除过度工程化层级
+- 集成Claude提取器
+- 知识图谱快速定位
+
+**阶段3: 自动更新** ⏳ 待实施（1周）
+- 知识图谱自动更新
+- 经验质量评分
+- 去重机制
+
+---
+
+---
+## 6. 建议 **P1**
+
+**优先级**: P1 | **类别**: Project Management | **标签**: Project Management
+
+**来源**: REFACTORING-STATUS-REPORT.md:6. 建议
+
+### 问题现象
+
+### 6.1 短期建议（1-2周）
+
+**优先级1: 实施Claude Semantic ExperienceExtractor**
+
+**理由**:
+- ✅ 核心创新功能
+
+### 解决方案
+
+- ✅ 无依赖阻塞
+- ✅ 可独立验证
+
+**实施步骤**:
+1. 创建 `claude_semantic_extractor.py`
+2. 实现4轮思考流程
+3. 对话式测试（5个场景）
+4. 验证提取质量
+
+**成功标准**:
+- 经验质量评分 > 0.7
+- 测试覆盖5个场景
+
+### 6.2 中期建议（3-4周）
+
+**优先级2: 简化WorkflowOrchestrator**
+
+**前提**: Claude提取器已实施并验证
+
+**实施步骤**:
+1. 移除过度工程化层级
+2. 集成Claude提取器
+3. 保留向后兼容性
+4. 知识图谱快速定位
+
+**成功标准**:
+- 代码行数减少60%
+- 执行时间降低50%
+- 7阶段工作流正常运行
+
+### 6.3 长期建议（1-2个月）
+
+**优先级3: 知识图谱自动更新**
+
+**前提**: WorkflowOrchestrator已简化
+
+**实施步骤**:
+1. 实现自动更新机制
+2. 集成到工作流
+3. 验证更新准确性
+4. 监控性能影响
+
+**成功标准**:
+- 图谱自动更新准确率 > 95%
+- 更新时间 < 30秒
+- 无需手动维护
+
+### 6.4 可选建议
+
+**选项A: 保留现有规则提取器**
+- 作为Claude提取器的fallback
+- 适用于简单、结构化文档
+
+**选项B: 增量迁移**
+- 保留旧系统
+- 新文档使用Claude提取器
+- 逐步迁移现有文档
+
+**选项C: 全部替换**
+- 直接替换为Claude提取器
+- 简化架构
+- 降低维护成本
+
+**推荐**: **选项C**（全部替换）
+- 理由：Claude提取器质量更高，维护成本更低
+
+---
+
+---
+## Bug修复 **P1**
+
+**优先级**: P1 | **类别**: Project Management | **标签**: Project Management | Code
+
+**来源**: WORKFLOW-ORCHESTRATOR-PHASE1-REPORT.md:Bug修复
+
+### 问题现象
+
+### Bug: PhaseResult数据类初始化错误
+
+**错误**: `PhaseResult.__init__() missing 1 required positional argument: 'duration_seconds'`
+
+**根因**: PhaseResult数据类中`duration_seconds: float`缺少默认值
+
+### 解决方案
+
+```python
+duration_seconds: float
+
+duration_seconds: float = 0.0
+```
+
+**位置**: `workflow_orchestrator.py` 第37行
+
+---
+
+## 避免过度工程化 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: Project Management | **标签**: Simplification | Over-engineering | Architecture
+
+**来源**: [update-docs-overengineering-audit.md](../reports/2026-03-24/update-docs-overengineering-audit.md)
+
+### 问题现象
+
+**症状描述**:
+- 代码复杂度高但实际收益低
+- 大量"智能"规则实际只是简单匹配
+- 设计目标与实际实现严重背离
+- 维护成本高，难以理解和扩展
+
+**典型案例**:
+- ~400行Python代码实现基础关键词匹配
+- 8个辅助方法声称"深度思考"，实际只是字符串操作
+- 质量评分0.938来自规则匹配准确性，而非真正的语义理解
+
+### 根本原因
+
+**错误理解**: 在代码中实现"智能"逻辑 = 利用AI能力
+
+**正确理解**: 提供结构化上下文，让AI在执行时自然思考
+
+**对比示例**:
+```python
+# ❌ 错误：在Python中实现"思考"逻辑
+def _contains_problem_solution(self, content: str) -> bool:
+    problem_indicators = ['问题', '错误', '失败', 'bug']
+    return any(indicator in content for indicator in problem_indicators)
+
+# ✅ 正确：提供上下文，让Claude思考
+extraction_prompt = f"""
+文档内容: {content}
+
+请分析这段文档，识别问题-解决方案对
+"""
+# Claude执行时会进行深度语义理解
+```
+
+### 解决方案
+
+**核心原则**: **"简单 + Claude思考 = 高质量"**
+
+#### 1. 识别过度工程化的信号
+
+**架构层级过多**:
+- ❌ 5层架构实现基础功能
+- ✅ 2层架构：编排器 + 简单提取器
+
+**复杂方法过多**:
+- ❌ 8个辅助方法实现规则匹配
+- ✅ 1个提取方法 + 结构化提示词
+
+**硬编码规则**:
+- ❌ 11个固定类别 + 关键词映射
+- ✅ Claude根据内容自然分类
+
+**代码量异常**:
+- ❌ 400行代码实现关键词匹配
+- ✅ 50行代码 + Claude语义理解
+
+#### 2. 简化策略
+
+**删除所有规则匹配逻辑**:
+```python
+# 删除这些"智能"方法
+- _split_into_sections()      # Claude会自己理解结构
+- _contains_problem_solution()  # Claude会自己识别
+- _extract_problem_solution()   # Claude会自己提取
+- _remove_duplication()         # Claude会自己判断
+- _infer_category()            # Claude会自己分类
+- _infer_priority()            # Claude会自己判断
+- _extract_tags()              # Claude会自己识别
+- _remove_similar_experiences() # Claude会自己去重
+```
+
+**使用结构化提示词**:
+```python
+def extract_from_document(self, doc_path: Path) -> List[Experience]:
+    content = doc_path.read_text(encoding="utf-8")
+
+    # 提供结构化上下文
+    extraction_prompt = f"""
+请从以下文档中提取可复用的经验和最佳实践：
+
+文档路径: {doc_path}
+文档内容:
+
+{content}
+
+提取要求：
+1. 识别问题-解决方案对
+2. 提取核心经验和教训
+3. 推断类别和优先级
+4. 提取相关标签
+5. 避免重复
+
+返回格式：JSON列表
+"""
+
+    # Claude在执行时会进行深度语义理解
+    experiences = self._claude_extract(extraction_prompt)
+    return experiences
+```
+
+#### 3. 简化效果对比
+
+| 维度 | 简化前 | 简化后 |
+|------|--------|--------|
+| **代码量** | ~400行 | ~50行 (-87.5%) |
+| **方法数** | 8个辅助方法 | 1个提取方法 |
+| **类别灵活性** | 固定11个类别 | Claude自动分类 |
+| **Claude思考** | ❌ 未使用 | ✅ 真正使用 |
+| **维护成本** | 高（复杂逻辑） | 低（简单提示词） |
+| **提取质量** | 规则匹配 | 语义理解（更高） |
+
+### 实施建议
+
+**立即执行**:
+1. ✅ 审查现有代码，识别过度工程化部分
+2. ✅ 删除不必要的规则匹配逻辑
+3. ✅ 简化为结构化提示词
+4. ✅ 让Claude进行语义理解
+
+**长期维护**:
+- 定期审查代码复杂度
+- 优先使用Claude能力而非规则
+- 保持架构简单（2-3层）
+- 代码审查时检查过度工程化
+
+### 代码审查清单
+
+- [ ] 是否有超过3层的架构？
+- [ ] 是否有大量"智能"规则方法？
+- [ ] 是否使用了硬编码的类别或关键词？
+- [ ] 代码量是否超过实际需求？
+- [ ] 是否真正利用了Claude的语义理解？
+
+### 案例文档
+
+- [update-docs-overengineering-audit.md](../reports/2026-03-24/update-docs-overengineering-audit.md) - 完整审计报告
+- [Claude Semantic Experience Extractor](https://github.com/anthropics/claude-code-skills) - 简化案例
+
+---
+
+## TDD驱动的Prompt工程 ⭐ **P1重要**
+
+**优先级**: P1 | **类别**: Project Management | **标签**: TDD | Prompt Engineering | Testing
+
+**来源**: [PROMPT-VALIDATION-TEST-FRAMEWORK.md](../reports/2026-03-24/PROMPT-VALIDATION-TEST-FRAMEWORK.md)
+
+### 问题现象
+
+**症状描述**:
+- Prompt质量难以评估
+- 不确定哪个Prompt效果更好
+- 缺乏系统化的优化方法
+- 依赖直觉而非数据
+
+**技术原因**:
+- 没有建立测试基线
+- 缺少质量评估标准
+- 没有自动化测试框架
+
+### 解决方案
+
+**核心方法**: **TDD驱动 + 多轮迭代 + 黄金标准**
+
+#### 1. 建立黄金标准（Ground Truth）
+
+**人工提取示例**:
+```markdown
+## React Hooks规则遵守
+
+**问题**: React组件崩溃，错误信息"React has detected a change in the order of Hooks called"
+
+**解决方案**:
+1. 只在顶层调用Hooks
+2. 没有在Hooks调用之间进行条件返回
+3. 使用ESLint插件检测
+```
+
+**关键特征**:
+- ✅ 明确的问题症状
+- ✅ 技术根因分析
+- ✅ 具体的解决方案
+- ✅ 可操作性（有代码示例）
+
+#### 2. 设计质量评估标准
+
+**4个评分维度**:
+
+| 维度 | 分值 | 评估标准 |
+|------|------|----------|
+| **完整性** (0-30) | 问题症状、技术原因、解决方案、代码示例 | 是否包含所有4个要素？ |
+| **准确性** (0-30) | 问题描述准确、技术细节正确、解决方案可行 | 是否有事实错误？ |
+| **可操作性** (0-20) | 具体步骤、代码示例、可立即应用 | 是否需要额外资源？ |
+| **独特性** (0-20) | 不重复、有独特价值、值得记录 | 与现有经验是否重复？ |
+
+**评分等级**:
+- 90-100分: 优秀 (Excellent)
+- 80-89分: 良好 (Good)
+- 70-79分: 一般 (Fair)
+- 60-69分: 较差 (Poor)
+- 0-59分: 失败 (Failed)
+
+#### 3. Prompt变体设计
+
+**5种Prompt策略**:
+
+| 策略 | 特点 | 适用场景 |
+|------|------|----------|
+| **Prompt A: 直接提取** | 简洁指令，让Claude自由理解 | 简单文档 |
+| **Prompt B: 结构化提取** | 明确字段要求，格式化输出 | 复杂文档 |
+| **Prompt C: 思考链式** | 分步引导，模拟深度思考 | 需要深度分析 |
+| **Prompt D: 示例驱动** | 提供黄金标准示例 | 需要高质量输出 |
+| **Prompt E: 对话式** | 多轮提问，逐步完善 | 复杂任务 |
+
+**Prompt D示例**（推荐）:
+```markdown
+请参考以下黄金标准示例，从文档中提取类似质量的经验：
+
+**文档**: {doc_path}
+**内容**: {content}
+
+**黄金标准示例**:
+{
+  "title": "React Hooks规则遵守",
+  "problem": "症状：React组件崩溃...\\n技术原因：Hook在条件返回后调用...",
+  "solution": "核心规则：...\\n代码示例：...",
+  "category": "React",
+  "priority": "P1"
+}
+
+**要求**: 提取与示例质量相当的经验
+```
+
+#### 4. 自动化测试流程
+
+**第1轮**: 基线测试
+1. 实现所有Prompt变体
+2. 在测试文档上测试
+3. 记录提取结果
+4. 计算平均质量分数
+
+**第2轮**: 优化迭代
+1. 分析第1轮结果
+2. 识别问题Prompt
+3. 设计优化版本
+4. 再次测试对比
+
+**第3轮**: 最终验证
+1. 在所有测试文档上测试最佳Prompt
+2. 人工评估质量
+3. 生成最终报告
+
+### 成功标准
+
+**优秀Prompt的标准**:
+- ✅ 平均质量分数 > 85分
+- ✅ 提取经验数量合理（不多不少）
+- ✅ 所有维度分数 > 20分
+- ✅ 人工评估认可
+
+**完整测试覆盖**:
+- ✅ 测试至少3个不同领域的文档
+- ✅ 每个Prompt至少测试2次
+- ✅ 人工评估至少10个提取的经验
+
+### 实施建议
+
+**立即执行**:
+1. ✅ 创建测试脚本框架
+2. ✅ 建立黄金标准示例
+3. ✅ 实现5个Prompt变体
+4. ✅ 执行第1轮测试
+5. ✅ 分析并优化Prompt
+6. ✅ 执行第2轮测试
+7. ✅ 生成最终报告
+
+**预期产出**:
+- 经过验证的最佳Prompt
+- 完整的测试数据
+- 可复用的测试框架
+- 质量评估标准
+
+### 案例文档
+
+- [PROMPT-VALIDATION-TEST-FRAMEWORK.md](../reports/2026-03-24/PROMPT-VALIDATION-TEST-FRAMEWORK.md) - 完整测试框架
+
+---
+
+---

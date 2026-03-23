@@ -1952,3 +1952,1808 @@ function EventList({ events }) {
 - [调试技能 - 并行开发](./debugging-skills.md#并行开发策略) - 并行开发具体方法
 - [项目管理 - 并行开发策略](./project-management.md#并行开发策略) - 项目级并行开发
 - [调试技能](./debugging-skills.md) - React组件调试方法
+
+## 一、公开API变更点分析 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Code
+
+**来源**: breaking-changes.md:一、公开API变更点分析
+
+### 问题现象
+
+### 1.1 CLI命令接口（7阶段工作流）
+
+#### ✅ 保持兼容的命令
+
+```bash
+# ========== 阶段1: 变更检测 ==========
+/update-docs                           # 完整流程（向后兼容）
+/update-docs --update-only            # 仅更新文档
+/update-docs --dry-run                # 预览模式
+
+# ========== 阶段2: 文档更新 ==========
+/update-docs --manual docs/api/       # 手动指定文档
+/update-docs --verbose                # 详细模式
+
+# ========== 阶段3: 重复检测 ==========
+/update-docs --integrate              # 整合重复文档
+/update-docs --integrate --target docs/reports/  # 目标目录
+
+# ========== 阶段4: 归档管理 ==========
+/update-docs --archive                # 归档过时文档
+/update-docs --archive --target docs/old.md  # 归档特定文档
+
+# ========== 阶段5: 索引维护 ==========
+# (自动执行，无显式命令)
+
+# ========== 阶段6: 合规审计 ==========
+/update-docs --audit                  # 文档合规性审计
+
+# ========== 阶段7: 报告生成 ==========
+# (自动生成，无显式命令)
+```
+
+**兼容性**: ✅ **100%向后兼容**
+- 所有旧命令保持相同行为
+- 无参数变更
+- 无输出格式变更
+
+#### ⚠️ 新增命令（知识图谱）
+
+```bash
+# ========== 知识图谱命令（NEW）==========
+/update-docs --kg-only                # 仅更新知识图谱
+/update-docs --kg-rebuild             # 全量重建知识图谱
+/update-docs --skip-kg                # 跳过知识图谱更新
+
+# ========== 知识图谱查询命令（NEW）==========
+/kg:query "GraphQL 400错误"           # 关键词查询
+/kg:related doc:react-best-practices  # 关联查询
+
+### 解决方案
+
+/kg:visualize                         # 可视化
+/kg:stats                             # 统计信息
+```
+
+**兼容性**: ✅ **新增功能，不影响旧代码**
+- 旧代码不使用这些命令时，行为完全不变
+- 可选择性使用新功能
+
+### 1.2 输出格式变更
+
+#### ⚠️ 报告格式扩展
+
+**旧格式**（重构前）：
+```markdown
+# 文档更新日志 - 2026-03-22
+
+---
+## 测试覆盖分析 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React
+
+**来源**: test-scenarios.md:测试覆盖分析
+
+### 问题现象
+
+### 当前测试覆盖情况
+
+**已覆盖场景**（基于SKILL.md中的测试场景）：
+
+1. ✅ **快速定位问题**（场景1）
+   - 测试命令：`/kg:query "GraphQL 400错误"`
+
+### 解决方案
+
+- 预期响应时间：<500ms
+
+2. ✅ **关联发现**（场景2）
+   - 测试命令：`/kg:related doc:react-best-practices`
+   - 预期响应时间：<1000ms
+
+3. ✅ **经验复用**（场景3）
+   - 测试命令：`/kg:related code:GameService`
+   - 预期响应时间：<1000ms
+
+**缺失的测试场景**：
+
+1. ❌ **对话式文档分析** - 通过对话引导Claude思考
+2. ❌ **经验提取验证** - 从报告中提取经验
+3. ❌ **文档整合决策** - 整合重复文档的对话式决策
+4. ❌ **归档策略讨论** - 归档文档的对话式策略
+5. ❌ **知识图谱更新触发** - 通过对话触发知识图谱更新
+6. ❌ **多轮对话推理** - 复杂问题的多轮对话推理
+7. ❌ **文档映射验证** - 验证代码到文档的映射逻辑
+
+---
+
+---
+## 步骤 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: React | **标签**: React | Code | Hooks
+
+**来源**: test-scenarios.md:步骤
+
+### 问题现象
+
+### 1. 提取有价值内容
+
+### 解决方案
+
+- 具体问题描述（Dashboard统计数据不更新）
+
+### 2. 整合到经验文档
+在 `performance-patterns.md` 添加：
+```markdown
+
+**问题**: Dashboard统计数据不更新
+**原因**: 更新操作未清理缓存
+**验证**: 数据实时更新 ✅
+```
+
+### 3. 归档原报告
+
+### 4. 更新索引
+- 更新 `docs/lessons-learned/README.md`
+- 添加"案例研究"章节索引
+
+### 5. 验证整合
+- 检查内容完整性
+- 验证内部链接
+- 确认无断链
+```
+
+**测试员**: 执行整合后，如何验证效果？
+
+**Claude**: [验证方法]
+1. **内容完整性检查**:
+   - 确认所有有价值内容已迁移
+   - 确认经验文档包含案例研究
+
+2. **链接验证**:
+   - 更新引用到新位置或经验文档
+
+3. **可发现性测试**:
+   - 搜索"Dashboard缓存失效"
+   - 应找到经验文档而非归档报告
+
+4. **维护性验证**:
+   - 更新经验文档时无需同步更新归档报告
+   - 单一真相来源原则得到满足
+```
+
+**验证点**:
+- ✅ Claude识别重复内容
+- ✅ 分析文档生命周期状态
+- ✅ 提供合理的整合理由
+- ✅ 生成详细的整合计划
+- ✅ 提供验证方法
+
+---
+
+### 场景3: 知识图谱查询推理对话测试
+
+**测试目标**: 验证Claude能够通过对话使用知识图谱进行推理
+
+**对话流程**:
+
+```
+**测试员**: Claude，我遇到一个React性能问题：页面加载很慢，控制台显示"React has detected a change in the order of Hooks called"。请帮我分析
+
+**Claude**: [使用知识图谱查询]
+```
+执行: /kg:query "React Hooks规则违反"
+```
+
+**查询结果**:
+- **问题节点**: `problem:react-hooks-order-violation`
+- **相关文档**: `doc:react-best-practices`
+- **代码片段**: `snippet:react-hooks-correct-order`
+
+**分析**:
+这是一个典型的React Hooks规则违反问题。
+
+**症状分析**:
+- 错误信息："React has detected a change in the order of Hooks called"
+- 性能影响：页面加载慢（可能因为React重新渲染或错误恢复）
+
+**根本原因**:
+React Hooks必须在每次渲染时以相同的顺序调用。如果在条件返回、循环或嵌套函数中调用Hooks，会导致Hooks顺序不一致。
+
+
+```
+```
+
+1. **识别问题代码模式**:
+```javascript
+// ❌ 错误：Hook在条件返回之后
+function Component() {
+  const data = useData();
+
+  if (isLoading) return <Loading />; // 条件返回
+
+  const processed = useMemo(() => {}, [data]); // Hook在条件返回后
+  return <View />;
+}
+```
+
+```javascript
+// ✅ 正确：所有Hook在条件返回之前
+function Component() {
+  const data = useData();
+
+  // 所有Hook在条件返回之前
+  const processed = useMemo(() => {
+    if (!data) return null;
+    return data.filter(...);
+  }, [data]);
+
+  if (isLoading) return <Loading />; // 条件返回在最后
+
+  return <View />;
+}
+```
+
+3. **验证方法**:
+- 检查控制台无React Hooks错误
+- 确认页面加载速度正常
+- 运行ESLint React Hooks规则检查
+
+**测试员**: 这个问题如何预防？
+
+**Claude**: [查询预防措施]
+```
+```
+
+**预防措施**:
+1. **ESLint强制检测**:
+```bash
+npm install eslint-plugin-react-hooks --save-dev
+```
+
+2. **Code Review清单**:
+- [ ] 所有Hooks都在组件最顶层？
+- [ ] 没有在条件语句、循环或嵌套函数中调用Hooks？
+- [ ] 没有在Hooks调用之间进行条件返回？
+- [ ] 每次渲染时Hooks的调用顺序相同？
+
+3. **开发规范**:
+- 更新CLAUDE.md添加React Hooks规则章节
+- 参考文档：`docs/lessons-learned/react-best-practices.md`
+
+**测试员**: 请生成完整的问题分析报告
+
+**Claude**: [生成报告]
+```markdown
+# React Hooks规则违反问题分析
+
+---
+## 相关文档 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Code
+
+**来源**: test-scenarios.md:相关文档
+
+### 问题现象
+
+- [React最佳实践](docs/lessons-learned/react-best-practices.md)
+- [测试指南](docs/lessons-learned/testing-guide.md)
+```
+```
+
+**验证点**:
+- ✅ Claude正确识别问题类型
+
+### 解决方案
+
+- ✅ 给出预防措施
+- ✅ 生成结构化报告
+
+---
+
+### 场景4: 文档映射验证对话测试
+
+**测试目标**: 验证Claude能够验证代码到文档的映射逻辑
+
+**对话流程**:
+
+```
+**测试员**: Claude，我修改了 `backend/services/games/game_service.py`，添加了一个新方法 `get_game_with_metrics(game_gid)`。请问应该更新哪些文档？
+
+**Claude**: [分析代码变更]
+```
+执行代码变更检测:
+- 文件: backend/services/games/game_service.py
+- 变更类型: 方法添加
+- 方法名: get_game_with_metrics
+- 参数: game_gid: int
+- 返回: GameEntity with metrics
+```
+
+**映射规则分析**:
+根据 `SKILL.md` 的文档映射规则：
+- `backend/services/` → `docs/development/`
+- Service层变更 → 更新Service架构文档
+
+**应更新的文档**:
+1. **API文档** (`docs/api/README.md`):
+   - 添加新端点说明（如果有对应API路由）
+   - 格式：`GET /api/games/{game_gid}/metrics`
+
+2. **Service架构文档** (`docs/development/backend-development.md`):
+   - 在"Service层"章节添加方法说明
+   - 描述：获取游戏及其统计指标
+   - 参数：game_gid (int)
+   - 返回：GameEntity with event_count, param_count等
+
+3. **经验文档** (`docs/lessons-learned/api-design-patterns.md`):
+   - 如果包含新的设计模式（如：批量查询优化）
+   - 提取经验到对应章节
+
+**测试员**: 请生成API文档的更新内容
+
+**Claude**: [生成API文档]
+```markdown
+### GET /api/games/{game_gid}/metrics
+
+获取游戏及其统计指标。
+
+**请求参数**:
+- `game_gid` (int, required): 游戏业务GID
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "gid": "10000147",
+    "name": "STAR001",
+    "ods_db": "ieu_ods",
+    "event_count": 15,
+    "param_count": 42,
+    "last_updated": "2026-03-23T10:30:00Z"
+  }
+}
+```
+
+**性能说明**:
+- 使用缓存装饰器（TTL: 1800秒）
+- 自动统计关联的事件和参数数量
+- 避免N+1查询问题
+
+**错误响应**:
+- 404: 游戏不存在
+- 400: game_gid格式错误
+```
+
+**测试员**: 请生成Service架构文档的更新内容
+
+**Claude**: [生成架构文档]
+```markdown
+#### GameService.get_game_with_metrics()
+
+获取游戏及其统计指标。
+
+**方法签名**:
+```python
+@cached(ttl=1800)
+def get_game_with_metrics(self, game_gid: int) -> GameEntity:
+    """
+    获取游戏及其统计指标
+
+    Args:
+        game_gid: 游戏业务GID
+
+    Returns:
+        GameEntity with metrics:
+        - event_count: 事件数量
+        - param_count: 参数数量
+        - last_updated: 最后更新时间
+
+    Raises:
+        GameNotFoundError: 游戏不存在
+    """
+```
+
+**实现特点**:
+1. 使用缓存装饰器提升性能
+2. 自动统计关联数据（避免N+1查询）
+3. 返回Entity对象（类型安全）
+
+**性能优化**:
+- 缓存TTL: 1800秒（30分钟）
+- 使用Repository的批量查询方法
+- 单次查询获取所有统计数据
+
+**相关代码**:
+- Repository: `GameRepository.find_by_gid_with_metrics()`
+- Entity: `GameEntity` (models/entities.py)
+```
+
+**测试员**: 这个新方法是否有值得提取的经验？
+
+**Claude**: [分析经验提取]
+**潜在经验**:
+1. **缓存策略**:
+   - 方法级别的缓存（而非查询级别）
+   - TTL设置考虑数据变化频率
+
+2. **性能优化**:
+   - 批量查询避免N+1问题
+   - 在Repository层聚合统计数据
+
+3. **Entity架构**:
+   - 返回Entity对象而非字典
+   - 类型安全和自动验证
+
+**建议**:
+如果有新的性能优化模式，可以更新：
+- `docs/lessons-learned/performance-patterns.md` - 批量查询优化章节
+- `docs/lessons-learned/api-design-patterns.md` - DataLoader实施章节
+
+**测试员**: 请生成文档更新计划
+
+**Claude**: [生成更新计划]
+```markdown
+# 文档更新计划
+
+---
+## 4轮思考工作流 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Code
+
+**来源**: CONVERSATION-TESTING-GUIDE.md:4轮思考工作流
+
+### 问题现象
+
+### Round 1: 快速阅读（Quick Reading）
+
+### 解决方案
+
+**对话提示**:
+```
+请阅读这份文档，快速了解主题和结构。
+
+文档内容：
+[插入文档内容]
+
+请回答：
+1. 这份文档的主题是什么？
+2. 文档描述了哪些问题？
+```
+
+**期望输出**:
+- 文档主题总结
+- 问题列表（候选）
+
+### Round 2: 深度思考（Deep Thinking）
+
+
+**对话提示**:
+```
+现在深入分析这份文档，提取可复用的经验。
+
+请思考：
+1. 问题的根本原因是什么？
+3. 这个经验能否复用到其他场景？
+4. 经验的质量如何（0-1分）？
+
+请以以下格式输出：
+- Title: 经验标题
+- Category: 类别（11个固定类别之一）
+- Priority: P0/P1/P2
+- Tags: 技术标签
+- Quality Score: 0-1分
+- Reason: 评分理由
+```
+
+**期望输出**:
+- 结构化的Experience对象
+- 质量评分和理由
+
+### Round 3: 质量自检（Quality Self-Check）
+
+
+**对话提示**:
+```
+请检查刚才提取的经验：
+
+   - 如果有重复，请修正重复部分
+
+2. 经验是否完整？
+   - Problem字段是否清晰描述问题？
+   - 是否有代码示例或具体步骤？
+
+3. 质量评分是否合理？
+   - 根据以下标准重新评分：
+     * 唯一性（1 - 与历史经验的最大相似度）
+     * 实用性（代码示例、可操作步骤）
+     * 完整性（所有字段填充、详细描述）
+
+请输出修正后的Experience对象。
+```
+
+**期望输出**:
+- 修正后的Experience对象
+- 质量评分已更新
+
+### Round 4: 最终输出（Final Output）
+
+**目的**: 生成高质量的Experience对象，准备更新到lessons-learned/
+
+**对话提示**:
+```
+请最终确认提取的经验：
+
+[Experience对象内容]
+
+请确认：
+2. ✅ 经验内容完整
+3. ✅ 类别映射正确
+4. ✅ 标签相关
+
+如果确认无误，请输出"✅ 准备更新到经验文档"。
+```
+
+**期望输出**:
+- ✅ 准备更新到经验文档
+- 最终的Experience对象
+
+---
+
+---
+## 5个测试场景 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: React | **标签**: React | Code | Hooks | Lazy Loading | Suspense
+
+**来源**: CONVERSATION-TESTING-GUIDE.md:5个测试场景
+
+### 问题现象
+
+### 场景1: React Hooks错误提取
+
+**测试文档**: `docs/lessons-learned/react-best-practices.md` (React Hooks规则章节)
+
+**输入**:
+```
+请从React Hooks规则章节提取经验：
+- 问题：违反React Hooks规则导致组件崩溃
+
+### 解决方案
+
+```
+
+**期望结果**:
+- Title: "React Hooks规则遵守"
+- Problem: 清晰描述违反规则导致的崩溃
+- Category: "React"
+- Quality Score: >0.8
+
+### 场景2: Lazy Loading问题提取
+
+**测试文档**: `docs/lessons-learned/react-best-practices.md` (Lazy Loading章节)
+
+**输入**:
+```
+请从Lazy Loading章节提取经验：
+- 问题：不恰当的lazy loading导致页面卡在加载状态
+```
+
+**期望结果**:
+- Title: "Lazy Loading最佳实践"
+- Problem: 描述双重Suspense嵌套问题
+- Category: "React"
+- Quality Score: >0.8
+
+### 场景3: API设计模式提取
+
+**测试文档**: `docs/lessons-learned/api-design-patterns.md` (DataLoader实施章节)
+
+**输入**:
+```
+请从DataLoader实施章节提取经验：
+- 问题：N+1查询问题导致性能下降
+```
+
+**期望结果**:
+- Title: "DataLoader批量查询优化"
+- Problem: 描述N+1查询问题
+- Category: "API"
+- Quality Score: >0.8
+
+### 场景4: 缓存失效策略提取
+
+**测试文档**: `docs/lessons-learned/performance-patterns.md` (缓存失效章节)
+
+**输入**:
+```
+请从缓存失效章节提取经验：
+- 问题：缓存更新后数据不一致
+```
+
+**期望结果**:
+- Title: "缓存失效装饰器自动化"
+- Problem: 描述数据不一致问题
+- Category: "Performance"
+- Quality Score: >0.8
+
+
+
+**输入**:
+```
+- 问题：测试失败率从20%到100%的提升
+```
+
+**期望结果**:
+- Title: "TDD+并行执行策略"
+- Problem: 描述测试失败问题
+- Category: "Testing"
+- Quality Score: >0.8
+
+---
+
+---
+## 成功标准 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React
+
+**来源**: CONVERSATION-TESTING-GUIDE.md:成功标准
+
+### 问题现象
+
+### 质量指标
+
+| 指标 | 目标 | 测量方法 |
+|------|------|----------|
+
+### 解决方案
+
+| 经验质量评分 | >0.7 | 对话评分 |
+| 提取准确率 | >90% | 对话验证 |
+
+### 完整性指标
+
+| 指标 | 目标 | 测量方法 |
+|------|------|----------|
+| 5个场景全部测试 | ✅ | 完成清单 |
+| 每个场景输出Experience对象 | ✅ | 对话验证 |
+| 质量评分合理 | ✅ | 人工判断 |
+
+---
+
+---
+## 测试流程 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Code
+
+**来源**: CONVERSATION-TESTING-GUIDE.md:测试流程
+
+### 问题现象
+
+### 步骤1: 准备测试文档
+
+```bash
+# 确认测试文档存在
+ls docs/lessons-learned/react-best-practices.md
+ls docs/lessons-learned/api-design-patterns.md
+ls docs/lessons-learned/performance-patterns.md
+
+### 解决方案
+
+```
+
+### 步骤2: 执行对话式测试
+
+对于每个场景：
+1. **Round 1**: 快速阅读文档
+2. **Round 2**: 深度思考提取经验
+3. **Round 3**: 质量自检修正
+4. **Round 4**: 最终输出确认
+
+### 步骤3: 记录测试结果
+
+创建测试结果文档：
+```bash
+docs/reports/2026-03-23/CONVERSATION-TEST-RESULTS.md
+```
+
+记录每个场景的：
+- ✅ 提取的Experience对象
+- ✅ 质量评分
+- ✅ 发现的问题
+- ✅ 改进建议
+
+### 步骤4: 分析测试结果
+
+生成测试报告：
+- 提取准确率
+- 平均质量评分
+- 改进建议
+
+---
+
+---
+## 示例对话 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: React | **标签**: React | Code | Hooks
+
+**来源**: CONVERSATION-TESTING-GUIDE.md:示例对话
+
+### 问题现象
+
+### 场景1: React Hooks错误提取
+
+**Round 1: 快速阅读**
+```
+User: 请阅读React Hooks规则章节，快速了解主题和结构。
+
+Claude: 我已经阅读了React Hooks规则章节。
+
+主题：React Hooks规则遵守
+
+问题列表：
+- 违反Hooks规则导致组件崩溃
+- Hook在条件返回之后调用
+
+### 解决方案
+
+- 所有Hook在条件返回之前调用
+- ESLint检测Hook规则
+```
+
+**Round 2: 深度思考**
+```
+User: 现在深入分析，提取可复用的经验。
+
+Claude: 让我深度分析这个React Hooks问题。
+
+Title: React Hooks规则遵守
+
+Problem:
+在React组件中违反Hooks调用顺序规则会导致组件崩溃。
+具体表现为：第1次渲染时调用1个Hook，第2次渲染时调用2个Hook，
+React检测到Hooks数量不一致，抛出"Rendered more hooks than during
+the previous render"错误。
+
+React Hooks必须遵守两个规则：
+1. 只在顶层调用Hooks（不在if、for、嵌套函数中）
+2. 没有在Hooks调用之间进行条件返回
+
+正确模式：
+function Component() {
+  const [state, setState] = useState()  // Hook 1
+  useEffect(() => {}, [])              // Hook 2
+
+  if (isLoading) return <Loading />    // 条件返回在所有Hook之后
+  return <View />
+}
+
+错误模式：
+function Component() {
+  const [state, setState] = useState()
+
+  if (isLoading) return <Loading />    // ❌ 条件返回在中间
+
+  useEffect(() => {}, [])              // ❌ Hook在条件返回后
+  return <View />
+}
+
+Category: React
+Priority: P1 (重要但不紧急)
+Tags: React, Hooks, ESLint
+Quality Score: 0.9
+Reason:
+- 唯一性: 高（明确的React规则违反模式）
+- 实用性: 高（提供正确和错误模式对比）
+```
+
+**Round 3: 质量自检**
+```
+User: 请检查刚才提取的经验，检查重复和完整性。
+
+Claude: 检查提取的经验...
+
+  - Problem描述问题（组件崩溃）
+
+✅ 经验完整性验证
+  - Problem字段清晰描述违反规则导致的崩溃 ✅
+  - 包含代码示例 ✅
+
+✅ 质量评分确认
+  - 唯一性: 1.0 (明确的React特定问题)
+  - 实用性: 0.9 (有代码示例)
+  - 完整性: 0.9 (包含ESLint配置建议)
+
+  综合评分: 0.93
+
+修正后Experience对象：
+[同上，无修正]
+```
+
+**Round 4: 最终输出**
+```
+User: 请最终确认提取的经验。
+
+Claude: 确认提取的经验...
+
+✅ 准备更新到经验文档
+
+最终Experience对象：
+Title: "React Hooks规则遵守"
+Problem: [同上]
+Category: React
+Priority: P1
+Tags: React, Hooks, ESLint
+Quality Score: 0.93
+```
+
+---
+
+---
+## Refactoring Goals **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React
+
+**来源**: REFACTORING-COMPLETE-FINAL-REPORT.md:Refactoring Goals
+
+### 问题现象
+
+### Primary Objectives
+1. ✅ **Simplify Architecture**: Reduce from 5 layers to 2 layers
+2. ✅ **Leverage Claude Thinking**: Use Claude's semantic understanding instead of rules
+
+### 解决方案
+
+4. ✅ **Maintain Functionality**: Keep all core features working
+
+### Success Metrics
+- ✅ Quality Score: 0.938 (Excellent) vs previous ~0.6-0.7
+- ✅ Duplication Rate: 0% vs previous ~30%
+- ✅ Extraction Accuracy: 100% (All 5 scenarios validated)
+- ✅ Architecture Simplicity: 2 layers vs 5 layers designed
+- ✅ Implementation Complete: 100% (vs 20% before)
+
+---
+
+---
+## Implementation Details **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Code
+
+**来源**: REFACTORING-COMPLETE-FINAL-REPORT.md:Implementation Details
+
+### 问题现象
+
+### Core Component: Claude Semantic Experience Extractor
+
+**File**: `/Users/mckenzie/.claude/skills/update-docs/core/claude_semantic_extractor.py`
+
+**Key Features**:
+1. **4-Round Thinking Workflow**:
+   - Round 1: Quick Reading - Understand document topic and structure
+
+### 解决方案
+
+- Round 3: Quality Self-Check - Check duplication and validate completeness
+   - Round 4: Final Output - Generate high-quality Experience object
+
+2. **Duplication Removal**:
+   ```python
+   ```
+
+
+### WorkflowOrchestrator Integration
+
+**Updated File**: `/Users/mckenzie/.claude/skills/update-docs/core/workflow_orchestrator.py`
+
+**Key Changes**:
+- Replaced `reflective_extractor` and `category_mapper` with `claude_extractor`
+- Simplified `_phase_experience_extraction()` to use Claude extractor directly
+- Removed dependency on unimplemented modules
+
+**New Extraction Flow**:
+```python
+# Phase 4: Experience Extraction
+all_experiences = []
+for report_file in report_files:
+    experiences = self.claude_extractor.extract_from_document(report_file)
+    all_experiences.extend(experiences)
+
+# Update target documents
+for exp in all_experiences:
+    target_doc = self.experience_extractor.find_target_document(exp.category)
+    if target_doc:
+        self.experience_extractor.update_experience_doc(exp, target_doc)
+```
+
+---
+
+---
+## Testing & Validation ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: React | **标签**: React | Code | Hooks | Lazy Loading | Suspense
+
+**来源**: REFACTORING-COMPLETE-FINAL-REPORT.md:Testing & Validation
+
+### 问题现象
+
+### Conversation-Based Testing Methodology
+
+**File**: `docs/reports/2026-03-23/CONVERSATION-TESTING-GUIDE.md`
+
+**Key Innovation**: Test through dialogue that triggers Claude thinking, not automated scripts
+
+**Test Scenarios**:
+1. ✅ Scenario 1: React Hooks Error Extraction (VALIDATED)
+2. ✅ Scenario 2: Lazy Loading Problem Extraction (VALIDATED)
+3. ✅ Scenario 3: API Design Pattern Extraction (VALIDATED)
+4. ✅ Scenario 4: Cache Invalidation Strategy Extraction (VALIDATED)
+
+### 解决方案
+
+### Scenario 1 Test Results
+
+**File**: `docs/reports/2026-03-23/CONVERSATION-TEST-RESULTS.md`
+
+**Test Document**: `docs/lessons-learned/react-best-practices.md` (Lines 9-108)
+
+**Extracted Experience**:
+```python
+Experience(
+    title="React Hooks规则遵守",
+    problem="在React组件中违反Hooks调用顺序规则会导致组件崩溃...",
+    category="React",
+    priority="P1",
+    tags=["React", "Hooks", "ESLint"]
+)
+```
+
+**Quality Metrics**:
+- ✅ Quality Score: 0.95 (Excellent)
+- ✅ Extraction Accuracy: 100%
+- ✅ Unique: 1.0 (Distinct React-specific problem)
+- ✅ Utility: 1.0 (Contains correct and error pattern examples)
+- ✅ Completeness: 0.85 (Comprehensive coverage)
+
+### Scenario 2 Test Results
+
+**Test Document**: `docs/lessons-learned/react-best-practices.md` (Lines 200-350)
+
+**Extracted Experience**:
+```python
+Experience(
+    title="Lazy Loading最佳实践",
+    problem="症状描述：页面卡在加载状态，用户看不到实际内容。技术原因：双重Suspense嵌套导致lazy组件永不resolve，外层Suspense优先显示fallback掩盖内层加载状态",
+    category="React",
+    priority="P0",
+    tags=["React", "Lazy Loading", "Suspense", "Performance"]
+)
+```
+
+**Quality Metrics**:
+- ✅ Quality Score: 0.95 (Excellent)
+- ✅ Duplication Rate: 0%
+- ✅ Extraction Accuracy: 100%
+
+### Scenario 3 Test Results
+
+**Test Document**: `docs/lessons-learned/api-design-patterns.md` (Lines 1315-1514)
+
+**Extracted Experience**:
+```python
+Experience(
+    title="GraphQL DataLoader批量查询优化",
+    problem="症状描述：GraphQL API响应慢（>500ms），数据库负载高。技术原因：N+1查询问题 - 事件列表查询执行101次（100个事件参数 + 1次主查询）",
+    category="API",
+    priority="P0",
+    tags=["GraphQL", "DataLoader", "Performance", "N+1 Queries", "Caching"]
+)
+```
+
+**Quality Metrics**:
+- ✅ Quality Score: 0.92 (Excellent)
+- ✅ Duplication Rate: 0%
+- ✅ Extraction Accuracy: 100%
+
+### Scenario 4 Test Results
+
+**Test Document**: `docs/lessons-learned/performance-patterns.md` (Lines 874-1023)
+
+**Extracted Experience**:
+```python
+Experience(
+    title="缓存失效策略最佳实践",
+    problem="症状描述：缓存命中率低（<60%），API响应时间长（>1秒），用户感觉到数据更新延迟。根因分析：1. 缓存键生成错误 2. 缓存TTL过短 3. 数据更新后未清理缓存 4. Bloom Filter误判",
+    category="Performance",
+    priority="P0",
+    tags=["Caching", "Cache Invalidation", "Performance", "@cached", "@cache_invalidate"]
+)
+```
+
+**Quality Metrics**:
+- ✅ Quality Score: 0.93 (Excellent)
+- ✅ Duplication Rate: 0%
+- ✅ Extraction Accuracy: 100%
+
+### Scenario 5 Test Results
+
+
+**Extracted Experience**:
+```python
+Experience(
+    category="Testing",
+    priority="P0",
+    tags=["Testing", "TDD", "Iteration", "Parallel Execution", "Root Cause Analysis"]
+)
+```
+
+**Quality Metrics**:
+- ✅ Quality Score: 0.94 (Excellent)
+- ✅ Duplication Rate: 0%
+- ✅ Extraction Accuracy: 100%
+
+### Overall Test Results
+
+**All Scenarios Completed**:
+- ✅ Average Quality Score: **0.938** (Excellent)
+- ✅ Average Duplication Rate: **0%** (Perfect)
+- ✅ Extraction Accuracy: **100%** across all scenarios
+- ✅ Consistent Performance: Quality scores range from 0.92-0.95 (very consistent)
+
+---
+
+---
+## 3. 剩余工作 ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: React | **标签**: React | Code | Hooks | Lazy Loading
+
+**来源**: REFACTORING-STATUS-REPORT.md:3. 剩余工作
+
+### 问题现象
+
+### 3.1 核心功能（高优先级）
+
+#### Claude Semantic ExperienceExtractor ⭐ **最重要**
+
+**设计文档位置**: [design.md#claude-semantic-experience-extractor](../plans/2026-03-23-update-docs-refactoring-design.md#claude-semantic-experience-extractor)
+
+**目的**: 替代基于规则的经验提取，使用Claude深度思考
+
+**核心功能**:
+```python
+class ClaudeSemanticExperienceExtractor:
+    """使用Claude语义理解提取经验"""
+
+    def extract_from_document(self, doc_path: Path) -> List[Experience]:
+        """
+        4轮思考流程:
+
+        Round 1: 快速阅读
+        - 理解文档主题和结构
+
+### 解决方案
+
+Round 2: 深度思考
+        - 分析问题根本原因
+        - 判断经验可复用性
+
+        Round 3: 质量自检
+        - 验证经验完整性
+        - 评分经验质量
+
+        Round 4: 最终输出
+        - 生成高质量Experience对象
+        - 添加标签和优先级
+        """
+        # 实现Claude对话式提取
+```
+
+**与现有方法的对比**:
+
+| 方面 | 现有方法（规则） | Claude语义提取 |
+|------|------------------|----------------|
+| 提取方式 | 正则表达式 + 关键词匹配 | Claude语义理解 |
+| 准确性 | 低（产生重复） | 高（深度理解） |
+| 可扩展性 | 低（需硬编码规则） | 高（自动适应） |
+| Claude思考利用 | ❌ 否 | ✅ 是 |
+
+**预期收益**:
+- ✅ 经验质量提升50%
+- ✅ 适应新技术栈（无需更新规则）
+
+**实施时间**: 1-2周
+
+**依赖**: 无（可独立实施）
+
+#### 简化WorkflowOrchestrator
+
+**设计文档位置**: [design.md#workflow-orchestrator](../plans/2026-03-23-update-docs-refactoring-design.md#workflow-orchestrator)
+
+**目的**: 从5层架构简化到2层
+
+**当前架构**（未实现的设计）:
+```
+WorkflowOrchestrator
+  → CachedReflectiveExperienceExtractor
+  → ReflectiveExperienceExtractor
+  → DynamicCategoryMapper
+  → ExperienceExtractor
+```
+
+**目标架构**:
+```
+Layer 1: WorkflowOrchestrator (简化版)
+  ├── 执行7阶段工作流
+  ├── 使用知识图谱快速定位文档
+  └── 调用Claude Semantic ExperienceExtractor
+
+Layer 2: Claude Semantic ExperienceExtractor
+  ├── 直接阅读文档内容
+  ├── 使用Claude语义理解提取经验
+  └── 简单类别映射（11个固定类别）
+```
+
+**关键变化**:
+- ❌ 移除：CachedReflectiveExperienceExtractor（过度缓存）
+- ❌ 移除：ReflectiveExperienceExtractor（4轮反思，过度复杂）
+- ❌ 移除：DynamicCategoryMapper（从图谱学习，过度工程）
+- ✅ 保留：WorkflowOrchestrator（简化版）
+- ✅ 新增：Claude Semantic ExperienceExtractor（核心创新）
+
+**预期收益**:
+- ✅ 代码复杂度降低60%
+- ✅ 执行时间降低50%（移除缓存层）
+- ✅ 维护成本降低70%
+
+**实施时间**: 2-3周
+
+**依赖**: Claude Semantic ExperienceExtractor（必须先实施）
+
+### 3.2 增强功能（中优先级）
+
+#### 知识图谱自动更新
+
+**设计文档位置**: [design.md#knowledge-graph-auto-update](../plans/2026-03-23-update-docs-refactoring-design.md#knowledge-graph-auto-update)
+
+**目的**: 技能使用后自动更新知识图谱
+
+**功能**:
+```python
+class KnowledgeGraphAutoUpdater:
+    """自动更新知识图谱"""
+
+    def update_after_skill_usage(
+        self,
+        experiences: List[Experience],
+        updated_docs: List[Path]
+    ):
+        """
+        在技能使用后自动更新知识图谱
+
+        - 新增经验节点
+        - 更新文档关联
+        - 重新计算相似度
+        """
+        pass
+```
+
+**触发时机**:
+- ✅ Phase 4: 经验提取完成后
+- ✅ Phase 7: 原有知识图谱更新后
+
+**预期收益**:
+- ✅ 知识图谱始终最新
+- ✅ 无需手动维护
+- ✅ 经验可发现性提升
+
+**实施时间**: 1周
+
+**依赖**: WorkflowOrchestrator简化（需集成到工作流）
+
+#### 对话式测试系统
+
+**设计文档位置**: [design.md#conversation-based-testing](../plans/2026-03-23-update-docs-refactoring-design.md#conversation-based-testing)
+
+**目的**: 替代Python脚本测试，使用对话验证
+
+**测试场景**（来自 [test-scenarios.md](test-scenarios.md)）:
+
+1. **场景1: React Hooks错误提取**
+   - 期望：提取React Hooks规则经验
+
+2. **场景2: Lazy Loading问题提取**
+   - 期望：提取Lazy Loading最佳实践
+
+3. **场景3: API设计模式提取**
+   - 输入：DataLoader实施文档
+   - 期望：提取批量查询优化经验
+
+4. **场景4: 缓存失效策略提取**
+   - 输入：缓存系统文档
+   - 期望：提取缓存失效装饰器经验
+
+   - 输入：4轮测试迭代报告
+   - 期望：提取TDD+并行执行经验
+
+**测试方法**:
+```python
+# ❌ 旧方法：Python脚本测试
+def test_experience_extraction():
+    extractor = ExperienceExtractor()
+    assert len(experiences) > 0
+    assert experiences[0].problem != ""
+
+# ✅ 新方法：对话式测试
+def test_conversation_extraction():
+    """
+    通过对话触发Claude思考:
+
+    User: "从这份报告中提取React Hooks经验"
+    Claude: [读取报告，深度分析，提取经验]
+    Claude: [验证，修正]
+    User: "给经验打分（0-1）"
+    Claude: [评分，说明理由]
+    """
+```
+
+**预期收益**:
+- ✅ 测试覆盖真实使用场景
+- ✅ 验证Claude思考质量
+- ✅ 发现边缘情况
+
+**实施时间**: 1周
+
+**依赖**: Claude Semantic ExperienceExtractor（需先实现）
+
+### 3.3 长期优化（低优先级）
+
+#### 经验质量评分系统
+
+**设计文档位置**: [design.md#quality-scoring](../plans/2026-03-23-update-docs-refactoring-design.md#quality-scoring)
+
+**功能**:
+- 唯一性评分（检测重复）
+- 实用性评分（代码示例、可操作步骤）
+- 完整性评分（字段填充、详细描述）
+
+**实施时间**: 2周
+
+**依赖**: Claude Semantic ExperienceExtractor
+
+#### 经验去重机制
+
+**功能**:
+- 与历史经验对比
+- 检测语义重复
+- 整合重复经验
+
+**实施时间**: 1周
+
+**依赖**: 知识图谱自动更新
+
+---
+
+---
+## 7. 成功指标 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React
+
+**来源**: REFACTORING-STATUS-REPORT.md:7. 成功指标
+
+### 问题现象
+
+### 7.1 质量指标
+
+| 指标 | 当前 | 目标 | 测量方法 |
+|------|------|------|----------|
+
+### 解决方案
+
+| 经验质量评分 | 未知 | >0.7 | 人工评估 |
+| 提取准确率 | ~60% | >90% | 对话式测试 |
+
+### 7.2 性能指标
+
+| 指标 | 当前 | 目标 | 测量方法 |
+|------|------|------|----------|
+| 执行时间 | ~64秒 | <35秒 | 自动计时 |
+| 代码复杂度 | 高 | 降低60% | 代码行数 |
+| 维护成本 | 高 | 降低70% | 模块数量 |
+
+### 7.3 用户体验指标
+
+| 指标 | 当前 | 目标 | 测量方法 |
+|------|------|------|----------|
+| 技能可用性 | 中 | 高 | 用户反馈 |
+| 提取满意度 | 低 | 高 | 用户调查 |
+| 知识图谱新鲜度 | 手动 | 自动 | 更新频率 |
+
+---
+
+---
+## 经验教训 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React
+
+**来源**: WORKFLOW-ORCHESTRATOR-PHASE1-REPORT.md:经验教训
+
+### 问题现象
+
+### 1. 权限配置的重要性
+
+**问题**: 未配置Edit权限导致重复权限提示
+
+### 解决方案
+
+**经验**: 自动化工作流需要提前配置所有必要权限
+
+### 2. 数据类默认值
+
+**问题**: PhaseResult缺少duration_seconds默认值导致初始化错误
+
+
+**经验**: 数据类字段应提供合理默认值
+
+### 3. 测试驱动开发
+
+**经验**: 先编写测试，快速验证功能正确性
+
+**实践**: 4个测试快速验证了编排器核心功能
+
+---
+
+---
+## 测试场景概览 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Hooks | Lazy Loading
+
+**来源**: CONVERSATION-TEST-RESULTS.md:测试场景概览
+
+### 问题现象
+
+| 场景 | 状态 | 质量评分 | 重复率 | 结果 |
+|......|......|.........-|......--|......|
+| 场景1: React Hooks错误提取 | ✅ 完成 | 0.95 | 0% | ✅ 成功 |
+| 场景2: Lazy Loading问题提取 | ✅ 完成 | 0.95 | 0% | ✅ 成功 |
+| 场景3: API设计模式提取 | ✅ 完成 | 0.92 | 0% | ✅ 成功 |
+| 场景4: 缓存失效策略提取 | ✅ 完成 | 0.93 | 0% | ✅ 成功 |
+
+### 解决方案
+
+---
+
+---
+## 场景1: React Hooks错误提取 ✅ ⚠️ **P0极其重要**
+
+**优先级**: P0 | **类别**: React | **标签**: React | Code | Hooks
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景1: React Hooks错误提取 ✅
+
+### 问题现象
+
+**测试文档**: `docs/lessons-learned/react-best-practices.md`
+**章节**: "React Hooks规则"（第9-108行）
+
+### Round 1: 快速阅读 ✅
+
+**文档主题**: React Hooks规则遵守
+
+**问题识别**:
+- React组件崩溃："Rendered more hooks than during the previous render"
+- Hook在条件返回之后调用（违反规则）
+
+### 解决方案
+
+- 所有Hook在条件返回之前调用
+- ESLint强制检测Hook规则
+
+### Round 2: 深度思考 🧠
+
+**提取的Experience对象**:
+
+```python
+Experience(
+    title="React Hooks规则遵守",
+    problem="在React组件中违反Hooks调用顺序规则会导致组件崩溃。具体表现为：第1次渲染时调用1个Hook，第2次渲染时调用2个Hook，React检测到Hooks数量不一致，抛出'Rendered more hooks than during the previous render'错误。",
+    category="React",
+    priority="P1",
+    source="docs/lessons-learned/react-best-practices.md",
+    tags=["React", "Hooks", "ESLint"]
+)
+```
+
+**质量评分**: 0.95
+
+**评分理由**:
+- 唯一性: 1.0（明确的React特定问题）
+- 实用性: 1.0（包含正确和错误代码对比）
+- 完整性: 0.85（覆盖全面）
+
+### Round 3: 质量自检 ✅
+
+**重复检查**:
+- Problem描述问题（组件崩溃、Hook顺序不一致）
+
+**完整性检查**:
+- ✅ Problem字段清晰描述违反规则导致的崩溃
+- ✅ 包含预防措施（ESLint配置、代码审查清单）
+
+**质量评分确认**: 0.95（维持原评分）
+
+**修正**: 无需修正，经验质量优秀。
+
+### Round 4: 最终输出 ✅
+
+**确认**: ✅ 准备更新到经验文档
+
+---
+
+---
+## 场景1测试结果 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Hooks
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景1测试结果
+
+### 问题现象
+
+### 成功指标
+
+| 指标 | 目标 | 实际 | 状态 |
+|------|------|------|------|
+
+### 解决方案
+
+| 经验质量评分 | >0.7 | 0.95 | ✅ 优秀 |
+| 提取准确率 | >90% | 100% | ✅ 优秀 |
+
+### 关键发现
+
+**优势**:
+- ✅ Claude成功识别了React Hooks规则的核心问题
+- ✅ 提取的经验结构完整、逻辑清晰
+- ✅ 包含了代码示例（正确和错误模式对比）
+
+**对比现有方法**:
+- **旧方法**（规则提取）: 可能产生重复内容，无法深度理解
+- **新方法**（Claude语义）: 深度理解，无重复，质量更高
+
+### 改进建议
+
+**无需改进** - 当前提取质量已达到优秀水平
+
+---
+
+---
+## 场景2: Lazy Loading问题提取 ✅ **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Code | Lazy Loading | Suspense
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景2: Lazy Loading问题提取 ✅
+
+### 问题现象
+
+**测试文档**: `docs/lessons-learned/react-best-practices.md`
+**章节**: "Lazy Loading最佳实践"（第111-204行）
+
+### Round 1: 快速阅读 ✅
+
+**文档主题**: Lazy Loading最佳实践
+
+**问题识别**:
+- 页面卡在 "LOADING EVENT2TABLE..." 状态，无法加载
+- 双重Suspense嵌套导致lazy组件永不resolve
+- 小型组件使用lazy loading导致严重的加载问题
+
+### 解决方案
+
+- 选择性使用Lazy Loading（小型组件直接导入）
+- 仅在大型组件（>10KB）使用lazy loading
+- 使用原则明确：大型组件、不常用路由页面、复杂数据可视化组件
+
+### Round 2: 深度思考 🧠
+
+**提取的Experience对象**:
+
+```python
+Experience(
+    title="Lazy Loading最佳实践",
+    problem="症状描述：页面卡在 'LOADING EVENT2TABLE...' 状态，无法加载。控制台无错误信息，用户永远看不到实际加载内容或错误信息。技术原因：1. 双重Suspense嵌套 - 外层Suspense优先显示fallback，lazy组件永不resolve 2. 小型组件使用lazy loading - 性能收益极小，但可能导致严重的加载问题 3. lazy组件加载失败但错误被外层Suspense捕获 - 用户看不到错误信息。",
+    category="React",
+    priority="P0",
+    source="docs/lessons-learned/react-best-practices.md:Lazy Loading最佳实践",
+    tags=["React", "Lazy Loading", "Suspense", "Performance"]
+)
+```
+
+**质量评分**: 0.95
+
+**评分理由**:
+- 唯一性: 1.0（独特的Lazy Loading问题）
+- 实用性: 0.9（包含代码示例和使用原则）
+
+### Round 3: 质量自检 ✅
+
+**重复检查**:
+- Problem描述问题（页面卡住、双重Suspense嵌套）
+
+**完整性检查**:
+- ✅ Problem字段清晰描述症状和根本原因
+- ✅ 包含预防措施（代码审查清单、性能对比）
+
+**质量评分确认**: 0.95（维持原评分）
+
+**修正**: 无需修正，经验质量优秀。
+
+### Round 4: 最终输出 ✅
+
+**确认**: ✅ 准备更新到经验文档
+
+---
+
+---
+## 场景2测试结果 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Lazy Loading | Suspense
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景2测试结果
+
+### 问题现象
+
+### 成功指标
+
+| 指标 | 目标 | 实际 | 状态 |
+|------|------|------|------|
+
+### 解决方案
+
+| 经验质量评分 | >0.7 | 0.95 | ✅ 优秀 |
+| 提取准确率 | >90% | 100% | ✅ 优秀 |
+
+### 关键发现
+
+**优势**:
+- ✅ Claude成功识别了Lazy Loading的核心问题（双重Suspense嵌套）
+- ✅ 提取的经验结构完整、逻辑清晰
+- ✅ 包含了代码示例（错误架构和正确模式对比）
+
+**对比现有方法**:
+- **旧方法**（规则提取）: 可能无法识别复杂的问题模式
+- **新方法**（Claude语义）: 深度理解复杂问题，质量更高
+
+### 改进建议
+
+**无需改进** - 当前提取质量已达到优秀水平
+
+---
+
+---
+## 场景5测试结果 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React
+
+**来源**: CONVERSATION-TEST-RESULTS.md:场景5测试结果
+
+### 问题现象
+
+### 成功指标
+
+| 指标 | 目标 | 实际 | 状态 |
+|------|------|------|------|
+
+### 解决方案
+
+| 经验质量评分 | >0.7 | 0.94 | ✅ 优秀 |
+| 提取准确率 | >90% | 100% | ✅ 优秀 |
+
+### 关键发现
+
+**优势**:
+- ✅ 提取的经验结构完整、逻辑清晰
+- ✅ 包含了4步循环流程和TDD铁律
+- ✅ 包含并行执行策略（67%性能提升）
+
+**对比现有方法**:
+- **旧方法**（规则提取）: 可能无法理解迭代方法论的价值
+
+### 改进建议
+
+**无需改进** - 当前提取质量已达到优秀水平
+
+---
+
+---
+## 🎉 所有场景测试完成 **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Hooks | Lazy Loading
+
+**来源**: CONVERSATION-TEST-RESULTS.md:🎉 所有场景测试完成
+
+### 问题现象
+
+### 测试总结
+
+| 场景 | 状态 | 质量评分 | 重复率 |
+|------|------|----------|--------|
+| 场景1: React Hooks错误提取 | ✅ 完成 | 0.95 | 0% |
+| 场景2: Lazy Loading问题提取 | ✅ 完成 | 0.95 | 0% |
+| 场景3: API设计模式提取 | ✅ 完成 | 0.92 | 0% |
+| 场景4: 缓存失效策略提取 | ✅ 完成 | 0.93 | 0% |
+
+### 解决方案
+
+**平均质量评分**: 0.938（优秀）
+**平均重复率**: 0%（完美）
+
+### 关键成就
+
+✅ **所有5个场景成功完成对话式测试**
+✅ **平均质量评分0.938**（远超0.7目标）
+✅ **100%提取准确率**（所有场景一次通过）
+
+### 对比分析
+
+**新方法（Claude语义） vs 旧方法（规则提取）**:
+
+| 指标 | 旧方法 | 新方法 | 改进 |
+|------|--------|--------|------|
+| 质量评分 | ~0.6-0.7 | 0.938 | +34-56% |
+| 重复率 | ~30% | 0% | -100% |
+| 理解深度 | 浅层（关键词匹配） | 深度（语义理解） | 显著提升 |
+| 实施完整度 | 20% | 100% | +400% |
+
+### 结论
+
+✅ **Claude语义提取器验证成功**
+✅ **2层简化架构有效**
+✅ **4轮思考工作流优秀**
+
+**建议**: 部署Claude Semantic Experience Extractor到生产环境，替代基于规则的提取方法。
+
+---
+
+**测试执行者**: Claude (update-docs refactoring)
+**测试完成时间**: 2026-03-23
+**最终状态**: ✅ 所有场景测试通过
+
+---
+
+**测试执行者**: Claude (update-docs refactoring)
+**下次更新**: 完成所有5个场景测试后
+**目标**: 验证Claude语义提取器的有效性
+
+---
+## 📊 7-Phase Workflow Details **P1**
+
+**优先级**: P1 | **类别**: React | **标签**: React | Code
+
+**来源**: AUTOMATION-QUICK-REFERENCE.md:📊 7-Phase Workflow Details
+
+### 问题现象
+
+### Phase 1: 变更检测 (2-3秒)
+
+**Detection Methods**:
+- Git diff analysis
+- AST semantic analysis
+- Commit message keyword matching
+
+**Output**: List of changed files and affected documents
+
+### Phase 2: 文档更新 (3-5秒)
+
+**Update Actions**:
+- API endpoint changes → `docs/api/`
+- Architecture changes → `docs/development/`
+- Feature changes → Feature-specific docs
+- Metadata updates (date, version)
+
+**Smart Mapping**:
+```
+backend/api/routes/       → docs/api/
+backend/services/         → docs/development/
+frontend/src/features/    → docs/development/
+backend/services/hql/     → docs/hql/
+backend/core/cache/       → docs/cache/
+```
+
+### Phase 3: 重复检测 (5-10秒)
+
+**Detection**:
+- Cross-document similarity analysis (TF-IDF + cosine similarity)
+- Threshold: 0.7 similarity
+
+**Actions**:
+- Identify semantic duplicates
+- Detect outdated/conflicting documents
+- Generate integration report
+
+### Phase 4: 经验提取 (5-8秒)
+
+**Extraction Patterns**:
+```python
+
+### 解决方案
+
+```
+
+**Category Mapping**:
+```python
+{
+    "React": "react-best-practices.md",
+    "GraphQL": "api-design-patterns.md",
+    "Testing": "testing-guide.md",
+    "Security": "security-essentials.md",
+    "Performance": "performance-patterns.md",
+    # ... etc
+}
+```
+
+### Phase 5: 自动归档 (2-3秒)
+
+**Archive Conditions**:
+- Documents 6+ months stale
+- Temporary reports completed
+- Duplicate content integrated
+
+**Archive Structure**:
+```
+archive/
+├── reports/{date}/
+├── implementation-reports/{date}/
+├── performance/{date}/
+├── testing/{date}/
+└── general/{date}/
+```
+
+**Archive Stamp**:
+```markdown
+---
+
+> **Archived**: 2026-03-23
+> **Reason**: Older than 6 months
+> **Original Location**: docs/reports/old-report.md
+
+---
+```
+
+**Whitelist Protection**:
+- README.md (never archived)
+- CLAUDE.md (never archived)
+- CHANGELOG.md (never archived)
+
+### Phase 6: 索引更新 (3-5秒)
+
+**Updated Indexes**:
+- `docs/README.md` - Main documentation index
+- `docs/lessons-learned/README.md` - Experience documentation index
+
+**Statistics**:
+- Total subdirectories: 26
+- Total documents: 1107
+- Active documents: 737 (66.5%)
+- Archived documents: 370 (33.5%)
+
+### Phase 7: 知识图谱更新 (5-30秒)
+
+**Update Modes**:
+- **Incremental** (normal): <5 seconds
+  - Only updates changed documents
+  - Increments counter (+1/+2/...)
+
+- **Full Detection** (every 10 updates): <30 seconds
+  - Node integrity check
+  - Recalculate document similarity
+  - Detect orphan nodes
+  - Reset counter
+
+**Knowledge Graph Stats**:
+- Nodes: 1045 (6 types)
+- Edges: 6385 (9 relationship types)
+- Incremental counter: 0-10/10
+
+---
+
+---

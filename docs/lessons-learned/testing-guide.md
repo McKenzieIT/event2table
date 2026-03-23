@@ -1,18 +1,8 @@
 # 测试指南
 
 > **来源**: 整合了9个文档的测试相关经验
-> **最后更新**: 2026-03-23 ✨ 新增测试规范文档引用
+> **最后更新**: 2026-03-04 ✨ 新增E2E测试完整流程章节
 > **维护**: 每次测试相关问题修复后立即更新
-
----
-
-## 📋 测试规范文档
-
-**重要**: 所有测试开发必须遵循 [测试规范文档](../testing/test-specification.md)，包括：
-- 组件导出/导入规范
-- 测试文件规范
-- GraphQL Mock 规范
-- ESLint 配置
 
 ---
 
@@ -3583,6 +3573,73 @@ def execute_phase(self, phase_name: str) -> PhaseResult
 - 管理重试计数
 
 ####
+
+---
+
+
+
+## 对话式测试方法 ⭐ **P1重要**
+
+**优先级**: P1 | **类别**: Testing | **标签**: Conversation Testing | Claude Thinking | Quality Validation
+
+**来源**: [CONVERSATION-TESTING-GUIDE.md](../reports/2026-03-23/CONVERSATION-TESTING-GUIDE.md)
+
+### 问题现象
+
+**症状描述**:
+- 传统Python脚本测试无法触发Claude深度思考
+- 测试流程固定，缺乏灵活性
+- 难以发现边缘情况
+
+**技术原因**:
+- 自动化脚本只验证结果，不验证思考过程
+- 断言(Assert)无法评估语义理解质量
+
+### 解决方案
+
+**核心方法**: **4轮思考工作流 + 对话式验证**
+
+#### 对话式测试 vs 脚本测试
+
+| 方面 | Python脚本测试 | 对话式测试 |
+|------|---------------|-------------|
+| **Claude思考** | ❌ 未触发 | ✅ 深度思考 |
+| **灵活性** | 固定流程 | 动态调整 |
+| **验证方式** | 断言 | 人工判断 |
+
+#### 4轮思考工作流
+
+**Round 1: 快速阅读**
+- 理解文档主题和结构
+- 识别问题-解决方案候选
+
+**Round 2: 深度思考**
+- 分析问题根本原因
+- 评估解决方案质量
+
+**Round 3: 质量自检**
+- 检查字段重复
+- 验证完整性
+
+**Round 4: 最终输出**
+- 生成高质量Experience对象
+
+#### 质量评估标准
+
+**3个维度**:
+- 唯一性 (1 - 相似度)
+- 实用性 (代码示例、可操作步骤)
+- 完整性 (字段填充、详细描述)
+
+**成功标准**:
+- Quality Score > 0.9
+- Duplication Rate < 5%
+- Extraction Accuracy 100%
+
+### 案例文档
+
+- [CONVERSATION-TESTING-GUIDE.md](../reports/2026-03-23/CONVERSATION-TESTING-GUIDE.md)
+- [CONVERSATION-TEST-RESULTS.md](../reports/2026-03-23/CONVERSATION-TEST-RESULTS.md)
 
 ---
 
