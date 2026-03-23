@@ -156,7 +156,8 @@ jobs:
 
       - name: 运行Critical E2E测试
         run: |
-          npx playwright test frontend/test/e2e/critical/
+          cd frontend
+          npx playwright test test/e2e/critical/
 
       - name: 上传测试报告
         if: always()
