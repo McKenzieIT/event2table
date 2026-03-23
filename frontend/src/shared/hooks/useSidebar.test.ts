@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@test/test-utils';
+import { renderHook, act, waitFor } from '@test/test-utils';
 import { useSidebar } from './useSidebar';
 
 describe('useSidebar', () => {
   beforeEach(() => {
-    // Clear localStorage before each test
-    localStorage.clear();
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {});
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => null);
+    // Reset localStorage mock state
+    vi.clearAllMocks();
+    // Reset getItem to return null by default
+    localStorage.getItem.mockReturnValue(null);
   });
 
   afterEach(() => {
@@ -17,22 +17,27 @@ describe('useSidebar', () => {
   describe('initial state', () => {
     it('should initialize with default state', () => {
       const { result } = renderHook(() => useSidebar());
-      
+
       expect(result.current.collapsed).toBe(false);
       expect(result.current.groupStates).toEqual({});
     });
 
-    it('should load state from localStorage', () => {
+    it('should load state from localStorage', async () => {
       const savedState = { collapsed: true, groupStates: { group1: true } };
-      vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => {
+
+      // Mock getItem to return saved state
+      localStorage.getItem.mockImplementation((key: string) => {
         if (key === 'sidebarCollapsed') return JSON.stringify(savedState.collapsed);
         if (key === 'sidebarGroupStates') return JSON.stringify(savedState.groupStates);
         return null;
       });
 
       const { result } = renderHook(() => useSidebar());
-      
-      expect(result.current.collapsed).toBe(true);
+
+      // Wait for useEffect to complete loading from localStorage
+      await waitFor(() => {
+        expect(result.current.collapsed).toBe(true);
+      });
       expect(result.current.groupStates).toEqual({ group1: true });
     });
   });
@@ -40,39 +45,41 @@ describe('useSidebar', () => {
   describe('toggleCollapsed', () => {
     it('should toggle collapsed state', () => {
       const { result } = renderHook(() => useSidebar());
-      
+
       act(() => {
         result.current.toggleCollapsed();
       });
-      
+
       expect(result.current.collapsed).toBe(true);
-      
+
       act(() => {
         result.current.toggleCollapsed();
       });
-      
+
       expect(result.current.collapsed).toBe(false);
     });
 
     it('should save to localStorage', () => {
-      const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
       const { result } = renderHook(() => useSidebar());
-      
+
       act(() => {
         result.current.toggleCollapsed();
       });
-      
-      expect(setItemSpy).toHaveBeenCalledWith('sidebarCollapsed', JSON.stringify(true));
+
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'sidebarCollapsed',
+        JSON.stringify(true)
+      );
     });
 
     it('should dispatch custom event', () => {
       const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
       const { result } = renderHook(() => useSidebar());
-      
+
       act(() => {
         result.current.toggleCollapsed();
       });
-      
+
       expect(dispatchSpy).toHaveBeenCalledWith(
         expect.objectContaining({ type: 'sidebarToggled' })
       );
@@ -82,28 +89,28 @@ describe('useSidebar', () => {
   describe('toggleGroup', () => {
     it('should toggle group state', () => {
       const { result } = renderHook(() => useSidebar());
-      
+
       act(() => {
         result.current.toggleGroup('group1');
       });
-      
+
       expect(result.current.groupStates.group1).toBe(true);
-      
+
       act(() => {
         result.current.toggleGroup('group1');
       });
-      
+
       expect(result.current.groupStates.group1).toBe(false);
     });
 
     it('should handle multiple groups', () => {
       const { result } = renderHook(() => useSidebar());
-      
+
       act(() => {
         result.current.toggleGroup('group1');
         result.current.toggleGroup('group2');
       });
-      
+
       expect(result.current.groupStates.group1).toBe(true);
       expect(result.current.groupStates.group2).toBe(true);
     });
@@ -113,26 +120,25 @@ describe('useSidebar', () => {
     it('should expand all groups', () => {
       const { result } = renderHook(() => useSidebar());
       const groupIds = ['group1', 'group2', 'group3'];
-      
+
       act(() => {
         result.current.expandAllGroups(groupIds);
       });
-      
+
       expect(result.current.groupStates.group1).toBe(true);
       expect(result.current.groupStates.group2).toBe(true);
       expect(result.current.groupStates.group3).toBe(true);
     });
 
     it('should save to localStorage', () => {
-      const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
       const { result } = renderHook(() => useSidebar());
       const groupIds = ['group1', 'group2'];
-      
+
       act(() => {
         result.current.expandAllGroups(groupIds);
       });
-      
-      expect(setItemSpy).toHaveBeenCalledWith(
+
+      expect(localStorage.setItem).toHaveBeenCalledWith(
         'sidebarGroupStates',
         JSON.stringify({ group1: true, group2: true })
       );
@@ -143,27 +149,26 @@ describe('useSidebar', () => {
     it('should collapse all groups', () => {
       const { result } = renderHook(() => useSidebar());
       const groupIds = ['group1', 'group2', 'group3'];
-      
+
       act(() => {
         result.current.expandAllGroups(groupIds);
         result.current.collapseAllGroups(groupIds);
       });
-      
+
       expect(result.current.groupStates.group1).toBe(false);
       expect(result.current.groupStates.group2).toBe(false);
       expect(result.current.groupStates.group3).toBe(false);
     });
 
     it('should save to localStorage', () => {
-      const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
       const { result } = renderHook(() => useSidebar());
       const groupIds = ['group1', 'group2'];
-      
+
       act(() => {
         result.current.collapseAllGroups(groupIds);
       });
-      
-      expect(setItemSpy).toHaveBeenCalledWith(
+
+      expect(localStorage.setItem).toHaveBeenCalledWith(
         'sidebarGroupStates',
         JSON.stringify({ group1: false, group2: false })
       );
@@ -172,12 +177,12 @@ describe('useSidebar', () => {
 
   describe('localStorage error handling', () => {
     it('should handle localStorage errors gracefully', () => {
-      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      localStorage.setItem.mockImplementation(() => {
         throw new Error('Storage quota exceeded');
       });
-      
+
       const { result } = renderHook(() => useSidebar());
-      
+
       expect(() => {
         act(() => {
           result.current.toggleCollapsed();
@@ -186,10 +191,10 @@ describe('useSidebar', () => {
     });
 
     it('should handle localStorage get errors gracefully', () => {
-      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      localStorage.getItem.mockImplementation(() => {
         throw new Error('Storage access denied');
       });
-      
+
       expect(() => {
         renderHook(() => useSidebar());
       }).not.toThrow();
