@@ -7,6 +7,16 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./test/setup.ts'],
     testTimeout: 10000, // Increase default timeout to 10s
+    // Exclude E2E tests (Playwright) and other non-unit test files
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/test/e2e/**',
+      '**/tests/e2e/**',
+      '**/test/manual/**',
+      '**/test/performance/**',
+      '**/tests/debug/**',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -23,6 +33,7 @@ export default defineConfig({
       '@analytics': path.resolve(__dirname, './src/analytics'),
       '@canvas-react': path.resolve(__dirname, '../canvas-react/src'),
       '@types': path.resolve(__dirname, './src/types'),
+      '@test': path.resolve(__dirname, './test'),
     }
   }
 });

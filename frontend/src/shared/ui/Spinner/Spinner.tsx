@@ -29,6 +29,8 @@
 
 import React from 'react';
 import './Spinner.css';
+import { buildConditionalClasses } from '../utils/classNames';
+import { compareSpinnerProps } from '../utils/memoComparators';
 
 /**
  * Size variants for the spinner
@@ -62,11 +64,12 @@ const Spinner = React.forwardRef<HTMLDivElement, SpinnerProps>(({
   className = '',
   ...props
 }, ref) => {
-  const spinnerClass = [
+  // 使用工具函数构建 CSS 类名
+  const spinnerClass = buildConditionalClasses(
     'cyber-spinner',
-    `cyber-spinner--${size}`,
-    className
-  ].filter(Boolean).join(' ');
+    {},
+    [className, `cyber-spinner--${size}`]
+  );
 
   return (
     <div
@@ -90,12 +93,8 @@ const Spinner = React.forwardRef<HTMLDivElement, SpinnerProps>(({
 
 Spinner.displayName = 'Spinner';
 
-const MemoizedSpinner = React.memo(Spinner, (prevProps, nextProps) => {
-  return (
-    prevProps.size === nextProps.size &&
-    prevProps.label === nextProps.label
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedSpinner = React.memo(Spinner, compareSpinnerProps);
 
 MemoizedSpinner.displayName = 'MemoizedSpinner';
 

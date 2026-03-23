@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, createMockGameContext } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import EventNodeBuilder from '@event-builder/pages/EventNodeBuilder';
@@ -18,6 +18,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => vi.fn(),
     useLocation: () => ({ search: '?game_gid=10000147', pathname: '/event-node-builder' }),
+    useOutletContext: () => createMockGameContext(),
   };
 });
 

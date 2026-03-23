@@ -34,14 +34,14 @@
 import React, {
   forwardRef,
   useId,
+  type ChangeEventHandler,
+  type FocusEventHandler,
+  type InputHTMLAttributes,
 } from 'react';
-import type {
-  IconComponent,
-  LabeledComponentProps,
-  ChangeEventHandler,
-  FocusEventHandler,
-} from '@/types/common';
+
 import './Input.css';
+
+import type { IconComponent, LabeledComponentProps } from '@/shared/ui/types/common';
 
 /**
  * Input HTML element types
@@ -87,7 +87,7 @@ type InputType =
  * - maxLength: PropTypes.number → maxLength?: number
  * - minLength: PropTypes.number → minLength?: number
  */
-export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'onBlur' | 'onFocus' | 'value'>, LabeledComponentProps {
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'onBlur' | 'onFocus' | 'value'>, LabeledComponentProps {
   /**
    * Input type (text, password, email, number, etc.)
    * @default 'text'
@@ -117,12 +117,12 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   /**
    * Blur event handler
    */
-  onBlur?: FocusEventHandler;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
 
   /**
    * Focus event handler
    */
-  onFocus?: FocusEventHandler;
+  onFocus?: FocusEventHandler<HTMLInputElement>;
 
   /**
    * Custom ID for the input (auto-generated if not provided)
@@ -311,4 +311,5 @@ const MemoizedInput = React.memo(Input, (prevProps, nextProps) => {
 // Set display name for memoized component
 MemoizedInput.displayName = 'MemoizedInput';
 
+export { MemoizedInput as Input };
 export default MemoizedInput;

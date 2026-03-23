@@ -18,15 +18,13 @@
  * <Button disabled>Processing...</Button>
  */
 
-import React from 'react';
-import type {
-  Variant,
-  Size,
-  IconComponent,
-  BaseComponentProps,
-  MouseEventHandler,
-} from '@/types/common';
+import React, { forwardRef, type ComponentPropsWithoutRef, type ForwardedRef } from 'react';
+
 import './Button.css';
+
+import { buildCompoundClasses } from '../utils/classNames';
+import { compareButtonProps } from '../utils/memoComparators';
+import type { BaseComponentProps, IconComponent, MouseEventHandler } from '@/shared/ui/types/common';
 
 /**
  * Button variant types (extended to support all used variants)
@@ -48,13 +46,15 @@ type ButtonVariant =
 /**
  * Button component props - extends common base props
  */
-export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'size' | 'onClick'>, BaseComponentProps {
+export interface ButtonProps extends Omit<ComponentPropsWithoutRef<'button'>, 'size' | 'onClick'>, BaseComponentProps {
   /** Button variant */
   variant?: ButtonVariant;
   /** Button size */
   size?: Size;
   /** Icon component */
   icon?: IconComponent;
+  /** Loading state */
+  loading?: boolean;
   /** Click handler */
   onClick?: MouseEventHandler;
 }
@@ -65,7 +65,7 @@ export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   children,
   variant = 'primary',
-  size = 'md',
+  size = 'medium',
   disabled = false,
   loading = false,
   icon: Icon,
@@ -73,14 +73,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   className = '',
   ...props
 }, ref) => {
-  const buttonClass = [
+  // 使用工具函数构建 CSS 类名
+  const buttonClass = buildCompoundClasses(
     'cyber-button',
-    `cyber-button--${variant}`,
-    `cyber-button--${size}`,
-    disabled && 'cyber-button--disabled',
-    loading && 'cyber-button--loading',
+    variant,
+    size,
+    { disabled, loading },
     className
-  ].filter(Boolean).join(' ');
+  );
 
   return (
     <button
@@ -104,22 +104,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   );
 });
 
-// Memoize to prevent unnecessary re-renders
-// Only re-render if props actually change
 Button.displayName = 'Button';
 
-const MemoizedButton = React.memo(Button, (prevProps, nextProps) => {
-  // Custom comparison for better performance
-  return (
-    prevProps.variant === nextProps.variant &&
-    prevProps.size === nextProps.size &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.loading === nextProps.loading &&
-    prevProps.className === nextProps.className &&
-    prevProps.children === nextProps.children &&
-    prevProps.onClick === nextProps.onClick
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedButton = React.memo(Button, compareButtonProps);
 
 MemoizedButton.displayName = 'MemoizedButton';
 

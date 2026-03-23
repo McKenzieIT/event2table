@@ -2,7 +2,7 @@
  * useUnifiedEscHandler单元测试 - 简化版
  */
 
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useUnifiedEscHandler } from '../hooks/useUnifiedEscHandler';
 

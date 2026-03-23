@@ -16,6 +16,49 @@ interface BulkOperationsToolbarProps {
   disabled?: boolean;
 }
 
+// ============================================================================
+// Error Handling Helper - Extracted to reduce duplication
+// ============================================================================
+
+interface AsyncOperationResult {
+  success: boolean;
+  data?: unknown;
+}
+
+const handleAsyncOperation = async <T,>(
+  operation: () => Promise<T>,
+  setLoading: (loading: boolean) => void,
+  onSuccess?: (data: T) => void,
+  errorMessage: string = '操作失败，请重试'
+): Promise<void> => {
+  setLoading(true);
+  try {
+    const result = await operation();
+    onSuccess?.(result);
+  } catch (error) {
+    console.error(errorMessage, error);
+    alert(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// ============================================================================
+// File Download Helper - Extracted to reduce duplication
+// ============================================================================
+
+const downloadFile = (data: unknown, filename: string, mimeType: string = 'application/json'): void => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 /**
  * 批量操作工具栏组件
  *
@@ -44,77 +87,70 @@ export const BulkOperationsToolbar = memo<BulkOperationsToolbarProps>(({
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
 
-    setIsDeleting(true);
-    try {
-      const response = await bulkDeleteEvents({ event_ids: selectedIds });
-      if (response.success) {
-        setShowDeleteConfirm(false);
-        onDeleteSuccess?.();
-        alert(`成功删除 ${response.data?.deleted_count} 个事件`);
-      }
-    } catch (error) {
-      console.error('批量删除失败:', error);
-      alert('批量删除失败，请重试');
-    } finally {
-      setIsDeleting(false);
-    }
+    await handleAsyncOperation(
+      async () => {
+        const response = await bulkDeleteEvents({ event_ids: selectedIds });
+        if (response.success) {
+          setShowDeleteConfirm(false);
+          onDeleteSuccess?.();
+          alert(`成功删除 ${response.data?.deleted_count} 个事件`);
+        }
+        return response;
+      },
+      setIsDeleting,
+      undefined,
+      '批量删除失败，请重试'
+    );
   };
 
   const handleBulkExport = async () => {
     if (selectedIds.length === 0) return;
 
-    setIsExporting(true);
-    try {
-      const response = await bulkExportEvents({
-        event_ids: selectedIds,
-        format: 'json',
-      });
-      if (response.success) {
-        onExportSuccess?.(response.data);
-        
-        // 下载JSON文件
-        const blob = new Blob([JSON.stringify(response.data?.events, null, 2)], {
-          type: 'application/json',
+    await handleAsyncOperation(
+      async () => {
+        const response = await bulkExportEvents({
+          event_ids: selectedIds,
+          format: 'json',
         });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `events_export_${new Date().toISOString().slice(0, 10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        alert(`成功导出 ${response.data?.count} 个事件`);
-      }
-    } catch (error) {
-      console.error('批量导出失败:', error);
-      alert('批量导出失败，请重试');
-    } finally {
-      setIsExporting(false);
-    }
+        if (response.success) {
+          onExportSuccess?.(response.data);
+          
+          // Download JSON file using helper
+          downloadFile(
+            response.data?.events,
+            `events_export_${new Date().toISOString().slice(0, 10)}.json`
+          );
+          
+          alert(`成功导出 ${response.data?.count} 个事件`);
+        }
+        return response;
+      },
+      setIsExporting,
+      undefined,
+      '批量导出失败，请重试'
+    );
   };
 
   const handleBulkValidate = async () => {
     if (selectedIds.length === 0) return;
 
-    setIsValidating(true);
-    try {
-      const response = await bulkValidateParameters({ event_ids: selectedIds });
-      if (response.success) {
-        onValidateSuccess?.(response.data?.results || []);
-        
-        const { valid_events, invalid_events } = response.data || {};
-        alert(
-          `验证完成：\n有效事件: ${valid_events} 个\n无效事件: ${invalid_events} 个`
-        );
-      }
-    } catch (error) {
-      console.error('批量验证失败:', error);
-      alert('批量验证失败，请重试');
-    } finally {
-      setIsValidating(false);
-    }
+    await handleAsyncOperation(
+      async () => {
+        const response = await bulkValidateParameters({ event_ids: selectedIds });
+        if (response.success) {
+          onValidateSuccess?.(response.data?.results || []);
+          
+          const { valid_events, invalid_events } = response.data || {};
+          alert(
+            `验证完成：\n有效事件: ${valid_events} 个\n无效事件: ${invalid_events} 个`
+          );
+        }
+        return response;
+      },
+      setIsValidating,
+      undefined,
+      '批量验证失败，请重试'
+    );
   };
 
   if (selectedCount === 0) {

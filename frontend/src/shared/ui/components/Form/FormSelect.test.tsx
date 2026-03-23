@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -286,7 +286,7 @@ describe('FormSelect Component', () => {
       });
 
       render(
-        <TestFormWrapper schema={schema}>
+        <TestFormWrapper schema={schema} mode="onSubmit" defaultValues={{ sport: '' }}>
           <FormSelect name="sport" options={options} />
           <button type="submit">Submit</button>
         </TestFormWrapper>
@@ -298,12 +298,17 @@ describe('FormSelect Component', () => {
         expect(screen.getByText('Required')).toBeInTheDocument();
       });
 
+      // Select a valid option to clear the error
       const select = screen.getByRole('combobox');
       await user.selectOptions(select, 'football');
 
+      // Trigger form submission to validate the new value
+      await user.click(screen.getByRole('button', { name: /submit/i }));
+
+      // Wait for React Hook Form to update the validation state
       await waitFor(() => {
         expect(screen.queryByText('Required')).not.toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
 
     it('should hide helper text when error is present', async () => {

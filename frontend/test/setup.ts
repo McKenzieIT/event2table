@@ -7,10 +7,43 @@ import React from 'react';
 // Make React globally available for components that use React.memo without explicit import
 (global as any).React = React;
 
+// Mock localStorage before any tests run
+const localStorageMock = {
+  getItem: vi.fn(() => null),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  length: 0,
+  key: vi.fn(),
+};
+Object.defineProperty(global, 'localStorage', {
+  value: localStorageMock,
+  writable: true,
+});
+
+// Mock sessionStorage as well
+const sessionStorageMock = {
+  getItem: vi.fn(() => null),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  length: 0,
+  key: vi.fn(),
+};
+Object.defineProperty(global, 'sessionStorage', {
+  value: sessionStorageMock,
+  writable: true,
+});
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  // Reset localStorage mock
+  localStorageMock.getItem.mockReturnValue(null);
+  localStorageMock.setItem.mockClear();
+  localStorageMock.removeItem.mockClear();
+  localStorageMock.clear.mockClear();
 });
 
 // Add custom matchers

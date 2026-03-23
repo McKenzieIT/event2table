@@ -13,11 +13,11 @@
 
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
 import React from 'react';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
+import { render, screen, fireEvent, waitFor, cleanup } from '@test/test-utils';
 import CanvasFlow from '../components/CanvasFlow';
-import { ReactFlowWrapper } from '../../../test-utils/ReactFlowWrapper';
+
+// Note: render from @test/test-utils already wraps with AllProviders (includes BrowserRouter, QueryClientProvider, ReactFlowWrapper)
+// No need for manual wrapper
 
 // 类型定义
 interface MockGameData {
@@ -106,16 +106,16 @@ vi.mock('../../hooks/useFlowExecute', () => ({
 }));
 
 vi.mock('../../api/canvasApi', () => ({
-  loadEventConfig: vi.fn(() => ({
+  loadEventConfig: vi.fn((configId: number) => ({
     success: true,
     data: {
       config: {
-        id: 1,
-        name: 'Test Config',
-        event_name: 'test_event',
+        id: configId,
+        name: `Test Config ${configId}`,
+        event_name: `test_event_${configId}`,
         fieldList: [
-          { name: 'field1', type: 'string' },
-          { name: 'field2', type: 'number' },
+          { name: `field1_${configId}`, type: 'string' },
+          { name: `field2_${configId}`, type: 'number' },
         ],
       },
     },
@@ -124,7 +124,7 @@ vi.mock('../../api/canvasApi', () => ({
 
 vi.mock('./utils/nodeConverter', () => ({
   configToReactFlowNode: (config: any, position: any) => ({
-    id: 'node-1',
+    id: `node-${config.id}-${Date.now()}-${Math.random()}`,
     type: 'event',
     position,
     data: {
@@ -221,27 +221,9 @@ vi.mock('../components/nodes/OutputNode', () => ({
   default: ({ data }: any) => <div data-testid="output-node">{data.label}</div>,
 }));
 
-// Wrapper with providers
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-      mutations: {
-        retry: false,
-      },
-    },
-  });
-
-  return ({ children }: { children: React.ReactNode }) => (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <ReactFlowWrapper>{children}</ReactFlowWrapper>
-      </QueryClientProvider>
-    </BrowserRouter>
-  );
-};
+// Note: render from @test/test-utils already wraps with AllProviders
+// (includes BrowserRouter, QueryClientProvider, ReactFlowWrapper, ToastProvider)
+// No need for manual wrapper
 
 describe('CanvasFlow', () => {
   const mockGameData: MockGameData = {
@@ -260,34 +242,34 @@ describe('CanvasFlow', () => {
 
   describe('Component Rendering', () => {
     test('should render CanvasFlow component', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       expect(screen.getByTestId('canvas-flow-container')).toBeInTheDocument();
     });
 
     test('should render NodeSidebar with game data', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       expect(screen.getByTestId('node-sidebar')).toBeInTheDocument();
       expect(screen.getByText(/Node Sidebar - Test Game/i)).toBeInTheDocument();
     });
 
     test('should render Toolbar with game data', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       expect(screen.getByTestId('toolbar')).toBeInTheDocument();
       expect(screen.getByText(/Toolbar - Test Game/i)).toBeInTheDocument();
     });
 
     test('should render ReactFlow canvas', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       expect(screen.getByTestId('react-flow-wrapper')).toBeInTheDocument();
       expect(screen.getByTestId('react-flow-wrapper')).toHaveClass('react-flow-wrapper');
     });
 
     test('should render info panel with node and edge counts', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       const infoPanel = screen.getByTestId('canvas-info-panel');
       expect(infoPanel).toBeInTheDocument();
@@ -308,12 +290,11 @@ describe('CanvasFlow', () => {
 
   describe('Node Operations', () => {
     test('should handle drop event to add node', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      // Create mock drag event with proper dataTransfer implementation
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -324,23 +305,22 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
       dragEvent.clientX = 100;
       dragEvent.clientY = 100;
       
-      // Mock the target element's getBoundingClientRect
       Object.defineProperty(dragEvent, 'target', {
         value: wrapper,
         writable: false,
       });
       
-      // Ensure wrapper has getBoundingClientRect method
-      wrapper.getBoundingClientRect = vi.fn(() => ({
-        left: 0,
-        top: 0,
-      }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -350,12 +330,12 @@ describe('CanvasFlow', () => {
     });
 
     test('should handle node click to show properties panel', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Add a node first
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -366,6 +346,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
@@ -377,7 +358,10 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -395,12 +379,12 @@ describe('CanvasFlow', () => {
     });
 
     test('should close properties panel when close button clicked', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Add a node
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -411,6 +395,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
@@ -422,7 +407,10 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -448,12 +436,12 @@ describe('CanvasFlow', () => {
     });
 
     test('should handle node double-click for event nodes', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Add a node
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent = new Event('drop', { bubbles: true }) as any;
+      const dragEvent = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -464,6 +452,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent.preventDefault = vi.fn();
@@ -475,7 +464,10 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent);
 
@@ -500,12 +492,13 @@ describe('CanvasFlow', () => {
 
   describe('Edge Operations', () => {
     test('should handle edge connection', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Add two nodes
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
-      const dragEvent1 = new Event('drop', { bubbles: true }) as any;
+      // First node drop
+      const dragEvent1 = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent1.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -516,6 +509,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent1.preventDefault = vi.fn();
@@ -527,11 +521,20 @@ describe('CanvasFlow', () => {
         writable: false,
       });
       
-      wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent1);
 
-      const dragEvent2 = new Event('drop', { bubbles: true }) as any;
+      // Wait for first node to appear
+      await waitFor(() => {
+        expect(screen.getByTestId('event-node')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
+      // Second node drop
+      const dragEvent2 = new Event('drop', { bubbles: true, cancelable: true }) as any;
       dragEvent2.dataTransfer = {
         getData: vi.fn((key: string) => {
           if (key === 'application/reactflow') {
@@ -542,6 +545,7 @@ describe('CanvasFlow', () => {
           }
           return '';
         }),
+        setData: vi.fn(),
         dropEffect: 'move',
       };
       dragEvent2.preventDefault = vi.fn();
@@ -552,9 +556,15 @@ describe('CanvasFlow', () => {
         value: wrapper,
         writable: false,
       });
+      
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: vi.fn(() => ({ left: 0, top: 0, width: 1000, height: 1000 })),
+        writable: true,
+      });
 
       fireEvent(wrapper, dragEvent2);
 
+      // Wait for both nodes to appear
       await waitFor(() => {
         expect(screen.getAllByTestId('event-node')).toHaveLength(2);
       }, { timeout: 3000 });
@@ -571,7 +581,7 @@ describe('CanvasFlow', () => {
 
   describe('Flow Control', () => {
     test('should handle clear canvas with confirmation', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Clear canvas would be triggered by keyboard shortcut or toolbar button
       // This is a placeholder for clear canvas testing
@@ -579,7 +589,7 @@ describe('CanvasFlow', () => {
     });
 
     test('should handle undo operation', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Undo would be triggered by keyboard shortcut or toolbar button
       // This is a placeholder for undo testing
@@ -587,7 +597,7 @@ describe('CanvasFlow', () => {
     });
 
     test('should handle redo operation', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Redo would be triggered by keyboard shortcut or toolbar button
       // This is a placeholder for redo testing
@@ -595,7 +605,7 @@ describe('CanvasFlow', () => {
     });
 
     test('should handle save flow', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Save would be triggered by keyboard shortcut or toolbar button
       // This is a placeholder for save flow testing
@@ -603,7 +613,7 @@ describe('CanvasFlow', () => {
     });
 
     test('should handle generate HQL', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // Generate HQL would be triggered by keyboard shortcut or toolbar button
       // This is a placeholder for generate HQL testing
@@ -617,7 +627,7 @@ describe('CanvasFlow', () => {
 
   describe('Modal Interactions', () => {
     test('should show JOIN config modal when JOIN node is double-clicked', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // This would require adding a JOIN node to the canvas
       // This is a placeholder for JOIN modal testing
@@ -625,7 +635,7 @@ describe('CanvasFlow', () => {
     });
 
     test('should show HQL result modal when HQL is generated', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       // HQL result modal would be shown after successful HQL generation
       // This is a placeholder for HQL result modal testing
@@ -639,7 +649,7 @@ describe('CanvasFlow', () => {
 
   describe('Drag and Drop', () => {
     test('should handle drag over event', () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
@@ -657,7 +667,7 @@ describe('CanvasFlow', () => {
     });
 
     test('should handle invalid drop data gracefully', async () => {
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       const wrapper = screen.getByTestId('react-flow-wrapper');
       
@@ -728,7 +738,7 @@ describe('CanvasFlow', () => {
         loadEventConfig: mockLoadEventConfig,
       }));
 
-      render(<CanvasFlow gameData={mockGameData} />, { wrapper: createWrapper() });
+      render(<CanvasFlow gameData={mockGameData} />);
 
       const wrapper = screen.getByTestId('react-flow-wrapper');
       

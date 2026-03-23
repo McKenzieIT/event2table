@@ -29,13 +29,18 @@
  * />
  */
 
-import React, { useCallback, useEffect, forwardRef, useRef, useMemo, RefObject } from 'react';
+import React, { useEffect, forwardRef, useMemo, type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+
 import './Checkbox.css';
+
+import { useCheckboxField } from '../hooks/useToggleField';
+import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
+import { compareCheckboxProps } from '../utils/memoComparators';
 
 /**
  * Props for the Checkbox component
  */
-export interface CheckboxProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
+export interface CheckboxProps extends Omit<ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
   /**
    * Label text displayed next to the checkbox
    */
@@ -120,67 +125,48 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
   id,
   ...props
 }, ref) => {
-  const checkboxRef = useRef<HTMLInputElement>(null);
-  const inputId = id || React.useId();
-  const isInvalid = Boolean(error);
+  // 使用自定义 Hook 管理表单字段逻辑
+  const { fieldId, fieldRef, mergedRef, isInvalid, handleCheckboxChange } = useCheckboxField({
+    customId: id,
+    error,
+    onCheckboxChange: onChange,
+    disabled,
+    checked,
+    ref
+  });
 
   // Handle indeterminate state
   useEffect(() => {
-    if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = indeterminate;
+    if (fieldRef.current) {
+      fieldRef.current.indeterminate = indeterminate;
     }
-  }, [indeterminate]);
+  }, [indeterminate, fieldRef]);
 
-  // Merge refs
-  useEffect(() => {
-    if (typeof ref === 'function') {
-      ref(checkboxRef.current);
-    } else if (ref) {
-      ref.current = checkboxRef.current;
-    }
-  }, [ref]);
+  // 使用工具函数构建 CSS 类名
+  const wrapperClass = buildWrapperClasses('cyber-checkbox-wrapper', {
+    invalid: isInvalid,
+    disabled
+  });
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!disabled) {
-      onChange?.(event.target.checked, event);
-    }
-  }, [disabled, onChange]);
-
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const wrapperClass = useMemo(() => {
-    return [
-      'cyber-checkbox-wrapper',
-      isInvalid && 'cyber-checkbox-wrapper--invalid',
-      disabled && 'cyber-checkbox-wrapper--disabled',
-      className
-    ].filter(Boolean).join(' ');
-  }, [isInvalid, disabled, className]);
-
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const checkboxClass = useMemo(() => {
-    return [
-      'cyber-checkbox',
-      checked && 'cyber-checkbox--checked',
-      indeterminate && 'cyber-checkbox--indeterminate',
-      isInvalid && 'cyber-checkbox--invalid',
-      disabled && 'cyber-checkbox--disabled'
-    ].filter(Boolean).join(' ');
-  }, [checked, indeterminate, isInvalid, disabled]);
+  const checkboxClass = buildConditionalClasses('cyber-checkbox', {
+    checked,
+    indeterminate,
+    invalid: isInvalid,
+    disabled
+  }, [className]);
 
   return (
     <div className={wrapperClass}>
-      <label className="cyber-checkbox-label" htmlFor={inputId}>
+      <label className="cyber-checkbox-label" htmlFor={fieldId}>
         <input
-          ref={checkboxRef}
-          id={inputId}
+          ref={mergedRef}
+          id={fieldId}
           type="checkbox"
           name={name}
           value={value}
           checked={checked}
           disabled={disabled}
-          onChange={handleChange}
+          onChange={handleCheckboxChange}
           aria-invalid={isInvalid}
           aria-required={required}
           aria-checked={indeterminate ? 'mixed' : checked}
@@ -227,17 +213,11 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
 
 Checkbox.displayName = 'Checkbox';
 
-const MemoizedCheckbox = React.memo(Checkbox, (prevProps, nextProps) => {
-  return (
-    prevProps.checked === nextProps.checked &&
-    prevProps.indeterminate === nextProps.indeterminate &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.error === nextProps.error &&
-    prevProps.onChange === nextProps.onChange
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedCheckbox = React.memo(Checkbox, compareCheckboxProps);
 
 MemoizedCheckbox.displayName = 'MemoizedCheckbox';
 
-export default MemoizedCheckbox;
+export { MemoizedCheckbox as Checkbox };
 export type { CheckboxProps };
+export default MemoizedCheckbox;

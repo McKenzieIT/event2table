@@ -12,7 +12,7 @@
  * - Memory footprint <50% of native list
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@test/test-utils';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { VirtualList } from '../index';
 

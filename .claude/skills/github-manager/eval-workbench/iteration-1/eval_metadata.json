@@ -1,0 +1,31 @@
+{
+  "eval_id": 0,
+  "eval_name": "branch-diverged-teaching",
+  "prompt": "我的本地分支和远程分支分叉了，本地有30个提交领先，远程有21个提交落后。请帮我分析问题并提供解决方案。",
+  "assertions": [
+    {
+      "name": "explains_why_rebase_vs_merge",
+      "description": "解释了为什么选择 rebase 而不是 merge，或者解释了两种方案的优缺点",
+      "type": "contains",
+      "expected": "rebase"
+    },
+    {
+      "name": "provides_best_practice_reasoning",
+      "description": "提供了最佳实践的理由说明（WHY）",
+      "type": "contains",
+      "expected": "为什么"
+    },
+    {
+      "name": "explains_tradeoffs",
+      "description": "解释了方案的权衡/优缺点",
+      "type": "contains_any",
+      "expected": ["优点", "缺点", "优点是", "缺点是", "好处", "风险"]
+    },
+    {
+      "name": "teaches_github_knowledge",
+      "description": "教授了 GitHub 相关知识",
+      "type": "contains_any",
+      "expected": ["最佳实践", "经验", "建议", "推荐"]
+    }
+  ]
+}

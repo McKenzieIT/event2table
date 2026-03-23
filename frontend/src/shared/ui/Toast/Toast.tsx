@@ -10,7 +10,7 @@
  * Glassmorphism toast notifications with slide-in animations
  */
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode, HTMLAttributes } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
 import './Toast.css';
 
 /**
@@ -68,6 +68,115 @@ interface ToastItemProps {
  * Toast Context
  */
 const ToastContext = createContext<ToastContextValue | null>(null);
+
+/**
+ * Toast Item - Individual toast notification
+ * NOTE: Must be defined before MemoizedToastItem and ToastContainer
+ */
+function ToastItem({ toast, onRemove }: ToastItemProps) {
+  const [isExiting, setIsExiting] = useState(false);
+  const exitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleRemove = useCallback(() => {
+    setIsExiting(true);
+    exitTimeoutRef.current = setTimeout(() => onRemove(toast.id), 300);
+  }, [onRemove, toast.id]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (exitTimeoutRef.current) {
+        clearTimeout(exitTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const icons: Record<ToastType, string> = {
+    success: '✓',
+    error: '✕',
+    warning: '⚠',
+    info: 'ℹ',
+  };
+
+  const titles: Record<ToastType, string> = {
+    success: '成功',
+    error: '错误',
+    warning: '警告',
+    info: '提示',
+  };
+
+  return (
+    <div
+      className={[
+        'cyber-toast',
+        `cyber-toast--${toast.type}`,
+        isExiting && 'cyber-toast--exiting'
+      ].filter(Boolean).join(' ')}
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <div className="cyber-toast__icon">
+        {icons[toast.type]}
+      </div>
+      <div className="cyber-toast__content">
+        <div className="cyber-toast__title">
+          {titles[toast.type]}
+        </div>
+        <div className="cyber-toast__message">
+          {toast.message}
+        </div>
+      </div>
+      <button
+        type="button"
+        className="cyber-toast__close"
+        onClick={handleRemove}
+        aria-label="关闭通知"
+      >
+        ×
+      </button>
+      {toast.duration > 0 && (
+        <div
+          className="cyber-toast__progress"
+          style={{
+            animation: `toastProgress ${toast.duration}ms linear forwards`
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+ToastItem.displayName = 'ToastItem';
+
+/**
+ * Memoized ToastItem
+ * NOTE: Must be defined before ToastContainer
+ */
+const MemoizedToastItem = React.memo(ToastItem, (prevProps, nextProps) => {
+  // Only re-render if toast object or onRemove changes
+  return prevProps.toast === nextProps.toast && prevProps.onRemove === nextProps.onRemove;
+});
+
+MemoizedToastItem.displayName = 'MemoizedToastItem';
+
+/**
+ * Toast Container - Fixed position container
+ * NOTE: Must be defined before ToastProvider
+ */
+const ToastContainer = React.memo<ToastContainerProps>(({ toasts, onRemove }) => {
+  if (toasts.length === 0) return null;
+
+  return (
+    <div className="cyber-toast-container" role="region" aria-live="polite" aria-label="Toast notifications">
+      {toasts.map(toast => (
+        <MemoizedToastItem key={toast.id} toast={toast} onRemove={onRemove} />
+      ))}
+    </div>
+  );
+});
+
+ToastContainer.displayName = 'ToastContainer';
 
 /**
  * Toast Provider - Manages toast state and rendering
@@ -145,108 +254,5 @@ export function useToast(): ToastContextValue {
   }
   return context;
 }
-
-/**
- * Toast Container - Fixed position container
- */
-const ToastContainer = React.memo<ToastContainerProps>(({ toasts, onRemove }) => {
-  if (toasts.length === 0) return null;
-
-  return (
-    <div className="cyber-toast-container" role="region" aria-live="polite" aria-label="Toast notifications">
-      {toasts.map(toast => (
-        <MemoizedToastItem key={toast.id} toast={toast} onRemove={onRemove} />
-      ))}
-    </div>
-  );
-});
-
-ToastContainer.displayName = 'ToastContainer';
-
-/**
- * Toast Item - Individual toast notification
- */
-function ToastItem({ toast, onRemove }: ToastItemProps) {
-  const [isExiting, setIsExiting] = useState(false);
-  const exitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleRemove = useCallback(() => {
-    setIsExiting(true);
-    exitTimeoutRef.current = setTimeout(() => onRemove(toast.id), 300);
-  }, [onRemove, toast.id]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (exitTimeoutRef.current) {
-        clearTimeout(exitTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const icons: Record<ToastType, string> = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ',
-  };
-
-  const titles: Record<ToastType, string> = {
-    success: '成功',
-    error: '错误',
-    warning: '警告',
-    info: '提示',
-  };
-
-  return (
-    <div
-      className={[
-        'cyber-toast',
-        `cyber-toast--${toast.type}`,
-        isExiting && 'cyber-toast--exiting'
-      ].filter(Boolean).join(' ')}
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
-      <div className="cyber-toast__icon">
-        {icons[toast.type]}
-      </div>
-      <div className="cyber-toast__content">
-        <div className="cyber-toast__title">
-          {titles[toast.type]}
-        </div>
-        <div className="cyber-toast__message">
-          {toast.message}
-        </div>
-      </div>
-      <button
-        type="button"
-        className="cyber-toast__close"
-        onClick={handleRemove}
-        aria-label="关闭通知"
-      >
-        ×
-      </button>
-      {toast.duration > 0 && (
-        <div
-          className="cyber-toast__progress"
-          style={{
-            animation: `toastProgress ${toast.duration}ms linear forwards`
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-const MemoizedToastItem = React.memo(ToastItem, (prevProps, nextProps) => {
-  // Only re-render if toast object or onRemove changes
-  return prevProps.toast === nextProps.toast && prevProps.onRemove === nextProps.onRemove;
-});
-
-MemoizedToastItem.displayName = 'MemoizedToastItem';
-
-ToastItem.displayName = 'ToastItem';
 
 export default ToastProvider;

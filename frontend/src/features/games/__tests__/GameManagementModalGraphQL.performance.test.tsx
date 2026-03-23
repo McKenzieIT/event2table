@@ -18,7 +18,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
+import { render, waitFor, screen } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
 import GameManagementModalGraphQL from '../GameManagementModalGraphQL';
 import { performance } from 'perf_hooks';
@@ -37,9 +37,9 @@ import { useQuery, useMutation } from '@apollo/client';
 
 describe('GameManagementModalGraphQL - Performance Tests', () => {
   const mockGames = [
-    { id: 1, gid: '10000147', name: 'STAR001', ods_db: 'ieu_ods', eventCount: 5, parameterCount: 10 },
-    { id: 2, gid: '10000148', name: 'STAR002', ods_db: 'ieu_ods', eventCount: 3, parameterCount: 8 },
-    { id: 3, gid: '10000149', name: 'STAR003', ods_db: 'overseas_ods', eventCount: 7, parameterCount: 12 },
+    { id: 1, gid: '10000147', name: 'STAR001', odsDb: 'ieu_ods', eventCount: 5, parameterCount: 10 },
+    { id: 2, gid: '10000148', name: 'STAR002', odsDb: 'ieu_ods', eventCount: 3, parameterCount: 8 },
+    { id: 3, gid: '10000149', name: 'STAR003', odsDb: 'overseas_ods', eventCount: 7, parameterCount: 12 },
   ];
 
   beforeEach(() => {
@@ -92,7 +92,7 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         id: i + 1,
         gid: `100001${i + 47}`,
         name: `GAME${i + 1}`,
-        ods_db: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
+        odsDb: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
         eventCount: Math.floor(Math.random() * 10),
         parameterCount: Math.floor(Math.random() * 15),
       }));
@@ -240,7 +240,7 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         id: i + 1,
         gid: `10000${i + 100}`,
         name: `GAME${i + 1}`,
-        ods_db: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
+        odsDb: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
         eventCount: Math.floor(Math.random() * 10),
         parameterCount: Math.floor(Math.random() * 15),
       }));
@@ -278,7 +278,7 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         id: i + 1,
         gid: `10000${i + 100}`,
         name: `GAME${i + 1}`,
-        ods_db: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
+        odsDb: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
         eventCount: Math.floor(Math.random() * 10),
         parameterCount: Math.floor(Math.random() * 15),
       }));
@@ -348,7 +348,7 @@ describe('GameManagementModalGraphQL - Performance Tests', () => {
         id: i + 1,
         gid: `10000${i + 100}`,
         name: `GAME${i + 1}`,
-        ods_db: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
+        odsDb: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
         eventCount: Math.floor(Math.random() * 10),
         parameterCount: Math.floor(Math.random() * 15),
       }));

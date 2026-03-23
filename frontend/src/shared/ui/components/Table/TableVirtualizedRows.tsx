@@ -68,12 +68,6 @@ export const TableVirtualizedRows = React.memo(<TData extends RowData>({
             data-index={virtualRow.index}
             data-virtualizer={index === 0 ? "true" : undefined}
             ref={dynamicRowHeight ? rowVirtualizer.measureElement : undefined}
-        const row = rows[virtualRow.index];
-        return (
-          <tr
-            key={row.id}
-            data-index={virtualRow.index}
-            ref={dynamicRowHeight ? rowVirtualizer.measureElement : undefined}
             className={[
               'table-tr',
               'table-tr--virtual',

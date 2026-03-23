@@ -6,7 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ApolloProvider } from "@apollo/client/react";
 import { Toaster } from "react-hot-toast";
 import { ToastProvider } from "@shared/ui";
-import ErrorBoundary from "@shared/components/ErrorBoundary";
+import { ErrorBoundary } from "@shared/ui/ErrorBoundary";
 import { client } from "@shared/apollo/client";
 import App from "./App";
 

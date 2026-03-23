@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@test/test-utils';
 import { performance } from 'perf_hooks';
 
 describe('React Components Performance Benchmark', () => {
@@ -22,7 +22,7 @@ describe('React Components Performance Benchmark', () => {
         id: i + 1,
         gid: `100001${i + 47}`,
         name: `GAME${i + 1}`,
-        ods_db: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
+        odsDb: i % 2 === 0 ? 'ieu_ods' : 'overseas_ods',
         eventCount: Math.floor(Math.random() * 10),
         parameterCount: Math.floor(Math.random() * 15),
       }));

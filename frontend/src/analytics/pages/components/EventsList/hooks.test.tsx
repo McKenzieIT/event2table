@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEventsList } from './hooks';
 
 // Mock fetch
-global.fetch = vi.fn();
+(globalThis as typeof globalThis & { fetch: typeof vi.fn }).fetch = vi.fn();
 
 // Mock react-router-dom
 vi.mock('react-router-dom', () => ({

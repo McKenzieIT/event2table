@@ -2,7 +2,7 @@
  * TaskList Component Tests
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@test/test-utils';
 import { TaskList } from '../TaskList';
 import type { Task } from '../../api/taskApi';
 

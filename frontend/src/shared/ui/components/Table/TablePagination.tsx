@@ -42,10 +42,15 @@ export const TablePagination = React.memo(({
     }
   };
 
-  const renderPageNumbers = () => {
+  // ============================================================================
+  // Page Number Generation - Extracted complex logic
+  // ============================================================================
+
+  const calculateVisiblePages = (currentPage: number, totalPages: number): Array<number | string> => {
     const pages: Array<number | string> = [];
     const maxVisible = 7;
 
+    // Early return: show all pages if total is small
     if (totalPages <= maxVisible) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
@@ -56,22 +61,27 @@ export const TablePagination = React.memo(({
     let start = Math.max(2, currentPage - halfVisible + 1);
     let end = Math.min(totalPages - 1, currentPage + halfVisible - 1);
 
+    // Adjust for pages near the beginning
     if (currentPage <= halfVisible) {
       end = Math.min(totalPages - 1, maxVisible - 1);
     }
 
+    // Adjust for pages near the end
     if (currentPage > totalPages - halfVisible) {
       start = Math.max(2, totalPages - maxVisible + 2);
     }
 
+    // Add ellipsis before middle pages if needed
     if (start > 2) {
       pages.push('...');
     }
 
+    // Add middle pages
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
 
+    // Add ellipsis after middle pages if needed
     if (end < totalPages - 1) {
       pages.push('...');
     }
@@ -79,6 +89,10 @@ export const TablePagination = React.memo(({
     pages.push(totalPages);
 
     return pages;
+  };
+
+  const renderPageNumbers = () => {
+    return calculateVisiblePages(currentPage, totalPages);
   };
 
   const startItem = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;

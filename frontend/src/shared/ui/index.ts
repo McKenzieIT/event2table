@@ -18,6 +18,7 @@
  * - Badge: 徽章标签组件
  * - Spinner: 加载指示器组件
  * - Table: 数据表格组件
+ * - VirtualList: 虚拟滚动列表组件
  *
  * ### 业务组件
  * 与业务逻辑相关的组件
@@ -28,7 +29,7 @@
  *
  * ### 布局组件
  * 用于页面布局的组件
- * - Card: 卡片容器组件
+ * - Card: 卡片容器组件（支持 Card.Header, Card.Body, Card.Title 等子组件）
  * - Modal: 模态框组件
  * - PageLoader: 页面加载器组件
  * - Pagination: 分页组件
@@ -110,13 +111,27 @@
  *     </>
  *   );
  * }
+ *
+ * @example
+ * // 使用 VirtualList
+ * import { VirtualList } from '@shared/ui';
+ *
+ * function MyList({ items }) {
+ *   return (
+ *     <VirtualList
+ *       items={items}
+ *       renderItem={(item, index) => <div key={index}>{item.name}</div>}
+ *       estimateSize={60}
+ *     />
+ *   );
+ * }
  */
 
 // ============================================================================
 // 基础组件
 // ============================================================================
 
-export { default as Button } from './Button/Button';
+export { Button } from './Button/Button';
 export { default as Input } from './Input/Input';
 export { default as TextArea } from './TextArea/TextArea';
 export { Table } from './components/Table/Table';
@@ -127,8 +142,12 @@ export { default as Switch } from './Switch/Switch';
 export { default as Spinner } from './Spinner/Spinner';
 
 // Select exports
-export { Select } from './components/Select/Select';
+export { default as Select } from './components/Select/Select';
 export type { SelectProps, SelectOption } from './components/Select/Select.types';
+
+// VirtualList exports (整合自 @shared/components/VirtualList)
+export { VirtualList, DefaultSkeleton } from '../components/VirtualList/VirtualList';
+export type { VirtualListProps, VirtualListRef } from '../components/VirtualList/VirtualList';
 
 // 基础组件类型导出
 export type { InputProps } from './Input/Input';
@@ -154,7 +173,10 @@ export type { SelectGamePromptProps } from './SelectGamePrompt';
 // 布局组件
 // ============================================================================
 
-export { default as Card } from './Card/Card';
+// Card exports - 导出 Card 主组件和子组件
+export { Card, CardHeader, CardBody, CardFooter, CardTitle, CardContent } from './Card/Card';
+export type { CardProps, CardVariant, CardPadding, CardSubComponentProps } from './Card/Card';
+
 export { default as PageLoader } from './PageLoader/PageLoader';
 export { default as Pagination } from './Pagination/Pagination';
 
@@ -164,8 +186,8 @@ export { default as Pagination } from './Pagination/Pagination';
 
 // Modal exports
 export { Modal } from './components/Modal/Modal';
+export { Modal as BaseModal } from './components/Modal/Modal';
 export type { ModalProps, ModalSize, ModalAnimation, ModalVariant } from './components/Modal/Modal.types';
-
 
 // 布局组件类型导出
 export type { PaginationProps } from './Pagination/Pagination';
@@ -188,5 +210,22 @@ export type { ToastType } from './Toast/Toast';
 // 特殊组件
 // ============================================================================
 
-export { default as ErrorBoundary } from './ErrorBoundary';
+export { ErrorBoundary, ErrorFallback } from './ErrorBoundary';
 export { default as CanvasErrorBoundary } from './CanvasErrorBoundary';
+
+// PerformanceMonitor 和 CodeBlock 导出
+export { default as PerformanceMonitor } from './PerformanceMonitor';
+export { default as CodeBlock } from './CodeBlock/CodeBlock';
+
+// ============================================================================
+// 布局组件 - Drawer
+// ============================================================================
+
+export { Drawer } from '../../components/ui/Drawer';
+export type { DrawerProps } from '../../components/ui/Drawer';
+
+// ============================================================================
+// Theme 组件
+// ============================================================================
+
+export { ThemeProvider, useTheme, getThemeStore, resetThemeStore } from '../../providers/ThemeProvider';

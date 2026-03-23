@@ -2,7 +2,7 @@
  * TaskFilters Component Tests
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@test/test-utils';
 import { TaskFilters } from '../TaskFilters';
 import type { TaskFilters as TaskFiltersType } from '../../api/taskApi';
 

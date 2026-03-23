@@ -42,11 +42,12 @@ import React, {
   useId,
   useCallback,
   useMemo,
-  TextareaHTMLAttributes,
-  ChangeEvent,
-  FocusEvent,
-  ReactNode
+  type ChangeEvent,
+  type FocusEvent,
+  type ReactNode,
+  type TextareaHTMLAttributes,
 } from 'react';
+
 import './TextArea.css';
 
 /**
@@ -77,7 +78,7 @@ type TextAreaResize = 'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'i
  * - readOnly: PropTypes.bool (default: false) → readOnly?: boolean
  * - autoFocus: PropTypes.bool (default: false) → autoFocus?: boolean
  */
-export interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'onBlur' | 'onFocus' | 'value' | 'resize' | 'rows'> {
+export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'onBlur' | 'onFocus' | 'value' | 'resize' | 'rows'> {
   /**
    * Label text displayed above the textarea
    */
@@ -339,4 +340,5 @@ const MemoizedTextArea = React.memo(TextArea, (prevProps, nextProps) => {
 // Set display name for memoized component
 MemoizedTextArea.displayName = 'MemoizedTextArea';
 
+export { MemoizedTextArea as TextArea };
 export default MemoizedTextArea;

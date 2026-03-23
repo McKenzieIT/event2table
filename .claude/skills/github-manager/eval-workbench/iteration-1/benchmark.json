@@ -1,0 +1,29 @@
+{
+  "eval_name": "branch-diverged-teaching",
+  "iterations": [
+    {
+      "run_id": "eval-0-with_skill",
+      "config": "with_skill",
+      "pass_rate": 1.0,
+      "passed_assertions": 4,
+      "total_assertions": 4,
+      "duration_ms": 15000,
+      "total_tokens": 1049
+    },
+    {
+      "run_id": "eval-0-without_skill",
+      "config": "without_skill",
+      "pass_rate": 0.5,
+      "passed_assertions": 2,
+      "total_assertions": 4,
+      "duration_ms": 12000,
+      "total_tokens": 811
+    }
+  ],
+  "delta": {
+    "pass_rate_delta": 0.5,
+    "assertions_delta": 2,
+    "skill_better": true
+  },
+  "conclusion": "使用 github-manager skill 的输出在教学质量上明显优于不使用 skill：\n- with_skill: 100% 通过率 (4/4)\n- without_skill: 50% 通过率 (2/4)\n\n主要差异：\n1. with_skill 提供了完整的 '最佳实践说明' 章节，解释 WHY\n2. with_skill 提供了结构化的 '优缺点分析' 章节\n3. with_skill 明确教授了 GitHub 知识和最佳实践\n4. without_skill 虽然也提到了优缺点，但缺乏深入的教学说明"
+}

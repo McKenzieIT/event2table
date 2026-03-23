@@ -9,23 +9,34 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, createMockGameContext } from '@test/test-utils';
 import { GET_EVENTS, GET_CATEGORIES } from '@shared/graphql/operations';
 import { DELETE_EVENT } from '@shared/graphql/operations';
 import EventsListGraphQL from '../EventsListGraphQL';
 import { performanceMonitor, PerformanceMetrics } from '@shared/utils/performanceMonitor';
 import userEvent from '@testing-library/user-event';
+import { vi, beforeEach, describe, test, expect } from 'vitest';
 
 // Mock MockedProvider since Apollo Client v4 doesn't export it from testing
 const MockedProvider = ({ children }: { children: React.ReactNode }) => {
   return <div data-testid="mocked-provider">{children}</div>;
 };
 
+// Mock useOutletContext using the new unified mock approach
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useOutletContext: () => createMockGameContext(),
+    useNavigate: () => vi.fn(),
+  };
+});
+
 // Mock game context
 const mockCurrentGame = {
   gid: 10000147,
   name: 'Test Game',
-  ods_db: 'ieu_ods'
+  odsDb: 'ieu_ods'
 };
 
 // Mock events data
@@ -74,19 +85,20 @@ const mocks = [
   }
 ];
 
+// Helper function for rendering with context (shared across describe blocks)
+const renderWithContext = (component: React.ReactElement) => {
+  return render(
+    <MockedProvider mocks={mocks} addTypename={false}>
+      {component}
+    </MockedProvider>
+  );
+};
+
 describe('EventsListGraphQL Performance Tests', () => {
   beforeEach(() => {
     // Reset performance metrics before each test
     performanceMonitor.reset();
   });
-
-  const renderWithContext = (component: React.ReactElement) => {
-    return render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        {component}
-      </MockedProvider>
-    );
-  };
 
   test('should render large dataset efficiently with virtual scrolling', async () => {
     const startTime = performance.now();

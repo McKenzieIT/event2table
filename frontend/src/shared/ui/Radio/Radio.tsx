@@ -40,13 +40,18 @@
  * />
  */
 
-import React, { useCallback, useEffect, forwardRef, useRef, useMemo } from 'react';
+import React, { forwardRef, type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+
 import './Radio.css';
+
+import { useRadioField } from '../hooks/useToggleField';
+import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
+import { compareToggleProps } from '../utils/memoComparators';
 
 /**
  * Props for the Radio component
  */
-export interface RadioProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
+export interface RadioProps extends Omit<ComponentPropsWithoutRef<'input'>, 'onChange' | 'type'> {
   /**
    * Label text displayed next to the radio button
    */
@@ -125,59 +130,39 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(({
   id,
   ...props
 }, ref) => {
-  const radioRef = useRef<HTMLInputElement>(null);
-  const inputId = id || React.useId();
-  const isInvalid = Boolean(error);
+  // 使用自定义 Hook 管理表单字段逻辑
+  const { fieldId, fieldRef, mergedRef, isInvalid, handleRadioChange } = useRadioField({
+    customId: id,
+    error,
+    onRadioChange: onChange,
+    disabled,
+    ref
+  });
 
-  // Merge refs
-  useEffect(() => {
-    if (typeof ref === 'function') {
-      ref(radioRef.current);
-    } else if (ref) {
-      ref.current = radioRef.current;
-    }
-  }, [ref]);
+  // 使用工具函数构建 CSS 类名
+  const wrapperClass = buildWrapperClasses('cyber-radio-wrapper', {
+    invalid: isInvalid,
+    disabled
+  });
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!disabled) {
-      onChange?.(event.target.value, event);
-    }
-  }, [disabled, onChange]);
-
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const wrapperClass = useMemo(() => {
-    return [
-      'cyber-radio-wrapper',
-      isInvalid && 'cyber-radio-wrapper--invalid',
-      disabled && 'cyber-radio-wrapper--disabled',
-      className
-    ].filter(Boolean).join(' ');
-  }, [isInvalid, disabled, className]);
-
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const radioClass = useMemo(() => {
-    return [
-      'cyber-radio',
-      checked && 'cyber-radio--checked',
-      isInvalid && 'cyber-radio--invalid',
-      disabled && 'cyber-radio--disabled'
-    ].filter(Boolean).join(' ');
-  }, [checked, isInvalid, disabled]);
+  const radioClass = buildConditionalClasses('cyber-radio', {
+    checked,
+    invalid: isInvalid,
+    disabled
+  }, [className]);
 
   return (
     <div className={wrapperClass}>
-      <label className="cyber-radio-label" htmlFor={inputId}>
+      <label className="cyber-radio-label" htmlFor={fieldId}>
         <input
-          ref={radioRef}
-          id={inputId}
+          ref={mergedRef}
+          id={fieldId}
           type="radio"
           name={name}
           value={value}
           checked={checked}
           disabled={disabled}
-          onChange={handleChange}
+          onChange={handleRadioChange}
           aria-invalid={isInvalid}
           aria-required={required}
           className="cyber-radio-input"
@@ -209,16 +194,11 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(({
 
 Radio.displayName = 'Radio';
 
-const MemoizedRadio = React.memo(Radio, (prevProps, nextProps) => {
-  return (
-    prevProps.checked === nextProps.checked &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.error === nextProps.error &&
-    prevProps.onChange === nextProps.onChange
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedRadio = React.memo(Radio, compareToggleProps);
 
 MemoizedRadio.displayName = 'MemoizedRadio';
 
-export default MemoizedRadio;
+export { MemoizedRadio as Radio };
 export type { RadioProps };
+export default MemoizedRadio;

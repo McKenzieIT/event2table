@@ -223,21 +223,29 @@
 
 /* ========================================
    Dark Mode Enhancements - 深色模式增强
+   通过 data-theme 属性支持主题切换
    ======================================== */
 
-@media (prefers-color-scheme: dark) {
-  .field-canvas-stats {
-    /* Slightly darker background for pure dark mode */
-    background: linear-gradient(
-      135deg,
-      rgba(6, 182, 212, 0.15) 0%,
-      rgba(139, 92, 246, 0.1) 50%,
-      rgba(59, 130, 246, 0.12) 100%
-    );
+/* 默认深色主题（无需 data-theme 也生效） */
+.field-canvas-stats {
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.15) 0%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(59, 130, 246, 0.12) 100%
+  );
+  border-color: rgba(6, 182, 212, 0.4);
+}
 
-    /* Stronger border */
-    border-color: rgba(6, 182, 212, 0.4);
-  }
+/* 亮色主题 */
+[data-theme='light'] .field-canvas-stats {
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.08) 0%,
+    rgba(139, 92, 246, 0.05) 50%,
+    rgba(59, 130, 246, 0.06) 100%
+  );
+  border-color: rgba(6, 182, 212, 0.25);
 }
 
 /* ========================================

@@ -2,7 +2,7 @@
  * 简化的测试文件 - 用于调试渲染问题
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@test/test-utils';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { gql } from '@apollo/client';

@@ -13,8 +13,38 @@ repos:
         language: system
         pass_filenames: false
 
+      - id: type-check-backend
+        name: Type Check Backend Code
+        entry: mypy backend/ --strict --ignore-missing-imports
+        language: system
+        pass_filenames: false
+
       - id: format-frontend
         name: Format Frontend Code
         entry: prettier --write frontend/src/ --config config/.prettierrc
+        language: system
+        pass_filenames: false
+
+      - id: lint-frontend
+        name: Lint Frontend Code
+        entry: cd frontend && npm run lint -- --max-warnings=0
+        language: system
+        pass_filenames: false
+
+      - id: type-check-frontend
+        name: Type Check Frontend Code
+        entry: cd frontend && npm run type-check
+        language: system
+        pass_filenames: false
+
+      - id: test-backend
+        name: Run Backend Unit Tests
+        entry: pytest backend/tests/unit/ -v --cov=backend --cov-report=term-missing
+        language: system
+        pass_filenames: false
+
+      - id: test-frontend
+        name: Run Frontend Unit Tests
+        entry: cd frontend && npm run test:unit
         language: system
         pass_filenames: false

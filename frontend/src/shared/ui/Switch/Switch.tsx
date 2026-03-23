@@ -29,13 +29,18 @@
  * />
  */
 
-import React, { useCallback, useEffect, forwardRef, useRef, useMemo, useId } from 'react';
+import React, { forwardRef, type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+
 import './Switch.css';
+
+import { useSwitchField } from '../hooks/useToggleField';
+import { buildConditionalClasses, buildWrapperClasses } from '../utils/classNames';
+import { compareToggleProps } from '../utils/memoComparators';
 
 /**
  * Props for the Switch component
  */
-export interface SwitchProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'type' | 'onChange'> {
+export interface SwitchProps extends Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'onChange'> {
   /**
    * Label text for the switch
    */
@@ -116,59 +121,41 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
   id,
   ...props
 }, ref) => {
-  const switchRef = useRef<HTMLInputElement>(null);
-  const inputId = id || useId();
-  const isInvalid = Boolean(error);
+  // 使用自定义 Hook 管理表单字段逻辑
+  const { fieldId, fieldRef, mergedRef, isInvalid, handleSwitchChange, handleKeyDown } = useSwitchField({
+    customId: id,
+    error,
+    onSwitchChange: onChange,
+    disabled,
+    checked,
+    ref
+  });
 
-  // Merge refs
-  useEffect(() => {
-    if (typeof ref === 'function') {
-      ref(switchRef.current);
-    } else if (ref) {
-      ref.current = switchRef.current;
-    }
-  }, [ref]);
+  // 使用工具函数构建 CSS 类名
+  const wrapperClass = buildWrapperClasses('cyber-switch-wrapper', {
+    invalid: isInvalid,
+    disabled
+  }, [className]);
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!disabled) {
-      onChange?.(event.target.checked, event);
-    }
-  }, [disabled, onChange]);
-
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const wrapperClass = useMemo(() => {
-    return [
-      'cyber-switch-wrapper',
-      isInvalid && 'cyber-switch-wrapper--invalid',
-      disabled && 'cyber-switch-wrapper--disabled',
-      className
-    ].filter(Boolean).join(' ');
-  }, [isInvalid, disabled, className]);
-
-  // PERFORMANCE: useMemo to cache CSS class computations
-  // Prevents re-creation of class strings on every render
-  const switchClass = useMemo(() => {
-    return [
-      'cyber-switch',
-      checked && 'cyber-switch--checked',
-      isInvalid && 'cyber-switch--invalid',
-      disabled && 'cyber-switch--disabled'
-    ].filter(Boolean).join(' ');
-  }, [checked, isInvalid, disabled]);
+  const switchClass = buildConditionalClasses('cyber-switch', {
+    checked,
+    invalid: isInvalid,
+    disabled
+  });
 
   return (
     <div className={wrapperClass}>
-      <label className="cyber-switch-label" htmlFor={inputId}>
+      <label className="cyber-switch-label" htmlFor={fieldId}>
         <input
-          ref={switchRef}
-          id={inputId}
+          ref={mergedRef}
+          id={fieldId}
           type="checkbox"
           name={name}
           value={value}
           checked={checked}
           disabled={disabled}
-          onChange={handleChange}
+          onChange={handleSwitchChange}
+          onKeyDown={handleKeyDown}
           aria-invalid={isInvalid}
           aria-required={required}
           className="cyber-switch-input"
@@ -221,15 +208,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({
 
 Switch.displayName = 'Switch';
 
-const MemoizedSwitch = React.memo(Switch, (prevProps, nextProps) => {
-  return (
-    prevProps.checked === nextProps.checked &&
-    prevProps.disabled === nextProps.disabled &&
-    prevProps.error === nextProps.error &&
-    prevProps.onChange === nextProps.onChange
-  );
-});
+// 使用共享的 memo 比较函数
+const MemoizedSwitch = React.memo(Switch, compareToggleProps);
 
 MemoizedSwitch.displayName = 'MemoizedSwitch';
 
+export { MemoizedSwitch as Switch };
 export default MemoizedSwitch;

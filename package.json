@@ -21,7 +21,9 @@
     "lint:backend": "flake8 backend/",
     "lint:frontend": "cd frontend && npm run lint",
     "format:backend": "black backend/",
-    "format:frontend": "cd frontend && npm run format"
+    "format:frontend": "cd frontend && npm run format",
+    "prepare": "husky install",
+    "pre-commit": "pre-commit run --all-files"
   },
   "keywords": [
     "event2table",
@@ -37,7 +39,9 @@
     "@graphql-codegen/typescript-operations": "^5.0.8",
     "@graphql-codegen/typescript-react-apollo": "^4.4.0",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "terser": "^5.46.0"
+    "terser": "^5.46.0",
+    "husky": "^9.1.7",
+    "pre-commit": "^3.0.1"
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",

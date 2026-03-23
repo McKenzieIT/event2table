@@ -5,7 +5,7 @@
  * 测试GraphQL查询和变更的完整流程
  */
 
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing';
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';

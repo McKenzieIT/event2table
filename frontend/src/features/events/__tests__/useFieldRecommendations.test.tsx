@@ -4,7 +4,7 @@
  * Unit tests for field recommendation React Query hooks
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@test/test-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';

@@ -34,8 +34,8 @@ describe('typeGuards', () => {
         id: 1,
         gid: 10000147,
         name: 'Test Game',
-        ods_db: 'ieu_ods',
-        created_at: '2024-01-01'
+        odsDb: 'ieu_ods',
+        createdAt: '2024-01-01'
       };
       expect(isGame(game)).toBe(true);
     });
@@ -45,7 +45,7 @@ describe('typeGuards', () => {
       expect(isGame(undefined)).toBe(false);
       expect(isGame({})).toBe(false);
       expect(isGame({ id: 1 })).toBe(false);
-      expect(isGame({ id: '1' as any, gid: 10000147, name: 'Test', ods_db: 'ieu_ods' })).toBe(false);
+      expect(isGame({ id: '1' as any, gid: 10000147, name: 'Test', odsDb: 'ieu_ods' })).toBe(false);
     });
 
     it('should validate all required fields', () => {
@@ -53,14 +53,14 @@ describe('typeGuards', () => {
         id: 1,
         gid: 10000147,
         name: 'Test Game',
-        ods_db: 'ieu_ods',
-        created_at: '2024-01-01'
+        odsDb: 'ieu_ods',
+        createdAt: '2024-01-01'
       };
 
       expect(isGame({ ...validGame, id: '1' as any })).toBe(false);
       expect(isGame({ ...validGame, gid: '10000147' as any })).toBe(false);
       expect(isGame({ ...validGame, name: 123 as any })).toBe(false);
-      expect(isGame({ ...validGame, ods_db: 123 as any })).toBe(false);
+      expect(isGame({ ...validGame, odsDb: 123 as any })).toBe(false);
     });
 
     it('should allow objects with extra properties', () => {
@@ -68,8 +68,8 @@ describe('typeGuards', () => {
         id: 1,
         gid: 10000147,
         name: 'Test Game',
-        ods_db: 'ieu_ods',
-        created_at: '2024-01-01',
+        odsDb: 'ieu_ods',
+        createdAt: '2024-01-01',
         description: 'Extra property',
         version: 1
       };
@@ -81,11 +81,10 @@ describe('typeGuards', () => {
     it('should return true for valid Event object', () => {
       const event: Event = {
         id: 1,
-        event_name: 'login',
-        display_name: 'Login',
-        game_gid: 10000147,
-        event_type: 'user',
-        created_at: '2024-01-01'
+        eventName: 'login',
+        eventNameCn: 'Login',
+        gameGid: 10000147,
+        createdAt: '2024-01-01'
       };
       expect(isEvent(event)).toBe(true);
     });
@@ -96,32 +95,16 @@ describe('typeGuards', () => {
       expect(isEvent({})).toBe(false);
       expect(isEvent({ id: 1 })).toBe(false);
     });
-
-    it('should validate event_type values', () => {
-      const baseEvent = {
-        id: 1,
-        event_name: 'test',
-        display_name: 'Test',
-        game_gid: 10000147,
-        created_at: '2024-01-01'
-      };
-
-      expect(isEvent({ ...baseEvent, event_type: 'user' })).toBe(true);
-      expect(isEvent({ ...baseEvent, event_type: 'system' })).toBe(true);
-      expect(isEvent({ ...baseEvent, event_type: 'auto' })).toBe(true);
-      // Note: TypeScript doesn't enforce literal types at runtime
-      // Type guard would need additional validation for exact values
-    });
   });
 
   describe('isParameter', () => {
     it('should return true for valid Parameter object', () => {
       const param: Parameter = {
         id: 1,
-        param_name: 'zone_id',
-        param_name_cn: '区域ID',
-        param_type: 'int',
-        game_gid: 10000147
+        paramName: 'zone_id',
+        paramNameCn: '区域ID',
+        paramType: 'int',
+        gameGid: 10000147
       };
       expect(isParameter(param)).toBe(true);
     });
@@ -130,16 +113,16 @@ describe('typeGuards', () => {
       expect(isParameter(null)).toBe(false);
       expect(isParameter(undefined)).toBe(false);
       expect(isParameter({})).toBe(false);
-      expect(isParameter({ id: 1, param_name: 'test' })).toBe(false);
+      expect(isParameter({ id: 1, paramName: 'test' })).toBe(false);
     });
 
-    it('should allow null game_gid', () => {
+    it('should allow null gameGid', () => {
       const param = {
         id: 1,
-        param_name: 'zone_id',
-        param_name_cn: '区域ID',
-        param_type: 'int',
-        game_gid: null
+        paramName: 'zone_id',
+        paramNameCn: '区域ID',
+        paramType: 'int',
+        gameGid: null
       };
       expect(isParameter(param)).toBe(true);
     });
@@ -149,8 +132,8 @@ describe('typeGuards', () => {
     describe('isGameArray', () => {
       it('should return true for array of Game objects', () => {
         const games: Game[] = [
-          { id: 1, gid: 10000147, name: 'Game 1', ods_db: 'ieu_ods', created_at: '2024-01-01' },
-          { id: 2, gid: 10000148, name: 'Game 2', ods_db: 'ieu_ods', created_at: '2024-01-02' }
+          { id: 1, gid: 10000147, name: 'Game 1', odsDb: 'ieu_ods', createdAt: '2024-01-01' },
+          { id: 2, gid: 10000148, name: 'Game 2', odsDb: 'ieu_ods', createdAt: '2024-01-02' }
         ];
         expect(isGameArray(games)).toBe(true);
       });
@@ -159,15 +142,15 @@ describe('typeGuards', () => {
         expect(isGameArray([])).toBe(true); // Empty array is valid
         expect(isGameArray(null)).toBe(false);
         expect(isGameArray([{}])).toBe(false);
-        expect(isGameArray([{ id: 1, gid: 10000147, name: 'Game', ods_db: 'ieu_ods', created_at: '2024-01-01' }, null])).toBe(false);
+        expect(isGameArray([{ id: 1, gid: 10000147, name: 'Game', odsDb: 'ieu_ods', createdAt: '2024-01-01' }, null])).toBe(false);
       });
     });
 
     describe('isEventArray', () => {
       it('should return true for array of Event objects', () => {
         const events: Event[] = [
-          { id: 1, event_name: 'login', display_name: 'Login', game_gid: 10000147, event_type: 'user', created_at: '2024-01-01' },
-          { id: 2, event_name: 'logout', display_name: 'Logout', game_gid: 10000147, event_type: 'user', created_at: '2024-01-02' }
+          { id: 1, eventName: 'login', eventNameCn: 'Login', gameGid: 10000147, createdAt: '2024-01-01' },
+          { id: 2, eventName: 'logout', eventNameCn: 'Logout', gameGid: 10000147, createdAt: '2024-01-02' }
         ];
         expect(isEventArray(events)).toBe(true);
       });
@@ -182,8 +165,8 @@ describe('typeGuards', () => {
     describe('isParameterArray', () => {
       it('should return true for array of Parameter objects', () => {
         const params: Parameter[] = [
-          { id: 1, param_name: 'zone_id', param_name_cn: '区域ID', param_type: 'int', game_gid: 10000147 },
-          { id: 2, param_name: 'level', param_name_cn: '等级', param_type: 'int', game_gid: 10000147 }
+          { id: 1, paramName: 'zone_id', paramNameCn: '区域ID', paramType: 'int', gameGid: 10000147 },
+          { id: 2, paramName: 'level', paramNameCn: '等级', paramType: 'int', gameGid: 10000147 }
         ];
         expect(isParameterArray(params)).toBe(true);
       });
@@ -232,8 +215,8 @@ describe('typeGuards', () => {
           id: 1,
           gid: 10000147,
           name: 'Test Game',
-          ods_db: 'ieu_ods',
-          created_at: '2024-01-01'
+          odsDb: 'ieu_ods',
+          createdAt: '2024-01-01'
         };
         expect(() => assertGame(game)).not.toThrow();
       });
@@ -248,11 +231,10 @@ describe('typeGuards', () => {
       it('should not throw for valid Event', () => {
         const event: Event = {
           id: 1,
-          event_name: 'login',
-          display_name: 'Login',
-          game_gid: 10000147,
-          event_type: 'user',
-          created_at: '2024-01-01'
+          eventName: 'login',
+          eventNameCn: 'Login',
+          gameGid: 10000147,
+          createdAt: '2024-01-01'
         };
         expect(() => assertEvent(event)).not.toThrow();
       });
@@ -266,7 +248,7 @@ describe('typeGuards', () => {
     describe('assertEventArray', () => {
       it('should not throw for valid Event array', () => {
         const events: Event[] = [
-          { id: 1, event_name: 'login', display_name: 'Login', game_gid: 10000147, event_type: 'user', created_at: '2024-01-01' }
+          { id: 1, eventName: 'login', eventNameCn: 'Login', gameGid: 10000147, createdAt: '2024-01-01' }
         ];
         expect(() => assertEventArray(events)).not.toThrow();
       });
@@ -280,7 +262,7 @@ describe('typeGuards', () => {
     describe('assertGameArray', () => {
       it('should not throw for valid Game array', () => {
         const games: Game[] = [
-          { id: 1, gid: 10000147, name: 'Game', ods_db: 'ieu_ods', created_at: '2024-01-01' }
+          { id: 1, gid: 10000147, name: 'Game', odsDb: 'ieu_ods', createdAt: '2024-01-01' }
         ];
         expect(() => assertGameArray(games)).not.toThrow();
       });
@@ -294,7 +276,7 @@ describe('typeGuards', () => {
     describe('assertParameterArray', () => {
       it('should not throw for valid Parameter array', () => {
         const params: Parameter[] = [
-          { id: 1, param_name: 'zone_id', param_name_cn: '区域ID', param_type: 'int', game_gid: 10000147 }
+          { id: 1, paramName: 'zone_id', paramNameCn: '区域ID', paramType: 'int', gameGid: 10000147 }
         ];
         expect(() => assertParameterArray(params)).not.toThrow();
       });
@@ -320,7 +302,7 @@ describe('typeGuards', () => {
       const isGameArrayCustom = createArrayGuard(isGame);
 
       const games: Game[] = [
-        { id: 1, gid: 10000147, name: 'Game', ods_db: 'ieu_ods', created_at: '2024-01-01' }
+        { id: 1, gid: 10000147, name: 'Game', odsDb: 'ieu_ods', createdAt: '2024-01-01' }
       ];
 
       expect(isGameArrayCustom(games)).toBe(true);
@@ -335,7 +317,7 @@ describe('typeGuards', () => {
 
       const validResponse = {
         data: [
-          { id: 1, event_name: 'login', display_name: 'Login', game_gid: 10000147, event_type: 'user', created_at: '2024-01-01' }
+          { id: 1, eventName: 'login', eventNameCn: 'Login', gameGid: 10000147, createdAt: '2024-01-01' }
         ],
         success: true
       };
@@ -355,7 +337,7 @@ describe('typeGuards', () => {
 
       const response = {
         data: [
-          { id: 1, gid: 10000147, name: 'Game', ods_db: 'ieu_ods', created_at: '2024-01-01' }
+          { id: 1, gid: 10000147, name: 'Game', odsDb: 'ieu_ods', createdAt: '2024-01-01' }
         ],
         success: true
       };
@@ -380,8 +362,8 @@ describe('typeGuards', () => {
         id: 1,
         gid: 10000147,
         name: 'Test Game',
-        ods_db: 'ieu_ods',
-        created_at: '2024-01-01'
+        odsDb: 'ieu_ods',
+        createdAt: '2024-01-01'
       };
 
       expect(guards.isGame(game)).toBe(true);
@@ -395,8 +377,8 @@ describe('typeGuards', () => {
         id: 1,
         gid: 10000147,
         name: 'Game',
-        ods_db: 'ieu_ods',
-        created_at: '2024-01-01'
+        odsDb: 'ieu_ods',
+        createdAt: '2024-01-01'
       };
 
       if (isGame(data)) {
@@ -410,11 +392,11 @@ describe('typeGuards', () => {
 
     it('should narrow type with isEventArray', () => {
       const data: unknown = [
-        { id: 1, event_name: 'login', display_name: 'Login', game_gid: 10000147, event_type: 'user', created_at: '2024-01-01' }
+        { id: 1, eventName: 'login', eventNameCn: 'Login', gameGid: 10000147, createdAt: '2024-01-01' }
       ];
 
       if (isEventArray(data)) {
-        expect(data[0].event_name).toBe('login');
+        expect(data[0].eventName).toBe('login');
         expect(data.length).toBe(1);
       } else {
         fail('Should have been identified as Event array');
@@ -428,8 +410,8 @@ describe('typeGuards', () => {
         id: 1,
         gid: 10000147,
         name: 'Game',
-        ods_db: 'ieu_ods',
-        created_at: '2024-01-01',
+        odsDb: 'ieu_ods',
+        createdAt: '2024-01-01',
         extraProp: 'value',
         anotherProp: 123
       };
@@ -443,12 +425,12 @@ describe('typeGuards', () => {
     });
 
     it('should handle missing optional fields', () => {
-      // created_at is not validated in type guard
+      // createdAt is not validated in type guard
       const gameWithoutCreatedAt = {
         id: 1,
         gid: 10000147,
         name: 'Game',
-        ods_db: 'ieu_ods'
+        odsDb: 'ieu_ods'
       };
       expect(isGame(gameWithoutCreatedAt)).toBe(true);
     });
@@ -458,8 +440,8 @@ describe('typeGuards', () => {
         id: '1' as any,
         gid: 10000147,
         name: 'Game',
-        ods_db: 'ieu_ods',
-        created_at: '2024-01-01'
+        odsDb: 'ieu_ods',
+        createdAt: '2024-01-01'
       };
       expect(isGame(game)).toBe(false);
     });

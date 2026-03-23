@@ -18,32 +18,27 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
 import GameManagementModalGraphQL, { GameManagementModal } from './GameManagementModalGraphQL';
 import { GET_GAMES, CREATE_GAME } from '../../shared/graphql/operations';
 
-// Mock GraphQL operations
+// Mock GraphQL operations - must match GET_GAMES query fields exactly
+// Query fields: gid, name, odsDb, eventCount, parameterCount
 const mockGames = [
   {
-    id: 1,
     gid: 10000147,
     name: 'STAR001',
-    ods_db: 'ieu_ods',
+    odsDb: 'ieu_ods',
     eventCount: 5,
     parameterCount: 10,
-    createdAt: '2026-01-01T00:00:00Z',
-    updatedAt: '2026-01-01T00:00:00Z',
   },
   {
-    id: 2,
     gid: 10000148,
     name: 'Test Game',
-    ods_db: 'overseas_ods',
+    odsDb: 'overseas_ods',
     eventCount: 3,
     parameterCount: 7,
-    createdAt: '2026-01-02T00:00:00Z',
-    updatedAt: '2026-01-02T00:00:00Z',
   },
 ];
 
@@ -70,7 +65,7 @@ describe('GameManagementModalGraphQL', () => {
     it('应该显示"创建游戏"按钮', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <GameManagementModal />
+          <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 
@@ -90,7 +85,7 @@ describe('GameManagementModalGraphQL', () => {
     it('点击"创建游戏"按钮应该打开创建表单', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <GameManagementModal />
+          <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 
@@ -120,7 +115,7 @@ describe('GameManagementModalGraphQL', () => {
     it('创建按钮应该有正确的data-testid属性', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <GameManagementModal />
+          <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 
@@ -139,7 +134,7 @@ describe('GameManagementModalGraphQL', () => {
     it('应该显示游戏管理标题', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <GameManagementModal />
+          <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 
@@ -151,7 +146,7 @@ describe('GameManagementModalGraphQL', () => {
     it('应该显示游戏列表', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <GameManagementModal />
+          <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 
@@ -169,7 +164,7 @@ describe('GameManagementModalGraphQL', () => {
     it('应该显示搜索框', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <GameManagementModal />
+          <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 
@@ -188,7 +183,7 @@ describe('GameManagementModalGraphQL', () => {
     it('应该为每个游戏显示编辑和删除按钮', async () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <GameManagementModal />
+          <GameManagementModal isOpen={true} onClose={() => {}} />
         </MockedProvider>
       );
 

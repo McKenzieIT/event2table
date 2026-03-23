@@ -41,3 +41,19 @@ export type { UsePromiseConfirmReturn, ConfirmOptions as PromiseConfirmOptions }
 
 export { useRetry, useAsyncRetry } from './useRetry';
 export type { RetryOptions, RetryState, RetryReturn } from './useRetry';
+
+// Error Handling Hooks
+export {
+  useErrorHandler,
+  type ErrorHandlerOptions,
+  type ErrorHandlerState,
+  type ErrorHandlerResult,
+} from './useErrorHandler';
+
+export {
+  useAsyncAction,
+  useAsyncActionWithParams,
+  type AsyncState,
+  type AsyncActionOptions,
+  type AsyncActionResult,
+} from './useAsyncAction';

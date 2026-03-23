@@ -4,9 +4,9 @@
  */
 
 import React from 'react';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@test/test-utils';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   useGames,
   useGame,
@@ -28,6 +28,8 @@ import {
   GET_EVENTS,
   GET_EVENT,
   SEARCH_EVENTS,
+} from '../../shared/graphql/queries';
+import {
   CREATE_GAME,
   UPDATE_GAME,
   DELETE_GAME,
@@ -38,18 +40,19 @@ import {
 
 // Mock数据
 const mockGames = [
-  { gid: 1001, name: 'Game 1', odsDb: 'ieu_ods', eventCount: 10, parameterCount: 50 },
-  { gid: 1002, name: 'Game 2', odsDb: 'ieu_ods', eventCount: 20, parameterCount: 100 },
+  { __typename: 'Game', gid: 1001, name: 'Game 1', odsDb: 'ieu_ods', eventCount: 10, parameterCount: 50 },
+  { __typename: 'Game', gid: 1002, name: 'Game 2', odsDb: 'ieu_ods', eventCount: 20, parameterCount: 100 },
 ];
 
-const mockGame = { gid: 1001, name: 'Game 1', odsDb: 'ieu_ods', eventCount: 10, parameterCount: 50 };
+const mockGame = { __typename: 'Game', gid: 1001, name: 'Game 1', odsDb: 'ieu_ods', eventCount: 10, parameterCount: 50 };
 
 const mockEvents = [
-  { id: 1, eventName: 'login', eventNameCn: '登录', categoryName: '用户行为', paramCount: 5 },
-  { id: 2, eventName: 'purchase', eventNameCn: '购买', categoryName: '支付相关', paramCount: 10 },
+  { __typename: 'Event', id: 1, eventName: 'login', eventNameCn: '登录', categoryId: 1, categoryName: '用户行为', sourceTable: 'log_events', targetTable: 'dwd_events', paramCount: 5 },
+  { __typename: 'Event', id: 2, eventName: 'purchase', eventNameCn: '购买', categoryId: 2, categoryName: '支付相关', sourceTable: 'log_events', targetTable: 'dwd_events', paramCount: 10 },
 ];
 
 const mockEvent = {
+  __typename: 'Event',
   id: 1,
   gameGid: 1001,
   eventName: 'login',
@@ -62,11 +65,15 @@ const mockEvent = {
 };
 
 // 测试wrapper
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <MockedProvider mocks={[]} addTypename={false}>
-    {children}
-  </MockedProvider>
-);
+const createWrapper = (mocks: any[] = []) => {
+  return function Wrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <MockedProvider mocks={mocks} addTypename={false}>
+        {children}
+      </MockedProvider>
+    );
+  };
+};
 
 describe('GraphQL Hooks', () => {
   describe('useGames', () => {
@@ -86,11 +93,7 @@ describe('GraphQL Hooks', () => {
       ];
 
       const { result } = renderHook(() => useGames(20, 0), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -118,11 +121,7 @@ describe('GraphQL Hooks', () => {
       ];
 
       const { result } = renderHook(() => useGame(1001), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -133,7 +132,9 @@ describe('GraphQL Hooks', () => {
     });
 
     it('should skip query when gid is null', () => {
-      const { result } = renderHook(() => useGame(null), { wrapper });
+      const { result } = renderHook(() => useGame(null as any), {
+        wrapper: createWrapper([]),
+      });
 
       expect(result.current.loading).toBe(false);
       expect(result.current.data).toBeUndefined();
@@ -142,6 +143,11 @@ describe('GraphQL Hooks', () => {
 
   describe('useSearchGames', () => {
     it('should search games', async () => {
+      const searchMockGames = [
+        { __typename: 'Game', gid: 1001, name: 'Game 1', odsDb: 'ieu_ods' },
+        { __typename: 'Game', gid: 1002, name: 'Game 2', odsDb: 'ieu_ods' },
+      ];
+
       const mocks = [
         {
           request: {
@@ -150,29 +156,27 @@ describe('GraphQL Hooks', () => {
           },
           result: {
             data: {
-              searchGames: mockGames,
+              searchGames: searchMockGames,
             },
           },
         },
       ];
 
       const { result } = renderHook(() => useSearchGames('Game'), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
 
-      expect(result.current.data?.searchGames).toEqual(mockGames);
+      expect(result.current.data?.searchGames).toEqual(searchMockGames);
     });
 
     it('should skip query when query is empty', () => {
-      const { result } = renderHook(() => useSearchGames(''), { wrapper });
+      const { result } = renderHook(() => useSearchGames(''), {
+        wrapper: createWrapper([]),
+      });
 
       expect(result.current.loading).toBe(false);
       expect(result.current.data).toBeUndefined();
@@ -181,6 +185,31 @@ describe('GraphQL Hooks', () => {
 
   describe('useEvents', () => {
     it('should fetch events for a game', async () => {
+      const eventsMock = [
+        { 
+          __typename: 'Event', 
+          id: 1, 
+          eventName: 'login', 
+          eventNameCn: '登录', 
+          categoryId: 1, 
+          categoryName: '用户行为', 
+          sourceTable: 'log_events', 
+          targetTable: 'dwd_events', 
+          paramCount: 5 
+        },
+        { 
+          __typename: 'Event', 
+          id: 2, 
+          eventName: 'purchase', 
+          eventNameCn: '购买', 
+          categoryId: 2, 
+          categoryName: '支付相关', 
+          sourceTable: 'log_events', 
+          targetTable: 'dwd_events', 
+          paramCount: 10 
+        },
+      ];
+
       const mocks = [
         {
           request: {
@@ -189,29 +218,27 @@ describe('GraphQL Hooks', () => {
           },
           result: {
             data: {
-              events: mockEvents,
+              events: eventsMock,
             },
           },
         },
       ];
 
       const { result } = renderHook(() => useEvents(1001, 50, 0), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
 
-      expect(result.current.data?.events).toEqual(mockEvents);
+      expect(result.current.data?.events).toEqual(eventsMock);
     });
 
     it('should skip query when gameGid is null', () => {
-      const { result } = renderHook(() => useEvents(null), { wrapper });
+      const { result } = renderHook(() => useEvents(null as any), {
+        wrapper: createWrapper([]),
+      });
 
       expect(result.current.loading).toBe(false);
       expect(result.current.data).toBeUndefined();
@@ -235,11 +262,7 @@ describe('GraphQL Hooks', () => {
       ];
 
       const { result } = renderHook(() => useEvent(1), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -252,6 +275,11 @@ describe('GraphQL Hooks', () => {
 
   describe('useSearchEvents', () => {
     it('should search events', async () => {
+      const searchMockEvents = [
+        { __typename: 'Event', id: 1, eventName: 'login', eventNameCn: '登录', gameGid: 1001 },
+        { __typename: 'Event', id: 2, eventName: 'purchase', eventNameCn: '购买', gameGid: 1001 },
+      ];
+
       const mocks = [
         {
           request: {
@@ -260,25 +288,21 @@ describe('GraphQL Hooks', () => {
           },
           result: {
             data: {
-              searchEvents: mockEvents,
+              searchEvents: searchMockEvents,
             },
           },
         },
       ];
 
       const { result } = renderHook(() => useSearchEvents('login', 1001), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
 
-      expect(result.current.data?.searchEvents).toEqual(mockEvents);
+      expect(result.current.data?.searchEvents).toEqual(searchMockEvents);
     });
   });
 
@@ -294,31 +318,16 @@ describe('GraphQL Hooks', () => {
             data: {
               createGame: {
                 ok: true,
-                game: { gid: 1003, name: 'Game 3', odsDb: 'ieu_ods' },
+                game: { __typename: 'Game', gid: 1003, name: 'Game 3', odsDb: 'ieu_ods' },
                 errors: null,
               },
-            },
-          },
-        },
-        {
-          request: {
-            query: GET_GAMES,
-            variables: { limit: 20, offset: 0 },
-          },
-          result: {
-            data: {
-              games: [...mockGames, { gid: 1003, name: 'Game 3', odsDb: 'ieu_ods' }],
             },
           },
         },
       ];
 
       const { result } = renderHook(() => useCreateGame(), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -346,7 +355,7 @@ describe('GraphQL Hooks', () => {
             data: {
               updateGame: {
                 ok: true,
-                game: { gid: 1001, name: 'Updated Game 1', odsDb: 'ieu_ods' },
+                game: { __typename: 'Game', gid: 1001, name: 'Updated Game 1', odsDb: 'ieu_ods' },
                 errors: null,
               },
             },
@@ -355,11 +364,7 @@ describe('GraphQL Hooks', () => {
       ];
 
       const { result } = renderHook(() => useUpdateGame(), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -386,6 +391,7 @@ describe('GraphQL Hooks', () => {
           result: {
             data: {
               deleteGame: {
+                __typename: 'DeleteGamePayload',
                 ok: true,
                 message: 'Game deleted successfully',
                 errors: null,
@@ -393,25 +399,10 @@ describe('GraphQL Hooks', () => {
             },
           },
         },
-        {
-          request: {
-            query: GET_GAMES,
-            variables: { limit: 20, offset: 0 },
-          },
-          result: {
-            data: {
-              games: [mockGames[1]],
-            },
-          },
-        },
       ];
 
       const { result } = renderHook(() => useDeleteGame(), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -438,14 +429,13 @@ describe('GraphQL Hooks', () => {
               eventName: 'logout',
               eventNameCn: '登出',
               categoryId: 1,
-              includeInCommonParams: false,
             },
           },
           result: {
             data: {
               createEvent: {
                 ok: true,
-                event: { id: 3, eventName: 'logout', eventNameCn: '登出' },
+                event: { __typename: 'Event', id: 3, eventName: 'logout', eventNameCn: '登出' },
                 errors: null,
               },
             },
@@ -454,11 +444,7 @@ describe('GraphQL Hooks', () => {
       ];
 
       const { result } = renderHook(() => useCreateEvent(), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -472,7 +458,6 @@ describe('GraphQL Hooks', () => {
           eventName: 'logout',
           eventNameCn: '登出',
           categoryId: 1,
-          includeInCommonParams: false,
         },
       });
 
@@ -490,14 +475,13 @@ describe('GraphQL Hooks', () => {
               id: 1,
               eventNameCn: '用户登录',
               categoryId: 1,
-              includeInCommonParams: true,
             },
           },
           result: {
             data: {
               updateEvent: {
                 ok: true,
-                event: { id: 1, eventNameCn: '用户登录' },
+                event: { __typename: 'Event', id: 1, eventNameCn: '用户登录' },
                 errors: null,
               },
             },
@@ -506,11 +490,7 @@ describe('GraphQL Hooks', () => {
       ];
 
       const { result } = renderHook(() => useUpdateEvent(), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {
@@ -523,7 +503,6 @@ describe('GraphQL Hooks', () => {
           id: 1,
           eventNameCn: '用户登录',
           categoryId: 1,
-          includeInCommonParams: true,
         },
       });
 
@@ -542,6 +521,7 @@ describe('GraphQL Hooks', () => {
           result: {
             data: {
               deleteEvent: {
+                __typename: 'DeleteEventPayload',
                 ok: true,
                 message: 'Event deleted successfully',
                 errors: null,
@@ -552,11 +532,7 @@ describe('GraphQL Hooks', () => {
       ];
 
       const { result } = renderHook(() => useDeleteEvent(), {
-        wrapper: ({ children }) => (
-          <MockedProvider mocks={mocks} addTypename={false}>
-            {children}
-          </MockedProvider>
-        ),
+        wrapper: createWrapper(mocks),
       });
 
       await waitFor(() => {

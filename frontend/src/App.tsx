@@ -5,7 +5,8 @@
 import React from 'react';
 import { useRoutes, Navigate } from 'react-router-dom';
 import { routes } from './routes/routes';
-import ErrorBoundary from './shared/components/ErrorBoundary';
+import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
+import { ThemeProvider } from '@shared/ui';
 
 /**
  * App Component
@@ -13,14 +14,21 @@ import ErrorBoundary from './shared/components/ErrorBoundary';
  * Root component that sets up routing and error boundaries
  * NOTE: Suspense boundary removed - all components are now direct imports
  * to fix Playwright test timeout issues caused by double Suspense nesting.
+ *
+ * ThemeProvider wraps the app to provide theme context with:
+ * - localStorage persistence
+ * - data-theme attribute on document.documentElement
+ * - Dark mode default (Cyberpunk Lab Theme)
  */
 function App(): React.JSX.Element {
   const element = useRoutes(routes);
 
   return (
-    <ErrorBoundary>
-      {element || <Navigate to="/" replace />}
-    </ErrorBoundary>
+    <ThemeProvider>
+      <ErrorBoundary>
+        {element || <Navigate to="/" replace />}
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
 

@@ -1,0 +1,83 @@
+[
+  {
+    "eval_id": 0,
+    "eval_name": "branch-diverged-teaching",
+    "prompt": "我的本地分支和远程分支分叉了，本地有30个提交领先，远程有21个提交落后。请帮我分析问题并提供解决方案。",
+    "assertions": [
+      {
+        "name": "explains_why_rebase_vs_merge",
+        "description": "解释了为什么选择 rebase 而不是 merge，或者解释了两种方案的优缺点",
+        "type": "contains",
+        "expected": "rebase"
+      },
+      {
+        "name": "provides_best_practice_reasoning",
+        "description": "提供了最佳实践的理由说明（WHY）",
+        "type": "contains",
+        "expected": "为什么"
+      },
+      {
+        "name": "explains_tradeoffs",
+        "description": "解释了方案的权衡/优缺点",
+        "type": "contains_any",
+        "expected": ["优点", "缺点", "优点是", "缺点是", "好处", "风险"]
+      },
+      {
+        "name": "teaches_github_knowledge",
+        "description": "教授了 GitHub 相关知识",
+        "type": "contains_any",
+        "expected": ["最佳实践", "经验", "建议", "推荐"]
+      }
+    ]
+  },
+  {
+    "eval_id": 1,
+    "eval_name": "force-delete-branch-warning",
+    "prompt": "我想删除一个未合并的功能分支 feature/old-feature，git 提示需要使用 -D 强制删除。请告诉我该怎么做。",
+    "assertions": [
+      {
+        "name": "warns_about_data_loss",
+        "description": "警告了数据丢失风险",
+        "type": "contains_any",
+        "expected": ["丢失", "风险", "警告", "注意", "无法恢复"]
+      },
+      {
+        "name": "explains_why_branch_not_merged",
+        "description": "解释了为什么分支未合并",
+        "type": "contains_any",
+        "expected": ["未合并", "没有合并", "not merged", "独立"]
+      },
+      {
+        "name": "provides_alternative_options",
+        "description": "提供了替代选项",
+        "type": "contains_any",
+        "expected": ["合并", "merge", "备份", "stash", "cherry-pick"]
+      }
+    ]
+  },
+  {
+    "eval_id": 2,
+    "eval_name": "worktree-cleanup-guidance",
+    "prompt": "我刚完成了一个功能分支的开发，已经合并到 main 了。现在我有一个 worktree 在 .worktrees/feature-xyz，还有对应的分支 feature/xyz。请帮我清理。",
+    "assertions": [
+      {
+        "name": "explains_cleanup_order",
+        "description": "解释了清理顺序（先 worktree 后 branch）",
+        "type": "contains",
+        "expected": "worktree"
+      },
+      {
+        "name": "explains_why_this_order",
+        "description": "解释了为什么是这个顺序",
+        "type": "contains_any",
+        "expected": ["因为", "原因是", "所以", "需要先"]
+      },
+      {
+        "name": "confirms_before_destructive_action",
+        "description": "在破坏性操作前要求确认",
+        "type": "contains_any",
+        "expected": ["确认", "确定", "是否", "y/n"]
+      }
+    ]
+  }
+]

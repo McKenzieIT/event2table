@@ -30,7 +30,14 @@
  * </Card>
  */
 
-import React, { forwardRef, ForwardRefRenderFunction, memo, HTMLAttributes, ReactNode } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  memo,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
+
 import './Card.css';
 
 /**
@@ -68,10 +75,46 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, 'as'> {
 /**
  * Props for Card sub-components
  */
-interface CardSubComponentProps extends HTMLAttributes<HTMLDivElement> {
+export interface CardSubComponentProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   className?: string;
 }
+
+// Memoized sub-components (defined first for proper hoisting)
+const CardHeader = memo<CardSubComponentProps>(function CardHeader({ children, className = '', ...props }) {
+  return (
+    <div className={[`cyber-card__header`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </div>
+  );
+});
+
+const CardBody = memo<CardSubComponentProps>(function CardBody({ children, className = '', ...props }) {
+  return (
+    <div className={[`cyber-card__body`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </div>
+  );
+});
+
+const CardFooter = memo<CardSubComponentProps>(function CardFooter({ children, className = '', ...props }) {
+  return (
+    <div className={[`cyber-card__footer`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </div>
+  );
+});
+
+const CardTitle = memo<CardSubComponentProps>(function CardTitle({ children, className = '', ...props }) {
+  return (
+    <h3 className={[`cyber-card__title`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </h3>
+  );
+});
+
+// CardContent is an alias for CardBody
+const CardContent = CardBody;
 
 const Card: ForwardRefRenderFunction<HTMLElement, CardProps> = ({
   children,
@@ -123,59 +166,36 @@ const MemoizedCard = memo(ForwardedCard, (prevProps, nextProps) => {
   );
 });
 
-MemoizedCard.displayName = 'MemoizedCard';
+MemoizedCard.displayName = 'Card';
 
-// Memoized sub-components
-const CardHeader = memo<CardSubComponentProps>(function CardHeader({ children, className = '', ...props }) {
-  return (
-    <div className={[`cyber-card__header`, className].filter(Boolean).join(' ')} {...props}>
-      {children}
-    </div>
-  );
-});
-
-const CardBody = memo<CardSubComponentProps>(function CardBody({ children, className = '', ...props }) {
-  return (
-    <div className={[`cyber-card__body`, className].filter(Boolean).join(' ')} {...props}>
-      {children}
-    </div>
-  );
-});
-
-const CardFooter = memo<CardSubComponentProps>(function CardFooter({ children, className = '', ...props }) {
-  return (
-    <div className={[`cyber-card__footer`, className].filter(Boolean).join(' ')} {...props}>
-      {children}
-    </div>
-  );
-});
-
-const CardTitle = memo<CardSubComponentProps>(function CardTitle({ children, className = '', ...props }) {
-  return (
-    <h3 className={[`cyber-card__title`, className].filter(Boolean).join(' ')} {...props}>
-      {children}
-    </h3>
-  );
-});
-
-// Define CardWithSubComponents type
-interface CardWithSubComponents extends React.MemoExoticComponent<React.ForwardRefExoticComponent<CardProps & React.RefAttributes<HTMLElement>>> {
+// Define CardWithSubComponents interface with all sub-components
+interface CardWithSubComponents 
+  extends React.MemoExoticComponent<React.ForwardRefExoticComponent<CardProps & React.RefAttributes<HTMLElement>>> {
+  /** Card header section */
   Header: typeof CardHeader;
+  /** Card body section */
   Body: typeof CardBody;
+  /** Card footer section */
   Footer: typeof CardFooter;
+  /** Card title */
   Title: typeof CardTitle;
+  /** Card content (alias for Body) */
   Content: typeof CardBody;
 }
 
-// Attach sub-components to MemoizedCard with proper typing
+// Attach sub-components to the memoized Card
 const CardComponent = MemoizedCard as CardWithSubComponents;
 CardComponent.Header = CardHeader;
 CardComponent.Body = CardBody;
 CardComponent.Footer = CardFooter;
 CardComponent.Title = CardTitle;
-CardComponent.Content = CardBody;
+CardComponent.Content = CardContent;
 
-// Export sub-components as named exports
-export { CardHeader, CardBody, CardFooter, CardTitle };
+// Export sub-components as named exports for direct import
+export { CardHeader, CardBody, CardFooter, CardTitle, CardContent };
 
+// Export the main Card component with sub-components attached
+export { CardComponent as Card };
+
+// Default export for convenience
 export default CardComponent;

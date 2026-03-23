@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { Table } from '../Table';

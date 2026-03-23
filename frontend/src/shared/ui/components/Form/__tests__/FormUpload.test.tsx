@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import { useForm } from 'react-hook-form';
 import FormUpload from '../FormUpload';
 import Form from '../Form';

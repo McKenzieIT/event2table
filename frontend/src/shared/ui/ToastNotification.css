@@ -124,9 +124,4 @@
   max-width: 400px;
 }
 
-/* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .toast-notification {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  }
-}
+/* 深色模式 - 默认已是深色主题，无需额外样式 */
