@@ -102,7 +102,7 @@ const QUICK_ACTIONS: QuickAction[] = [
 /**
  * QuickActionButtons Component
  */
-export default function QuickActionButtons({
+export function QuickActionButtons({
   eventId,
   onFieldsAdded,
   disabled = false
