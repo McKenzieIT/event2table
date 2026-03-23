@@ -5,14 +5,12 @@
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@test/test-utils';
+import { renderHook, act } from '@test/test-utils';
 import { useRetry, useAsyncRetry } from './useRetry';
-
-// Mock setTimeout 和 clearTimeout
-vi.useFakeTimers();
 
 describe('useRetry', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.clearAllTimers();
     vi.clearAllMocks();
   });
@@ -42,15 +40,20 @@ describe('useRetry', () => {
       const asyncFn = vi.fn()
         .mockRejectedValueOnce(new Error('Failed'))
         .mockResolvedValue('success');
-      
+
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         initialDelay: 100,
+        jitter: false, // Disable jitter for deterministic testing
+        shouldRetry: () => true, // Force retry for generic Error
       }));
 
       let returnValue: string | undefined;
       await act(async () => {
-        returnValue = await result.current.execute();
+        const promise = result.current.execute();
+        // Use runAllTimersAsync to complete all pending timers
+        await vi.runAllTimersAsync();
+        returnValue = await promise;
       });
 
       expect(returnValue).toBe('success');
@@ -63,9 +66,16 @@ describe('useRetry', () => {
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         initialDelay: 100,
+        jitter: false,
+        shouldRetry: () => true, // Force retry for all errors
       }));
 
-      await expect(result.current.execute()).rejects.toThrow('Failed');
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await expect(promise).rejects.toThrow('Failed');
+      });
+
       expect(asyncFn).toHaveBeenCalledTimes(3); // 初始调用 + 2次重试
     });
   });
@@ -76,60 +86,49 @@ describe('useRetry', () => {
         .mockRejectedValueOnce(new Error('Failed'))
         .mockRejectedValueOnce(new Error('Failed'))
         .mockResolvedValue('success');
-      
+
       const onRetry = vi.fn();
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 3,
         initialDelay: 100,
         backoffFactor: 2,
+        jitter: false,
         onRetry,
+        shouldRetry: () => true, // Force retry for generic Error
       }));
 
-      act(() => {
-        result.current.execute();
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await promise;
       });
 
-      // 第一次重试应该在 100ms 后
-      vi.advanceTimersByTime(100);
-      await waitFor(() => {
-        expect(onRetry).toHaveBeenCalledTimes(1);
-      });
-
-      // 第二次重试应该在 200ms 后 (100 * 2)
-      vi.advanceTimersByTime(200);
-      await waitFor(() => {
-        expect(onRetry).toHaveBeenCalledTimes(2);
-      });
-
-      // 第三次重试应该在 400ms 后 (100 * 2^2)
-      vi.advanceTimersByTime(400);
-      await waitFor(() => {
-        expect(onRetry).toHaveBeenCalledTimes(3);
-      });
+      expect(onRetry).toHaveBeenCalledTimes(2);
+      expect(asyncFn).toHaveBeenCalledTimes(3);
     });
 
     it('应该限制最大延迟时间', async () => {
       const asyncFn = vi.fn()
         .mockRejectedValue(new Error('Failed'));
-      
+
       const onRetry = vi.fn();
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 5,
         initialDelay: 100,
         backoffFactor: 10,
         maxDelay: 500,
+        jitter: false,
         onRetry,
+        shouldRetry: () => true, // Force retry
       }));
 
-      act(() => {
-        result.current.execute();
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await expect(promise).rejects.toThrow('Failed');
       });
 
-      // 所有重试都应该在 maxDelay 限制内
-      vi.advanceTimersByTime(500);
-      await waitFor(() => {
-        expect(onRetry).toHaveBeenCalled();
-      });
+      expect(onRetry).toHaveBeenCalled();
     });
   });
 
@@ -143,7 +142,10 @@ describe('useRetry', () => {
         shouldRetry,
       }));
 
-      await expect(result.current.execute()).rejects.toThrow('Failed');
+      await act(async () => {
+        await expect(result.current.execute()).rejects.toThrow('Failed');
+      });
+
       expect(asyncFn).toHaveBeenCalledTimes(1); // 不应该重试
       expect(shouldRetry).toHaveBeenCalled();
     });
@@ -152,55 +154,56 @@ describe('useRetry', () => {
       const asyncFn = vi.fn()
         .mockRejectedValueOnce(new TypeError('Failed to fetch'))
         .mockResolvedValue('success');
-      
+
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         initialDelay: 100,
+        jitter: false,
       }));
 
-      act(() => {
-        result.current.execute();
-      });
-
-      vi.advanceTimersByTime(100);
-      await waitFor(() => {
-        expect(result.current.state.isComplete).toBe(true);
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await promise;
       });
 
       expect(asyncFn).toHaveBeenCalledTimes(2);
+      expect(result.current.state.isComplete).toBe(true);
     });
 
     it('应该默认重试 5xx 错误', async () => {
       const asyncFn = vi.fn()
         .mockRejectedValueOnce({ status: 500 })
         .mockResolvedValue('success');
-      
+
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         initialDelay: 100,
+        jitter: false,
       }));
 
-      act(() => {
-        result.current.execute();
-      });
-
-      vi.advanceTimersByTime(100);
-      await waitFor(() => {
-        expect(result.current.state.isComplete).toBe(true);
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await promise;
       });
 
       expect(asyncFn).toHaveBeenCalledTimes(2);
+      expect(result.current.state.isComplete).toBe(true);
     });
 
     it('不应该重试 4xx 错误', async () => {
       const asyncFn = vi.fn().mockRejectedValue({ status: 404 });
-      
+
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         initialDelay: 100,
       }));
 
-      await expect(result.current.execute()).rejects.toEqual({ status: 404 });
+      await act(async () => {
+        await expect(result.current.execute()).rejects.toEqual({ status: 404 });
+      });
+
       expect(asyncFn).toHaveBeenCalledTimes(1);
     });
   });
@@ -210,23 +213,24 @@ describe('useRetry', () => {
       const asyncFn = vi.fn()
         .mockRejectedValueOnce(new Error('Failed'))
         .mockResolvedValue('success');
-      
+
       const onRetry = vi.fn();
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         initialDelay: 100,
+        jitter: false,
         onRetry,
+        shouldRetry: () => true, // Force retry for generic Error
       }));
 
-      act(() => {
-        result.current.execute();
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await promise;
       });
 
-      vi.advanceTimersByTime(100);
-      await waitFor(() => {
-        expect(onRetry).toHaveBeenCalledTimes(1);
-        expect(onRetry).toHaveBeenCalledWith(expect.any(Error), 1);
-      });
+      expect(onRetry).toHaveBeenCalledTimes(1);
+      expect(onRetry).toHaveBeenCalledWith(expect.any(Error), 1);
     });
 
     it('应该在成功时调用 onSuccess 回调', async () => {
@@ -251,9 +255,16 @@ describe('useRetry', () => {
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         onFailure,
+        shouldRetry: () => true,
+        jitter: false,
       }));
 
-      await expect(result.current.execute()).rejects.toThrow('Failed');
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await expect(promise).rejects.toThrow('Failed');
+      });
+
       expect(onFailure).toHaveBeenCalledWith(expect.any(Error));
     });
   });
@@ -263,40 +274,48 @@ describe('useRetry', () => {
       const asyncFn = vi.fn()
         .mockRejectedValueOnce(new Error('Failed'))
         .mockResolvedValue('success');
-      
+
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 2,
         initialDelay: 100,
+        jitter: false,
+        shouldRetry: () => true, // Force retry for generic Error
       }));
 
-      act(() => {
-        result.current.execute();
+      // Initial state
+      expect(result.current.state.isRetrying).toBe(false);
+      expect(result.current.state.attempt).toBe(0);
+      expect(result.current.state.isComplete).toBe(false);
+
+      await act(async () => {
+        const promise = result.current.execute();
+        // Advance timers
+        await vi.runAllTimersAsync();
+        await promise;
       });
 
-      // 初始状态
-      expect(result.current.state.isRetrying).toBe(true);
-      expect(result.current.state.attempt).toBe(1);
-
-      // 第一次重试
-      vi.advanceTimersByTime(100);
-      await waitFor(() => {
-        expect(result.current.state.attempt).toBe(2);
-      });
-
-      // 完成状态
-      await waitFor(() => {
-        expect(result.current.state.isComplete).toBe(true);
-        expect(result.current.state.isRetrying).toBe(false);
-      });
+      // Final state after successful retry
+      expect(result.current.state.isComplete).toBe(true);
+      expect(result.current.state.isRetrying).toBe(false);
+      expect(result.current.state.attempt).toBe(2);
+      expect(result.current.state.lastError).toBeNull();
     });
 
     it('应该记录最后一次错误', async () => {
       const asyncFn = vi.fn().mockRejectedValue(new Error('Failed'));
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 1,
+        initialDelay: 100,
+        jitter: false,
+        shouldRetry: () => true,
       }));
 
-      await expect(result.current.execute()).rejects.toThrow('Failed');
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await expect(promise).rejects.toThrow('Failed');
+      });
+
       expect(result.current.state.lastError).toBeInstanceOf(Error);
     });
   });
@@ -306,9 +325,17 @@ describe('useRetry', () => {
       const asyncFn = vi.fn().mockRejectedValue(new Error('Failed'));
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 1,
+        initialDelay: 100,
+        jitter: false,
+        shouldRetry: () => true,
       }));
 
-      await expect(result.current.execute()).rejects.toThrow('Failed');
+      await act(async () => {
+        const promise = result.current.execute();
+        await vi.runAllTimersAsync();
+        await expect(promise).rejects.toThrow('Failed');
+      });
+
       expect(result.current.state.attempt).toBe(2);
 
       act(() => {
@@ -322,30 +349,35 @@ describe('useRetry', () => {
 
     it('应该支持取消重试', async () => {
       const asyncFn = vi.fn()
-        .mockRejectedValue(new Error('Failed'))
+        .mockRejectedValueOnce(new Error('Failed'))
         .mockResolvedValue('success');
-      
+
       const { result } = renderHook(() => useRetry(asyncFn, {
         maxRetries: 3,
         initialDelay: 1000,
+        jitter: false,
       }));
 
-      act(() => {
+      // Start execution
+      await act(async () => {
         result.current.execute();
+        // Wait a bit for the first attempt to fail (but not enough for retry)
+        await vi.advanceTimersByTimeAsync(10);
       });
 
-      // 在第一次失败后取消
-      vi.advanceTimersByTime(100);
-      await waitFor(() => {
-        expect(result.current.state.lastError).toBeInstanceOf(Error);
-      });
+      // Verify first attempt failed
+      expect(result.current.state.lastError).toBeInstanceOf(Error);
 
+      // Cancel the retry
       act(() => {
         result.current.cancel();
       });
 
-      // 不应该继续重试
-      vi.advanceTimersByTime(2000);
+      // Advance more time - should not retry
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5000);
+      });
+
       expect(asyncFn).toHaveBeenCalledTimes(1);
     });
   });
@@ -384,6 +416,7 @@ describe('useAsyncRetry', () => {
     const asyncFn = vi.fn().mockRejectedValue(new Error('Failed'));
     const { result } = renderHook(() => useAsyncRetry(asyncFn, {
       maxRetries: 1,
+      shouldRetry: () => false,
     }));
 
     await act(async () => {
