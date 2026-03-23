@@ -3766,3 +3766,59 @@ module.exports = {
 - **[Test Fix Iteration]**([docs/lessons-learned/test-fix-iteration.md])
 - **[Testing Guide]**([docs/lessons-learned/testing-guide.md])
 - **[Typescript Migration]**([docs/lessons-learned/typescript-migration.md])
+
+## 经验文档快速查找 ⭐ **极其重要**
+
+> **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
+
+### 核心经验文档
+- **[Hive_Type_Documentation_Update_Summary]**([docs/lessons-learned/HIVE_TYPE_DOCUMENTATION_UPDATE_SUMMARY.md])
+- **[Readme]**([docs/lessons-learned/README.md])
+- **[Agent Browser Testing]**([docs/lessons-learned/agent-browser-testing.md])
+- **[Api Design Patterns]**([docs/lessons-learned/api-design-patterns.md])
+- **[Database Patterns]**([docs/lessons-learned/database-patterns.md])
+- **[Debugging Skills]**([docs/lessons-learned/debugging-skills.md])
+- **[Deployment Operations]**([docs/lessons-learned/deployment-operations.md])
+- **[Event Node Builder Errors]**([docs/lessons-learned/event-node-builder-errors.md])
+- **[Graphql Field Completeness]**([docs/lessons-learned/graphql-field-completeness.md])
+- **[Mutation Business Logic]**([docs/lessons-learned/mutation-business-logic.md])
+- **[Mypy Compliance]**([docs/lessons-learned/mypy-compliance.md])
+- **[Performance Patterns]**([docs/lessons-learned/performance-patterns.md])
+- **[Project Management]**([docs/lessons-learned/project-management.md])
+- **[Python Development]**([docs/lessons-learned/python-development.md])
+- **[Refactoring Checklist]**([docs/lessons-learned/refactoring-checklist.md])
+- **[Repository Migration]**([docs/lessons-learned/repository-migration.md])
+- **[Security Essentials]**([docs/lessons-learned/security-essentials.md])
+- **[Security Integration Testing]**([docs/lessons-learned/security-integration-testing.md])
+- **[Service Architecture]**([docs/lessons-learned/service-architecture.md])
+- **[Test Fix Iteration]**([docs/lessons-learned/test-fix-iteration.md])
+- **[Testing Guide]**([docs/lessons-learned/testing-guide.md])
+- **[Typescript Migration]**([docs/lessons-learned/typescript-migration.md])
+
+## 经验文档快速查找 ⭐ **极其重要**
+
+> **🚨 所有项目经验已整合到经验文档系统，避免重复，持续更新**
+
+### 核心经验文档
+- **[Hive_Type_Documentation_Update_Summary]**([docs/lessons-learned/HIVE_TYPE_DOCUMENTATION_UPDATE_SUMMARY.md])
+- **[Agent Browser Testing]**([docs/lessons-learned/agent-browser-testing.md])
+- **[Api Design Patterns]**([docs/lessons-learned/api-design-patterns.md])
+- **[Database Patterns]**([docs/lessons-learned/database-patterns.md])
+- **[Debugging Skills]**([docs/lessons-learned/debugging-skills.md])
+- **[Deployment Operations]**([docs/lessons-learned/deployment-operations.md])
+- **[Event Node Builder Errors]**([docs/lessons-learned/event-node-builder-errors.md])
+- **[Graphql Field Completeness]**([docs/lessons-learned/graphql-field-completeness.md])
+- **[Mutation Business Logic]**([docs/lessons-learned/mutation-business-logic.md])
+- **[Mypy Compliance]**([docs/lessons-learned/mypy-compliance.md])
+- **[Performance Patterns]**([docs/lessons-learned/performance-patterns.md])
+- **[Project Management]**([docs/lessons-learned/project-management.md])
+- **[Python Development]**([docs/lessons-learned/python-development.md])
+- **[React Best Practices]**([docs/lessons-learned/react-best-practices.md])
+- **[Refactoring Checklist]**([docs/lessons-learned/refactoring-checklist.md])
+- **[Repository Migration]**([docs/lessons-learned/repository-migration.md])
+- **[Security Essentials]**([docs/lessons-learned/security-essentials.md])
+- **[Security Integration Testing]**([docs/lessons-learned/security-integration-testing.md])
+- **[Service Architecture]**([docs/lessons-learned/service-architecture.md])
+- **[Test Fix Iteration]**([docs/lessons-learned/test-fix-iteration.md])
+- **[Testing Guide]**([docs/lessons-learned/testing-guide.md])
+- **[Typescript Migration]**([docs/lessons-learned/typescript-migration.md])

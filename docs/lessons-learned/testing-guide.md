@@ -3095,3 +3095,494 @@ mcp__chrome-devtools__await_text({
 - P1经验点：9个 (+2)
 - 总计：22个测试经验点 (+4)
 - 最后更新：2026-03-21 🆕 新增TDD与E2E测试综合经验
+
+### 来自 docs/test-coverage-scan-2026-03-21.md (2026-03-23)
+
+**关键主题**:
+- 组件库优化最终验收扫描报告
+- 执行摘要
+- 关键指标
+- 1. 测试覆盖率分析
+- 1.1 整体覆盖率
+
+**重要经验**:
+- 本次验收扫描对 Event2Table 组件库优化工作进行了全面验证，涵盖测试覆盖率、测试文件完整性、测试文件组织结构等关键指标。扫描结果显示组件库在经过4个阶段的优化后，测试覆盖率显著提升，测试基础设施完善。
+- ### 关键指标
+- | 组件文件总数 | 69 | ✅ |
+- | 测试文件总数 | 41 | ✅ |
+- | 测试代码总行数 | 12,508 | ✅ |
+
+
+### 权限配置报告
+
+> **Priority**: P2
+> **Source**: docs/reports/2026-03-23/PERMISSIONS-SETUP.md | reflective-extract-0.58
+> **Tags**: quality-0.58
+> **Extracted**: 2026-03-23
+
+#### 🚨 Problem
+
+**修复的问题数**: 0
+
+## 详细信息
+
+### 检查的目录
+
+总共检查了 8 个目录：
+- `.claude/skills/update-docs/core`
+- `.claude/skills/update-docs/kg/storage`
+- `.claude/skills/update-docs/scripts`
+- `.claude/skills/update-docs/tests`
+- `docs`
+- `docs/lessons-learned`
+- `docs/reports`
+- `docs/archive`
+
+## 下一步
+
+权限配置完成，可以开始实施自动化系统。
+
+#### ✅ Solution
+
+**修复的问题数**: 0
+
+## 详细信息
+
+### 检查的目录
+
+总共检查了 8 个目录：
+- `.claude/skills/update-docs/core`
+- `.claude/skills/update-docs/kg/storage`
+- `.claude/skills/update-docs/scripts`
+- `.claude/skills/update-docs/tests`
+- `docs`
+- `docs/lessons-learned`
+- `docs/reports`
+- `docs/archive`
+
+## 下一步
+
+权限配置完成，可以开始实施自动化系统。
+
+---
+
+
+### Workflow Orchestrator - Phase 1 实施报告
+
+> **Priority**: P1
+> **Source**: docs/reports/2026-03-23/WORKFLOW-ORCHESTRATOR-PHASE1-REPORT.md | reflective-extract-0.94
+> **Tags**: Python, quality-0.94
+> **Extracted**: 2026-03-23
+
+#### 🚨 Problem
+
+**执行结果**: ✅ 所有权限配置成功，0个问题
+
+#### 2. 添加Edit权限到settings.json
+
+**文件**: `/Users/mckenzie/Documents/event2table/.claude/settings.json`
+
+**添加的权限**:
+- `Edit(//Users/mckenzie/.claude/skills/update-docs/**)` - 允许编辑update-docs技能目录
+- `Edit(//Users/mckenzie/Documents/event2table/docs/**)` - 允许编辑项目文档目录
+
+**结果**: ✅ 解决了权限提示问题
+
+---
+
+### ✅ 阶段1: 工作流编排器（已完成）
+
+#### 1. 创建WorkflowOrchestrator类
+
+**文件**: `/Users/mckenzie/.claude/skills/update-docs/core/workflow_orchestrator.py`
+
+**核心类**:
+
+**PhaseResult** - 阶段执行结果：
+```python
+@dataclass
+class PhaseResult:
+phase_name: str
+success: bool
+duration_seconds: float = 0.0
+items_processed: int = 0
+items_changed: int = 0
+errors: List[str] = field(default_factory=list)
+warnings: List[str] = field(default_factory=list)
+```
+
+**WorkflowResult** - 工作流执行结果：
+```python
+@dataclass
+class WorkflowResult:
+success: bool
+phases_completed: List[str]
+phases_failed: List[str]
+duration_seconds: float
+metrics: Dict[str, Any]
+errors: List[Exception]
+timestamp: datetime
+```
+
+**WorkflowOrchestr
+
+#### ✅ Solution
+
+- 自动检查并修复所有必需目录的权限
+- 支持.git目录权限验证
+- 支持Python目录权限配置
+- 生成权限检查报告
+
+**必需目录列表**:
+```python
+REQUIRED_DIRS = [
+".claude/skills/update-docs/core",
+".claude/skills/update-docs/kg/storage",
+".claude/skills/update-docs/scripts",
+".claude/skills/update-docs/tests",
+"docs",
+"docs/lessons-learned",
+"docs/reports",
+"docs/archive",
+]
+```
+
+**执行结果**: ✅ 所有权限配置成功，0个问题
+
+#### 2. 添加Edit权限到settings.json
+
+**文件**: `/Users/mckenzie/Documents/event2table/.claude/settings.json`
+
+**添加的权限**:
+- `Edit(//Users/mckenzie/.claude/skills/update-docs/**)` - 允许编辑update-docs技能目录
+- `Edit(//Users/mckenzie/Documents/event2table/docs/**)` - 允许编辑项目文档目录
+
+**结果**: ✅ 解决了权限提示问题
+
+---
+
+### ✅ 阶段1: 工作流编排器（已完成）
+
+#### 1. 创建WorkflowOrchestrator类
+
+**文件**: `/Users/mckenzie/.claude/skills/update-docs/core/workflow_orchestrator.py`
+
+**核心类**:
+
+**PhaseResult** - 阶段执行结果：
+```python
+@dataclass
+class PhaseResult:
+phase_name: str
+success: bool
+duration_seconds: float = 0.0
+items_processed: int = 0
+items_changed: int = 0
+errors: List[str] = field(default_factory=list)
+warnings: List[str] = field(default_factory=list)
+```
+
+**WorkflowResult** - 工作流执行结果：
+```python
+@dataclass
+class WorkflowResult:
+success: bool
+phases_completed: List[str]
+phases_failed: List[str]
+duration_seconds: float
+metrics: Dict[str, Any]
+errors: List[Exception]
+timestamp: datetime
+```
+
+**WorkflowOrchestrator** - 核心编排器：
+```python
+class WorkflowOrchestrator:
+PHASES = [
+"change_detection",
+"document_updates",
+"duplicate_detection",
+"experience_extraction",
+"auto_archiving",
+"index_updates",
+"knowledge_graph_updates",
+]
+
+PARALLEL_PHASES = [
+["duplicate_detection", "experience_extraction"],
+["auto_archiving", "index_updates"],
+]
+
+def execute_full_workflow(self) -> WorkflowResult
+def execute_phase(self, phase_name: str) -> PhaseResult
+```
+
+**关键特性**:
+- ✅ 7阶段自动化工作流
+- ✅ 并行执行支持（阶段3+4，5+6）
+- ✅ 错误恢复机制（最大重试3次）
+- ✅ 进度跟踪和报告
+- ✅ 性能目标：35秒总时间
+
+#### 2. 支持类实现
+
+**ProgressTracker** - 进度跟踪器：
+- 跟踪当前执行阶段
+- 记录已完成阶段
+- 生成进度百分比报告
+
+**ErrorRecovery** - 错误恢复器：
+- 判断阶段是否应该重试
+- 提供恢复策略建议
+- 管理重试计数
+
+####
+
+---
+
+
+### Test Experience
+
+> **Priority**: P2
+> **Source**: test-source.md
+> **Tags**: test
+> **Extracted**: 2026-03-23
+
+#### 🚨 Problem
+
+Test problem description
+
+#### ✅ Solution
+
+Test solution description
+
+---
+
+
+### 权限配置报告
+
+> **Priority**: P2
+> **Source**: docs/reports/2026-03-23/PERMISSIONS-SETUP.md | reflective-extract-0.58
+> **Tags**: quality-0.58
+> **Extracted**: 2026-03-23
+
+#### 🚨 Problem
+
+**修复的问题数**: 0
+
+## 详细信息
+
+### 检查的目录
+
+总共检查了 8 个目录：
+- `.claude/skills/update-docs/core`
+- `.claude/skills/update-docs/kg/storage`
+- `.claude/skills/update-docs/scripts`
+- `.claude/skills/update-docs/tests`
+- `docs`
+- `docs/lessons-learned`
+- `docs/reports`
+- `docs/archive`
+
+## 下一步
+
+权限配置完成，可以开始实施自动化系统。
+
+#### ✅ Solution
+
+**修复的问题数**: 0
+
+## 详细信息
+
+### 检查的目录
+
+总共检查了 8 个目录：
+- `.claude/skills/update-docs/core`
+- `.claude/skills/update-docs/kg/storage`
+- `.claude/skills/update-docs/scripts`
+- `.claude/skills/update-docs/tests`
+- `docs`
+- `docs/lessons-learned`
+- `docs/reports`
+- `docs/archive`
+
+## 下一步
+
+权限配置完成，可以开始实施自动化系统。
+
+---
+
+
+### Workflow Orchestrator - Phase 1 实施报告
+
+> **Priority**: P1
+> **Source**: docs/reports/2026-03-23/WORKFLOW-ORCHESTRATOR-PHASE1-REPORT.md | reflective-extract-0.94
+> **Tags**: Python, quality-0.94
+> **Extracted**: 2026-03-23
+
+#### 🚨 Problem
+
+**执行结果**: ✅ 所有权限配置成功，0个问题
+
+#### 2. 添加Edit权限到settings.json
+
+**文件**: `/Users/mckenzie/Documents/event2table/.claude/settings.json`
+
+**添加的权限**:
+- `Edit(//Users/mckenzie/.claude/skills/update-docs/**)` - 允许编辑update-docs技能目录
+- `Edit(//Users/mckenzie/Documents/event2table/docs/**)` - 允许编辑项目文档目录
+
+**结果**: ✅ 解决了权限提示问题
+
+---
+
+### ✅ 阶段1: 工作流编排器（已完成）
+
+#### 1. 创建WorkflowOrchestrator类
+
+**文件**: `/Users/mckenzie/.claude/skills/update-docs/core/workflow_orchestrator.py`
+
+**核心类**:
+
+**PhaseResult** - 阶段执行结果：
+```python
+@dataclass
+class PhaseResult:
+phase_name: str
+success: bool
+duration_seconds: float = 0.0
+items_processed: int = 0
+items_changed: int = 0
+errors: List[str] = field(default_factory=list)
+warnings: List[str] = field(default_factory=list)
+```
+
+**WorkflowResult** - 工作流执行结果：
+```python
+@dataclass
+class WorkflowResult:
+success: bool
+phases_completed: List[str]
+phases_failed: List[str]
+duration_seconds: float
+metrics: Dict[str, Any]
+errors: List[Exception]
+timestamp: datetime
+```
+
+**WorkflowOrchestr
+
+#### ✅ Solution
+
+- 自动检查并修复所有必需目录的权限
+- 支持.git目录权限验证
+- 支持Python目录权限配置
+- 生成权限检查报告
+
+**必需目录列表**:
+```python
+REQUIRED_DIRS = [
+".claude/skills/update-docs/core",
+".claude/skills/update-docs/kg/storage",
+".claude/skills/update-docs/scripts",
+".claude/skills/update-docs/tests",
+"docs",
+"docs/lessons-learned",
+"docs/reports",
+"docs/archive",
+]
+```
+
+**执行结果**: ✅ 所有权限配置成功，0个问题
+
+#### 2. 添加Edit权限到settings.json
+
+**文件**: `/Users/mckenzie/Documents/event2table/.claude/settings.json`
+
+**添加的权限**:
+- `Edit(//Users/mckenzie/.claude/skills/update-docs/**)` - 允许编辑update-docs技能目录
+- `Edit(//Users/mckenzie/Documents/event2table/docs/**)` - 允许编辑项目文档目录
+
+**结果**: ✅ 解决了权限提示问题
+
+---
+
+### ✅ 阶段1: 工作流编排器（已完成）
+
+#### 1. 创建WorkflowOrchestrator类
+
+**文件**: `/Users/mckenzie/.claude/skills/update-docs/core/workflow_orchestrator.py`
+
+**核心类**:
+
+**PhaseResult** - 阶段执行结果：
+```python
+@dataclass
+class PhaseResult:
+phase_name: str
+success: bool
+duration_seconds: float = 0.0
+items_processed: int = 0
+items_changed: int = 0
+errors: List[str] = field(default_factory=list)
+warnings: List[str] = field(default_factory=list)
+```
+
+**WorkflowResult** - 工作流执行结果：
+```python
+@dataclass
+class WorkflowResult:
+success: bool
+phases_completed: List[str]
+phases_failed: List[str]
+duration_seconds: float
+metrics: Dict[str, Any]
+errors: List[Exception]
+timestamp: datetime
+```
+
+**WorkflowOrchestrator** - 核心编排器：
+```python
+class WorkflowOrchestrator:
+PHASES = [
+"change_detection",
+"document_updates",
+"duplicate_detection",
+"experience_extraction",
+"auto_archiving",
+"index_updates",
+"knowledge_graph_updates",
+]
+
+PARALLEL_PHASES = [
+["duplicate_detection", "experience_extraction"],
+["auto_archiving", "index_updates"],
+]
+
+def execute_full_workflow(self) -> WorkflowResult
+def execute_phase(self, phase_name: str) -> PhaseResult
+```
+
+**关键特性**:
+- ✅ 7阶段自动化工作流
+- ✅ 并行执行支持（阶段3+4，5+6）
+- ✅ 错误恢复机制（最大重试3次）
+- ✅ 进度跟踪和报告
+- ✅ 性能目标：35秒总时间
+
+#### 2. 支持类实现
+
+**ProgressTracker** - 进度跟踪器：
+- 跟踪当前执行阶段
+- 记录已完成阶段
+- 生成进度百分比报告
+
+**ErrorRecovery** - 错误恢复器：
+- 判断阶段是否应该重试
+- 提供恢复策略建议
+- 管理重试计数
+
+####
+
+---
+

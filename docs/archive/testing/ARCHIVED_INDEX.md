@@ -130,3 +130,7 @@ Ralph Loop迭代测试报告（2026年2月）：
 ## 2026-03-20 归档
 
 - `docs/reports/2026-03/FORM-VALIDATION-TEST-REPORT.md` → `docs/archive/testing/2026-03/FORM-VALIDATION-TEST-REPORT.md`
+
+## 2026-03-23 归档
+
+- `docs/reports/2026-03-21-test-optimization.md` → `docs/archive/testing/2026-03/2026-03-21-test-optimization.md`

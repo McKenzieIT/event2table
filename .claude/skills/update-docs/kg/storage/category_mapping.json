@@ -1,0 +1,20 @@
+{
+  "category_mapping": {
+    "docs/lessons-learned/api-design-patterns.md": "API",
+    "docs/lessons-learned/react-best-practices.md": "React",
+    "docs/lessons-learned/security-essentials.md": "Security",
+    "docs/lessons-learned/performance-patterns.md": "Performance",
+    "docs/lessons-learned/testing-guide.md": "Testing",
+    "docs/lessons-learned/database-patterns.md": "Database",
+    "docs/implementation-reports/test-extraction.md": "TypeScript",
+    "docs/reports/2026-03-23/PERMISSIONS-SETUP.md": "Testing",
+    "docs/reports/2026-03-23/WORKFLOW-ORCHESTRATOR-PHASE1-REPORT.md": "Testing",
+    "docs/reports/2026-03-21/DOC-INTEGRATION-FINAL-REPORT-ROUND2.md": "TypeScript"
+  },
+  "metadata": {
+    "last_updated": "2026-03-23T14:08:10.862903",
+    "total_categories": 7,
+    "total_documents": 10,
+    "auto_learned": true
+  }
+}

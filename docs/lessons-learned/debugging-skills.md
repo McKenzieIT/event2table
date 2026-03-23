@@ -851,3 +851,188 @@ npm run test:e2e  # E2E测试
 - ### 技术注意事项
 - ### 协作注意事项
 
+
+### 来自 docs/plans/2026-03-21-cache-refactor-implementation.md (2026-03-22)
+
+**关键主题**:
+- 缓存系统重构实施计划
+- 前置条件
+- 确保在项目根目录
+- 激活虚拟环境
+- 验证环境
+
+**重要经验**:
+- python --version  # 应该是 Python 3.14.2
+- pytest --version   # 应该是 pytest 7.4.3
+- # 运行Parameter Repository测试（应该13个失败）
+- kwargs: 关键字参数字典
+- logger.debug(f"✅ 缓存命中: {cache_key}")
+
+
+### 来自 docs/superpowers/plans/2026-03-20-component-library-phase2-plan.md (2026-03-22)
+
+**关键主题**:
+- 组件库现代化第二阶段实施计划
+- 文件结构
+- 新增文件
+- 修改文件
+- 阶段1：迁移与统一 (2周)
+
+**重要经验**:
+- | 组件 | 目标覆盖率 | 关键测试点 |
+
+
+### 来自 docs/superpowers/specs/2026-03-20-component-library-phase2-design.md (2026-03-22)
+
+**关键主题**:
+- 组件库现代化第二阶段设计文档
+- 概述
+- 项目背景
+- 当前状态
+- 发现的问题
+
+**重要经验**:
+- | isOpen | ✅ | ✅ | 兼容 |
+- | onClose | ✅ | ✅ | 兼容 |
+- | title | ✅ | ✅ | 兼容 |
+- | children | ✅ | ✅ | 兼容 |
+- | size | ✅ | ✅ | 兼容 |
+
+
+### 来自 docs/README.md (2026-03-23)
+
+**关键主题**:
+- Event2Table Documentation Center
+- 📊 Documentation Statistics
+
+
+### 来自 docs/CLAUDE.md (2026-03-23)
+
+**关键主题**:
+- Recent Activity
+
+
+### 来自 docs/reports/2026-03-23/IMPLEMENTATION-SUMMARY.md (2026-03-23)
+
+**关键主题**:
+- update-docs Automation Implementation Summary
+- Executive Summary
+- Implementation Status
+- ✅ Phase 1: Foundation (Complete)
+- ✅ Phase 2: Automation Core (Complete)
+
+**重要经验**:
+- > **Status**: ✅ Core Implementation Complete
+- ### ✅ Phase 1: Foundation (Complete)
+- - ✅ 26 subdirectories organized into 7 categories
+- - ✅ Quick Finder with 8 common topics
+- - ✅ Statistics: 1107 documents (66.5% active, 33.5% archived)
+
+
+### 来自 docs/experiences/CLAUDE.md (2026-03-23)
+
+**关键主题**:
+- Recent Activity
+
+
+### 来自 docs/implementation-reports/phase-4-completed.md (2026-03-23)
+
+**关键主题**:
+- 阶段4完成报告：测试覆盖率提升
+- 执行时间
+- 任务概述
+- 已完成工作
+- 1. 测试覆盖率扫描 (Commit: e1b63d3)
+
+**重要经验**:
+- - 识别出测试覆盖率不足的关键组件
+- - ✅ 扫描并分析了测试覆盖率
+- - ✅ 为 Table 组件补充了完整的测试
+- - ✅ 创建了集成测试文件
+- - ⚠️ 测试验证发现了一些问题需要修复
+
+
+### 来自 docs/implementation-reports/phase-4-completed.md (2026-03-23)
+
+**关键主题**:
+- 阶段4完成报告：测试覆盖率提升
+- 执行时间
+- 任务概述
+- 已完成工作
+- 1. 测试覆盖率扫描 (Commit: e1b63d3)
+
+**重要经验**:
+- - 识别出测试覆盖率不足的关键组件
+- - ✅ 扫描并分析了测试覆盖率
+- - ✅ 为 Table 组件补充了完整的测试
+- - ✅ 创建了集成测试文件
+- - ⚠️ 测试验证发现了一些问题需要修复
+
+
+### 来自 docs/implementation-reports/phase-2-completed.md (2026-03-23)
+
+**关键主题**:
+- 阶段2完成报告 - 大文件拆分
+- 概述
+- 执行摘要
+- 已完成工作
+- 1. Table.tsx 拆分
+
+**重要经验**:
+- - Table.tsx: 854 行 (❌ 超过500行限制)
+- - TableHeader.tsx: 102 行 ✅
+- - TableBody.tsx: 21 行 ✅
+- - TableRow.tsx: 42 行 ✅
+- - TableCell.tsx: 47 行 ✅
+
+
+### 来自 docs/superpowers/specs/2026-03-22-github-manager-skill-design.md (2026-03-23)
+
+**关键主题**:
+- GitHub Manager Skill 完整设计规范
+- 一、概述
+- 1.1 背景
+- 1.2 目标
+- 1.3 用户需求确认
+
+**重要经验**:
+- "可能遗漏重要检查项",
+- HIGH = "high"      # 阻塞性问题，必须立即解决
+- MEDIUM = "medium"  # 重要问题，应尽快解决
+- 2. **强制审查** - 所有变更必须通过PR和代码审查
+- "warning_message": "⚠️ 此操作具有破坏性，请确认后继续",
+
+
+### 来自 docs/superpowers/specs/2026-03-22-github-manager-skill-design.md (2026-03-23)
+
+**关键主题**:
+- GitHub Manager Skill 完整设计规范
+- 一、概述
+- 1.1 背景
+- 1.2 目标
+- 1.3 用户需求确认
+
+**重要经验**:
+- "可能遗漏重要检查项",
+- HIGH = "high"      # 阻塞性问题，必须立即解决
+- MEDIUM = "medium"  # 重要问题，应尽快解决
+- 2. **强制审查** - 所有变更必须通过PR和代码审查
+- "warning_message": "⚠️ 此操作具有破坏性，请确认后继续",
+
+
+### 来自 docs/reports/2026-03-21/DOC-INTEGRATION-FINAL-REPORT-ROUND2.md (2026-03-23)
+
+**关键主题**:
+- 文档整合最终报告 - 2026-03-21 (第二轮)
+- 执行摘要
+- ✅ 完成情况
+- 详细成果
+- 1. 经验提取与整合 ✅
+
+**重要经验**:
+- **状态**: ✅ 所有任务已完成（100%）
+- ### ✅ 完成情况
+- - ✅ 分析了3个核心报告（批次实施、集成测试、下一步建议）
+- - ✅ 提取了Subagent-Driven Development经验
+- - ✅ 提取了代码质量管理经验（TypeScript、ESLint、单元测试）
+

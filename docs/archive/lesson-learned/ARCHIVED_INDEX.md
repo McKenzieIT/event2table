@@ -10,3 +10,7 @@
 ## 2026-03-21 归档
 
 - `docs/lessons-learned/react-best-practices.md` → `docs/archive/lesson-learned/2026-03/react-best-practices.md`
+
+## 2026-03-23 归档
+
+- `docs/lessons-learned/README.md` → `docs/archive/lesson-learned/2026-03/README_2.md`

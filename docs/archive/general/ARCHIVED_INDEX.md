@@ -38,3 +38,22 @@
 - `docs/superpowers/specs/2026-03-20-component-library-modernization-design.md` → `docs/archive/general/2026-03/2026-03-20-component-library-modernization-design.md`
 - `docs/superpowers/specs/agents/code-audit-agent-prompt.md` → `docs/archive/general/2026-03/code-audit-agent-prompt.md`
 - `docs/superpowers/specs/agents/backend-design-agent-prompt.md` → `docs/archive/general/2026-03/backend-design-agent-prompt.md`
+
+## 2026-03-22 归档
+
+- `docs/plans/2026-03-21-cache-system-refactor-design.md` → `docs/archive/general/2026-03/2026-03-21-cache-system-refactor-design.md`
+- `docs/superpowers/specs/2026-03-20-component-library-phase2-design.md` → `docs/archive/general/2026-03/2026-03-20-component-library-phase2-design.md`
+- `docs/superpowers/specs/2026-03-20-component-library-modernization-implementation-plan.md` → `docs/archive/general/2026-03/2026-03-20-component-library-modernization-implementation-plan.md`
+
+## 2026-03-23 归档
+
+- `docs/experiences/CLAUDE.md` → `docs/archive/general/2026-03/CLAUDE_1.md`
+- `docs/reports/2026-03-18/CLAUDE-MD-CONTENT-VERIFICATION.md` → `docs/archive/general/2026-03/CLAUDE-MD-CONTENT-VERIFICATION.md`
+- `docs/development/BATCH-MUTATIONS-IMPLEMENTATION-SUMMARY.md` → `docs/archive/general/2026-03/BATCH-MUTATIONS-IMPLEMENTATION-SUMMARY.md`
+- `docs/state-management/BEST-PRACTICES.md` → `docs/archive/general/2026-03/BEST-PRACTICES_2.md`
+- `docs/implementation-reports/phase-3-completed.md` → `docs/archive/general/2026-03/phase-3-completed.md`
+- `docs/implementation-reports/phase-2-completed.md` → `docs/archive/general/2026-03/phase-2-completed.md`
+- `docs/implementation-reports/phase-1-completed.md` → `docs/archive/general/2026-03/phase-1-completed.md`
+- `docs/superpowers/specs/2026-03-22-github-manager-skill-design-plan-c.md` → `docs/archive/general/2026-03/2026-03-22-github-manager-skill-design-plan-c.md`
+- `docs/superpowers/plans/2026-03-22-github-manager-skill-agent-implementation-plan.md` → `docs/archive/general/2026-03/2026-03-22-github-manager-skill-agent-implementation-plan.md`
+- `docs/reports/2026-03-21/DOC-INTEGRATION-FINAL-REPORT.md` → `docs/archive/general/2026-03/DOC-INTEGRATION-FINAL-REPORT.md`

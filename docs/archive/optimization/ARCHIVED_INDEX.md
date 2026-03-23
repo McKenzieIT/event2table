@@ -87,3 +87,10 @@
 ## 2026-03-19 归档
 
 - `docs/performance/GRAPHQL-PERFORMANCE-OPTIMIZATION-REPORT.md` → `docs/archive/optimization/2026-03/GRAPHQL-PERFORMANCE-OPTIMIZATION-REPORT.md`
+
+## 2026-03-23 归档
+
+- `docs/plans/2026-03-21-git-repo-cicd-optimization-design.md` → `docs/archive/optimization/2026-03/2026-03-21-git-repo-cicd-optimization-design.md`
+- `docs/performance-analysis/react-memo-plan.md` → `docs/archive/optimization/2026-03/react-memo-plan.md`
+- `docs/superpowers/plans/2026-03-21-component-library-optimization.md` → `docs/archive/optimization/2026-03/2026-03-21-component-library-optimization.md`
+- `docs/implementation-reports/2026-03-21-component-library-optimization-completed.md` → `docs/archive/optimization/2026-03/2026-03-21-component-library-optimization-completed.md`
