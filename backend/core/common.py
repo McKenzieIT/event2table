@@ -15,49 +15,14 @@ Example:
 Author: Event2Table Development Team
 Created: 2026-02-10
 Modified: 2026-03-10
-"
+"""
 
 # ⚠️ PERFORMANCE: N+1 query detected - needs refactor
 # TODO: Replace loop queries with JOIN or prefetch
 
-from backend.core.cache.decorators import cached
-
-# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
-# TODO: Replace loop queries with single JOIN query
-# See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
-
-# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
-# ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
-"""
-通用业务逻辑函数模块
-
-包含跨多个模块复用的业务逻辑函数. 
-
-作者: Claude Code
-版本: 1.0.0
-创建日期: 2026-02-09
-
-功能分类:
-- 表单处理通用函数
-- 缓存管理通用函数
-- 数据获取通用函数
-- 表名生成通用函数
-
-使用示例:
-    >>> from backend.core.common import validate_form_fields, clear_entity_caches
-    >>>
-    >>> # 表单验证
-    >>> field_defs = [
-    ...     {'name': 'game_gid', 'required': True, 'alias': '游戏ID'},
-    ...     {'name': 'event_name', 'required': True}
-    ... ]
-    >>> is_valid, values, error = validate_form_fields(field_defs)
-    >>>
-    >>> # 缓存清理
-    >>> clear_entity_caches('event', event_id, game_gid=123)
-"""
-
 import logging
+
+from backend.core.cache.decorators import cached
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import flash, request
