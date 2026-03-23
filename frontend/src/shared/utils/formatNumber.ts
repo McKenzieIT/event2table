@@ -19,10 +19,13 @@ export function formatNumber(value: unknown, options: FormatNumberOptions = {}):
   const {
     locale = 'zh-CN',
     minimumFractionDigits = 0,
-    maximumFractionDigits = 0,
     compact = false,
     suffix = '',
   } = options;
+
+  // Ensure maximumFractionDigits >= minimumFractionDigits to avoid RangeError
+  const maxFrac = options.maximumFractionDigits ?? Math.max(minimumFractionDigits, 0);
+  const maximumFractionDigits = Math.max(maxFrac, minimumFractionDigits);
 
   if (compact) {
     if (num >= 100000000) {
@@ -47,15 +50,31 @@ export function formatPercent(value: number, total: number, options: FormatNumbe
   }
   
   const percent = (value / total) * 100;
-  return formatNumber(percent, { maximumFractionDigits: 1 }) + '%';
+  // Merge provided options with default maximumFractionDigits: 1
+  const mergedOptions: FormatNumberOptions = {
+    maximumFractionDigits: 1,
+    ...options,
+  };
+  return formatNumber(percent, mergedOptions) + '%';
 }
 
 export function formatBytes(bytes: number, decimals: number = 2): string {
   if (bytes === 0) return '0 Bytes';
   
+  // Handle fractional bytes (0 < bytes < 1)
+  if (bytes > 0 && bytes < 1) {
+    return bytes.toFixed(decimals) + ' Bytes';
+  }
+  
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  // Format with thousand separators for Bytes, or use toFixed for larger units
+  if (i === 0) {
+    // For bytes, use toLocaleString for thousand separators
+    return bytes.toLocaleString('zh-CN') + ' Bytes';
+  }
   
   return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
 }
