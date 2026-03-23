@@ -33,7 +33,6 @@ on:
 
 env:
   NODE_VERSION: '18'
-  PNPM_VERSION: '8'
 
 jobs:
   # ========================================
@@ -48,31 +47,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run type check
         working-directory: frontend
-        run: pnpm run type-check
+        run: npm run type-check
 
       - name: Run linting
         working-directory: frontend
-        run: pnpm run lint
+        run: npm run lint
 
       - name: Run unit tests
         working-directory: frontend
-        run: pnpm run test:coverage --reporter=json --reporter=default
+        run: npm run test:coverage --reporter=json --reporter=default
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
@@ -105,23 +101,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run integration tests
         working-directory: frontend
-        run: pnpm run test:integration
+        run: npm run test:integration
 
       - name: Archive test results
         if: always()
@@ -144,31 +137,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright browsers
         working-directory: frontend
-        run: pnpm exec playwright install --with-deps
+        run: npx playwright install --with-deps
 
       - name: Build application
         working-directory: frontend
-        run: pnpm run build
+        run: npm run build
 
       - name: Run E2E tests
         working-directory: frontend
-        run: pnpm run test:e2e
+        run: npm run test:e2e
 
       - name: Upload Playwright report
         if: always()
@@ -199,31 +189,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright browsers
         working-directory: frontend
-        run: pnpm exec playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Build Storybook
         working-directory: frontend
-        run: pnpm run build:storybook
+        run: npm run build:storybook
 
       - name: Run visual regression tests
         working-directory: frontend
-        run: pnpm run test:visual
+        run: npm run test:visual
         continue-on-error: true
 
       - name: Upload visual diff report
@@ -249,27 +236,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run bundle size analysis
         working-directory: frontend
-        run: pnpm run analyze
+        run: npm run analyze
 
       - name: Run performance benchmarks
         working-directory: frontend
-        run: pnpm run test:performance
+        run: npm run test:performance
 
       - name: Check bundle size limits
         run: |
@@ -306,23 +290,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run security audit
         working-directory: frontend
-        run: pnpm audit --audit-level=moderate
+        run: npm audit --audit-level=moderate
         continue-on-error: true
 
       - name: Run Snyk security scan
