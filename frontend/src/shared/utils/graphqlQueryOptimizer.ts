@@ -251,18 +251,18 @@ class GraphQLQueryOptimizer {
   /**
    * 获取缓存的查询
    * @param queryKey - 查询键
-   * @returns 缓存的查询字符串,如果不存在或已过期则返回null
+   * @returns 缓存的查询对象,如果不存在或已过期则返回undefined
    */
-  getCachedQuery(queryKey: string): string | null {
+  getCachedQuery(queryKey: string): CachedQuery | undefined {
     const cached = this.queryCache.get(queryKey);
     if (cached) {
       // 缓存有效期5分钟
       if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
-        return cached.query;
+        return cached;
       }
       this.queryCache.delete(queryKey);
     }
-    return null;
+    return undefined;
   }
 
   /**

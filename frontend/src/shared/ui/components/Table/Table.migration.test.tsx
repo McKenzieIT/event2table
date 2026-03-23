@@ -36,5 +36,8 @@ describe('Table Migration', () => {
     
     // Check that table wrapper exists
     expect(container.querySelector('.table-wrapper')).toBeInTheDocument();
+    
+    // Note: Virtual scrolling is handled internally by the Table component
+    // The data-virtualizer attribute may not be present in test environment
   });
 });

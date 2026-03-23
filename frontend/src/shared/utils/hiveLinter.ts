@@ -80,16 +80,13 @@ function validateBasicSyntax(sql: string): Diagnostic[] {
     }
 
     // Check for missing quotes in string literals
-    const stringMatches = line.match(/'[^']*'/g);
-    if (stringMatches) {
-      stringMatches.forEach(match => {
-        if (match.endsWith("'")) return; // Properly closed
-        diagnostics.push({
-          from: sql.indexOf(line) + line.indexOf(match),
-          to: sql.indexOf(line) + line.indexOf(match) + match.length,
-          severity: 'error',
-          message: 'Unclosed string literal'
-        });
+    const singleQuoteCount = (line.match(/'/g) || []).length;
+    if (singleQuoteCount % 2 !== 0) {
+      diagnostics.push({
+        from: sql.indexOf(line),
+        to: sql.indexOf(line) + line.length,
+        severity: 'error',
+        message: 'Unclosed string literal'
       });
     }
   });

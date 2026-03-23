@@ -250,6 +250,7 @@ describe('hiveLinter', () => {
 
   describe('real-world scenarios', () => {
     it('should validate complex HQL queries', () => {
+      const bizdate = '20240101';
       const hql = `CREATE OR REPLACE VIEW dwd_event_login AS
         SELECT
           ds,

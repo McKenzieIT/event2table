@@ -269,7 +269,8 @@ class GraphQLPerformanceMonitor {
   generateRecommendations(stats: PerformanceStats): Recommendation[] {
     const recommendations: Recommendation[] = [];
 
-    if (parseFloat(stats.graphql.cacheHitRate) < 50) {
+    // Only recommend caching improvement if there are enough requests to evaluate
+    if (stats.graphql.totalRequests > 0 && parseFloat(stats.graphql.cacheHitRate) < 50) {
       recommendations.push({
         type: 'caching',
         priority: 'high',
@@ -277,7 +278,8 @@ class GraphQLPerformanceMonitor {
       });
     }
 
-    if (stats.graphql.averageDuration > stats.rest.averageDuration) {
+    // Only recommend performance improvement if REST requests exist and GraphQL is slower
+    if (stats.rest.totalRequests > 0 && stats.graphql.averageDuration > stats.rest.averageDuration) {
       recommendations.push({
         type: 'performance',
         priority: 'high',
@@ -285,7 +287,8 @@ class GraphQLPerformanceMonitor {
       });
     }
 
-    if (stats.graphql.totalRequests > stats.rest.totalRequests) {
+    // Only recommend query merging if REST requests exist and GraphQL has more requests
+    if (stats.rest.totalRequests > 0 && stats.graphql.totalRequests > stats.rest.totalRequests) {
       recommendations.push({
         type: 'requests',
         priority: 'medium',

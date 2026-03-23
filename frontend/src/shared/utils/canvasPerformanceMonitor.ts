@@ -66,8 +66,10 @@ export class CanvasPerformanceMonitor {
   measureInteractionTime<T>(callback: () => T): { result: T; time: number } {
     const startTime = performance.now();
     const result = callback();
-    this.metrics.interactionTime = Math.round(performance.now() - startTime);
-    return { result, time: this.metrics.interactionTime };
+    const time = Math.round(performance.now() - startTime);
+    // Accumulate interaction time instead of replacing it
+    this.metrics.interactionTime += time;
+    return { result, time };
   }
 
   getMetrics(): PerformanceMetrics {

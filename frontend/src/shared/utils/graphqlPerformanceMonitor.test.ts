@@ -294,7 +294,10 @@ describe('GraphQLPerformanceMonitor', () => {
     it('should return empty recommendations when performance is good', () => {
       monitor.trackGraphQLRequest('Query1', {}, 100, true);
       monitor.trackGraphQLRequest('Query2', {}, 100, true);
-      monitor.trackRESTRequest('/api/test', 'GET', 200);
+      monitor.trackGraphQLRequest('Query3', {}, 100, true);
+      monitor.trackRESTRequest('/api/test1', 'GET', 200);
+      monitor.trackRESTRequest('/api/test2', 'GET', 200);
+      monitor.trackRESTRequest('/api/test3', 'GET', 200);
 
       const report = monitor.generateReport();
       expect(report.recommendations.length).toBe(0);

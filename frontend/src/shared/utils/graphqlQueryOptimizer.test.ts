@@ -592,7 +592,7 @@ describe('GraphQLQueryOptimizer', () => {
     });
 
     it('should handle query with nested empty objects', () => {
-      const emptyQuery = `query {
+      const query = `query {
         user {
           profile {
             settings {
