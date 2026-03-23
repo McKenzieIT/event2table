@@ -400,14 +400,12 @@ describe('FormHelperText', () => {
 
 describe('useFormContextValue Hook', () => {
   it('should throw error when used outside Form component', () => {
-    const TestComponent = () => {
-      useFormContextValue();
-      return null;
+    const TestChild = () => {
+      expect(() => useFormContextValue()).toThrow('useFormContextValue must be used within a Form component');
+      return <div>Test</div>;
     };
 
-    expect(() => render(<TestComponent />)).toThrow(
-      'useFormContextValue must be used within a Form component'
-    );
+    render(<TestChild />);
   });
 
   it('should provide form context value when used within Form component', () => {
