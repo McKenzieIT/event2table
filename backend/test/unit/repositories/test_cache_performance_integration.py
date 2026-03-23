@@ -17,7 +17,9 @@ import os
 import time
 import pytest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+)
 
 from backend.models.repositories.parameters import ParameterRepository
 from backend.models.repositories.join_config_repository import JoinConfigRepository
@@ -221,6 +223,7 @@ class TestFlowRepositoryCachePerformance:
         # 创建流程 (应该失效缓存)
         try:
             from backend.models.entities import FlowEntity
+
             flow = FlowEntity(
                 game_gid=90000001,
                 flow_name="test_cache_invalidation",

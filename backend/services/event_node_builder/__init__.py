@@ -262,9 +262,7 @@ def save_config():
                 logger.error(
                     f"[SAVE_CONFIG] CRITICAL: Node {created_node.id} not found in DB after creation!"
                 )
-                return json_error_response(
-                    "Node creation verification failed", status_code=500
-                )
+                return json_error_response("Node creation verification failed", status_code=500)
 
             logger.debug(
                 f"[SAVE_CONFIG] Verification passed: node_id={created_node.id} exists in DB"

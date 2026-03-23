@@ -75,10 +75,7 @@ def _configure_app(app):
     # Template context
     @app.context_processor
     def inject_template_vars():
-        is_dev = (
-            os.environ.get('FLASK_ENV') == 'development'
-            or debug_mode
-        )
+        is_dev = os.environ.get('FLASK_ENV') == 'development' or debug_mode
         return {
             'config': type('Config', (), {'ENV': 'development' if is_dev else 'production'})(),
             'vite_dev_url': os.environ.get('VITE_DEV_URL', 'http://localhost:5173'),
@@ -112,24 +109,28 @@ def _init_extensions(app):
         logger.warning("⚠️ 应用将在无缓存模式下运行")
 
     # CORS
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization"],
+            },
+            r"/api/graphql": {
+                "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+                "methods": ["GET", "POST", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization"],
+            },
         },
-        r"/api/graphql": {
-            "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
-            "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-        },
-    })
+    )
     logger.info("✅ CORS已启用: 允许来自 localhost:5173 的请求")
 
     # Security
     try:
         from backend.core.security import add_security_headers, init_csrf_protection
     except ImportError:
+
         def add_security_headers(response):
             return response
 
@@ -146,6 +147,7 @@ def _init_extensions(app):
     # V1 API deprecation middleware
     try:
         from backend.api.middleware.deprecation import init_deprecation_middleware
+
         init_deprecation_middleware(app)
     except Exception as exc:
         logger.warning(f"V1 API deprecation middleware initialization failed: {exc}")
@@ -192,6 +194,7 @@ def _register_optional_blueprint(app, module_path, blueprint_name):
     """Safely import and register an optional blueprint."""
     try:
         import importlib
+
         module = importlib.import_module(module_path)
         blueprint = getattr(module, blueprint_name, None)
         if blueprint:
@@ -203,6 +206,7 @@ def _register_optional_blueprint(app, module_path, blueprint_name):
 def _register_graphql(app):
     """Register the GraphQL API endpoint."""
     from backend.gql_api.schema import schema
+
     app.add_url_rule(
         '/api/graphql',
         view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True),
@@ -219,7 +223,8 @@ def _register_frontend_routes(app):
         try:
             return send_from_directory(str(FRONTEND_DIST_DIR), 'index.html')
         except FileNotFoundError:
-            return """
+            return (
+                """
             <h1>Event2Table API</h1>
             <p>Frontend not built. Please run:</p>
             <pre>cd frontend && npm run build</pre>
@@ -231,7 +236,9 @@ def _register_frontend_routes(app):
                 <li><a href="/api/categories">GET /api/categories</a></li>
                 <li><a href="/hql-preview-v2/api/status">GET /hql-preview-v2/api/status</a></li>
             </ul>
-            """, 200
+            """,
+                200,
+            )
 
     @app.route('/frontend/dist/<path:filename>')
     def serve_frontend_dist(filename):
@@ -290,6 +297,7 @@ def _warmup_cache(app):
     try:
         with app.app_context():
             from backend.core.startup.app_initializer import initialize_app
+
             initialize_app(app)
             logger.info("✅ 应用初始化器已启动")
     except Exception as exc:
@@ -298,6 +306,7 @@ def _warmup_cache(app):
         try:
             with app.app_context():
                 from backend.core.cache.cache_warmer import cache_warmer
+
                 cache_warmer.warmup_on_startup(warm_all_events=False)
                 cache_warmer.start_periodic_warmup(interval_hours=1)
         except Exception as exc2:

@@ -20,6 +20,7 @@ logger = get_logger(__name__)
 
 common_params_bp = Blueprint("common_params", __name__)
 
+
 @common_params_bp.route("/api/common-params", methods=["GET"])
 def list_common_params():
     """API: List common parameters for a specific game"""
@@ -44,6 +45,7 @@ def list_common_params():
     except Exception as e:
         logger.error(f"Error fetching common params: {e}")
         return json_error_response("Failed to fetch common params", status_code=500)
+
 
 @common_params_bp.route("/api/common-params/sync", methods=["POST"])
 def sync_common_params():
@@ -81,6 +83,7 @@ def sync_common_params():
         logger.error(f"Error syncing common params: {e}", exc_info=True)
         return json_error_response(f"Failed to sync common parameters: {str(e)}", status_code=500)
 
+
 @common_params_bp.route("/api/common-params/<int:param_id>", methods=["DELETE"])
 def delete_common_param(param_id):
     """API: Delete a common parameter"""
@@ -97,6 +100,7 @@ def delete_common_param(param_id):
     except Exception as e:
         logger.error(f"Error deleting common param: {e}")
         return json_error_response("Failed to delete common parameter", status_code=500)
+
 
 @common_params_bp.route("/api/common-params/bulk-delete", methods=["DELETE", "POST"])
 @common_params_bp.route(

@@ -162,9 +162,7 @@ class AsyncTaskService(BaseService):
         updated = self.task_repo.update(task["id"], updates)
 
         if updated:
-            logger.info(
-                f"任务状态更新: task_id={task_id}, status={status}, progress={progress}"
-            )
+            logger.info(f"任务状态更新: task_id={task_id}, status={status}, progress={progress}")
             # 清理任务相关缓存
             self.invalidate_pattern(f"async_tasks:*")
             return True

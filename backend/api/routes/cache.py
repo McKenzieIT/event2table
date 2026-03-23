@@ -629,9 +629,7 @@ def invalidate_event_cache(event_id: int):
         # 失效事件相关缓存
         invalidated_keys = cache_invalidator_enhanced.invalidate_event_related(event_id, game_gid)
 
-        logger.info(
-            f"失效事件缓存: event_id={event_id}, game_gid={game_gid}, {len(invalidated_keys)}个键"
-        )
+        logger.info(f"失效事件缓存: event_id={event_id}, game_gid={game_gid}, {len(invalidated_keys)}个键")
 
         return jsonify(
             {

@@ -408,7 +408,7 @@ def ensure_game_gid_int(value: Any) -> int:
     """
     确保game_gid是整数类型
 
-    用于类型一致性验证, 确保game_gid在整个应用中保持为INTEGER类型. 
+    用于类型一致性验证, 确保game_gid在整个应用中保持为INTEGER类型.
 
     Args:
         value: game_gid值（可以是int, str或其他类型）

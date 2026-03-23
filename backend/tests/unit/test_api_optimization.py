@@ -26,17 +26,8 @@ from typing import Dict, Any, List
 from flask import Flask, jsonify, Response
 from flask_compress import Compress
 
-from backend.core.config.compression import (
-    CompressionConfig,
-    init_compression,
-    enable_compression
-)
-from backend.core.utils.json_serializer import (
-    JSONSerializer,
-    json_dumps,
-    json_loads,
-    HAS_ORJSON
-)
+from backend.core.config.compression import CompressionConfig, init_compression, enable_compression
+from backend.core.utils.json_serializer import JSONSerializer, json_dumps, json_loads, HAS_ORJSON
 
 
 class TestCompressionConfig:
@@ -54,12 +45,7 @@ class TestCompressionConfig:
 
     def test_custom_config(self):
         """Test custom configuration values"""
-        config = CompressionConfig(
-            enabled=True,
-            min_size=1000,
-            level=8,
-            algorithms=['gzip']
-        )
+        config = CompressionConfig(enabled=True, min_size=1000, level=8, algorithms=['gzip'])
 
         assert config.min_size == 1000
         assert config.level == 8
@@ -91,11 +77,9 @@ class TestCompressionIntegration:
 
         @app.route('/api/test')
         def test_endpoint():
-            return jsonify({
-                'success': True,
-                'data': [i for i in range(100)],
-                'message': 'Test response data'
-            })
+            return jsonify(
+                {'success': True, 'data': [i for i in range(100)], 'message': 'Test response data'}
+            )
 
         @app.route('/api/small')
         def small_endpoint():
@@ -105,11 +89,7 @@ class TestCompressionIntegration:
 
     def test_init_compression(self, app):
         """Test compression initialization"""
-        config = CompressionConfig(
-            enabled=True,
-            min_size=500,
-            level=6
-        )
+        config = CompressionConfig(enabled=True, min_size=500, level=6)
 
         init_compression(app, config)
 
@@ -148,18 +128,14 @@ class TestCompressionPerformance:
                         {
                             'event_id': j,
                             'event_name': f'event_{j}',
-                            'params': [f'param_{k}' for k in range(20)]
+                            'params': [f'param_{k}' for k in range(20)],
                         }
                         for j in range(10)
-                    ]
+                    ],
                 }
                 for i in range(10)
             ],
-            'metadata': {
-                'total': 10,
-                'page': 1,
-                'timestamp': '2026-03-18T00:00:00Z'
-            }
+            'metadata': {'total': 10, 'page': 1, 'timestamp': '2026-03-18T00:00:00Z'},
         }
 
     def test_json_size(self, sample_json_data):
@@ -182,10 +158,14 @@ class TestCompressionPerformance:
 
         compression_ratio = ((original_size - compressed_size) / original_size) * 100
 
-        print(f"Gzip compression: {original_size:,} → {compressed_size:,} bytes ({compression_ratio:.1f}% reduction)")
+        print(
+            f"Gzip compression: {original_size:,} → {compressed_size:,} bytes ({compression_ratio:.1f}% reduction)"
+        )
 
         # Assert compression ratio ≥70%
-        assert compression_ratio >= 70, f"Compression ratio: {compression_ratio:.1f}% (target: ≥70%)"
+        assert (
+            compression_ratio >= 70
+        ), f"Compression ratio: {compression_ratio:.1f}% (target: ≥70%)"
 
     def test_brotli_compression_ratio(self, sample_json_data):
         """Test Brotli compression ratio (should be ≥70%)"""
@@ -198,10 +178,14 @@ class TestCompressionPerformance:
 
         compression_ratio = ((original_size - compressed_size) / original_size) * 100
 
-        print(f"Brotli compression: {original_size:,} → {compressed_size:,} bytes ({compression_ratio:.1f}% reduction)")
+        print(
+            f"Brotli compression: {original_size:,} → {compressed_size:,} bytes ({compression_ratio:.1f}% reduction)"
+        )
 
         # Assert compression ratio ≥70%
-        assert compression_ratio >= 70, f"Compression ratio: {compression_ratio:.1f}% (target: ≥70%)"
+        assert (
+            compression_ratio >= 70
+        ), f"Compression ratio: {compression_ratio:.1f}% (target: ≥70%)"
 
     def test_brotli_vs_gzip(self, sample_json_data):
         """Test that Brotli achieves better compression than gzip"""
@@ -213,7 +197,9 @@ class TestCompressionPerformance:
         gzip_size = len(gzip_compressed)
 
         # Brotli compression
-        brotli_compressed = brotli.compress(json_str.encode('utf-8'), mode=brotli.MODE_GENERIC, quality=6)
+        brotli_compressed = brotli.compress(
+            json_str.encode('utf-8'), mode=brotli.MODE_GENERIC, quality=6
+        )
         brotli_size = len(brotli_compressed)
 
         # Brotli should be better or equal
@@ -241,11 +227,11 @@ class TestJSONSerialization:
                     'gid': f'10000{i}',
                     'name': f'Game {i}',
                     'ods_db': 'domestic' if i % 2 == 0 else 'overseas',
-                    'events': [f'event_{j}' for j in range(50)]
+                    'events': [f'event_{j}' for j in range(50)],
                 }
                 for i in range(100)
             ],
-            'timestamp': '2026-03-18T00:00:00Z'
+            'timestamp': '2026-03-18T00:00:00Z',
         }
 
     def test_json_serializer_initialization(self):
@@ -292,10 +278,7 @@ class TestJSONSerialization:
         """Test datetime serialization"""
         from datetime import datetime
 
-        data = {
-            'timestamp': datetime(2026, 3, 18, 12, 30, 45),
-            'name': 'Test'
-        }
+        data = {'timestamp': datetime(2026, 3, 18, 12, 30, 45), 'name': 'Test'}
 
         json_str = json_dumps(data)
 
@@ -309,11 +292,7 @@ class TestJSONSerialization:
 
     def test_unicode_serialization(self):
         """Test Unicode character serialization"""
-        data = {
-            'chinese': '你好世界',
-            'emoji': '😀🎉',
-            'special': '©®™€'
-        }
+        data = {'chinese': '你好世界', 'emoji': '😀🎉', 'special': '©®™€'}
 
         json_str = json_dumps(data)
         parsed = json_loads(json_str)
@@ -344,12 +323,9 @@ class TestJSONSerializationPerformance:
                     'name': f'Game {i}',
                     'description': f'Test game description {i}' * 50,
                     'events': [
-                        {
-                            'event_id': j,
-                            'params': [f'param_{k}' for k in range(100)]
-                        }
+                        {'event_id': j, 'params': [f'param_{k}' for k in range(100)]}
                         for j in range(100)
-                    ]
+                    ],
                 }
                 for i in range(100)
             ]
@@ -373,7 +349,9 @@ class TestJSONSerializationPerformance:
             orjson_time = time.time() - start
 
             speedup = json_time / orjson_time
-            print(f"Serialization speedup: {speedup:.2f}x (json: {json_time:.3f}s, orjson: {orjson_time:.3f}s)")
+            print(
+                f"Serialization speedup: {speedup:.2f}x (json: {json_time:.3f}s, orjson: {orjson_time:.3f}s)"
+            )
 
             # orjson should be at least 1.5x faster
             assert speedup >= 1.5, f"Speedup: {speedup:.2f}x (target: ≥1.5x)"
@@ -399,7 +377,9 @@ class TestJSONSerializationPerformance:
             orjson_time = time.time() - start
 
             speedup = json_time / orjson_time
-            print(f"Deserialization speedup: {speedup:.2f}x (json: {json_time:.3f}s, orjson: {orjson_time:.3f}s)")
+            print(
+                f"Deserialization speedup: {speedup:.2f}x (json: {json_time:.3f}s, orjson: {orjson_time:.3f}s)"
+            )
 
             # orjson should be at least 1.5x faster
             assert speedup >= 1.5, f"Speedup: {speedup:.2f}x (target: ≥1.5x)"
@@ -418,7 +398,7 @@ class TestOptimizationIntegration:
                 {
                     'gid': f'10000{i}',
                     'name': f'Game {i}',
-                    'events': [f'event_{j}' for j in range(50)]
+                    'events': [f'event_{j}' for j in range(50)],
                 }
                 for i in range(50)
             ]
@@ -435,7 +415,9 @@ class TestOptimizationIntegration:
         # Calculate overall reduction
         total_reduction = ((original_size - compressed_size) / original_size) * 100
 
-        print(f"End-to-end: {original_size:,} → {compressed_size:,} bytes ({total_reduction:.1f}% reduction)")
+        print(
+            f"End-to-end: {original_size:,} → {compressed_size:,} bytes ({total_reduction:.1f}% reduction)"
+        )
 
         # Assert ≥70% overall reduction
         assert total_reduction >= 70, f"Total reduction: {total_reduction:.1f}% (target: ≥70%)"
@@ -449,7 +431,7 @@ class TestOptimizationIntegration:
                     'name': 'Test Game',
                     'value': 42,
                     'active': True,
-                    'tags': ['game', 'test', 'sample']
+                    'tags': ['game', 'test', 'sample'],
                 }
             ]
         }
@@ -489,14 +471,14 @@ class TestOptimizationTargets:
                             {
                                 'event_id': j,
                                 'event_name': f'event_name_{j}' * 5,
-                                'params': [f'param_{k}' for k in range(30)]
+                                'params': [f'param_{k}' for k in range(30)],
                             }
                             for j in range(20)
-                        ]
+                        ],
                     }
                     for i in range(10)
                 ]
-            }
+            },
         }
 
         json_str = json.dumps(data)
@@ -514,7 +496,9 @@ class TestOptimizationTargets:
         print(f"   Compression ratio: {compression_ratio:.1f}%")
         print(f"   Bandwidth saved: {original_size - compressed_size:,} bytes")
 
-        assert compression_ratio >= 70, f"Compression ratio: {compression_ratio:.1f}% (target: ≥70%)"
+        assert (
+            compression_ratio >= 70
+        ), f"Compression ratio: {compression_ratio:.1f}% (target: ≥70%)"
 
     def test_transmission_size_reduction_70_80_percent(self):
         """Test transmission size reduction target: 70-80%"""
@@ -527,8 +511,8 @@ class TestOptimizationTargets:
                     'description': f'Description {i}' * 50,
                     'metadata': {
                         'tags': [f'tag{j}' for j in range(20)],
-                        'attributes': {f'attr{k}': f'value{k}' * 10 for k in range(10)}
-                    }
+                        'attributes': {f'attr{k}': f'value{k}' * 10 for k in range(10)},
+                    },
                 }
                 for i in range(100)
             ]
@@ -557,11 +541,7 @@ class TestOptimizationTargets:
         # Generate test data
         data = {
             'items': [
-                {
-                    'id': i,
-                    'name': f'Item {i}',
-                    'values': [j for j in range(100)]
-                }
+                {'id': i, 'name': f'Item {i}', 'values': [j for j in range(100)]}
                 for i in range(1000)
             ]
         }

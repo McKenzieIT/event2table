@@ -37,7 +37,7 @@ class TestEventService:
             table_name='ieu_ods.ods_10000147_all_view',
             description='User login event',
             created_at='2026-01-01 00:00:00',
-            updated_at='2026-01-01 00:00:00'
+            updated_at='2026-01-01 00:00:00',
         )
 
     @pytest.fixture
@@ -53,7 +53,7 @@ class TestEventService:
                 category_name='Authentication',
                 table_name='ieu_ods.ods_10000147_all_view',
                 created_at='2026-01-01 00:00:00',
-                updated_at='2026-01-01 00:00:00'
+                updated_at='2026-01-01 00:00:00',
             ),
             EventEntity(
                 id=2,
@@ -64,8 +64,8 @@ class TestEventService:
                 category_name='Authentication',
                 table_name='ieu_ods.ods_10000147_all_view',
                 created_at='2026-01-01 00:00:00',
-                updated_at='2026-01-01 00:00:00'
-            )
+                updated_at='2026-01-01 00:00:00',
+            ),
         ]
 
     # ==================== get_events ====================
@@ -144,7 +144,9 @@ class TestEventService:
         result = service.get_events_by_game(10000147, page=1, per_page=20)
 
         assert len(result) == 2
-        mock_repo.return_value.find_by_game_gid.assert_called_once_with(10000147, page=1, per_page=20)
+        mock_repo.return_value.find_by_game_gid.assert_called_once_with(
+            10000147, page=1, per_page=20
+        )
 
     @patch.object(EventService, '_get_repository')
     def test_get_events_by_game_empty(self, mock_repo, service):
@@ -170,7 +172,7 @@ class TestEventService:
             'event_name': 'test_event',
             'game_gid': 10000147,
             'table_name': 'ieu_ods.ods_10000147_all_view',
-            'category_id': 1
+            'category_id': 1,
         }
 
         result = service.create_event(EventEntity(**event_data))
@@ -185,25 +187,21 @@ class TestEventService:
         """Test create event when game doesn't exist"""
         mock_validate.return_value = False
 
-        event_data = {
-            'event_name': 'test_event',
-            'game_gid': 99999999
-        }
+        event_data = {'event_name': 'test_event', 'game_gid': 99999999}
 
         with pytest.raises(ValueError, match='Game 99999999 not found'):
             service.create_event(EventEntity(**event_data))
 
     @patch.object(EventService, '_get_repository')
     @patch.object(EventService, '_validate_game_exists')
-    def test_create_event_duplicate_name(self, mock_validate, mock_repo, service, mock_event_entity):
+    def test_create_event_duplicate_name(
+        self, mock_validate, mock_repo, service, mock_event_entity
+    ):
         """Test create event with duplicate name"""
         mock_validate.return_value = True
         mock_repo.return_value.find_by_name.return_value = mock_event_entity
 
-        event_data = {
-            'event_name': 'login',
-            'game_gid': 10000147
-        }
+        event_data = {'event_name': 'login', 'game_gid': 10000147}
 
         with pytest.raises(ValueError, match='Event login already exists for game 10000147'):
             service.create_event(EventEntity(**event_data))
@@ -217,10 +215,7 @@ class TestEventService:
         mock_repo.return_value.update.return_value = True
         mock_repo.return_value.find_by_id.return_value = mock_event_entity
 
-        update_data = {
-            'event_name': 'updated_event',
-            'description': 'Updated description'
-        }
+        update_data = {'event_name': 'updated_event', 'description': 'Updated description'}
 
         result = service.update_event(1, update_data)
 
@@ -271,8 +266,20 @@ class TestEventService:
         mock_repo.return_value.create_batch.return_value = [1, 2]
 
         events_data = [
-            EventEntity(**{'event_name': 'event1', 'game_gid': 10000147, 'table_name': 'ieu_ods.ods_10000147_all_view'}),
-            EventEntity(**{'event_name': 'event2', 'game_gid': 10000147, 'table_name': 'ieu_ods.ods_10000147_all_view'})
+            EventEntity(
+                **{
+                    'event_name': 'event1',
+                    'game_gid': 10000147,
+                    'table_name': 'ieu_ods.ods_10000147_all_view',
+                }
+            ),
+            EventEntity(
+                **{
+                    'event_name': 'event2',
+                    'game_gid': 10000147,
+                    'table_name': 'ieu_ods.ods_10000147_all_view',
+                }
+            ),
         ]
 
         result = service.batch_create_events(events_data)
@@ -354,7 +361,7 @@ class TestEventService:
         """Test get event stats by game"""
         mock_repo.return_value.get_event_stats_by_game.return_value = [
             {'category_name': 'Authentication', 'event_count': 5},
-            {'category_name': 'Combat', 'event_count': 10}
+            {'category_name': 'Combat', 'event_count': 10},
         ]
 
         result = service.get_event_stats_by_game(10000147)
@@ -372,8 +379,8 @@ class TestEventService:
             'event': Mock(id=1, event_name='login'),
             'parameters': [
                 {'param_name': 'user_id', 'param_type': 'base'},
-                {'param_name': 'zone_id', 'param_type': 'param'}
-            ]
+                {'param_name': 'zone_id', 'param_type': 'param'},
+            ],
         }
 
         result = service.get_event_with_parameters(1)
@@ -399,7 +406,7 @@ class TestEventService:
         event_data = {
             'event_name': 'test_event',
             'game_gid': 10000147,
-            'table_name': 'ieu_ods.ods_10000147_all_view'
+            'table_name': 'ieu_ods.ods_10000147_all_view',
         }
 
         # Should not raise exception

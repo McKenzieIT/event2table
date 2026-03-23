@@ -30,9 +30,7 @@ class GenerateHQL(graphene.Mutation):
 
     class Arguments:
         event_ids = List(Int, required=True, description="事件ID列表")
-        mode = String(
-            default_value="single", description="生成模式: single, union_all, join, where_in"
-        )
+        mode = String(default_value="single", description="生成模式: single, union_all, join, where_in")
         options = String(description="JSON格式的选项")
 
     ok = Boolean(description="操作是否成功")

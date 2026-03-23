@@ -452,8 +452,8 @@ def get_game_gid_param(request_obj, param_name: str = "game_gid") -> Optional[st
     """
     从请求中获取 game_gid 参数（支持字符串和整数类型）
 
-    由于数据库中 games.gid 是 TEXT 类型, 但部分代码使用 type=int, 
-    此函数提供统一的方式来获取和转换 game_gid 参数. 
+    由于数据库中 games.gid 是 TEXT 类型, 但部分代码使用 type=int,
+    此函数提供统一的方式来获取和转换 game_gid 参数.
 
     Args:
         request_obj: Flask request 对象
@@ -697,12 +697,14 @@ def get_games_with_event_counts() -> List[Dict[str, Any]]:
         for game in games:
             print(f"Game: {game['name']}, Events: {game['event_count']}")
     """
-    return fetch_all_as_dict("""
+    return fetch_all_as_dict(
+        """
         SELECT g.*,
                (SELECT COUNT(*) FROM log_events WHERE game_gid = g.gid) as event_count
         FROM games g
         ORDER BY g.name
-    """)
+    """
+    )
 
 
 def check_game_has_events(game_gid: int) -> bool:

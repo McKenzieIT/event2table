@@ -14,6 +14,7 @@ from unittest.mock import patch, MagicMock
 # Add backend to path
 sys.path.insert(0, os.path.dirname(__file__))
 
+
 def test_cache_hit_rate():
     """Test that cache hit rate is 100% for repeated calls"""
     from backend.models.repositories.parameters import ParameterRepository
@@ -37,7 +38,7 @@ def test_cache_hit_rate():
             'json_path': None,
             'is_active': 1,
             'created_at': None,
-            'updated_at': None
+            'updated_at': None,
         }
     ]
 
@@ -45,20 +46,10 @@ def test_cache_hit_rate():
         mock_fetch.return_value = mock_data
 
         # First call - should be cache miss
-        result1 = repo.get_paginated_params(
-            game_gid=90000001,
-            page=1,
-            per_page=10,
-            search=None
-        )
+        result1 = repo.get_paginated_params(game_gid=90000001, page=1, per_page=10, search=None)
 
         # Second call - should be cache hit
-        result2 = repo.get_paginated_params(
-            game_gid=90000001,
-            page=1,
-            per_page=10,
-            search=None
-        )
+        result2 = repo.get_paginated_params(game_gid=90000001, page=1, per_page=10, search=None)
 
         # Verify cache hit
         if mock_fetch.call_count == 1:
@@ -70,6 +61,7 @@ def test_cache_hit_rate():
         else:
             print(f"❌ 缓存未命中！数据库调用了 {mock_fetch.call_count} 次")
             return False
+
 
 if __name__ == '__main__':
     success = test_cache_hit_rate()

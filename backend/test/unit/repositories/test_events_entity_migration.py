@@ -37,20 +37,18 @@ class TestEventRepositoryEntityReturnTypes:
             'target_table': 'dwd.v_dwd_10000147_login_di',
             'include_in_common_params': 1,
             'created_at': '2024-01-01 00:00:00',
-            'updated_at': '2024-01-01 00:00:00'
+            'updated_at': '2024-01-01 00:00:00',
         }
 
         mock_fetch_one = MagicMock(return_value=mock_data)
-        monkeypatch.setattr(
-            'backend.models.repositories.events.fetch_one_as_dict',
-            mock_fetch_one
-        )
+        monkeypatch.setattr('backend.models.repositories.events.fetch_one_as_dict', mock_fetch_one)
 
         result = repo.find_by_id(1)
 
         # ✅ Should return EventEntity
-        assert isinstance(result, EventEntity), \
-            f"find_by_id should return EventEntity, got {type(result)}"
+        assert isinstance(
+            result, EventEntity
+        ), f"find_by_id should return EventEntity, got {type(result)}"
 
         # ✅ Should have correct field mapping
         assert result.id == 1
@@ -68,19 +66,17 @@ class TestEventRepositoryEntityReturnTypes:
             'event_name_cn': '登录',
             'category_id': 1,
             'source_table': 'ieu_ods.ods_10000147_all_view',
-            'target_table': 'dwd.v_dwd_10000147_login_di'
+            'target_table': 'dwd.v_dwd_10000147_login_di',
         }
 
         mock_fetch_one = MagicMock(return_value=mock_data)
-        monkeypatch.setattr(
-            'backend.models.repositories.events.fetch_one_as_dict',
-            mock_fetch_one
-        )
+        monkeypatch.setattr('backend.models.repositories.events.fetch_one_as_dict', mock_fetch_one)
 
         result = repo.find_by_name('login', 10000147)
 
-        assert isinstance(result, EventEntity), \
-            f"find_by_name should return EventEntity, got {type(result)}"
+        assert isinstance(
+            result, EventEntity
+        ), f"find_by_name should return EventEntity, got {type(result)}"
         assert result.event_name == 'login'
 
     def test_find_by_game_gid_returns_event_entity_list(self, monkeypatch):
@@ -95,7 +91,7 @@ class TestEventRepositoryEntityReturnTypes:
                 'event_name_cn': '登录',
                 'category_id': 1,
                 'source_table': 'ieu_ods.ods_10000147_all_view',
-                'target_table': 'dwd.v_dwd_10000147_login_di'
+                'target_table': 'dwd.v_dwd_10000147_login_di',
             },
             {
                 'id': 2,
@@ -104,26 +100,23 @@ class TestEventRepositoryEntityReturnTypes:
                 'event_name_cn': '登出',
                 'category_id': 1,
                 'source_table': 'ieu_ods.ods_10000147_all_view',
-                'target_table': 'dwd.v_dwd_10000147_logout_di'
-            }
+                'target_table': 'dwd.v_dwd_10000147_logout_di',
+            },
         ]
 
         mock_fetch_all = MagicMock(return_value=mock_data)
-        monkeypatch.setattr(
-            'backend.models.repositories.events.fetch_all_as_dict',
-            mock_fetch_all
-        )
+        monkeypatch.setattr('backend.models.repositories.events.fetch_all_as_dict', mock_fetch_all)
 
         result = repo.find_by_game_gid(10000147)
 
-        assert isinstance(result, list), \
-            f"find_by_game_gid should return list, got {type(result)}"
+        assert isinstance(result, list), f"find_by_game_gid should return list, got {type(result)}"
         assert len(result) == 2
 
         # ✅ All items should be EventEntity
         for event in result:
-            assert isinstance(event, EventEntity), \
-                f"All items should be EventEntity, got {type(event)}"
+            assert isinstance(
+                event, EventEntity
+            ), f"All items should be EventEntity, got {type(event)}"
 
     def test_create_returns_event_entity(self, monkeypatch):
         """Test that create returns EventEntity"""
@@ -136,10 +129,7 @@ class TestEventRepositoryEntityReturnTypes:
         mock_cursor.lastrowid = 1
 
         mock_get_conn = MagicMock(return_value=mock_conn)
-        monkeypatch.setattr(
-            'backend.models.repositories.events.get_db_connection',
-            mock_get_conn
-        )
+        monkeypatch.setattr('backend.models.repositories.events.get_db_connection', mock_get_conn)
 
         # Mock find_by_id to return EventEntity
         mock_find_result = EventEntity(
@@ -148,7 +138,7 @@ class TestEventRepositoryEntityReturnTypes:
             event_name='test_event',
             event_name_cn='测试事件',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_event_di'
+            target_table='dwd.v_dwd_90000001_test_event_di',
         )
 
         monkeypatch.setattr(repo, 'find_by_id', MagicMock(return_value=mock_find_result))
@@ -160,13 +150,14 @@ class TestEventRepositoryEntityReturnTypes:
             'game_gid': 90000001,
             'event_name': 'test_event',
             'event_name_cn': '测试事件',
-            'category_id': 1
+            'category_id': 1,
         }
 
         result = repo.create(data)
 
-        assert isinstance(result, EventEntity), \
-            f"create should return EventEntity, got {type(result)}"
+        assert isinstance(
+            result, EventEntity
+        ), f"create should return EventEntity, got {type(result)}"
         assert result.event_name == 'test_event'
 
     def test_update_returns_event_entity(self, monkeypatch):
@@ -178,10 +169,7 @@ class TestEventRepositoryEntityReturnTypes:
         mock_conn.cursor.return_value = mock_cursor
 
         mock_get_conn = MagicMock(return_value=mock_conn)
-        monkeypatch.setattr(
-            'backend.models.repositories.events.get_db_connection',
-            mock_get_conn
-        )
+        monkeypatch.setattr('backend.models.repositories.events.get_db_connection', mock_get_conn)
 
         # Mock find_by_id to return EventEntity
         mock_find_result = EventEntity(
@@ -190,15 +178,16 @@ class TestEventRepositoryEntityReturnTypes:
             event_name='updated_event',
             event_name_cn='更新事件',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_updated_event_di'
+            target_table='dwd.v_dwd_90000001_updated_event_di',
         )
 
         monkeypatch.setattr(repo, 'find_by_id', MagicMock(return_value=mock_find_result))
 
         result = repo.update(1, {'event_name': 'updated_event'})
 
-        assert isinstance(result, EventEntity), \
-            f"update should return EventEntity, got {type(result)}"
+        assert isinstance(
+            result, EventEntity
+        ), f"update should return EventEntity, got {type(result)}"
 
 
 class TestEventRepositoryNoGameIdViolations:
@@ -210,21 +199,25 @@ class TestEventRepositoryNoGameIdViolations:
 
         # ✅ Method signature should only use game_gid, not game_id
         import inspect
+
         sig = inspect.signature(repo.create_with_parameters)
 
         # ❌ Should NOT have game_id parameter
-        assert 'game_id' not in sig.parameters, \
-            "create_with_parameters should NOT have game_id parameter (game_id violation)"
+        assert (
+            'game_id' not in sig.parameters
+        ), "create_with_parameters should NOT have game_id parameter (game_id violation)"
 
         # ✅ Should have event_data parameter with game_gid inside
-        assert 'event_data' in sig.parameters, \
-            "create_with_parameters should have event_data parameter"
+        assert (
+            'event_data' in sig.parameters
+        ), "create_with_parameters should have event_data parameter"
 
     def test_source_code_no_game_id_references(self):
         """Test that source code doesn't contain game_id references (except comments)"""
         repo = EventRepository()
 
         import inspect
+
         source = inspect.getsource(repo)
 
         # Count game_id references (excluding comments)
@@ -257,10 +250,7 @@ class TestEventRepositoryNoGameIdViolations:
 
         # Report violations
         if violations:
-            violation_msg = "\n".join([
-                f"  Line {line}: {content}"
-                for line, content in violations
-            ])
+            violation_msg = "\n".join([f"  Line {line}: {content}" for line, content in violations])
             pytest.fail(
                 f"Found {len(violations)} game_id violations in EventRepository:\n{violation_msg}\n"
                 f"✅ Correct: Use game_gid (business GID)\n"
@@ -272,13 +262,16 @@ class TestEventRepositoryNoGameIdViolations:
         repo = EventRepository()
 
         import inspect
+
         source = inspect.getsource(repo)
 
         # Check for common patterns
         violations = []
 
         # Pattern 1: WHERE game_id = ?
-        if 'WHERE game_id' in source and 'WHERE game_gid' not in source.replace('WHERE game_id', ''):
+        if 'WHERE game_id' in source and 'WHERE game_gid' not in source.replace(
+            'WHERE game_id', ''
+        ):
             violations.append("Found 'WHERE game_id' - should use 'WHERE game_gid'")
 
         # Pattern 2: JOIN ... ON game_id
@@ -304,7 +297,7 @@ class TestEventRepositoryEntityFieldMapping:
             name='login',  # ✅ Using alias
             name_cn='登录',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_login_di'
+            target_table='dwd.v_dwd_90000001_login_di',
         )
 
         assert event.event_name == 'login'
@@ -316,7 +309,7 @@ class TestEventRepositoryEntityFieldMapping:
             game_gid=90000001,
             event_name='login',  # ✅ Using field name
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_login_di'
+            target_table='dwd.v_dwd_90000001_login_di',
         )
 
         assert event.event_name == 'login'
@@ -328,7 +321,7 @@ class TestEventRepositoryEntityFieldMapping:
             game_gid=90000001,
             event_name='login',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_login_di'
+            target_table='dwd.v_dwd_90000001_login_di',
         )
 
         # Reading should work
@@ -352,11 +345,11 @@ class TestEventRepositoryCacheDecorators:
 
         # Check decorator is applied (method should have __wrapped__ or similar)
         import inspect
+
         method = getattr(repo, 'find_by_id')
 
         # Cached methods have specific attributes
-        assert hasattr(method, '__func__') or callable(method), \
-            "find_by_id should be callable"
+        assert hasattr(method, '__func__') or callable(method), "find_by_id should be callable"
 
     def test_count_by_game_gid_has_cache_decorator(self):
         """Test that count_by_game_gid has @cached decorator"""
@@ -365,10 +358,10 @@ class TestEventRepositoryCacheDecorators:
         assert hasattr(repo, 'count_by_game_gid')
 
         import inspect
+
         method = getattr(repo, 'count_by_game_gid')
 
-        assert callable(method), \
-            "count_by_game_gid should be callable"
+        assert callable(method), "count_by_game_gid should be callable"
 
 
 class TestEventRepositorySQLValidator:
@@ -385,10 +378,7 @@ class TestEventRepositorySQLValidator:
         mock_conn.cursor.return_value = mock_cursor
 
         mock_get_conn = MagicMock(return_value=mock_conn)
-        monkeypatch.setattr(
-            'backend.models.repositories.events.get_db_connection',
-            mock_get_conn
-        )
+        monkeypatch.setattr('backend.models.repositories.events.get_db_connection', mock_get_conn)
 
         # Mock find_by_id
         mock_result = EventEntity(
@@ -396,7 +386,7 @@ class TestEventRepositorySQLValidator:
             game_gid=90000001,
             event_name='test',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_di'
+            target_table='dwd.v_dwd_90000001_test_di',
         )
         monkeypatch.setattr(repo, 'find_by_id', MagicMock(return_value=mock_result))
 
@@ -405,9 +395,9 @@ class TestEventRepositorySQLValidator:
 
         # Verify SQLValidator was called
         # (Note: This depends on implementation details)
-        assert mock_validator.validate_column_name.called or \
-               'SQLValidator' in str(mock_validator.mock_calls), \
-            "update should use SQLValidator for column name validation"
+        assert mock_validator.validate_column_name.called or 'SQLValidator' in str(
+            mock_validator.mock_calls
+        ), "update should use SQLValidator for column name validation"
 
 
 class TestEventRepositoryIntegration:
@@ -420,8 +410,9 @@ class TestEventRepositoryIntegration:
         test_gid = TEST_GID_START + 1
 
         # Verify test GID is in valid range
-        assert test_gid >= 90000000, \
-            "Test GIDs should be in range 90000000+ to avoid conflicts with production data"
+        assert (
+            test_gid >= 90000000
+        ), "Test GIDs should be in range 90000000+ to avoid conflicts with production data"
 
         # This test documents the requirement
         # Actual integration test would need test database
@@ -432,20 +423,23 @@ class TestEventRepositoryIntegration:
         repo = EventRepository()
 
         import inspect
+
         source = inspect.getsource(repo.create_batch)
 
         # ✅ Should use executemany (batch operation)
-        assert 'executemany' in source, \
-            "create_batch should use executemany for batch INSERT"
+        assert 'executemany' in source, "create_batch should use executemany for batch INSERT"
 
         # ✅ Should not have loop pattern (N+1 indicator)
         # Allow for loop in data preparation, but not for execute()
         lines = source.split('\n')
-        execute_lines = [i for i, line in enumerate(lines) if 'execute(' in line and 'executemany' not in line]
+        execute_lines = [
+            i for i, line in enumerate(lines) if 'execute(' in line and 'executemany' not in line
+        ]
 
         # Should have minimal execute() calls (only for ID lookup)
-        assert len(execute_lines) <= 2, \
-            f"create_batch should minimize execute() calls to avoid N+1, found {len(execute_lines)}"
+        assert (
+            len(execute_lines) <= 2
+        ), f"create_batch should minimize execute() calls to avoid N+1, found {len(execute_lines)}"
 
 
 # Test execution marker

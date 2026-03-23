@@ -5,6 +5,7 @@ Direct cache system test
 """
 
 import sys
+
 sys.path.insert(0, '.')
 
 from backend.core.cache.cache_system import cache_result

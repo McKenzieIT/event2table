@@ -159,9 +159,7 @@ class TestCacheKeyValidator:
         ]
 
         for pattern in valid_patterns:
-            assert CacheKeyValidator.validate_pattern_for_wildcard(
-                pattern
-            ), f"应该验证通过: {pattern}"
+            assert CacheKeyValidator.validate_pattern_for_wildcard(pattern), f"应该验证通过: {pattern}"
 
     def test_validate_wildcard_invalid_patterns(self):
         """测试无效的通配符模式"""

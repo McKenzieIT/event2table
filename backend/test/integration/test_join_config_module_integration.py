@@ -46,7 +46,8 @@ class TestJoinConfigModuleIntegration:
                 table_exists = False
 
         if not table_exists:
-            cursor.execute('''
+            cursor.execute(
+                '''
                 CREATE TABLE join_configs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     game_gid INTEGER NOT NULL,
@@ -63,7 +64,8 @@ class TestJoinConfigModuleIntegration:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            ''')
+            '''
+            )
             cursor.execute(
                 'CREATE INDEX IF NOT EXISTS idx_join_configs_game_gid ON join_configs(game_gid)'
             )

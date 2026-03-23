@@ -142,7 +142,7 @@ class HQLVersionRepository(GenericRepository):
             (event_id, hql_content, version_number, change_description, created_by)
             VALUES (?, ?, ?, ?, ?)
         """
-        
+
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
@@ -152,10 +152,10 @@ class HQLVersionRepository(GenericRepository):
             )
             conn.commit()
             version_id = cursor.lastrowid
-            
+
             # 清除缓存
             self._clear_event_cache(event_id)
-            
+
             # 返回创建的版本
             return self.find_by_id(version_id)
         except Exception as e:
@@ -165,9 +165,7 @@ class HQLVersionRepository(GenericRepository):
         finally:
             conn.close()
 
-    def compare_versions(
-        self, version_id_1: int, version_id_2: int
-    ) -> Dict[str, Any]:
+    def compare_versions(self, version_id_1: int, version_id_2: int) -> Dict[str, Any]:
         """
         比较两个版本的差异
 
@@ -195,9 +193,7 @@ class HQLVersionRepository(GenericRepository):
             }
 
         # 计算差异
-        diff = self._calculate_diff(
-            version_1["hql_content"], version_2["hql_content"]
-        )
+        diff = self._calculate_diff(version_1["hql_content"], version_2["hql_content"])
 
         return {
             "version_1": {
@@ -218,9 +214,7 @@ class HQLVersionRepository(GenericRepository):
             "changes": diff["changes"],
         }
 
-    def _calculate_diff(
-        self, content1: str, content2: str
-    ) -> Dict[str, Any]:
+    def _calculate_diff(self, content1: str, content2: str) -> Dict[str, Any]:
         """
         计算两个HQL内容的差异
 

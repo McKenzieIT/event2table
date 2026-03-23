@@ -816,7 +816,9 @@ class BatchCreateParameters(graphene.Mutation):
                 FROM event_params ep
                 LEFT JOIN param_templates pt ON ep.template_id = pt.id
                 WHERE ep.id IN ({})
-                """.format(','.join('?' * len(created_ids))),
+                """.format(
+                    ','.join('?' * len(created_ids))
+                ),
                 tuple(created_ids),
             )
 
@@ -1071,7 +1073,9 @@ class BatchUpdateParameters(graphene.Mutation):
                 FROM event_params ep
                 LEFT JOIN param_templates pt ON ep.template_id = pt.id
                 WHERE ep.id IN ({})
-                """.format(','.join('?' * len(updated_ids))),
+                """.format(
+                    ','.join('?' * len(updated_ids))
+                ),
                 tuple(updated_ids),
             )
 

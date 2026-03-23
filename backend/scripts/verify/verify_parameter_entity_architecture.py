@@ -27,7 +27,7 @@ def check_game_id_violations():
 
     files_to_check = [
         "services/parameters/parameter_service.py",
-        "models/repositories/parameters.py"
+        "models/repositories/parameters.py",
     ]
 
     violations_found = False
@@ -75,11 +75,7 @@ def check_entity_architecture():
 
         # 检查ParameterEntity
         param_entity = ParameterEntity(
-            id=1,
-            event_id=1,
-            game_gid=90000001,
-            name="test_param",
-            param_type="param"
+            id=1, event_id=1, game_gid=90000001, name="test_param", param_type="param"
         )
 
         print("\n✅ ParameterEntity创建成功")
@@ -88,10 +84,7 @@ def check_entity_architecture():
 
         # 检查CommonParameterEntity
         common_entity = CommonParameterEntity(
-            id=1,
-            game_gid=90000001,
-            name="common_param",
-            param_type="base"
+            id=1, game_gid=90000001, name="common_param", param_type="base"
         )
 
         print("\n✅ CommonParameterEntity创建成功")
@@ -130,7 +123,7 @@ def check_repository_methods():
             'find_by_id',
             'update',
             'get_active_by_event',
-            'get_all_by_event'
+            'get_all_by_event',
         ]
 
         all_correct = True
@@ -158,6 +151,7 @@ def check_repository_methods():
     except Exception as e:
         print(f"\n❌ Repository方法检查失败: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -171,7 +165,7 @@ def main():
     results = {
         "game_id违规检查": check_game_id_violations(),
         "Entity架构检查": check_entity_architecture(),
-        "Repository方法检查": check_repository_methods()
+        "Repository方法检查": check_repository_methods(),
     }
 
     print("\n" + "=" * 80)

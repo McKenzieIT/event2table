@@ -35,10 +35,12 @@ class TestEventModuleIntegration:
 
         try:
             # 创建测试游戏
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR IGNORE INTO games (gid, name, ods_db, dwd_prefix)
                 VALUES (92000001, 'E2E Test Game', 'ieu_ods', 'dwd')
-            """)
+            """
+            )
             conn.commit()
         except Exception as e:
             conn.rollback()

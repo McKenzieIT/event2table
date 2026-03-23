@@ -6,21 +6,26 @@
 
 import time
 import sys
+
 sys.path.insert(0, '.')
 
 from unittest.mock import patch
 from backend.models.repositories.parameters import ParameterRepository
 
+
 def benchmark_cache_performance():
     """测试缓存性能提升"""
 
     repo = ParameterRepository()
-    mock_data = [{
-        'id': i,
-        'event_id': 100 + i,
-        'param_name': f'param_{i}',
-        'game_gid': 90000001,
-    } for i in range(100)]
+    mock_data = [
+        {
+            'id': i,
+            'event_id': 100 + i,
+            'param_name': f'param_{i}',
+            'game_gid': 90000001,
+        }
+        for i in range(100)
+    ]
 
     with patch('backend.models.repositories.parameters.fetch_all_as_dict') as mock_fetch:
         mock_fetch.return_value = mock_data
@@ -43,6 +48,7 @@ def benchmark_cache_performance():
             print("   性能: 良好 (<5秒)")
         else:
             print("   性能: 需要优化 (>5秒)")
+
 
 if __name__ == '__main__':
     benchmark_cache_performance()

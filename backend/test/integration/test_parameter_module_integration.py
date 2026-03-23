@@ -34,16 +34,20 @@ class TestParameterModuleIntegration:
 
         try:
             # 创建测试游戏
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR IGNORE INTO games (gid, name, ods_db, dwd_prefix)
                 VALUES (93000001, 'E2E Test Game', 'ieu_ods', 'dwd')
-            """)
+            """
+            )
 
             # 创建测试事件 (只使用game_gid, 不使用废弃的game_id)
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR IGNORE INTO log_events (game_gid, event_name, event_name_cn, source_table, target_table)
                 VALUES (93000001, 'test_event', '测试事件', 'ieu_ods.unknown', 'dwd.unknown')
-            """)
+            """
+            )
 
             conn.commit()
         except Exception as e:

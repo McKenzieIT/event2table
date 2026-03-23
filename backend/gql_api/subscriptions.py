@@ -20,19 +20,13 @@ class EventSubscription(graphene.ObjectType):
     """事件变更订阅"""
 
     # 事件创建订阅
-    event_created = graphene.String(
-        game_gid=graphene.Int(required=True), description="订阅事件创建通知"
-    )
+    event_created = graphene.String(game_gid=graphene.Int(required=True), description="订阅事件创建通知")
 
     # 事件更新订阅
-    event_updated = graphene.String(
-        event_id=graphene.Int(required=True), description="订阅事件更新通知"
-    )
+    event_updated = graphene.String(event_id=graphene.Int(required=True), description="订阅事件更新通知")
 
     # 事件删除订阅
-    event_deleted = graphene.String(
-        game_gid=graphene.Int(required=True), description="订阅事件删除通知"
-    )
+    event_deleted = graphene.String(game_gid=graphene.Int(required=True), description="订阅事件删除通知")
 
     def resolve_event_created(root, info, game_gid):
         """订阅事件创建"""

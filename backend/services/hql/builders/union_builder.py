@@ -19,7 +19,7 @@ class UnionBuilder:
     """
     多事件UNION HQL构建器
 
-    功能: 
+    功能:
     - 支持UNION ALL合并多个事件
     - 支持分区过滤
     - 支持自定义WHERE条件

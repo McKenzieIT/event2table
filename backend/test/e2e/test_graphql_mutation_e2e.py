@@ -36,10 +36,7 @@ class TestGraphQLMutationE2E:
 
         # This should NOT raise 'NoneType' object has no attribute 'user' error
         result = mutation.mutate(
-            info,
-            gid=90099999,  # Test GID (safe range)
-            name='TDD Test Game',
-            ods_db='ieu_ods'
+            info, gid=90099999, name='TDD Test Game', ods_db='ieu_ods'  # Test GID (safe range)
         )
 
         # Assert: Mutation should succeed
@@ -73,10 +70,7 @@ class TestGraphQLMutationE2E:
 
         # Use the game created in previous test
         result = mutation.mutate(
-            info,
-            gid=90099999,
-            name='TDD Test Game Updated',
-            description='Updated via TDD test'
+            info, gid=90099999, name='TDD Test Game Updated', description='Updated via TDD test'
         )
 
         # Assert: Mutation should succeed
@@ -107,11 +101,7 @@ class TestGraphQLMutationE2E:
         mutation = DeleteGame()
 
         # Use the game created in previous tests
-        result = mutation.mutate(
-            info,
-            gid=90099999,
-            confirm=True  # Force delete
-        )
+        result = mutation.mutate(info, gid=90099999, confirm=True)  # Force delete
 
         # Assert: Mutation should succeed
         assert result is not None

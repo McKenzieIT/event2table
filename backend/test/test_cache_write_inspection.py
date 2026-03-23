@@ -5,6 +5,7 @@ Inspect cache writes
 """
 
 import sys
+
 sys.path.insert(0, '.')
 
 from unittest.mock import patch
@@ -16,19 +17,23 @@ cache_ops = []
 original_get = None
 original_set = None
 
+
 def mock_get(key):
     result = original_get(key)
     cache_ops.append(('GET', key, result is not None))
     print(f"   Cache GET: {key[:80]}... → {'HIT' if result else 'MISS'}")
     return result
 
+
 def mock_set(key, value, **kwargs):
     cache_ops.append(('SET', key, value))
     print(f"   Cache SET: {key[:80]}... → {type(value).__name__}")
     return original_set(key, value, **kwargs)
 
+
 # Monkey-patch cache
 from backend.core.cache import decorators
+
 original_get = decorators._cache.get
 original_set = decorators._cache.set
 decorators._cache.get = mock_get
@@ -38,12 +43,14 @@ decorators._cache.set = mock_set
 repo = ParameterRepository()
 
 # Mock data
-mock_param_data = [{
-    'id': 1,
-    'event_id': 100,
-    'param_name': 'test_param',
-    'game_gid': 90000001,
-}]
+mock_param_data = [
+    {
+        'id': 1,
+        'event_id': 100,
+        'param_name': 'test_param',
+        'game_gid': 90000001,
+    }
+]
 
 print("=" * 60)
 print("Cache Write Inspection")

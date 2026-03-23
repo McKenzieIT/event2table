@@ -13,6 +13,7 @@ class TestExtractCacheParams:
 
     def test_skip_self_parameter(self):
         """Test correctly skipping self parameter"""
+
         class TestRepo:
             def method(self, arg1, arg2):
                 return (arg1, arg2)
@@ -25,6 +26,7 @@ class TestExtractCacheParams:
 
     def test_regular_function_no_self(self):
         """Test regular function does not skip parameters"""
+
         def standalone_func(arg1, arg2):
             return (arg1, arg2)
 
@@ -34,6 +36,7 @@ class TestExtractCacheParams:
 
     def test_unhashable_dict_serialization(self):
         """Test dict parameter is JSON serialized"""
+
         def func(data):
             return data
 
@@ -44,6 +47,7 @@ class TestExtractCacheParams:
 
     def test_unhashable_list_serialization(self):
         """Test list parameter is JSON serialized"""
+
         def func(items):
             return items
 
@@ -54,14 +58,11 @@ class TestExtractCacheParams:
 
     def test_mixed_params(self):
         """Test mixed parameter types"""
+
         def func(page, limit, filters):
             return (page, limit, filters)
 
-        args, kwargs = _extract_cache_params(
-            func,
-            (1, 50),
-            {'filters': {'status': 'active'}}
-        )
+        args, kwargs = _extract_cache_params(func, (1, 50), {'filters': {'status': 'active'}})
 
         assert args == (1, 50)
         assert 'filters' in kwargs

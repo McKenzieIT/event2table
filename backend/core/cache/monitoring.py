@@ -438,9 +438,7 @@ class CacheAlertManager:
                         alert.resolved = True
                         del self.active_alerts[rule.name]
 
-                    logger.info(
-                        f"✅ 告警已解除: {rule.name} " f"({rule.metric}: {current_value:.2%})"
-                    )
+                    logger.info(f"✅ 告警已解除: {rule.name} " f"({rule.metric}: {current_value:.2%})")
 
         return new_alerts
 
@@ -587,10 +585,7 @@ class CacheAlertManager:
                     logger.info(f"✅ 缓存预热完成: {result}")
 
             else:
-                logger.warning(
-                    "⚠️ 未配置预热回调函数, 跳过自动预热. "
-                    "请在初始化时传入 warmup_callback 参数. "
-                )
+                logger.warning("⚠️ 未配置预热回调函数, 跳过自动预热. " "请在初始化时传入 warmup_callback 参数. ")
                 logger.info(
                     "💡 提示: 在 web_app.py 中配置回调示例:\n"
                     "   from backend.services.cache.cache_warmup import CacheWarmer\n"

@@ -854,7 +854,9 @@ class BatchAddFieldsToCanvasMutation(graphene.Mutation):
                         'data_type': None,
                         'usage_count': 0,
                     }
-                    logger.info(f"[batchAddFieldsToCanvas] Field {i}: name={field['name']}, type={field_type_value}")
+                    logger.info(
+                        f"[batchAddFieldsToCanvas] Field {i}: name={field['name']}, type={field_type_value}"
+                    )
                     field_dicts.append(field_dict)
 
                 logger.info(f"[batchAddFieldsToCanvas] Created {len(field_dicts)} field dicts")
@@ -891,10 +893,6 @@ class ParameterManagementMutations(ObjectType):
     # Mutation field definitions
     change_parameter_type = ChangeParameterTypeMutation.Field(description="修改参数类型")
 
-    auto_sync_common_parameters = AutoSyncCommonParametersMutation.Field(
-        description="自动同步公共参数"
-    )
+    auto_sync_common_parameters = AutoSyncCommonParametersMutation.Field(description="自动同步公共参数")
 
-    batch_add_fields_to_canvas = BatchAddFieldsToCanvasMutation.Field(
-        description="批量添加字段到画布"
-    )
+    batch_add_fields_to_canvas = BatchAddFieldsToCanvasMutation.Field(description="批量添加字段到画布")

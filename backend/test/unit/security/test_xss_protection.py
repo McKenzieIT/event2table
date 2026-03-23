@@ -72,7 +72,7 @@ class TestXSSProtection:
             event['event_name'] == malicious_name
         ), f"[XSS漏洞发现] 事件名称未转义: 存储为 '{event['event_name']}', 应该存储为 '&lt;script&gt;...'"
 
-        # ✅ 期望行为(当前未实现): 
+        # ✅ 期望行为(当前未实现):
         # expected_escaped = html.escape(malicious_name)
         # assert event['event_name'] == expected_escaped, \
         #     f"事件名称应被转义: 期望 '{expected_escaped}', 实际 '{event['event_name']}'"

@@ -51,8 +51,8 @@ def test_database():
     """
     共享的测试数据库初始化fixture
 
-    确保测试数据库只被初始化一次, 由app和db fixtures共享使用. 
-    这是session-scoped fixture, 确保整个测试session使用同一个数据库. 
+    确保测试数据库只被初始化一次, 由app和db fixtures共享使用.
+    这是session-scoped fixture, 确保整个测试session使用同一个数据库.
     """
     # 设置测试环境
     os.environ["FLASK_ENV"] = "testing"
@@ -153,13 +153,13 @@ def db(test_database):
     """
     提供测试数据库连接的fixture - 依赖test_database fixture
 
-    注意: 这个fixture提供的是数据库连接对象, 不是数据库路径. 
-    test_database fixture负责初始化数据库. 
+    注意: 这个fixture提供的是数据库连接对象, 不是数据库路径.
+    test_database fixture负责初始化数据库.
 
-    使用function scope确保每个测试获得独立的数据库连接, 
-    防止测试之间的状态污染和连接损坏传播. 
+    使用function scope确保每个测试获得独立的数据库连接,
+    防止测试之间的状态污染和连接损坏传播.
 
-    使用事务回滚模式: 
+    使用事务回滚模式:
     - 每个测试开始时开启新事务
     - 测试完成后回滚所有更改
     - 确保每个测试都在干净的数据库状态上运行

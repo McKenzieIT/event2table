@@ -87,7 +87,9 @@ class FieldRecommendationService(BaseService):
                 field_name_hint, game_gid=game_gid, limit=limit
             )
             for field in similar_fields:
-                field["recommendation_reason"] = f"与'{field_name_hint}'相似 (相似度: {field['similarity_score']:.2f})"
+                field[
+                    "recommendation_reason"
+                ] = f"与'{field_name_hint}'相似 (相似度: {field['similarity_score']:.2f})"
                 recommendations.append(field)
 
         # 策略2: 基于事件类型的推荐
@@ -121,7 +123,9 @@ class FieldRecommendationService(BaseService):
                 if len(unique_recommendations) >= limit:
                     break
 
-        logger.info(f"Generated {len(unique_recommendations)} recommendations for game_gid={game_gid}")
+        logger.info(
+            f"Generated {len(unique_recommendations)} recommendations for game_gid={game_gid}"
+        )
         return unique_recommendations
 
     @cached("field_recommendations.patterns", timeout=600)
@@ -205,7 +209,9 @@ class FieldRecommendationService(BaseService):
         # 生成推理说明
         reasoning = self._generate_type_reasoning(field_name, inferred_type, confidence)
 
-        logger.info(f"Inferred type for '{field_name}': {inferred_type} (confidence: {confidence:.2f})")
+        logger.info(
+            f"Inferred type for '{field_name}': {inferred_type} (confidence: {confidence:.2f})"
+        )
 
         return {
             "field_name": field_name,
@@ -274,14 +280,21 @@ class FieldRecommendationService(BaseService):
 
         # 高置信度模式
         high_confidence_patterns = [
-            "role_id", "account_id", "user_id", "uid", "game_id", "gid",
-            "server_id", "channel_id", "platform", "device_id", "utdid"
+            "role_id",
+            "account_id",
+            "user_id",
+            "uid",
+            "game_id",
+            "gid",
+            "server_id",
+            "channel_id",
+            "platform",
+            "device_id",
+            "utdid",
         ]
 
         # 中等置信度模式
-        medium_confidence_patterns = [
-            "zone_id", "item_id", "skill_id", "level", "count", "num"
-        ]
+        medium_confidence_patterns = ["zone_id", "item_id", "skill_id", "level", "count", "num"]
 
         # 检查是否匹配高置信度模式
         for pattern in high_confidence_patterns:
@@ -300,7 +313,9 @@ class FieldRecommendationService(BaseService):
         # 默认置信度
         return 0.60
 
-    def _generate_type_reasoning(self, field_name: str, inferred_type: str, confidence: float) -> str:
+    def _generate_type_reasoning(
+        self, field_name: str, inferred_type: str, confidence: float
+    ) -> str:
         """
         生成类型推断的推理说明
 
@@ -340,7 +355,9 @@ class FieldRecommendationService(BaseService):
             >>> service.invalidate_recommendations_cache(game_gid=10000147)
         """
         if game_gid:
-            self.invalidator.invalidate_pattern("field_recommendations.recommend", game_gid=game_gid)
+            self.invalidator.invalidate_pattern(
+                "field_recommendations.recommend", game_gid=game_gid
+            )
             self.invalidator.invalidate_pattern("field_recommendations.patterns", game_gid=game_gid)
             logger.info(f"Invalidated recommendations cache for game_gid={game_gid}")
         else:

@@ -36,10 +36,7 @@ def test_get_all_with_event_count_no_n_plus_one(monkeypatch):
 
     # Mock fetch_all_as_dict in the games module itself (since it's imported at module level)
     mock_fetch_all = MagicMock()
-    monkeypatch.setattr(
-        'backend.models.repositories.games.fetch_all_as_dict',
-        mock_fetch_all
-    )
+    monkeypatch.setattr('backend.models.repositories.games.fetch_all_as_dict', mock_fetch_all)
 
     # Mock response with 3 games and their event counts
     mock_response = [
@@ -52,7 +49,7 @@ def test_get_all_with_event_count_no_n_plus_one(monkeypatch):
             'dwd_prefix': 'dwd',
             'created_at': '2026-01-01 00:00:00',
             'updated_at': '2026-01-01 00:00:00',
-            'event_count': 5
+            'event_count': 5,
         },
         {
             'id': 2,
@@ -63,7 +60,7 @@ def test_get_all_with_event_count_no_n_plus_one(monkeypatch):
             'dwd_prefix': 'dwd',
             'created_at': '2026-01-01 00:00:00',
             'updated_at': '2026-01-01 00:00:00',
-            'event_count': 3
+            'event_count': 3,
         },
         {
             'id': 3,
@@ -74,8 +71,8 @@ def test_get_all_with_event_count_no_n_plus_one(monkeypatch):
             'dwd_prefix': 'dwd',
             'created_at': '2026-01-01 00:00:00',
             'updated_at': '2026-01-01 00:00:00',
-            'event_count': 0
-        }
+            'event_count': 0,
+        },
     ]
 
     mock_fetch_all.return_value = mock_response
@@ -93,23 +90,19 @@ def test_get_all_with_event_count_no_n_plus_one(monkeypatch):
     call_args = mock_fetch_all.call_args
     query = call_args[0][0] if call_args[0] else call_args.kwargs.get('query', '')
 
-    assert 'LEFT JOIN' in query.upper(), (
-        "Query should use LEFT JOIN to fetch games and event counts in single query"
-    )
+    assert (
+        'LEFT JOIN' in query.upper()
+    ), "Query should use LEFT JOIN to fetch games and event counts in single query"
 
-    assert 'LOG_EVENTS' in query.upper(), (
-        "Query should join with log_events table"
-    )
+    assert 'LOG_EVENTS' in query.upper(), "Query should join with log_events table"
 
-    assert 'COUNT' in query.upper(), (
-        "Query should use COUNT to aggregate events"
-    )
+    assert 'COUNT' in query.upper(), "Query should use COUNT to aggregate events"
 
     # Verify results are GameEntity objects
     assert len(results) == 3, "Should return 3 games"
-    assert all(isinstance(game, GameEntity) for game in results), (
-        "All results should be GameEntity instances"
-    )
+    assert all(
+        isinstance(game, GameEntity) for game in results
+    ), "All results should be GameEntity instances"
 
     # Verify event counts are present
     assert results[0].event_count == 5, "First game should have 5 events"

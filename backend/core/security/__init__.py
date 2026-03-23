@@ -55,37 +55,30 @@ from .error_sanitizer import sanitize_error
 __all__ = [
     # SQL validation
     'SQLValidator',
-    
     # Authentication and authorization
     'authenticated',
     'require_permission',
     'check_auth_context',
     'check_user_permission',
-    
     # CSRF protection
     'generate_csrf_token',
     'validate_csrf_token',
     'csrf_protect',
     'init_csrf_protection',
-    
     # Rate limiting
     'rate_limit',
     'DEFAULT_RATE_LIMIT_REQUESTS',
     'DEFAULT_RATE_LIMIT_WINDOW',
     'STRICT_RATE_LIMIT_REQUESTS',
     'STRICT_RATE_LIMIT_WINDOW',
-    
     # Security headers
     'add_security_headers',
-    
     # Request validators
     'require_json',
     'validate_content_length',
     'sanitize_filename',
-    
     # Path validation
     'PathValidator',
-    
     # Error sanitization
     'sanitize_error',
 ]

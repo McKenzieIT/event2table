@@ -48,12 +48,7 @@ class TestGraphQLAuthentication:
         # This should raise an error in current implementation
         # After fix, this should succeed
         with pytest.raises(Exception) as exc_info:
-            result = mutation.mutate(
-                info,
-                gid=90099999,
-                name='Test Auth Game',
-                ods_db='ieu_ods'
-            )
+            result = mutation.mutate(info, gid=90099999, name='Test Auth Game', ods_db='ieu_ods')
 
         # Assert: Should fail with authentication error (current state)
         assert 'Authentication required' in str(exc_info.value)
@@ -79,12 +74,7 @@ class TestGraphQLAuthentication:
         mutation = CreateGame()
 
         # This should succeed (after we fix the authentication issue)
-        result = mutation.mutate(
-            info,
-            gid=90099998,
-            name='Test Game With User',
-            ods_db='ieu_ods'
-        )
+        result = mutation.mutate(info, gid=90099998, name='Test Game With User', ods_db='ieu_ods')
 
         # Assert: Should succeed
         assert result is not None
@@ -110,12 +100,7 @@ class TestGraphQLAuthentication:
 
         # This should raise an error in current implementation
         with pytest.raises(Exception) as exc_info:
-            result = mutation.mutate(
-                info,
-                gid=90099997,
-                name='Test No Context',
-                ods_db='ieu_ods'
-            )
+            result = mutation.mutate(info, gid=90099997, name='Test No Context', ods_db='ieu_ods')
 
         # Assert: Should fail with context error (current state)
         assert 'context' in str(exc_info.value).lower()

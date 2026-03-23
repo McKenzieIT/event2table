@@ -61,6 +61,7 @@ def cached(ttl: int = 300, key_prefix: str = None, add_response_headers: bool = 
                     if add_response_headers:
                         try:
                             from backend.core.cache.middleware import set_cache_context
+
                             set_cache_context('HIT', cache_key)
                         except Exception:
                             pass  # 中间件不可用时忽略
@@ -78,6 +79,7 @@ def cached(ttl: int = 300, key_prefix: str = None, add_response_headers: bool = 
                 if add_response_headers:
                     try:
                         from backend.core.cache.middleware import set_cache_context
+
                         set_cache_context('MISS', cache_key)
                     except Exception:
                         pass
@@ -271,7 +273,7 @@ def cache_invalidate(func: Callable) -> Callable:
     """
     ⚡ PERF: 自动缓存失效装饰器 (Phase 1.1 - Critical Fix)
 
-    自动失效与函数相关的所有缓存键,无需手动指定键模式. 
+    自动失效与函数相关的所有缓存键,无需手动指定键模式.
 
     工作原理:
     1. 执行被装饰的函数(CREATE/UPDATE/DELETE操作)

@@ -17,7 +17,7 @@ class FieldBuilder:
     """
     字段SQL构建器
 
-    支持4种字段类型: 
+    支持4种字段类型:
     - base: 基础字段（如: role_id）
     - param: JSON参数字段（如: get_json_object(params, '$.zone_id')）
     - custom: 自定义表达式

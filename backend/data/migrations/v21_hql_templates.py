@@ -15,16 +15,17 @@ logger = logging.getLogger(__name__)
 def migrate(conn: sqlite3.Connection):
     """
     执行数据库迁移 v21
-    
+
     创建 hql_templates 表和相关索引
     """
     cursor = conn.cursor()
-    
+
     try:
         logger.info("Migration v21: Creating hql_templates table...")
-        
+
         # 创建 hql_templates 表
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS hql_templates (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL UNIQUE,
@@ -44,10 +45,11 @@ def migrate(conn: sqlite3.Connection):
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_used_at TIMESTAMP
             )
-        """)
-        
+        """
+        )
+
         logger.info("Migration v21: hql_templates table created")
-        
+
         # 创建索引
         indexes = [
             ("idx_hql_templates_category", "category"),
@@ -57,20 +59,22 @@ def migrate(conn: sqlite3.Connection):
             ("idx_hql_templates_is_active", "is_active"),
             ("idx_hql_templates_name", "name"),
         ]
-        
+
         for index_name, column in indexes:
             try:
-                cursor.execute(f"""
+                cursor.execute(
+                    f"""
                     CREATE INDEX IF NOT EXISTS {index_name}
                     ON hql_templates({column})
-                """)
+                """
+                )
                 logger.info(f"Migration v21: index {index_name} created")
             except Exception as e:
                 logger.warning(f"Migration v21: Could not create index {index_name}: {e}")
-        
+
         conn.commit()
         logger.info("Migration v21 completed: HQL templates support added")
-        
+
     except Exception as e:
         conn.rollback()
         logger.error(f"Migration v21 failed: {e}")

@@ -217,7 +217,7 @@ class JoinConfigRepository(GenericRepository):
         # 调用父类创建方法(返回字典而非ID)
         created_dict = super().create(data_to_insert)
 
-        # 由于JoinConfigRepository重写了find_by_id()返回Entity, 
+        # 由于JoinConfigRepository重写了find_by_id()返回Entity,
         # super().create()实际返回的是Entity对象而非字典
         if created_dict is not None:
             # 如果是Entity对象, 直接返回

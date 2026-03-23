@@ -452,9 +452,7 @@ class EventParamManager:
                 return False
 
             # 保存当前版本
-            self._save_version(
-                cursor, event_param_id, current["version"], f"回滚到版本{target_version}"
-            )
+            self._save_version(cursor, event_param_id, current["version"], f"回滚到版本{target_version}")
 
             # 停用当前版本
             cursor.execute("UPDATE event_params SET is_active = 0 WHERE id = ?", (event_param_id,))

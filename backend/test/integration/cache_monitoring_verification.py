@@ -33,9 +33,7 @@ def test_cache_stats():
         print("✅ 缓存统计API正常")
         print(f"   L1缓存使用率: {data['l1_cache']['usage']}")
         if 'monitoring' in data and 'performance_metrics' in data['monitoring']:
-            print(
-                f"   当前命中率: {data['monitoring']['performance_metrics'].get('hit_rate', 'N/A')}"
-            )
+            print(f"   当前命中率: {data['monitoring']['performance_metrics'].get('hit_rate', 'N/A')}")
             print(
                 f"   平均响应时间: {data['monitoring']['performance_metrics'].get('avg_response_time_ms', 'N/A')} ms"
             )

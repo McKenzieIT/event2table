@@ -32,7 +32,7 @@ class ProjectAdapter:
         """
         从项目数据构建抽象Event
 
-        这是业务逻辑的核心: 
+        这是业务逻辑的核心:
         - 查询log_events表获取事件信息
         - 查询games表获取数据库信息
         - 构建完整的表名

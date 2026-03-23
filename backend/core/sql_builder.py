@@ -48,7 +48,7 @@ class AggregateFunctionBuilder:
     """
     SQL聚合函数构建器
 
-    使用策略模式支持不同的聚合函数. 
+    使用策略模式支持不同的聚合函数.
     """
 
     # 内置聚合函数模板

@@ -14,6 +14,7 @@ class TestCachedDecorator:
 
     def test_cache_hit_with_self_parameter(self):
         """测试带self参数的缓存命中"""
+
         class TestRepo:
             def __init__(self):
                 self.call_count = 0
@@ -40,6 +41,7 @@ class TestCachedDecorator:
 
     def test_cache_miss_different_parameters(self):
         """测试不同参数导致cache miss"""
+
         class TestRepo:
             def __init__(self):
                 self.call_count = 0
@@ -64,6 +66,7 @@ class TestCachedDecorator:
 
     def test_fallback_on_error(self):
         """测试错误时fallback到旧方式"""
+
         @cached(ttl=60)
         def problematic_func(data):
             return {'data': 'value'}

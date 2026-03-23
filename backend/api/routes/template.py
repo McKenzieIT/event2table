@@ -53,9 +53,9 @@ def api_get_template_categories():
     try:
         service = TemplateService()
         categories = service.get_categories()
-        
+
         return json_success_response(data=categories)
-    
+
     except Exception as e:
         logger.error(f"Error fetching template categories: {e}")
         return json_error_response("Failed to fetch template categories", status_code=500)
@@ -82,9 +82,9 @@ def api_get_template_subcategories(category: str):
     try:
         service = TemplateService()
         subcategories = service.get_subcategories(category)
-        
+
         return json_success_response(data=subcategories)
-    
+
     except Exception as e:
         logger.error(f"Error fetching template subcategories: {e}")
         return json_error_response("Failed to fetch template subcategories", status_code=500)
@@ -120,7 +120,7 @@ def api_search_templates():
     try:
         service = TemplateService()
         data = request.get_json() or {}
-        
+
         keyword = data.get("keyword")
         category = data.get("category")
         subcategory = data.get("subcategory")
@@ -128,13 +128,13 @@ def api_search_templates():
         game_gid = data.get("game_gid")
         limit = data.get("limit", 50)
         offset = data.get("offset", 0)
-        
+
         # 验证参数
         if limit < 1 or limit > 100:
             return json_error_response("limit must be between 1 and 100", status_code=400)
         if offset < 0:
             return json_error_response("offset must be non-negative", status_code=400)
-        
+
         result = service.search_templates(
             keyword=keyword,
             category=category,
@@ -142,11 +142,11 @@ def api_search_templates():
             tags=tags,
             game_gid=game_gid,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
-        
+
         return json_success_response(data=result)
-    
+
     except Exception as e:
         logger.error(f"Error searching templates: {e}")
         return json_error_response("Failed to search templates", status_code=500)
@@ -169,15 +169,15 @@ def api_get_popular_templates():
     try:
         service = TemplateService()
         limit = request.args.get("limit", 10, type=int)
-        
+
         # 验证参数
         if limit < 1 or limit > 50:
             limit = 10
-        
+
         templates = service.get_popular_templates(limit=limit)
-        
+
         return json_success_response(data=templates)
-    
+
     except Exception as e:
         logger.error(f"Error fetching popular templates: {e}")
         return json_error_response("Failed to fetch popular templates", status_code=500)
@@ -209,12 +209,12 @@ def api_export_template(template_id: int):
     try:
         service = TemplateService()
         template = service.export_template(template_id)
-        
+
         if not template:
             return json_error_response("Template not found", status_code=404)
-        
+
         return json_success_response(data=template)
-    
+
     except Exception as e:
         logger.error(f"Error exporting template {template_id}: {e}")
         return json_error_response("Failed to export template", status_code=500)
@@ -253,21 +253,18 @@ def api_import_template():
     try:
         service = TemplateService()
         data = request.get_json()
-        
+
         if not data:
             return json_error_response("Request body is required", status_code=400)
-        
+
         # 导入模板
         template = service.import_template(data)
-        
+
         if not template:
             return json_error_response("Failed to import template", status_code=500)
-        
-        return json_success_response(
-            data=template,
-            message="Template imported successfully"
-        )
-    
+
+        return json_success_response(data=template, message="Template imported successfully")
+
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
     except Exception as e:
@@ -296,12 +293,12 @@ def api_get_template(template_id: int):
     try:
         service = TemplateService()
         template = service.get_template_by_id(template_id)
-        
+
         if not template:
             return json_error_response("Template not found", status_code=404)
-        
+
         return json_success_response(data=template)
-    
+
     except Exception as e:
         logger.error(f"Error fetching template {template_id}: {e}")
         return json_error_response("Failed to fetch template", status_code=500)
@@ -327,20 +324,20 @@ def api_increment_template_usage(template_id: int):
     try:
         service = TemplateService()
         success = service.increment_usage(template_id)
-        
+
         if not success:
             return json_error_response("Template not found", status_code=404)
-        
+
         # 获取更新后的模板
         template = service.get_template_by_id(template_id)
-        
+
         return json_success_response(
             data={
                 "template_id": template_id,
-                "usage_count": template.get('usage_count', 0) if template else 0
+                "usage_count": template.get('usage_count', 0) if template else 0,
             }
         )
-    
+
     except Exception as e:
         logger.error(f"Error incrementing template usage: {e}")
         return json_error_response("Failed to increment template usage", status_code=500)

@@ -102,10 +102,7 @@ def api_get_recommendations():
             f"(game_gid={game_gid}, event_name={event_name}, hint={field_name_hint})"
         )
 
-        return json_success_response(
-            data=recommendations,
-            message=f"获取到{len(recommendations)}条推荐"
-        )
+        return json_success_response(data=recommendations, message=f"获取到{len(recommendations)}条推荐")
 
     except ValueError as e:
         logger.error(f"Validation error in get_recommendations: {e}")
@@ -171,13 +168,11 @@ def api_get_common_patterns():
         )
 
         logger.info(
-            f"Retrieved {len(patterns_data['patterns'])} patterns "
-            f"for game_gid={game_gid}"
+            f"Retrieved {len(patterns_data['patterns'])} patterns " f"for game_gid={game_gid}"
         )
 
         return json_success_response(
-            data=patterns_data,
-            message=f"获取到{len(patterns_data['patterns'])}条常用字段模式"
+            data=patterns_data, message=f"获取到{len(patterns_data['patterns'])}条常用字段模式"
         )
 
     except ValueError as e:
@@ -230,8 +225,7 @@ def api_infer_field_type():
         )
 
         return json_success_response(
-            data=type_inference,
-            message=f"字段类型推断成功: {type_inference['inferred_type']}"
+            data=type_inference, message=f"字段类型推断成功: {type_inference['inferred_type']}"
         )
 
     except ValueError as e:

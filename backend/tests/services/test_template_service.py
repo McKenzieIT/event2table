@@ -22,21 +22,13 @@ class TestTemplateService(unittest.TestCase):
         """Test getting template categories"""
         # Mock response
         mock_fetch.return_value = [
-            {
-                'category': '登录事件',
-                'template_count': 10,
-                'total_usage': 150
-            },
-            {
-                'category': '充值付费',
-                'template_count': 5,
-                'total_usage': 80
-            }
+            {'category': '登录事件', 'template_count': 10, 'total_usage': 150},
+            {'category': '充值付费', 'template_count': 5, 'total_usage': 80},
         ]
-        
+
         # Call method
         result = self.service.get_categories()
-        
+
         # Assertions
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['category'], '登录事件')
@@ -47,14 +39,11 @@ class TestTemplateService(unittest.TestCase):
     def test_get_subcategories(self, mock_fetch):
         """Test getting subcategories for a category"""
         # Mock response
-        mock_fetch.return_value = [
-            {'subcategory': '基础登录'},
-            {'subcategory': '设备登录'}
-        ]
-        
+        mock_fetch.return_value = [{'subcategory': '基础登录'}, {'subcategory': '设备登录'}]
+
         # Call method
         result = self.service.get_subcategories('登录事件')
-        
+
         # Assertions
         self.assertEqual(len(result), 2)
         self.assertIn('基础登录', result)
@@ -70,10 +59,10 @@ class TestTemplateService(unittest.TestCase):
         mock_fetch_all.return_value = [
             {'id': 1, 'name': 'test_template', 'display_name': 'Test Template'}
         ]
-        
+
         # Call method
         result = self.service.search_templates(keyword='test', limit=10, offset=0)
-        
+
         # Assertions
         self.assertIn('templates', result)
         self.assertIn('total', result)
@@ -84,13 +73,11 @@ class TestTemplateService(unittest.TestCase):
     def test_get_popular_templates(self, mock_fetch):
         """Test getting popular templates"""
         # Mock response
-        mock_fetch.return_value = [
-            {'id': 1, 'name': 'popular_template', 'usage_count': 100}
-        ]
-        
+        mock_fetch.return_value = [{'id': 1, 'name': 'popular_template', 'usage_count': 100}]
+
         # Call method
         result = self.service.get_popular_templates(limit=10)
-        
+
         # Assertions
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]['usage_count'], 100)
@@ -103,12 +90,12 @@ class TestTemplateService(unittest.TestCase):
         mock_fetch.return_value = {
             'id': 1,
             'name': 'test_template',
-            'display_name': 'Test Template'
+            'display_name': 'Test Template',
         }
-        
+
         # Call method
         result = self.service.get_template_by_id(1)
-        
+
         # Assertions
         self.assertIsNotNone(result)
         self.assertEqual(result['id'], 1)
@@ -120,14 +107,11 @@ class TestTemplateService(unittest.TestCase):
         """Test incrementing template usage"""
         # Mock responses
         mock_execute.return_value = 1
-        mock_fetch.return_value = {
-            'id': 1,
-            'usage_count': 11
-        }
-        
+        mock_fetch.return_value = {'id': 1, 'usage_count': 11}
+
         # Call method
         result = self.service.increment_usage(1)
-        
+
         # Assertions
         self.assertTrue(result)
         mock_execute.assert_called_once()
@@ -138,12 +122,8 @@ class TestTemplateService(unittest.TestCase):
         """Test creating a new template"""
         # Mock responses
         mock_execute.return_value = 1
-        mock_fetch.return_value = {
-            'id': 1,
-            'name': 'new_template',
-            'display_name': 'New Template'
-        }
-        
+        mock_fetch.return_value = {'id': 1, 'name': 'new_template', 'display_name': 'New Template'}
+
         # Test data
         template_data = {
             'name': 'new_template',
@@ -151,12 +131,12 @@ class TestTemplateService(unittest.TestCase):
             'category': '登录事件',
             'hql_content': 'SELECT * FROM table',
             'tags': ['test'],
-            'variables': {'param1': 'value1'}
+            'variables': {'param1': 'value1'},
         }
-        
+
         # Call method
         result = self.service.create_template(template_data)
-        
+
         # Assertions
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], 'new_template')
@@ -167,16 +147,13 @@ class TestTemplateService(unittest.TestCase):
         """Test updating a template"""
         # Mock response
         mock_execute.return_value = 1
-        
+
         # Test data
-        update_data = {
-            'display_name': 'Updated Template',
-            'description': 'Updated description'
-        }
-        
+        update_data = {'display_name': 'Updated Template', 'description': 'Updated description'}
+
         # Call method
         result = self.service.update_template(1, update_data)
-        
+
         # Assertions
         self.assertTrue(result)
         mock_execute.assert_called_once()
@@ -186,16 +163,12 @@ class TestTemplateService(unittest.TestCase):
     def test_delete_template(self, mock_fetch, mock_execute):
         """Test deleting a template"""
         # Mock responses
-        mock_fetch.return_value = {
-            'id': 1,
-            'name': 'test_template',
-            'is_system': 0
-        }
+        mock_fetch.return_value = {'id': 1, 'name': 'test_template', 'is_system': 0}
         mock_execute.return_value = 1
-        
+
         # Call method
         result = self.service.delete_template(1)
-        
+
         # Assertions
         self.assertTrue(result)
         mock_execute.assert_called_once()
@@ -204,16 +177,12 @@ class TestTemplateService(unittest.TestCase):
         """Test that deleting a system template raises an error"""
         # Mock response
         with patch('backend.services.template_service.fetch_one_as_dict') as mock_fetch:
-            mock_fetch.return_value = {
-                'id': 1,
-                'name': 'system_template',
-                'is_system': 1
-            }
-            
+            mock_fetch.return_value = {'id': 1, 'name': 'system_template', 'is_system': 1}
+
             # Call method and assert error
             with self.assertRaises(ValueError) as context:
                 self.service.delete_template(1)
-            
+
             self.assertIn('Cannot delete system template', str(context.exception))
 
     @patch('backend.services.template_service.fetch_one_as_dict')
@@ -229,12 +198,12 @@ class TestTemplateService(unittest.TestCase):
             'tags': json.dumps(['test']),
             'variables': json.dumps({'param1': 'value1'}),
             'created_at': '2024-01-01',
-            'updated_at': '2024-01-01'
+            'updated_at': '2024-01-01',
         }
-        
+
         # Call method
         result = self.service.export_template(1)
-        
+
         # Assertions
         self.assertIsNotNone(result)
         self.assertEqual(result['name'], 'test_template')
@@ -249,22 +218,19 @@ class TestTemplateService(unittest.TestCase):
         """Test importing a template"""
         # Mock responses
         mock_fetch.return_value = None  # Template doesn't exist
-        mock_create.return_value = {
-            'id': 1,
-            'name': 'imported_template'
-        }
-        
+        mock_create.return_value = {'id': 1, 'name': 'imported_template'}
+
         # Test data
         template_data = {
             'name': 'imported_template',
             'display_name': 'Imported Template',
             'category': '登录事件',
-            'hql_content': 'SELECT * FROM table'
+            'hql_content': 'SELECT * FROM table',
         }
-        
+
         # Call method
         result = self.service.import_template(template_data)
-        
+
         # Assertions
         self.assertIsNotNone(result)
         mock_create.assert_called_once()
@@ -276,11 +242,11 @@ class TestTemplateService(unittest.TestCase):
             'name': 'test_template'
             # Missing display_name, category, hql_content
         }
-        
+
         # Call method and assert error
         with self.assertRaises(ValueError) as context:
             self.service.import_template(template_data)
-        
+
         self.assertIn('Missing required field', str(context.exception))
 
 

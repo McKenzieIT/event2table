@@ -60,11 +60,7 @@ def main():
     backend_root = Path(__file__).parent.parent
     routes_dir = backend_root / "api" / "routes"
 
-    files_to_refactor = [
-        "categories.py",
-        "parameters.py",
-        "flows.py"
-    ]
+    files_to_refactor = ["categories.py", "parameters.py", "flows.py"]
 
     for filename in files_to_refactor:
         file_path = routes_dir / filename

@@ -49,41 +49,23 @@ def sample_event_data():
         "game_id": 1,
         "game_gid": 10000147,
         "source_table": "ieu_ods.ods_10000147_all_view",
-        "target_table": "dwd.v_dwd_10000147_test_login_di"
+        "target_table": "dwd.v_dwd_10000147_test_login_di",
     }
 
 
 @pytest.fixture
 def sample_game_data():
     """Sample game data for testing"""
-    return {
-        "id": 1,
-        "gid": 10000147,
-        "name": "Test Game",
-        "ods_db": "ieu_ods",
-        "dwd_prefix": "dwd"
-    }
+    return {"id": 1, "gid": 10000147, "name": "Test Game", "ods_db": "ieu_ods", "dwd_prefix": "dwd"}
 
 
 @pytest.fixture
 def sample_base_fields():
     """Sample base fields (direct table columns)"""
     return [
-        {
-            "name": "role_id",
-            "type": "base",
-            "alias": None
-        },
-        {
-            "name": "account_id",
-            "type": "base",
-            "alias": None
-        },
-        {
-            "name": "ds",
-            "type": "base",
-            "alias": None
-        }
+        {"name": "role_id", "type": "base", "alias": None},
+        {"name": "account_id", "type": "base", "alias": None},
+        {"name": "ds", "type": "base", "alias": None},
     ]
 
 
@@ -91,18 +73,8 @@ def sample_base_fields():
 def sample_param_fields():
     """Sample parameter fields (from JSON params)"""
     return [
-        {
-            "name": "zone_id",
-            "type": "param",
-            "json_path": "$.zoneId",
-            "alias": "zone"
-        },
-        {
-            "name": "level",
-            "type": "param",
-            "json_path": "$.level",
-            "alias": None
-        }
+        {"name": "zone_id", "type": "param", "json_path": "$.zoneId", "alias": "zone"},
+        {"name": "level", "type": "param", "json_path": "$.level", "alias": None},
     ]
 
 
@@ -114,7 +86,7 @@ def sample_custom_fields():
             "name": "custom_field",
             "type": "custom",
             "custom_expression": "CONCAT(role_id, '_', account_id)",
-            "alias": "role_account"
+            "alias": "role_account",
         }
     ]
 
@@ -124,18 +96,8 @@ def sample_where_conditions():
     """Sample WHERE conditions"""
     return {
         "conditions": [
-            {
-                "field": "ds",
-                "operator": "=",
-                "value": "20260312",
-                "logical_op": "AND"
-            },
-            {
-                "field": "role_id",
-                "operator": ">",
-                "value": 0,
-                "logical_op": "AND"
-            }
+            {"field": "ds", "operator": "=", "value": "20260312", "logical_op": "AND"},
+            {"field": "role_id", "operator": ">", "value": 0, "logical_op": "AND"},
         ]
     }
 
@@ -145,24 +107,9 @@ def sample_nested_conditions():
     """Sample nested WHERE conditions with AND/OR logic"""
     return {
         "conditions": [
-            {
-                "field": "ds",
-                "operator": "=",
-                "value": "20260312",
-                "logical_op": "AND"
-            },
-            {
-                "field": "zone_id",
-                "operator": "=",
-                "value": 1,
-                "logical_op": "OR"
-            },
-            {
-                "field": "level",
-                "operator": ">=",
-                "value": 10,
-                "logical_op": "AND"
-            }
+            {"field": "ds", "operator": "=", "value": "20260312", "logical_op": "AND"},
+            {"field": "zone_id", "operator": "=", "value": 1, "logical_op": "OR"},
+            {"field": "level", "operator": ">=", "value": 10, "logical_op": "AND"},
         ]
     }
 
@@ -202,29 +149,26 @@ class TestHQLGenerationAPI:
             "event_id": 1,
             "fields": sample_base_fields,
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
         # Mock the ProjectAdapter and HQLGenerator (imported locally in function)
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter methods
             mock_adapter = Mock()
             mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view",
-                partition_field="ds"
+                name="test_login", table_name="ieu_ods.ods_10000147_all_view", partition_field="ds"
             )
             mock_adapter.event_from_project.return_value = mock_event
 
             # Mock field_from_project to return Field objects
             def mock_field_conversion(field):
-                return Field(
-                    name=field["name"],
-                    type=field["type"],
-                    alias=field.get("alias")
-                )
+                return Field(name=field["name"], type=field["type"], alias=field.get("alias"))
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -249,7 +193,7 @@ WHERE ds = '${bizdate}';
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -285,21 +229,20 @@ WHERE ds = '${bizdate}';
             "event_id": 1,
             "fields": [
                 {"name": "role_id", "type": "base", "alias": "roleId"},
-                {"name": "zone_id", "type": "param", "json_path": "$.zoneId", "alias": "zone"}
+                {"name": "zone_id", "type": "param", "json_path": "$.zoneId", "alias": "zone"},
             ],
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
@@ -307,8 +250,9 @@ WHERE ds = '${bizdate}';
                     name=field["name"],
                     type=field["type"],
                     alias=field.get("alias"),
-                    json_path=field.get("json_path")
+                    json_path=field.get("json_path"),
                 )
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -329,7 +273,7 @@ WHERE ds = '${bizdate}';
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -360,18 +304,17 @@ WHERE ds = '${bizdate}';
             "event_id": 1,
             "fields": sample_param_fields,
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
@@ -379,8 +322,9 @@ WHERE ds = '${bizdate}';
                     name=field["name"],
                     type=field["type"],
                     json_path=field["json_path"],
-                    alias=field.get("alias")
+                    alias=field.get("alias"),
                 )
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -401,7 +345,7 @@ WHERE ds = '${bizdate}';
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -427,16 +371,12 @@ WHERE ds = '${bizdate}';
             - Returns 400 status code
             - Error message indicates missing parameter
         """
-        request_data = {
-            "event_id": 1,
-            "fields": [],
-            "filter_conditions": {}
-        }
+        request_data = {"event_id": 1, "fields": [], "filter_conditions": {}}
 
         response = client.post(
             '/event_node_builder/api/preview-hql',
             json=request_data,
-            content_type='application/json'
+            content_type='application/json',
         )
 
         assert response.status_code == 400
@@ -460,16 +400,12 @@ WHERE ds = '${bizdate}';
             - Returns 400 status code
             - Error message indicates missing parameter
         """
-        request_data = {
-            "game_gid": 10000147,
-            "fields": [],
-            "filter_conditions": {}
-        }
+        request_data = {"game_gid": 10000147, "fields": [], "filter_conditions": {}}
 
         response = client.post(
             '/event_node_builder/api/preview-hql',
             json=request_data,
-            content_type='application/json'
+            content_type='application/json',
         )
 
         assert response.status_code == 400
@@ -497,7 +433,7 @@ WHERE ds = '${bizdate}';
             "game_gid": 10000147,
             "event_id": 99999,  # Non-existent event
             "fields": [],
-            "filter_conditions": {}
+            "filter_conditions": {},
         }
 
         with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter:
@@ -508,7 +444,7 @@ WHERE ds = '${bizdate}';
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             assert response.status_code == 404
@@ -535,29 +471,26 @@ WHERE ds = '${bizdate}';
         request_data = {
             "game_gid": 10000147,
             "event_id": 1,
-            "fields": [
-                {"name": "invalid_field"}  # Missing 'type' field
-            ],
-            "filter_conditions": {}
+            "fields": [{"name": "invalid_field"}],  # Missing 'type' field
+            "filter_conditions": {},
         }
 
         with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter:
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             # Mock field_from_project to raise ValueError for invalid field
-            mock_adapter.field_from_project.side_effect = ValueError("Invalid field: missing 'type'")
+            mock_adapter.field_from_project.side_effect = ValueError(
+                "Invalid field: missing 'type'"
+            )
 
             MockAdapter.return_value = mock_adapter
 
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             assert response.status_code == 400
@@ -579,7 +512,9 @@ class TestHQLGenerationWithWHERE:
     - Complex logical operators
     """
 
-    def test_generate_hql_with_simple_where(self, client, sample_base_fields, sample_where_conditions):
+    def test_generate_hql_with_simple_where(
+        self, client, sample_base_fields, sample_where_conditions
+    ):
         """
         Test HQL generation with simple WHERE conditions
 
@@ -600,22 +535,22 @@ class TestHQLGenerationWithWHERE:
             "event_id": 1,
             "fields": sample_base_fields,
             "filter_conditions": sample_where_conditions,
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
                 return Field(name=field["name"], type=field["type"])
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             def mock_condition_conversion(cond):
@@ -623,8 +558,9 @@ class TestHQLGenerationWithWHERE:
                     field=cond["field"],
                     operator=cond["operator"],
                     value=cond.get("value"),
-                    logical_op=cond["logical_op"]
+                    logical_op=cond["logical_op"],
                 )
+
             mock_adapter.condition_from_project.side_effect = mock_condition_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -646,7 +582,7 @@ WHERE ds = '20260312' AND role_id > 0;
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -659,7 +595,9 @@ WHERE ds = '20260312' AND role_id > 0;
             assert 'role_id > 0' in data['data']
             assert ' AND ' in data['data']
 
-    def test_generate_hql_with_nested_conditions(self, client, sample_base_fields, sample_nested_conditions):
+    def test_generate_hql_with_nested_conditions(
+        self, client, sample_base_fields, sample_nested_conditions
+    ):
         """
         Test HQL generation with nested AND/OR conditions
 
@@ -682,22 +620,22 @@ WHERE ds = '20260312' AND role_id > 0;
             "event_id": 1,
             "fields": sample_base_fields,
             "filter_conditions": sample_nested_conditions,
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
                 return Field(name=field["name"], type=field["type"])
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             def mock_condition_conversion(cond):
@@ -705,8 +643,9 @@ WHERE ds = '20260312' AND role_id > 0;
                     field=cond["field"],
                     operator=cond["operator"],
                     value=cond.get("value"),
-                    logical_op=cond["logical_op"]
+                    logical_op=cond["logical_op"],
                 )
+
             mock_adapter.condition_from_project.side_effect = mock_condition_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -730,7 +669,7 @@ WHERE ds = '20260312'
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -764,7 +703,7 @@ WHERE ds = '20260312'
                     "field": "role_id",
                     "operator": "=",
                     "value": "1'; DROP TABLE users; --",
-                    "logical_op": "AND"
+                    "logical_op": "AND",
                 }
             ]
         }
@@ -774,22 +713,22 @@ WHERE ds = '20260312'
             "event_id": 1,
             "fields": sample_base_fields,
             "filter_conditions": malicious_condition,
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
                 return Field(name=field["name"], type=field["type"])
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             # Mock condition_from_project to handle malicious input safely
@@ -801,8 +740,9 @@ WHERE ds = '20260312'
                     field=cond["field"],
                     operator=cond["operator"],
                     value=value,
-                    logical_op=cond["logical_op"]
+                    logical_op=cond["logical_op"],
                 )
+
             mock_adapter.condition_from_project.side_effect = mock_condition_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -822,7 +762,7 @@ WHERE role_id = '1''; DROP TABLE users; --';
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions - request should succeed but with escaped input
@@ -857,16 +797,18 @@ WHERE role_id = '1''; DROP TABLE users; --';
                         "field": "account_id",
                         "operator": "LIKE",
                         "value": "TEST_%",
-                        "logical_op": "AND"
+                        "logical_op": "AND",
                     }
                 ]
             },
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
             mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
@@ -891,7 +833,7 @@ WHERE account_id LIKE 'TEST_%';
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -922,20 +864,17 @@ WHERE account_id LIKE 'TEST_%';
             "fields": [{"name": "role_id", "type": "base"}],
             "filter_conditions": {
                 "conditions": [
-                    {
-                        "field": "zone_id",
-                        "operator": "IN",
-                        "value": [1, 2, 3],
-                        "logical_op": "AND"
-                    }
+                    {"field": "zone_id", "operator": "IN", "value": [1, 2, 3], "logical_op": "AND"}
                 ]
             },
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
             mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
@@ -960,7 +899,7 @@ WHERE zone_id IN (1, 2, 3);
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -1002,22 +941,22 @@ class TestHQLValidation:
             "event_id": 1,
             "fields": sample_base_fields,
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
                 return Field(name=field["name"], type=field["type"])
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -1039,7 +978,7 @@ WHERE ds = '${bizdate}';
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -1073,33 +1012,28 @@ WHERE ds = '${bizdate}';
             - Message indicates missing required fields
         """
         # Fields without required base fields
-        incomplete_fields = [
-            {"name": "custom_field", "type": "custom", "custom_expression": "1+1"}
-        ]
+        incomplete_fields = [{"name": "custom_field", "type": "custom", "custom_expression": "1+1"}]
 
         request_data = {
             "game_gid": 10000147,
             "event_id": 1,
             "fields": incomplete_fields,
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             mock_adapter.field_from_project.return_value = Field(
-                name="custom_field",
-                type="custom",
-                custom_expression="1+1"
+                name="custom_field", type="custom", custom_expression="1+1"
             )
 
             MockAdapter.return_value = mock_adapter
@@ -1118,7 +1052,7 @@ FROM ieu_ods.ods_10000147_all_view;
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions - currently succeeds but should warn
@@ -1148,13 +1082,16 @@ FROM ieu_ods.ods_10000147_all_view;
             "event_id": 1,
             "fields": [{"name": "role_id", "type": "base"}],
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator, \
-             patch('backend.core.security.sql_validator.SQLValidator') as MockValidator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator, patch(
+            'backend.core.security.sql_validator.SQLValidator'
+        ) as MockValidator:
             # Mock SQLValidator
             mock_validator = Mock()
             mock_validator.validate_table_name.return_value = "ieu_ods.ods_10000147_all_view"
@@ -1162,10 +1099,7 @@ FROM ieu_ods.ods_10000147_all_view;
 
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
             mock_adapter.field_from_project.return_value = Field(name="role_id", type="base")
 
@@ -1181,7 +1115,7 @@ FROM ieu_ods.ods_10000147_all_view;
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -1209,18 +1143,17 @@ FROM ieu_ods.ods_10000147_all_view;
             "event_id": 1,
             "fields": [],
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             MockAdapter.return_value = mock_adapter
@@ -1235,7 +1168,7 @@ FROM ieu_ods.ods_10000147_all_view;
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions - implementation dependent
@@ -1262,18 +1195,17 @@ FROM ieu_ods.ods_10000147_all_view;
                 "event_id": 1,
                 "fields": [{"name": "role_id", "type": "base"}],
                 "filter_conditions": {},
-                "sql_mode": sql_mode
+                "sql_mode": sql_mode,
             }
 
-            with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-                 patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+            with patch(
+                'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+            ) as MockAdapter, patch(
+                'backend.services.hql.core.generator.HQLGenerator'
+            ) as MockGenerator:
                 # Mock adapter
                 mock_adapter = Mock()
-                mock_event = Event(
-                    name="test_login",
-                    table_name="ieu_ods.ods_10000147_all_view"
-                )
+                mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
                 mock_adapter.event_from_project.return_value = mock_event
                 mock_adapter.field_from_project.return_value = Field(name="role_id", type="base")
 
@@ -1288,7 +1220,7 @@ FROM ieu_ods.ods_10000147_all_view;
                 response = client.post(
                     '/event_node_builder/api/preview-hql',
                     json=request_data,
-                    content_type='application/json'
+                    content_type='application/json',
                 )
 
                 # Should succeed for valid modes
@@ -1300,22 +1232,19 @@ FROM ieu_ods.ods_10000147_all_view;
             "event_id": 1,
             "fields": [{"name": "role_id", "type": "base"}],
             "filter_conditions": {},
-            "sql_mode": "INVALID_MODE"
+            "sql_mode": "INVALID_MODE",
         }
 
         with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter:
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
             MockAdapter.return_value = mock_adapter
 
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=invalid_request,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Should return error or handle gracefully
@@ -1351,22 +1280,22 @@ class TestHQLGenerationIntegration:
             "event_id": 1,
             "fields": sample_base_fields,
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
                 return Field(name=field["name"], type=field["type"])
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -1380,7 +1309,7 @@ class TestHQLGenerationIntegration:
             response = client.post(
                 '/event_node_builder/api/preview-hql',
                 json=request_data,
-                content_type='application/json'
+                content_type='application/json',
             )
 
             # Assertions
@@ -1419,8 +1348,12 @@ class TestHQLGenerationIntegration:
 
             # Check methods
             rule = next(
-                (r for r in app.url_map.iter_rules() if r.rule == '/event_node_builder/api/preview-hql'),
-                None
+                (
+                    r
+                    for r in app.url_map.iter_rules()
+                    if r.rule == '/event_node_builder/api/preview-hql'
+                ),
+                None,
             )
             assert rule is not None
             assert 'POST' in rule.methods
@@ -1444,22 +1377,22 @@ class TestHQLGenerationIntegration:
             "event_id": 1,
             "fields": sample_base_fields,
             "filter_conditions": {},
-            "sql_mode": "view"
+            "sql_mode": "view",
         }
 
-        with patch('backend.services.hql.adapters.project_adapter.ProjectAdapter') as MockAdapter, \
-             patch('backend.services.hql.core.generator.HQLGenerator') as MockGenerator:
-
+        with patch(
+            'backend.services.hql.adapters.project_adapter.ProjectAdapter'
+        ) as MockAdapter, patch(
+            'backend.services.hql.core.generator.HQLGenerator'
+        ) as MockGenerator:
             # Mock adapter
             mock_adapter = Mock()
-            mock_event = Event(
-                name="test_login",
-                table_name="ieu_ods.ods_10000147_all_view"
-            )
+            mock_event = Event(name="test_login", table_name="ieu_ods.ods_10000147_all_view")
             mock_adapter.event_from_project.return_value = mock_event
 
             def mock_field_conversion(field):
                 return Field(name=field["name"], type=field["type"])
+
             mock_adapter.field_from_project.side_effect = mock_field_conversion
 
             MockAdapter.return_value = mock_adapter
@@ -1475,7 +1408,7 @@ class TestHQLGenerationIntegration:
                 response = client.post(
                     '/event_node_builder/api/preview-hql',
                     json=request_data,
-                    content_type='application/json'
+                    content_type='application/json',
                 )
                 responses.append(response)
 

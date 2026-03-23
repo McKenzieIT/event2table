@@ -139,9 +139,7 @@ def api_compare_hql_versions():
         if "error" in diff_result:
             return json_error_response(diff_result["error"], status_code=404)
 
-        return json_success_response(
-            data=diff_result, message="Versions compared successfully"
-        )
+        return json_success_response(data=diff_result, message="Versions compared successfully")
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
     except Exception as e:
@@ -191,9 +189,7 @@ def api_get_hql_version_history(event_id):
 
         versions = hql_version_service.get_version_history(event_id, limit=limit)
 
-        return json_success_response(
-            data=versions, message=f"Retrieved {len(versions)} version(s)"
-        )
+        return json_success_response(data=versions, message=f"Retrieved {len(versions)} version(s)")
     except ValueError as e:
         return json_error_response(str(e), status_code=400)
     except Exception as e:

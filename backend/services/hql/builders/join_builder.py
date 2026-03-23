@@ -19,7 +19,7 @@ class JoinBuilder:
     """
     多事件JOIN HQL构建器
 
-    功能: 
+    功能:
     - 支持INNER/LEFT/RIGHT/CROSS JOIN
     - 支持多条件JOIN
     - 支持事件别名
@@ -211,7 +211,9 @@ class JoinBuilder:
             SQLValidator.validate_identifier(right_field, "right_field")
 
             # operator已在VALID_OPERATORS白名单中验证
-            on_conditions.append(f"{left_event}.{left_field} {operator} {right_event}.{right_field}")
+            on_conditions.append(
+                f"{left_event}.{left_field} {operator} {right_event}.{right_field}"
+            )
 
         on_clause = " AND ".join(on_conditions)
         return f"{join_clause} ON {on_clause}"

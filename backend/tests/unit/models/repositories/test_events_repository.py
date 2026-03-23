@@ -37,7 +37,7 @@ class TestEventRepository:
             'table_name': 'ieu_ods.ods_10000147_all_view',
             'description': 'User login event',
             'created_at': '2026-01-01 00:00:00',
-            'updated_at': '2026-01-01 00:00:00'
+            'updated_at': '2026-01-01 00:00:00',
         }
 
     @pytest.fixture
@@ -52,7 +52,7 @@ class TestEventRepository:
                 'ods_db': 'ieu_ods',
                 'category_name': 'Authentication',
                 'table_name': 'ieu_ods.ods_10000147_all_view',
-                'param_count': 5
+                'param_count': 5,
             },
             {
                 'id': 2,
@@ -62,8 +62,8 @@ class TestEventRepository:
                 'ods_db': 'ieu_ods',
                 'category_name': 'Authentication',
                 'table_name': 'ieu_ods.ods_10000147_all_view',
-                'param_count': 3
-            }
+                'param_count': 3,
+            },
         ]
 
     # ==================== find_by_id ====================
@@ -225,12 +225,14 @@ class TestEventRepository:
 
     @patch('backend.models.repositories.events.fetch_one_as_dict')
     @patch('backend.models.repositories.events.fetch_all_as_dict')
-    def test_get_with_parameters_success(self, mock_fetch_all, mock_fetch_one, repository, mock_event_data):
+    def test_get_with_parameters_success(
+        self, mock_fetch_all, mock_fetch_one, repository, mock_event_data
+    ):
         """Test successful get with parameters"""
         mock_fetch_one.return_value = mock_event_data
         mock_fetch_all.return_value = [
             {'id': 1, 'param_name': 'user_id', 'param_type': 'base'},
-            {'id': 2, 'param_name': 'zone_id', 'param_type': 'param'}
+            {'id': 2, 'param_name': 'zone_id', 'param_type': 'param'},
         ]
 
         result = repository.get_with_parameters(1)
@@ -265,7 +267,7 @@ class TestEventRepository:
             'event_name': 'test_event',
             'game_gid': 10000147,
             'table_name': 'ieu_ods.ods_10000147_all_view',
-            'category_id': 1
+            'category_id': 1,
         }
 
         result = repository.create(event_data)
@@ -283,10 +285,7 @@ class TestEventRepository:
         mock_cursor.execute.side_effect = Exception("DB Error")
         mock_get_conn.return_value = mock_conn
 
-        event_data = {
-            'event_name': 'test_event',
-            'game_gid': 10000147
-        }
+        event_data = {'event_name': 'test_event', 'game_gid': 10000147}
 
         with pytest.raises(Exception):
             repository.create(event_data)
@@ -374,13 +373,13 @@ class TestEventRepository:
             {
                 'event_name': 'event1',
                 'game_gid': 10000147,
-                'table_name': 'ieu_ods.ods_10000147_all_view'
+                'table_name': 'ieu_ods.ods_10000147_all_view',
             },
             {
                 'event_name': 'event2',
                 'game_gid': 10000147,
-                'table_name': 'ieu_ods.ods_10000147_all_view'
-            }
+                'table_name': 'ieu_ods.ods_10000147_all_view',
+            },
         ]
 
         result = repository.create_batch(events_data)
@@ -404,9 +403,7 @@ class TestEventRepository:
         mock_cursor.executemany.side_effect = Exception("DB Error")
         mock_get_conn.return_value = mock_conn
 
-        events_data = [
-            {'event_name': 'event1', 'game_gid': 10000147}
-        ]
+        events_data = [{'event_name': 'event1', 'game_gid': 10000147}]
 
         with pytest.raises(Exception):
             repository.create_batch(events_data)
@@ -470,7 +467,7 @@ class TestEventRepository:
         """Test get event stats by game"""
         mock_fetch.return_value = [
             {'category_name': 'Authentication', 'event_count': 5},
-            {'category_name': 'Combat', 'event_count': 10}
+            {'category_name': 'Combat', 'event_count': 10},
         ]
 
         result = repository.get_event_stats_by_game(10000147)

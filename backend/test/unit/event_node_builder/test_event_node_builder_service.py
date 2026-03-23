@@ -30,6 +30,7 @@ from backend.core.cache.cache_system import HierarchicalCache
 # Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def sample_game_entity():
     """Create a sample GameEntity"""
@@ -42,7 +43,7 @@ def sample_game_entity():
         dwd_prefix="dwd",
         event_count=5,
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
 
 
@@ -60,7 +61,7 @@ def sample_event_entity():
         description="Login event",
         is_active=True,
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
 
 
@@ -75,13 +76,13 @@ def sample_event_node_entity():
         config_json={
             "fields": [
                 {"name": "role_id", "type": "base", "alias": "roleId"},
-                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"}
+                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"},
             ],
-            "mode": "single"
+            "mode": "single",
         },
         is_active=True,
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
 
 
@@ -101,20 +102,17 @@ def mock_repositories(sample_game_entity, sample_event_entity, sample_event_node
     mock_node_repo.create.return_value = 1
     mock_node_repo.count_by_game_gid.return_value = 1
 
-    return {
-        "game_repo": mock_game_repo,
-        "event_repo": mock_event_repo,
-        "node_repo": mock_node_repo
-    }
+    return {"game_repo": mock_game_repo, "event_repo": mock_event_repo, "node_repo": mock_node_repo}
 
 
 @pytest.fixture
 def service(mock_repositories):
     """Create EventNodeService with mocked repositories"""
-    with patch('backend.services.events.event_node_service.GameRepository') as MockGameRepo, \
-         patch('backend.services.events.event_node_service.EventRepository') as MockEventRepo, \
-         patch('backend.services.events.event_node_service.EventNodeRepository') as MockNodeRepo:
-
+    with patch('backend.services.events.event_node_service.GameRepository') as MockGameRepo, patch(
+        'backend.services.events.event_node_service.EventRepository'
+    ) as MockEventRepo, patch(
+        'backend.services.events.event_node_service.EventNodeRepository'
+    ) as MockNodeRepo:
         MockGameRepo.return_value = mock_repositories["game_repo"]
         MockEventRepo.return_value = mock_repositories["event_repo"]
         MockNodeRepo.return_value = mock_repositories["node_repo"]
@@ -126,6 +124,7 @@ def service(mock_repositories):
 # ============================================================================
 # Test Class: TestEventNodeBuilderService
 # ============================================================================
+
 
 class TestEventNodeBuilderService:
     """Test suite for Event Node Builder Service layer"""
@@ -147,15 +146,11 @@ class TestEventNodeBuilderService:
         frontend_fields = [
             {"name": "role_id", "type": "base"},
             {"name": "account_id", "type": "base"},
-            {"name": "zone_id", "type": "base"}
+            {"name": "zone_id", "type": "base"},
         ]
 
         # Expected output: Database column references
-        expected_mappings = [
-            "role_id",
-            "account_id",
-            "zone_id"
-        ]
+        expected_mappings = ["role_id", "account_id", "zone_id"]
 
         # Mock repository to return config with these fields
         config = {"fields": frontend_fields, "mode": "single"}
@@ -165,7 +160,7 @@ class TestEventNodeBuilderService:
             name="Test Node",
             event_id=1,
             config_json=config,
-            is_active=True
+            is_active=True,
         )
 
         service.node_repo.find_by_id.return_value = node
@@ -194,14 +189,14 @@ class TestEventNodeBuilderService:
         frontend_fields = [
             {"name": "zoneId", "type": "param", "json_path": "$.zoneId"},
             {"name": "level", "type": "param", "json_path": "$.level"},
-            {"name": "vipLevel", "type": "param", "json_path": "$.vipLevel"}
+            {"name": "vipLevel", "type": "param", "json_path": "$.vipLevel"},
         ]
 
         # Expected output: JSON extraction expressions
         expected_extractions = [
             "get_json_object(params, '$.zoneId')",
             "get_json_object(params, '$.level')",
-            "get_json_object(params, '$.vipLevel')"
+            "get_json_object(params, '$.vipLevel')",
         ]
 
         # Mock repository to return config with these fields
@@ -212,7 +207,7 @@ class TestEventNodeBuilderService:
             name="Test Node",
             event_id=1,
             config_json=config,
-            is_active=True
+            is_active=True,
         )
 
         service.node_repo.find_by_id.return_value = node
@@ -245,29 +240,38 @@ class TestEventNodeBuilderService:
         """
         # Mock parameter update event
         updated_params = [
-            Mock(id=1, param_name="zoneId", param_name_cn="区域ID",
-                 param_description="Zone ID", json_path="$.zoneId",
-                 hql_config={"type": "param"}, is_active=True),
-            Mock(id=2, param_name="level", param_name_cn="等级",
-                 param_description="Player level", json_path="$.level",
-                 hql_config={"type": "param"}, is_active=True)
+            Mock(
+                id=1,
+                param_name="zoneId",
+                param_name_cn="区域ID",
+                param_description="Zone ID",
+                json_path="$.zoneId",
+                hql_config={"type": "param"},
+                is_active=True,
+            ),
+            Mock(
+                id=2,
+                param_name="level",
+                param_name_cn="等级",
+                param_description="Player level",
+                json_path="$.level",
+                hql_config={"type": "param"},
+                is_active=True,
+            ),
         ]
 
         # Mock event repository to return event with parameters
         service.event_repo.find_by_id.return_value = sample_event_entity
 
         # Mock node repository to return existing node
-        existing_config = {
-            "fields": [{"name": "role_id", "type": "base"}],
-            "mode": "single"
-        }
+        existing_config = {"fields": [{"name": "role_id", "type": "base"}], "mode": "single"}
         existing_node = EventNodeEntity(
             id=1,
             game_gid=10000147,
             name="Test Node",
             event_id=1,
             config_json=existing_config,
-            is_active=True
+            is_active=True,
         )
         service.node_repo.find_by_id.return_value = existing_node
 
@@ -276,9 +280,9 @@ class TestEventNodeBuilderService:
             "fields": [
                 {"name": "role_id", "type": "base"},
                 {"name": "zoneId", "type": "param", "json_path": "$.zoneId"},
-                {"name": "level", "type": "param", "json_path": "$.level"}
+                {"name": "level", "type": "param", "json_path": "$.level"},
             ],
-            "mode": "single"
+            "mode": "single",
         }
 
         updated_node = EventNodeEntity(
@@ -287,7 +291,7 @@ class TestEventNodeBuilderService:
             name="Test Node",
             event_id=1,
             config_json=updated_config,
-            is_active=True
+            is_active=True,
         )
 
         # Perform update
@@ -324,7 +328,7 @@ class TestEventNodeBuilderService:
             event_name_cn="登录",
             source_table="ods_10000147_all_view",
             target_table="dwd_10000147_login_di",
-            is_active=True
+            is_active=True,
         )
 
         event2 = EventEntity(
@@ -334,7 +338,7 @@ class TestEventNodeBuilderService:
             event_name_cn="登出",
             source_table="ods_10000147_all_view",
             target_table="dwd_10000147_logout_di",
-            is_active=True
+            is_active=True,
         )
 
         # Create nodes for each event with different configs
@@ -344,7 +348,7 @@ class TestEventNodeBuilderService:
             name="Login Node",
             event_id=1,
             config_json={"fields": [{"name": "role_id", "type": "base"}], "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         node2 = EventNodeEntity(
@@ -353,7 +357,7 @@ class TestEventNodeBuilderService:
             name="Logout Node",
             event_id=2,
             config_json={"fields": [{"name": "account_id", "type": "base"}], "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         # Mock repository to return different nodes based on event_id
@@ -401,10 +405,10 @@ class TestEventNodeBuilderService:
         field_config = {
             "fields": [
                 {"name": "role_id", "type": "base", "alias": "roleId"},
-                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"}
+                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"},
             ],
             "mode": "single",
-            "filters": []
+            "filters": [],
         }
 
         # Create node with config
@@ -414,7 +418,7 @@ class TestEventNodeBuilderService:
             name="Saved Node",
             event_id=1,
             config_json=field_config,
-            is_active=True
+            is_active=True,
         )
 
         # Mock repository create to return new ID
@@ -429,7 +433,7 @@ class TestEventNodeBuilderService:
             config_json=field_config,
             is_active=True,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
         service.node_repo.find_by_id.return_value = created_node
 
@@ -472,10 +476,10 @@ class TestEventNodeBuilderService:
         mock_config = {
             "fields": [
                 {"name": "role_id", "type": "base", "alias": "roleId"},
-                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"}
+                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"},
             ],
             "mode": "single",
-            "filters": []
+            "filters": [],
         }
 
         mock_node = EventNodeEntity(
@@ -486,7 +490,7 @@ class TestEventNodeBuilderService:
             config_json=mock_config,
             is_active=True,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         service.node_repo.find_by_id.return_value = mock_node
@@ -525,9 +529,9 @@ class TestEventNodeBuilderService:
         valid_config = {
             "fields": [
                 {"name": "role_id", "type": "base"},
-                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"}
+                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"},
             ],
-            "mode": "single"
+            "mode": "single",
         }
 
         valid_node = EventNodeEntity(
@@ -536,7 +540,7 @@ class TestEventNodeBuilderService:
             name="Valid Node",
             event_id=1,
             config_json=valid_config,
-            is_active=True
+            is_active=True,
         )
 
         service.node_repo.find_by_id.return_value = valid_node
@@ -559,9 +563,9 @@ class TestEventNodeBuilderService:
         invalid_config = {
             "fields": [
                 {"name": "", "type": "base"},  # Empty name
-                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"}
+                {"name": "zone_id", "type": "param", "json_path": "$.zoneId"},
             ],
-            "mode": "single"
+            "mode": "single",
         }
 
         # Pydantic will accept empty strings, but we can test that
@@ -573,7 +577,7 @@ class TestEventNodeBuilderService:
             name="Invalid Node",
             event_id=1,
             config_json=invalid_config,
-            is_active=True
+            is_active=True,
         )
 
         # Verify the node is created with the invalid config
@@ -600,13 +604,13 @@ class TestEventNodeBuilderService:
         mock_base_fields = [
             {"name": "role_id", "type": "base", "description": "Role ID"},
             {"name": "account_id", "type": "base", "description": "Account ID"},
-            {"name": "zone_id", "type": "base", "description": "Zone ID"}
+            {"name": "zone_id", "type": "base", "description": "Zone ID"},
         ]
 
         mock_param_fields = [
             {"name": "zoneId", "type": "param", "json_path": "$.zoneId"},
             {"name": "level", "type": "param", "json_path": "$.level"},
-            {"name": "zoneId", "type": "param", "json_path": "$.zoneId"}  # Duplicate
+            {"name": "zoneId", "type": "param", "json_path": "$.zoneId"},  # Duplicate
         ]
 
         # Mock node config that combines both
@@ -618,7 +622,7 @@ class TestEventNodeBuilderService:
             name="Test Node",
             event_id=1,
             config_json={"fields": all_fields, "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         service.node_repo.find_by_id.return_value = mock_node
@@ -657,17 +661,18 @@ class TestEventNodeBuilderService:
         # Input: Original field list
         original_fields = [
             {"name": "role_id", "type": "base"},
-            {"name": "zoneId", "type": "param", "json_path": "$.zoneId"}
+            {"name": "zoneId", "type": "param", "json_path": "$.zoneId"},
         ]
 
         # Create a copy to verify original is not modified
         import copy
+
         original_copy = copy.deepcopy(original_fields)
 
         # Apply transformations
         transformed_fields = [
             {"name": "role_id", "type": "base", "alias": "roleId"},
-            {"name": "zoneId", "type": "param", "json_path": "$.zoneId", "alias": "zoneId"}
+            {"name": "zoneId", "type": "param", "json_path": "$.zoneId", "alias": "zoneId"},
         ]
 
         # Create node with transformed fields
@@ -678,7 +683,7 @@ class TestEventNodeBuilderService:
             name="Transformed Node",
             event_id=1,
             config_json=transformed_config,
-            is_active=True
+            is_active=True,
         )
 
         service.node_repo.find_by_id.return_value = transformed_node
@@ -715,7 +720,7 @@ class TestEventNodeBuilderService:
             name="New Node",
             event_id=1,
             config_json={"fields": [], "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         service.node_repo.create.return_value = 1
@@ -725,7 +730,7 @@ class TestEventNodeBuilderService:
             name="New Node",
             event_id=1,
             config_json={"fields": [], "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         # Create node
@@ -755,7 +760,7 @@ class TestEventNodeBuilderService:
             name="Existing Node",
             event_id=1,
             config_json={"fields": [], "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         updated_node = EventNodeEntity(
@@ -764,7 +769,7 @@ class TestEventNodeBuilderService:
             name="Updated Node",
             event_id=1,
             config_json={"fields": [{"name": "role_id", "type": "base"}], "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         # Setup mock to return existing node first, then updated node
@@ -795,7 +800,7 @@ class TestEventNodeBuilderService:
             name="Node to Delete",
             event_id=1,
             config_json={"fields": [], "mode": "single"},
-            is_active=True
+            is_active=True,
         )
 
         service.node_repo.find_by_id.return_value = existing_node

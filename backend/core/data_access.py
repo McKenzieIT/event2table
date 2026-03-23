@@ -483,8 +483,8 @@ class GenericRepository:
 
         取代所有: 多次单独调用 create()
 
-        注意: 由于SQLite的executemany()不返回lastrowid, 此方法使用循环插入. 
-        但保持在单个事务中, 仍然比多次单独调用create()更高效. 
+        注意: 由于SQLite的executemany()不返回lastrowid, 此方法使用循环插入.
+        但保持在单个事务中, 仍然比多次单独调用create()更高效.
 
         Args:
             records: 要创建的记录列表, 每个记录是一个字典
@@ -593,9 +593,7 @@ class CachedRepositories:
     EVENT_PARAMS = GenericRepository(
         "event_params", primary_key="id", enable_cache=True, cache_timeout=60
     )
-    LOGS = GenericRepository(
-        "logs", primary_key="id", enable_cache=True, cache_timeout=30
-    )  # 短缓存
+    LOGS = GenericRepository("logs", primary_key="id", enable_cache=True, cache_timeout=30)  # 短缓存
     COMMON_PARAMS = GenericRepository(
         "common_params", primary_key="id", enable_cache=True, cache_timeout=300
     )  # 长缓存

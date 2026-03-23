@@ -788,8 +788,8 @@ def cache_result(cache_key_pattern, timeout=None):
     """
     缓存装饰器（兼容性包装器）
 
-    这是一个兼容性函数, 包装 @cached 装饰器以保持向后兼容. 
-    新代码应该直接使用 @cached 装饰器. 
+    这是一个兼容性函数, 包装 @cached 装饰器以保持向后兼容.
+    新代码应该直接使用 @cached 装饰器.
 
     Usage:
         @cache_result('games:all', timeout=3600)
@@ -814,8 +814,8 @@ def clear_game_cache(game_id=None):
     """
     清除游戏相关缓存（兼容性包装器）
 
-    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存. 
-    新代码应该直接使用 cache_invalidator. 
+    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存.
+    新代码应该直接使用 cache_invalidator.
 
     Args:
         game_id: 游戏ID（None表示清除所有游戏缓存）
@@ -839,7 +839,7 @@ def clear_event_cache(event_id):
     """
     清除事件相关缓存（兼容性包装器）
 
-    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存. 
+    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存.
 
     Args:
         event_id: 事件ID
@@ -852,7 +852,7 @@ def clear_cache_pattern(pattern):
     """
     清除匹配模式的所有缓存（兼容性包装器）
 
-    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存. 
+    这是一个兼容性函数, 使用 CacheInvalidator 来清除缓存.
 
     Args:
         pattern: 缓存键模式（支持通配符）
@@ -927,8 +927,8 @@ def parse_json_cached(json_str):
     """
     解析JSON字符串（带缓存）
 
-    这是一个兼容性函数, 用于解析JSON字符串. 
-    由于v3.0不再需要JSON解析缓存, 此函数直接返回解析结果. 
+    这是一个兼容性函数, 用于解析JSON字符串.
+    由于v3.0不再需要JSON解析缓存, 此函数直接返回解析结果.
 
     Args:
         json_str: JSON字符串

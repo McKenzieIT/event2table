@@ -75,10 +75,12 @@ class MigrationTestSuite:
 
         all_passed = True
         for table in tables:
-            cursor.execute(f'''
+            cursor.execute(
+                f'''
                 SELECT COUNT(*) FROM pragma_table_info('{table}')
                 WHERE name = 'game_gid'
-            ''')
+            '''
+            )
             has_column = cursor.fetchone()[0] > 0
 
             if has_column:
@@ -147,11 +149,13 @@ class MigrationTestSuite:
         cursor = conn.cursor()
 
         # Test log_events → games relationship
-        cursor.execute('''
+        cursor.execute(
+            '''
             SELECT COUNT(*) FROM log_events le
             LEFT JOIN games g ON le.game_gid = g.gid
             WHERE g.gid IS NULL
-        ''')
+        '''
+        )
         orphaned_events = cursor.fetchone()[0]
 
         if orphaned_events == 0:
@@ -162,11 +166,13 @@ class MigrationTestSuite:
             )
 
         # Test event_node_configs → games relationship
-        cursor.execute('''
+        cursor.execute(
+            '''
             SELECT COUNT(*) FROM event_node_configs enc
             LEFT JOIN games g ON enc.game_gid = g.gid
             WHERE g.gid IS NULL
-        ''')
+        '''
+        )
         orphaned_nodes = cursor.fetchone()[0]
 
         if orphaned_nodes == 0:

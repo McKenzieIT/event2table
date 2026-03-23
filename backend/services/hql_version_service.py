@@ -77,15 +77,11 @@ class HQLVersionService(BaseService):
         if version:
             # 清除相关缓存
             self._clear_version_cache(event_id)
-            logger.info(
-                f"Saved HQL version {version_number} for event {event_id} by {created_by}"
-            )
+            logger.info(f"Saved HQL version {version_number} for event {event_id} by {created_by}")
 
         return version
 
-    def compare_versions(
-        self, version_id_1: int, version_id_2: int
-    ) -> Dict[str, Any]:
+    def compare_versions(self, version_id_1: int, version_id_2: int) -> Dict[str, Any]:
         """
         比较两个版本的差异
 
@@ -218,9 +214,7 @@ class HQLVersionService(BaseService):
         return self.repository.get_version_count(event_id)
 
     @cached(ttl=300)
-    def get_version_by_number(
-        self, event_id: int, version_number: int
-    ) -> Optional[Dict[str, Any]]:
+    def get_version_by_number(self, event_id: int, version_number: int) -> Optional[Dict[str, Any]]:
         """
         根据事件ID和版本号获取版本
 

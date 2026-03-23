@@ -37,7 +37,7 @@ class TestGameService:
             created_at='2026-01-01 00:00:00',
             updated_at='2026-01-01 00:00:00',
             event_count=10,
-            param_count=50
+            param_count=50,
         )
 
     @pytest.fixture
@@ -53,7 +53,7 @@ class TestGameService:
                 dwd_prefix='dwd',
                 icon_path=None,
                 created_at='2026-01-01 00:00:00',
-                updated_at='2026-01-01 00:00:00'
+                updated_at='2026-01-01 00:00:00',
             ),
             GameEntity(
                 id=2,
@@ -64,8 +64,8 @@ class TestGameService:
                 dwd_prefix='dwd',
                 icon_path=None,
                 created_at='2026-01-02 00:00:00',
-                updated_at='2026-01-02 00:00:00'
-            )
+                updated_at='2026-01-02 00:00:00',
+            ),
         ]
 
     # ==================== get_games ====================
@@ -144,11 +144,7 @@ class TestGameService:
         mock_repo.return_value.create.return_value = 1
         mock_repo.return_value.find_by_id.return_value = mock_game_entity
 
-        game_data = {
-            'gid': '10000147',
-            'name': 'New Game',
-            'ods_db': 'ieu_ods'
-        }
+        game_data = {'gid': '10000147', 'name': 'New Game', 'ods_db': 'ieu_ods'}
 
         result = service.create_game(GameEntity(**game_data))
 
@@ -161,11 +157,7 @@ class TestGameService:
         """Test create game with duplicate gid"""
         mock_repo.return_value.find_by_gid.return_value = mock_game_entity
 
-        game_data = {
-            'gid': '10000147',
-            'name': 'Duplicate Game',
-            'ods_db': 'ieu_ods'
-        }
+        game_data = {'gid': '10000147', 'name': 'Duplicate Game', 'ods_db': 'ieu_ods'}
 
         with pytest.raises(ValueError, match='Game gid 10000147 already exists'):
             service.create_game(GameEntity(**game_data))
@@ -178,10 +170,7 @@ class TestGameService:
         mock_repo.return_value.find_by_gid.return_value = mock_game_entity
         mock_repo.return_value.update.return_value = mock_game_entity
 
-        update_data = {
-            'name': 'Updated Name',
-            'description': 'Updated Description'
-        }
+        update_data = {'name': 'Updated Name', 'description': 'Updated Description'}
 
         result = service.update_game('10000147', update_data)
 
@@ -266,7 +255,7 @@ class TestGameService:
 
         games_data = [
             GameEntity(**{'gid': '10000147', 'name': 'Game 1', 'ods_db': 'ieu_ods'}),
-            GameEntity(**{'gid': '10000148', 'name': 'Game 2', 'ods_db': 'ieu_ods'})
+            GameEntity(**{'gid': '10000148', 'name': 'Game 2', 'ods_db': 'ieu_ods'}),
         ]
 
         result = service.batch_create_games(games_data)
@@ -283,7 +272,7 @@ class TestGameService:
 
         games_data = [
             GameEntity(**{'gid': '10000147', 'name': 'Game 1', 'ods_db': 'ieu_ods'}),
-            GameEntity(**{'gid': '10000148', 'name': 'Game 2', 'ods_db': 'ieu_ods'})
+            GameEntity(**{'gid': '10000148', 'name': 'Game 2', 'ods_db': 'ieu_ods'}),
         ]
 
         with pytest.raises(ValueError, match='Game gid 10000147 already exists'):
@@ -322,7 +311,7 @@ class TestGameService:
         """Test get game categories summary"""
         mock_repo.return_value.get_game_categories_summary.return_value = [
             {'category_id': 1, 'category_name': 'Combat', 'event_count': 5},
-            {'category_id': 2, 'category_name': 'Economy', 'event_count': 3}
+            {'category_id': 2, 'category_name': 'Economy', 'event_count': 3},
         ]
 
         result = service.get_game_categories_summary('10000147')
@@ -355,11 +344,7 @@ class TestGameService:
 
     def test_validate_game_data_valid(self, service):
         """Test validate game data with valid input"""
-        game_data = {
-            'gid': '10000147',
-            'name': 'Valid Game',
-            'ods_db': 'ieu_ods'
-        }
+        game_data = {'gid': '10000147', 'name': 'Valid Game', 'ods_db': 'ieu_ods'}
 
         # Should not raise exception
         service.validate_game_data(GameEntity(**game_data))
@@ -379,7 +364,7 @@ class TestGameService:
         game_data = {
             'gid': '10000147',
             'name': 'Invalid Game',
-            'ods_db': 'invalid_db'  # Should be 'ieu_ods' or 'overseas_ods'
+            'ods_db': 'invalid_db',  # Should be 'ieu_ods' or 'overseas_ods'
         }
 
         with pytest.raises(Exception):  # Pydantic ValidationError

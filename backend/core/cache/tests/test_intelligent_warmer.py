@@ -552,14 +552,10 @@ class TestIntelligentCacheWarmer:
         current_time = time.time()
 
         # 添加旧访问(在时间窗口外)
-        warmer.access_log.append(
-            {'key': 'old_key', 'timestamp': current_time - 400}  # 超过默认的5分钟窗口
-        )
+        warmer.access_log.append({'key': 'old_key', 'timestamp': current_time - 400})  # 超过默认的5分钟窗口
 
         # 添加新访问(在时间窗口内)
-        warmer.access_log.append(
-            {'key': 'new_key', 'timestamp': current_time - 100}  # 在5分钟窗口内
-        )
+        warmer.access_log.append({'key': 'new_key', 'timestamp': current_time - 100})  # 在5分钟窗口内
 
         # 预测的键
         predicted_keys = ["old_key", "new_key"]
@@ -833,9 +829,7 @@ class TestEdgeCases:
         current_time = time.time()
 
         # 添加一个很久以前的访问
-        warmer.access_log.append(
-            {'key': 'ancient_key', 'timestamp': current_time - 100000}  # 超过1天
-        )
+        warmer.access_log.append({'key': 'ancient_key', 'timestamp': current_time - 100000})  # 超过1天
 
         # 预测热点键(只看最近1小时)
         hot_keys = warmer.predict_hot_keys()

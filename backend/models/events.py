@@ -803,8 +803,8 @@ def compare_event_with_existing(event_data: Dict[str, Any], game_gid: int) -> Di
 class ExcelImporter:
     """Excel事件导入器(简化版)
 
-    将Excel文件解析, 验证, 导入逻辑封装在一个类中, 
-    提高可测试性和可维护性. 
+    将Excel文件解析, 验证, 导入逻辑封装在一个类中,
+    提高可测试性和可维护性.
     """
 
     def __init__(self, file, game_gid, form_data):
@@ -931,9 +931,7 @@ class ExcelImporter:
 
             # 自动检测参数中文名列
             if not columns["param_name_cn"]:
-                columns["param_name_cn"] = find_column_by_keywords(
-                    headers, ["参数名称", "参数中文名", "参数"]
-                )
+                columns["param_name_cn"] = find_column_by_keywords(headers, ["参数名称", "参数中文名", "参数"])
 
             # 自动检测参数类型列
             if not columns["param_type"]:

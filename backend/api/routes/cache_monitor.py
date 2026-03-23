@@ -29,6 +29,7 @@ logger = get_logger(__name__)
 
 cache_monitor_bp = Blueprint("cache_monitor", __name__)
 
+
 @cache_monitor_bp.route("/admin/cache/status")
 def cache_status():
     """获取缓存状态信息"""
@@ -101,6 +102,7 @@ def cache_status():
             }
         )
 
+
 @cache_monitor_bp.route("/admin/cache/keys")
 def list_cache_keys():
     """列出所有缓存键"""
@@ -151,6 +153,7 @@ def list_cache_keys():
     except Exception as e:
         logger.error(f"Error listing cache keys: {e}", exc_info=True)
         return jsonify({"success": False, "error": "An internal error occurred"})
+
 
 @cache_monitor_bp.route("/admin/cache/stats")
 def cache_stats():
@@ -215,6 +218,7 @@ def cache_stats():
     except Exception as e:
         logger.error(f"获取缓存统计失败: {e}", exc_info=True)
         return jsonify({"error": "An internal error occurred", "message": "获取缓存统计失败"}), 500
+
 
 @cache_monitor_bp.route("/admin/cache/performance")
 def cache_performance():
@@ -306,6 +310,7 @@ def cache_performance():
         logger.error(f"获取性能指标失败: {e}", exc_info=True)
         return jsonify({"error": "An internal error occurred", "message": "获取性能指标失败"}), 500
 
+
 @cache_monitor_bp.route("/admin/cache/clear", methods=["POST"])
 def clear_all_cache():
     """
@@ -349,9 +354,11 @@ def clear_all_cache():
         logger.error(f"清空缓存失败: {e}", exc_info=True)
         return jsonify({"success": False, "error": "An internal error occurred"}), 500
 
+
 # ============================================================================
 # 辅助函数
 # ============================================================================
+
 
 def calculate_redis_hit_rate(redis_info: dict) -> str:
     """

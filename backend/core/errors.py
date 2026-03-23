@@ -247,6 +247,7 @@ class ConfigurationError(DWDGeneratorError):
     def __init__(self, message: str):
         super().__init__(message, status_code=500)
 
+
 __all__ = [
     'DWDGeneratorError',
     'ValidationError',

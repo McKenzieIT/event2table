@@ -206,9 +206,7 @@ class TestWhereBuilderSecurity:
         builder = WhereBuilder()
 
         # Invalid logical operator
-        conditions = [
-            Condition("level", ">", 10, logical_op="MALICIOUS; DROP TABLE--")
-        ]
+        conditions = [Condition("level", ">", 10, logical_op="MALICIOUS; DROP TABLE--")]
 
         # Should reject invalid logical operator
         # Note: Current implementation may not validate logical_op strictly
@@ -520,4 +518,7 @@ class TestSQLInjectionPatterns:
         # This test documents known XSS patterns that should be handled
         for pattern in xss_patterns:
             # Verify these are indeed XSS patterns (documentation test)
-            assert any(xss_marker in pattern for xss_marker in ["<script", "<img", "javascript:", "<iframe", "<svg"])
+            assert any(
+                xss_marker in pattern
+                for xss_marker in ["<script", "<img", "javascript:", "<iframe", "<svg"]
+            )

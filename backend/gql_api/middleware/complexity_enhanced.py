@@ -33,9 +33,16 @@ class EnhancedComplexityMiddleware:
 
     # Known list fields that accept limit/first/last arguments
     LIST_FIELDS: Set[str] = {
-        'games', 'events', 'parameters', 'categories',
-        'templates', 'nodes', 'flows', 'joinConfigs',
-        'gameStats', 'allGameStats'
+        'games',
+        'events',
+        'parameters',
+        'categories',
+        'templates',
+        'nodes',
+        'flows',
+        'joinConfigs',
+        'gameStats',
+        'allGameStats',
     }
 
     def __init__(self, max_complexity: int = 1000):
@@ -46,7 +53,9 @@ class EnhancedComplexityMiddleware:
             max_complexity: Maximum allowed query complexity
         """
         self.max_complexity = max_complexity
-        logger.info(f"EnhancedComplexityMiddleware initialized with max_complexity={max_complexity}")
+        logger.info(
+            f"EnhancedComplexityMiddleware initialized with max_complexity={max_complexity}"
+        )
 
     def resolve(self, next, root, info, **args):
         """
@@ -68,9 +77,7 @@ class EnhancedComplexityMiddleware:
         complexity = self._calculate_complexity(info.operation)
 
         if complexity > self.max_complexity:
-            logger.warning(
-                f"Query complexity {complexity} exceeds maximum {self.max_complexity}"
-            )
+            logger.warning(f"Query complexity {complexity} exceeds maximum {self.max_complexity}")
             raise GraphQLError(
                 f"Query complexity {complexity} exceeds maximum allowed "
                 f"complexity of {self.max_complexity}. "

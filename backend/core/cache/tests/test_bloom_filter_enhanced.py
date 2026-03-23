@@ -866,9 +866,7 @@ class TestBloomFilterScalability:
 
         stats = bloom.get_stats()
         # 允许一些误差(假阳性可能导致统计偏高)
-        assert (
-            9000 <= stats['total_items'] <= 11000
-        ), f"应有约10000个元素, 实际{stats['total_items']}"
+        assert 9000 <= stats['total_items'] <= 11000, f"应有约10000个元素, 实际{stats['total_items']}"
         assert 0.08 <= stats['estimated_capacity_used'] <= 0.12, "容量使用应约为10%"
 
 

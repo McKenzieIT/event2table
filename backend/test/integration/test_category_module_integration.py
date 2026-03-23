@@ -33,7 +33,8 @@ class TestCategoryModuleIntegration:
         cursor = conn.cursor()
 
         # 创建测试用的event_categories表
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS event_categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT UNIQUE NOT NULL,
@@ -44,7 +45,8 @@ class TestCategoryModuleIntegration:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         conn.commit()
         yield
@@ -158,9 +160,7 @@ class TestCategoryModuleIntegration:
         service = CategoryService()
         category_ids = []
         for i in range(5):
-            category_data = EventCategoryEntity(
-                name=f"TEST_Batch Category {i}", name_cn=f"批量测试{i}"
-            )
+            category_data = EventCategoryEntity(name=f"TEST_Batch Category {i}", name_cn=f"批量测试{i}")
             created = service.create_category(category_data)
             category_ids.append(created.id)
 
@@ -183,9 +183,7 @@ class TestCategoryModuleIntegration:
         service = CategoryService()
         category_ids = []
         for i in range(3):
-            category_data = EventCategoryEntity(
-                name=f"TEST_Batch Update {i}", name_cn=f"批量更新{i}"
-            )
+            category_data = EventCategoryEntity(name=f"TEST_Batch Update {i}", name_cn=f"批量更新{i}")
             created = service.create_category(category_data)
             category_ids.append(created.id)
 
@@ -205,9 +203,7 @@ class TestCategoryModuleIntegration:
         # 1. 创建多个测试分类
         service = CategoryService()
         for i in range(3):
-            category_data = EventCategoryEntity(
-                name=f"TEST_All Category {i}", name_cn=f"所有分类{i}"
-            )
+            category_data = EventCategoryEntity(name=f"TEST_All Category {i}", name_cn=f"所有分类{i}")
             service.create_category(category_data)
 
         # 2. 获取所有分类

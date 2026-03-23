@@ -100,9 +100,7 @@ class TemplateEngine:
         matches = self.VARIABLE_PATTERN.findall(template)
         return list(matches)
 
-    def validate_variables(
-        self, template: str, available: Set[str] = None
-    ) -> Dict[str, List[str]]:
+    def validate_variables(self, template: str, available: Set[str] = None) -> Dict[str, List[str]]:
         """
         验证模板中的变量
 

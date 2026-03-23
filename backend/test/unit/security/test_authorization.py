@@ -344,8 +344,8 @@ class TestMutationAuthDecorators:
         """
         测试所有mutation类都有认证检查
 
-        这是一个元测试, 检查代码结构. 
-        当前应该失败, 因为还没有添加认证检查. 
+        这是一个元测试, 检查代码结构.
+        当前应该失败, 因为还没有添加认证检查.
         """
         mutation_files = [
             'backend/gql_api/mutations/event_mutations.py',
@@ -461,8 +461,7 @@ class TestMutationAuthDecorators:
             print("这违反了安全原则: 所有写操作必须验证用户身份和权限")
 
             pytest.fail(
-                f"发现 {len(mutations_without_auth)} 个mutation缺少认证检查\n"
-                f"这违反了安全原则: 所有写操作必须验证用户身份和权限"
+                f"发现 {len(mutations_without_auth)} 个mutation缺少认证检查\n" f"这违反了安全原则: 所有写操作必须验证用户身份和权限"
             )
         else:
             print("\n✅ 所有mutations都有认证检查")

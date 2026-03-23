@@ -76,6 +76,7 @@ class ConnectionPoolConfig:
 
 class PoolExhaustedError(Exception):
     """Raised when connection pool is exhausted"""
+
     pass
 
 
@@ -188,7 +189,7 @@ class ConnectionPool:
         conn = sqlite3.connect(
             self.db_path,
             check_same_thread=False,  # Allow connections to be used across threads
-            timeout=self.config.connection_timeout
+            timeout=self.config.connection_timeout,
         )
 
         # Use row factory for dict-like access
@@ -256,9 +257,7 @@ class ConnectionPool:
                     pooled_conn = self._create_connection()
                     pooled_conn.mark_used()
                     self._connections.append(pooled_conn)
-                    logger.debug(
-                        f"New connection created (total: {self.total_connections})"
-                    )
+                    logger.debug(f"New connection created (total: {self.total_connections})")
                     return pooled_conn.connection
 
                 # Pool is exhausted, wait for a connection to be returned
@@ -376,10 +375,8 @@ def get_connection_pool() -> ConnectionPool:
         with _global_pool_lock:
             if _global_pool is None:  # Double-check locking
                 from backend.core.config import get_db_path
-                _global_pool = ConnectionPool(
-                    db_path=get_db_path(),
-                    config=ConnectionPoolConfig()
-                )
+
+                _global_pool = ConnectionPool(db_path=get_db_path(), config=ConnectionPoolConfig())
                 logger.info("Global connection pool initialized")
 
     return _global_pool

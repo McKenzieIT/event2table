@@ -139,7 +139,7 @@ class RedisConnectionManager:
         """
         获取Redis连接（上下文管理器）
 
-        使用with语句确保连接自动释放: 
+        使用with语句确保连接自动释放:
 
         >>> with redis_connection_manager.get_connection() as conn:
         >>>     conn.set('key', 'value')
@@ -194,8 +194,8 @@ class RedisConnectionManager:
         """
         获取Redis客户端（不推荐使用）
 
-        警告: 此方法不使用上下文管理器, 需要手动管理连接. 
-        推荐使用get_connection()上下文管理器. 
+        警告: 此方法不使用上下文管理器, 需要手动管理连接.
+        推荐使用get_connection()上下文管理器.
 
         Returns:
             Redis客户端
@@ -302,7 +302,7 @@ class RedisConnectionManager:
         """
         关闭连接池
 
-        注意: 此方法会关闭所有连接, 谨慎使用. 
+        注意: 此方法会关闭所有连接, 谨慎使用.
         """
         with self._pool_lock:
             if self._pool is not None:

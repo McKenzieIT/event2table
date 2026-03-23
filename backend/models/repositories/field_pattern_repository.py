@@ -42,7 +42,9 @@ class FieldPatternRepository(GenericRepository):
         )
 
     @cached(ttl=1800)  # Cache for 30 minutes
-    def get_common_field_patterns(self, game_gid: Optional[int] = None, limit: int = 50) -> List[Dict[str, Any]]:
+    def get_common_field_patterns(
+        self, game_gid: Optional[int] = None, limit: int = 50
+    ) -> List[Dict[str, Any]]:
         """
         获取常用字段模式
 
@@ -251,7 +253,9 @@ class FieldPatternRepository(GenericRepository):
         }
 
     @cached(ttl=1800)  # Cache for 30 minutes
-    def find_similar_fields(self, field_name: str, game_gid: Optional[int] = None, limit: int = 10) -> List[Dict[str, Any]]:
+    def find_similar_fields(
+        self, field_name: str, game_gid: Optional[int] = None, limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """
         基于字段名称相似度查找相似字段
 
@@ -331,9 +335,20 @@ class FieldPatternRepository(GenericRepository):
 
         # 基础字段模式
         base_patterns = [
-            "role_id", "account_id", "user_id", "uid", "game_id", "gid",
-            "server_id", "channel_id", "platform", "device_id", "utdid",
-            "ds", "dt", "hour"
+            "role_id",
+            "account_id",
+            "user_id",
+            "uid",
+            "game_id",
+            "gid",
+            "server_id",
+            "channel_id",
+            "platform",
+            "device_id",
+            "utdid",
+            "ds",
+            "dt",
+            "hour",
         ]
 
         # 检查是否匹配基础字段模式
@@ -398,9 +413,9 @@ class FieldPatternRepository(GenericRepository):
                     cost = 1
 
                 matrix[i][j] = min(
-                    matrix[i - 1][j] + 1,      # 删除
-                    matrix[i][j - 1] + 1,      # 插入
-                    matrix[i - 1][j - 1] + cost  # 替换
+                    matrix[i - 1][j] + 1,  # 删除
+                    matrix[i][j - 1] + 1,  # 插入
+                    matrix[i - 1][j - 1] + cost,  # 替换
                 )
 
         # 计算相似度

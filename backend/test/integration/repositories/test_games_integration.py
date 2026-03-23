@@ -47,25 +47,34 @@ def test_get_all_with_event_count_single_query(test_db):
 
     # Insert games
     for gid, name, ods_db, dwd_prefix in games_data:
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO games (gid, name, ods_db, dwd_prefix)
             VALUES (?, ?, ?, ?)
-        """, (gid, name, ods_db, dwd_prefix))
+        """,
+            (gid, name, ods_db, dwd_prefix),
+        )
 
     # Insert events for games
     # Game A (10000147): 5 events
     for i in range(5):
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO log_events (game_gid, event_name, event_name_cn, source_table, target_table)
             VALUES (?, ?, ?, ?, ?)
-        """, (10000147, f"event_a_{i}", f"事件A_{i}", f"source_a_{i}", f"target_a_{i}"))
+        """,
+            (10000147, f"event_a_{i}", f"事件A_{i}", f"source_a_{i}", f"target_a_{i}"),
+        )
 
     # Game B (10000148): 3 events
     for i in range(3):
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO log_events (game_gid, event_name, event_name_cn, source_table, target_table)
             VALUES (?, ?, ?, ?, ?)
-        """, (10000148, f"event_b_{i}", f"事件B_{i}", f"source_b_{i}", f"target_b_{i}"))
+        """,
+            (10000148, f"event_b_{i}", f"事件B_{i}", f"source_b_{i}", f"target_b_{i}"),
+        )
 
     # Game C (10000149): 0 events (intentionally left empty)
 
@@ -81,6 +90,7 @@ def test_get_all_with_event_count_single_query(test_db):
 
     # Apply patch
     import backend.models.repositories.games as games_module
+
     games_module.fetch_all_as_dict = spy_fetch
 
     try:
@@ -95,12 +105,15 @@ def test_get_all_with_event_count_single_query(test_db):
         print(f"==================\n")
 
         # Verify results
-        assert len(results) >= 3, f"Expected at least 3 games, got {len(results)}"  # >= because conftest creates test games
+        assert (
+            len(results) >= 3
+        ), f"Expected at least 3 games, got {len(results)}"  # >= because conftest creates test games
 
         # CRITICAL ASSERTION: Verify only ONE query was executed
         assert len(captured_queries) == 1, (
             f"Expected 1 query, got {len(captured_queries)} queries - N+1 problem detected!\n"
-            f"Queries executed:\n" + "\n".join(f"  {i+1}. {q[:150]}..." for i, q in enumerate(captured_queries))
+            f"Queries executed:\n"
+            + "\n".join(f"  {i+1}. {q[:150]}..." for i, q in enumerate(captured_queries))
         )
 
         # CRITICAL ASSERTION: Verify the query uses LEFT JOIN (N+1 prevention)
@@ -111,10 +124,11 @@ def test_get_all_with_event_count_single_query(test_db):
             f"This indicates N+1 problem - should use JOIN instead of separate queries!"
         )
 
-        assert "COUNT(DISTINCT le.id)" in query.upper() or "COUNT(DISTINCT log_events.id)" in query.upper() or "COUNT(DISTINCT LE.ID)" in query.upper(), (
-            f"Query does not count events properly!\n"
-            f"Query: {query}"
-        )
+        assert (
+            "COUNT(DISTINCT le.id)" in query.upper()
+            or "COUNT(DISTINCT log_events.id)" in query.upper()
+            or "COUNT(DISTINCT LE.ID)" in query.upper()
+        ), (f"Query does not count events properly!\n" f"Query: {query}")
 
         # Verify event counts are correct
         game_a = next((g for g in results if g.gid == 10000147), None)
@@ -180,10 +194,13 @@ def test_get_all_with_event_count_no_events(test_db):
     conn.execute("DELETE FROM games")
 
     for i in range(3):
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO games (gid, name, ods_db, dwd_prefix)
             VALUES (?, ?, ?, ?)
-        """, (f"9000000{i}", f"Test Game {i}", "ieu_ods", "dwd"))
+        """,
+            (f"9000000{i}", f"Test Game {i}", "ieu_ods", "dwd"),
+        )
 
     conn.commit()
 
@@ -219,18 +236,24 @@ def test_get_all_with_event_count_performance_scaling(test_db):
     num_games = 50
     for i in range(num_games):
         gid = f"9000000{i:02d}"
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO games (gid, name, ods_db, dwd_prefix)
             VALUES (?, ?, ?, ?)
-        """, (gid, f"Test Game {i}", "ieu_ods", "dwd"))
+        """,
+            (gid, f"Test Game {i}", "ieu_ods", "dwd"),
+        )
 
         # Add random number of events (0-10)
         num_events = i % 11  # 0 to 10 events
         for j in range(num_events):
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO log_events (game_gid, event_name, event_name_cn, source_table, target_table)
                 VALUES (?, ?, ?, ?, ?)
-            """, (gid, f"event_{j}", f"事件{j}", f"source_{j}", f"target_{j}"))
+            """,
+                (gid, f"event_{j}", f"事件{j}", f"source_{j}", f"target_{j}"),
+            )
 
     conn.commit()
 
@@ -243,6 +266,7 @@ def test_get_all_with_event_count_performance_scaling(test_db):
         return original_fetch(query, params or [])
 
     import backend.models.repositories.games as games_module
+
     games_module.fetch_all_as_dict = spy_fetch
 
     try:
@@ -258,9 +282,9 @@ def test_get_all_with_event_count_performance_scaling(test_db):
 
         # Verify query uses LEFT JOIN
         query = captured_queries[0]
-        assert "LEFT JOIN" in query.upper(), (
-            f"Query does not contain LEFT JOIN! N+1 problem detected."
-        )
+        assert (
+            "LEFT JOIN" in query.upper()
+        ), f"Query does not contain LEFT JOIN! N+1 problem detected."
 
         # Verify we got all games
         assert len(results) == num_games, f"Expected {num_games} games, got {len(results)}"
@@ -268,9 +292,9 @@ def test_get_all_with_event_count_performance_scaling(test_db):
         # Verify event counts are correct
         for i, game in enumerate(sorted(results, key=lambda g: g.gid)):
             expected_count = i % 11
-            assert game.event_count == expected_count, (
-                f"Game {game.gid} should have {expected_count} events, got {game.event_count}"
-            )
+            assert (
+                game.event_count == expected_count
+            ), f"Game {game.gid} should have {expected_count} events, got {game.event_count}"
 
         print(f"✓ Test passed: {num_games} games fetched in 1 query (O(1) scaling confirmed)")
         print(f"  - Query uses LEFT JOIN: ✓")

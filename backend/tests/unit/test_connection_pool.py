@@ -25,7 +25,7 @@ from backend.core.database.connection_pool import (
     ConnectionPool,
     get_connection_pool,
     ConnectionPoolConfig,
-    PoolExhaustedError
+    PoolExhaustedError,
 )
 
 
@@ -44,10 +44,7 @@ class TestConnectionPoolConfig:
     def test_custom_config(self):
         """Test custom configuration values"""
         config = ConnectionPoolConfig(
-            max_connections=20,
-            min_connections=5,
-            max_idle_time=600,
-            connection_timeout=60
+            max_connections=20, min_connections=5, max_idle_time=600, connection_timeout=60
         )
 
         assert config.max_connections == 20
@@ -59,10 +56,7 @@ class TestConnectionPoolConfig:
         """Test configuration validation"""
         # max_connections must be >= min_connections
         with pytest.raises(ValueError):
-            ConnectionPoolConfig(
-                max_connections=5,
-                min_connections=10  # Invalid: min > max
-            )
+            ConnectionPoolConfig(max_connections=5, min_connections=10)  # Invalid: min > max
 
         # max_connections must be positive
         with pytest.raises(ValueError):
@@ -85,19 +79,13 @@ class TestConnectionPool:
     def pool_config(self):
         """Test configuration"""
         return ConnectionPoolConfig(
-            max_connections=5,
-            min_connections=1,
-            max_idle_time=60,
-            connection_timeout=10
+            max_connections=5, min_connections=1, max_idle_time=60, connection_timeout=10
         )
 
     @pytest.fixture
     def pool(self, test_db_path, pool_config):
         """Create a connection pool for testing"""
-        pool = ConnectionPool(
-            db_path=str(test_db_path),
-            config=pool_config
-        )
+        pool = ConnectionPool(db_path=str(test_db_path), config=pool_config)
         yield pool
         pool.close()
 
@@ -226,19 +214,13 @@ class TestConnectionPoolThreadSafety:
     def pool_config(self):
         """Test configuration"""
         return ConnectionPoolConfig(
-            max_connections=10,
-            min_connections=2,
-            max_idle_time=60,
-            connection_timeout=30
+            max_connections=10, min_connections=2, max_idle_time=60, connection_timeout=30
         )
 
     @pytest.fixture
     def pool(self, test_db_path, pool_config):
         """Create a connection pool for testing"""
-        pool = ConnectionPool(
-            db_path=str(test_db_path),
-            config=pool_config
-        )
+        pool = ConnectionPool(db_path=str(test_db_path), config=pool_config)
         yield pool
         pool.close()
 
@@ -286,12 +268,14 @@ class TestConnectionPoolThreadSafety:
         """Test concurrent database queries"""
         # Create test table
         conn = pool.get_connection()
-        conn.execute("""
+        conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS test_table (
                 id INTEGER PRIMARY KEY,
                 value TEXT
             )
-        """)
+        """
+        )
         conn.commit()
         pool.return_connection(conn)
 
@@ -302,16 +286,11 @@ class TestConnectionPoolThreadSafety:
                 conn = pool.get_connection(timeout=5)
 
                 # Insert data
-                conn.execute(
-                    "INSERT INTO test_table (value) VALUES (?)",
-                    (f"worker_{worker_id}",)
-                )
+                conn.execute("INSERT INTO test_table (value) VALUES (?)", (f"worker_{worker_id}",))
                 conn.commit()
 
                 # Query data
-                result = conn.execute(
-                    "SELECT COUNT(*) FROM test_table"
-                ).fetchone()
+                result = conn.execute("SELECT COUNT(*) FROM test_table").fetchone()
 
                 pool.return_connection(conn)
 
@@ -357,19 +336,13 @@ class TestConnectionPoolPerformance:
     def pool_config(self):
         """Test configuration"""
         return ConnectionPoolConfig(
-            max_connections=10,
-            min_connections=2,
-            max_idle_time=60,
-            connection_timeout=30
+            max_connections=10, min_connections=2, max_idle_time=60, connection_timeout=30
         )
 
     @pytest.fixture
     def pool(self, test_db_path, pool_config):
         """Create a connection pool for testing"""
-        pool = ConnectionPool(
-            db_path=str(test_db_path),
-            config=pool_config
-        )
+        pool = ConnectionPool(db_path=str(test_db_path), config=pool_config)
         yield pool
         pool.close()
 
@@ -463,8 +436,7 @@ class TestConnectionPoolIntegration:
     def pool(self, test_db_path):
         """Create a connection pool for testing"""
         pool = ConnectionPool(
-            db_path=str(test_db_path),
-            config=ConnectionPoolConfig(max_connections=5)
+            db_path=str(test_db_path), config=ConnectionPoolConfig(max_connections=5)
         )
         yield pool
         pool.close()
@@ -473,25 +445,25 @@ class TestConnectionPoolIntegration:
         """Test CRUD operations with connection pool"""
         # Create table
         conn = pool.get_connection()
-        conn.execute("""
+        conn.execute(
+            """
             CREATE TABLE test_users (
                 id INTEGER PRIMARY KEY,
                 name TEXT,
                 email TEXT
             )
-        """)
+        """
+        )
         conn.commit()
         pool.return_connection(conn)
 
         # Insert data
         conn = pool.get_connection()
         conn.execute(
-            "INSERT INTO test_users (name, email) VALUES (?, ?)",
-            ("Alice", "alice@example.com")
+            "INSERT INTO test_users (name, email) VALUES (?, ?)", ("Alice", "alice@example.com")
         )
         conn.execute(
-            "INSERT INTO test_users (name, email) VALUES (?, ?)",
-            ("Bob", "bob@example.com")
+            "INSERT INTO test_users (name, email) VALUES (?, ?)", ("Bob", "bob@example.com")
         )
         conn.commit()
         pool.return_connection(conn)
@@ -508,18 +480,14 @@ class TestConnectionPoolIntegration:
         # Update data
         conn = pool.get_connection()
         conn.execute(
-            "UPDATE test_users SET email = ? WHERE name = ?",
-            ("alice@updated.com", "Alice")
+            "UPDATE test_users SET email = ? WHERE name = ?", ("alice@updated.com", "Alice")
         )
         conn.commit()
         pool.return_connection(conn)
 
         # Verify update
         conn = pool.get_connection()
-        user = conn.execute(
-            "SELECT * FROM test_users WHERE name = ?",
-            ("Alice",)
-        ).fetchone()
+        user = conn.execute("SELECT * FROM test_users WHERE name = ?", ("Alice",)).fetchone()
         pool.return_connection(conn)
 
         assert user["email"] == "alice@updated.com"

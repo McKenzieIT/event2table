@@ -86,8 +86,8 @@ def get_game_by_gid_alias(game_gid: int):
     """
     根据GID获取单个游戏 (前端兼容路由)
 
-    这是一个别名路由, 指向与 /api/games/<game_gid> 相同的处理函数. 
-    前端代码使用 /api/games/by-gid/<game_gid> 格式. 
+    这是一个别名路由, 指向与 /api/games/<game_gid> 相同的处理函数.
+    前端代码使用 /api/games/by-gid/<game_gid> 格式.
 
     Args:
         game_gid: 游戏业务GID (如 10000147)

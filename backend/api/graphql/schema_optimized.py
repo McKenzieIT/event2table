@@ -109,9 +109,7 @@ class Query(ObjectType):
     node = relay.Node.Field()
 
     # 游戏查询(带分页)
-    games = relay.ConnectionField(
-        GameConnection, search=String(), description="查询游戏列表（带分页）"
-    )
+    games = relay.ConnectionField(GameConnection, search=String(), description="查询游戏列表（带分页）")
 
     # 单个游戏查询
     game = Field(GameNode, gid=Int(required=True), description="根据GID查询游戏")

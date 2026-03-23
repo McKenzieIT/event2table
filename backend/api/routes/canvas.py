@@ -29,6 +29,7 @@ canvas_service = get_canvas_service()
 # 获取GameService单例
 game_service = GameService()
 
+
 @canvas_bp.route("/canvas/node_canvas")
 def node_canvas():
     """
@@ -68,6 +69,7 @@ def node_canvas():
     template = "node_canvas_react.html" if use_react else "node_canvas.html"
     return render_template(template, game=game)
 
+
 @canvas_bp.route("/canvas/node_canvas_react")
 def node_canvas_react():
     """
@@ -103,6 +105,7 @@ def node_canvas_react():
 
     return render_template("node_canvas_react.html", game=game)
 
+
 @canvas_bp.route("/api/canvas/health", methods=["GET"])
 def health_check():
     """
@@ -112,6 +115,7 @@ def health_check():
         JSON: 健康状态
     """
     return json_success_response(data={"status": "healthy"}, message="Canvas module is working")
+
 
 @canvas_bp.route("/api/canvas/validate", methods=["POST"])
 def validate_flow():
@@ -154,6 +158,7 @@ def validate_flow():
         logger.exception(f"Error validating flow: {e}")
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
 
+
 @canvas_bp.route("/api/canvas/prepare", methods=["POST"])
 def prepare_generation():
     """
@@ -185,6 +190,7 @@ def prepare_generation():
     except Exception as e:
         logger.exception(f"Error preparing flow: {e}")
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
+
 
 @canvas_bp.route("/api/canvas/preview-results", methods=["POST"])
 def preview_sql_results():
@@ -236,6 +242,7 @@ def preview_sql_results():
     except Exception as e:
         logger.exception(f"Error generating preview results: {e}")
         return jsonify(error_response("An internal error occurred", status_code=500)[0]), 500
+
 
 def generate_mock_results(output_fields, limit=5):
     """
@@ -324,6 +331,7 @@ def generate_mock_results(output_fields, limit=5):
         "execution_time_ms": random.randint(50, 200),  # Mock execution time
     }
 
+
 @canvas_bp.route("/api/canvas/flows", methods=["GET"])
 def list_flows():
     """
@@ -352,6 +360,7 @@ def list_flows():
         logger.exception(f"Error listing flows: {e}")
         return json_error_response("Failed to list flows", status_code=500)
 
+
 @canvas_bp.route("/api/canvas/flows/<int:flow_id>", methods=["GET"])
 @cached(ttl=1800, key_prefix="canvas:flow")  # Cache for 30 minutes
 def get_flow(flow_id: int):
@@ -375,6 +384,7 @@ def get_flow(flow_id: int):
     except Exception as e:
         logger.exception(f"Error getting flow: {e}")
         return json_error_response("Failed to get flow", status_code=500)
+
 
 @canvas_bp.route("/api/canvas/flows", methods=["POST"])
 def create_flow():
@@ -417,6 +427,7 @@ def create_flow():
     except Exception as e:
         logger.exception(f"Error creating flow: {e}")
         return json_error_response("Failed to create flow", status_code=500)
+
 
 @canvas_bp.route("/api/canvas/flows/<int:flow_id>", methods=["PUT", "PATCH"])
 def update_flow(flow_id: int):
@@ -467,6 +478,7 @@ def update_flow(flow_id: int):
         logger.exception(f"Error updating flow: {e}")
         return json_error_response("Failed to update flow", status_code=500)
 
+
 @canvas_bp.route("/api/canvas/flows/<int:flow_id>", methods=["DELETE"])
 def delete_flow(flow_id: int):
     """
@@ -498,6 +510,7 @@ def delete_flow(flow_id: int):
     except Exception as e:
         logger.exception(f"Error deleting flow: {e}")
         return json_error_response("Failed to delete flow", status_code=500)
+
 
 @canvas_bp.route("/api/canvas/flows/<int:flow_id>/export", methods=["GET"])
 def export_flow(flow_id: int):
@@ -531,5 +544,6 @@ def export_flow(flow_id: int):
     except Exception as e:
         logger.exception(f"Error exporting flow: {e}")
         return json_error_response("Failed to export flow", status_code=500)
+
 
 logger.info("Canvas blueprint loaded")

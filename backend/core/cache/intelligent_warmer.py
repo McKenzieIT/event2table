@@ -409,9 +409,7 @@ class IntelligentCacheWarmer:
             self.stats['actual_hits'] = actual_hits
             self.stats['prediction_accuracy'] = accuracy
 
-        logger.debug(
-            f"📊 预测准确率: {accuracy:.2f}% " f"(预测{predicted_count}个, 命中{actual_hits}个)"
-        )
+        logger.debug(f"📊 预测准确率: {accuracy:.2f}% " f"(预测{predicted_count}个, 命中{actual_hits}个)")
 
         return {
             'accuracy': accuracy,

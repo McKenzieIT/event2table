@@ -430,16 +430,19 @@ class ParamLibraryRepository(GenericRepository):
             >>> repo = ParamLibraryRepository()
             >>> stats = repo.get_statistics()
         """
-        stats = fetch_one_as_dict("""
+        stats = fetch_one_as_dict(
+            """
             SELECT
                 COUNT(*) as total_parameters,
                 SUM(CASE WHEN is_standard = 1 THEN 1 ELSE 0 END) as standard_parameters,
                 SUM(usage_count) as total_usage,
                 AVG(usage_count) as avg_usage
             FROM param_library
-        """)
+        """
+        )
 
-        category_stats = fetch_all_as_dict("""
+        category_stats = fetch_all_as_dict(
+            """
             SELECT
                 category,
                 COUNT(*) as count,
@@ -448,7 +451,8 @@ class ParamLibraryRepository(GenericRepository):
             WHERE category IS NOT NULL
             GROUP BY category
             ORDER BY count DESC
-        """)
+        """
+        )
 
         return {
             "total_parameters": stats["total_parameters"] if stats else 0,

@@ -41,7 +41,8 @@ def test_db():
     cursor = conn.cursor()
 
     # Create hql_history table if not exists
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS hql_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL DEFAULT 0,
@@ -59,7 +60,8 @@ def test_db():
             name_en TEXT,
             name_cn TEXT
         )
-    """)
+    """
+    )
 
     # Create indexes
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_hql_history_type ON hql_history(hql_type)")

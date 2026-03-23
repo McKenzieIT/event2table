@@ -24,6 +24,7 @@ from backend.core.cache.cache_system import HierarchicalCache
 # Test Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def mock_param_repo():
     """Mock ParameterRepository"""
@@ -61,7 +62,7 @@ def sample_parameter_entity():
         description="Zone ID",
         is_common=False,
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
 
 
@@ -77,13 +78,14 @@ def sample_common_parameter_entity():
         hive_type="BIGINT",
         description="Role ID",
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
 
 
 # ============================================================================
 # Test: get_parameters_paginated (Must use game_gid, not game_id)
 # ============================================================================
+
 
 class TestGetParametersPaginated:
     """Test get_parameters_paginated method"""
@@ -94,16 +96,12 @@ class TestGetParametersPaginated:
         mock_param_repo.get_all_parameters_paginated.return_value = {
             "parameters": [
                 ParameterEntity(
-                    id=1,
-                    event_id=1,
-                    game_gid=90000001,
-                    name="zone_id",
-                    param_type="param"
+                    id=1, event_id=1, game_gid=90000001, name="zone_id", param_type="param"
                 )
             ],
             "total": 1,
             "page": 1,
-            "has_more": False
+            "has_more": False,
         }
 
         # Act
@@ -122,7 +120,7 @@ class TestGetParametersPaginated:
             "parameters": [],
             "total": 0,
             "page": 1,
-            "has_more": False
+            "has_more": False,
         }
 
         # Act
@@ -141,23 +139,17 @@ class TestGetParametersPaginated:
             "parameters": [],
             "total": 0,
             "page": 1,
-            "has_more": False
+            "has_more": False,
         }
 
         # Act
         parameter_service.get_parameters_paginated(
-            game_gid=90000001,
-            search="zone",
-            type_filter="param"
+            game_gid=90000001, search="zone", type_filter="param"
         )
 
         # Assert
         mock_param_repo.get_all_parameters_paginated.assert_called_once_with(
-            game_gid=90000001,
-            search="zone",
-            type_filter="param",
-            page=1,
-            limit=50
+            game_gid=90000001, search="zone", type_filter="param", page=1, limit=50
         )
 
 
@@ -165,10 +157,13 @@ class TestGetParametersPaginated:
 # Test: get_parameters_by_event (Must return Entity objects)
 # ============================================================================
 
+
 class TestGetParametersByEvent:
     """Test get_parameters_by_event method"""
 
-    def test_returns_entity_objects(self, parameter_service, mock_param_repo, sample_parameter_entity):
+    def test_returns_entity_objects(
+        self, parameter_service, mock_param_repo, sample_parameter_entity
+    ):
         """Test that method returns Entity objects"""
         # Arrange
         mock_param_repo.find_by_event.return_value = [sample_parameter_entity]
@@ -197,10 +192,13 @@ class TestGetParametersByEvent:
 # Test: create_parameter (Must use game_gid, return Entity)
 # ============================================================================
 
+
 class TestCreateParameter:
     """Test create_parameter method"""
 
-    def test_creates_parameter_with_game_gid(self, parameter_service, mock_param_repo, sample_parameter_entity):
+    def test_creates_parameter_with_game_gid(
+        self, parameter_service, mock_param_repo, sample_parameter_entity
+    ):
         """Test creating parameter with game_gid"""
         # Arrange
         mock_param_repo.create.return_value = 1
@@ -224,10 +222,13 @@ class TestCreateParameter:
 # Test: update_parameter (Must use game_gid, return Entity)
 # ============================================================================
 
+
 class TestUpdateParameter:
     """Test update_parameter method"""
 
-    def test_updates_parameter_with_game_gid(self, parameter_service, mock_param_repo, sample_parameter_entity):
+    def test_updates_parameter_with_game_gid(
+        self, parameter_service, mock_param_repo, sample_parameter_entity
+    ):
         """Test updating parameter with game_gid"""
         # Arrange
         mock_param_repo.update.return_value = True
@@ -256,6 +257,7 @@ class TestUpdateParameter:
 # Test: delete_parameter (Must invalidate cache)
 # ============================================================================
 
+
 class TestDeleteParameter:
     """Test delete_parameter method"""
 
@@ -276,10 +278,13 @@ class TestDeleteParameter:
 # Test: get_common_parameters (Must use game_gid)
 # ============================================================================
 
+
 class TestGetCommonParameters:
     """Test get_common_parameters method"""
 
-    def test_returns_common_parameter_entities(self, parameter_service, mock_param_repo, sample_common_parameter_entity):
+    def test_returns_common_parameter_entities(
+        self, parameter_service, mock_param_repo, sample_common_parameter_entity
+    ):
         """Test that method returns CommonParameterEntity objects"""
         # Arrange
         mock_param_repo.get_common_params.return_value = [sample_common_parameter_entity]
@@ -311,6 +316,7 @@ class TestGetCommonParameters:
 # Test: No game_id violations
 # ============================================================================
 
+
 class TestNoGameIdViolations:
     """Test that no game_id violations exist in returned data"""
 
@@ -320,16 +326,12 @@ class TestNoGameIdViolations:
         mock_param_repo.get_all_parameters_paginated.return_value = {
             "parameters": [
                 ParameterEntity(
-                    id=1,
-                    event_id=1,
-                    game_gid=90000001,
-                    name="zone_id",
-                    param_type="param"
+                    id=1, event_id=1, game_gid=90000001, name="zone_id", param_type="param"
                 )
             ],
             "total": 1,
             "page": 1,
-            "has_more": False
+            "has_more": False,
         }
 
         # Act
@@ -341,7 +343,9 @@ class TestNoGameIdViolations:
             assert param.game_gid == 90000001
             # Note: ParameterEntity doesn't have game_id field by design
 
-    def test_by_event_results_no_game_id(self, parameter_service, mock_param_repo, sample_parameter_entity):
+    def test_by_event_results_no_game_id(
+        self, parameter_service, mock_param_repo, sample_parameter_entity
+    ):
         """Test that event parameters don't contain game_id"""
         # Arrange
         mock_param_repo.find_by_event.return_value = [sample_parameter_entity]
@@ -354,7 +358,9 @@ class TestNoGameIdViolations:
             assert hasattr(param, "game_gid")  # ✅ Has game_gid
             assert param.game_gid == 90000001
 
-    def test_common_params_no_game_id(self, parameter_service, mock_param_repo, sample_common_parameter_entity):
+    def test_common_params_no_game_id(
+        self, parameter_service, mock_param_repo, sample_common_parameter_entity
+    ):
         """Test that common parameters don't contain game_id"""
         # Arrange
         mock_param_repo.get_common_params.return_value = [sample_common_parameter_entity]
@@ -371,6 +377,7 @@ class TestNoGameIdViolations:
 # ============================================================================
 # Test: Cache Integration
 # ============================================================================
+
 
 class TestCacheIntegration:
     """Test cache integration"""

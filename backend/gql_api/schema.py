@@ -97,9 +97,7 @@ class Query(
         description="查询游戏的事件列表（支持过滤和分页）",
     )
 
-    search_events = List(
-        EventType, query=String(required=True), game_gid=Int(), description="搜索事件"
-    )
+    search_events = List(EventType, query=String(required=True), game_gid=Int(), description="搜索事件")
 
     # Category queries
     category = Field(CategoryType, id=Int(required=True), description="根据ID查询单个分类")
@@ -130,13 +128,9 @@ class Query(
     # Dashboard queries
     dashboard_stats = Field(DashboardStatsType, description="获取仪表盘统计数据")
 
-    game_stats = Field(
-        GameStatsType, game_gid=Int(required=True), description="获取指定游戏的统计数据"
-    )
+    game_stats = Field(GameStatsType, game_gid=Int(required=True), description="获取指定游戏的统计数据")
 
-    all_game_stats = List(
-        GameStatsType, limit=Int(default_value=20), description="获取所有游戏的统计数据"
-    )
+    all_game_stats = List(GameStatsType, limit=Int(default_value=20), description="获取所有游戏的统计数据")
 
     # Template queries
     template = Field(TemplateType, id=Int(required=True), description="根据ID查询单个模板")
@@ -193,9 +187,7 @@ class Query(
 
     param_config = Field(ParamConfigType, param_id=Int(required=True), description="查询参数配置")
 
-    validation_rules = List(
-        ValidationRuleType, param_id=Int(required=True), description="查询参数验证规则"
-    )
+    validation_rules = List(ValidationRuleType, param_id=Int(required=True), description="查询参数验证规则")
 
     # Join Config queries
     join_config = Field(JoinConfigType, id=Int(required=True), description="根据ID查询单个Join配置")

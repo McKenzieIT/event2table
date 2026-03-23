@@ -171,13 +171,12 @@ def clear_entity_caches(entity_type: str, entity_id: int, game_gid: Optional[int
 # ============================================================================
 
 
-
 @cached(ttl=1800)  # Cache for 30 minutes
 def get_reference_data(data_types: List[str]) -> Dict[str, List[Dict]]:
     """
     通用的参考数据获取函数
 
-    用于获取games, categories等参考表数据, 支持缓存. 
+    用于获取games, categories等参考表数据, 支持缓存.
 
     Args:
         data_types: 数据类型列表, 支持:

@@ -31,6 +31,7 @@ TEST_GAME_GID = 90000001  # 使用测试GID范围（90000000+）
 # Test Flow Operations (Flow模板管理)
 # ============================================================================
 
+
 class TestFlowOperations:
     """Flow操作测试类 - 验证Entity架构和game_gid使用"""
 
@@ -297,6 +298,7 @@ class TestFlowOperations:
 # Test Event Node Operations (EventNode管理)
 # ============================================================================
 
+
 class TestEventNodeOperations:
     """EventNode操作测试类 - 验证Entity架构和game_gid使用"""
 
@@ -444,6 +446,7 @@ class TestEventNodeOperations:
 # Test Flow Validation (Flow验证)
 # ============================================================================
 
+
 class TestFlowValidation:
     """Flow验证测试类"""
 
@@ -510,6 +513,7 @@ class TestFlowValidation:
 # Test Cache Integration (缓存集成)
 # ============================================================================
 
+
 class TestCacheIntegration:
     """缓存集成测试类 - 验证缓存装饰器使用"""
 
@@ -521,8 +525,9 @@ class TestCacheIntegration:
     def test_get_flow_has_cache_decorator(self, mock_cached):
         """验证get_flow使用@cached_service装饰器"""
         # Check if method has cache decorator metadata
-        has_cache = hasattr(self.service.get_flow, '__wrapped__') or \
-                   'cache' in str(type(self.service.get_flow))
+        has_cache = hasattr(self.service.get_flow, '__wrapped__') or 'cache' in str(
+            type(self.service.get_flow)
+        )
 
         # This is a basic check - in production, verify actual cache behavior
         assert has_cache or True  # Placeholder for actual cache verification
@@ -569,6 +574,7 @@ class TestCacheIntegration:
 # ============================================================================
 # Integration Tests (集成测试)
 # ============================================================================
+
 
 class TestCanvasServiceIntegration:
     """CanvasService集成测试 - 验证完整工作流"""
@@ -618,13 +624,13 @@ class TestCanvasServiceIntegration:
                     params = sig.parameters
 
                     # Verify no game_id parameter exists
-                    assert 'game_id' not in params, \
-                        f"{method_name}不应有game_id参数，应使用game_gid"
+                    assert 'game_id' not in params, f"{method_name}不应有game_id参数，应使用game_gid"
 
 
 # ============================================================================
 # Test Export Operations (导出操作)
 # ============================================================================
+
 
 class TestExportOperations:
     """导出操作测试类"""

@@ -21,7 +21,7 @@ class EventBuilderAppService:
     Event Builder Application Service
 
     Handles batch field operations for event node builder.
-    完整实现, 直接查询数据库, 正确分类字段类型. 
+    完整实现, 直接查询数据库, 正确分类字段类型.
     """
 
     def batch_add_fields(self, event_id: int, field_type: str) -> Dict[str, Any]:
@@ -71,7 +71,7 @@ class EventBuilderAppService:
         """
         根据字段类型获取字段列表
 
-        完整实现, 直接查询数据库, 正确分类字段类型. 
+        完整实现, 直接查询数据库, 正确分类字段类型.
         """
         # 基础字段(硬编码)
         base_fields = [
@@ -159,7 +159,8 @@ class EventBuilderAppService:
                     'name': p['param_name'],
                     'field_type': 'common',
                     'description': p.get('param_name_cn', p['param_name']),
-                    'json_path': p.get('json_path') or f'$.{p["param_name"]}',  # Auto-generate json_path if None
+                    'json_path': p.get('json_path')
+                    or f'$.{p["param_name"]}',  # Auto-generate json_path if None
                 }
                 for p in common_params
             ]
@@ -188,7 +189,8 @@ class EventBuilderAppService:
                     'name': p['param_name'],
                     'field_type': 'param',
                     'description': p.get('param_name_cn', p['param_name']),
-                    'json_path': p.get('json_path') or f'$.{p["param_name"]}',  # Auto-generate json_path if None
+                    'json_path': p.get('json_path')
+                    or f'$.{p["param_name"]}',  # Auto-generate json_path if None
                 }
                 for p in params
             ]

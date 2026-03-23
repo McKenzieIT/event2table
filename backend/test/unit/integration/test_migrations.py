@@ -123,14 +123,16 @@ class TestDatabaseMigrations(unittest.TestCase):
         # Recreate table without category_id
         columns_str = ", ".join(columns)
         cursor.execute(f"DROP TABLE log_events")
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             CREATE TABLE log_events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 game_id INTEGER,
                 event_name TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # Set database version to 0 (simulate v0 database)
         cursor.execute("PRAGMA user_version = 0")
@@ -280,14 +282,16 @@ class TestDatabaseMigrations(unittest.TestCase):
         # Manually remove game_gid column to simulate pre-v18 database
         # Note: SQLite doesn't support DROP COLUMN, so we recreate the table
         cursor.execute("DROP TABLE log_events")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE log_events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 game_id INTEGER,
                 event_name TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # Re-insert test data without game_gid
         cursor.execute(

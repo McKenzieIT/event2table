@@ -39,7 +39,7 @@ class TestParameterRepositoryCache:
             'json_path': None,
             'is_active': 1,
             'created_at': None,
-            'updated_at': None
+            'updated_at': None,
         }
 
     def test_get_paginated_params_cache_hit(self, repo, mock_param_data):
@@ -133,7 +133,9 @@ class TestParameterRepositoryCache:
         """
         # The @cache_invalidate decorator uses @wraps(func) which adds __wrapped__ attribute
         # This test verifies the decorator is present without actually calling the method
-        assert hasattr(repo.create, '__wrapped__'), "create() should have @cache_invalidate decorator"
+        assert hasattr(
+            repo.create, '__wrapped__'
+        ), "create() should have @cache_invalidate decorator"
         assert callable(repo.create), "create() should be callable"
 
     def test_update_param_invalidates_cache(self, repo):
@@ -143,7 +145,9 @@ class TestParameterRepositoryCache:
         """
         # The @cache_invalidate decorator uses @wraps(func) which adds __wrapped__ attribute
         # This test verifies the decorator is present without actually calling the method
-        assert hasattr(repo.update, '__wrapped__'), "update() should have @cache_invalidate decorator"
+        assert hasattr(
+            repo.update, '__wrapped__'
+        ), "update() should have @cache_invalidate decorator"
         assert callable(repo.update), "update() should be callable"
 
     def test_cache_performance_improvement(self, repo, mock_param_data):
@@ -173,17 +177,19 @@ class TestParameterRepositoryCache:
             time_hit = time.time() - start2
 
             # Verify cache miss actually took some time (mock worked)
-            assert time_miss >= 0.05, \
-                f"Cache miss should take at least 50ms (actual: {time_miss*1000:.1f}ms). " \
+            assert time_miss >= 0.05, (
+                f"Cache miss should take at least 50ms (actual: {time_miss*1000:.1f}ms). "
                 f"The slow_query mock may not have executed."
+            )
 
             # Verify cache hit is significantly faster (at least 10x)
             # With 100ms sleep, cache hit should be <10ms, achieving 10x speedup
             speedup = time_miss / time_hit
-            assert time_hit < time_miss / 10, \
-                f"Cache hit ({time_hit*1000:.2f}ms) should be at least 10x faster than cache miss ({time_miss*1000:.2f}ms). " \
-                f"Actual speedup: {speedup:.1f}x. " \
+            assert time_hit < time_miss / 10, (
+                f"Cache hit ({time_hit*1000:.2f}ms) should be at least 10x faster than cache miss ({time_miss*1000:.2f}ms). "
+                f"Actual speedup: {speedup:.1f}x. "
                 f"Cache may not be working correctly."
+            )
 
     def test_cache_ttl_respected(self, repo, mock_param_data):
         """
@@ -203,6 +209,7 @@ class TestParameterRepositoryCache:
 
             # This test verifies TTL is set correctly in decorator
             from backend.models.repositories.parameters import ParameterRepository
+
             # Check that method has cache decorator
             assert hasattr(repo.get_paginated_params, '__wrapped__')
 

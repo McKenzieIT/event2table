@@ -34,6 +34,7 @@ T = TypeVar('T')
 # 日期时间处理工具
 # ============================================================================
 
+
 def format_date(dt: Optional[datetime], format_str: str = "%Y-%m-%d") -> Optional[str]:
     """
     格式化日期为字符串（简化版本，仅日期部分）
@@ -98,6 +99,7 @@ def parse_datetime(date_str: str, format_str: str = "%Y-%m-%d %H:%M:%S") -> Opti
 # ============================================================================
 # 字符串清理和验证工具
 # ============================================================================
+
 
 def sanitize_string(s: Any) -> str:
     """
@@ -206,6 +208,7 @@ def normalize_identifier(value: str) -> str:
 # 分页参数处理工具
 # ============================================================================
 
+
 def get_pagination_params() -> Tuple[int, int, int]:
     """
     从请求中获取分页参数
@@ -234,10 +237,7 @@ def get_pagination_params() -> Tuple[int, int, int]:
 
 
 def build_pagination_response(
-    items: List[Any],
-    total: int,
-    page: int,
-    per_page: int
+    items: List[Any], total: int, page: int, per_page: int
 ) -> Dict[str, Any]:
     """
     构建分页响应
@@ -271,8 +271,8 @@ def build_pagination_response(
             'total': total,
             'total_pages': total_pages,
             'has_next': page < total_pages,
-            'has_prev': page > 1
-        }
+            'has_prev': page > 1,
+        },
     }
 
 
@@ -280,10 +280,11 @@ def build_pagination_response(
 # 错误处理装饰器
 # ============================================================================
 
+
 def handle_api_errors(
     error_message: str = "Operation failed",
     validation_error_message: str = "Validation error",
-    not_found_message: str = "Resource not found"
+    not_found_message: str = "Resource not found",
 ) -> Callable:
     """
     API错误处理装饰器
@@ -304,26 +305,22 @@ def handle_api_errors(
             return json_success_response(data=games)
     """
 
-    def decorator(func: Callable[..., Tuple[Dict[str, Any], int]]) -> Callable[..., Tuple[Dict[str, Any], int]]:
+    def decorator(
+        func: Callable[..., Tuple[Dict[str, Any], int]]
+    ) -> Callable[..., Tuple[Dict[str, Any], int]]:
         @wraps(func)
         def wrapper(*args, **kwargs) -> Tuple[Dict[str, Any], int]:
             try:
                 return func(*args, **kwargs)
             except ValidationError as e:
                 logger.error(f"Validation error in {func.__name__}: {e}")
-                return json_error_response(
-                    f"{validation_error_message}: {str(e)}",
-                    status_code=400
-                )
+                return json_error_response(f"{validation_error_message}: {str(e)}", status_code=400)
             except ValueError as e:
                 logger.error(f"Value error in {func.__name__}: {e}")
                 return json_error_response(str(e), status_code=400)
             except KeyError as e:
                 logger.error(f"Missing key in {func.__name__}: {e}")
-                return json_error_response(
-                    f"Missing required field: {str(e)}",
-                    status_code=400
-                )
+                return json_error_response(f"Missing required field: {str(e)}", status_code=400)
             except Exception as e:
                 logger.error(f"Unexpected error in {func.__name__}: {e}", exc_info=True)
                 return json_error_response(error_message, status_code=500)
@@ -336,6 +333,7 @@ def handle_api_errors(
 # ============================================================================
 # 请求验证辅助函数
 # ============================================================================
+
 
 def validate_request_json(required_fields: Optional[List[str]] = None) -> Dict[str, Any]:
     """
@@ -404,11 +402,12 @@ def get_game_gid_from_request() -> Optional[int]:
 # 批量操作辅助函数
 # ============================================================================
 
+
 def process_batch_items(
     items: List[Any],
     processor: Callable[[Any], Tuple[bool, str]],
     success_message: str = "Operation completed",
-    partial_message: str = "Operation partially completed"
+    partial_message: str = "Operation partially completed",
 ) -> Dict[str, Any]:
     """
     处理批量操作
@@ -455,28 +454,21 @@ def process_batch_items(
         return {
             'success': True,
             'message': success_message,
-            'stats': {
-                'total': total,
-                'successful': success_count,
-                'failed': failed_count
-            }
+            'stats': {'total': total, 'successful': success_count, 'failed': failed_count},
         }
     else:
         return {
             'success': success_count > 0,
             'message': partial_message,
-            'stats': {
-                'total': total,
-                'successful': success_count,
-                'failed': failed_count
-            },
-            'errors': failed
+            'stats': {'total': total, 'successful': success_count, 'failed': failed_count},
+            'errors': failed,
         }
 
 
 # ============================================================================
 # 数据转换辅助函数
 # ============================================================================
+
 
 def convert_to_dict_list(items: List[Any], keys: List[str]) -> List[Dict[str, Any]]:
     """
@@ -539,11 +531,12 @@ def extract_fields(data: Dict[str, Any], field_map: Dict[str, str]) -> Dict[str,
 # 日志辅助函数
 # ============================================================================
 
+
 def log_api_call(
     endpoint: str,
     method: str,
     params: Optional[Dict[str, Any]] = None,
-    user_id: Optional[int] = None
+    user_id: Optional[int] = None,
 ):
     """
     记录API调用日志

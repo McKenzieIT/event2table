@@ -42,19 +42,13 @@ class TestEventNodesConsistency:
     def clean_test_data(self, db_connection, test_game_gid):
         """Clean up test data before and after each test"""
         # Cleanup before
-        db_connection.execute(
-            "DELETE FROM event_nodes WHERE game_gid = ?",
-            (test_game_gid,)
-        )
+        db_connection.execute("DELETE FROM event_nodes WHERE game_gid = ?", (test_game_gid,))
         db_connection.commit()
 
         yield
 
         # Cleanup after
-        db_connection.execute(
-            "DELETE FROM event_nodes WHERE game_gid = ?",
-            (test_game_gid,)
-        )
+        db_connection.execute("DELETE FROM event_nodes WHERE game_gid = ?", (test_game_gid,))
         db_connection.commit()
 
     def test_stats_and_search_consistency_with_active_node(
@@ -78,12 +72,7 @@ class TestEventNodesConsistency:
 
         # Act: Call search API
         repo = EventNodeRepository()
-        search_results = repo.search_nodes(
-            game_gid=test_game_gid,
-            keyword="",
-            limit=100,
-            offset=0
-        )
+        search_results = repo.search_nodes(game_gid=test_game_gid, keyword="", limit=100, offset=0)
 
         # Assert: Stats should show 1 node
         assert stats["total_nodes"] == 1, (
@@ -125,12 +114,7 @@ class TestEventNodesConsistency:
 
         # Act: Call search API
         repo = EventNodeRepository()
-        search_results = repo.search_nodes(
-            game_gid=test_game_gid,
-            keyword="",
-            limit=100,
-            offset=0
-        )
+        search_results = repo.search_nodes(game_gid=test_game_gid, keyword="", limit=100, offset=0)
 
         # Assert: Stats should show 0 nodes (not 1 from cache)
         assert stats["total_nodes"] == 0, (
@@ -221,14 +205,14 @@ class TestEventNodesConsistency:
         db_connection.execute(
             """INSERT INTO games (gid, name, ods_db, dwd_prefix)
             VALUES (?, ?, ?, ?)""",
-            (game_gid, "Test Game", "ieu_ods", "dwd")
+            (game_gid, "Test Game", "ieu_ods", "dwd"),
         )
 
         # Create test event
         cursor = db_connection.execute(
             """INSERT INTO log_events (game_gid, name, name_cn)
             VALUES (?, ?, ?)""",
-            (game_gid, "test.event", "测试事件")
+            (game_gid, "test.event", "测试事件"),
         )
         return cursor.lastrowid
 
@@ -236,8 +220,7 @@ class TestEventNodesConsistency:
         """Create an active event node (is_active=1)"""
         # Get event_id
         event_row = db_connection.execute(
-            "SELECT id FROM log_events WHERE game_gid = ? LIMIT 1",
-            (game_gid,)
+            "SELECT id FROM log_events WHERE game_gid = ? LIMIT 1", (game_gid,)
         ).fetchone()
 
         if not event_row:
@@ -250,7 +233,7 @@ class TestEventNodesConsistency:
         cursor = db_connection.execute(
             """INSERT INTO event_nodes (game_gid, name, event_id, config_json, is_active)
             VALUES (?, ?, ?, ?, 1)""",
-            (game_gid, "Test Node", event_id, config_json)
+            (game_gid, "Test Node", event_id, config_json),
         )
         db_connection.commit()
         return cursor.lastrowid
@@ -259,8 +242,7 @@ class TestEventNodesConsistency:
         """Create a soft-deleted event node (is_active=0)"""
         # Get event_id
         event_row = db_connection.execute(
-            "SELECT id FROM log_events WHERE game_gid = ? LIMIT 1",
-            (game_gid,)
+            "SELECT id FROM log_events WHERE game_gid = ? LIMIT 1", (game_gid,)
         ).fetchone()
 
         if not event_row:
@@ -273,7 +255,7 @@ class TestEventNodesConsistency:
         cursor = db_connection.execute(
             """INSERT INTO event_nodes (game_gid, name, event_id, config_json, is_active)
             VALUES (?, ?, ?, ?, 0)""",
-            (game_gid, "Deleted Node", event_id, config_json)
+            (game_gid, "Deleted Node", event_id, config_json),
         )
         db_connection.commit()
         return cursor.lastrowid
@@ -299,27 +281,15 @@ class TestEventNodesRepositoryDirect:
     @pytest.fixture
     def clean_test_data(self, db_connection, test_game_gid):
         """Clean up test data"""
-        db_connection.execute(
-            "DELETE FROM event_nodes WHERE game_gid = ?",
-            (test_game_gid,)
-        )
-        db_connection.execute(
-            "DELETE FROM log_events WHERE game_gid = ?",
-            (test_game_gid,)
-        )
-        db_connection.execute(
-            "DELETE FROM games WHERE gid = ?",
-            (test_game_gid,)
-        )
+        db_connection.execute("DELETE FROM event_nodes WHERE game_gid = ?", (test_game_gid,))
+        db_connection.execute("DELETE FROM log_events WHERE game_gid = ?", (test_game_gid,))
+        db_connection.execute("DELETE FROM games WHERE gid = ?", (test_game_gid,))
         db_connection.commit()
 
         yield
 
         # Cleanup
-        db_connection.execute(
-            "DELETE FROM event_nodes WHERE game_gid = ?",
-            (test_game_gid,)
-        )
+        db_connection.execute("DELETE FROM event_nodes WHERE game_gid = ?", (test_game_gid,))
         db_connection.commit()
 
     def test_repository_stats_query_filters_is_active(
@@ -333,12 +303,11 @@ class TestEventNodesRepositoryDirect:
         # Arrange: Create test data
         db_connection.execute(
             "INSERT INTO games (gid, name, ods_db, dwd_prefix) VALUES (?, ?, ?, ?)",
-            (test_game_gid, "Test Game", "ieu_ods", "dwd")
+            (test_game_gid, "Test Game", "ieu_ods", "dwd"),
         )
 
         event_id = db_connection.execute(
-            "INSERT INTO log_events (game_gid, name) VALUES (?, ?)",
-            (test_game_gid, "test.event")
+            "INSERT INTO log_events (game_gid, name) VALUES (?, ?)", (test_game_gid, "test.event")
         ).lastrowid
 
         # Create 2 active nodes
@@ -346,14 +315,14 @@ class TestEventNodesRepositoryDirect:
             db_connection.execute(
                 """INSERT INTO event_nodes (game_gid, name, event_id, config_json, is_active)
                 VALUES (?, ?, ?, ?, 1)""",
-                (test_game_gid, f"Active Node {i}", event_id, '{"test": "data"}')
+                (test_game_gid, f"Active Node {i}", event_id, '{"test": "data"}'),
             )
 
         # Create 1 soft-deleted node
         db_connection.execute(
             """INSERT INTO event_nodes (game_gid, name, event_id, config_json, is_active)
             VALUES (?, ?, ?, ?, 0)""",
-            (test_game_gid, "Deleted Node", event_id, '{"test": "data"}')
+            (test_game_gid, "Deleted Node", event_id, '{"test": "data"}'),
         )
 
         db_connection.commit()

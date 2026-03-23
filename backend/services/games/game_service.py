@@ -97,7 +97,8 @@ class GameService:
             # 使用 LEFT JOIN 获取统计信息, 避免 N+1 查询
             # 修复前: N次查询(N = 游戏数量)
             # 修复后: 1次查询
-            games_with_stats = fetch_all_as_dict("""
+            games_with_stats = fetch_all_as_dict(
+                """
                 SELECT
                     g.id,
                     g.gid,
@@ -116,7 +117,8 @@ class GameService:
                 GROUP BY g.id, g.gid, g.name, g.ods_db, g.dwd_prefix,
                          g.icon_path, g.description, g.created_at, g.updated_at
                 ORDER BY g.id
-            """)
+            """
+            )
 
             # 转换为 GameEntity 列表
             games = [GameEntity(**game) for game in games_with_stats]
@@ -372,7 +374,8 @@ class GameService:
         # ⚡ Performance Optimization: N+1 query fixed
         # Changed from N individual queries to 1 JOIN query
         # Expected improvement: 50-100x faster
-        games = fetch_all_as_dict("""
+        games = fetch_all_as_dict(
+            """
             SELECT
                 g.id,
                 g.gid,
@@ -392,7 +395,8 @@ class GameService:
             LEFT JOIN flow_templates ft ON ft.game_gid = g.gid
             GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
             ORDER BY g.id
-        """)
+        """
+        )
 
         return games
 

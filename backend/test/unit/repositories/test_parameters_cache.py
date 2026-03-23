@@ -22,7 +22,9 @@ import pytest
 from typing import List, Dict
 
 # Add project path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+)
 
 from backend.models.repositories.parameters import ParameterRepository
 from backend.models.entities import ParameterEntity
@@ -237,22 +239,23 @@ class TestParameterRepositoryCacheTTLSpec:
         """测试get_paginated_params TTL=180s"""
         # 这个测试需要mock time或使用更短的TTL进行测试
         # 这里仅验证装饰器存在
-        assert hasattr(self.repo.get_paginated_params, '__wrapped__'), \
-            "get_paginated_params应该有@cached装饰器"
+        assert hasattr(
+            self.repo.get_paginated_params, '__wrapped__'
+        ), "get_paginated_params应该有@cached装饰器"
 
         print(f"✅ get_paginated_params TTL测试通过: 装饰器已应用")
 
     def test_get_params_by_event_id_ttl_300s(self):
         """测试get_params_by_event_id TTL=300s"""
-        assert hasattr(self.repo.get_params_by_event_id, '__wrapped__'), \
-            "get_params_by_event_id应该有@cached装饰器"
+        assert hasattr(
+            self.repo.get_params_by_event_id, '__wrapped__'
+        ), "get_params_by_event_id应该有@cached装饰器"
 
         print(f"✅ get_params_by_event_id TTL测试通过: 装饰器已应用")
 
     def test_get_common_params_ttl_3600s(self):
         """测试get_common_params TTL=3600s"""
-        assert hasattr(self.repo.get_common_params, '__wrapped__'), \
-            "get_common_params应该有@cached装饰器"
+        assert hasattr(self.repo.get_common_params, '__wrapped__'), "get_common_params应该有@cached装饰器"
 
         print(f"✅ get_common_params TTL测试通过: 装饰器已应用")
 

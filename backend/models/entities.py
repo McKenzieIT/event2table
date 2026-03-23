@@ -72,25 +72,25 @@ class GameEntity(BaseModel):
     @classmethod
     def validate_ods_db(cls, v: str) -> str:
         """
-        验证ODS数据库名称
+            验证ODS数据库名称
 
-        生产环境: 只允许 ieu_ods 或 overseas_ods
-    测试环境: 允许任意值 (用于测试数据创建)
+            生产环境: 只允许 ieu_ods 或 overseas_ods
+        测试环境: 允许任意值 (用于测试数据创建)
 
-        Args:
-            v: ODS数据库名称
+            Args:
+                v: ODS数据库名称
 
-        Returns:
-            验证后的数据库名称
+            Returns:
+                验证后的数据库名称
 
-        Raises:
-            ValueError: 生产环境下使用无效的数据库名称
+            Raises:
+                ValueError: 生产环境下使用无效的数据库名称
         """
         # 检查是否在测试环境 (仅当明确设置FLASK_ENV=testing时)
         # 注意: 不自动检测PYTEST_CURRENT_TEST,以允许测试验证功能
         is_testing = (
-            os.environ.get("FLASK_ENV", "").lower() == "testing" or
-            os.environ.get("ENVIRONMENT", "").lower() == "test"
+            os.environ.get("FLASK_ENV", "").lower() == "testing"
+            or os.environ.get("ENVIRONMENT", "").lower() == "test"
         )
 
         # 测试环境: 允许任意值
@@ -311,9 +311,7 @@ class ParameterEntity(BaseModel):
     event_id: int = Field(..., gt=0, description="事件ID")
     game_gid: int = Field(..., ge=0, description="游戏GID")
     name: str = Field(..., min_length=1, max_length=100, description="参数名称")
-    param_type: Literal["base", "param", "common", "calculate"] = Field(
-        "base", description="参数类型"
-    )
+    param_type: Literal["base", "param", "common", "calculate"] = Field("base", description="参数类型")
     json_path: Optional[str] = Field(None, description="JSON提取路径 (如 $.zoneId)")
     hive_type: str = Field("STRING", description="Hive数据类型")
     description: Optional[str] = Field(None, description="参数描述")
@@ -401,9 +399,7 @@ class CommonParameterEntity(BaseModel):
     # 业务字段
     game_gid: int = Field(..., ge=0, description="游戏GID")
     name: str = Field(..., min_length=1, max_length=100, description="参数名称")
-    param_type: Literal["base", "param", "calculate"] = Field(
-        "param", description="参数类型"
-    )
+    param_type: Literal["base", "param", "calculate"] = Field("param", description="参数类型")
     json_path: Optional[str] = Field(None, description="JSON提取路径")
     hive_type: str = Field("STRING", description="Hive数据类型")
     description: Optional[str] = Field(None, description="参数描述")
@@ -473,7 +469,9 @@ class FieldBuilderConfigEntity(BaseModel):
     # 业务字段
     name: str = Field(..., min_length=1, max_length=200, description="配置名称")
     display_name: str = Field(..., min_length=1, max_length=200, description="显示名称")
-    output_table: str = Field(..., alias="view_name", min_length=1, max_length=200, description="输出表/视图名称")
+    output_table: str = Field(
+        ..., alias="view_name", min_length=1, max_length=200, description="输出表/视图名称"
+    )
 
     # 配置数据 (JSON格式)
     source_events: Optional[str] = Field(None, description="源事件列表(JSON)")
@@ -529,18 +527,15 @@ class FieldBuilderConfigEntity(BaseModel):
                 "view_name": "v_dwd_custom_view",
                 "output_table": "v_dwd_custom_view",
                 "field_mapping_v2": {
-                    "view_config": {
-                        "game_gid": 10000147,
-                        "date_var": "${bizdate}"
-                    },
+                    "view_config": {"game_gid": 10000147, "date_var": "${bizdate}"},
                     "base_fields": [
                         {
                             "event_id": 1,
                             "event_name": "login",
                             "field_name": "role_id",
-                            "alias": "role_id"
+                            "alias": "role_id",
                         }
-                    ]
+                    ],
                 },
                 "source_events": "[1, 2, 3]",
                 "created_at": "2024-01-01T00:00:00",
@@ -615,14 +610,8 @@ class FlowEntity(BaseModel):
     name: Optional[str] = Field(None, max_length=200, description="流程名称别名")
 
     # JSON字段 - 自动序列化/反序列化
-    flow_graph: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="流程图结构（节点和边）"
-    )
-    variables: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="流程变量"
-    )
+    flow_graph: Dict[str, Any] = Field(default_factory=dict, description="流程图结构（节点和边）")
+    variables: Dict[str, Any] = Field(default_factory=dict, description="流程变量")
 
     # 关联
     game_gid: Optional[int] = Field(None, description="关联游戏GID")
@@ -650,13 +639,14 @@ class FlowEntity(BaseModel):
     def deserialize_json_fields(cls, v):
         """从数据库读取时反序列化JSON字段"""
         from backend.core.utils.json_helpers import deserialize_json_field
+
         return deserialize_json_field(v)
 
     model_config = ConfigDict(
         from_attributes=True,
         populate_by_name=True,
         # exclude为None的字段
-        exclude_none=False
+        exclude_none=False,
     )
 
 
@@ -707,6 +697,7 @@ class JoinConfigEntity(BaseModel):
     def sanitize_name(cls, v: str) -> str:
         """防止XSS攻击"""
         import html
+
         if v:
             return html.escape(v.strip())
         return v
@@ -716,6 +707,7 @@ class JoinConfigEntity(BaseModel):
     def deserialize_list_fields(cls, v):
         """从数据库读取时反序列化list字段"""
         from backend.core.utils.json_helpers import deserialize_json_field
+
         return deserialize_json_field(v)
 
     @field_validator('join_config', 'where_conditions', 'field_mappings', mode='before')
@@ -723,13 +715,10 @@ class JoinConfigEntity(BaseModel):
     def deserialize_dict_fields(cls, v):
         """从数据库读取时反序列化dict字段"""
         from backend.core.utils.json_helpers import deserialize_json_field
+
         return deserialize_json_field(v)
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True,
-        exclude_none=False
-    )
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, exclude_none=False)
 
 
 # ============================================================================
@@ -780,6 +769,7 @@ class HQLHistoryEntity(BaseModel):
     def sanitize_name(cls, v: str) -> str:
         """防止XSS攻击"""
         import html
+
         if v:
             return html.escape(v.strip())
         return v
@@ -789,6 +779,7 @@ class HQLHistoryEntity(BaseModel):
     def deserialize_json_list(cls, v):
         """从数据库读取时反序列化JSON列表"""
         from backend.core.utils.json_helpers import deserialize_json_field
+
         return deserialize_json_field(v)
 
     @field_validator('metadata_json', mode='before')
@@ -796,12 +787,10 @@ class HQLHistoryEntity(BaseModel):
     def deserialize_json_dict(cls, v):
         """从数据库读取时反序列化JSON字典"""
         from backend.core.utils.json_helpers import deserialize_json_field
+
         return deserialize_json_field(v)
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True
-    )
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 # ============================================================================
@@ -842,14 +831,12 @@ class EventCategoryEntity(BaseModel):
     def sanitize_name(cls, v: str) -> str:
         """防止XSS攻击"""
         import html
+
         if v:
             return html.escape(v.strip())
         return v
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True
-    )
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 # ============================================================================
@@ -889,6 +876,7 @@ class EventNodeEntity(BaseModel):
     def sanitize_name(cls, v: str) -> str:
         """防止XSS攻击"""
         import html
+
         return html.escape(v.strip())
 
     @field_validator('config_json', mode='before')
@@ -896,9 +884,7 @@ class EventNodeEntity(BaseModel):
     def deserialize_config(cls, v):
         """从数据库读取时反序列化配置"""
         from backend.core.utils.json_helpers import deserialize_json_field
+
         return deserialize_json_field(v)
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True
-    )
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)

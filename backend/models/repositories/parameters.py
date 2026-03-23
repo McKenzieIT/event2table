@@ -1571,9 +1571,7 @@ class ParameterRepository(GenericRepository):
     # ========== 新增方法: 修复测试失败 (2026-03-21) ==========
 
     @cached(ttl=300)  # Cache for 5 minutes
-    def get_paginated_params(
-        self, page: int = 1, per_page: int = 50
-    ) -> Dict[str, Any]:
+    def get_paginated_params(self, page: int = 1, per_page: int = 50) -> Dict[str, Any]:
         """
         获取分页参数列表
 

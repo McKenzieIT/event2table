@@ -40,7 +40,7 @@ class SecureHasher:
     """
     安全哈希计算器
 
-    提供统一的哈希计算接口, 使用强加密算法（SHA-256等）. 
+    提供统一的哈希计算接口, 使用强加密算法（SHA-256等）.
 
     支持的算法:
     - sha256: 默认, 安全且性能好
@@ -87,7 +87,7 @@ class SecureHasher:
         """
         计算Python对象的安全哈希值
 
-        对象会先序列化为JSON字符串, 再计算哈希值. 
+        对象会先序列化为JSON字符串, 再计算哈希值.
 
         Args:
             obj: Python对象（dict, list, tuple等）
@@ -201,7 +201,7 @@ def compute_cache_key(obj: Any, algorithm: str = "sha256") -> str:
     """
     计算缓存键的安全哈希值（专用函数）
 
-    用于缓存系统, 确保相同对象产生相同的哈希值. 
+    用于缓存系统, 确保相同对象产生相同的哈希值.
 
     Args:
         obj: 要计算哈希的对象

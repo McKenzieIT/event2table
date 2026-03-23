@@ -28,6 +28,7 @@ event_node_builder_bp = Blueprint("event_node_builder", __name__, url_prefix="/e
 event_node_service = EventNodeService()
 game_service = GameService()
 
+
 def validate_game_exists(game_gid: int) -> bool:
     """
     验证游戏是否存在 (ERS架构)
@@ -36,6 +37,7 @@ def validate_game_exists(game_gid: int) -> bool:
     """
     game = game_service.get_game_by_gid(game_gid)
     return game is not None
+
 
 @event_node_builder_bp.route("/api/preview-hql", methods=["POST"])
 def preview_hql():
@@ -120,6 +122,7 @@ def preview_hql():
         logger.error(f"Error generating HQL preview: {e}", exc_info=True)
         return json_error_response(f"Failed to generate HQL preview: {str(e)}", status_code=500)
 
+
 @event_node_builder_bp.route("/api/params", methods=["GET"])
 def get_event_params():
     """
@@ -167,6 +170,7 @@ def get_event_params():
     except Exception as e:
         logger.error(f"Error fetching event params: {e}")
         return json_error_response(f"Failed to fetch event params: {str(e)}", status_code=500)
+
 
 @event_node_builder_bp.route("/api/save", methods=["POST"])
 @invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is created
@@ -237,9 +241,7 @@ def save_config():
                 logger.error(
                     f"[SAVE_CONFIG] CRITICAL: Node {created_node.id} not found in DB after creation!"
                 )
-                return json_error_response(
-                    "Node creation verification failed", status_code=500
-                )
+                return json_error_response("Node creation verification failed", status_code=500)
 
             logger.debug(
                 f"[SAVE_CONFIG] Verification passed: node_id={created_node.id} exists in DB"
@@ -273,6 +275,7 @@ def save_config():
         # ✅ 新增: 更详细的异常日志
         logger.error(f"[SAVE_CONFIG] Unexpected error: {str(e)}", exc_info=True)
         return json_error_response(f"Failed to save config: {str(e)}", status_code=500)
+
 
 @event_node_builder_bp.route("/api/update", methods=["POST"])
 @invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is updated
@@ -329,6 +332,7 @@ def update_config():
         logger.error(f"Error updating config: {e}", exc_info=True)
         return json_error_response(f"Failed to update config: {str(e)}", status_code=500)
 
+
 @event_node_builder_bp.route("/api/load/<int:config_id>", methods=["GET"])
 def load_config(config_id):
     """
@@ -356,6 +360,7 @@ def load_config(config_id):
     except Exception as e:
         logger.error(f"Error loading config: {e}", exc_info=True)
         return json_error_response(f"Failed to load config: {str(e)}", status_code=500)
+
 
 @event_node_builder_bp.route("/api/list", methods=["GET"])
 def list_configs():
@@ -402,6 +407,7 @@ def list_configs():
         logger.error(f"Error fetching config list: {e}", exc_info=True)
         return json_error_response(f"Failed to fetch config list: {str(e)}", status_code=500)
 
+
 @event_node_builder_bp.route("/api/delete/<int:config_id>", methods=["DELETE"])
 @invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is deleted
 def delete_config(config_id):
@@ -422,6 +428,7 @@ def delete_config(config_id):
     except Exception as e:
         logger.error(f"Error deleting config: {e}", exc_info=True)
         return json_error_response(f"Failed to delete config: {str(e)}", status_code=500)
+
 
 @event_node_builder_bp.route("/api/copy/<int:node_id>", methods=["POST"])
 @invalidate_cache("event_nodes:stats:*")  # Explicitly invalidate stats cache when node is copied
@@ -449,10 +456,12 @@ def copy_node(node_id):
         logger.error(f"Error copying node: {e}", exc_info=True)
         return json_error_response(f"Failed to copy node: {str(e)}", status_code=500)
 
+
 # ============================================
 # Event Nodes Search & Stats Endpoints
 # Added 2026-02-15 to support EventNodes.tsx frontend
 # ============================================
+
 
 @event_node_builder_bp.route("/api/search", methods=["GET"])
 def search_event_nodes():
@@ -520,6 +529,7 @@ def search_event_nodes():
     except Exception as e:
         logger.error(f"Error searching event nodes: {e}")
         return json_error_response("Failed to search event nodes", status_code=500)
+
 
 @event_node_builder_bp.route("/api/stats", methods=["GET"])
 @cached(ttl=300, key_prefix="event_nodes:stats")  # Cache for 5 minutes (reduced from 30 min)

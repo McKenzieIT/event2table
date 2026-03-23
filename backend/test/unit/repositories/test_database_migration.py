@@ -210,7 +210,8 @@ class TestMigrationClasses:
         # 首先创建旧的parameters表
         conn = sqlite3.connect(temp_db)
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS parameters (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_id INTEGER NOT NULL,
@@ -220,7 +221,8 @@ class TestMigrationClasses:
                 param_description TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
         conn.commit()
         conn.close()
 
@@ -493,7 +495,8 @@ def temp_db():
     cursor = conn.cursor()
 
     # 创建基础表结构(模拟旧版本数据库)
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS games (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             gid INTEGER UNIQUE NOT NULL,
@@ -501,26 +504,32 @@ def temp_db():
             ods_db TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS log_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_gid INTEGER NOT NULL,
             event_name TEXT NOT NULL,
             FOREIGN KEY (game_gid) REFERENCES games(gid)
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS event_categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE
         )
-    """)
+    """
+    )
 
     # 为迁移5创建hql_statements表
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS hql_statements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_gid INTEGER NOT NULL,
@@ -530,10 +539,12 @@ def temp_db():
             FOREIGN KEY (game_gid) REFERENCES games(gid),
             FOREIGN KEY (event_id) REFERENCES log_events(id)
         )
-    """)
+    """
+    )
 
     # 为迁移9创建join_configs表
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS join_configs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -542,7 +553,8 @@ def temp_db():
             display_name TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
     conn.commit()
     conn.close()
@@ -569,7 +581,8 @@ def temp_db_with_game_id():
     cursor = conn.cursor()
 
     # 创建基础表结构(旧版本: 使用game_id外键)
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS games (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             gid INTEGER UNIQUE NOT NULL,
@@ -577,9 +590,11 @@ def temp_db_with_game_id():
             ods_db TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS log_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_id INTEGER NOT NULL,
@@ -590,17 +605,21 @@ def temp_db_with_game_id():
             target_table TEXT,
             FOREIGN KEY (game_id) REFERENCES games(id)
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS event_categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE
         )
-    """)
+    """
+    )
 
     # 为迁移5创建hql_statements表(迁移18之前需要的表)
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS hql_statements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_id INTEGER NOT NULL,
@@ -610,10 +629,12 @@ def temp_db_with_game_id():
             FOREIGN KEY (game_id) REFERENCES games(id),
             FOREIGN KEY (event_id) REFERENCES log_events(id)
         )
-    """)
+    """
+    )
 
     # 为迁移9创建join_configs表(迁移18之前需要的表)
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS join_configs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -622,7 +643,8 @@ def temp_db_with_game_id():
             display_name TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
     conn.commit()
     conn.close()

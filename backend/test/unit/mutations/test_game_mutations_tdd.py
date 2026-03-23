@@ -41,12 +41,7 @@ class TestGameMutationsTDD:
         # This should NOT raise 'NoneType' object has no attribute 'user'
         # Instead, it should succeed (or fail for business logic reasons, not auth)
         try:
-            result = mutation.mutate(
-                info,
-                gid=90099999,
-                name='TDD Test Game',
-                ods_db='ieu_ods'
-            )
+            result = mutation.mutate(info, gid=90099999, name='TDD Test Game', ods_db='ieu_ods')
 
             # If we get here without AttributeError, the auth fix works!
             assert result is not None, "Mutation should return a result"
@@ -79,11 +74,7 @@ class TestGameMutationsTDD:
         mutation = UpdateGame()
 
         try:
-            result = mutation.mutate(
-                info,
-                gid=90099998,
-                name='Updated Name'
-            )
+            result = mutation.mutate(info, gid=90099998, name='Updated Name')
             assert result is not None
             print(f"\n✅ SUCCESS: Update mutation no auth error!")
         except AttributeError as e:
@@ -104,11 +95,7 @@ class TestGameMutationsTDD:
         mutation = DeleteGame()
 
         try:
-            result = mutation.mutate(
-                info,
-                gid=90099997,
-                confirm=True
-            )
+            result = mutation.mutate(info, gid=90099997, confirm=True)
             assert result is not None
             print(f"\n✅ SUCCESS: Delete mutation no auth error!")
         except AttributeError as e:

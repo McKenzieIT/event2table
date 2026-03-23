@@ -26,17 +26,20 @@ class TestJoinConfigsGameGidMigration:
             cursor = conn.cursor()
 
             # 创建基础表
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE games (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     gid INTEGER UNIQUE NOT NULL,
                     name TEXT NOT NULL,
                     ods_db TEXT
                 )
-            """)
+            """
+            )
 
             # 创建使用game_id的join_configs表(旧版本)
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE join_configs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
@@ -46,7 +49,8 @@ class TestJoinConfigsGameGidMigration:
                     display_name TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
+            """
+            )
 
             # 插入测试数据
             cursor.execute(
@@ -56,10 +60,12 @@ class TestJoinConfigsGameGidMigration:
                 "INSERT INTO games (gid, name, ods_db) VALUES (99999999, 'Another Game', 'test_db')"
             )
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO join_configs (name, game_id, source_events, display_name)
                 VALUES ('Test Config', 1, '[1,2]', 'Test')
-            """)
+            """
+            )
 
             conn.commit()
             conn.close()
@@ -93,17 +99,20 @@ class TestJoinConfigsGameGidMigration:
             cursor = conn.cursor()
 
             # 创建基础表
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE games (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     gid INTEGER UNIQUE NOT NULL,
                     name TEXT NOT NULL,
                     ods_db TEXT
                 )
-            """)
+            """
+            )
 
             # 创建使用game_gid的join_configs表(新版本)
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE join_configs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
@@ -113,17 +122,20 @@ class TestJoinConfigsGameGidMigration:
                     display_name TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
+            """
+            )
 
             # 插入测试数据
             cursor.execute(
                 "INSERT INTO games (gid, name, ods_db) VALUES (10000147, 'Test Game', 'ieu_ods')"
             )
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO join_configs (name, game_gid, source_events, display_name)
                 VALUES ('Test Config', 10000147, '[1,2]', 'Test')
-            """)
+            """
+            )
 
             conn.commit()
             conn.close()

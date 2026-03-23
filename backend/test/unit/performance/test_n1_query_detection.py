@@ -67,7 +67,6 @@ class TestN1QueryDetection:
             patch('backend.core.utils.converters.fetch_one_as_dict') as mock_fetch_one,
             patch('backend.core.utils.converters.fetch_all_as_dict') as mock_fetch_all,
         ):
-
             # Mock get_filtered_parameters (not used by optimized implementation, but kept for compatibility)
             mock_get_params.return_value = mock_params
 
@@ -132,7 +131,6 @@ class TestN1QueryDetection:
             patch('backend.core.utils.converters.fetch_one_as_dict') as mock_fetch_one,
             patch('backend.core.utils.converters.fetch_all_as_dict') as mock_fetch_all,
         ):
-
             mock_get_params.return_value = []
             mock_fetch_one.return_value = {'count': 10}
             mock_fetch_all.return_value = []
@@ -311,7 +309,6 @@ class TestN1QueryDetection:
             patch('backend.core.utils.converters.fetch_one_as_dict') as mock_fetch_one,
             patch('backend.core.utils.converters.fetch_all_as_dict') as mock_fetch_all,
         ):
-
             mock_get_params.return_value = mock_params
             mock_fetch_one.return_value = {'count': 10}  # 10 total events
 
@@ -400,7 +397,6 @@ class TestN1QueryDetection:
             ) as mock_get_params,
             patch('backend.core.utils.converters.fetch_one_as_dict') as mock_fetch_one,
         ):
-
             mock_get_params.return_value = []
             mock_fetch_one.return_value = {'count': 0}  # No events
 

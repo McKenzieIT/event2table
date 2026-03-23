@@ -48,17 +48,11 @@ class TestGraphQLAuthIntegration:
             }
         '''
 
-        variables = {
-            'gid': 90099999,
-            'name': 'Test Auth Game',
-            'odsDb': 'ieu_ods'
-        }
+        variables = {'gid': 90099999, 'name': 'Test Auth Game', 'odsDb': 'ieu_ods'}
 
         # Execute WITHOUT user context (development mode)
         result = schema.execute(
-            mutation,
-            variables=variables,
-            context_value=None  # No context = no user
+            mutation, variables=variables, context_value=None  # No context = no user
         )
 
         # BEFORE FIX: This should have errors
@@ -91,11 +85,7 @@ class TestGraphQLAuthIntegration:
             }
         '''
 
-        variables = {
-            'gid': 90099998,
-            'name': 'Test Game With User',
-            'odsDb': 'ieu_ods'
-        }
+        variables = {'gid': 90099998, 'name': 'Test Game With User', 'odsDb': 'ieu_ods'}
 
         # Create mock context with user
         mock_context = Mock()
@@ -104,11 +94,7 @@ class TestGraphQLAuthIntegration:
         mock_context.user = mock_user
 
         # Execute WITH mock user context
-        result = schema.execute(
-            mutation,
-            variables=variables,
-            context_value=mock_context
-        )
+        result = schema.execute(mutation, variables=variables, context_value=mock_context)
 
         print(f"\n=== GraphQL Result (With Auth) ===")
         print(f"Errors: {result.errors}")

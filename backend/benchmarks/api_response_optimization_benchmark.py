@@ -115,13 +115,13 @@ def generate_realistic_api_data(size: str = 'large') -> Dict[str, Any]:
                                     'param_id': k,
                                     'param_name': f'param_{k}',
                                     'template_name': f'template_{k}',
-                                    'description': f'Parameter description {k}' * 10
+                                    'description': f'Parameter description {k}' * 10,
                                 }
                                 for k in range(params_per_event)
-                            ]
+                            ],
                         }
                         for j in range(events_per_game)
-                    ]
+                    ],
                 }
                 for i in range(games_count)
             ]
@@ -131,8 +131,8 @@ def generate_realistic_api_data(size: str = 'large') -> Dict[str, Any]:
             'total_events': games_count * events_per_game,
             'total_params': games_count * events_per_game * params_per_event,
             'page': 1,
-            'per_page': games_count
-        }
+            'per_page': games_count,
+        },
     }
 
 
@@ -319,7 +319,9 @@ def benchmark_transmission_size(results: BenchmarkResults):
         results.add(f'Transmission Size - {name}', 'Compressed', compressed_size, 'bytes')
         results.add(f'Transmission Size - {name}', 'Reduction', reduction, '%')
 
-        print(f"   ✅ {name}: {original_size:,} → {compressed_size:,} bytes ({reduction:.1f}% reduction)")
+        print(
+            f"   ✅ {name}: {original_size:,} → {compressed_size:,} bytes ({reduction:.1f}% reduction)"
+        )
 
 
 def run_all_benchmarks():
@@ -353,6 +355,7 @@ def run_all_benchmarks():
     except Exception as e:
         print(f"\n❌ Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

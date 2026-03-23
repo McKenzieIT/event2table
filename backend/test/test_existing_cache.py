@@ -6,6 +6,7 @@ Test existing cached method
 
 import sys
 import logging
+
 sys.path.insert(0, '.')
 
 # Enable debug logging

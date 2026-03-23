@@ -24,11 +24,7 @@ class TestParameterEntityArchitecture:
     def test_parameter_entity_has_game_gid_not_game_id(self):
         """验证ParameterEntity只有game_gid字段，没有game_id"""
         entity = ParameterEntity(
-            id=1,
-            event_id=1,
-            game_gid=90000001,
-            name="zone_id",
-            param_type="param"
+            id=1, event_id=1, game_gid=90000001, name="zone_id", param_type="param"
         )
 
         # ✅ 必须有game_gid
@@ -40,12 +36,7 @@ class TestParameterEntityArchitecture:
 
     def test_common_parameter_entity_has_game_gid_not_game_id(self):
         """验证CommonParameterEntity只有game_gid字段，没有game_id"""
-        entity = CommonParameterEntity(
-            id=1,
-            game_gid=90000001,
-            name="role_id",
-            param_type="base"
-        )
+        entity = CommonParameterEntity(id=1, game_gid=90000001, name="role_id", param_type="base")
 
         # ✅ 必须有game_gid
         assert hasattr(entity, "game_gid")
@@ -71,6 +62,7 @@ class TestParameterRepositoryEntityArchitecture:
 
         # ✅ 返回类型应该是Optional[ParameterEntity] (可能为None)
         from typing import get_origin, get_args
+
         return_type = hints.get('return')
         # 检查是否是Optional[ParameterEntity] (Union[ParameterEntity, None])
         if get_origin(return_type) is Union:
@@ -85,6 +77,7 @@ class TestParameterRepositoryEntityArchitecture:
 
         # ✅ 返回类型应该是Optional[ParameterEntity]
         from typing import get_origin, get_args
+
         return_type = hints.get('return')
         if get_origin(return_type) is Union:
             args = get_args(return_type)
@@ -112,6 +105,7 @@ class TestParameterRepositoryEntityArchitecture:
 
         # ✅ 返回类型应该是Optional[ParameterEntity]
         from typing import get_origin, get_args
+
         return_type = hints.get('return')
         if get_origin(return_type) is Union:
             args = get_args(return_type)
@@ -133,6 +127,7 @@ class TestParameterServiceEntityArchitecture:
 
         # ✅ 返回类型应该是Optional[ParameterEntity]
         from typing import get_origin, get_args
+
         return_type = hints.get('return')
         if get_origin(return_type) is Union:
             args = get_args(return_type)
@@ -174,11 +169,16 @@ class TestNoGameIdViolations:
     def test_parameter_service_file_no_game_id_violations(self):
         """验证ParameterService文件中无game_id违规"""
         import subprocess
+
         result = subprocess.run(
-            ["grep", "-n", "game_id",
-             "/Users/mckenzie/Documents/event2table/backend/services/parameters/parameter_service.py"],
+            [
+                "grep",
+                "-n",
+                "game_id",
+                "/Users/mckenzie/Documents/event2table/backend/services/parameters/parameter_service.py",
+            ],
             capture_output=True,
-            text=True
+            text=True,
         )
 
         # 过滤掉注释和game_gid
@@ -195,11 +195,16 @@ class TestNoGameIdViolations:
     def test_parameter_repository_file_no_game_id_violations(self):
         """验证ParameterRepository文件中无game_id违规"""
         import subprocess
+
         result = subprocess.run(
-            ["grep", "-n", "game_id",
-             "/Users/mckenzie/Documents/event2table/backend/models/repositories/parameters.py"],
+            [
+                "grep",
+                "-n",
+                "game_id",
+                "/Users/mckenzie/Documents/event2table/backend/models/repositories/parameters.py",
+            ],
             capture_output=True,
-            text=True
+            text=True,
         )
 
         # 过滤掉注释和game_gid

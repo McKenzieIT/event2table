@@ -30,7 +30,9 @@ class TestIndexCreation:
         cursor = conn.cursor()
 
         # 获取所有索引
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='log_events'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='log_events'"
+        )
         indexes = {row[0] for row in cursor.fetchall()}
 
         # 验证必需的索引存在
@@ -38,7 +40,7 @@ class TestIndexCreation:
             'idx_log_events_game_gid',  # 已存在
             'idx_log_events_category_id',  # 已存在
             'idx_log_events_game_category',  # 已存在
-            'idx_log_events_game_gid_created_at'  # 新增
+            'idx_log_events_game_gid_created_at',  # 新增
         ]
 
         for index in required_indexes:
@@ -52,7 +54,9 @@ class TestIndexCreation:
         cursor = conn.cursor()
 
         # 获取所有索引
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='event_params'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='event_params'"
+        )
         indexes = {row[0] for row in cursor.fetchall()}
 
         # 验证必需的索引存在
@@ -74,7 +78,9 @@ class TestIndexCreation:
         cursor = conn.cursor()
 
         # 获取所有索引
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='join_configs'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='join_configs'"
+        )
         indexes = {row[0] for row in cursor.fetchall()}
 
         # 验证必需的索引存在
@@ -94,7 +100,9 @@ class TestIndexCreation:
         cursor = conn.cursor()
 
         # 获取所有索引
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='flow_templates'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='flow_templates'"
+        )
         indexes = {row[0] for row in cursor.fetchall()}
 
         # 验证必需的索引存在
@@ -138,10 +146,12 @@ class TestQueryPerformance:
 
         # 测试查询性能
         start = time.time()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT * FROM log_events
             WHERE game_gid = 10000147 AND category_id = 1
-        """)
+        """
+        )
         rows = cursor.fetchall()
         end = time.time()
 
@@ -159,13 +169,15 @@ class TestQueryPerformance:
 
         # 测试JOIN性能
         start = time.time()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT le.*, ep.id as param_id
             FROM log_events le
             LEFT JOIN event_params ep ON le.id = ep.event_id
             WHERE le.game_gid = 10000147
             LIMIT 100
-        """)
+        """
+        )
         rows = cursor.fetchall()
         end = time.time()
 
@@ -183,12 +195,14 @@ class TestQueryPerformance:
 
         # 测试分页性能
         start = time.time()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT * FROM event_params
             WHERE game_gid = 10000147
             ORDER BY id
             LIMIT 20 OFFSET 100
-        """)
+        """
+        )
         rows = cursor.fetchall()
         end = time.time()
 
@@ -206,10 +220,12 @@ class TestQueryPerformance:
 
         # 测试通用参数查询
         start = time.time()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT * FROM event_params
             WHERE game_gid = 10000147 AND is_common = 1
-        """)
+        """
+        )
         rows = cursor.fetchall()
         end = time.time()
 
@@ -230,12 +246,14 @@ class TestIndexSize:
         cursor = conn.cursor()
 
         # 获取所有索引大小
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT name, tbl_name
             FROM sqlite_master
             WHERE type='index'
             AND name NOT LIKE 'sqlite_%'
-        """)
+        """
+        )
         indexes = cursor.fetchall()
 
         total_size = 0
@@ -285,16 +303,17 @@ class TestQueryPlans:
         cursor = conn.cursor()
 
         # 检查查询计划
-        cursor.execute("""
+        cursor.execute(
+            """
             EXPLAIN QUERY PLAN
             SELECT * FROM log_events WHERE game_gid = 10000147
-        """)
+        """
+        )
         plan = cursor.fetchall()
 
         # 验证使用了索引
         plan_str = str(plan)
-        assert 'SEARCH' in plan_str or 'INDEX' in plan_str, \
-            f"Query does not use index: {plan}"
+        assert 'SEARCH' in plan_str or 'INDEX' in plan_str, f"Query does not use index: {plan}"
 
         conn.close()
 
@@ -304,19 +323,20 @@ class TestQueryPlans:
         cursor = conn.cursor()
 
         # 检查JOIN查询计划
-        cursor.execute("""
+        cursor.execute(
+            """
             EXPLAIN QUERY PLAN
             SELECT le.*, ep.id as param_id
             FROM log_events le
             LEFT JOIN event_params ep ON le.id = ep.event_id
             WHERE le.game_gid = 10000147
-        """)
+        """
+        )
         plan = cursor.fetchall()
 
         # 验证使用了索引
         plan_str = str(plan)
-        assert 'SEARCH' in plan_str or 'INDEX' in plan_str, \
-            f"JOIN does not use index: {plan}"
+        assert 'SEARCH' in plan_str or 'INDEX' in plan_str, f"JOIN does not use index: {plan}"
 
         conn.close()
 

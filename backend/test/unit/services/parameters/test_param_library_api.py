@@ -21,9 +21,9 @@ def client(app):
     """
     创建测试客户端
 
-    注意: 此 fixture 现在依赖 conftest.py 中的 app fixture, 
-    该 fixture 已经正确处理了测试数据库的初始化和迁移. 
-    不应该在这里删除或重建数据库, 以避免破坏其他测试的数据库状态. 
+    注意: 此 fixture 现在依赖 conftest.py 中的 app fixture,
+    该 fixture 已经正确处理了测试数据库的初始化和迁移.
+    不应该在这里删除或重建数据库, 以避免破坏其他测试的数据库状态.
     """
     # 确保使用测试环境
     os.environ['FLASK_ENV'] = 'testing'
@@ -45,10 +45,12 @@ def test_check_param_library_existing_parameter(client):
     from backend.core.utils import execute_write
 
     # 创建参数库参数
-    execute_write("""
+    execute_write(
+        """
         INSERT INTO param_library (param_name, param_name_cn, template_id, category)
         VALUES ('accountId', '账户ID', 1, 'common')
-    """)
+    """
+    )
 
     response = client.get('/api/param-library/check?param_name=accountId&template_id=1')
 
@@ -187,14 +189,18 @@ def test_batch_check_param_library(client):
     from backend.core.utils import execute_write
 
     # 创建参数库参数
-    execute_write("""
+    execute_write(
+        """
         INSERT INTO param_library (param_name, param_name_cn, template_id, category)
         VALUES ('accountId', '账户ID', 1, 'common')
-    """)
-    execute_write("""
+    """
+    )
+    execute_write(
+        """
         INSERT INTO param_library (param_name, param_name_cn, template_id, category)
         VALUES ('roleId', '角色ID', 2, 'common')
-    """)
+    """
+    )
 
     response = client.post(
         '/api/param-library/batch-check',

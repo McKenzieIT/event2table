@@ -77,10 +77,12 @@ class ParametersPerformanceTest:
             game = cursor.fetchone()
 
             if not game:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO games (name, gid, description, status)
                     VALUES ('Test Game', '10000147', 'Performance Test Game', 'active')
-                """)
+                """
+                )
                 game_id = cursor.lastrowid
                 print(f"✅ Created test game: id={game_id}")
             else:

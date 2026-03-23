@@ -5,6 +5,7 @@ Simple cache verification test
 """
 
 import sys
+
 sys.path.insert(0, '.')
 
 from backend.models.repositories.parameters import ParameterRepository

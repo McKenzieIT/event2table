@@ -40,7 +40,7 @@ class TestBackendCodeDuplication:
             "uses_decorator": uses_decorator,
             "has_try_except": has_try_except,
             "has_json_success": has_json_success,
-            "has_json_error": has_json_error
+            "has_json_error": has_json_error,
         }
 
     def test_events_py_uses_decorator(self):
@@ -89,22 +89,17 @@ class TestBackendCodeDuplication:
 
     def test_import_shared_utils(self):
         """Test files import from backend.core.utils.common"""
-        files_to_check = [
-            "events.py",
-            "games.py",
-            "categories.py",
-            "parameters.py",
-            "flows.py"
-        ]
+        files_to_check = ["events.py", "games.py", "categories.py", "parameters.py", "flows.py"]
 
         for filename in files_to_check:
             file_path = self.api_routes_dir / filename
             if file_path.exists():
                 content = file_path.read_text()
                 # Should import from shared utilities
-                assert "from backend.core.utils.common import" in content or \
-                       "from backend.core.utils import common" in content, \
-                       f"{filename} should import from backend.core.utils.common"
+                assert (
+                    "from backend.core.utils.common import" in content
+                    or "from backend.core.utils import common" in content
+                ), f"{filename} should import from backend.core.utils.common"
 
 
 class TestBackendDateFormatting:
@@ -120,13 +115,7 @@ class TestBackendDateFormatting:
         # Allow some strftime usage but it should be minimal
         # Most date formatting should use format_datetime() from common.py
 
-        files_to_check = [
-            "events.py",
-            "games.py",
-            "categories.py",
-            "parameters.py",
-            "flows.py"
-        ]
+        files_to_check = ["events.py", "games.py", "categories.py", "parameters.py", "flows.py"]
 
         for filename in files_to_check:
             file_path = self.api_routes_dir / filename
@@ -136,8 +125,9 @@ class TestBackendDateFormatting:
 
                 # Should use format_datetime() instead of manual strftime
                 # Allow some strftime for special cases
-                assert strftime_count <= 2, \
-                    f"{filename} should use format_datetime() from common.py instead of manual strftime"
+                assert (
+                    strftime_count <= 2
+                ), f"{filename} should use format_datetime() from common.py instead of manual strftime"
 
 
 class TestBackendStringSanitization:
@@ -150,13 +140,7 @@ class TestBackendStringSanitization:
 
     def test_no_manual_html_escape_in_routes(self):
         """Test routes don't manually escape HTML"""
-        files_to_check = [
-            "events.py",
-            "games.py",
-            "categories.py",
-            "parameters.py",
-            "flows.py"
-        ]
+        files_to_check = ["events.py", "games.py", "categories.py", "parameters.py", "flows.py"]
 
         for filename in files_to_check:
             file_path = self.api_routes_dir / filename
@@ -165,8 +149,9 @@ class TestBackendStringSanitization:
 
                 # Should not manually import and use html.escape
                 # Should use sanitize_string() from common.py instead
-                assert not ("import html" in content and "html.escape" in content), \
-                    f"{filename} should use sanitize_string() from common.py instead of html.escape"
+                assert not (
+                    "import html" in content and "html.escape" in content
+                ), f"{filename} should use sanitize_string() from common.py instead of html.escape"
 
 
 class TestBackendPagination:
@@ -179,12 +164,7 @@ class TestBackendPagination:
 
     def test_uses_get_pagination_params(self):
         """Test routes use get_pagination_params() from common.py"""
-        files_to_check = [
-            "events.py",
-            "games.py",
-            "categories.py",
-            "parameters.py"
-        ]
+        files_to_check = ["events.py", "games.py", "categories.py", "parameters.py"]
 
         for filename in files_to_check:
             file_path = self.api_routes_dir / filename
@@ -193,14 +173,14 @@ class TestBackendPagination:
 
                 # Check for manual pagination calculation
                 has_manual_pagination = (
-                    "request.args.get('page'" in content or
-                    "request.args.get(\"page\"" in content
+                    "request.args.get('page'" in content or "request.args.get(\"page\"" in content
                 )
 
                 if has_manual_pagination:
                     # Should use get_pagination_params()
-                    assert "get_pagination_params" in content, \
-                        f"{filename} should use get_pagination_params() from common.py for pagination"
+                    assert (
+                        "get_pagination_params" in content
+                    ), f"{filename} should use get_pagination_params() from common.py for pagination"
 
 
 if __name__ == "__main__":

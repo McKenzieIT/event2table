@@ -223,9 +223,7 @@ class JoinConfigService:
         # 失效缓存
         if deleted_count > 0:
             self.invalidator.invalidate_pattern("join_configs.list")
-            logger.info(
-                f"批量删除Join Config成功,已失效缓存: game_gid={game_gid}, count={deleted_count}"
-            )
+            logger.info(f"批量删除Join Config成功,已失效缓存: game_gid={game_gid}, count={deleted_count}")
 
         return deleted_count
 

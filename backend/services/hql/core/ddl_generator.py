@@ -14,7 +14,7 @@ class DDLGenerator:
     """
     DDL生成器
 
-    生成Hive DDL语句, 支持: 
+    生成Hive DDL语句, 支持:
     - CREATE TABLE (with ORC storage and partitioning)
     - ALTER TABLE (ADD/REPLACE columns)
 

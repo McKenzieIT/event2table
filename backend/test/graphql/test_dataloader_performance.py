@@ -28,8 +28,22 @@ class TestGameLoader:
         """Test that multiple game requests are batched into single query"""
         # Mock database response
         mock_fetch.return_value = [
-            {'id': 1, 'gid': 10000147, 'name': 'Game1', 'ods_db': 'ieu_ods', 'event_count': 5, 'param_count': 10},
-            {'id': 2, 'gid': 10000148, 'name': 'Game2', 'ods_db': 'ieu_ods', 'event_count': 3, 'param_count': 7},
+            {
+                'id': 1,
+                'gid': 10000147,
+                'name': 'Game1',
+                'ods_db': 'ieu_ods',
+                'event_count': 5,
+                'param_count': 10,
+            },
+            {
+                'id': 2,
+                'gid': 10000148,
+                'name': 'Game2',
+                'ods_db': 'ieu_ods',
+                'event_count': 3,
+                'param_count': 7,
+            },
         ]
 
         # Load multiple games
@@ -158,9 +172,7 @@ class TestDataLoaderIntegration:
     @patch('backend.gql_api.dataloaders.game_loader.fetch_all_as_dict')
     @patch('backend.core.utils.fetch_all_as_dict')
     @patch('backend.core.utils.fetch_all_as_dict')
-    def test_prevent_n_plus_one_queries(
-        self, mock_params, mock_events, mock_games
-    ):
+    def test_prevent_n_plus_one_queries(self, mock_params, mock_events, mock_games):
         """
         Test that nested Game -> Events -> Parameters query
         uses batch loading instead of N+1 queries
@@ -215,8 +227,7 @@ class TestDataLoaderPerformance:
         """Test that loading 100 games still uses single query"""
         # Mock 100 games
         mock_fetch.return_value = [
-            {'id': i, 'gid': 10000000 + i, 'name': f'Game{i}'}
-            for i in range(100)
+            {'id': i, 'gid': 10000000 + i, 'name': f'Game{i}'} for i in range(100)
         ]
 
         loader = GameLoader()
@@ -246,8 +257,7 @@ class TestDataLoaderPerformance:
         # Setup
         num_games = 100
         mock_games.return_value = [
-            {'id': i, 'gid': 10000000 + i, 'name': f'Game{i}'}
-            for i in range(num_games)
+            {'id': i, 'gid': 10000000 + i, 'name': f'Game{i}'} for i in range(num_games)
         ]
         mock_events.return_value = [
             {'id': i, 'game_gid': 10000000 + (i % 10), 'event_name': f'event{i}'}

@@ -166,7 +166,7 @@ class FlowService(BaseService):
             }
         """
         from backend.core.utils import fetch_one_as_dict
-        
+
         # 统计flow关联的事件节点数量作为views
         node_count_query = '''
             SELECT COUNT(*) as count
@@ -175,11 +175,11 @@ class FlowService(BaseService):
         '''
         node_count_result = fetch_one_as_dict(node_count_query, (flow_id,))
         views = node_count_result['count'] if node_count_result else 0
-        
+
         # 获取flow的updated_at作为last_used
         flow = self.flow_repo.find_by_id(flow_id)
         last_used = flow.updated_at if flow else None
-        
+
         return {'views': views, 'last_used': last_used}
 
     def _get_last_modified(self, flow_id: int) -> Optional[datetime]:

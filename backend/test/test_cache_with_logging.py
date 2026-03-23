@@ -6,6 +6,7 @@ Cache test with logging enabled
 
 import sys
 import logging
+
 sys.path.insert(0, '.')
 
 # Enable debug logging for cache

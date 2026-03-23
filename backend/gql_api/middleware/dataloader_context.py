@@ -61,8 +61,7 @@ class DataLoaderContextMiddleware:
                 'parameter': ParameterLoader(),
             }
             logger.debug(
-                f"Injected DataLoaders into context: "
-                f"{list(info.context.dataloaders.keys())}"
+                f"Injected DataLoaders into context: " f"{list(info.context.dataloaders.keys())}"
             )
 
         # Continue with resolver chain
@@ -93,18 +92,14 @@ def get_dataloader(info: Any, loader_name: str) -> DataLoader:
 
     if 'dataloaders' not in info.context:
         raise ValueError(
-            "DataLoaders not found in context. "
-            "Ensure DataLoaderContextMiddleware is installed."
+            "DataLoaders not found in context. " "Ensure DataLoaderContextMiddleware is installed."
         )
 
     loaders = info.context.dataloaders
 
     if loader_name not in loaders:
         available = ', '.join(loaders.keys())
-        raise ValueError(
-            f"Unknown DataLoader: '{loader_name}'. "
-            f"Available loaders: {available}"
-        )
+        raise ValueError(f"Unknown DataLoader: '{loader_name}'. " f"Available loaders: {available}")
 
     return loaders[loader_name]
 

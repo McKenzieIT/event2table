@@ -24,7 +24,7 @@ class EventImporter:
     """
     事件导入器 (重构版 - 使用EventService)
 
-    职责: 
+    职责:
     - 批量导入事件的业务流程编排
     - 使用EventService处理单个事件创建
     - 使用CategoryRepository处理分类管理

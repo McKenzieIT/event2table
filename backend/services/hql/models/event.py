@@ -93,7 +93,7 @@ class Field:
     """
     抽象字段模型
 
-    支持4种字段类型: 
+    支持4种字段类型:
     - base: 直接从表查询的基础字段（role_id, account_id等）
     - param: 从JSON params字段提取的参数（get_json_object(params, '$.zone_id')）
     - custom: 自定义HQL表达式

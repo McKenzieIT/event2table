@@ -54,7 +54,9 @@ class ParameterManagementLoader(DataLoader):
                 JOIN events e ON ep.event_id = e.id
                 WHERE ep.event_id IN ({})
                 ORDER BY ep.event_id, ep.param_name
-            """.format(','.join('?' * len(event_ids)))
+            """.format(
+                ','.join('?' * len(event_ids))
+            )
 
             all_params = repo.fetch_all(query, event_ids)
 
@@ -111,7 +113,9 @@ class CommonParametersLoader(DataLoader):
                 GROUP BY ep.param_name, ep.param_type, ep.param_description
                 HAVING event_count > 1
                 ORDER BY event_count DESC
-            """.format(','.join('?' * len(game_gids)))
+            """.format(
+                ','.join('?' * len(game_gids))
+            )
 
             all_common_params = repo.fetch_all(query, game_gids)
 

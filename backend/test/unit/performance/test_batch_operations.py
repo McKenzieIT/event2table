@@ -32,17 +32,17 @@ class TestBatchCreatePerformance:
         """
         P0: 测试批量创建使用真正的批量INSERT
 
-        当前实现（错误）: 
+        当前实现（错误）:
         - for game_input in games:
             game_repo.create(game_data)
 
-        期望实现（正确）: 
+        期望实现（正确）:
         - execute_many(
             "INSERT INTO games (...) VALUES (...), (...), (...)"
             [(data1), (data2), (data3)]
           )
 
-        验证: 
+        验证:
         - 应该调用execute_many
         - 数据库往返次数应该<=2（而非100次）
         - 性能应该<1秒（而非>5秒）
@@ -94,9 +94,7 @@ class TestBatchCreatePerformance:
             print(f"  预期执行时间: <1.0秒")
 
             # ✅ 验证使用批量方法
-            assert (
-                actual_calls == 1
-            ), f"批量创建应该调用create_batch一次, 当前调用次数: {actual_calls}"
+            assert actual_calls == 1, f"批量创建应该调用create_batch一次, 当前调用次数: {actual_calls}"
 
             # ====================
             # 验证2: 性能要求
@@ -113,7 +111,7 @@ class TestBatchCreatePerformance:
         """
         P0: 使用AST检测串行批量操作模式
 
-        危险模式: 
+        危险模式:
         - for game_input in games:
             game_repo.create(...)
 
@@ -210,11 +208,11 @@ class TestBatchUpdatePerformance:
         """
         P0: 测试批量更新使用CASE WHEN批量UPDATE
 
-        当前实现（错误）: 
+        当前实现（错误）:
         - for update_input in updates:
             game_repo.update(update_input.id, update_data)
 
-        期望实现（正确）: 
+        期望实现（正确）:
         - execute(
             "UPDATE games SET
                 name = CASE id WHEN 1 THEN 'A' WHEN 2 THEN 'B' END,
@@ -222,7 +220,7 @@ class TestBatchUpdatePerformance:
              WHERE id IN (1, 2, 3)"
           )
 
-        验证: 
+        验证:
         - 应该只执行1-2条UPDATE语句
         - 不应该有50次数据库往返
         - 性能应该<0.5秒
@@ -281,9 +279,7 @@ class TestBatchUpdatePerformance:
             print(f"  预期执行时间: <3.0秒 (包含mock开销)")
 
             # ⚠️ 这个断言会失败, 因为当前实现循环调用50次UPDATE
-            assert (
-                actual_calls == 1
-            ), f"批量更新应该使用CASE WHEN, 当前数据库往返次数: {actual_calls} (期望: 1)"
+            assert actual_calls == 1, f"批量更新应该使用CASE WHEN, 当前数据库往返次数: {actual_calls} (期望: 1)"
 
             # ====================
             # 验证2: 性能要求
@@ -307,16 +303,16 @@ class TestBatchDeletePerformance:
         """
         P0: 测试批量删除使用WHERE IN批量DELETE
 
-        当前实现（错误）: 
+        当前实现（错误）:
         - for game_id in ids:
             game_repo.delete(game_id)
 
-        期望实现（正确）: 
+        期望实现（正确）:
         - execute(
             "DELETE FROM games WHERE id IN (1, 2, 3, ...)"
           )
 
-        验证: 
+        验证:
         - 应该只执行1条DELETE语句
         - 不应该有50次数据库往返
         - 性能应该<0.5秒
@@ -356,9 +352,7 @@ class TestBatchDeletePerformance:
             print(f"  预期执行时间: <0.5秒")
 
             # ⚠️ 这个断言会失败, 因为当前实现循环调用50次DELETE
-            assert (
-                actual_calls == 1
-            ), f"批量删除应该使用WHERE IN, 当前数据库往返次数: {actual_calls} (期望: 1)"
+            assert actual_calls == 1, f"批量删除应该使用WHERE IN, 当前数据库往返次数: {actual_calls} (期望: 1)"
 
             # ====================
             # 验证2: 性能要求
@@ -379,7 +373,7 @@ class TestBatchOperationsTransaction:
         """
         P0: 测试批量创建使用事务
 
-        验证: 
+        验证:
         - 应该使用事务包裹批量操作
         - 失败时应该回滚所有操作
         - 不应该部分成功
@@ -461,17 +455,17 @@ class TestBatchOperationsRollback:
         """
         P0: 测试批量创建失败时回滚所有操作
 
-        场景: 
+        场景:
         - 批量创建100个游戏
         - 第50个游戏失败（如: GID重复）
         - 期望: 所有99个游戏都应该回滚
 
-        当前实现: 
+        当前实现:
         - 可能会创建前49个游戏
         - 然后在第50个失败
         - 结果: 部分成功（不一致状态）
 
-        期望实现: 
+        期望实现:
         - 使用事务
         - 任何失败都回滚所有操作
         - 结果: 全部失败（一致状态）

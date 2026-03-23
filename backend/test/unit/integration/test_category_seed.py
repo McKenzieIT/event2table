@@ -55,10 +55,12 @@ def test_event_creation_with_category():
 
         if not game:
             # Create test game
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO games (gid, name, ods_db)
                 VALUES (10000147, 'Test Game', 'test_ods')
-            """)
+            """
+            )
             conn.commit()
             game = cursor.execute("SELECT * FROM games WHERE gid = 10000147").fetchone()
             print(f"   Created test game: ID {game['id']}")

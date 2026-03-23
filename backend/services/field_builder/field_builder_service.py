@@ -275,7 +275,7 @@ class FieldBuilderService:
         """
         批量获取Field Builder配置 (避免N+1查询)
 
-        使用IN clause批量查询, 避免循环查询导致的N+1问题. 
+        使用IN clause批量查询, 避免循环查询导致的N+1问题.
 
         Args:
             config_ids: 配置ID列表

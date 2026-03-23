@@ -18,7 +18,8 @@ def migrate_hql_history(db_path: str):
     cursor = conn.cursor()
 
     # 创建hql_history表
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS hql_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL DEFAULT 0,
@@ -32,18 +33,23 @@ def migrate_hql_history(db_path: str):
             created_at TIMESTAMP NOT NULL DEFAULT (datetime('now', 'localtime')),
             metadata_json TEXT
         )
-    """)
+    """
+    )
 
     # 创建索引以提高查询性能
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE INDEX IF NOT EXISTS idx_hql_history_user_created
         ON hql_history(user_id, created_at DESC)
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE INDEX IF NOT EXISTS idx_hql_history_session_created
         ON hql_history(session_id, created_at DESC)
-    """)
+    """
+    )
 
     conn.commit()
     conn.close()

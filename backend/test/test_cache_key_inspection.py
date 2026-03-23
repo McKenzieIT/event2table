@@ -5,6 +5,7 @@ Inspect cache keys directly
 """
 
 import sys
+
 sys.path.insert(0, '.')
 
 from unittest.mock import patch
@@ -14,13 +15,16 @@ from backend.models.repositories.parameters import ParameterRepository
 original_get = None
 cache_keys_seen = []
 
+
 def mock_get(key):
     cache_keys_seen.append(key)
     print(f"   Cache GET: {key}")
     return original_get(key)
 
+
 # Monkey-patch cache
 from backend.core.cache import decorators
+
 original_get = decorators._cache.get
 decorators._cache.get = mock_get
 
@@ -28,12 +32,14 @@ decorators._cache.get = mock_get
 repo = ParameterRepository()
 
 # Mock data
-mock_param_data = [{
-    'id': 1,
-    'event_id': 100,
-    'param_name': 'test_param',
-    'game_gid': 90000001,
-}]
+mock_param_data = [
+    {
+        'id': 1,
+        'event_id': 100,
+        'param_name': 'test_param',
+        'game_gid': 90000001,
+    }
+]
 
 print("=" * 60)
 print("Cache Key Inspection")

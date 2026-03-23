@@ -10,6 +10,7 @@ This script verifies:
 """
 
 import sys
+
 sys.path.insert(0, '..')
 import inspect
 from backend.models.repositories.events import EventRepository
@@ -137,7 +138,7 @@ def verify_complete_implementation():
     for i, line in enumerate(service_source.split('\n'), 1):
         if line.strip() == 'pass':
             issues.append(f"❌ EventService line {i}: Found 'pass' statement")
-        elif 'TODO' in line and 'def ' in '\n'.join(service_source.split('\n')[max(0, i-3):i]):
+        elif 'TODO' in line and 'def ' in '\n'.join(service_source.split('\n')[max(0, i - 3) : i]):
             issues.append(f"⚠️  EventService line {i}: Found TODO placeholder")
 
     if not issues:

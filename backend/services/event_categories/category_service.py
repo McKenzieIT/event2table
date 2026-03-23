@@ -193,7 +193,7 @@ class CategoryService:
             category_ids: 类别ID列表
 
         Returns:
-            包含删除结果的字典: 
+            包含删除结果的字典:
             - deleted_count: 成功删除的数量
             - failed_ids: 删除失败的ID列表
             - failed_reasons: 失败原因字典 {id: reason}
@@ -226,8 +226,7 @@ class CategoryService:
                 self.invalidator.invalidate_pattern(f"categories.detail:{category_id}")
 
             logger.info(
-                f"批量删除类别完成: 成功={result['deleted_count']}, "
-                f"失败={len(result['failed_ids'])}"
+                f"批量删除类别完成: 成功={result['deleted_count']}, " f"失败={len(result['failed_ids'])}"
             )
 
         # 生成消息
@@ -240,9 +239,9 @@ class CategoryService:
         elif deleted == 0:
             result["message"] = f"Failed to delete any categories ({failed} errors)"
         else:
-            result["message"] = (
-                f"Successfully deleted {deleted} out of {total} categories ({failed} failed)"
-            )
+            result[
+                "message"
+            ] = f"Successfully deleted {deleted} out of {total} categories ({failed} failed)"
 
         return result
 

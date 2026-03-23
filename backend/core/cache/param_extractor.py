@@ -52,7 +52,9 @@ def _extract_cache_params(func: Callable, args: tuple, kwargs: dict) -> Tuple[tu
     if hasattr(func, '__self__'):
         # This is a bound method, skip the first arg (the instance)
         cleaned_args = args[1:] if len(args) > 1 else ()
-        logger.debug(f"Skip bound method instance: original args={len(args)}, cleaned={len(cleaned_args)}")
+        logger.debug(
+            f"Skip bound method instance: original args={len(args)}, cleaned={len(cleaned_args)}"
+        )
     elif params and params[0].name == 'self':
         # This is an unbound method, skip the first arg (self)
         cleaned_args = args[1:] if len(args) > 1 else ()

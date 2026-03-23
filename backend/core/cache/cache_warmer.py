@@ -61,7 +61,8 @@ class CacheWarmer:
         try:
             from backend.core.config.config import CacheConfig
 
-            games = fetch_all_as_dict("""
+            games = fetch_all_as_dict(
+                """
                 SELECT
                     g.id,
                     g.gid,
@@ -81,7 +82,8 @@ class CacheWarmer:
                 LEFT JOIN flow_templates ft ON ft.game_id = g.id  # Note: flow_templates uses game_id FK
                 GROUP BY g.id, g.gid, g.name, g.ods_db, g.icon_path, g.created_at, g.updated_at
                 ORDER BY g.id
-            """)
+            """
+            )
 
             # Cache with 1 hour TTL (static data)
             hierarchical_cache.set("games.list", games, ttl=CacheConfig.CACHE_TIMEOUT_STATIC)

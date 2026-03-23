@@ -25,24 +25,24 @@ class WhereBuilder:
 
     # 定义允许的操作符白名单（防止SQL注入）
     VALID_OPERATORS = {
-        Operator.EQ.value,      # "="
-        Operator.NE.value,      # "!="
-        Operator.GT.value,      # ">"
-        Operator.LT.value,      # "<"
-        Operator.GTE.value,     # ">="
-        Operator.LTE.value,     # "<="
-        Operator.LIKE.value,    # "LIKE"
-        Operator.IN.value,      # "IN"
+        Operator.EQ.value,  # "="
+        Operator.NE.value,  # "!="
+        Operator.GT.value,  # ">"
+        Operator.LT.value,  # "<"
+        Operator.GTE.value,  # ">="
+        Operator.LTE.value,  # "<="
+        Operator.LIKE.value,  # "LIKE"
+        Operator.IN.value,  # "IN"
         Operator.NOT_IN.value,  # "NOT IN"
-        Operator.IS_NULL.value,     # "IS NULL"
-        Operator.IS_NOT_NULL.value, # "IS NOT NULL"
+        Operator.IS_NULL.value,  # "IS NULL"
+        Operator.IS_NOT_NULL.value,  # "IS NOT NULL"
     }
 
     # 定义允许的逻辑操作符白名单（防止SQL注入）
     VALID_LOGICAL_OPERATORS = {
-        LogicalOperator.AND.value,   # "AND"
-        LogicalOperator.OR.value,    # "OR"
-        None,                        # 第一个条件不需要逻辑操作符
+        LogicalOperator.AND.value,  # "AND"
+        LogicalOperator.OR.value,  # "OR"
+        None,  # 第一个条件不需要逻辑操作符
     }
 
     def build(self, conditions: List[Condition], context: Optional[dict] = None) -> str:

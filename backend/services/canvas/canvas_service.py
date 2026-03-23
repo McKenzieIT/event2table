@@ -157,9 +157,7 @@ class CanvasService:
         """
         return self.flow_repo.find_by_game_gid(game_gid)
 
-    @cached_service(
-        key_template="canvas.flows:all", ttl_l1=60, ttl_l2=300  # ⚡ 添加canvas前缀避免键冲突
-    )
+    @cached_service(key_template="canvas.flows:all", ttl_l1=60, ttl_l2=300)  # ⚡ 添加canvas前缀避免键冲突
     def get_all_flows(self) -> List[FlowEntity]:
         """
         获取所有激活的Flow模板

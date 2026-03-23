@@ -352,9 +352,7 @@ class CacheCapacityMonitor:
         # 检查严重阈值
         if usage >= self.l1_critical_threshold:
             if not self._alert_state["l1_critical_sent"]:
-                logger.critical(
-                    f"🚨 L1容量严重告警: {usage:.1%} >= {self.l1_critical_threshold:.1%}"
-                )
+                logger.critical(f"🚨 L1容量严重告警: {usage:.1%} >= {self.l1_critical_threshold:.1%}")
                 self._alert_state["l1_critical_sent"] = True
 
                 # 自动扩容L1
@@ -394,9 +392,7 @@ class CacheCapacityMonitor:
         # 检查严重阈值
         if usage >= self.l2_critical_threshold:
             if not self._alert_state["l2_critical_sent"]:
-                logger.critical(
-                    f"🚨 L2容量严重告警: {usage:.1%} >= {self.l2_critical_threshold:.1%}"
-                )
+                logger.critical(f"🚨 L2容量严重告警: {usage:.1%} >= {self.l2_critical_threshold:.1%}")
                 self._alert_state["l2_critical_sent"] = True
             return "CRITICAL"
 
@@ -425,9 +421,7 @@ class CacheCapacityMonitor:
 
             self.cache.l1_size = new_size
 
-            logger.info(
-                f"📈 L1缓存自动扩容: {old_size} → {new_size} (+{new_size - old_size}, +50%)"
-            )
+            logger.info(f"📈 L1缓存自动扩容: {old_size} → {new_size} (+{new_size - old_size}, +50%)")
 
     def check_capacity_predictions(self) -> List[Dict]:
         """

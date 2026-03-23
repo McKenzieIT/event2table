@@ -28,7 +28,7 @@ class TestParameterRepositoryEntityIntegration:
             'param_description': 'Zone ID',
             'json_path': '$.zoneId',
             'created_at': '2024-01-01 00:00:00',
-            'updated_at': '2024-01-01 00:00:00'
+            'updated_at': '2024-01-01 00:00:00',
         }
 
         entity = ParameterRepository._row_to_entity(row)
@@ -42,12 +42,7 @@ class TestParameterRepositoryEntityIntegration:
 
     def test_row_to_entity_with_game_gid_map(self):
         """验证_row_to_entity使用game_gid_map避免N+1查询"""
-        row = {
-            'id': 1,
-            'event_id': 1,
-            'param_name': 'zone_id',
-            'json_path': '$.zoneId'
-        }
+        row = {'id': 1, 'event_id': 1, 'param_name': 'zone_id', 'json_path': '$.zoneId'}
 
         game_gid_map = {1: 90000001}  # event_id -> game_gid
 
@@ -72,11 +67,7 @@ class TestParameterServiceEntityIntegration:
 
         # 验证Entity对象可以被正确创建
         entity = ParameterEntity(
-            id=1,
-            event_id=1,
-            game_gid=90000001,
-            name="zone_id",
-            param_type="param"
+            id=1, event_id=1, game_gid=90000001, name="zone_id", param_type="param"
         )
 
         assert isinstance(entity, ParameterEntity)
@@ -89,11 +80,7 @@ class TestNoGameIdViolationsIntegration:
     def test_parameter_entity_no_game_id_field(self):
         """验证ParameterEntity没有game_id字段"""
         entity = ParameterEntity(
-            id=1,
-            event_id=1,
-            game_gid=90000001,
-            name="zone_id",
-            param_type="param"
+            id=1, event_id=1, game_gid=90000001, name="zone_id", param_type="param"
         )
 
         # ✅ 必须有game_gid
@@ -107,12 +94,7 @@ class TestNoGameIdViolationsIntegration:
 
     def test_common_parameter_entity_no_game_id_field(self):
         """验证CommonParameterEntity没有game_id字段"""
-        entity = CommonParameterEntity(
-            id=1,
-            game_gid=90000001,
-            name="role_id",
-            param_type="base"
-        )
+        entity = CommonParameterEntity(id=1, game_gid=90000001, name="role_id", param_type="base")
 
         # ✅ 必须有game_gid
         assert hasattr(entity, 'game_gid')

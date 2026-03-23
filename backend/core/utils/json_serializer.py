@@ -38,12 +38,12 @@ logger = logging.getLogger(__name__)
 # Try to import orjson, fall back to standard json
 try:
     import orjson
+
     HAS_ORJSON = True
 except ImportError:
     HAS_ORJSON = False
     logger.warning(
-        "orjson not installed, falling back to standard json. "
-        "Install with: pip install orjson"
+        "orjson not installed, falling back to standard json. " "Install with: pip install orjson"
     )
 
 
@@ -65,12 +65,15 @@ class JSONSerializer:
 
     # orjson options for compatibility (only set if orjson is available)
     DEFAULT_OPTIONS = (
-        (orjson.OPT_SERIALIZE_NUMPY |  # Serialize NumPy types
-         orjson.OPT_NAIVE_UTC |  # Naive datetime as UTC
-         orjson.OPT_UTC_Z |  # Use 'Z' suffix for UTC
-         orjson.OPT_SERIALIZE_UUID |  # Serialize UUID objects
-         orjson.OPT_NON_STR_KEYS)  # Allow non-string keys
-        if HAS_ORJSON else 0
+        (
+            orjson.OPT_SERIALIZE_NUMPY
+            | orjson.OPT_NAIVE_UTC  # Serialize NumPy types
+            | orjson.OPT_UTC_Z  # Naive datetime as UTC
+            | orjson.OPT_SERIALIZE_UUID  # Use 'Z' suffix for UTC
+            | orjson.OPT_NON_STR_KEYS  # Serialize UUID objects
+        )  # Allow non-string keys
+        if HAS_ORJSON
+        else 0
     )
 
     def __init__(self, options: int = None):

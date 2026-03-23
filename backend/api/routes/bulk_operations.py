@@ -26,6 +26,7 @@ bulk_bp = Blueprint('bulk_operations', __name__)
 
 logger = logging.getLogger(__name__)
 
+
 @bulk_bp.route("/bulk-delete-events", methods=["POST"])
 def api_bulk_delete_events():
     """
@@ -83,6 +84,7 @@ def api_bulk_delete_events():
     except Exception as e:
         logger.error(f"Error in bulk delete events: {e}")
         return json_error_response(f"Failed to delete events: {str(e)}", status_code=500)
+
 
 @bulk_bp.route("/bulk-update-category", methods=["POST"])
 def api_bulk_update_category():
@@ -151,6 +153,7 @@ def api_bulk_update_category():
         logger.error(f"Error in bulk update category: {e}")
         return json_error_response(f"Failed to update category: {str(e)}", status_code=500)
 
+
 @bulk_bp.route("/bulk-toggle-common-params", methods=["POST"])
 def api_bulk_toggle_common_params():
     """
@@ -210,6 +213,7 @@ def api_bulk_toggle_common_params():
     except Exception as e:
         logger.error(f"Error in bulk toggle common params: {e}")
         return json_error_response(f"Failed to toggle common params: {str(e)}", status_code=500)
+
 
 @bulk_bp.route("/bulk-export-events", methods=["POST"])
 def api_bulk_export_events():
@@ -316,6 +320,7 @@ def api_bulk_export_events():
     except Exception as e:
         logger.error(f"Error in bulk export events: {e}")
         return json_error_response(f"Failed to export events: {str(e)}", status_code=500)
+
 
 @bulk_bp.route("/bulk-validate-parameters", methods=["POST"])
 def api_bulk_validate_parameters():

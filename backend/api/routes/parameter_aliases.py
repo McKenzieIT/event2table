@@ -25,6 +25,7 @@ logger = get_logger(__name__)
 
 parameter_aliases_bp = Blueprint("parameter_aliases", __name__)
 
+
 @parameter_aliases_bp.route("/api/parameter-aliases", methods=["GET"])
 def get_parameter_aliases():
     """API: Get all aliases for a parameter"""
@@ -42,6 +43,7 @@ def get_parameter_aliases():
     aliases = alias_repo.find_by_param_and_game(param_id, game_gid)
 
     return json_success_response(data=aliases, message="Parameter aliases retrieved")
+
 
 @parameter_aliases_bp.route("/api/parameter-aliases", methods=["POST"])
 def create_parameter_alias():
@@ -97,6 +99,7 @@ def create_parameter_alias():
         data=created_alias, message="Parameter alias created", status_code=201
     )
 
+
 @parameter_aliases_bp.route("/api/parameter-aliases/<int:alias_id>", methods=["PUT"])
 def update_parameter_alias(alias_id):
     """API: Update a parameter alias"""
@@ -123,6 +126,7 @@ def update_parameter_alias(alias_id):
     updated_alias = alias_repo.find_by_id(alias_id)
     return json_success_response(data=updated_alias, message="Parameter alias updated")
 
+
 @parameter_aliases_bp.route("/api/parameter-aliases/<int:alias_id>/prefer", methods=["PUT"])
 def set_preferred_alias(alias_id):
     """API: Set an alias as preferred"""
@@ -141,6 +145,7 @@ def set_preferred_alias(alias_id):
 
     updated_alias = alias_repo.find_by_id(alias_id)
     return json_success_response(data=updated_alias, message="Preferred alias set")
+
 
 @parameter_aliases_bp.route("/api/parameters/<int:param_id>/display-name", methods=["PUT"])
 def update_parameter_display_name(param_id):

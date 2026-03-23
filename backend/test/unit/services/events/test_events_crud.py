@@ -181,10 +181,7 @@ class TestEventBuilder:
     def test_build_table_names_with_custom_ods(self):
         """Test table name generation with custom ODS database"""
         builder = (
-            EventBuilder()
-            .set_game(10000147, "custom_ods")
-            .set_names("login", "登录")
-            .set_category(1)
+            EventBuilder().set_game(10000147, "custom_ods").set_names("login", "登录").set_category(1)
         )
 
         event = builder.build()

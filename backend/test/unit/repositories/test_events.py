@@ -18,10 +18,7 @@ def test_create_batch_no_n_plus_one(monkeypatch):
 
     # Mock fetch_all_as_dict to capture database calls
     mock_fetch_all = MagicMock()
-    monkeypatch.setattr(
-        'backend.models.repositories.events.fetch_all_as_dict',
-        mock_fetch_all
-    )
+    monkeypatch.setattr('backend.models.repositories.events.fetch_all_as_dict', mock_fetch_all)
 
     # Setup mock to return sample events
     mock_fetch_all.return_value = [
@@ -46,17 +43,22 @@ def test_create_batch_no_n_plus_one(monkeypatch):
 
     # Verify the implementation uses IN query (not loop)
     import inspect
+
     source = inspect.getsource(repo.create_batch)
 
     # Check that source contains "UNION ALL" (batch query indicator)
     # and doesn't have pattern of "for.*fetchone" (N+1 indicator)
-    assert "UNION ALL" in source or "IN (" in source, \
-        "Should use batch query (UNION ALL or IN clause)"
+    assert (
+        "UNION ALL" in source or "IN (" in source
+    ), "Should use batch query (UNION ALL or IN clause)"
 
     # Check that it doesn't have N+1 pattern (fetchone in loop)
-    assert "for " in source or "fetchone" not in source or \
-           "query_count" in source or "UNION ALL" in source, \
-        "Should not have N+1 query pattern"
+    assert (
+        "for " in source
+        or "fetchone" not in source
+        or "query_count" in source
+        or "UNION ALL" in source
+    ), "Should not have N+1 query pattern"
 
 
 def test_create_batch_returns_list():
@@ -78,5 +80,4 @@ def test_event_repository_has_required_methods():
     ]
 
     for method_name in required_methods:
-        assert hasattr(repo, method_name), \
-            f"EventRepository should have {method_name} method"
+        assert hasattr(repo, method_name), f"EventRepository should have {method_name} method"

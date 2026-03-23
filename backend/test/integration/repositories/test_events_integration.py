@@ -29,10 +29,13 @@ def test_create_batch_single_query(test_db):
     conn.commit()
 
     # Create test game
-    conn.execute("""
+    conn.execute(
+        """
         INSERT INTO games (gid, name, ods_db, dwd_prefix)
         VALUES (?, ?, ?, ?)
-    """, ("10000147", "Test Game", "ieu_ods", "dwd"))
+    """,
+        ("10000147", "Test Game", "ieu_ods", "dwd"),
+    )
 
     # Prepare batch event data
     events_data = [
@@ -76,6 +79,7 @@ def test_create_batch_single_query(test_db):
 
     # Apply patch
     import backend.models.repositories.events as events_module
+
     events_module.fetch_all_as_dict = spy_fetch
 
     try:
@@ -88,7 +92,9 @@ def test_create_batch_single_query(test_db):
         # Verify query count - should be much less than N+1
         # With UNION ALL approach: 1 executemany + 1 SELECT UNION ALL = 2 queries
         # N+1 approach would be: 1 executemany + 3 SELECT = 4 queries
-        assert len(captured_queries) <= 2, f"Expected ≤2 queries, got {len(captured_queries)} - N+1 problem detected!"
+        assert (
+            len(captured_queries) <= 2
+        ), f"Expected ≤2 queries, got {len(captured_queries)} - N+1 problem detected!"
 
         print(f"✓ Test passed: {len(captured_queries)} queries for 3 events (N+1 would be 4+)")
 
@@ -138,8 +144,9 @@ def test_create_batch_empty_database(test_db):
         assert isinstance(result_ids, list), "Should return a list"
     except Exception as e:
         # If database requires game to exist first, that's acceptable
-        assert "game" in str(e).lower() or "games" in str(e).lower(), \
-            f"Error should be about missing game, got: {e}"
+        assert (
+            "game" in str(e).lower() or "games" in str(e).lower()
+        ), f"Error should be about missing game, got: {e}"
 
     conn.close()
 
@@ -156,16 +163,22 @@ def test_create_batch_with_existing_events(test_db):
     conn.execute("DELETE FROM games")
 
     # Create game
-    conn.execute("""
+    conn.execute(
+        """
         INSERT INTO games (gid, name, ods_db, dwd_prefix)
         VALUES (?, ?, ?, ?)
-    """, ("10000147", "Test Game", "ieu_ods", "dwd"))
+    """,
+        ("10000147", "Test Game", "ieu_ods", "dwd"),
+    )
 
     # Create one event first
-    conn.execute("""
+    conn.execute(
+        """
         INSERT INTO log_events (game_gid, event_name, event_name_cn, category_id, source_table, target_table)
         VALUES (?, ?, ?, ?, ?, ?)
-    """, ("10000147", "existing_event", "existing_event_cn", 1, "source_table", "target_table"))
+    """,
+        ("10000147", "existing_event", "existing_event_cn", 1, "source_table", "target_table"),
+    )
 
     conn.commit()
 
@@ -207,10 +220,13 @@ def test_create_batch_performance_scaling(test_db):
 
     try:
         # Create game (no need to delete, test database is isolated)
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO games (gid, name, ods_db, dwd_prefix)
             VALUES (?, ?, ?, ?)
-        """, (unique_gid, "Performance Test Game", "ieu_ods", "dwd"))
+        """,
+            (unique_gid, "Performance Test Game", "ieu_ods", "dwd"),
+        )
 
         # Prepare 50 events
         events_data = [

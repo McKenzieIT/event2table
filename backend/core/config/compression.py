@@ -50,7 +50,7 @@ class CompressionConfig:
         min_size: int = 500,
         level: int = 6,
         mime_types: set = None,
-        algorithms: list = None
+        algorithms: list = None,
     ):
         """
         Initialize compression configuration
@@ -160,10 +160,7 @@ def init_compression(app: Flask, config: CompressionConfig = None) -> Flask:
 
 # Convenience function for common use cases
 def enable_compression(
-    app: Flask,
-    level: int = 6,
-    min_size: int = 500,
-    prefer_brotli: bool = True
+    app: Flask, level: int = 6, min_size: int = 500, prefer_brotli: bool = True
 ) -> Flask:
     """
     Enable compression with sensible defaults

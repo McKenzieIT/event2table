@@ -691,10 +691,12 @@ class EventRepository(GenericRepository):
                 # 这里简化处理：假设(game_gid, event_name)唯一或返回第一个ID
                 if identifiers:
                     # 使用UNION ALL组合多个查询
-                    union_queries = ' UNION ALL '.join([
-                        f"SELECT id FROM log_events WHERE game_gid = ? AND event_name = ?"
-                        for _ in identifiers
-                    ])
+                    union_queries = ' UNION ALL '.join(
+                        [
+                            f"SELECT id FROM log_events WHERE game_gid = ? AND event_name = ?"
+                            for _ in identifiers
+                        ]
+                    )
 
                     # 展开参数: [(gid1, name1), (gid2, name2)] -> [gid1, name1, gid2, name2]
                     flat_params = [item for pair in identifiers for item in pair]

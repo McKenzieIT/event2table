@@ -18,7 +18,7 @@ from backend.core.security.authentication import (
     is_development_mode,
     is_production_mode,
     check_auth_context,
-    check_user_permission
+    check_user_permission,
 )
 
 
@@ -43,6 +43,7 @@ class TestEnvironmentDetection:
         # Re-import to test default behavior
         import importlib
         import backend.core.security.authentication
+
         importlib.reload(backend.core.security.authentication)
 
         assert is_development_mode() == True
@@ -119,6 +120,7 @@ class TestAuthenticatedDecorator:
 
         Expected: Allow mutation
         """
+
         @authenticated
         def mock_mutation(root, info, *args, **kwargs):
             return "SUCCESS"
@@ -162,6 +164,7 @@ class TestRequirePermissionDecorator:
 
         Expected: Allow mutation
         """
+
         @require_permission('game:write')
         def mock_mutation(root, info, *args, **kwargs):
             return "SUCCESS"
@@ -182,6 +185,7 @@ class TestRequirePermissionDecorator:
 
         Expected: Raise Exception (missing permission)
         """
+
         @require_permission('game:delete')
         def mock_mutation(root, info, *args, **kwargs):
             return "SUCCESS"

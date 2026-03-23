@@ -32,7 +32,7 @@ class TestEventServiceEntityUsage:
             name='test_event',
             name_cn='测试事件',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_event_di'
+            target_table='dwd.v_dwd_90000001_test_event_di',
         )
 
         # Mock repository
@@ -46,7 +46,7 @@ class TestEventServiceEntityUsage:
             game_gid=90000001,
             event_name='test_event',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_event_di'
+            target_table='dwd.v_dwd_90000001_test_event_di',
         )
         service.event_repo.create = MagicMock(return_value=mock_result)
 
@@ -59,8 +59,9 @@ class TestEventServiceEntityUsage:
         result = service.create_event(event_data)
 
         # ✅ Should return EventEntity
-        assert isinstance(result, EventEntity), \
-            f"create_event should return EventEntity, got {type(result)}"
+        assert isinstance(
+            result, EventEntity
+        ), f"create_event should return EventEntity, got {type(result)}"
 
     def test_update_event_returns_event_entity(self):
         """Test that update_event returns EventEntity"""
@@ -71,7 +72,7 @@ class TestEventServiceEntityUsage:
             game_gid=90000001,
             event_name='test_event',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_event_di'
+            target_table='dwd.v_dwd_90000001_test_event_di',
         )
 
         service.event_repo.find_by_id = MagicMock(return_value=mock_event)
@@ -80,8 +81,9 @@ class TestEventServiceEntityUsage:
 
         result = service.update_event(1, {'event_name': 'updated'})
 
-        assert isinstance(result, EventEntity), \
-            f"update_event should return EventEntity, got {type(result)}"
+        assert isinstance(
+            result, EventEntity
+        ), f"update_event should return EventEntity, got {type(result)}"
 
     def test_get_event_by_id_returns_event_entity(self):
         """Test that get_event_by_id returns EventEntity"""
@@ -92,15 +94,16 @@ class TestEventServiceEntityUsage:
             game_gid=90000001,
             event_name='test_event',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_event_di'
+            target_table='dwd.v_dwd_90000001_test_event_di',
         )
 
         service.event_repo.find_by_id = MagicMock(return_value=mock_event)
 
         result = service.get_event_by_id(1)
 
-        assert isinstance(result, EventEntity), \
-            f"get_event_by_id should return EventEntity, got {type(result)}"
+        assert isinstance(
+            result, EventEntity
+        ), f"get_event_by_id should return EventEntity, got {type(result)}"
 
     def test_search_events_returns_event_entity_list(self):
         """Test that search_events returns List[EventEntity]"""
@@ -112,27 +115,27 @@ class TestEventServiceEntityUsage:
                 game_gid=90000001,
                 event_name='login',
                 source_table='ieu_ods.ods_90000001_all_view',
-                target_table='dwd.v_dwd_90000001_login_di'
+                target_table='dwd.v_dwd_90000001_login_di',
             ),
             EventEntity(
                 id=2,
                 game_gid=90000001,
                 event_name='logout',
                 source_table='ieu_ods.ods_90000001_all_view',
-                target_table='dwd.v_dwd_90000001_logout_di'
-            )
+                target_table='dwd.v_dwd_90000001_logout_di',
+            ),
         ]
 
         service.event_repo.search_events = MagicMock(return_value=mock_events)
 
         result = service.search_events('login', game_gid=90000001)
 
-        assert isinstance(result, list), \
-            f"search_events should return list, got {type(result)}"
+        assert isinstance(result, list), f"search_events should return list, got {type(result)}"
 
         for event in result:
-            assert isinstance(event, EventEntity), \
-                f"All items should be EventEntity, got {type(event)}"
+            assert isinstance(
+                event, EventEntity
+            ), f"All items should be EventEntity, got {type(event)}"
 
 
 class TestEventServiceNoGameIdViolations:
@@ -157,7 +160,7 @@ class TestEventServiceNoGameIdViolations:
             game_gid=90000001,
             event_name='test',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_di'
+            target_table='dwd.v_dwd_90000001_test_di',
         )
         service.event_repo.create_with_parameters = MagicMock(return_value=mock_result)
 
@@ -169,7 +172,7 @@ class TestEventServiceNoGameIdViolations:
             game_gid=90000001,
             name='test',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_test_di'
+            target_table='dwd.v_dwd_90000001_test_di',
         )
 
         # Call method
@@ -181,24 +184,28 @@ class TestEventServiceNoGameIdViolations:
 
         # ✅ Should have event_data and parameters, NOT game_id
         args, kwargs = call_args
-        assert 'event_data' in kwargs or len(args) >= 1, \
-            "create_with_parameters should receive event_data"
+        assert (
+            'event_data' in kwargs or len(args) >= 1
+        ), "create_with_parameters should receive event_data"
 
         # ❌ Should NOT have game_id parameter
-        assert 'game_id' not in kwargs, \
-            "create_with_parameters should NOT receive game_id parameter (game_id violation)"
+        assert (
+            'game_id' not in kwargs
+        ), "create_with_parameters should NOT receive game_id parameter (game_id violation)"
 
         # Check positional arguments (should only be event_data and parameters)
         if len(args) >= 2:
             # Second arg should be parameters list, not game_id
-            assert isinstance(args[1], list), \
-                f"Second argument should be parameters list, got {type(args[1])}"
+            assert isinstance(
+                args[1], list
+            ), f"Second argument should be parameters list, got {type(args[1])}"
 
     def test_source_code_no_game_id_references(self):
         """Test that source code doesn't contain game_id references"""
         service = EventService()
 
         import inspect
+
         source = inspect.getsource(service)
 
         # Check for game_id references (excluding comments)
@@ -219,10 +226,7 @@ class TestEventServiceNoGameIdViolations:
                     violations.append((i, line.strip()))
 
         if violations:
-            violation_msg = "\n".join([
-                f"  Line {line}: {content}"
-                for line, content in violations
-            ])
+            violation_msg = "\n".join([f"  Line {line}: {content}" for line, content in violations])
             pytest.fail(
                 f"Found {len(violations)} game_id violations in EventService:\n{violation_msg}\n"
                 f"✅ Correct: Use game_gid (business GID)\n"
@@ -238,6 +242,7 @@ class TestEventServiceCompleteImplementation:
         service = EventService()
 
         import inspect
+
         source = inspect.getsource(service)
 
         # Check for pass statements (excluding valid ones in abstract methods)
@@ -253,14 +258,14 @@ class TestEventServiceCompleteImplementation:
             if line.strip() == 'pass':
                 # Check context - if it's in a real method, it's a violation
                 if i > 0:
-                    prev_lines = '\n'.join(lines[max(0, i-5):i])
+                    prev_lines = '\n'.join(lines[max(0, i - 5) : i])
                     if 'def ' in prev_lines and 'raise NotImplementedError' not in prev_lines:
                         pass_lines.append((i, line.strip()))
 
         # Check for TODO comments in method bodies
         todo_lines = []
         for i, line in enumerate(lines, 1):
-            if 'TODO' in line and 'def ' in '\n'.join(lines[max(0, i-3):i]):
+            if 'TODO' in line and 'def ' in '\n'.join(lines[max(0, i - 3) : i]):
                 todo_lines.append((i, line.strip()))
 
         violations = []
@@ -286,7 +291,8 @@ class TestEventServiceCompleteImplementation:
 
         # Get all public methods
         methods = [
-            (name, method) for name, method in inspect.getmembers(service, predicate=inspect.ismethod)
+            (name, method)
+            for name, method in inspect.getmembers(service, predicate=inspect.ismethod)
             if not name.startswith('_')
         ]
 
@@ -328,6 +334,7 @@ class TestEventServiceCacheDecorators:
 
         assert hasattr(service, 'get_events_by_game')
         import inspect
+
         method = getattr(service, 'get_events_by_game')
         assert callable(method)
 
@@ -337,6 +344,7 @@ class TestEventServiceCacheDecorators:
 
         assert hasattr(service, 'get_event_by_id')
         import inspect
+
         method = getattr(service, 'get_event_by_id')
         assert callable(method)
 
@@ -346,6 +354,7 @@ class TestEventServiceCacheDecorators:
 
         assert hasattr(service, 'create_event')
         import inspect
+
         method = getattr(service, 'create_event')
         assert callable(method)
 
@@ -355,6 +364,7 @@ class TestEventServiceCacheDecorators:
 
         assert hasattr(service, 'update_event')
         import inspect
+
         method = getattr(service, 'update_event')
         assert callable(method)
 
@@ -364,6 +374,7 @@ class TestEventServiceCacheDecorators:
 
         assert hasattr(service, 'delete_event')
         import inspect
+
         method = getattr(service, 'delete_event')
         assert callable(method)
 
@@ -382,7 +393,7 @@ class TestEventServiceErrorHandling:
             game_gid=99999999,  # Non-existent game
             name='test_event',
             source_table='ieu_ods.ods_99999999_all_view',
-            target_table='dwd.v_dwd_99999999_test_event_di'
+            target_table='dwd.v_dwd_99999999_test_event_di',
         )
 
         # Should raise ValueError
@@ -403,7 +414,7 @@ class TestEventServiceErrorHandling:
             game_gid=90000001,
             event_name='login',
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_login_di'
+            target_table='dwd.v_dwd_90000001_login_di',
         )
         service.event_repo.find_by_name = MagicMock(return_value=mock_existing)
 
@@ -411,7 +422,7 @@ class TestEventServiceErrorHandling:
             game_gid=90000001,
             name='login',  # Already exists
             source_table='ieu_ods.ods_90000001_all_view',
-            target_table='dwd.v_dwd_90000001_login_di'
+            target_table='dwd.v_dwd_90000001_login_di',
         )
 
         # Should raise ValueError
@@ -458,8 +469,9 @@ class TestEventServiceUsesTestGidRange:
         ]
 
         for gid in test_gids:
-            assert gid >= TEST_GID_START, \
-                f"Test GID {gid} should be in range {TEST_GID_START}+ to avoid conflicts"
+            assert (
+                gid >= TEST_GID_START
+            ), f"Test GID {gid} should be in range {TEST_GID_START}+ to avoid conflicts"
 
         pytest.skip("Documentation test - verifies test GID range usage")
 

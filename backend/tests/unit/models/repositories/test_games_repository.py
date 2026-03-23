@@ -35,7 +35,7 @@ class TestGameRepository:
             'dwd_prefix': 'dwd',
             'icon_path': None,
             'created_at': '2026-01-01 00:00:00',
-            'updated_at': '2026-01-01 00:00:00'
+            'updated_at': '2026-01-01 00:00:00',
         }
 
     @pytest.fixture
@@ -51,7 +51,7 @@ class TestGameRepository:
                 'dwd_prefix': 'dwd',
                 'icon_path': None,
                 'created_at': '2026-01-01 00:00:00',
-                'updated_at': '2026-01-01 00:00:00'
+                'updated_at': '2026-01-01 00:00:00',
             },
             {
                 'id': 2,
@@ -62,8 +62,8 @@ class TestGameRepository:
                 'dwd_prefix': 'dwd',
                 'icon_path': None,
                 'created_at': '2026-01-02 00:00:00',
-                'updated_at': '2026-01-02 00:00:00'
-            }
+                'updated_at': '2026-01-02 00:00:00',
+            },
         ]
 
     # ==================== find_by_gid ====================
@@ -119,7 +119,7 @@ class TestGameRepository:
         """Test find all filters out invalid data"""
         mock_fetch.return_value = [
             {'id': 1, 'gid': '10000147', 'name': 'Valid Game', 'ods_db': 'ieu_ods'},
-            {'id': 2, 'gid': None, 'name': 'Invalid Game'}  # Missing required fields
+            {'id': 2, 'gid': None, 'name': 'Invalid Game'},  # Missing required fields
         ]
 
         result = repository.find_all()
@@ -162,15 +162,9 @@ class TestGameRepository:
                 'gid': '10000147',
                 'name': 'Game One',
                 'ods_db': 'ieu_ods',
-                'event_count': 10
+                'event_count': 10,
             },
-            {
-                'id': 2,
-                'gid': '10000148',
-                'name': 'Game Two',
-                'ods_db': 'ieu_ods',
-                'event_count': 5
-            }
+            {'id': 2, 'gid': '10000148', 'name': 'Game Two', 'ods_db': 'ieu_ods', 'event_count': 5},
         ]
 
         result = repository.get_all_with_event_count()
@@ -192,7 +186,7 @@ class TestGameRepository:
                 'ods_db': 'ieu_ods',
                 'event_count': 10,
                 'param_count': 50,
-                'last_event_update': '2026-01-01 12:00:00'
+                'last_event_update': '2026-01-01 12:00:00',
             }
         ]
 
@@ -292,10 +286,7 @@ class TestGameRepository:
         mock_cursor.rowcount = 2
         mock_get_conn.return_value = mock_conn
 
-        result = repository.batch_update_by_gid(
-            [10000147, 10000148],
-            {'name': 'Updated Name'}
-        )
+        result = repository.batch_update_by_gid([10000147, 10000148], {'name': 'Updated Name'})
 
         assert result == 2
         mock_cursor.execute.assert_called_once()
@@ -319,7 +310,9 @@ class TestGameRepository:
         result = repository.find_by_ods_db('ieu_ods')
 
         assert len(result) >= 1
-        mock_fetch.assert_called_once_with("SELECT * FROM games WHERE ods_db = ? ORDER BY name", ('ieu_ods',))
+        mock_fetch.assert_called_once_with(
+            "SELECT * FROM games WHERE ods_db = ? ORDER BY name", ('ieu_ods',)
+        )
 
     # ==================== search_by_name ====================
 
@@ -338,13 +331,7 @@ class TestGameRepository:
     @patch('backend.models.repositories.games.fetch_all_as_dict')
     def test_get_game_categories_summary(self, mock_fetch, repository):
         """Test get game categories summary"""
-        mock_fetch.return_value = [
-            {
-                'category_id': 1,
-                'category_name': 'Combat',
-                'event_count': 5
-            }
-        ]
+        mock_fetch.return_value = [{'category_id': 1, 'category_name': 'Combat', 'event_count': 5}]
 
         result = repository.get_game_categories_summary(10000147)
 
@@ -388,10 +375,7 @@ class TestGameRepository:
     @patch('backend.models.repositories.games.fetch_all_as_dict')
     def test_get_gids_by_list(self, mock_fetch, repository):
         """Test get gids by list"""
-        mock_fetch.return_value = [
-            {'gid': '10000147'},
-            {'gid': '10000148'}
-        ]
+        mock_fetch.return_value = [{'gid': '10000147'}, {'gid': '10000148'}]
 
         result = repository.get_gids_by_list(['10000147', '10000148', '10000149'])
 
@@ -459,7 +443,7 @@ class TestGameRepository:
 
         games_data = [
             {'gid': '10000147', 'name': 'Game 1', 'ods_db': 'ieu_ods'},
-            {'gid': '10000148', 'name': 'Game 2', 'ods_db': 'ieu_ods'}
+            {'gid': '10000148', 'name': 'Game 2', 'ods_db': 'ieu_ods'},
         ]
 
         result = repository.create_batch(games_data)
@@ -484,9 +468,7 @@ class TestGameRepository:
         mock_cursor.executemany.side_effect = Exception("DB Error")
         mock_get_conn.return_value = mock_conn
 
-        games_data = [
-            {'gid': '10000147', 'name': 'Game 1', 'ods_db': 'ieu_ods'}
-        ]
+        games_data = [{'gid': '10000147', 'name': 'Game 1', 'ods_db': 'ieu_ods'}]
 
         with pytest.raises(Exception):
             repository.create_batch(games_data)

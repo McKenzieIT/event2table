@@ -33,7 +33,8 @@ class TestGameModuleIntegration:
         cursor = conn.cursor()
 
         # 创建测试用的游戏表
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS games (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 gid INTEGER UNIQUE NOT NULL,
@@ -44,7 +45,8 @@ class TestGameModuleIntegration:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         conn.commit()
         yield

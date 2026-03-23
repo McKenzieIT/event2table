@@ -5,6 +5,7 @@ Cache debug test with mock
 """
 
 import sys
+
 sys.path.insert(0, '.')
 
 from unittest.mock import patch, MagicMock
@@ -25,7 +26,7 @@ mock_param_data = {
     'json_path': None,
     'is_active': 1,
     'created_at': None,
-    'updated_at': None
+    'updated_at': None,
 }
 
 print("=" * 60)

@@ -54,7 +54,7 @@ class CodeDuplicateAnalyzer:
             "strftime_calls": 0,
             "manual_formatting": 0,
             "files_with_patterns": [],
-            "locations": []
+            "locations": [],
         }
 
         for file_path in files:
@@ -66,22 +66,23 @@ class CodeDuplicateAnalyzer:
                     for node in ast.walk(tree):
                         # 检测strftime调用
                         if isinstance(node, ast.Call):
-                            if (hasattr(node.func, 'attr') and
-                                node.func.attr == 'strftime'):
+                            if hasattr(node.func, 'attr') and node.func.attr == 'strftime':
                                 date_formatting_patterns["strftime_calls"] += 1
-                                date_formatting_patterns["locations"].append({
-                                    "file": str(file_path.relative_to(self.backend_root)),
-                                    "line": node.lineno
-                                })
+                                date_formatting_patterns["locations"].append(
+                                    {
+                                        "file": str(file_path.relative_to(self.backend_root)),
+                                        "line": node.lineno,
+                                    }
+                                )
 
             except Exception as e:
                 # 跳过解析错误的文件
                 continue
 
         # 提取唯一文件
-        date_formatting_patterns["files_with_patterns"] = list(set(
-            loc["file"] for loc in date_formatting_patterns["locations"]
-        ))
+        date_formatting_patterns["files_with_patterns"] = list(
+            set(loc["file"] for loc in date_formatting_patterns["locations"])
+        )
 
         return date_formatting_patterns
 
@@ -101,7 +102,7 @@ class CodeDuplicateAnalyzer:
             "strip_calls": 0,
             "manual_sanitization": 0,
             "files_with_patterns": [],
-            "locations": []
+            "locations": [],
         }
 
         for file_path in files:
@@ -113,35 +114,37 @@ class CodeDuplicateAnalyzer:
                     for node in ast.walk(tree):
                         # 检测html.escape调用
                         if isinstance(node, ast.Call):
-                            if (hasattr(node.func, 'attr') and
-                                node.func.attr == 'escape'):
+                            if hasattr(node.func, 'attr') and node.func.attr == 'escape':
                                 sanitization_patterns["html_escape_calls"] += 1
-                                sanitization_patterns["locations"].append({
-                                    "file": str(file_path.relative_to(self.backend_root)),
-                                    "line": node.lineno,
-                                    "type": "html.escape"
-                                })
+                                sanitization_patterns["locations"].append(
+                                    {
+                                        "file": str(file_path.relative_to(self.backend_root)),
+                                        "line": node.lineno,
+                                        "type": "html.escape",
+                                    }
+                                )
 
                         # 检测strip调用
                         if isinstance(node, ast.Call):
-                            if (hasattr(node.func, 'attr') and
-                                node.func.attr == 'strip'):
+                            if hasattr(node.func, 'attr') and node.func.attr == 'strip':
                                 sanitization_patterns["strip_calls"] += 1
                                 if len(sanitization_patterns["locations"]) < 20:
-                                    sanitization_patterns["locations"].append({
-                                        "file": str(file_path.relative_to(self.backend_root)),
-                                        "line": node.lineno,
-                                        "type": "str.strip"
-                                    })
+                                    sanitization_patterns["locations"].append(
+                                        {
+                                            "file": str(file_path.relative_to(self.backend_root)),
+                                            "line": node.lineno,
+                                            "type": "str.strip",
+                                        }
+                                    )
 
             except Exception as e:
                 # 跳过解析错误的文件
                 continue
 
         # 提取唯一文件
-        sanitization_patterns["files_with_patterns"] = list(set(
-            loc["file"] for loc in sanitization_patterns["locations"]
-        ))
+        sanitization_patterns["files_with_patterns"] = list(
+            set(loc["file"] for loc in sanitization_patterns["locations"])
+        )
 
         return sanitization_patterns
 
@@ -161,7 +164,7 @@ class CodeDuplicateAnalyzer:
             "logger_error_calls": 0,
             "json_error_calls": 0,
             "files_with_patterns": [],
-            "locations": []
+            "locations": [],
         }
 
         for file_path in files:
@@ -284,16 +287,10 @@ class TestCodeDuplicationDetection:
             content = f.read()
 
         if "def format_date" not in content:
-            pytest.fail(
-                "共享工具模块缺少format_date()函数。\n"
-                "请实现该函数以统一日期格式化逻辑"
-            )
+            pytest.fail("共享工具模块缺少format_date()函数。\n" "请实现该函数以统一日期格式化逻辑")
 
         if "def sanitize_string" not in content:
-            pytest.fail(
-                "共享工具模块缺少sanitize_string()函数。\n"
-                "请实现该函数以统一字符串清理逻辑"
-            )
+            pytest.fail("共享工具模块缺少sanitize_string()函数。\n" "请实现该函数以统一字符串清理逻辑")
 
 
 class TestCommonUtilsImplementation:
@@ -304,20 +301,14 @@ class TestCommonUtilsImplementation:
         try:
             from backend.core.utils.common import format_date
         except ImportError as e:
-            pytest.fail(
-                f"无法导入format_date函数：{e}\n"
-                "请在backend/core/utils/common.py中实现该函数"
-            )
+            pytest.fail(f"无法导入format_date函数：{e}\n" "请在backend/core/utils/common.py中实现该函数")
 
     def test_sanitize_string_function_exists(self):
         """测试：sanitize_string函数应该存在并可用"""
         try:
             from backend.core.utils.common import sanitize_string
         except ImportError as e:
-            pytest.fail(
-                f"无法导入sanitize_string函数：{e}\n"
-                "请在backend/core/utils/common.py中实现该函数"
-            )
+            pytest.fail(f"无法导入sanitize_string函数：{e}\n" "请在backend/core/utils/common.py中实现该函数")
 
     def test_format_date_basic_functionality(self):
         """测试：format_date基本功能"""

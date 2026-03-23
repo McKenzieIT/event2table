@@ -81,7 +81,9 @@ def test_get_event_count_different_games(monkeypatch):
     assert result2b == 50
 
     # Should only call database twice (once per game), not 4 times
-    assert mock_fetch.call_count == 2, f"Expected 2 DB calls (one per game), got {mock_fetch.call_count}"
+    assert (
+        mock_fetch.call_count == 2
+    ), f"Expected 2 DB calls (one per game), got {mock_fetch.call_count}"
 
     print("✓ Test passed: Cache key includes game_gid (2 DB calls for 4 requests across 2 games)")
 

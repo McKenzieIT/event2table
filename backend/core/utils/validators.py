@@ -216,7 +216,7 @@ def sanitize_and_validate_string(
     """
     清理和验证字符串输入（统一安全工具函数）
 
-    防止XSS攻击, 输入长度溢出等安全问题. 
+    防止XSS攻击, 输入长度溢出等安全问题.
 
     Args:
         value: 要验证的值（可以是任意类型）

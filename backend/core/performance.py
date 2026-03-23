@@ -296,7 +296,7 @@ class BatchQueryOptimizer:
     def _execute_batch(self, query_key: str, queries: list) -> Dict[str, Any]:
         """执行批量查询(需要子类实现)"""
         # 这里应该根据实际的数据库类型实现批量查询
-        # 例如: 
+        # 例如:
         # - SQLite: 使用 IN 子句
         # - MySQL: 使用批量查询
         # - PostgreSQL: 使用 ARRAY 参数

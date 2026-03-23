@@ -87,7 +87,8 @@ def init_db(db_path: Optional[Path] = None):
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='hql_statements'")
     if not cursor.fetchone():
         logger.info("Creating hql_statements table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE hql_statements (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_id INTEGER NOT NULL,
@@ -99,14 +100,16 @@ def init_db(db_path: Optional[Path] = None):
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (event_id) REFERENCES log_events(id) ON DELETE CASCADE
             )
-        """)
+        """
+        )
         conn.commit()
         logger.info("hql_statements table created successfully")
     else:
         logger.info("hql_statements table already exists")
 
     # Create tables
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS games (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             gid TEXT UNIQUE NOT NULL,
@@ -115,18 +118,22 @@ def init_db(db_path: Optional[Path] = None):
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS event_categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS log_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_id INTEGER NOT NULL,
@@ -141,9 +148,11 @@ def init_db(db_path: Optional[Path] = None):
             FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
             FOREIGN KEY (category_id) REFERENCES event_categories(id) ON DELETE CASCADE
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS parameters (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             event_id INTEGER NOT NULL,
@@ -156,9 +165,11 @@ def init_db(db_path: Optional[Path] = None):
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (event_id) REFERENCES log_events(id) ON DELETE CASCADE
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS common_params (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_id INTEGER NOT NULL,
@@ -172,9 +183,11 @@ def init_db(db_path: Optional[Path] = None):
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS event_category_relations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             event_id INTEGER NOT NULL,
@@ -184,9 +197,11 @@ def init_db(db_path: Optional[Path] = None):
             FOREIGN KEY (category_id) REFERENCES event_categories(id) ON DELETE CASCADE,
             UNIQUE(event_id, category_id)
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS event_common_params (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             event_id INTEGER NOT NULL,
@@ -195,9 +210,11 @@ def init_db(db_path: Optional[Path] = None):
             FOREIGN KEY (event_id) REFERENCES log_events(id) ON DELETE CASCADE,
             FOREIGN KEY (common_param_id) REFERENCES common_params(id) ON DELETE CASCADE
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS join_configs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -209,9 +226,11 @@ def init_db(db_path: Optional[Path] = None):
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS event_nodes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_id INTEGER NOT NULL,
@@ -224,9 +243,11 @@ def init_db(db_path: Optional[Path] = None):
             FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
             FOREIGN KEY (event_id) REFERENCES log_events(id) ON DELETE CASCADE
         )
-    """)
+    """
+    )
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS parameter_aliases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game_id INTEGER NOT NULL,
@@ -242,10 +263,12 @@ def init_db(db_path: Optional[Path] = None):
             FOREIGN KEY (param_id) REFERENCES parameters(id) ON DELETE CASCADE,
             UNIQUE(game_id, param_id, alias)
         )
-    """)
+    """
+    )
 
     # Create sql_optimizations table
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS sql_optimizations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             original_hql TEXT NOT NULL,
@@ -254,13 +277,16 @@ def init_db(db_path: Optional[Path] = None):
             suggested_rules TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
     # Create index on sql_optimizations
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE INDEX IF NOT EXISTS idx_sql_optimizations_created_at
         ON sql_optimizations(created_at)
-    """)
+    """
+    )
 
     # Seed default categories if table is empty
     _seed_default_categories(cursor)
@@ -367,7 +393,8 @@ class MigrationV2_EventCategoryRelations(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v2: Adding event_category_relations table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE event_category_relations (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event_id INTEGER NOT NULL,
@@ -377,7 +404,8 @@ class MigrationV2_EventCategoryRelations(BaseMigration):
                     FOREIGN KEY (category_id) REFERENCES event_categories(id) ON DELETE CASCADE,
                     UNIQUE(event_id, category_id)
                 )
-            """)
+            """
+            )
             logger.info("Migration v2 completed: event_category_relations table added")
 
 
@@ -449,7 +477,8 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
 
         # 1. Create param_templates table
         logger.info("Migration v6: Creating param_templates table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS param_templates (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 template_name TEXT NOT NULL UNIQUE,
@@ -464,7 +493,8 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # 2. Insert predefined type templates
         templates_data = [
@@ -592,7 +622,8 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
 
         # 3. Create param_library table
         logger.info("Migration v6: Creating param_library table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS param_library (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 param_name TEXT NOT NULL,
@@ -607,11 +638,13 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
                 FOREIGN KEY (template_id) REFERENCES param_templates(id),
                 UNIQUE(param_name)
             )
-        """)
+        """
+        )
 
         # 4. Create event_params table
         logger.info("Migration v6: Creating event_params table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS event_params (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_id INTEGER NOT NULL,
@@ -631,11 +664,13 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
                 FOREIGN KEY (template_id) REFERENCES param_templates(id),
                 UNIQUE(event_id, param_name, version)
             )
-        """)
+        """
+        )
 
         # 5. Create param_versions table
         logger.info("Migration v6: Creating param_versions table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS param_versions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_param_id INTEGER NOT NULL,
@@ -651,11 +686,13 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
                 FOREIGN KEY (event_param_id) REFERENCES event_params(id) ON DELETE CASCADE,
                 FOREIGN KEY (template_id) REFERENCES param_templates(id)
             )
-        """)
+        """
+        )
 
         # 6. Create param_configs table
         logger.info("Migration v6: Creating param_configs table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS param_configs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_param_id INTEGER NOT NULL UNIQUE,
@@ -668,14 +705,17 @@ class MigrationV6_ParameterManagementRefactoring(BaseMigration):
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (event_param_id) REFERENCES event_params(id) ON DELETE CASCADE
             )
-        """)
+        """
+        )
 
         # 7. Check if old parameters table exists and rename it
         logger.info("Migration v6: Checking for old parameters table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT name FROM sqlite_master
             WHERE type='table' AND name='parameters'
-        """)
+        """
+        )
         old_table_exists = cursor.fetchone() is not None
 
         if old_table_exists:
@@ -730,7 +770,8 @@ class MigrationV7_ParameterValidationAndBatchOperations(BaseMigration):
 
         # 1. Create param_validation_rules table
         logger.info("Migration v7: Creating param_validation_rules table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS param_validation_rules (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_param_id INTEGER NOT NULL UNIQUE,
@@ -742,11 +783,13 @@ class MigrationV7_ParameterValidationAndBatchOperations(BaseMigration):
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (event_param_id) REFERENCES event_params(id) ON DELETE CASCADE
             )
-        """)
+        """
+        )
 
         # 2. Create batch_import_records table
         logger.info("Migration v7: Creating batch_import_records table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS batch_import_records (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 import_name TEXT NOT NULL,
@@ -761,11 +804,13 @@ class MigrationV7_ParameterValidationAndBatchOperations(BaseMigration):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 completed_at TIMESTAMP
             )
-        """)
+        """
+        )
 
         # 3. Create batch_import_details table
         logger.info("Migration v7: Creating batch_import_details table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS batch_import_details (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 import_id INTEGER NOT NULL,
@@ -777,29 +822,38 @@ class MigrationV7_ParameterValidationAndBatchOperations(BaseMigration):
                 error_message TEXT,
                 FOREIGN KEY (import_id) REFERENCES batch_import_records(id) ON DELETE CASCADE
             )
-        """)
+        """
+        )
 
         # 4. Create indexes for validation rules
         logger.info("Migration v7: Creating indexes for param_validation_rules...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_validation_rules_param_id
             ON param_validation_rules(event_param_id)
-        """)
-        cursor.execute("""
+        """
+        )
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_validation_rules_type
             ON param_validation_rules(rule_type)
-        """)
+        """
+        )
 
         # 5. Create indexes for batch imports
         logger.info("Migration v7: Creating indexes for batch_import tables...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_batch_import_records_status
             ON batch_import_records(status)
-        """)
-        cursor.execute("""
+        """
+        )
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_batch_import_details_import_id
             ON batch_import_details(import_id)
-        """)
+        """
+        )
 
         logger.info("Migration v7 completed: validation rules and batch operations created")
 
@@ -814,7 +868,8 @@ class MigrationV8_ParameterDependencies(BaseMigration):
 
         # Create param_dependencies table
         logger.info("Migration v8: Creating param_dependencies table...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS param_dependencies (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_id INTEGER NOT NULL,
@@ -828,22 +883,29 @@ class MigrationV8_ParameterDependencies(BaseMigration):
                 FOREIGN KEY (depends_on_param_id) REFERENCES event_params(id) ON DELETE CASCADE,
                 UNIQUE(event_id, dependent_param_id, depends_on_param_id)
             )
-        """)
+        """
+        )
 
         # Create indexes
         logger.info("Migration v8: Creating indexes for param_dependencies...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_param_dependencies_event_id
             ON param_dependencies(event_id)
-        """)
-        cursor.execute("""
+        """
+        )
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_param_dependencies_dependent
             ON param_dependencies(dependent_param_id)
-        """)
-        cursor.execute("""
+        """
+        )
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_param_dependencies_depends_on
             ON param_dependencies(depends_on_param_id)
-        """)
+        """
+        )
 
         logger.info("Migration v8 completed: parameter dependencies created")
 
@@ -886,7 +948,8 @@ class MigrationV9_EnhancedHQLGeneration(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v9: Creating hql_generation_templates table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE hql_generation_templates (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     template_name TEXT NOT NULL UNIQUE,
@@ -899,7 +962,8 @@ class MigrationV9_EnhancedHQLGeneration(BaseMigration):
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
+            """
+            )
 
         # Create field_selection_presets table
         cursor.execute(
@@ -907,7 +971,8 @@ class MigrationV9_EnhancedHQLGeneration(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v9: Creating field_selection_presets table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE field_selection_presets (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     preset_name TEXT NOT NULL,
@@ -919,7 +984,8 @@ class MigrationV9_EnhancedHQLGeneration(BaseMigration):
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
 
         logger.info("Migration v9 completed: Enhanced HQL generation features added")
 
@@ -947,10 +1013,12 @@ class MigrationV10_ArrayParameterHierarchy(BaseMigration):
 
         # Create index for parameter hierarchy
         logger.info("Migration v10: Creating indexes for parameter hierarchy...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_event_params_event_template
             ON event_params(event_id, template_id)
-        """)
+        """
+        )
 
         logger.info("Migration v10 completed: array parameter hierarchy support added")
 
@@ -977,7 +1045,8 @@ class MigrationV11_FieldBuilderSupport(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v11: Creating node_templates table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE node_templates (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     node_name TEXT NOT NULL,
@@ -988,7 +1057,8 @@ class MigrationV11_FieldBuilderSupport(BaseMigration):
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
+            """
+            )
 
         # Create flow_templates table
         cursor.execute(
@@ -996,7 +1066,8 @@ class MigrationV11_FieldBuilderSupport(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v11: Creating flow_templates table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE flow_templates (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     flow_name TEXT NOT NULL,
@@ -1007,18 +1078,23 @@ class MigrationV11_FieldBuilderSupport(BaseMigration):
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
+            """
+            )
 
         # Create indexes
         logger.info("Migration v11: Creating indexes for node and flow templates...")
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_node_templates_type
             ON node_templates(node_type)
-        """)
-        cursor.execute("""
+        """
+        )
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_flow_templates_created_by
             ON flow_templates(created_by)
-        """)
+        """
+        )
 
         logger.info("Migration v11 completed: field builder support added")
 
@@ -1056,7 +1132,8 @@ class MigrationV12_FlowTemplates(BaseMigration):
         else:
             # Table doesn't exist, create it
             logger.info("Migration v12: Creating flow_templates table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE flow_templates (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
@@ -1070,18 +1147,23 @@ class MigrationV12_FlowTemplates(BaseMigration):
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
 
         # Create indexes
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_flow_templates_game_id
                 ON flow_templates(game_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_flow_templates_updated_at
                 ON flow_templates(updated_at)
-            """)
+            """
+            )
         except Exception as e:
             logger.warning(f"Migration v12: Could not create indexes: {e}")
 
@@ -1100,7 +1182,8 @@ class MigrationV13_EventNodesAndParameterAliases(BaseMigration):
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='event_nodes'")
         if not cursor.fetchone():
             logger.info("Migration v13: Creating event_nodes table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE event_nodes (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     game_id INTEGER NOT NULL,
@@ -1113,7 +1196,8 @@ class MigrationV13_EventNodesAndParameterAliases(BaseMigration):
                     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
                     FOREIGN KEY (event_id) REFERENCES log_events(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
 
         # Create parameter_aliases table
         cursor.execute(
@@ -1121,7 +1205,8 @@ class MigrationV13_EventNodesAndParameterAliases(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v13: Creating parameter_aliases table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE parameter_aliases (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     game_id INTEGER NOT NULL,
@@ -1137,26 +1222,35 @@ class MigrationV13_EventNodesAndParameterAliases(BaseMigration):
                     FOREIGN KEY (param_id) REFERENCES parameters(id) ON DELETE CASCADE,
                     UNIQUE(game_id, param_id, alias)
                 )
-            """)
+            """
+            )
 
         # Create indexes
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_event_nodes_game_id
                 ON event_nodes(game_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_event_nodes_event_id
                 ON event_nodes(event_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_parameter_aliases_game_id
                 ON parameter_aliases(game_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_parameter_aliases_param_id
                 ON parameter_aliases(param_id)
-            """)
+            """
+            )
         except Exception as e:
             logger.warning(f"Migration v13: Could not create indexes: {e}")
 
@@ -1177,7 +1271,8 @@ class MigrationV14_FieldNameMappings(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v14: Creating field_name_mappings table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE field_name_mappings (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     game_id INTEGER NOT NULL,
@@ -1190,7 +1285,8 @@ class MigrationV14_FieldNameMappings(BaseMigration):
                     UNIQUE(game_id, param_name),
                     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
 
         # Create field_name_history table
         cursor.execute(
@@ -1198,7 +1294,8 @@ class MigrationV14_FieldNameMappings(BaseMigration):
         )
         if not cursor.fetchone():
             logger.info("Migration v14: Creating field_name_history table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE field_name_history (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     mapping_id INTEGER NOT NULL,
@@ -1206,22 +1303,29 @@ class MigrationV14_FieldNameMappings(BaseMigration):
                     used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (mapping_id) REFERENCES field_name_mappings(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
 
         # Create indexes
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_field_mappings_game_param
                 ON field_name_mappings(game_id, param_name)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS field_name_history_mapping_id
                 ON field_name_history(mapping_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS field_name_history_used_at
                 ON field_name_history(used_at)
-            """)
+            """
+            )
         except Exception as e:
             logger.warning(f"Migration v14: Could not create indexes: {e}")
 
@@ -1236,7 +1340,8 @@ class MigrationV15_EventNodeConfigs(BaseMigration):
     def upgrade(self, cursor: sqlite3.Cursor, conn: sqlite3.Connection):
         logger.info("Migration v15: Creating event_node_configs table...")
 
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS event_node_configs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 game_gid INTEGER NOT NULL,
@@ -1251,22 +1356,29 @@ class MigrationV15_EventNodeConfigs(BaseMigration):
                 created_by VARCHAR(100),
                 FOREIGN KEY (event_id) REFERENCES log_events(id)
             )
-        """)
+        """
+        )
 
         # Create indexes for performance
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_event_node_game_gid
                 ON event_node_configs(game_gid)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_event_node_name_en
                 ON event_node_configs(name_en)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_event_node_event_id
                 ON event_node_configs(event_id)
-            """)
+            """
+            )
         except Exception as e:
             logger.warning(f"Migration v15: Could not create indexes: {e}")
 
@@ -1284,7 +1396,8 @@ class MigrationV16_AsyncTasks(BaseMigration):
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='async_tasks'")
         if not cursor.fetchone():
             logger.info("Migration v16: Creating async_tasks table...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE async_tasks (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     task_id TEXT UNIQUE NOT NULL,
@@ -1298,22 +1411,29 @@ class MigrationV16_AsyncTasks(BaseMigration):
                     started_at TIMESTAMP,
                     completed_at TIMESTAMP
                 )
-            """)
+            """
+            )
 
             # Create indexes for async_tasks
             try:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_async_tasks_task_id
                     ON async_tasks(task_id)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_async_tasks_status
                     ON async_tasks(status)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_async_tasks_created_at
                     ON async_tasks(created_at)
-                """)
+                """
+                )
             except Exception as e:
                 logger.warning(f"Migration v16: Could not create indexes: {e}")
 
@@ -1335,11 +1455,13 @@ class MigrationV17_CommonParamsDisplayName(BaseMigration):
                 cursor.execute("ALTER TABLE common_params ADD COLUMN display_name TEXT")
 
                 # Update existing records with default display names
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE common_params
                     SET display_name = param_name_cn
                     WHERE display_name IS NULL
-                """)
+                """
+                )
                 logger.info("Migration v17: display_name column added")
             else:
                 logger.info("Migration v17: display_name column already exists")
@@ -1367,20 +1489,24 @@ class MigrationV18_AddGameGid(BaseMigration):
 
                 # Migrate existing data: copy game_id to game_gid by joining with games table
                 logger.info("Migration v18: Migrating existing data to game_gid...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE log_events
                         SET game_gid = (
                             SELECT g.gid
                             FROM games g
                             WHERE g.id = log_events.game_id
                         )
-                """)
+                """
+                )
 
                 # Create index on game_gid
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_log_events_game_gid
                         ON log_events(game_gid)
-                """)
+                """
+                )
 
                 logger.info("Migration v18: game_gid column added and data migrated")
             else:
@@ -1560,7 +1686,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v2: Adding event_category_relations table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE event_category_relations (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         event_id INTEGER NOT NULL,
@@ -1570,7 +1697,8 @@ def migrate_db(db_path: Optional[Path] = None):
                         FOREIGN KEY (category_id) REFERENCES event_categories(id) ON DELETE CASCADE,
                         UNIQUE(event_id, category_id)
                     )
-                """)
+                """
+                )
                 logger.info("Migration v2 completed: event_category_relations table added")
 
         # Migration 3: Add include_in_common_params column to log_events
@@ -1625,7 +1753,8 @@ def migrate_db(db_path: Optional[Path] = None):
             logger.info("Migration v6: Starting parameter management refactoring...")
 
             # 1. Create param_templates table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS param_templates (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     template_name TEXT NOT NULL UNIQUE,
@@ -1640,7 +1769,8 @@ def migrate_db(db_path: Optional[Path] = None):
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
-            """)
+            """
+            )
             logger.info("Migration v6: param_templates table created")
 
             # 2. Insert predefined type templates
@@ -1759,7 +1889,8 @@ def migrate_db(db_path: Optional[Path] = None):
             logger.info("Migration v6: predefined type templates inserted")
 
             # 3. Create param_library table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS param_library (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     param_name TEXT NOT NULL,
@@ -1774,11 +1905,13 @@ def migrate_db(db_path: Optional[Path] = None):
                     FOREIGN KEY (template_id) REFERENCES param_templates(id),
                     UNIQUE(param_name)
                 )
-            """)
+            """
+            )
             logger.info("Migration v6: param_library table created")
 
             # 4. Create event_params table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS event_params (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event_id INTEGER NOT NULL,
@@ -1798,11 +1931,13 @@ def migrate_db(db_path: Optional[Path] = None):
                     FOREIGN KEY (template_id) REFERENCES param_templates(id),
                     UNIQUE(event_id, param_name, version)
                 )
-            """)
+            """
+            )
             logger.info("Migration v6: event_params table created")
 
             # 5. Create param_versions table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS param_versions (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event_param_id INTEGER NOT NULL,
@@ -1818,11 +1953,13 @@ def migrate_db(db_path: Optional[Path] = None):
                     FOREIGN KEY (event_param_id) REFERENCES event_params(id) ON DELETE CASCADE,
                     FOREIGN KEY (template_id) REFERENCES param_templates(id)
                 )
-            """)
+            """
+            )
             logger.info("Migration v6: param_versions table created")
 
             # 6. Create param_configs table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS param_configs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event_param_id INTEGER NOT NULL UNIQUE,
@@ -1835,7 +1972,8 @@ def migrate_db(db_path: Optional[Path] = None):
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (event_param_id) REFERENCES event_params(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
             logger.info("Migration v6: param_configs table created")
 
             # 7. Migrate existing parameters to event_params
@@ -1877,7 +2015,8 @@ def migrate_db(db_path: Optional[Path] = None):
 
             # 8. Extract common parameters to param_library
             # Use INSERT OR IGNORE to skip duplicate param_name conflicts
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR IGNORE INTO param_library
                 (param_name, param_name_cn, template_id, param_description,
                  category, is_standard, usage_count)
@@ -1893,12 +2032,14 @@ def migrate_db(db_path: Optional[Path] = None):
                 WHERE library_id IS NULL
                 GROUP BY param_name, param_name_cn, template_id, param_description
                 HAVING COUNT(*) >= 2
-            """)
+            """
+            )
             extracted_count = cursor.rowcount
             logger.info(f"Migration v6: extracted {extracted_count} common parameters to library")
 
             # 9. Mark parameters from library
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE event_params
                 SET library_id = (
                     SELECT id FROM param_library
@@ -1910,16 +2051,19 @@ def migrate_db(db_path: Optional[Path] = None):
                     SELECT 1 FROM param_library
                     WHERE param_library.param_name = event_params.param_name
                 )
-            """)
+            """
+            )
             marked_count = cursor.rowcount
             logger.info(f"Migration v6: marked {marked_count} parameters as from library")
 
             # 10. Rename old table (keep for rollback)
             # Check if old backup already exists to avoid conflicts
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT name FROM sqlite_master
                 WHERE type='table' AND name='parameters_old_v5'
-            """)
+            """
+            )
             old_backup_exists = cursor.fetchone() is not None
 
             if old_backup_exists:
@@ -1927,9 +2071,11 @@ def migrate_db(db_path: Optional[Path] = None):
                 cursor.execute("DROP TABLE IF EXISTS parameters_old_v5")
                 logger.info("Migration v6: dropped existing parameters_old_v5 table")
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 ALTER TABLE parameters RENAME TO parameters_old_v5
-            """)
+            """
+            )
             logger.info("Migration v6: renamed old parameters table to parameters_old_v5")
 
             conn.commit()
@@ -1940,7 +2086,8 @@ def migrate_db(db_path: Optional[Path] = None):
             logger.info("Migration v7: Starting parameter validation and batch operations...")
 
             # 1. Create param_validation_rules table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS param_validation_rules (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event_param_id INTEGER NOT NULL UNIQUE,
@@ -1952,11 +2099,13 @@ def migrate_db(db_path: Optional[Path] = None):
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (event_param_id) REFERENCES event_params(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
             logger.info("Migration v7: created param_validation_rules table")
 
             # 2. Create batch_import_records table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS batch_import_records (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     import_name TEXT NOT NULL,
@@ -1971,11 +2120,13 @@ def migrate_db(db_path: Optional[Path] = None):
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     completed_at TIMESTAMP
                 )
-            """)
+            """
+            )
             logger.info("Migration v7: created batch_import_records table")
 
             # 3. Create batch_import_details table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS batch_import_details (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     import_id INTEGER NOT NULL,
@@ -1987,29 +2138,38 @@ def migrate_db(db_path: Optional[Path] = None):
                     error_message TEXT,
                     FOREIGN KEY (import_id) REFERENCES batch_import_records(id) ON DELETE CASCADE
                 )
-            """)
+            """
+            )
             logger.info("Migration v7: created batch_import_details table")
 
             # 4. Create indexes for validation rules
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_validation_rules_param_id
                 ON param_validation_rules(event_param_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_validation_rules_type
                 ON param_validation_rules(rule_type)
-            """)
+            """
+            )
             logger.info("Migration v7: created indexes for param_validation_rules")
 
             # 5. Create indexes for batch imports
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_batch_import_records_status
                 ON batch_import_records(status)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_batch_import_details_import_id
                 ON batch_import_details(import_id)
-            """)
+            """
+            )
             logger.info("Migration v7: created indexes for batch_import tables")
 
             conn.commit()
@@ -2020,7 +2180,8 @@ def migrate_db(db_path: Optional[Path] = None):
             logger.info("Migration v8: Starting parameter dependencies...")
 
             # Create param_dependencies table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS param_dependencies (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event_id INTEGER NOT NULL,
@@ -2034,22 +2195,29 @@ def migrate_db(db_path: Optional[Path] = None):
                     FOREIGN KEY (depends_on_param_id) REFERENCES event_params(id) ON DELETE CASCADE,
                     UNIQUE(event_id, dependent_param_id, depends_on_param_id)
                 )
-            """)
+            """
+            )
             logger.info("Migration v8: created param_dependencies table")
 
             # Create indexes
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_param_dependencies_event_id
                 ON param_dependencies(event_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_param_dependencies_dependent
                 ON param_dependencies(dependent_param_id)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_param_dependencies_depends_on
                 ON param_dependencies(depends_on_param_id)
-            """)
+            """
+            )
             logger.info("Migration v8: created indexes for param_dependencies")
 
             conn.commit()
@@ -2085,7 +2253,8 @@ def migrate_db(db_path: Optional[Path] = None):
 
             # 2. Migrate existing join_configs to new format
             logger.info("Migration v9: Migrating existing join_configs to new format...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE join_configs
                 SET join_type = 'join',
                     where_conditions = '{}',
@@ -2097,7 +2266,8 @@ def migrate_db(db_path: Optional[Path] = None):
                         ) LIMIT 1
                     )
                 WHERE join_type IS NULL
-            """)
+            """
+            )
             affected_rows = cursor.rowcount
             logger.info(
                 f"Migration v9: Migrated {affected_rows} existing join_configs to new format"
@@ -2109,7 +2279,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v9: Creating hql_generation_templates table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE hql_generation_templates (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         template_name TEXT NOT NULL UNIQUE,
@@ -2122,7 +2293,8 @@ def migrate_db(db_path: Optional[Path] = None):
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
-                """)
+                """
+                )
 
                 # Insert default templates
                 cursor.executemany(
@@ -2184,7 +2356,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v9: Creating field_selection_presets table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE field_selection_presets (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         preset_name TEXT NOT NULL,
@@ -2196,7 +2369,8 @@ def migrate_db(db_path: Optional[Path] = None):
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
                     )
-                """)
+                """
+                )
                 logger.info("Migration v9: field_selection_presets table created")
 
             # 5. Create indexes for new columns
@@ -2249,10 +2423,12 @@ def migrate_db(db_path: Optional[Path] = None):
 
             # 2. 创建索引优化查询
             logger.info("Migration v10: Creating indexes for parameter hierarchy...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_event_params_event_template
                 ON event_params(event_id, template_id)
-            """)
+            """
+            )
             logger.info("Migration v10: index idx_event_params_event_template created")
 
             conn.commit()
@@ -2277,7 +2453,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v11: Creating node_templates table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE node_templates (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         node_name TEXT NOT NULL,
@@ -2288,7 +2465,8 @@ def migrate_db(db_path: Optional[Path] = None):
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
-                """)
+                """
+                )
                 logger.info("Migration v11: node_templates table created")
 
             # 3. 创建 flow_templates 表(为阶段2准备)
@@ -2297,7 +2475,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v11: Creating flow_templates table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE flow_templates (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         flow_name TEXT NOT NULL,
@@ -2308,30 +2487,39 @@ def migrate_db(db_path: Optional[Path] = None):
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
-                """)
+                """
+                )
                 logger.info("Migration v11: flow_templates table created")
 
             # 4. 创建索引优化查询性能
             logger.info("Migration v11: Creating indexes for node and flow templates...")
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_node_templates_type
                 ON node_templates(node_type)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_node_templates_created_by
                 ON node_templates(created_by)
-            """)
-            cursor.execute("""
+            """
+            )
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_flow_templates_created_by
                 ON flow_templates(created_by)
-            """)
+            """
+            )
             logger.info("Migration v11: indexes created")
 
             # 5. 创建 field_mapping_v2 索引
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_join_configs_field_mapping_v2
                 ON join_configs(field_mapping_v2)
-            """)
+            """
+            )
             logger.info("Migration v11: field_mapping_v2 index created")
 
             conn.commit()
@@ -2387,7 +2575,8 @@ def migrate_db(db_path: Optional[Path] = None):
             else:
                 # Table doesn't exist, create it
                 logger.info("Migration v12: Creating flow_templates table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE flow_templates (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL,
@@ -2401,24 +2590,29 @@ def migrate_db(db_path: Optional[Path] = None):
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
                     )
-                """)
+                """
+                )
                 logger.info("Migration v12: flow_templates table created")
 
             # Create indexes (safe to run if they exist)
             try:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_flow_templates_game_id
                     ON flow_templates(game_id)
-                """)
+                """
+                )
                 logger.info("Migration v12: game_id index created")
             except Exception as e:
                 logger.warning(f"Migration v12: Could not create game_id index: {e}")
 
             try:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_flow_templates_updated_at
                     ON flow_templates(updated_at)
-                """)
+                """
+                )
                 logger.info("Migration v12: updated_at index created")
             except Exception as e:
                 logger.warning(f"Migration v12: Could not create updated_at index: {e}")
@@ -2436,7 +2630,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v13: Creating event_nodes table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE event_nodes (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         game_id INTEGER NOT NULL,
@@ -2449,7 +2644,8 @@ def migrate_db(db_path: Optional[Path] = None):
                         FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
                         FOREIGN KEY (event_id) REFERENCES log_events(id) ON DELETE CASCADE
                     )
-                """)
+                """
+                )
                 logger.info("Migration v13: event_nodes table created")
 
             # Create parameter_aliases table
@@ -2458,7 +2654,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v13: Creating parameter_aliases table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE parameter_aliases (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         game_id INTEGER NOT NULL,
@@ -2474,27 +2671,36 @@ def migrate_db(db_path: Optional[Path] = None):
                         FOREIGN KEY (param_id) REFERENCES parameters(id) ON DELETE CASCADE,
                         UNIQUE(game_id, param_id, alias)
                     )
-                """)
+                """
+                )
                 logger.info("Migration v13: parameter_aliases table created")
 
             # Create indexes
             try:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_event_nodes_game_id
                     ON event_nodes(game_id)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_event_nodes_event_id
                     ON event_nodes(event_id)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_parameter_aliases_game_id
                     ON parameter_aliases(game_id)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_parameter_aliases_param_id
                     ON parameter_aliases(param_id)
-                """)
+                """
+                )
                 logger.info("Migration v13: indexes created")
             except Exception as e:
                 logger.warning(f"Migration v13: Could not create indexes: {e}")
@@ -2512,7 +2718,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v14: Creating field_name_mappings table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE field_name_mappings (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         game_id INTEGER NOT NULL,
@@ -2525,7 +2732,8 @@ def migrate_db(db_path: Optional[Path] = None):
                         UNIQUE(game_id, param_name),
                         FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
                     )
-                """)
+                """
+                )
                 logger.info("Migration v14: field_name_mappings table created")
 
             # Create field_name_history table
@@ -2534,7 +2742,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v14: Creating field_name_history table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE field_name_history (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         mapping_id INTEGER NOT NULL,
@@ -2542,23 +2751,30 @@ def migrate_db(db_path: Optional[Path] = None):
                         used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (mapping_id) REFERENCES field_name_mappings(id) ON DELETE CASCADE
                     )
-                """)
+                """
+                )
                 logger.info("Migration v14: field_name_history table created")
 
             # Create indexes for field name mappings
             try:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_field_mappings_game_param
                     ON field_name_mappings(game_id, param_name)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS field_name_history_mapping_id
                     ON field_name_history(mapping_id)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS field_name_history_used_at
                     ON field_name_history(used_at)
-                """)
+                """
+                )
                 logger.info("Migration v14: indexes created")
             except Exception as e:
                 logger.warning(f"Migration v14: Could not create indexes: {e}")
@@ -2570,7 +2786,8 @@ def migrate_db(db_path: Optional[Path] = None):
         if current_version < 15:
             logger.info("Migration v15: Creating event_node_configs table...")
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS event_node_configs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     game_gid INTEGER NOT NULL,
@@ -2585,23 +2802,30 @@ def migrate_db(db_path: Optional[Path] = None):
                     created_by VARCHAR(100),
                     FOREIGN KEY (event_id) REFERENCES log_events(id)
                 )
-            """)
+            """
+            )
             logger.info("Migration v15: created event_node_configs table")
 
             # Create indexes for performance
             try:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_event_node_game_gid
                     ON event_node_configs(game_gid)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_event_node_name_en
                     ON event_node_configs(name_en)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_event_node_event_id
                     ON event_node_configs(event_id)
-                """)
+                """
+                )
                 logger.info("Migration v15: indexes created")
             except Exception as e:
                 logger.warning(f"Migration v15: Could not create indexes: {e}")
@@ -2618,7 +2842,8 @@ def migrate_db(db_path: Optional[Path] = None):
             )
             if not cursor.fetchone():
                 logger.info("Migration v16: Creating async_tasks table...")
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE async_tasks (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         task_id TEXT UNIQUE NOT NULL,
@@ -2632,23 +2857,30 @@ def migrate_db(db_path: Optional[Path] = None):
                         started_at TIMESTAMP,
                         completed_at TIMESTAMP
                     )
-                """)
+                """
+                )
                 logger.info("Migration v16: async_tasks table created")
 
             # Create indexes for async_tasks
             try:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_async_tasks_task_id
                     ON async_tasks(task_id)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_async_tasks_status
                     ON async_tasks(status)
-                """)
-                cursor.execute("""
+                """
+                )
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_async_tasks_created_at
                     ON async_tasks(created_at)
-                """)
+                """
+                )
                 logger.info("Migration v16: async_tasks indexes created")
             except Exception as e:
                 logger.warning(f"Migration v16: Could not create indexes: {e}")
@@ -2667,11 +2899,13 @@ def migrate_db(db_path: Optional[Path] = None):
                     cursor.execute("ALTER TABLE common_params ADD COLUMN display_name TEXT")
 
                     # Update existing records with default display names
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         UPDATE common_params
                         SET display_name = param_name_cn
                         WHERE display_name IS NULL
-                    """)
+                    """
+                    )
                     logger.info("Migration v17: display_name column added")
                 else:
                     logger.info("Migration v17: display_name column already exists")
@@ -2695,20 +2929,24 @@ def migrate_db(db_path: Optional[Path] = None):
 
                     # Migrate existing data: copy game_id to game_gid by joining with games table
                     logger.info("Migration v18: Migrating existing data to game_gid...")
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         UPDATE log_events
                         SET game_gid = (
                             SELECT g.gid
                             FROM games g
                             WHERE g.id = log_events.game_id
                         )
-                    """)
+                    """
+                    )
 
                     # Create index on game_gid
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         CREATE INDEX IF NOT EXISTS idx_log_events_game_gid
                         ON log_events(game_gid)
-                    """)
+                    """
+                    )
 
                     logger.info("Migration v18: game_gid column added and data migrated")
                 else:
@@ -2733,10 +2971,12 @@ def migrate_db(db_path: Optional[Path] = None):
                     cursor.execute("ALTER TABLE event_params ADD COLUMN json_path TEXT")
 
                     # Create index on json_path for better query performance
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         CREATE INDEX IF NOT EXISTS idx_event_params_json_path
                         ON event_params(json_path)
-                    """)
+                    """
+                    )
 
                     logger.info("Migration v19: json_path column added to event_params")
                 else:

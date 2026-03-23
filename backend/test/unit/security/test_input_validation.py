@@ -98,17 +98,13 @@ def test_json_path_validation():
 
     # 测试8: 正确的JSON路径格式
     try:
-        EventParameterCreate(
-            param_name="test_param", json_path="$.zoneId", template_id=1  # ✅ 正确格式
-        )
+        EventParameterCreate(param_name="test_param", json_path="$.zoneId", template_id=1)  # ✅ 正确格式
     except ValidationError:
         pytest.fail("正确的JSON路径格式应该通过验证")
 
     # 测试9: 空JSON路径(应该允许, 因为它是可选的)
     try:
-        EventParameterCreate(
-            param_name="test_param", json_path="", template_id=1  # ✅ 空字符串是可选字段
-        )
+        EventParameterCreate(param_name="test_param", json_path="", template_id=1)  # ✅ 空字符串是可选字段
     except ValidationError:
         pytest.fail("空JSON路径应该被允许（它是可选字段）")
 

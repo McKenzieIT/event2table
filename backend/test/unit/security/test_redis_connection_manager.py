@@ -191,9 +191,7 @@ class TestRedisConnectionManagerIntegration:
 
         验证连接池不会超过最大连接数
         """
-        manager = RedisConnectionManager(
-            host='localhost', port=6379, max_connections=3  # 小的连接池
-        )
+        manager = RedisConnectionManager(host='localhost', port=6379, max_connections=3)  # 小的连接池
 
         try:
             connections = []
