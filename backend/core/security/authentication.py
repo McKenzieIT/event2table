@@ -17,9 +17,34 @@ Usage:
 """
 
 import logging
+import os
 from functools import wraps
 
 logger = logging.getLogger(__name__)
+
+
+def is_development_mode() -> bool:
+    """
+    Check if the application is running in development mode.
+
+    Returns:
+        True if FLASK_ENV is 'development' or not set (defaults to development)
+        False if FLASK_ENV is 'production' or any other value
+    """
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    return flask_env.lower() == 'development'
+
+
+def is_production_mode() -> bool:
+    """
+    Check if the application is running in production mode.
+
+    Returns:
+        True if FLASK_ENV is 'production'
+        False otherwise
+    """
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    return flask_env.lower() == 'production'
 
 
 def authenticated(func):

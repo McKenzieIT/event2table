@@ -13,7 +13,7 @@ Tests for:
 import pytest
 import json
 from datetime import datetime, timedelta
-from backend.api.routes.hql_preview_v2 import hql_preview_v2_bp
+from backend.api.routes.hql_preview import hql_preview_bp
 from backend.services.hql.hql_history_service import HQLHistoryService
 from backend.core.config.config import get_db_path, TEST_DB_PATH
 
@@ -25,7 +25,7 @@ def client():
 
     app = Flask(__name__)
     app.config["TESTING"] = True
-    app.register_blueprint(hql_preview_v2_bp)
+    app.register_blueprint(hql_preview_bp)
 
     with app.test_client() as client:
         yield client
@@ -85,7 +85,7 @@ class TestHQLHistorySaveEnhancements:
     def test_save_select_type(self, client, test_db):
         """Test saving SELECT type HQL"""
         response = client.post(
-            "/hql-preview-v2/api/history/save",
+            "/hql-preview/api/history/save",
             json={
                 "events": [{"game_gid": 10000147, "event_id": 1}],
                 "fields": [{"fieldName": "role_id", "fieldType": "base"}],
@@ -115,7 +115,7 @@ class TestHQLHistorySaveEnhancements:
         }
 
         response = client.post(
-            "/hql-preview-v2/api/history/save",
+            "/hql-preview/api/history/save",
             json={
                 "events": [{"game_gid": 10000147, "event_id": 1}],
                 "fields": [{"fieldName": "role_id", "fieldType": "base"}],
@@ -138,7 +138,7 @@ class TestHQLHistorySaveEnhancements:
     def test_save_ddl_type(self, client, test_db):
         """Test saving DDL type HQL"""
         response = client.post(
-            "/hql-preview-v2/api/history/save",
+            "/hql-preview/api/history/save",
             json={
                 "events": [],
                 "fields": [],
@@ -160,7 +160,7 @@ class TestHQLHistorySaveEnhancements:
     def test_save_required_fields_validation(self, client, test_db):
         """Test validation of required fields"""
         response = client.post(
-            "/hql-preview-v2/api/history/save",
+            "/hql-preview/api/history/save",
             json={
                 # Missing required fields: events, fields, mode, hql
                 "hql_type": "select",
@@ -175,7 +175,7 @@ class TestHQLHistorySaveEnhancements:
     def test_save_invalid_hql_type(self, client, test_db):
         """Test validation of hql_type"""
         response = client.post(
-            "/hql-preview-v2/api/history/save",
+            "/hql-preview/api/history/save",
             json={
                 "events": [{"game_gid": 10000147, "event_id": 1}],
                 "fields": [{"fieldName": "role_id", "fieldType": "base"}],
@@ -247,7 +247,7 @@ class TestHQLHistorySearch:
     def test_search_by_keyword(self, client):
         """Test fuzzy search by keyword"""
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"keyword": "login", "limit": 10},
             content_type="application/json",
         )
@@ -260,7 +260,7 @@ class TestHQLHistorySearch:
     def test_search_by_hql_type(self, client):
         """Test search by HQL type"""
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"hql_type": "ddl", "limit": 10},
             content_type="application/json",
         )
@@ -274,7 +274,7 @@ class TestHQLHistorySearch:
     def test_search_by_game_gid(self, client):
         """Test search by game GID"""
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"game_gid": 10000147, "limit": 10},
             content_type="application/json",
         )
@@ -288,7 +288,7 @@ class TestHQLHistorySearch:
     def test_search_by_user_id(self, client):
         """Test search by user ID"""
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"user_id": 1, "limit": 10},
             content_type="application/json",
         )
@@ -305,7 +305,7 @@ class TestHQLHistorySearch:
         yesterday = (datetime.now() - timedelta(days=1)).isoformat()
 
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"date_from": yesterday, "date_to": today, "limit": 10},
             content_type="application/json",
         )
@@ -317,7 +317,7 @@ class TestHQLHistorySearch:
     def test_search_with_pagination(self, client):
         """Test search with pagination"""
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"limit": 2, "offset": 0},
             content_type="application/json",
         )
@@ -332,7 +332,7 @@ class TestHQLHistorySearch:
     def test_search_invalid_limit(self, client):
         """Test validation of limit parameter"""
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"limit": 1000},  # Exceeds max of 500
             content_type="application/json",
         )
@@ -344,7 +344,7 @@ class TestHQLHistorySearch:
     def test_search_invalid_offset(self, client):
         """Test validation of offset parameter"""
         response = client.post(
-            "/hql-preview-v2/api/history/search",
+            "/hql-preview/api/history/search",
             json={"offset": -1},  # Negative offset
             content_type="application/json",
         )
@@ -380,7 +380,7 @@ class TestHQLHistoryGlobalSearch:
 
     def test_global_search_by_keyword(self, client):
         """Test global search by keyword"""
-        response = client.get("/hql-preview-v2/api/history/global?keyword=role_id&limit=10")
+        response = client.get("/hql-preview/api/history/global?keyword=role_id&limit=10")
 
         data = json.loads(response.data)
         assert response.status_code == 200
@@ -389,7 +389,7 @@ class TestHQLHistoryGlobalSearch:
 
     def test_global_search_by_hql_type(self, client):
         """Test global search by HQL type"""
-        response = client.get("/hql-preview-v2/api/history/global?hql_type=select&limit=10")
+        response = client.get("/hql-preview/api/history/global?hql_type=select&limit=10")
 
         data = json.loads(response.data)
         assert response.status_code == 200
@@ -399,7 +399,7 @@ class TestHQLHistoryGlobalSearch:
 
     def test_global_search_pagination(self, client):
         """Test global search with pagination"""
-        response = client.get("/hql-preview-v2/api/history/global?limit=2&offset=0")
+        response = client.get("/hql-preview/api/history/global?limit=2&offset=0")
 
         data = json.loads(response.data)
         assert response.status_code == 200
@@ -410,7 +410,7 @@ class TestHQLHistoryGlobalSearch:
 
     def test_global_search_response_structure(self, client):
         """Test global search response has required fields"""
-        response = client.get("/hql-preview-v2/api/history/global?limit=10")
+        response = client.get("/hql-preview/api/history/global?limit=10")
 
         data = json.loads(response.data)
         assert response.status_code == 200
