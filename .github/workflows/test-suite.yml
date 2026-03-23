@@ -160,7 +160,7 @@ jobs:
 
       - name: 上传测试报告
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: frontend/playwright-report/
@@ -196,7 +196,7 @@ jobs:
             --benchmark-json=output.json
 
       - name: 上传性能结果
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: performance-results
           path: output.json

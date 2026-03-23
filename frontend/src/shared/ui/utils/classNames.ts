@@ -28,7 +28,7 @@ export function buildConditionalClasses(
     .filter(([_, shouldApply]) => shouldApply)
     .map(([modifier]) => `${baseClass}--${modifier}`);
 
-  return [...additionalClasses, ...modifierClasses]
+  return [...additionalClasses, baseClass, ...modifierClasses]
     .filter(Boolean)
     .join(' ');
 }
