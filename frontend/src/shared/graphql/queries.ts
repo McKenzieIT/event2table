@@ -245,3 +245,87 @@ export const GET_GAME_STATS = gql`
     }
   }
 `;
+
+export const GET_ALL_GAME_STATS = gql`
+  query GetAllGameStats($limit: Int) {
+    allGameStats(limit: $limit) {
+      gameGid
+      gameName
+      eventCount
+      parameterCount
+      templateCount
+      lastUpdated
+    }
+  }
+`;
+
+export const SEARCH_CATEGORIES = gql`
+  query SearchCategories($query: String!) {
+    searchCategories(query: $query) {
+      id
+      name
+      eventCount
+    }
+  }
+`;
+
+export const GET_FLOWS = gql`
+  query GetFlows($gameGid: Int, $flowType: String, $limit: Int, $offset: Int) {
+    flows(gameGid: $gameGid, flowType: $flowType, limit: $limit, offset: $offset) {
+      id
+      gameGid
+      flowName
+      flowType
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_FLOW = gql`
+  query GetFlow($id: Int!) {
+    flow(id: $id) {
+      id
+      gameGid
+      flowName
+      flowType
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_ALL_PARAMETERS_BY_GAME = gql`
+  query GetAllParametersByGame($gameGid: Int!) {
+    allParametersByGame(gameGid: $gameGid) {
+      id
+      eventId
+      paramName
+      paramNameCn
+      paramType
+      paramDescription
+      jsonPath
+      isActive
+      version
+    }
+  }
+`;
+
+export const GET_PARAMETERS_MANAGEMENT = gql`
+  query GetParametersManagement($gameGid: Int!, $mode: String, $eventId: Int) {
+    parametersManagement(gameGid: $gameGid, mode: $mode, eventId: $eventId) {
+      id
+      eventId
+      paramName
+      paramNameCn
+      paramType
+      paramDescription
+      jsonPath
+      isActive
+      version
+      eventName
+    }
+  }
+`;
