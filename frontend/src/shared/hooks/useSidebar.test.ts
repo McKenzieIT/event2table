@@ -1,17 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@test/test-utils';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSidebar } from './useSidebar';
 
 describe('useSidebar', () => {
   beforeEach(() => {
-    // Reset localStorage mock state
+    // Reset localStorage mock calls
     vi.clearAllMocks();
-    // Reset getItem to return null by default
-    localStorage.getItem.mockReturnValue(null);
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initial state', () => {
@@ -26,7 +24,7 @@ describe('useSidebar', () => {
       const savedState = { collapsed: true, groupStates: { group1: true } };
 
       // Mock getItem to return saved state
-      localStorage.getItem.mockImplementation((key: string) => {
+      vi.mocked(localStorage.getItem).mockImplementation((key: string) => {
         if (key === 'sidebarCollapsed') return JSON.stringify(savedState.collapsed);
         if (key === 'sidebarGroupStates') return JSON.stringify(savedState.groupStates);
         return null;
@@ -177,7 +175,7 @@ describe('useSidebar', () => {
 
   describe('localStorage error handling', () => {
     it('should handle localStorage errors gracefully', () => {
-      localStorage.setItem.mockImplementation(() => {
+      vi.mocked(localStorage.setItem).mockImplementation(() => {
         throw new Error('Storage quota exceeded');
       });
 
@@ -191,7 +189,7 @@ describe('useSidebar', () => {
     });
 
     it('should handle localStorage get errors gracefully', () => {
-      localStorage.getItem.mockImplementation(() => {
+      vi.mocked(localStorage.getItem).mockImplementation(() => {
         throw new Error('Storage access denied');
       });
 
