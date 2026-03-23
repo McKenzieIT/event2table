@@ -51,7 +51,7 @@ interface RightSidebarProps {
   onShowHQLDetails?: () => void;
 }
 
-export default function RightSidebar({
+export function RightSidebar({
   gameGid,
   selectedEvent = null,
   fields = [],

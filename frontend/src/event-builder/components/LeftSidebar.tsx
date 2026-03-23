@@ -28,7 +28,7 @@ export interface LeftSidebarProps {
 /**
  * LeftSidebar Component
  */
-export default function LeftSidebar({
+export function LeftSidebar({
   gameGid,
   selectedEvent,
   onEventSelect,
