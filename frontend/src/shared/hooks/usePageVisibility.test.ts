@@ -113,8 +113,10 @@ describe('usePageVisibility', () => {
 
     it('should respect minimum interval', () => {
       vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
-      const { result } = renderHook(() => useSmartPolling(1000, 5000));
-      
+      // Use baseInterval=500 so that 500*6=3000 < minInterval=5000
+      // This tests that Math.max() correctly returns the minimum
+      const { result } = renderHook(() => useSmartPolling(500, 5000));
+
       expect(result.current.pollingInterval).toBe(5000);
     });
 
