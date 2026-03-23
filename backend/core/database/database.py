@@ -1,5 +1,3 @@
-from backend.core.cache.decorators import cached
-
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
 # See: docs/reports/2026-03-05/PERFORMANCE-OPTIMIZATION-DETAILED-REPORT.md
@@ -31,7 +29,6 @@ from backend.core.logging import get_logger
 logger = get_logger(__name__)
 
 
-@cached(ttl=1800)  # Cache for 30 minutes
 def get_db_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
     """
     Get database connection with row factory and WAL mode
@@ -53,7 +50,6 @@ def get_db_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
 
 
 @contextmanager
-@cached(ttl=1800)  # Cache for 30 minutes
 def get_db(db_path: Optional[Path] = None) -> Generator[sqlite3.Connection, None, None]:
     """
     Context manager for database connections with WAL mode
