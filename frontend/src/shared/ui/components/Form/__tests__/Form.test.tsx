@@ -260,14 +260,12 @@ describe('Form Component', () => {
 
   describe('Form State', () => {
     it('should track isSubmitting state', async () => {
-      let isSubmittingState = false;
-
       const TestFormWithState = () => {
         const form = useForm();
-        isSubmittingState = form.formState.isSubmitting;
 
         return (
           <Form form={form} onSubmit={async () => {}}>
+            <div data-testid="submitting-state">{form.formState.isSubmitting ? 'Submitting' : 'Not Submitting'}</div>
             <button type="submit">Submit</button>
           </Form>
         );
@@ -275,7 +273,7 @@ describe('Form Component', () => {
 
       render(<TestFormWithState />);
 
-      expect(isSubmittingState).toBe(false);
+      expect(screen.getByTestId('submitting-state')).toHaveTextContent('Not Submitting');
     });
 
     it('should track isValid state', () => {

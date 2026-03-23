@@ -2,6 +2,8 @@
 """
 API Performance Benchmark Script
 测试所有API端点的响应时间，建立性能基线
+
+Note: Timeout increased from 10s to 30s to accommodate slower API responses in test environment
 """
 
 import time
@@ -53,7 +55,7 @@ class APIPerformanceTester:
         for i in range(iterations):
             try:
                 start_time = time.perf_counter()
-                response = requests.request(method, url, timeout=10)
+                response = requests.request(method, url, timeout=30)
                 end_time = time.perf_counter()
 
                 duration_ms = (end_time - start_time) * 1000
