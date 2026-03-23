@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom';
 import { Card, Spinner } from '@shared/ui';
 import { useGameStore } from '@/stores/gameStore';
 import { useGames, useFlows } from '@shared/graphql/hooks';
-import { usePollingInterval } from '@/hooks/usePageVisibility';  // ⚡ PERF: Phase 2
+import { usePollingInterval } from '@shared/hooks/usePageVisibility';  // ⚡ PERF: Phase 2
 import { Modal } from '@shared/ui';
 import GameManagementModal from '@/features/games/GameManagementModalGraphQL';
 import './Dashboard.css';
