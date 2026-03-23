@@ -2,8 +2,10 @@
 Document Updater.
 
 Updates documentation based on code changes.
+
+Refactored to use dependency injection for DocMapper.
 """
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from pathlib import Path
 from datetime import datetime
 
@@ -14,11 +16,21 @@ from .doc_mapper import DocMapper
 class DocumentUpdater:
     """Updates documentation."""
 
-    def __init__(self, project_root: Path = None):
-        """Initialize document updater."""
+    def __init__(
+        self, 
+        project_root: Optional[Path] = None,
+        mapper: Optional[DocMapper] = None
+    ):
+        """
+        Initialize document updater.
+        
+        Args:
+            project_root: Project root path
+            mapper: Optional DocMapper instance (dependency injection)
+        """
         self.project_root = project_root or Path.cwd()
-        self.mapper = DocMapper()
-        self.mapper.load_default_rules()
+        self.mapper = mapper or DocMapper()
+        # Note: load_default_rules() moved to caller for explicit control
 
     def generate_update_summary(self, changes: List[Change]) -> Dict[str, Any]:
         """Generate update summary."""
