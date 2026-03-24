@@ -57,8 +57,6 @@ class GameEntity(BaseModel):
     gid: int = Field(..., ge=0, description="游戏业务GID")
     name: str = Field(..., min_length=1, max_length=100, description="游戏名称")
     ods_db: str = Field(..., description="ODS数据库名称 (生产: ieu_ods/overseas_ods, 测试: 任意值)")
-    description: Optional[str] = Field(None, description="游戏描述")
-    dwd_prefix: str = Field("dwd", description="DWD表前缀")
     icon_path: Optional[str] = Field(None, description="图标路径")
 
     # 元数据
