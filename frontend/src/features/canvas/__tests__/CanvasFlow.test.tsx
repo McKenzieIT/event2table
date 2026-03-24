@@ -11,7 +11,7 @@
  * - 拖放功能
  */
 
-import { render, screen, fireEvent, waitFor, cleanup } from '@test/test-utils';
+import { render, screen, fireEvent, waitFor, cleanup, act } from '@test/test-utils';
 import React from 'react';
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
 
@@ -422,7 +422,9 @@ describe('CanvasFlow', () => {
         dropEffect: 'none',
       };
 
-      fireEvent(wrapper, dragOverEvent);
+      act(() => {
+        fireEvent(wrapper, dragOverEvent);
+      });
 
       // Note: The dropEffect is set by the component's onDragOver handler
       // In test environment, this may not work as expected, so we just verify the event was fired
@@ -448,7 +450,9 @@ describe('CanvasFlow', () => {
       // The event will still be handled, just without a specific target
       wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
 
-      fireEvent(wrapper, dragEvent);
+      await act(async () => {
+        fireEvent(wrapper, dragEvent);
+      });
 
       // Should not add any node
       await waitFor(() => {
@@ -518,7 +522,9 @@ describe('CanvasFlow', () => {
       dragEvent.clientY = 100;
       wrapper.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0 }));
 
-      fireEvent(wrapper, dragEvent);
+      await act(async () => {
+        fireEvent(wrapper, dragEvent);
+      });
 
       // Should handle error without crashing
       await waitFor(() => {

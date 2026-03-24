@@ -2,7 +2,7 @@
  * FormUpload Component Unit Tests
  */
 
-import { render, screen, fireEvent, waitFor } from '@test/test-utils';
+import { render, screen, fireEvent, waitFor, act } from '@test/test-utils';
 import { useForm } from 'react-hook-form';
 import { describe, it, expect, vi } from 'vitest';
 
@@ -121,7 +121,9 @@ describe('FormUpload', () => {
       writable: true
     });
     
-    fireEvent.change(input);
+    await act(async () => {
+      fireEvent.change(input);
+    });
     
     await waitFor(() => {
       expect(screen.getByText('test.png')).toBeInTheDocument();
@@ -143,7 +145,9 @@ describe('FormUpload', () => {
       writable: true
     });
     
-    fireEvent.change(input);
+    await act(async () => {
+      fireEvent.change(input);
+    });
     
     await waitFor(() => {
       const preview = document.querySelector('.form-upload-preview');
@@ -166,7 +170,9 @@ describe('FormUpload', () => {
       writable: true
     });
     
-    fireEvent.change(input);
+    await act(async () => {
+      fireEvent.change(input);
+    });
     
     await waitFor(() => {
       expect(screen.getByText('2 KB')).toBeInTheDocument();
@@ -188,14 +194,19 @@ describe('FormUpload', () => {
       writable: true
     });
     
-    fireEvent.change(input);
+    await act(async () => {
+      fireEvent.change(input);
+    });
     
     await waitFor(() => {
       expect(screen.getByText('test.png')).toBeInTheDocument();
     });
     
     const removeButton = document.querySelector('.form-upload-remove');
-    fireEvent.click(removeButton!);
+    
+    await act(async () => {
+      fireEvent.click(removeButton!);
+    });
     
     await waitFor(() => {
       expect(screen.queryByText('test.png')).not.toBeInTheDocument();
@@ -219,7 +230,9 @@ describe('FormUpload', () => {
       writable: true
     });
     
-    fireEvent.change(input);
+    await act(async () => {
+      fireEvent.change(input);
+    });
     
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalled();
@@ -237,10 +250,14 @@ describe('FormUpload', () => {
     
     const dropzone = document.querySelector('.form-upload-dropzone');
     
-    fireEvent.dragEnter(dropzone!);
+    await act(async () => {
+      fireEvent.dragEnter(dropzone!);
+    });
     expect(dropzone).toHaveClass('form-upload-dropzone--dragging');
     
-    fireEvent.dragLeave(dropzone!);
+    await act(async () => {
+      fireEvent.dragLeave(dropzone!);
+    });
     expect(dropzone).not.toHaveClass('form-upload-dropzone--dragging');
   });
 

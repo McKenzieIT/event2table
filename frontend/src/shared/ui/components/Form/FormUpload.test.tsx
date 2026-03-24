@@ -9,7 +9,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { render, screen, waitFor, fireEvent } from '@test/test-utils';
+import { render, screen, waitFor, fireEvent, act } from '@test/test-utils';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -130,7 +130,10 @@ describe('FormUpload Component', () => {
       const fileInput = dropzone.querySelector('input[type="file"]') as HTMLInputElement;
 
       const file = createMockFile('test.pdf', 1024, 'application/pdf');
-      await user.upload(fileInput, file);
+      
+      await act(async () => {
+        await user.upload(fileInput, file);
+      });
 
       // Verify file is displayed in the list
       await waitFor(() => {
@@ -149,7 +152,9 @@ describe('FormUpload Component', () => {
       const dropzone = screen.getByRole('button', { name: /drag and drop/i });
       
       // Simulate drag enter
-      await fireEvent.dragEnter(dropzone);
+      await act(async () => {
+        await fireEvent.dragEnter(dropzone);
+      });
 
       expect(dropzone).toHaveClass('form-upload-dropzone--dragging');
     });
@@ -183,7 +188,10 @@ describe('FormUpload Component', () => {
       const fileInput = dropzone.querySelector('input[type="file"]') as HTMLInputElement;
 
       const file = createMockFile('test.pdf', 1024, 'application/pdf');
-      await user.upload(fileInput, file);
+      
+      await act(async () => {
+        await user.upload(fileInput, file);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('test.pdf')).toBeInTheDocument();
@@ -202,14 +210,20 @@ describe('FormUpload Component', () => {
       const fileInput = dropzone.querySelector('input[type="file"]') as HTMLInputElement;
 
       const file = createMockFile('test.pdf', 1024, 'application/pdf');
-      await user.upload(fileInput, file);
+      
+      await act(async () => {
+        await user.upload(fileInput, file);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('test.pdf')).toBeInTheDocument();
       });
 
       const removeButton = screen.getByRole('button', { name: /remove test.pdf/i });
-      await user.click(removeButton);
+      
+      await act(async () => {
+        await user.click(removeButton);
+      });
 
       await waitFor(() => {
         expect(screen.queryByText('test.pdf')).not.toBeInTheDocument();
@@ -250,7 +264,10 @@ describe('FormUpload Component', () => {
 
       const file1 = createMockFile('test1.pdf', 1024, 'application/pdf');
       const file2 = createMockFile('test2.pdf', 2048, 'application/pdf');
-      await user.upload(fileInput, [file1, file2]);
+      
+      await act(async () => {
+        await user.upload(fileInput, [file1, file2]);
+      });
 
       await waitFor(() => {
         expect(screen.getByText('test1.pdf')).toBeInTheDocument();
@@ -273,7 +290,10 @@ describe('FormUpload Component', () => {
       const fileInput = dropzone.querySelector('input[type="file"]') as HTMLInputElement;
 
       const file = createMockFile('large.pdf', 2048, 'application/pdf');
-      await user.upload(fileInput, file);
+      
+      await act(async () => {
+        await user.upload(fileInput, file);
+      });
 
       expect(alertMock).toHaveBeenCalledWith(expect.stringContaining('exceeds maximum size'));
     });
@@ -295,10 +315,12 @@ describe('FormUpload Component', () => {
       const file = createMockFile('test.exe', 1024, 'application/octet-stream');
       
       // Simulate drop event which bypasses the browser's accept filter
-      fireEvent.drop(dropzone, {
-        dataTransfer: {
-          files: [file],
-        },
+      await act(async () => {
+        fireEvent.drop(dropzone, {
+          dataTransfer: {
+            files: [file],
+          },
+        });
       });
 
       // The alert should be called synchronously
@@ -382,7 +404,9 @@ describe('FormUpload Component', () => {
         </TestFormWrapper>
       );
 
-      await user.click(screen.getByRole('button', { name: /submit/i }));
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /submit/i }));
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Required')).toBeInTheDocument();
@@ -392,7 +416,10 @@ describe('FormUpload Component', () => {
       const fileInput = dropzone.querySelector('input[type="file"]') as HTMLInputElement;
 
       const file = createMockFile('test.pdf', 1024, 'application/pdf');
-      await user.upload(fileInput, file);
+      
+      await act(async () => {
+        await user.upload(fileInput, file);
+      });
 
       // Wait for file to be displayed
       await waitFor(() => {
@@ -400,7 +427,9 @@ describe('FormUpload Component', () => {
       });
 
       // Submit again to trigger validation
-      await user.click(screen.getByRole('button', { name: /submit/i }));
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /submit/i }));
+      });
 
       await waitFor(() => {
         expect(screen.queryByText('Required')).not.toBeInTheDocument();
@@ -496,7 +525,10 @@ describe('FormUpload Component', () => {
       const fileInput = dropzone.querySelector('input[type="file"]') as HTMLInputElement;
 
       const file = createMockFile('test.pdf', 1024, 'application/pdf');
-      await user.upload(fileInput, file);
+      
+      await act(async () => {
+        await user.upload(fileInput, file);
+      });
 
       await waitFor(() => {
         const removeButton = screen.getByRole('button', { name: /remove test.pdf/i });
