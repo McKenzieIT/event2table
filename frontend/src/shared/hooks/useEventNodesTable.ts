@@ -21,7 +21,7 @@ import { useState, useMemo } from 'react';
 /**
  * 列定义类型
  */
-export type EventNodesColumnDef = ReturnType<typeof createColumnHelper<EventNode>>['accessor'>;
+export type EventNodesColumnDef = ReturnType<typeof createColumnHelper<EventNode>>['accessor'];
 
 interface UseEventNodesTableReturn {
   table: Table<EventNode>;
