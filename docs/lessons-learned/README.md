@@ -12,11 +12,12 @@
 - **Total Experience Documents**: 23
 - **Total Experience Points**: ~150+ (estimated)
 - **P0 (Critical)**: ~10 experiences
-- **P1 (Important)**: ~20 experiences
+- **P1 (Important)**: ~21 experiences
 - **P2 (Useful)**: ~120+ experiences
 - **Recent Updates** (2026-03-24):
   - ✅ 新增: 避免过度工程化 (P0)
   - ✅ 新增: TDD驱动的Prompt工程 (P1)
+  - ✅ 新增: 示例驱动Prompt验证方法 (P1) 🆕
   - ✅ 新增: 对话式测试方法 (P1)
 
 ---
@@ -50,6 +51,7 @@
 | **Test-Fix迭代** | [test-fix-iteration](test-fix-iteration.md) | P0 |
 | **过度工程化** 🆕 | [project-management](project-management.md) | P0 |
 | **TDD Prompt工程** 🆕 | [project-management](project-management.md) | P1 |
+| **Prompt验证测试** 🆕 | [project-management](project-management.md) | P1 |
 | **对话式测试** 🆕 | [testing-guide](testing-guide.md) | P1 |
 
 ---
@@ -66,10 +68,11 @@
 - 文档驱动开发 (P1)
 - **避免过度工程化** (P0) 🆕
 - **TDD驱动的Prompt工程** (P1) 🆕
+- **示例驱动Prompt验证** (P1) 🆕
 - Subagent-Driven Development (P1)
 - 技术债务管理 (P2)
 
-**Experience Count**: ~17 points
+**Experience Count**: ~18 points
 **Last Updated**: 2026-03-24
 
 ---

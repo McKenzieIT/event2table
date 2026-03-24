@@ -3649,6 +3649,40 @@ module.exports = {
 /update-docs        # 更新文档
 ```
 
+### 🆕 Update-Docs Skill 重构完成 (2026-03-24)
+
+**核心变化**: 从过度工程化转向对话驱动方法
+
+**代码减少**:
+- ❌ 删除8个过度工程化脚本 (4010行)
+- ✅ 创建2个简化脚本 (579行)
+- ✅ 重写SKILL.md (1284行 → ~500行)
+- **净减少**: -87% (接近90%目标)
+
+**归档的过度工程化脚本**:
+1. `experience_extractor.py` (888行) - 使用字符串匹配提取优先级
+2. `auto_archiver.py` (371行) - 使用正则匹配判断临时文件
+3. `index_generator.py` (448行) - 扫描前10行查找标题
+4. `workflow_orchestrator.py` (557行) - 自动编排7个阶段
+5. `reflective_experience_extractor.py` (567行) - 复杂的4轮反思
+6. `dynamic_category_mapper.py` (437行) - 从知识图谱自动学习分类
+7. `cached_reflective_extractor.py` (340行) - 缓存版反射提取器
+8. `claude_semantic_extractor.py` (402行) - Claude语义提取器（API调用方式）
+
+**新建的简化脚本**:
+1. `kg_helper.py` (265行) - 知识图谱查询辅助（不含自动决策）
+2. `file_operations.py` (314行) - 文件操作辅助（只执行机械操作）
+
+**核心原则变化**:
+- ❌ **旧方式**: 脚本自动判断 → 执行 → 用户审核
+- ✅ **新方式**: 对话理解意图 → 用户决策 → 脚本执行机械操作
+
+**测试结果**: 7个测试用例，100%通过率
+
+**详细报告**:
+- [重构总结报告](.claude/skills/update-docs/FINAL-SUMMARY-2026-03-24.md)
+- [测试报告](.claude/skills/update-docs/TEST-REPORT-2026-03-24.md)
+
 ---
 
 ## 快速参考
@@ -3694,6 +3728,7 @@ module.exports = {
 
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
+| 7.9.1 | 2026-03-24 | Update-Docs Skill 重构完成：从过度工程化转向对话驱动，代码减少87% (4010行→579行) |
 | 7.9 | 2026-03-02 | 新增项目管理最佳实践章节：并行开发、大规模重构、零破坏性变更 |
 | 7.8 | 2026-03-01 | 后端架构全面优化（Phase 1-4 完成）：100% ERS 架构迁移 |
 | 7.8 | 2026-02-26 | Entity架构迁移 + DDD清理完成：6/8核心模块迁移 |
