@@ -37,6 +37,9 @@ from backend.core.utils import (
 # Import Service layer
 from backend.services.flows.flow_service import FlowService
 
+# Import Repository layer
+from backend.models.repositories import DomainRepositories
+
 sys.path.append("..")
 try:
     from backend.core.cache.cache_system import clear_cache_pattern
@@ -55,7 +58,6 @@ except ImportError:
             Returns:
                 None
         """
-        pass
 
 
 # Import the parent blueprint
@@ -108,7 +110,7 @@ def api_create_flow():
             )
 
         # Validate game_gid exists using Repository
-        game = Repositories.GAMES.find_by_field("gid", data["game_gid"])
+        game = DomainRepositories["games"].find_by_field("gid", data["game_gid"])
         if not game:
             return json_error_response(
                 f"Game with gid {data['game_gid']} not found", status_code=404
@@ -174,7 +176,7 @@ def api_create_flow():
 def api_get_flow(flow_id):
     """API: Get flow details"""
     try:
-        flow = Repositories.FLOW_TEMPLATES.find_by_id(flow_id)
+        flow = DomainRepositories["flows"].find_by_id(flow_id)
 
         if not flow:
             return json_error_response("Flow not found", status_code=404)
@@ -189,7 +191,7 @@ def api_get_flow(flow_id):
 @api_bp.route("/api/flows/<int:flow_id>", methods=["PUT"])
 def api_update_flow(flow_id):
     """API: Update a flow"""
-    flow = Repositories.FLOW_TEMPLATES.find_by_id(flow_id)
+    flow = DomainRepositories["flows"].find_by_id(flow_id)
     if not flow:
         return json_error_response("Flow not found", status_code=404)
 
@@ -258,12 +260,12 @@ def api_update_flow(flow_id):
 @api_bp.route("/api/flows/<int:flow_id>", methods=["DELETE"])
 def api_delete_flow(flow_id):
     """API: Delete a flow"""
-    flow = Repositories.FLOW_TEMPLATES.find_by_id(flow_id)
+    flow = DomainRepositories["flows"].find_by_id(flow_id)
     if not flow:
         return json_error_response("Flow not found", status_code=404)
 
     try:
-        Repositories.FLOW_TEMPLATES.delete(flow_id)
+        DomainRepositories["flows"].delete(flow_id)
 
         clear_cache_pattern("flows")
         logger.info(f"Flow deleted: {flow_id}")
@@ -281,7 +283,7 @@ def api_load_flow(flow_id):
         # Import flow manager from backend services
         from backend.services.flows import flow_manager
 
-        flow = Repositories.FLOW_TEMPLATES.find_by_id(flow_id)
+        flow = DomainRepositories["flows"].find_by_id(flow_id)
         if not flow:
             return json_error_response("Flow not found", status_code=404)
 
@@ -370,7 +372,7 @@ def canvas_api_preview_results():
             return json_error_response("Missing flow_id", status_code=400)
 
         # Get flow details
-        flow = Repositories.FLOW_TEMPLATES.find_by_id(data["flow_id"])
+        flow = DomainRepositories["flows"].find_by_id(data["flow_id"])
         if not flow:
             return json_error_response("Flow not found", status_code=404)
 
@@ -404,7 +406,7 @@ def api_batch_delete_flows():
 
     try:
         # Delete flows using Repository batch delete
-        deleted_count = Repositories.FLOW_TEMPLATES.delete_batch(flow_ids)
+        deleted_count = DomainRepositories["flows"].delete_batch(flow_ids)
 
         clear_cache_pattern("flows")  # Clear cache after delete
         logger.info(f"Batch deleted {deleted_count} flows")
@@ -448,7 +450,7 @@ def api_batch_update_flows():
             updates["name"] = result
 
         # Use Repository batch update
-        updated_count = Repositories.FLOW_TEMPLATES.update_batch(flow_ids, updates)
+        updated_count = DomainRepositories["flows"].update_batch(flow_ids, updates)
 
         clear_cache_pattern("flows")  # Clear cache after update
         logger.info(f"Batch updated {updated_count} flows")
