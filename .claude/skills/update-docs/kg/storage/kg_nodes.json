@@ -1,17 +1,161 @@
-{
-  "nodes": [],
-  "metadata": {
-    "version": "1.0.0",
-    "created_at": "2026-03-22T00:00:00Z",
-    "last_updated": "2026-03-22T00:00:00Z",
-    "total_nodes": 0,
-    "node_types": {
-      "document": 0,
-      "problem": 0,
-      "solution": 0,
-      "code_snippet": 0,
-      "code": 0,
-      "concept": 0
+[
+  {
+    "id": "solution:avoid-over-engineering",
+    "type": "solution",
+    "title": "避免过度工程化",
+    "description": "识别和避免过度工程化的原则和方法",
+    "category": "Project Management",
+    "priority": "P0",
+    "tags": [
+      "Simplification",
+      "Over-engineering",
+      "Architecture"
+    ],
+    "source": "docs/reports/2026-03-24/update-docs-overengineering-audit.md",
+    "target_document": "docs/lessons-learned/project-management.md",
+    "created_at": "2026-03-24T10:31:09.807423",
+    "updated_at": "2026-03-24T10:31:09.807423",
+    "_metadata": {
+      "quality_score": 0.95,
+      "extraction_date": "2026-03-24",
+      "extraction_method": "manual"
     }
+  },
+  {
+    "id": "solution:tdd-prompt-engineering",
+    "type": "solution",
+    "title": "TDD驱动的Prompt工程",
+    "description": "使用测试驱动方法优化Prompt质量",
+    "category": "Project Management",
+    "priority": "P1",
+    "tags": [
+      "TDD",
+      "Prompt Engineering",
+      "Testing"
+    ],
+    "source": "docs/reports/2026-03-24/PROMPT-VALIDATION-TEST-FRAMEWORK.md",
+    "target_document": "docs/lessons-learned/project-management.md",
+    "created_at": "2026-03-24T10:31:09.807423",
+    "updated_at": "2026-03-24T10:31:09.807423",
+    "_metadata": {
+      "quality_score": 0.9,
+      "extraction_date": "2026-03-24",
+      "extraction_method": "manual"
+    }
+  },
+  {
+    "id": "solution:conversation-based-testing",
+    "type": "solution",
+    "title": "对话式测试方法",
+    "description": "通过对话触发Claude深度思考的测试方法",
+    "category": "Testing",
+    "priority": "P1",
+    "tags": [
+      "Conversation Testing",
+      "Claude Thinking",
+      "Quality Validation"
+    ],
+    "source": "docs/reports/2026-03-23/CONVERSATION-TESTING-GUIDE.md",
+    "target_document": "docs/lessons-learned/testing-guide.md",
+    "created_at": "2026-03-24T10:31:09.807423",
+    "updated_at": "2026-03-24T10:31:09.807423",
+    "_metadata": {
+      "quality_score": 0.92,
+      "extraction_date": "2026-03-24",
+      "extraction_method": "manual"
+    }
+  },
+  {
+    "id": "doc:update-docs-overengineering-audit",
+    "type": "document",
+    "title": "update-docs过度工程化审计报告",
+    "file_path": "docs/reports/2026-03-24/update-docs-overengineering-audit.md",
+    "is_archived": true,
+    "archived_location": "docs/archive/reports/2026-03/update-docs-overengineering-audit.md",
+    "archived_date": "2026-03-24",
+    "created_at": "2026-03-24",
+    "updated_at": "2026-03-24"
+  },
+  {
+    "id": "doc:prompt-validation-test-framework",
+    "type": "document",
+    "title": "Prompt验证测试框架",
+    "file_path": "docs/reports/2026-03-24/PROMPT-VALIDATION-TEST-FRAMEWORK.md",
+    "is_archived": true,
+    "archived_location": "docs/archive/reports/2026-03/PROMPT-VALIDATION-TEST-FRAMEWORK.md",
+    "archived_date": "2026-03-24",
+    "created_at": "2026-03-24",
+    "updated_at": "2026-03-24"
+  },
+  {
+    "id": "doc:conversation-testing-guide",
+    "type": "document",
+    "title": "对话式测试指南",
+    "file_path": "docs/reports/2026-03-23/CONVERSATION-TESTING-GUIDE.md",
+    "is_archived": true,
+    "archived_location": "docs/archive/reports/2026-03/CONVERSATION-TESTING-GUIDE.md",
+    "archived_date": "2026-03-24",
+    "created_at": "2026-03-23",
+    "updated_at": "2026-03-24"
+  },
+  {
+    "id": "doc:project-management",
+    "type": "document",
+    "title": "项目管理经验文档",
+    "file_path": "docs/lessons-learned/project-management.md",
+    "is_archived": false,
+    "created_at": null,
+    "updated_at": "2026-03-24",
+    "experience_count": 18
+  },
+  {
+    "id": "doc:testing-guide",
+    "type": "document",
+    "title": "测试指南经验文档",
+    "file_path": "docs/lessons-learned/testing-guide.md",
+    "is_archived": false,
+    "created_at": null,
+    "updated_at": "2026-03-24",
+    "experience_count": 20
+  },
+  {
+    "id": "solution:example-driven-prompt-validation",
+    "type": "solution",
+    "title": "示例驱动Prompt验证方法",
+    "description": "使用多Prompt对比测试和量化评分确定最优Prompt策略",
+    "category": "Project Management",
+    "priority": "P1",
+    "tags": [
+      "Prompt Engineering",
+      "Testing",
+      "Validation",
+      "Data-Driven"
+    ],
+    "source": "docs/archive/reports/2026-03/PROMPT-ROUND-1-RESULTS.md",
+    "target_document": "docs/lessons-learned/project-management.md",
+    "created_at": "2026-03-24T10:52:13.052918",
+    "updated_at": "2026-03-24T10:52:13.052918",
+    "_metadata": {
+      "quality_score": 0.98,
+      "extraction_date": "2026-03-24",
+      "extraction_method": "manual",
+      "test_data": {
+        "test_documents": 4,
+        "test_prompts": 5,
+        "total_test_cases": 20,
+        "completion_rate": "100%"
+      }
+    }
+  },
+  {
+    "id": "doc:prompt-round-1-results",
+    "type": "document",
+    "title": "Prompt验证测试Round 1结果报告",
+    "file_path": "docs/archive/reports/2026-03/PROMPT-ROUND-1-RESULTS.md",
+    "is_archived": true,
+    "archived_location": "docs/archive/reports/2026-03/PROMPT-ROUND-1-RESULTS.md",
+    "archived_date": "2026-03-24",
+    "created_at": "2026-03-24",
+    "updated_at": "2026-03-24"
   }
-}
+]

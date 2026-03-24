@@ -49,8 +49,6 @@ os.environ["FLASK_SECRET_KEY"] = "test-secret-key"
 try:
     from web_app import app
     from backend.core.cache.decorators import cached
-
-    from backend.core.cache.decorators import cached
     from backend.core.database import DB_PATH, get_db_connection, init_db
     from backend.core.logging import get_logger
 

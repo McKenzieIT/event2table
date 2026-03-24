@@ -1,12 +1,15 @@
 {
   "version": "1.0.0",
   "created_at": "2026-03-22T00:00:00Z",
-  "last_updated": "2026-03-22T00:00:00Z",
-  "incremental_update_counter": 0,
+  "last_updated": "2026-03-24",
+  "incremental_update_counter": 2,
   "incremental_update_threshold": 10,
   "next_full_check_threshold": 10,
   "last_full_check": null,
   "document_coverage": 0,
   "link_effectiveness": 0,
-  "orphan_node_ratio": 0
+  "orphan_node_ratio": 0,
+  "node_count": 10,
+  "edge_count": 16,
+  "last_update_action": "添加1个新经验：示例驱动Prompt验证方法"
 }
