@@ -493,10 +493,10 @@ class GameRepository(GenericRepository):
         cursor = conn.cursor()
 
         try:
-            # 构建批量INSERT SQL(移除name_cn字段, 数据库中不存在)
+            # 构建批量INSERT SQL(移除description和dwd_prefix字段, 数据库中不存在)
             query = """
-                INSERT INTO games (gid, name, ods_db, description, dwd_prefix, icon_path)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO games (gid, name, ods_db, icon_path)
+                VALUES (?, ?, ?, ?)
             """
 
             # 准备参数列表
@@ -505,8 +505,6 @@ class GameRepository(GenericRepository):
                     g.get('gid'),
                     g.get('name'),
                     g.get('ods_db', f"ods_game_{g.get('gid')}"),
-                    g.get('description', ''),
-                    g.get('dwd_prefix', 'dwd'),
                     g.get('icon_path'),
                 )
                 for g in games_data
