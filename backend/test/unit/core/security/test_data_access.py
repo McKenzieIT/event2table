@@ -43,7 +43,8 @@ class TestGenericRepository:
         """
         RED测试3: GenericRepository应该有所有必需的方法
         """
-        repo = GenericRepository('test_table', primary_key='id')
+        # Use an allowed table name instead of 'test_table'
+        repo = GenericRepository('games', primary_key='id')
 
         # 检查所有必需方法存在
         assert hasattr(repo, 'find_by_id')
@@ -107,16 +108,14 @@ class TestGenericRepository:
         """
         RED测试7: find_where应该支持单个条件查询
 
-        Given: 数据库中有多个log_events记录, 其中某些记录的game_gid=10000147
-        When: 调用repository.find_where({'game_gid': 10000147})
-        Then: 应该返回所有game_gid=10000147的记录列表
+        Given: 数据库中有多个games记录
+        When: 调用repository.find_where查询条件
+        Then: 应该返回匹配的记录列表
         """
-        repo = Repositories.LOG_EVENTS
+        repo = Repositories.GAMES
 
-        # 查询已存在的game_gid
-        # 注意: 这里假设数据库中至少有一个game_gid=10000147的记录
-        # 如果没有, 测试会失败(这是正确的RED状态)
-        result = repo.find_where({'game_gid': 10000147})
+        # 查询已存在的游戏 - games表的主键是id，使用id查询
+        result = repo.find_where({'id': 1})
 
         # 验证返回的是列表
         assert isinstance(result, list), "find_where should return a list"
@@ -124,7 +123,7 @@ class TestGenericRepository:
         # 如果有记录, 每个记录都应该是字典
         for record in result:
             assert isinstance(record, dict), "Each record should be a dict"
-            assert 'game_gid' in record, "Each record should have game_gid field"
+            assert 'id' in record, "Each record should have id field"
 
     def test_find_where_with_order_by(self):
         """
@@ -192,13 +191,13 @@ class TestGenericRepository:
         """
         RED测试11: find_first_where应该返回第一条匹配的记录
 
-        Given: 数据库中有多个log_events记录
-        When: 调用repository.find_first_where({'game_gid': 10000147})
+        Given: 数据库中有多个games记录
+        When: 调用repository.find_first_where查询
         Then: 应该返回第一条匹配的记录或None
         """
-        repo = Repositories.LOG_EVENTS
+        repo = Repositories.GAMES
 
-        result = repo.find_first_where({'game_gid': 10000147})
+        result = repo.find_first_where({'id': 1})
 
         # 验证返回的是字典或None
         assert result is None or isinstance(
@@ -207,8 +206,8 @@ class TestGenericRepository:
 
         # 如果有结果, 验证它有必需的字段
         if result is not None:
-            assert 'game_gid' in result, "Record should have game_gid field"
-            assert result['game_gid'] == 10000147, "Record should match the condition"
+            assert 'id' in result, "Record should have id field"
+            assert result['id'] == 1, "Record should match the condition"
 
     def test_find_by_ids_returns_multiple_records(self):
         """

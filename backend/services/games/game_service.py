@@ -202,9 +202,14 @@ class GameService:
             更新后的GameEntity
 
         Raises:
-            ValueError: game不存在
+            ValueError: game不存在或尝试修改STAR001游戏
         """
         validate_game_gid(game_gid)
+
+        # STAR001 保护: 禁止修改系统核心游戏
+        STAR001_GID = 10000147
+        if game_gid == STAR001_GID:
+            raise ValueError(f"Cannot modify STAR001 game (GID: {STAR001_GID}) - system protected")
 
         # 验证游戏存在
         existing = self.game_repo.find_by_gid(game_gid)
@@ -237,9 +242,14 @@ class GameService:
             game_gid: 游戏业务GID
 
         Raises:
-            ValueError: game不存在或有关联数据
+            ValueError: game不存在或有关联数据或尝试删除STAR001游戏
         """
         validate_game_gid(game_gid)
+
+        # STAR001 保护: 禁止删除系统核心游戏
+        STAR001_GID = 10000147
+        if game_gid == STAR001_GID:
+            raise ValueError(f"Cannot delete STAR001 game (GID: {STAR001_GID}) - system protected")
 
         # 验证游戏存在
         existing = self.game_repo.find_by_gid(game_gid)

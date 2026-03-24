@@ -595,11 +595,15 @@ describe('Performance Regression Tests', () => {
     const avgFirstFive = firstFive.reduce((a, b) => a + b, 0) / firstFive.length;
     const avgLastFive = lastFive.reduce((a, b) => a + b, 0) / lastFive.length;
 
-    // If both averages are 0 (mocked performance.now), skip the comparison
-    if (avgFirstFive === 0 && avgLastFive === 0) {
-      // Performance regression check passed (mocked environment)
+    // In test environment with mocked performance.now(), all times may be identical
+    // Check for performance degradation only when we have meaningful measurements
+    const hasRealMeasurements = renderTimes.some(t => t > 0);
+    
+    if (!hasRealMeasurements) {
+      // Performance regression check passed (mocked environment - all times are 0)
       expect(true).toBe(true);
     } else {
+      // With real measurements, ensure no significant degradation
       expect(avgLastFive).toBeLessThan(avgFirstFive * 1.5); // Less than 50% increase
       // Performance regression check passed
     }
