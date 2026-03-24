@@ -451,7 +451,7 @@ describe('GraphQLQueryOptimizer', () => {
 
       const cached = optimizer.getCachedQuery(queryKey);
       expect(cached).toBeDefined();
-      expect(cached?.query).toBe(query);
+      expect(cached.query).toBe(query);
     });
 
     it('should store timestamp', () => {
@@ -462,8 +462,8 @@ describe('GraphQLQueryOptimizer', () => {
       optimizer.cacheQuery(queryKey, query);
 
       const cached = optimizer.getCachedQuery(queryKey);
-      expect(cached?.timestamp).toBeGreaterThanOrEqual(beforeCache);
-      expect(cached?.timestamp).toBeLessThanOrEqual(Date.now());
+      expect(cached.timestamp).toBeGreaterThanOrEqual(beforeCache);
+      expect(cached.timestamp).toBeLessThanOrEqual(Date.now());
     });
 
     it('should return undefined for non-existent cache', () => {
@@ -477,7 +477,7 @@ describe('GraphQLQueryOptimizer', () => {
       optimizer.cacheQuery(queryKey, 'query 2');
 
       const cached = optimizer.getCachedQuery(queryKey);
-      expect(cached?.query).toBe('query 2');
+      expect(cached.query).toBe('query 2');
     });
   });
 
@@ -488,8 +488,10 @@ describe('GraphQLQueryOptimizer', () => {
 
       optimizer.clearCache();
 
-      expect(optimizer.getCachedQuery('q1')).toBeUndefined();
-      expect(optimizer.getCachedQuery('q2')).toBeUndefined();
+      const cached1 = optimizer.getCachedQuery('q1');
+      const cached2 = optimizer.getCachedQuery('q2');
+      expect(cached1).toBeUndefined();
+      expect(cached2).toBeUndefined();
     });
 
     it('should be safe to call when cache is empty', () => {
