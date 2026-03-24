@@ -4,6 +4,46 @@ import React from 'react';
 import { TableHeaderProps, TableColumn, RowData } from './Table.types';
 
 /**
+ * Validates and parses a width value to ensure it's a valid CSS value
+ * @param width - The width value from column definition (number | string | undefined)
+ * @returns A valid CSS width value (number with px, string, or 'auto')
+ */
+const parseWidth = (width: number | string | undefined): string | number | undefined => {
+  // Handle undefined/null
+  if (width === undefined || width === null) {
+    return 'auto';
+  }
+
+  // Handle string values (e.g., '100px', '10%', 'auto')
+  if (typeof width === 'string') {
+    // Validate it's not an empty string
+    return width.trim() !== '' ? width : 'auto';
+  }
+
+  // Handle number values
+  if (typeof width === 'number') {
+    // Check for invalid number values
+    if (!Number.isFinite(width) || Number.isNaN(width)) {
+      console.warn(`Invalid width value: ${width}. Using 'auto' instead.`);
+      return 'auto';
+    }
+
+    // Check for negative values
+    if (width < 0) {
+      console.warn(`Negative width value: ${width}. Using 'auto' instead.`);
+      return 'auto';
+    }
+
+    // Return valid number (will be converted to px by React)
+    return width;
+  }
+
+  // Fallback for any other type
+  console.warn(`Unsupported width type: ${typeof width}. Using 'auto' instead.`);
+  return 'auto';
+};
+
+/**
  * TableHeader Component
  * 
  * Renders the header section of the table with support for:
@@ -67,9 +107,9 @@ export const TableHead = React.memo(<TData extends RowData>({
   ].filter(Boolean).join(' ');
 
   const style: React.CSSProperties = {
-    width: header.getSize() !== 150 ? header.getSize() : undefined,
-    left: isPinnedLeft ? header.getStart() : undefined,
-    right: isPinnedRight ? header.getTotalRight() : undefined,
+    width: parseWidth(header.getSize()),
+    left: isPinnedLeft ? parseWidth(header.getStart()) : undefined,
+    right: isPinnedRight ? parseWidth(header.getTotalRight()) : undefined,
   };
 
   return (
