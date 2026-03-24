@@ -96,6 +96,8 @@ const Table = React.memo(<TData extends object = any>({
   currentPage = 1,
   onPageChange,
   pageSizeOptions = [10, 20, 50, 100],
+  showSizeChanger = false,
+  showQuickJumper = false,
   virtual = false,
   rowHeight = 50,
   maxHeight = 600,
@@ -177,7 +179,10 @@ const Table = React.memo(<TData extends object = any>({
       ...col,
       enableSorting: col.sortable !== false && sortable,
       enableFiltering: col.filterable !== false && filterable,
-      size: col.width || 'auto',
+      // Ensure size is a valid number or 'auto' string
+      size: (typeof col.width === 'number' && Number.isFinite(col.width) && col.width > 0)
+        ? col.width
+        : (col.width && typeof col.width === 'string' ? col.width : 'auto'),
       minSize: col.minWidth || 40,
       maxSize: col.maxWidth || 1000,
     }));
@@ -577,6 +582,8 @@ const Table = React.memo(<TData extends object = any>({
               {range[0]}-{range[1]} of {total} items
             </span>
           )}
+          showSizeChanger={showSizeChanger}
+          showQuickJumper={showQuickJumper}
         />
       )}
     </div>

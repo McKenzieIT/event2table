@@ -380,7 +380,25 @@ describe('Table Component', () => {
 
     it('should change page size when size changer is used', async () => {
       const user = userEvent.setup();
-      
+
+      render(
+        <Table
+          data={mockData}
+          columns={mockColumns}
+          pagination
+          pageSize={2}
+          pageSizeOptions={[2, 5, 10]}
+          showSizeChanger={true}
+        />
+      );
+
+      const sizeSelect = screen.getByDisplayValue('2 / page');
+      await user.selectOptions(sizeSelect, '5');
+
+      expect(sizeSelect).toHaveValue('5');
+    });
+
+    it('should not show size changer by default', () => {
       render(
         <Table
           data={mockData}
@@ -390,11 +408,10 @@ describe('Table Component', () => {
           pageSizeOptions={[2, 5, 10]}
         />
       );
-      
-      const sizeSelect = screen.getByDisplayValue('2 / page');
-      await user.selectOptions(sizeSelect, '5');
-      
-      expect(sizeSelect).toHaveValue('5');
+
+      // Size changer should not be visible when showSizeChanger is not set (defaults to false)
+      const sizeSelect = screen.queryByDisplayValue('2 / page');
+      expect(sizeSelect).not.toBeInTheDocument();
     });
 
     it('should not render pagination when disabled', () => {
@@ -656,8 +673,81 @@ describe('Table Component', () => {
   describe('Edge Cases', () => {
     it('should handle empty columns array', () => {
       render(<Table data={mockData} columns={[]} />);
-      
+
       expect(screen.getByRole('table')).toBeInTheDocument();
+    });
+
+    it('should handle columns with invalid width values', () => {
+      // Test with edge case width values that should be handled gracefully
+      const columnsWithEdgeWidth: TableColumn<(typeof mockData)[0]>[] = [
+        { id: 'id', header: 'ID', accessorKey: 'id', width: 0 }, // Zero width (should use auto)
+        { id: 'name', header: 'Name', accessorKey: 'name', width: undefined }, // Undefined (should use auto)
+        { id: 'age', header: 'Age', accessorKey: 'age' }, // No width property (should use auto)
+        { id: 'email', header: 'Email', accessorKey: 'email', width: 'auto' }, // String 'auto'
+        { id: 'status', header: 'Status', accessorKey: 'status', width: 100 }, // Valid number
+      ];
+
+      render(<Table data={mockData} columns={columnsWithEdgeWidth} />);
+
+      // Should render without errors despite edge case width values
+      expect(screen.getByRole('table')).toBeInTheDocument();
+
+      // All columns should be rendered
+      expect(screen.getByText('ID')).toBeInTheDocument();
+      expect(screen.getByText('Name')).toBeInTheDocument();
+      expect(screen.getByText('Age')).toBeInTheDocument();
+      expect(screen.getByText('Email')).toBeInTheDocument();
+      expect(screen.getByText('Status')).toBeInTheDocument();
+    });
+
+    it('should handle columns with valid width values', () => {
+      const columnsWithValidWidth: TableColumn<(typeof mockData)[0]>[] = [
+        { id: 'id', header: 'ID', accessorKey: 'id', width: 100 },
+        { id: 'name', header: 'Name', accessorKey: 'name', width: '200px' },
+        { id: 'age', header: 'Age', accessorKey: 'age', width: '15%' },
+        { id: 'email', header: 'Email', accessorKey: 'email', width: 0 },
+        { id: 'status', header: 'Status', accessorKey: 'status', width: undefined },
+      ];
+
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      render(<Table data={mockData} columns={columnsWithValidWidth} />);
+
+      // Should render without any warnings
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(consoleSpy).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle columns with string width values', () => {
+      const columnsWithStringWidth: TableColumn<(typeof mockData)[0]>[] = [
+        { id: 'id', header: 'ID', accessorKey: 'id', width: '100px' },
+        { id: 'name', header: 'Name', accessorKey: 'name', width: '20%' },
+        { id: 'age', header: 'Age', accessorKey: 'age', width: 'auto' },
+        { id: 'email', header: 'Email', accessorKey: 'email', width: '' }, // Empty string
+      ];
+
+      render(<Table data={mockData} columns={columnsWithStringWidth} />);
+
+      // Should render without errors
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByText('ID')).toBeInTheDocument();
+      expect(screen.getByText('Name')).toBeInTheDocument();
+    });
+
+    it('should handle column with undefined/null width gracefully', () => {
+      const columnsWithUndefinedWidth: TableColumn<(typeof mockData)[0]>[] = [
+        { id: 'id', header: 'ID', accessorKey: 'id', width: undefined },
+        { id: 'name', header: 'Name', accessorKey: 'name' }, // No width property
+      ];
+
+      render(<Table data={mockData} columns={columnsWithUndefinedWidth} />);
+
+      // Should render without errors, using default width
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByText('ID')).toBeInTheDocument();
+      expect(screen.getByText('Name')).toBeInTheDocument();
     });
 
     it('should handle missing column properties', () => {

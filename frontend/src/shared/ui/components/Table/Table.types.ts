@@ -95,6 +95,8 @@ export interface TableProps<TData = any> {
   currentPage?: number;
   onPageChange?: (page: number, pageSize: number) => void;
   pageSizeOptions?: number[];
+  showSizeChanger?: boolean;
+  showQuickJumper?: boolean;
   
   // Virtualization
   virtual?: boolean;
