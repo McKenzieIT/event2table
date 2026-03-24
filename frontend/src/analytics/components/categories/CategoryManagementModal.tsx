@@ -186,28 +186,10 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
     setFormData({ name: '', description: '' });
   }, []);
 
-  // Chrome MCP兼容性: 监听DOM值变化并同步到state
-  useEffect(() => {
-    if (!nameRef.current || !descRef.current) {
-      return;
-    }
-
-    const nameDomValue = nameRef.current.value;
-    const descDomValue = descRef.current.value;
-
-    const updates: Partial<CategoryFormData> = {};
-
-    if (nameDomValue !== formData.name) {
-      updates.name = nameDomValue;
-    }
-    if (descDomValue !== formData.description) {
-      updates.description = descDomValue;
-    }
-
-    if (Object.keys(updates).length > 0) {
-      setFormData(prev => ({ ...prev, ...updates }));
-    }
-  }, [formData.name, formData.description]);
+  // Chrome MCP兼容性: 使用 ref 和回调函数同步 DOM 值变化
+  const handleInputChange = useCallback((field: keyof CategoryFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
 
   if (!isOpen) return null;
 
@@ -264,7 +246,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
                   label="分类名称"
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="分类名称"
                   required
                   ref={nameRef}
@@ -274,7 +256,7 @@ const CategoryManagementModal: React.FC<CategoryManagementModalProps> = ({
                   label="描述"
                   type="text"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="分类描述（可选）"
                   ref={descRef}
                 />

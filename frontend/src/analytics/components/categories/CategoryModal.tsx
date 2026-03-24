@@ -16,7 +16,7 @@
 import { Button, Input , Modal } from '@shared/ui';
 import { useToast } from '@shared/ui/Toast/Toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import './CategoryModal.css';
 
 interface CategoryFormData {
@@ -57,12 +57,6 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
   // 模式检测：initialData === null 时为新增模式
   const isEditMode = initialData !== null;
 
-  // 表单状态
-  const [formData, setFormData] = useState<CategoryFormData>({
-    name: '',
-    description: ''
-  });
-
   // 验证错误
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -73,45 +67,28 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
   const nameRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
 
-  // 当模态框打开或 initialData 变化时，重置表单
-  useEffect(() => {
-    if (isOpen) {
-      if (initialData) {
-        // 编辑模式：填充数据
-        setFormData({
-          name: initialData.name || '',
-          description: initialData.description || ''
-        });
-      } else {
-        // 新增模式：清空表单
-        setFormData({ name: '', description: '' });
-      }
-      setErrors({});
+  // 使用 useMemo 计算初始表单数据，避免在 effect 中调用 setState
+  const initialFormData = useMemo(() => {
+    if (isOpen && initialData) {
+      return {
+        name: initialData.name || '',
+        description: initialData.description || ''
+      };
     }
-  }, [initialData, isOpen]);
+    return { name: '', description: '' };
+  }, [isOpen, initialData]);
 
-  // Chrome MCP兼容性: 监听DOM值变化并同步到state
-  useEffect(() => {
-    if (!nameRef.current || !descRef.current) {
-      return;
-    }
+  // 表单状态 - 使用初始值
+  const [formData, setFormData] = useState<CategoryFormData>(initialFormData);
 
-    const nameDomValue = nameRef.current.value;
-    const descDomValue = descRef.current.value;
+  // 使用 key 模式重置表单，当模态框打开或切换编辑对象时强制重新挂载
+  // 这会自动重置所有状态，无需在 effect 中调用 setState
+  const formKey = useMemo(() => `${isOpen}-${initialData?.id || 'new'}`, [isOpen, initialData]);
 
-    const updates: Partial<CategoryFormData> = {};
-
-    if (nameDomValue !== formData.name) {
-      updates.name = nameDomValue;
-    }
-    if (descDomValue !== formData.description) {
-      updates.description = descDomValue;
-    }
-
-    if (Object.keys(updates).length > 0) {
-      setFormData(prev => ({ ...prev, ...updates }));
-    }
-  }, [formData.name, formData.description]);
+  // Chrome MCP兼容性: 使用回调函数同步 DOM 值变化
+  const handleInputChange = useCallback((field: keyof CategoryFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
 
   // 关闭模态框
   const handleClose = () => {
@@ -231,7 +208,7 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
                 type="text"
                 id="categoryName"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => handleInputChange('name', e.target.value)}
                 placeholder="例如：战斗事件"
                 className="category-modal__input"
                 disabled={isSubmitting}
@@ -250,7 +227,7 @@ function CategoryModal({ isOpen, onClose, gameGid, initialData, onSuccess }: Cat
               <textarea
                 id="categoryDesc"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) => handleInputChange('description', e.target.value)}
                 placeholder="简要描述该分类的用途和包含的事件类型..."
                 className="category-modal__textarea"
                 disabled={isSubmitting}

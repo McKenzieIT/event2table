@@ -1,6 +1,6 @@
 
 > event2table-test-suite@1.0.0 test
-> npm run test:backend && npm run test:frontend --run src/shared/ui/components/Form/Form.test.tsx
+> npm run test:backend && npm run test:frontend
 
 
 > event2table-test-suite@1.0.0 test:backend

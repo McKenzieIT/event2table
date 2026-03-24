@@ -51,28 +51,42 @@ export default function ParameterDetailDrawer({
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Load parameter details
+  // Load parameter details - async operation is allowed in useEffect
   useEffect(() => {
     if (!show || !paramName || !gameGid) return;
 
-    setIsLoading(true);
-    setError(null);
+    let cancelled = false;
 
-    fetchParameterDetails(paramName, gameGid)
-      .then(response => {
-        if (response.success) {
-          setDetails(response.data as ParameterDetails);
-        } else {
-          setError(response.message || '加载失败');
+    const loadDetails = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetchParameterDetails(paramName, gameGid);
+        if (!cancelled) {
+          if (response.success) {
+            setDetails(response.data as ParameterDetails);
+          } else {
+            setError(response.message || '加载失败');
+          }
         }
-      })
-      .catch(err => {
-        console.error('Failed to fetch parameter details:', err);
-        setError(err.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      } catch (err: any) {
+        if (!cancelled) {
+          console.error('Failed to fetch parameter details:', err);
+          setError(err.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadDetails();
+
+    return () => {
+      cancelled = true;
+    };
   }, [show, paramName, gameGid]);
 
   // ESC key to close

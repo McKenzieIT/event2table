@@ -1,0 +1,3592 @@
+[
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventForm.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 119,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 119,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 133,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 133,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 160,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 160,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 171,
+        "column": 32,
+        "nodeType": "MemberExpression",
+        "endLine": 171,
+        "endColumn": 49
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 180,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 180,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 185,
+        "column": 52,
+        "nodeType": "Identifier",
+        "endLine": 185,
+        "endColumn": 63
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventForm.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 119,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 119,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 133,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 133,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 160,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 160,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 171,
+        "column": 32,
+        "nodeType": "MemberExpression",
+        "endLine": 171,
+        "endColumn": 49
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 180,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 180,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 185,
+        "column": 52,
+        "nodeType": "Identifier",
+        "endLine": 185,
+        "endColumn": 63
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventForm.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 119,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 119,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 133,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 133,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 160,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 160,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 171,
+        "column": 32,
+        "nodeType": "MemberExpression",
+        "endLine": 171,
+        "endColumn": 49
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 180,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 180,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 185,
+        "column": 52,
+        "nodeType": "Identifier",
+        "endLine": 185,
+        "endColumn": 63
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventForm.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 119,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 119,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 133,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 133,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 160,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 160,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 171,
+        "column": 32,
+        "nodeType": "MemberExpression",
+        "endLine": 171,
+        "endColumn": 49
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 180,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 180,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 185,
+        "column": 52,
+        "nodeType": "Identifier",
+        "endLine": 185,
+        "endColumn": 63
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventForm.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 119,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 119,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 133,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 133,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 160,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 160,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 171,
+        "column": 32,
+        "nodeType": "MemberExpression",
+        "endLine": 171,
+        "endColumn": 49
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 180,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 180,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 185,
+        "column": 52,
+        "nodeType": "Identifier",
+        "endLine": 185,
+        "endColumn": 63
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventForm.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 119,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 119,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 133,
+        "column": 3,
+        "nodeType": "MemberExpression",
+        "endLine": 133,
+        "endColumn": 18
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 160,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 160,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 171,
+        "column": 32,
+        "nodeType": "MemberExpression",
+        "endLine": 171,
+        "endColumn": 49
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 180,
+        "column": 24,
+        "nodeType": "MemberExpression",
+        "endLine": 180,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 185,
+        "column": 52,
+        "nodeType": "Identifier",
+        "endLine": 185,
+        "endColumn": 63
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/EventNodes.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 122,
+        "column": 47,
+        "nodeType": "Identifier",
+        "endLine": 122,
+        "endColumn": 55
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useQuery\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 139,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 139,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 149,
+        "column": 19,
+        "nodeType": "Identifier",
+        "endLine": 149,
+        "endColumn": 26
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useEventNodesTable\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 188,
+        "column": 5,
+        "nodeType": "Identifier",
+        "endLine": 188,
+        "endColumn": 23
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 191,
+        "column": 26,
+        "nodeType": "Identifier",
+        "endLine": 191,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMutation\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 223,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 223,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 297,
+        "column": 25,
+        "nodeType": "Identifier",
+        "endLine": 297,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 308,
+        "column": 29,
+        "nodeType": "Identifier",
+        "endLine": 308,
+        "endColumn": 40
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 331,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 331,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 344,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 344,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 350,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 350,
+        "endColumn": 32
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 360,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 360,
+        "endColumn": 31
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?",
+        "line": 377,
+        "column": 21,
+        "nodeType": "Identifier",
+        "endLine": 377,
+        "endColumn": 32
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterAnalysis.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 59,
+        "column": 23,
+        "nodeType": "Identifier",
+        "endLine": 59,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 64,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 64,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 31
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterAnalysis.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 59,
+        "column": 23,
+        "nodeType": "Identifier",
+        "endLine": 59,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 64,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 64,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 31
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterAnalysis.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 59,
+        "column": 23,
+        "nodeType": "Identifier",
+        "endLine": 59,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 64,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 64,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 31
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterCompare.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 88,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 88,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 97,
+        "column": 28,
+        "nodeType": "Identifier",
+        "endLine": 97,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 38
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterCompare.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 88,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 88,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 97,
+        "column": 28,
+        "nodeType": "Identifier",
+        "endLine": 97,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 38
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterCompare.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 88,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 88,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 97,
+        "column": 28,
+        "nodeType": "Identifier",
+        "endLine": 97,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 38
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterCompare.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 88,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 88,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 97,
+        "column": 28,
+        "nodeType": "Identifier",
+        "endLine": 97,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 38
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterCompare.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 88,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 88,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 97,
+        "column": 28,
+        "nodeType": "Identifier",
+        "endLine": 97,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 38
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParameterCompare.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 34
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 88,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 88,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 92,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 92,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 97,
+        "column": 28,
+        "nodeType": "Identifier",
+        "endLine": 97,
+        "endColumn": 35
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 27,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 38
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhanced.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 60,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 60,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 74,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 74,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 79,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 79,
+        "endColumn": 43
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhanced.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 60,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 60,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 74,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 74,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 79,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 79,
+        "endColumn": 43
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhanced.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 60,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 60,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 74,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 74,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 79,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 79,
+        "endColumn": 43
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhanced.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 60,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 60,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 69,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 69,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 74,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 74,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 79,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 79,
+        "endColumn": 43
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhancedGraphQL.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 35,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 42
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 83,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 83,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 93,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 93,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 98,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 98,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 103,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 103,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 35
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhancedGraphQL.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 35,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 42
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 83,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 83,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 93,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 93,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 98,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 98,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 103,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 103,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 35
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhancedGraphQL.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 35,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 42
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 83,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 83,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 93,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 93,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 98,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 98,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 103,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 103,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 35
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhancedGraphQL.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 35,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 42
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 83,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 83,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 93,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 93,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 98,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 98,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 103,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 103,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 35
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhancedGraphQL.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 35,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 42
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 83,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 83,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 93,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 93,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 98,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 98,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 103,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 103,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 35
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/analytics/pages/ParametersEnhancedGraphQL.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 78,
+        "column": 35,
+        "nodeType": "Identifier",
+        "endLine": 78,
+        "endColumn": 42
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 83,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 83,
+        "endColumn": 37
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 93,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 93,
+        "endColumn": 29
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 98,
+        "column": 30,
+        "nodeType": "Identifier",
+        "endLine": 98,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 103,
+        "column": 32,
+        "nodeType": "Identifier",
+        "endLine": 103,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 108,
+        "column": 24,
+        "nodeType": "Identifier",
+        "endLine": 108,
+        "endColumn": 35
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/features/canvas/components/PropertiesPanel.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.",
+        "line": 368,
+        "column": 31,
+        "nodeType": "Identifier",
+        "endLine": 368,
+        "endColumn": 42
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Input/Input.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 18,
+        "column": 29,
+        "nodeType": "MemberExpression",
+        "endLine": 18,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test5\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 70,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 70,
+        "endColumn": 27
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 139,
+        "column": 37,
+        "nodeType": "MemberExpression",
+        "endLine": 139,
+        "endColumn": 51
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 140,
+        "column": 41,
+        "nodeType": "MemberExpression",
+        "endLine": 140,
+        "endColumn": 55
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Input/Input.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 18,
+        "column": 29,
+        "nodeType": "MemberExpression",
+        "endLine": 18,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test5\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 70,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 70,
+        "endColumn": 27
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 139,
+        "column": 37,
+        "nodeType": "MemberExpression",
+        "endLine": 139,
+        "endColumn": 51
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 140,
+        "column": 41,
+        "nodeType": "MemberExpression",
+        "endLine": 140,
+        "endColumn": 55
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Input/Input.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 18,
+        "column": 29,
+        "nodeType": "MemberExpression",
+        "endLine": 18,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test5\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 70,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 70,
+        "endColumn": 27
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 139,
+        "column": 37,
+        "nodeType": "MemberExpression",
+        "endLine": 139,
+        "endColumn": 51
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 140,
+        "column": 41,
+        "nodeType": "MemberExpression",
+        "endLine": 140,
+        "endColumn": 55
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Input/Input.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 18,
+        "column": 29,
+        "nodeType": "MemberExpression",
+        "endLine": 18,
+        "endColumn": 43
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test5\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 70,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 70,
+        "endColumn": 27
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 139,
+        "column": 37,
+        "nodeType": "MemberExpression",
+        "endLine": 139,
+        "endColumn": 51
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test9\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 140,
+        "column": 41,
+        "nodeType": "MemberExpression",
+        "endLine": 140,
+        "endColumn": 55
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Radio/Radio.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 19,
+        "column": 43,
+        "nodeType": "MemberExpression",
+        "endLine": 19,
+        "endColumn": 57
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test4\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 51,
+        "column": 43,
+        "nodeType": "MemberExpression",
+        "endLine": 51,
+        "endColumn": 57
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test5\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 77,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 77,
+        "endColumn": 27
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Radio/Radio.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 19,
+        "column": 43,
+        "nodeType": "MemberExpression",
+        "endLine": 19,
+        "endColumn": 57
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test4\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 51,
+        "column": 43,
+        "nodeType": "MemberExpression",
+        "endLine": 51,
+        "endColumn": 57
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test5\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 77,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 77,
+        "endColumn": 27
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Radio/Radio.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 19,
+        "column": 43,
+        "nodeType": "MemberExpression",
+        "endLine": 19,
+        "endColumn": 57
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test4\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 51,
+        "column": 43,
+        "nodeType": "MemberExpression",
+        "endLine": 51,
+        "endColumn": 57
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test5\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 77,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 77,
+        "endColumn": 27
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Switch/Switch.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 20,
+        "column": 33,
+        "nodeType": "MemberExpression",
+        "endLine": 20,
+        "endColumn": 47
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test8\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 100,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 100,
+        "endColumn": 27
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/Switch/Switch.type-test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useState\" is called in function \"test2\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 20,
+        "column": 33,
+        "nodeType": "MemberExpression",
+        "endLine": 20,
+        "endColumn": 47
+      },
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"React.useRef\" is called in function \"test8\" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word \"use\".",
+        "line": 100,
+        "column": 15,
+        "nodeType": "MemberExpression",
+        "endLine": 100,
+        "endColumn": 27
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Form/Form.test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useFormContextValue\" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function.",
+        "line": 459,
+        "column": 22,
+        "nodeType": "Identifier",
+        "endLine": 459,
+        "endColumn": 41
+      }
+    ]
+  },
+  {
+    "file": "/Users/linjiacong/Documents/event2table/frontend/src/shared/ui/components/Form/__tests__/Form.test.tsx",
+    "messages": [
+      {
+        "ruleId": "react-hooks/rules-of-hooks",
+        "severity": 1,
+        "message": "React Hook \"useFormContextValue\" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function.",
+        "line": 405,
+        "column": 20,
+        "nodeType": "Identifier",
+        "endLine": 405,
+        "endColumn": 39
+      }
+    ]
+  }
+]

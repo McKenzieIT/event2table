@@ -46,7 +46,6 @@ export default function MainLayout(): React.JSX.Element {
 
   const { currentGame, selectGame } = useGameContext();
   const [isGameSheetOpen, setIsGameSheetOpen] = useState<boolean>(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
   useEffect(() => {
     const handleToggle = () => setIsGameSheetOpen(prev => !prev);
@@ -58,16 +57,22 @@ export default function MainLayout(): React.JSX.Element {
     };
   }, []);
 
-  useEffect(() => {
+  // 使用 useMemo 计算初始 sidebar 状态
+  const initialSidebarCollapsed = useMemo(() => {
     try {
       const savedCollapsed = localStorage.getItem('sidebarCollapsed');
       if (savedCollapsed !== null) {
-        setSidebarCollapsed(JSON.parse(savedCollapsed));
+        return JSON.parse(savedCollapsed);
       }
     } catch (error) {
       console.error('[MainLayout] Failed to load sidebar state:', error);
     }
+    return false; // 默认展开
+  }, []);
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(initialSidebarCollapsed);
+
+  useEffect(() => {
     const handleSidebarToggle = (e: CustomEvent) => {
       setSidebarCollapsed(e.detail);
     };
@@ -82,7 +87,7 @@ export default function MainLayout(): React.JSX.Element {
   useEffect(() => {
     const sidebarWidth = sidebarCollapsed ? '60px' : '260px';
     document.documentElement.style.setProperty('--sidebar-current-width', sidebarWidth);
-  }, [sidebarCollapsed]);
+  }, [sidebarCollapsed, setSidebarCollapsed]);
 
   const handleSelectGame = useCallback((game: GameData) => {
     selectGame({

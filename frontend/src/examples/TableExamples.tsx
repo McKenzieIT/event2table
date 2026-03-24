@@ -89,6 +89,10 @@ export function TableSortingExample() {
 export function TableSelectableExample() {
   const [selectedRows, setSelectedRows] = useState<User[]>([]);
 
+  const handleSelectionChange = (rows: object[]) => {
+    setSelectedRows(rows as User[]);
+  };
+
   return (
     <div className="example-section">
       <h3>可选择的表格</h3>
@@ -96,7 +100,7 @@ export function TableSelectableExample() {
         data={sampleUsers}
         columns={basicColumns}
         selectable={true}
-        onSelectionChange={setSelectedRows}
+        onSelectionChange={handleSelectionChange}
         pagination={false}
       />
       <div className="selected-info">
@@ -137,7 +141,7 @@ export function TableCustomCellExample() {
       accessorKey: 'status', 
       header: '状态', 
       width: 120,
-      cellRenderer: ({ value }) => (
+      cellRenderer: ({ value }: { value: string }) => (
         <span className={`status-badge status-${value}`}>
           {value === 'active' ? '活跃' : '非活跃'}
         </span>
@@ -169,9 +173,10 @@ export function TableCustomCellExample() {
 export function TableEditableExample() {
   const [data, setData] = useState<User[]>(sampleUsers);
 
-  const handleEdit = (row: User, columnId: string, value: unknown) => {
+  const handleEdit = (row: object, columnId: string, value: unknown) => {
+    const userRow = row as User;
     setData(prev => prev.map(item => 
-      item.id === row.id ? { ...item, [columnId]: value } : item
+      item.id === userRow.id ? { ...item, [columnId]: value } : item
     ));
   };
 

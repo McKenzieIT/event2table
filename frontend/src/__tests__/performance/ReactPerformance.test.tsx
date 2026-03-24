@@ -212,6 +212,7 @@ describe('React Performance Tests', () => {
         renderSpy();
         return <GameManagementModalGraphQL isOpen={true} onClose={() => {}} />;
       });
+      MockComponent.displayName = 'MockGameManagementModalGraphQL';
 
       const { rerender } = render(<MockComponent />);
       expect(renderSpy).toHaveBeenCalledTimes(1);
@@ -290,6 +291,7 @@ describe('React Performance Tests', () => {
         renderSpy();
         return <CustomNode data={mockData} selected={false} />;
       });
+      MockComponent.displayName = 'MockCustomNode';
 
       const { rerender } = render(<MockComponent />);
       expect(renderSpy).toHaveBeenCalledTimes(1);
@@ -357,6 +359,7 @@ describe('React Performance Tests', () => {
         renderSpy();
         return <EventForm />;
       });
+      MockComponent.displayName = 'MockEventForm';
 
       const { rerender } = render(<MockComponent />);
       const initialRenderCount = renderSpy.mock.calls.length;
@@ -415,7 +418,7 @@ describe('React Performance Tests', () => {
           return mockGames.filter((game: any) =>
             game.name.toLowerCase().includes(searchTerm.toLowerCase())
           );
-        }, [mockGames, searchTerm]);
+        }, [searchTerm]);
 
         return { searchTerm, setSearchTerm, filteredGames };
       });
@@ -492,7 +495,7 @@ describe('React Performance Tests', () => {
           return mockGames.filter((game: any) =>
             game.name.toLowerCase().includes(searchTerm.toLowerCase())
           );
-        }, [mockGames, searchTerm]);
+        }, [searchTerm]);
 
         return { searchTerm, setSearchTerm, filteredGames };
       });
