@@ -179,10 +179,11 @@ const Table = React.memo(<TData extends object = any>({
       ...col,
       enableSorting: col.sortable !== false && sortable,
       enableFiltering: col.filterable !== false && filterable,
-      // Ensure size is a valid number or 'auto' string
+      // Ensure size is always a valid number (TanStack Table requirement)
+      // width: 0, undefined, or 'auto' → use default size 150
       size: (typeof col.width === 'number' && Number.isFinite(col.width) && col.width > 0)
         ? col.width
-        : (col.width && typeof col.width === 'string' ? col.width : 'auto'),
+        : 150,  // Default column size in pixels
       minSize: col.minWidth || 40,
       maxSize: col.maxWidth || 1000,
     }));

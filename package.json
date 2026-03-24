@@ -39,11 +39,12 @@
     "@graphql-codegen/typescript-operations": "^5.0.8",
     "@graphql-codegen/typescript-react-apollo": "^4.4.0",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "terser": "^5.46.0",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "terser": "^5.46.0"
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
+    "@tanstack/react-virtual": "^3.13.23",
     "playwright": "^1.58.2"
   }
 }
