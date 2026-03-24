@@ -15,7 +15,6 @@ import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator, Optional
-from cachetools import TTLCache
 from backend.core.cache.decorators import cached
 
 from backend.core.config import get_db_path
