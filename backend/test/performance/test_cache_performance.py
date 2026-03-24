@@ -259,7 +259,9 @@ def on_test_stop(environment, **kwargs):
             f"⚠️  HIGH AVG RESPONSE TIME: {stats.total.avg_response_time:.0f}ms (threshold: 50ms)"
         )
 
-    if stats.total.get_response_time_percentile(0.99) > 500:  # P99 > 500ms (adjusted for CI environment)
+    if (
+        stats.total.get_response_time_percentile(0.99) > 500
+    ):  # P99 > 500ms (adjusted for CI environment)
         warnings.append(
             f"⚠️  HIGH P99 RESPONSE TIME: {stats.total.get_response_time_percentile(0.99):.0f}ms (threshold: 500ms)"
         )

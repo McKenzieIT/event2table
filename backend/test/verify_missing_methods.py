@@ -10,9 +10,11 @@ import sys
 import inspect
 from backend.models.repositories.parameters import ParameterRepository
 
+
 def check_method_exists(repo, method_name):
     """Check if method exists in repository"""
     return hasattr(repo, method_name)
+
 
 def main():
     repo = ParameterRepository()
@@ -22,17 +24,13 @@ def main():
     print("=" * 60)
 
     # Methods that tests expect
-    expected_methods = [
-        'get_paginated_params',
-        'get_params_by_event_id',
-        'get_common_params'
-    ]
+    expected_methods = ['get_paginated_params', 'get_params_by_event_id', 'get_common_params']
 
     # Methods that actually exist
     existing_methods = [
         'get_common_parameters',
         'get_common_params_by_game',
-        'get_common_params_with_event_count'
+        'get_common_params_with_event_count',
     ]
 
     print("\n📋 Expected by Tests (MISSING):")
@@ -60,7 +58,8 @@ def main():
     print("\n" + "=" * 60)
     print("Actions Needed:")
     print("=" * 60)
-    print("""
+    print(
+        """
 1. Add get_paginated_params(page, per_page)
    - Follow EventsRepository.get_paginated() pattern
    - Return paginated parameter list
@@ -72,7 +71,9 @@ def main():
 3. Add get_common_params() as alias
    - Call get_common_parameters() internally
    - Maintain backward compatibility
-    """)
+    """
+    )
+
 
 if __name__ == "__main__":
     main()

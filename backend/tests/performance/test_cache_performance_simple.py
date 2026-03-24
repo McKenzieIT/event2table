@@ -197,4 +197,6 @@ class TestCachePerformanceSimple:
         print(f"  Average: {avg_time:.2f} ms")
         print(f"  P95: {p95:.2f} ms")
 
-        assert p95 < 100, f"Concurrent operations P95 {p95:.2f}ms exceeds 100ms (adjusted for CI environment)"
+        assert (
+            p95 < 100
+        ), f"Concurrent operations P95 {p95:.2f}ms exceeds 100ms (adjusted for CI environment)"
