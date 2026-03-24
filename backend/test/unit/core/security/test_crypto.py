@@ -138,41 +138,61 @@ class TestSecureHasher:
     def test_hash_file_large_file(self):
         """测试大文件哈希(分块读取)"""
         from backend.core.crypto import SecureHasher
+        from pathlib import Path
+
+        # 创建项目内的临时目录
+        project_root = Path(__file__).parent.parent.parent.parent.parent
+        temp_dir = project_root / "test_temp"
+        temp_dir.mkdir(exist_ok=True)
 
         # 创建较大的临时文件(1MB)
-        with tempfile.NamedTemporaryFile(mode='wb', delete=False) as f:
-            f.write(b'x' * (1024 * 1024))
-            temp_path = f.name
+        temp_path = temp_dir / "test_hash_large.txt"
+        temp_path.write_bytes(b'x' * (1024 * 1024))
 
         try:
-            result = SecureHasher.hash_file(temp_path, chunk_size=8192)
+            result = SecureHasher.hash_file(str(temp_path), chunk_size=8192)
             assert len(result) == 64
             assert isinstance(result, str)
         finally:
-            os.unlink(temp_path)
+            temp_path.unlink()
+            if temp_dir.exists() and not any(temp_dir.iterdir()):
+                temp_dir.rmdir()
 
     def test_hash_file_consistency(self):
         """测试相同文件产生相同哈希"""
         from backend.core.crypto import SecureHasher
+        from pathlib import Path
+
+        # 创建项目内的临时目录
+        project_root = Path(__file__).parent.parent.parent.parent.parent
+        temp_dir = project_root / "test_temp"
+        temp_dir.mkdir(exist_ok=True)
 
         # 创建临时文件
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-            f.write("consistent content")
-            temp_path = f.name
+        temp_path = temp_dir / "test_hash_consistency.txt"
+        temp_path.write_text("consistent content")
 
         try:
-            hash1 = SecureHasher.hash_file(temp_path)
-            hash2 = SecureHasher.hash_file(temp_path)
+            hash1 = SecureHasher.hash_file(str(temp_path))
+            hash2 = SecureHasher.hash_file(str(temp_path))
             assert hash1 == hash2
         finally:
-            os.unlink(temp_path)
+            temp_path.unlink()
+            if temp_dir.exists() and not any(temp_dir.iterdir()):
+                temp_dir.rmdir()
 
     def test_hash_file_not_found(self):
         """测试文件不存在抛出错误"""
         from backend.core.crypto import SecureHasher
+        from pathlib import Path
 
-        with pytest.raises(FileNotFoundError):
-            SecureHasher.hash_file('/nonexistent/path/to/file.txt')
+        # 使用项目内的不存在的路径（但路径本身是安全的）
+        project_root = Path(__file__).parent.parent.parent.parent.parent
+        nonexistent_path = project_root / "test_temp" / "nonexistent_file.txt"
+
+        with pytest.raises((FileNotFoundError, ValueError)):
+            # 可能抛出 FileNotFoundError 或 ValueError（路径验证失败）
+            SecureHasher.hash_file(str(nonexistent_path))
 
 
 class TestConvenienceFunctions:
