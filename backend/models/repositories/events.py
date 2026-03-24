@@ -1116,3 +1116,89 @@ class EventRepository(GenericRepository):
         result = fetch_one_as_dict(query, tuple(params))
 
         return result["total"] if result else 0
+
+    def get_paginated(
+        self,
+        game_gid: Optional[int] = None,
+        category_id: Optional[int] = None,
+        search: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+    ) -> Dict[str, Any]:
+        """
+        分页查询事件（支持过滤和搜索）
+
+        Args:
+            game_gid: 可选的游戏GID过滤
+            category_id: 可选的分类ID过滤
+            search: 可选的搜索关键词
+            page: 页码（从1开始）
+            per_page: 每页数量
+
+        Returns:
+            Dict:
+                items: EventEntity列表
+                total: 总数量
+                page: 当前页码
+                per_page: 每页数量
+
+        Example:
+            >>> repo = EventRepository()
+            >>> result = repo.get_paginated(game_gid=10000147, page=1, per_page=20)
+            >>> print(f"Total events: {result['total']}")
+        """
+        # 构建查询条件
+        conditions = []
+        params = []
+
+        if game_gid:
+            conditions.append("le.game_gid = ?")
+            params.append(game_gid)
+
+        if category_id:
+            conditions.append("le.category_id = ?")
+            params.append(category_id)
+
+        if search:
+            search_pattern = f"%{search}%"
+            conditions.append("(le.event_name LIKE ? OR le.event_name_cn LIKE ?)")
+            params.extend([search_pattern, search_pattern])
+
+        where_clause = " AND ".join(conditions) if conditions else "1=1"
+
+        # 查询总数
+        count_query = f"""
+            SELECT COUNT(DISTINCT le.id) as total
+            FROM log_events le
+            WHERE {where_clause}
+        """
+        count_result = fetch_one_as_dict(count_query, tuple(params))
+        total = count_result["total"] if count_result else 0
+
+        # 分页查询数据
+        offset = (page - 1) * per_page
+        data_query = f"""
+            SELECT
+                le.*,
+                g.gid, g.name as game_name, g.ods_db,
+                ec.name as category_name,
+                COALESCE(COUNT(DISTINCT ep.id), 0) as param_count
+            FROM log_events le
+            LEFT JOIN games g ON le.game_gid = g.gid
+            LEFT JOIN event_categories ec ON le.category_id = ec.id
+            LEFT JOIN event_params ep ON le.id = ep.event_id AND ep.is_active = 1
+            WHERE {where_clause}
+            GROUP BY le.id
+            ORDER BY le.id DESC
+            LIMIT ? OFFSET ?
+        """
+        params.extend([per_page, offset])
+        rows = fetch_all_as_dict(data_query, tuple(params))
+        items = [EventEntity(**row) for row in rows]
+
+        return {
+            "items": items,
+            "total": total,
+            "page": page,
+            "per_page": per_page,
+        }
