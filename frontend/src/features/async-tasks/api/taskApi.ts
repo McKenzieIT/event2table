@@ -212,7 +212,7 @@ export async function getTaskStatistics(): Promise<TaskStatisticsResponse['data'
   const result = await response.json() as TaskStatisticsResponse;
 
   if (!result.success) {
-    throw new Error(result.message || 'Task statistics API request failed');
+    throw new Error((result as TaskStatisticsResponse & { message?: string }).message || 'Task statistics API request failed');
   }
 
   if (!result.data) {

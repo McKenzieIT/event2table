@@ -5,6 +5,8 @@ import type { CanvasField, WhereCondition } from '@shared/hooks/useEventNodeBuil
 import { useGameContext } from '@shared/hooks/useGameContext';
 import type { Game } from '@shared/hooks/useGameContext';
 import type { Event } from '@shared/types/api-types';
+import type { Field } from '@shared/types/fieldBuilder';
+import type { WhereItem } from '@shared/types/whereBuilder';
 import { ConfirmDialog } from '@shared/ui';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
@@ -44,6 +46,49 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
   const { currentGame } = (useOutletContext() as OutletContext) || {};
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  // 类型转换函数：CanvasField -> Field
+  const canvasFieldToField = useCallback((field: CanvasField): Field => ({
+    id: field.id,
+    type: field.fieldType === 'param' ? 'param' : field.fieldType === 'base' ? 'basic' : field.fieldType,
+    name: field.name,
+    displayName: field.displayName,
+    alias: field.alias,
+    dataType: field.dataType as any,
+    isEditable: field.isEditable ?? true,
+    sourceId: field.paramId ?? undefined,
+  }), []);
+
+  // 类型转换函数：WhereCondition -> WhereItem
+  const whereConditionToWhereItem = useCallback((condition: WhereCondition): WhereItem => ({
+    id: condition.id,
+    type: condition.type === 'group' ? 'group' : 'condition',
+    field: condition.field,
+    operator: condition.operator as any,
+    value: condition.value,
+    logicalOp: condition.logicalOp,
+    children: condition.type === 'group' ? condition.children?.map(whereConditionToWhereItem) : undefined,
+  }), []);
+
+  // 类型转换函数：WhereItem -> WhereCondition
+  const whereItemToWhereCondition = useCallback((item: WhereItem): WhereCondition => ({
+    id: item.id,
+    type: item.type === 'group' ? 'group' : 'condition',
+    field: (item as any).field,
+    operator: (item as any).operator,
+    value: (item as any).value,
+    logicalOp: (item as any).logicalOp,
+    children: item.type === 'group' ? (item as any).children?.map(whereItemToWhereCondition) : undefined,
+    dataType: (item as any).dataType,
+  }), []);
+
+  // 类型转换函数：CanvasField[] -> Field[]
+  const canvasFieldsToFields = useCallback((fields: CanvasField[]): Field[] => 
+    fields.map(canvasFieldToField), [canvasFieldToField]);
+
+  // 类型转换函数：WhereCondition[] -> WhereItem[]
+  const whereConditionsToWhereItems = useCallback((conditions: WhereCondition[]): WhereItem[] => 
+    conditions.map(whereConditionToWhereItem), [whereConditionToWhereItem]);
 
   // Toast
   const { success, error, warning } = useToast();
@@ -181,10 +226,10 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
       description: nodeConfig.description.trim(),
       base_fields: canvasFields.map(f => ({
         field_type: f.fieldType,
-        field_name: f.fieldName,
-        display_name: f.displayName,
+        field_name: f.fieldName || f.name,
+        display_name: f.displayName || f.name,
         alias: f.alias,
-        order: f.order,
+        order: f.order ?? 0,
         param_id: f.paramId,
       })),
       filter_conditions: JSON.stringify({
@@ -346,21 +391,21 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
                 if (field.fieldType) {
                   // FieldSelectorPanel passes dataType, but drag-drop uses hive_type
                   const hiveType = (field as any).dataType || field.hive_type;
-                  addFieldToCanvas(field.fieldType, field.fieldName!, field.displayName!, field.paramId, undefined, hiveType);
+                  addFieldToCanvas(field.fieldType, field.fieldName || field.name || '', field.displayName || field.name || '', field.paramId, undefined, hiveType);
                 } else if (field.type) {
                   // Handle from @dnd-kit system
                   const fieldType = field.type === 'parameter' ? 'param' : field.type;
-                  addFieldToCanvas(fieldType, field.name!, field.alias || field.name!, field.sourceId, field.hive_type);
+                  addFieldToCanvas(fieldType, field.name || '', field.alias || field.name || '', field.sourceId as number | null, field.hive_type);
                 }
               }}
             />
 
             <RightSidebar
               gameGid={Number(gameData.gid)}
-              selectedEvent={selectedEvent}
+              selectedEvent={selectedEvent as any}
               fields={canvasFields}
               whereConditions={whereConditions}
-              onWhereConditionsChange={setWhereConditions}
+              onWhereConditionsChange={(conditions) => setWhereConditions(conditions)}
               onShowWhereModal={() => setShowWhereConfig(true)}
               onShowHQLDetails={() => setShowHQLDetails(true)}
             />
@@ -391,13 +436,13 @@ const EventNodeBuilder = React.memo(function EventNodeBuilder(): React.JSX.Eleme
             <WhereBuilderModal
               isOpen={showWhereConfig}
               onClose={() => setShowWhereConfig(false)}
-              conditions={whereConditions}
-              onConditionsChange={setWhereConditions} // ✅ 新增：实时更新
-              onApply={(conditions) => {
-                setWhereConditions(conditions);
+              conditions={whereConditionsToWhereItems(whereConditions)}
+              onConditionsChange={(items) => setWhereConditions(items.map(whereItemToWhereCondition))}
+              onApply={(items) => {
+                setWhereConditions(items.map(whereItemToWhereCondition));
               }}
-              canvasFields={canvasFields}
-              selectedEvent={selectedEvent}
+              canvasFields={canvasFieldsToFields(canvasFields)}
+              selectedEvent={selectedEvent as any}
               data-testid="where-builder-modal"
             />
           )}

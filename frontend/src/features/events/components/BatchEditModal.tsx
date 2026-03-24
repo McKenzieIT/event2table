@@ -307,7 +307,7 @@ export const BatchEditModal = React.memo(function BatchEditModal({
           ) : (
             <>
               <Button
-                variant="outline-secondary"
+                variant="secondary"
                 onClick={() => setShowPreview(false)}
                 disabled={isSubmitting}
               >

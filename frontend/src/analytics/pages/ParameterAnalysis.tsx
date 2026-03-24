@@ -40,20 +40,20 @@ interface StatCard {
 const ParameterAnalysis: React.FC = () => {
   const { currentGame } = useOutletContext<GameContext>();
 
-  // Game context check - show prompt if no game selected
-  if (!currentGame) {
-    return <SelectGamePrompt message="查看参数分析需要先选择游戏" />;
-  }
-
   const { data: stats = {} as ParameterStats, isLoading, error } = useQuery<ParameterStats>({
-    queryKey: ['parameter-stats', currentGame.gid],
+    queryKey: ['parameter-stats', currentGame?.gid],
     queryFn: async () => {
-      const response = await fetch(`/api/parameters/stats?game_gid=${currentGame.gid}`);
+      const response = await fetch(`/api/parameters/stats?game_gid=${currentGame?.gid}`);
       if (!response.ok) throw new Error('加载失败');
       return response.json();
     },
     enabled: !!currentGame // Only execute when currentGame exists
   });
+
+  // Game context check - show prompt if no game selected (moved after hooks)
+  if (!currentGame) {
+    return <SelectGamePrompt message="查看参数分析需要先选择游戏" />;
+  }
 
   // useCallback: Stabilize retry handler
   const handleRetry = useCallback(() => {

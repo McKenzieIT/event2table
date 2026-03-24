@@ -31,7 +31,7 @@ const authLink = setContext((_, { headers }) => {
 });
 
 // Error handling link with detailed logging
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward, response }) => {
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   // GraphQL errors with detailed context
   if (graphQLErrors) {
     console.group('❌ GraphQL Errors');
@@ -103,15 +103,6 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward, re
       console.error('Response Body:', result);
     }
 
-    console.groupEnd();
-  }
-
-  // Log partial responses (when errorPolicy: 'all')
-  if (response && response.errors && response.data) {
-    console.group('⚠️ Partial Response');
-    console.warn('Query:', operation.operationName);
-    console.warn('Partial Data:', response.data);
-    console.warn('Errors:', response.errors);
     console.groupEnd();
   }
 
@@ -238,7 +229,7 @@ export const client = new ApolloClient({
       errorPolicy: 'all',
     },
   },
-  connectToDevTools: import.meta.env.DEV,
+  connectToDevTools: (import.meta as { env?: { DEV?: boolean } }).env?.DEV || false,
 });
 
 export default client;

@@ -113,17 +113,13 @@ function EventNodes() {
     setSearchParams(params);
   }, [filters, setSearchParams]);
 
-  // 游戏上下文验证
-  if (!gameGid) {
-    return <GameSelectionPrompt />;
-  }
-
-  // 数据获取
+  // 数据获取 - moved before early return
   const { data, isLoading, error, isError } = useQuery({
     queryKey: ["event-nodes", gameGid, filters],
     queryFn: async () => {
+      if (!gameGid) return null;
       const response = await eventNodesApi.list({
-        game_gid: gameGid!,
+        game_gid: gameGid,
         keyword: filters.keyword || undefined,
         today_modified: filters.todayModified || undefined,
         event_id: filters.eventId || undefined,
@@ -134,18 +130,55 @@ function EventNodes() {
     },
     retry: 2,
     staleTime: 30000,
+    enabled: !!gameGid,
   });
 
   const { data: stats } = useQuery({
     queryKey: ["event-nodes-stats", gameGid],
     queryFn: async () => {
-      const response = await eventNodesApi.stats(gameGid!);
+      if (!gameGid) return null;
+      const response = await eventNodesApi.stats(gameGid);
       return response.data;
     },
     staleTime: 60000,
+    enabled: !!gameGid,
   });
 
-  // 表格逻辑 - 使用 useMemo 优化 columns 创建
+  // 删除mutation - moved before early return
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => eventNodesApi.delete(id),
+    onMutate: async (id) => {
+      if (!gameGid) return;
+      await queryClient.cancelQueries(["event-nodes"]);
+      const previous = queryClient.getQueryData([
+        "event-nodes",
+        gameGid,
+        filters,
+      ]);
+      queryClient.setQueryData(
+        ["event-nodes", gameGid, filters],
+        (old: any) => ({
+          ...old,
+          nodes: old.nodes.filter((n: EventNode) => n.id !== id),
+        }),
+      );
+      return { previous };
+    },
+    onError: (err, id, context) => {
+      if (!gameGid) return;
+      queryClient.setQueryData(
+        ["event-nodes", gameGid, filters],
+        context?.previous,
+      );
+      toastError("删除失败，请重试");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event-nodes-stats"] });
+      success("删除成功");
+    },
+  });
+
+  // 表格逻辑 - 使用 useMemo 优化 columns 创建 - moved before early return
   const columns = useMemo(() => createEventNodesColumns({
     onViewHql: (nodeId) =>
       setModals((prev) => ({ ...prev, hql: { show: true, nodeId } })),
@@ -187,39 +220,7 @@ function EventNodes() {
   const { table, selectedIds, selectedCount, clearSelection } =
     useEventNodesTable(data?.nodes || [], columns);
 
-  // 删除mutation
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => eventNodesApi.delete(id),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries(["event-nodes"]);
-      const previous = queryClient.getQueryData([
-        "event-nodes",
-        gameGid,
-        filters,
-      ]);
-      queryClient.setQueryData(
-        ["event-nodes", gameGid, filters],
-        (old: any) => ({
-          ...old,
-          nodes: old.nodes.filter((n: EventNode) => n.id !== id),
-        }),
-      );
-      return { previous };
-    },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(
-        ["event-nodes", gameGid, filters],
-        context?.previous,
-      );
-      toastError("删除失败，请重试");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["event-nodes-stats"] });
-      success("删除成功");
-    },
-  });
-
-  // 批量删除mutation
+  // 批量删除mutation - moved before early return
   const bulkDeleteMutation = useMutation({
     mutationFn: (ids: number[]) => eventNodesApi.bulkDelete(ids),
     onSuccess: () => {
@@ -229,6 +230,49 @@ function EventNodes() {
       success("批量删除成功");
     },
   });
+
+  // Callbacks - moved before early return to fix react-hooks/rules-of-hooks
+  const handleBulkDelete = useCallback(() => {
+    setConfirmState({
+      open: true,
+      title: '确认批量删除',
+      message: `确定要删除选中的 ${selectedCount} 个节点吗？`,
+      onConfirm: () => {
+        setConfirmState(s => ({ ...s, open: false }));
+        bulkDeleteMutation.mutate(selectedIds);
+      }
+    });
+  }, [selectedCount, selectedIds, bulkDeleteMutation]);
+
+  const handleToggleAdvanced = useCallback(() => setShowAdvanced(!showAdvanced), [showAdvanced]);
+
+  const handleCloseHqlModal = useCallback(() =>
+    setModals((prev) => ({
+      ...prev,
+      hql: { show: false, nodeId: null },
+    }))
+  , []);
+
+  const handleCloseQuickEditModal = useCallback(() =>
+    setModals((prev) => ({
+      ...prev,
+      quickEdit: { show: false, nodeId: null },
+    }))
+  , []);
+
+  const handleQuickEditUpdate = useCallback(() => queryClient.invalidateQueries({ queryKey: ["event-nodes"] }), [queryClient]);
+
+  const handleCloseFieldsModal = useCallback(() =>
+    setModals((prev) => ({
+      ...prev,
+      fields: { show: false, nodeId: null },
+    }))
+  , []);
+
+  // 游戏上下文验证 - moved after all hooks
+  if (!gameGid) {
+    return <GameSelectionPrompt />;
+  }
 
   // 错误处理
   if (isError) {

@@ -99,7 +99,7 @@ describe('useRetry', () => {
       });
 
       expect(error).toBeInstanceOf(Error);
-      expect(error?.message).toBe('Failed');
+      expect((error as Error)?.message).toBe('Failed');
       expect(asyncFn).toHaveBeenCalledTimes(3); // 初始调用 + 2次重试
     });
   });

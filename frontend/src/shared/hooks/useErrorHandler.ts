@@ -43,15 +43,27 @@ export interface ErrorHandlerResult extends ErrorHandlerState {
 /**
  * 标准化错误对象
  */
-function standardizeError(error: Error, type: ErrorType = 'runtime'): StandardizedError {
-  return {
-    name: error.name,
-    message: error.message,
-    stack: error.stack,
-    type,
-    timestamp: Date.now(),
-    recoverable: type !== 'fatal',
-  };
+export interface StandardizedError {
+  /** 错误名称 */
+  name: string;
+  /** 错误消息 */
+  message: string;
+  /** 错误堆栈 */
+  stack?: string;
+  /** 错误类型 */
+  type: ErrorType;
+  /** 时间戳 */
+  timestamp: number;
+  /** 是否可恢复 */
+  recoverable: boolean;
+  /** 原始错误 */
+  originalError?: Error;
+  /** 用户友好的错误消息 */
+  userMessage?: string;
+  /** 是否可重试 */
+  retryable?: boolean;
+  /** 额外上下文 */
+  context?: Record<string, unknown>;
 }
 
 /**

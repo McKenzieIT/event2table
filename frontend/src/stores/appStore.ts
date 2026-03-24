@@ -156,16 +156,16 @@ export const useAppStore = create<AppStore>()(
 
 // ========== 初始化应用状态 ==========
 // 从环境变量读取配置
-if (import.meta.env.VITE_APP_VERSION) {
-  useAppStore.getState().setAppVersion(import.meta.env.VITE_APP_VERSION);
+if ((import.meta as { env?: Record<string, string> }).env.VITE_APP_VERSION) {
+  useAppStore.getState().setAppVersion((import.meta as { env?: Record<string, string> }).env.VITE_APP_VERSION);
 }
 
-if (import.meta.env.VITE_API_BASE_URL) {
-  useAppStore.getState().setApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
+if ((import.meta as { env?: Record<string, string> }).env.VITE_API_BASE_URL) {
+  useAppStore.getState().setApiBaseUrl((import.meta as { env?: Record<string, string> }).env.VITE_API_BASE_URL);
 }
 
-if (import.meta.env.MODE) {
-  const env = import.meta.env.MODE as 'development' | 'staging' | 'production';
+if ((import.meta as { env?: Record<string, string> }).env.MODE) {
+  const env = (import.meta as { env?: Record<string, string> }).env.MODE as 'development' | 'staging' | 'production';
   useAppStore.getState().setEnvironment(env);
 }
 

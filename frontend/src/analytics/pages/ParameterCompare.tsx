@@ -47,16 +47,11 @@ function ParameterCompare() {
   const [search1, setSearch1] = useState('');
   const [search2, setSearch2] = useState('');
 
-  // Game context check - show prompt if no game selected
-  if (!currentGame) {
-    return <SelectGamePrompt message="查看参数对比需要先选择游戏" />;
-  }
-
   // 加载所有参数
   const { data: allParameters = [] as Parameter[], isLoading } = useQuery<Parameter[]>({
-    queryKey: ['parameters', 'all', currentGame.gid, 'v2'], // v2 to force cache refresh
+    queryKey: ['parameters', 'all', currentGame?.gid, 'v2'], // v2 to force cache refresh
     queryFn: async () => {
-      const response = await fetch(`/api/parameters/all?game_gid=${currentGame.gid}`);
+      const response = await fetch(`/api/parameters/all?game_gid=${currentGame?.gid}`);
       if (!response.ok) throw new Error('加载参数失败');
       const result = await response.json();
       // API 返回格式: { data: { parameters: [...], total: 100 } }
@@ -64,6 +59,11 @@ function ParameterCompare() {
     },
     enabled: !!currentGame // Only execute when currentGame exists
   });
+
+  // Game context check - show prompt if no game selected (moved after hooks)
+  if (!currentGame) {
+    return <SelectGamePrompt message="查看参数对比需要先选择游戏" />;
+  }
 
   // 客户端过滤（useMemo优化）
   const filteredParams1 = useMemo(() => {

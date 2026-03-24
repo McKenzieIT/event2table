@@ -48,7 +48,7 @@ export function useTaskPolling(
       // Stop polling if task is in terminal state
       if (!data) return false;
       const terminalStates: TaskStatus[] = ['completed', 'failed', 'cancelled'];
-      return terminalStates.includes(data.status) ? false : interval;
+      return terminalStates.includes(data?.status as TaskStatus) ? false : interval;
     },
     refetchIntervalInBackground: true, // Continue polling when tab is in background
     staleTime: 0, // Always fetch fresh data during polling

@@ -39,7 +39,9 @@ export interface SavedFlow {
   id: number;
   game_id: number;
   name: string;
-  flow_data: FlowData;
+  flow_data?: FlowData;
+  nodes?: FlowNode[];
+  edges?: FlowEdge[];
   created_at: string;
   updated_at: string;
 }
@@ -57,6 +59,9 @@ export interface EventConfig {
   config_json?: string;
   created_at?: string;
   updated_at?: string;
+  success?: boolean;
+  data?: EventConfig;
+  message?: string;
 }
 
 /**
@@ -81,6 +86,8 @@ export interface ExecutionResult {
   hql: string;
   metadata?: Record<string, unknown>;
   error?: string;
+  output_fields?: unknown[];
+  data?: unknown;
 }
 
 /**

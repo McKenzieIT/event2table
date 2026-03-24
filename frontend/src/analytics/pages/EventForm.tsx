@@ -79,11 +79,7 @@ function EventForm() {
   const gameGidFromQuery = searchParams.get('game_gid');
   const effectiveGameGid = gameGidFromQuery || currentGame?.gid;
 
-  // Game context check - show prompt if no game selected (and not in edit mode)
-  if (!currentGame && !gameGidFromQuery) {
-    return <SelectGamePrompt message="创建事件需要先选择游戏" />;
-  }
-
+  // All hooks must be called at the top level, before any conditional returns
   const [formData, setFormData] = React.useState<EventFormData>({
     event_name: '',
     event_name_cn: '',
@@ -108,7 +104,7 @@ function EventForm() {
 
   // Fetch event data (edit mode) using GraphQL
   const { data: eventData, isLoading } = useQuery(GET_EVENT, {
-    variables: { id: parseInt(id) },
+    variables: { id: parseInt(id || '0') },
     skip: !isEdit,
     fetchPolicy: 'cache-and-network'
   });
@@ -205,6 +201,12 @@ function EventForm() {
           ]
     }
   );
+
+  // Game context check - show prompt if no game selected (and not in edit mode)
+  // This check is now AFTER all hooks are called
+  if (!currentGame && !gameGidFromQuery) {
+    return <SelectGamePrompt message="创建事件需要先选择游戏" />;
+  }
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {

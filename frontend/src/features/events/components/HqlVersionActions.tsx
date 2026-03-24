@@ -169,7 +169,7 @@ const HqlVersionActions: React.FC<HqlVersionActionsProps> = ({
         {/* Rollback Version */}
         <div className="action-group">
           <Button
-            variant="outline-warning"
+            variant="warning"
             onClick={handleRollback}
             disabled={!canRollback || isRollingBack}
           >
@@ -181,7 +181,7 @@ const HqlVersionActions: React.FC<HqlVersionActionsProps> = ({
         {/* Compare Versions */}
         <div className="action-group">
           <Button
-            variant="outline-info"
+            variant="info"
             onClick={handleCompare}
             disabled={!canCompare}
           >

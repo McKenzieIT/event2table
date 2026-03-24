@@ -41,7 +41,7 @@ export const FieldRecommendation: React.FC<FieldRecommendationProps> = React.mem
   const {
     mutate: getRecommendations,
     data: recommendationData,
-    isLoading: isRecommendationLoading,
+    isPending: isRecommendationLoading,
     error: recommendationError,
   } = useFieldRecommendations();
 
@@ -49,7 +49,7 @@ export const FieldRecommendation: React.FC<FieldRecommendationProps> = React.mem
   const {
     mutate: inferType,
     data: typeInferenceData,
-    isLoading: isInferenceLoading,
+    isPending: isInferenceLoading,
     error: inferenceError,
   } = useFieldTypeInference();
 

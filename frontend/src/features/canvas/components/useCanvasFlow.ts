@@ -49,8 +49,8 @@ export const useCanvasFlow = (gameData: GameData, flowId?: number | string) => {
     );
 
     // Save and execute mutations
-    const { mutate: saveFlowMutation, isLoading: isSaving } = useFlowSave();
-    const { mutate: executeFlowMutation, isLoading: isExecuting } = useFlowExecute();
+    const { mutate: saveFlowMutation, isPending: isSaving } = useFlowSave();
+    const { mutate: executeFlowMutation, isPending: isExecuting } = useFlowExecute();
 
     // Modal states
     const [showJoinConfig, setShowJoinConfig] = useState<boolean>(false);

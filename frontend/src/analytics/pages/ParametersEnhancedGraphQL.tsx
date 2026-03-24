@@ -62,17 +62,17 @@ function ParametersEnhancedGraphQL() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Game context check - show prompt if no game selected
-  if (!currentGame) {
-    return <SelectGamePrompt message="查看增强参数管理需要先选择游戏" />;
-  }
-
   // GraphQL query
   const { data: paramsData, loading: isLoading, error } = useParametersManagement(
-    currentGame.gid,
+    currentGame?.gid,
     'all',
     undefined
   );
+
+  // Game context check - show prompt if no game selected (moved after hooks)
+  if (!currentGame) {
+    return <SelectGamePrompt message="查看增强参数管理需要先选择游戏" />;
+  }
 
   // ⚡️ useMemo: Get parameters list (已有优化)
   const parameters: Parameter[] = useMemo(() => {
