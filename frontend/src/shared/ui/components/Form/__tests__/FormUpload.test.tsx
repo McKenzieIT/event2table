@@ -25,29 +25,34 @@ const createFile = (name: string, size: number = 1024, type: string = 'image/png
 
 describe('FormUpload', () => {
   it('should render with label', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" />
+        </TestFormWrapper>
+      );
+    });
+
     expect(screen.getByText('Upload Files')).toBeInTheDocument();
   });
 
   it('should render required indicator when required', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" required />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" required />
+        </TestFormWrapper>
+      );
+    });
+
     expect(screen.getByText('*')).toBeInTheDocument();
   });
 
   it('should render helper text', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" helperText="Max 5 files" />
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" helperText="Max 5 files" />
       </TestFormWrapper>
     );
     
@@ -55,100 +60,114 @@ describe('FormUpload', () => {
   });
 
   it('should render dropzone', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" />
+        </TestFormWrapper>
+      );
+    });
+
     const dropzone = document.querySelector('.form-upload-dropzone');
     expect(dropzone).toBeInTheDocument();
   });
 
   it('should render upload button', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" buttonText="Select Files" />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" buttonText="Select Files" />
+        </TestFormWrapper>
+      );
+    });
+
     expect(screen.getByText('Select Files')).toBeInTheDocument();
   });
 
   it('should show max file size hint', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" maxSize={1048576} />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" maxSize={1048576} />
+        </TestFormWrapper>
+      );
+    });
+
     expect(screen.getByText(/Max file size:/)).toBeInTheDocument();
   });
 
   it('should show max files hint when multiple', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" multiple maxFiles={5} />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" multiple maxFiles={5} />
+        </TestFormWrapper>
+      );
+    });
+
     expect(screen.getByText(/Max files: 5/)).toBeInTheDocument();
   });
 
   it('should be disabled when disabled prop is true', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" disabled />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" disabled />
+        </TestFormWrapper>
+      );
+    });
+
     const dropzone = document.querySelector('.form-upload-dropzone');
     expect(dropzone).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('should handle file selection', async () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" />
+        </TestFormWrapper>
+      );
+    });
+
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = createFile('test.png', 1024, 'image/png');
-    
+
     Object.defineProperty(input, 'files', {
       value: [file],
       writable: true
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText('test.png')).toBeInTheDocument();
     });
   });
 
   it('should show file preview for images', async () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" showPreview />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" showPreview />
+        </TestFormWrapper>
+      );
+    });
+
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = createFile('test.png', 1024, 'image/png');
-    
+
     Object.defineProperty(input, 'files', {
       value: [file],
       writable: true
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
-    
+
     await waitFor(() => {
       const preview = document.querySelector('.form-upload-preview');
       expect(preview).toBeInTheDocument();
@@ -156,58 +175,62 @@ describe('FormUpload', () => {
   });
 
   it('should show file size', async () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" />
+        </TestFormWrapper>
+      );
+    });
+
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = createFile('test.png', 2048, 'image/png');
-    
+
     Object.defineProperty(input, 'files', {
       value: [file],
       writable: true
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText('2 KB')).toBeInTheDocument();
     });
   });
 
   it('should allow file removal', async () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" />
+        </TestFormWrapper>
+      );
+    });
+
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = createFile('test.png', 1024, 'image/png');
-    
+
     Object.defineProperty(input, 'files', {
       value: [file],
       writable: true
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText('test.png')).toBeInTheDocument();
     });
-    
+
     const removeButton = document.querySelector('.form-upload-remove');
-    
+
     await act(async () => {
       fireEvent.click(removeButton!);
     });
-    
+
     await waitFor(() => {
       expect(screen.queryByText('test.png')).not.toBeInTheDocument();
     });
@@ -215,46 +238,50 @@ describe('FormUpload', () => {
 
   it('should validate file size', async () => {
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" maxSize={100} />
-      </TestFormWrapper>
-    );
-    
+
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" maxSize={100} />
+        </TestFormWrapper>
+      );
+    });
+
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = createFile('large.png', 1000, 'image/png');
-    
+
     Object.defineProperty(input, 'files', {
       value: [file],
       writable: true
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
-    
+
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalled();
     });
-    
+
     alertSpy.mockRestore();
   });
 
   it('should handle drag and drop', async () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" enableDragDrop />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" enableDragDrop />
+        </TestFormWrapper>
+      );
+    });
+
     const dropzone = document.querySelector('.form-upload-dropzone');
-    
+
     await act(async () => {
       fireEvent.dragEnter(dropzone!);
     });
     expect(dropzone).toHaveClass('form-upload-dropzone--dragging');
-    
+
     await act(async () => {
       fireEvent.dragLeave(dropzone!);
     });
@@ -262,24 +289,28 @@ describe('FormUpload', () => {
   });
 
   it('should have correct ARIA attributes', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" required />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" required />
+        </TestFormWrapper>
+      );
+    });
+
     const dropzone = document.querySelector('.form-upload-dropzone');
     expect(dropzone).toHaveAttribute('aria-required', 'true');
     expect(dropzone).toHaveAttribute('aria-invalid', 'false');
   });
 
   it('should apply custom className', () => {
-    render(
-      <TestFormWrapper>
-        <FormUpload name="files" label="Upload Files" className="custom-class" />
-      </TestFormWrapper>
-    );
-    
+    act(() => {
+      render(
+        <TestFormWrapper>
+          <FormUpload name="files" label="Upload Files" className="custom-class" />
+        </TestFormWrapper>
+      );
+    });
+
     const wrapper = document.querySelector('.custom-class');
     expect(wrapper).toBeInTheDocument();
   });

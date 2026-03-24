@@ -64,16 +64,19 @@ interface SearchInputProps {
 /**
  * SearchInput Component
  */
-function SearchInput({
-  value = '',
-  onChange,
-  placeholder = '搜索...',
-  onClear,
-  debounceMs = 300,
-  icon,
-  disabled = false,
-  className = '',
-}: SearchInputProps) {
+const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>((
+  {
+    value = '',
+    onChange,
+    placeholder = '搜索...',
+    onClear,
+    debounceMs = 300,
+    icon,
+    disabled = false,
+    className = '',
+  }: SearchInputProps,
+  externalRef
+) => {
   const defaultSearchIcon = (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8"></circle>
@@ -83,7 +86,8 @@ function SearchInput({
 
   const searchIcon = icon !== undefined ? icon : defaultSearchIcon;
   const renderedIcon = typeof searchIcon === 'function' ? React.createElement(searchIcon) : searchIcon;
-  const inputRef = useRef<HTMLInputElement>(null);
+  const internalRef = useRef<HTMLInputElement>(null);
+  const inputRef = (externalRef as React.RefObject<HTMLInputElement>) || internalRef;
   const [isFocused, setIsFocused] = useState(false);
   const [showClearButton, setShowClearButton] = useState(false);
   const [internalValue, setInternalValue] = useState(value);
@@ -163,7 +167,7 @@ function SearchInput({
       </div>
 
       <input
-        ref={inputRef}
+        ref={externalRef || internalRef}
         type="text"
         className={inputClass}
         placeholder={placeholder}
@@ -196,7 +200,9 @@ function SearchInput({
       )}
     </div>
   );
-}
+});
+
+SearchInput.displayName = 'SearchInput';
 
 // 使用共享的 memo 比较函数
 const MemoizedSearchInput = React.memo(SearchInput, compareSearchInputProps);
