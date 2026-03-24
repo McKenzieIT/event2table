@@ -8,7 +8,7 @@ import { TableHeaderProps, TableColumn, RowData } from './Table.types';
  * @param width - The width value from column definition (number | string | undefined)
  * @returns A valid CSS width value (number with px, string, or 'auto')
  */
-const parseWidth = (width: number | string | undefined): string | number | undefined => {
+const parseWidth = (width: number | string | undefined): string => {
   // Handle undefined/null
   if (width === undefined || width === null) {
     return 'auto';
@@ -34,8 +34,8 @@ const parseWidth = (width: number | string | undefined): string | number | undef
       return 'auto';
     }
 
-    // Return valid number (will be converted to px by React)
-    return width;
+    // Convert number to px string
+    return `${width}px`;
   }
 
   // Fallback for any other type
