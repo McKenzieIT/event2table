@@ -108,12 +108,14 @@ class SecureHasher:
         # 计算哈希
         return cls.hash_string(serialized, algorithm)
 
-    def hash_file(self, file_path: str) -> str:
+    @classmethod
+    def hash_file(cls, file_path: str, chunk_size: int = 8192) -> str:
         """
         计算文件的SHA256哈希值
 
         Args:
             file_path: 文件路径
+            chunk_size: 分块大小（字节），用于处理大文件
 
         Returns:
             文件的SHA256哈希值（十六进制字符串）
@@ -122,10 +124,12 @@ class SecureHasher:
             FileNotFoundError: 文件不存在
             ValueError: 文件路径验证失败
         """
+        import os
+
         # 验证文件路径（如果PathValidator可用）
         # 在测试环境中跳过路径验证，允许测试使用临时文件
         is_test_mode = os.environ.get("TESTING") or os.environ.get("PYTEST_CURRENT_TEST")
-        
+
         if PathValidator is not None and not is_test_mode:
             try:
                 project_root = Path(__file__).parent.parent.parent.resolve()
@@ -133,6 +137,21 @@ class SecureHasher:
             except Exception as e:
                 logger.warning(f"Path validation failed: {e}")
                 raise ValueError(f"Invalid file path: {file_path}") from e
+
+        # 检查文件是否存在
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File not found: {file_path}")
+
+        # 计算文件哈希
+        hasher = hashlib.sha256()
+        with open(file_path, 'rb') as f:
+            while True:
+                chunk = f.read(chunk_size)
+                if not chunk:
+                    break
+                hasher.update(chunk)
+
+        return hasher.hexdigest()
 
     @classmethod
     def _get_hasher(cls, algorithm: str):

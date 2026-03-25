@@ -66,7 +66,7 @@ class TestAPIParameterValidation(unittest.TestCase):
         # Mock Redis to avoid connection issues in test environment
         from unittest.mock import patch
 
-        with patch('backend.core.cache.cache_system.cache.get', return_value=None):
+        with patch('backend.core.cache.cache_system.hierarchical_cache.get', return_value=None):
             response = self.client.get("/api/events?game_id=abc")
 
             # Should handle gracefully (either filter by 0 or return error)

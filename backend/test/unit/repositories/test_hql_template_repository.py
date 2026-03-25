@@ -218,11 +218,10 @@ class TestHQLTemplateRepository:
 
         assert success is True, "delete_template should return True"
 
-        # 验证已删除
+        # 验证已删除 - delete_template returns True on successful deletion
+        # The template should no longer exist
         template = self.repo.find_by_id(template_id)
-        # Note: In some database configurations, the transaction might not be immediately visible
-        # So we check either None or that the record no longer matches the original ID
-        assert template is None or template.get("id") != template_id, "Template should be deleted"
+        assert template is None, "Template should be deleted"
 
     def test_delete_system_template_forbidden(self):
         """测试禁止删除系统模板"""
