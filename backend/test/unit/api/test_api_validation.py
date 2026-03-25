@@ -35,7 +35,7 @@ class TestAPIParameterValidation(unittest.TestCase):
         # Mock Redis to avoid connection issues in test environment
         from unittest.mock import patch
 
-        with patch('backend.core.cache.cache_system.cache.get', return_value=None):
+        with patch('backend.core.cache.cache_system.hierarchical_cache.get', return_value=None):
             response = self.client.get("/api/events?page=-1")
             # Should handle gracefully (default to page 1 or return error)
             # Note: In CI environment without Redis, this may return 500
@@ -46,7 +46,7 @@ class TestAPIParameterValidation(unittest.TestCase):
         # Mock Redis to avoid connection issues in test environment
         from unittest.mock import patch
 
-        with patch('backend.core.cache.cache_system.cache.get', return_value=None):
+        with patch('backend.core.cache.cache_system.hierarchical_cache.get', return_value=None):
             response = self.client.get("/api/events?per_page=abc")
             # Should handle gracefully (default to 20 or return error)
             # Note: In CI environment without Redis, this may return 500

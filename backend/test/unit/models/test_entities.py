@@ -301,9 +301,8 @@ class TestHelperFunctions:
 
     def test_round_trip_conversion(self):
         """测试往返转换"""
-        original = GameEntity(id=1, gid=10000147, name="Test", ods_db="ieu_ods", dwd_prefix="dwd")
+        original = GameEntity(id=1, gid=10000147, name="Test", ods_db="ieu_ods")
         data = entity_to_dict(original)
         restored = dict_to_entity(GameEntity, data)
         assert restored.gid == original.gid
         assert restored.name == original.name
-        assert restored.dwd_prefix == original.dwd_prefix
