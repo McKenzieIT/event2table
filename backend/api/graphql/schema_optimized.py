@@ -11,9 +11,8 @@
 """
 
 import graphene
-from graphene import ID, Boolean, Field, Int, List, ObjectType, String, relay
+from graphene import Boolean, Field, Int, List, ObjectType, String, relay
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from graphql import GraphQLError
 
 from backend.core.cache.cache_system import cached
 from backend.models.database.models import Event, Game, Parameter

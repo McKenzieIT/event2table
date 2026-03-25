@@ -30,20 +30,19 @@ api_bp = Blueprint("api", __name__)
 
 # Import all route modules to register their routes
 # These imports must come after creating the blueprint to avoid circular imports
+# noqa: F401 - These imports register routes via side effects
 from .routes import cache  # Cache management endpoints
+from .routes import categories  # noqa: F401
+from .routes import event_parameters  # noqa: F401
+from .routes import events  # noqa: F401
+from .routes import field_builder  # noqa: F401
+from .routes import flows  # noqa: F401
+from .routes import games  # noqa: F401
 from .routes import graphql  # GraphQL API
 from .routes import health  # Health check endpoint
+from .routes import hql_generation  # noqa: F401
+from .routes import join_configs  # noqa: F401
 from .routes import parameters  # 添加 parameters 模块
-from .routes import (
-    categories,
-    event_parameters,
-    events,
-    field_builder,
-    flows,
-    games,
-    hql_generation,
-    join_configs,
-)
 
 # TODO: Add more modules as they are created
 

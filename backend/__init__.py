@@ -6,7 +6,11 @@ import os
 # This prevents GraphQL schema MRO conflicts during testing
 if os.environ.get("FLASK_ENV") != "testing":
     try:
-        from . import api, core, models, services
+        # Import modules for package-level availability
+        from . import api  # noqa: F401
+        from . import core  # noqa: F401
+        from . import models  # noqa: F401
+        from . import services  # noqa: F401
     except ImportError as e:
         # Log but don't fail during import
         import logging

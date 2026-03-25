@@ -7,7 +7,7 @@ This module provides API endpoints for managing common parameters.
 It has been refactored to use ParameterService instead of direct database access.
 
 Architecture:
-- API Layer (this file) → Service Layer (ParameterService) → Repository Layer (ParameterRepository) → Database
+- API Layer → Service Layer → Repository Layer → Database
 """
 
 from flask import Blueprint, request
@@ -73,7 +73,10 @@ def sync_common_params():
 
         return json_success_response(
             data=result,
-            message=f"Synced {result['added']} common parameters from {result['total_events']} events",
+            message=(
+                f"Synced {result['added']} common parameters "
+                f"from {result['total_events']} events"
+            ),
         )
 
     except ValueError as e:

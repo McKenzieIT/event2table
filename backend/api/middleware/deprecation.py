@@ -7,9 +7,7 @@ V1 API废弃警告中间件
 import logging
 from functools import wraps
 
-from flask import jsonify, make_response, request
-
-from backend.core.cache.cache_system import CacheInvalidator
+from flask import jsonify, request
 
 logger = logging.getLogger(__name__)
 

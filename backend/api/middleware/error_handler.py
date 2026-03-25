@@ -35,8 +35,6 @@ import logging
 from functools import wraps
 from typing import Any, Dict, Tuple
 
-from flask import jsonify
-
 from backend.core.utils import json_error_response, json_success_response
 
 logger = logging.getLogger(__name__)

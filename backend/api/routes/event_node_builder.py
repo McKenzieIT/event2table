@@ -239,7 +239,8 @@ def save_config():
             verification = event_node_service.get_node_with_details(created_node.id)
             if not verification:
                 logger.error(
-                    f"[SAVE_CONFIG] CRITICAL: Node {created_node.id} not found in DB after creation!"
+                    f"[SAVE_CONFIG] CRITICAL: Node {created_node.id} "
+                    f"not found in DB after creation!"
                 )
                 return json_error_response("Node creation verification failed", status_code=500)
 

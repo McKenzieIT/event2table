@@ -51,13 +51,12 @@ API端点:
 import logging
 from datetime import datetime
 
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 
 from backend.core.cache.cache_system import CacheKeyBuilder, get_redis_client, hierarchical_cache
 from backend.core.cache.invalidator import cache_invalidator_enhanced
 from backend.core.cache.protection import cache_protection
 from backend.core.cache.statistics import cache_statistics
-from backend.core.config.config import CacheConfig
 
 # Import the api_bp to register routes directly
 from .. import api_bp

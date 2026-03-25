@@ -932,7 +932,8 @@ class EventRepository(GenericRepository):
         if where_clauses:
             count_query += " WHERE " + " AND ".join(where_clauses)
         total_result = fetch_one_as_dict(count_query, tuple(params))
-        total_events = total_result["total"] if total_result else 0
+        # 安全访问total键，防止KeyError
+        total_events = total_result.get("total", 0) if total_result else 0
 
         # 添加分页
         offset = (page - 1) * per_page

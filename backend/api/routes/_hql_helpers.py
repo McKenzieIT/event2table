@@ -12,7 +12,7 @@ from typing import Any, Dict, Tuple
 
 from werkzeug.exceptions import BadRequest
 
-from backend.core.utils import json_error_response, json_success_response, success_response
+from backend.core.utils import json_error_response, success_response
 
 logger = logging.getLogger(__name__)
 
