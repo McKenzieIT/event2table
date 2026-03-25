@@ -4,12 +4,13 @@
 缓存性能测试
 """
 
-import time
 import sys
+import time
 
 sys.path.insert(0, '.')
 
 from unittest.mock import patch
+
 from backend.models.repositories.parameters import ParameterRepository
 
 

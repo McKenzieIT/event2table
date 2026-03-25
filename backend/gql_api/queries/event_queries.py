@@ -60,7 +60,7 @@ class EventQueries:
     @staticmethod
     @cached(ttl=1800, key_prefix="events")
     def resolve_events(
-        root, info, game_gid: int, category: str = None, limit: int = 50, offset: int = 0
+        root, info, game_gid: int, category: str | None = None, limit: int = 50, offset: int = 0
     ):
         """
         Resolve list of events for a game with filtering and pagination.
@@ -114,7 +114,7 @@ class EventQueries:
 
     @staticmethod
     @cached(ttl=600, key_prefix="events_search")
-    def resolve_search_events(root, info, query: str, game_gid: int = None):
+    def resolve_search_events(root, info, query: str, game_gid: int | None = None):
         """
         Search events by name.
 

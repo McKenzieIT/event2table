@@ -5,6 +5,7 @@ HQL Template Repository 单元测试
 """
 
 import pytest
+
 from backend.models.repositories.hql_template_repository import HQLTemplateRepository
 
 

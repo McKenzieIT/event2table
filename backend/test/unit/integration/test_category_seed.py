@@ -15,8 +15,8 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 from backend.core.database.database import get_db_connection
-from backend.core.utils import fetch_all_as_dict, fetch_one_as_dict, execute_write
 from backend.core.logging import get_logger
+from backend.core.utils import execute_write, fetch_all_as_dict, fetch_one_as_dict
 
 logger = get_logger(__name__)
 

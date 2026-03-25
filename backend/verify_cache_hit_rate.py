@@ -7,9 +7,9 @@ This script verifies that the cache is working correctly by:
 2. Checking that the database is only called once (cache hit)
 """
 
-import sys
 import os
-from unittest.mock import patch, MagicMock
+import sys
+from unittest.mock import MagicMock, patch
 
 # Add backend to path
 sys.path.insert(0, os.path.dirname(__file__))
@@ -17,8 +17,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 def test_cache_hit_rate():
     """Test that cache hit rate is 100% for repeated calls"""
-    from backend.models.repositories.parameters import ParameterRepository
     from backend.core.cache.decorators import _cache
+    from backend.models.repositories.parameters import ParameterRepository
 
     # Clear cache before test
     _cache.clear()

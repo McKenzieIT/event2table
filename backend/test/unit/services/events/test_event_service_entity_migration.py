@@ -13,10 +13,12 @@ This test suite verifies:
 5. Error handling is complete
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import MagicMock, patch, Mock
-from backend.services.events.event_service import EventService
+
 from backend.models.entities import EventEntity
+from backend.services.events.event_service import EventService
 
 
 class TestEventServiceEntityUsage:

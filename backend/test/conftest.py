@@ -4,8 +4,9 @@ Pytest Configuration for Backend Tests
 This file contains pytest fixtures and configuration for running backend tests.
 """
 
-import sys
 import os
+import sys
+
 import pytest
 
 # Add project root to path

@@ -10,12 +10,14 @@ Tests for:
 - Canvas type HQL handling
 """
 
-import pytest
 import json
 from datetime import datetime, timedelta
+
+import pytest
+
 from backend.api.routes.hql_preview import hql_preview_bp
+from backend.core.config.config import TEST_DB_PATH, get_db_path
 from backend.services.hql.hql_history_service import HQLHistoryService
-from backend.core.config.config import get_db_path, TEST_DB_PATH
 
 
 @pytest.fixture(scope="module")

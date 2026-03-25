@@ -1,8 +1,9 @@
 """
 Unit tests for EventRepository
 """
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from backend.models.repositories.events import EventRepository
 

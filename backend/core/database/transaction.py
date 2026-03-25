@@ -44,7 +44,7 @@ def transactional(func: Callable) -> Callable:
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> Any:
-        conn = None
+        conn: conn | None = None
         try:
             conn = get_db_connection()
             conn.execute("BEGIN")

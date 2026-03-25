@@ -7,8 +7,9 @@ Tests all game-related API endpoints including CRUD operations,
 batch operations, and game context management.
 """
 
-import pytest
 import json
+
+import pytest
 from flask import Flask
 
 # The new games API doesn't export individual functions

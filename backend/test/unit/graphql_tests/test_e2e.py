@@ -4,8 +4,9 @@ GraphQL API E2E Tests
 End-to-end tests for GraphQL API functionality.
 """
 
-import pytest
 import sys
+
+import pytest
 
 sys.path.insert(0, '/Users/mckenzie/Documents/event2table')
 

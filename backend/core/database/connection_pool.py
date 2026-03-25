@@ -31,13 +31,13 @@ Author: Event2Table Performance Optimization Team
 Version: 1.0.0 (2026-03-18)
 """
 
+import logging
+import sqlite3
 import threading
 import time
-import sqlite3
-import logging
-from typing import Optional, Dict, Any
 from contextlib import contextmanager
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +145,7 @@ class ConnectionPool:
         ...     pool.return_connection(conn)
     """
 
-    def __init__(self, db_path: str, config: ConnectionPoolConfig = None):
+    def __init__(self, db_path: str, config: ConnectionPoolConfig | None = None):
         """
         Initialize connection pool
 
@@ -197,7 +197,7 @@ class ConnectionPool:
 
         return _PooledConnection(conn)
 
-    def get_connection(self, timeout: float = None) -> sqlite3.Connection:
+    def get_connection(self, timeout: float | None = None) -> sqlite3.Connection:
         """
         Acquire a connection from the pool
 

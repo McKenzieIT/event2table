@@ -5,23 +5,24 @@ Comprehensive Test Suite for game_id → game_gid Migration
 Tests all modified functionality to ensure no regressions
 """
 
-import sys
-import os
-import requests
 import json
+import os
+import sys
 from datetime import datetime
+
+import requests
 
 # Add project path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
-from backend.core.database import get_db_connection, DB_PATH
+from backend.core.database import DB_PATH, get_db_connection
 from backend.core.utils import (
-    validate_game_exists,
-    validate_game_id,
     check_game_has_events,
     get_categories_by_game,
-    get_games_with_event_counts,
     get_event_with_game_info,
+    get_games_with_event_counts,
+    validate_game_exists,
+    validate_game_id,
 )
 
 

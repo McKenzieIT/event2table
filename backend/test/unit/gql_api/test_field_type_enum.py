@@ -22,6 +22,7 @@ Priority: P0-1 (Critical)
 """
 
 import pytest
+
 from backend.gql_api.schema_parameter_management import FieldTypeEnum
 
 

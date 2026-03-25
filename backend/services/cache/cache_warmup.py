@@ -90,7 +90,7 @@ class CacheWarmer:
         logger.info(f"✅ Warmed up {len(events)} events")
         return len(events)
 
-    def warmup_common_params(self, game_gid: int = None) -> int:
+    def warmup_common_params(self, game_gid: int | None = None) -> int:
         """
         预热常用参数
 

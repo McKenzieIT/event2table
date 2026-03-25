@@ -9,7 +9,8 @@ TDD Phase: RED → GREEN - 验证现有Schema的输入验证
 
 import pytest
 from pydantic import ValidationError
-from backend.models.schemas import EventParameterCreate, EventCreate
+
+from backend.models.schemas import EventCreate, EventParameterCreate
 
 
 def test_parameter_create_requires_valid_name():

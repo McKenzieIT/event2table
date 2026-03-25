@@ -1,4 +1,4 @@
-from backend.core.cache.decorators import cached, cache_invalidate
+from backend.core.cache.decorators import cache_invalidate, cached
 
 # ⚠️ PERFORMANCE: N+1 query - needs JOIN/prefetch refactor
 # TODO: Replace loop queries with single JOIN query
@@ -45,7 +45,7 @@ class ParameterRepository(GenericRepository):
 
     @staticmethod
     def _row_to_entity(
-        row: Dict[str, Any], event_game_gid_map: Dict[int, int] = None
+        row: Dict[str, Any], event_game_gid_map: Dict[int, int] | None = None
     ) -> ParameterEntity:
         """
         将数据库行映射到ParameterEntity
@@ -115,8 +115,8 @@ class ParameterRepository(GenericRepository):
         Returns:
             创建的ParameterEntity, 失败返回None
         """
-        from backend.core.utils.converters import get_db_connection
         from backend.core.cache.cache_system import clear_cache_pattern
+        from backend.core.utils.converters import get_db_connection
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -696,8 +696,8 @@ class ParameterRepository(GenericRepository):
         query = f"UPDATE event_params SET {set_clause} WHERE id = ?"
         values = list(db_data.values()) + [param_id]
 
-        from backend.core.utils.converters import get_db_connection
         from backend.core.cache.cache_system import clear_cache_pattern
+        from backend.core.utils.converters import get_db_connection
 
         conn = get_db_connection()
         cursor = conn.cursor()

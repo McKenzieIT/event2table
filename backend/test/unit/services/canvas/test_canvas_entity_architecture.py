@@ -12,13 +12,13 @@ Canvas Service Entity Architecture Tests
 测试覆盖率目标: ≥80%
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
+
+from backend.models.entities import EventEntity, EventNodeEntity, FlowEntity, GameEntity
 from backend.services.canvas.canvas_service import CanvasService
-from backend.models.entities import FlowEntity, EventNodeEntity, GameEntity, EventEntity
-
 
 # ============================================================================
 # Test Constants

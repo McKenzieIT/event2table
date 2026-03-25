@@ -29,7 +29,7 @@ class AppInitializer:
     - 健康检查
     """
 
-    def __init__(self, app: Flask = None):
+    def __init__(self, app: Flask | None = None):
         self.app = app
         self.cache_warmer = CacheWarmer()
         self.cache_stats = CacheStatistics()

@@ -168,7 +168,7 @@ class CacheMiddleware:
         except Exception as e:
             logger.debug(f"Cache set error: {e}")
 
-    def invalidate(self, pattern: str = None):
+    def invalidate(self, pattern: str | None = None):
         """
         Invalidate cache entries.
 

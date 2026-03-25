@@ -6,10 +6,11 @@ join_configs game_id迁移单元测试
 测试join_configs从game_id迁移到game_gid
 """
 
-import pytest
 import sqlite3
 import tempfile
 from pathlib import Path
+
+import pytest
 
 
 class TestJoinConfigsGameGidMigration:

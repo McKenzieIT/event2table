@@ -16,10 +16,10 @@ from backend.gql_api.middleware.cache_middleware import (
     cache_middleware,
 )
 from backend.gql_api.middleware.complexity_limit import ComplexityLimitMiddleware
+from backend.gql_api.middleware.dataloader_context import DataLoaderContextMiddleware
 
 # Import middleware
 from backend.gql_api.middleware.depth_limit import DepthLimitMiddleware
-from backend.gql_api.middleware.dataloader_context import DataLoaderContextMiddleware
 from backend.gql_api.middleware.error_handling import ErrorHandlingMiddleware
 
 # Import schema

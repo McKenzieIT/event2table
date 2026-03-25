@@ -7,13 +7,15 @@ Tests for backend/models/events.py module
 Following TDD principle: Write tests first, watch them fail, then implement.
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+
 from backend.models.events import (
-    EventData,
     EventBuilder,
-    _parse_event_parameters,
+    EventData,
     _build_event_from_form,
+    _parse_event_parameters,
 )
 
 

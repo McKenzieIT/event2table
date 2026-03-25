@@ -4,9 +4,10 @@
 Unit Tests for Template Service
 """
 
-import unittest
 import json
-from unittest.mock import patch, MagicMock
+import unittest
+from unittest.mock import MagicMock, patch
+
 from backend.services.template_service import TemplateService
 
 

@@ -214,7 +214,7 @@ class MissingJoinConfigError(HQLGenerationError):
 class NotFoundError(DWDGeneratorError):
     """Exception raised when a resource is not found"""
 
-    def __init__(self, resource_type: str, resource_id: Any = None):
+    def __init__(self, resource_type: str, resource_id: Any | None = None):
         self.resource_type = resource_type
         self.resource_id = resource_id
         if resource_id:

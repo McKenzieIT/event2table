@@ -39,7 +39,7 @@ class GenerateHQL(graphene.Mutation):
 
     @authenticated
     @require_permission("write")
-    def mutate(self, info, event_ids: list, mode: str = "single", options: str = None):
+    def mutate(self, info, event_ids: list, mode: str = "single", options: str | None = None):
         """
         Execute the mutation
 
@@ -236,7 +236,7 @@ class SaveHQLTemplate(graphene.Mutation):
 
     @authenticated
     @require_permission("write")
-    def mutate(self, info, name: str, content: str, category: str = None, description: str = None):
+    def mutate(self, info, name: str, content: str, category: str | None = None, description: str | None = None):
         """
         Execute the mutation
 

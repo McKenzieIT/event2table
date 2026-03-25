@@ -111,7 +111,7 @@ class AlertingSystem:
             },
         }
 
-    def check_metric(self, metric_type: AlertType, value: float, context: Dict = None):
+    def check_metric(self, metric_type: AlertType, value: float, context: Dict | None = None):
         """
         Check a metric against alert rules.
 

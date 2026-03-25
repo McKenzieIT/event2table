@@ -10,14 +10,16 @@ Tests cover:
 - Error handling
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 from flask import Flask
+
+from backend.core.cache.cache_system import HierarchicalCache
 
 # Import the blueprint and dependencies
 from backend.services.event_node_builder import event_node_builder_bp
 from backend.services.events.event_service import EventService
-from backend.core.cache.cache_system import HierarchicalCache
 
 
 @pytest.fixture
@@ -264,8 +266,8 @@ class TestGetEventParamsCacheBehavior:
 
     def test_cache_key_prefix(self):
         """Test that cache key prefix is set to 'event_params'"""
-        from backend.services.event_node_builder import get_event_params
         from backend.core.cache.decorators import cached
+        from backend.services.event_node_builder import get_event_params
 
         # Get the decorator's metadata
         # This verifies the key_prefix parameter in @cached decorator

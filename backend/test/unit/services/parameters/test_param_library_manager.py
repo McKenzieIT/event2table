@@ -7,8 +7,10 @@ Tests the migration from direct database access to Repository pattern.
 Follows TDD: Test first, implementation second.
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+
 from backend.services.parameters.param_library_manager import ParamLibraryManager
 
 

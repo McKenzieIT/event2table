@@ -19,7 +19,7 @@ _cache = HierarchicalCache()
 _invalidator = CacheInvalidator(_cache)
 
 
-def cached(ttl: int = 300, key_prefix: str = None, add_response_headers: bool = True):
+def cached(ttl: int = 300, key_prefix: str | None = None, add_response_headers: bool = True):
     """
     简化的缓存装饰器 (为Worker 4性能优化添加)
 
@@ -114,7 +114,7 @@ def cached(ttl: int = 300, key_prefix: str = None, add_response_headers: bool = 
     return decorator
 
 
-def cached_with_headers(ttl: int = 300, key_prefix: str = None):
+def cached_with_headers(ttl: int = 300, key_prefix: str | None = None):
     """
     带HTTP响应头的缓存装饰器 (用于监控)
 

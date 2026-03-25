@@ -4,10 +4,11 @@ Canvas Integration Test - Server-side verification
 Tests canvas page accessibility and JavaScript file loading
 """
 
-import requests
 import re
 import sys
 from pathlib import Path
+
+import requests
 
 
 class CanvasIntegrationTest:

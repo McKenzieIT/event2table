@@ -35,7 +35,7 @@ class TemplateEngine:
     def __init__(self):
         """初始化模板引擎"""
 
-    def render(self, template: str, variables: Dict[str, str] = None) -> str:
+    def render(self, template: str, variables: Dict[str, str] | None = None) -> str:
         """
         替换模板中的变量
 
@@ -100,7 +100,9 @@ class TemplateEngine:
         matches = self.VARIABLE_PATTERN.findall(template)
         return list(matches)
 
-    def validate_variables(self, template: str, available: Set[str] = None) -> Dict[str, List[str]]:
+    def validate_variables(
+        self, template: str, available: Set[str] | None = None
+    ) -> Dict[str, List[str]]:
         """
         验证模板中的变量
 
@@ -170,7 +172,7 @@ class TemplateEngine:
 
 
 # 便捷函数
-def render_template(template: str, variables: Dict[str, str] = None) -> str:
+def render_template(template: str, variables: Dict[str, str] | None = None) -> str:
     """
     渲染模板（便捷函数）
 

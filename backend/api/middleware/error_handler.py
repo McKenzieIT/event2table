@@ -84,7 +84,7 @@ def create_error_response(message: str, status_code: int = 400) -> Tuple[Dict[st
     return {"success": False, "error": message}, status_code
 
 
-def create_success_response(data: Any = None, message: str = None) -> Dict[str, Any]:
+def create_success_response(data: Any | None = None, message: str | None = None) -> Dict[str, Any]:
     """Deprecated: Use json_success_response() from backend.core.utils instead."""
     response = {"success": True}
     if data is not None:

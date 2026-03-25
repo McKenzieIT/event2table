@@ -4,8 +4,9 @@ TDD测试: 验证JoinConfig使用game_gid而非game_id
 这是TDD的RED阶段 - 测试应该失败, 因为当前代码使用了game_id
 """
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 
 
 def test_join_config_query_uses_game_gid():
@@ -70,8 +71,9 @@ def test_join_config_resolver_parameter_name():
     """
     测试JoinConfig resolver参数名使用game_gid
     """
-    from backend.gql_api.queries.join_config_queries import JoinConfigQueries
     import inspect
+
+    from backend.gql_api.queries.join_config_queries import JoinConfigQueries
 
     # 获取方法签名
     method = JoinConfigQueries.resolve_join_configs

@@ -14,9 +14,8 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from backend.core.cache.cache_system import CacheInvalidator, cached
-from backend.services.base_service import BaseService
-
 from backend.models.repositories.hql_version_repository import HQLVersionRepository
+from backend.services.base_service import BaseService
 
 logger = logging.getLogger(__name__)
 

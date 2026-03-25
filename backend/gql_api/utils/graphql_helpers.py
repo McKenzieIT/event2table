@@ -182,7 +182,7 @@ class GraphQLCache:
         Args:
             ttl: Time-to-live in seconds (default: 5 minutes)
         """
-        self._cache = {}
+        self._cache: Dict[str, tuple[Any, float]] = {}
         self._ttl = ttl
 
     def get(self, key: str) -> Optional[Any]:

@@ -10,12 +10,13 @@ Unit Tests for Bloom Filter Security Fixes
 - 路径遍历防护
 """
 
-import pytest
+import base64
+import json
 import os
 import tempfile
-import json
-import base64
 from unittest.mock import Mock, patch
+
+import pytest
 
 from backend.core.cache.bloom_filter_enhanced import EnhancedBloomFilter, get_enhanced_bloom_filter
 

@@ -9,8 +9,8 @@ Parameter Module Entity Architecture Verification Script
 3. 方法返回类型检查
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
@@ -71,7 +71,7 @@ def check_entity_architecture():
     print("=" * 80)
 
     try:
-        from backend.models.entities import ParameterEntity, CommonParameterEntity
+        from backend.models.entities import CommonParameterEntity, ParameterEntity
 
         # 检查ParameterEntity
         param_entity = ParameterEntity(
@@ -105,10 +105,11 @@ def check_repository_methods():
     print("=" * 80)
 
     try:
-        from backend.models.repositories.parameters import ParameterRepository
-        from backend.models.entities import ParameterEntity
-        from typing import get_args, get_origin
         import sys
+        from typing import get_args, get_origin
+
+        from backend.models.entities import ParameterEntity
+        from backend.models.repositories.parameters import ParameterRepository
 
         if sys.version_info >= (3, 8):
             from typing import Union

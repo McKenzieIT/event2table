@@ -36,9 +36,9 @@ class TemplateQueries:
     def resolve_templates(
         root,
         info,
-        game_gid: int = None,
-        category: str = None,
-        search: str = None,
+        game_gid: int | None = None,
+        category: str | None = None,
+        search: str | None = None,
         limit: int = 20,
         offset: int = 0,
     ):
@@ -75,7 +75,7 @@ class TemplateQueries:
             return []
 
     @staticmethod
-    def resolve_search_templates(root, info, query: str, game_gid: int = None):
+    def resolve_search_templates(root, info, query: str, game_gid: int | None = None):
         """Search templates by name or description."""
         try:
             from backend.core.utils import fetch_all_as_dict

@@ -7,10 +7,11 @@ Event Node Module Integration Tests
 """
 
 import pytest
+
 from backend.models.entities import EventNodeEntity
 from backend.models.repositories.event_node_repository import EventNodeRepository
-from backend.models.repositories.games import GameRepository
 from backend.models.repositories.events import EventRepository
+from backend.models.repositories.games import GameRepository
 from backend.services.events.event_node_service import EventNodeService
 
 

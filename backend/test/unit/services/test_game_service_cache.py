@@ -3,8 +3,9 @@ Unit tests for GameService caching (Task 1.3)
 
 Tests that _get_event_count and _get_flow_count methods use caching properly.
 """
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 
 
 def test_get_event_count_uses_cache(monkeypatch):
@@ -90,8 +91,9 @@ def test_get_event_count_different_games(monkeypatch):
 
 def test_cache_decorator_present():
     """Test that @cached decorator is present on both methods"""
-    from backend.services.games.game_service import GameService
     import inspect
+
+    from backend.services.games.game_service import GameService
 
     service = GameService()
 

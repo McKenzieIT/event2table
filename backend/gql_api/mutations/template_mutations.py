@@ -40,10 +40,10 @@ class CreateTemplate(graphene.Mutation):
         self,
         info,
         name: str,
-        description: str = None,
-        category: str = None,
-        game_gid: int = None,
-        config: str = None,
+        description: str | None = None,
+        category: str | None = None,
+        game_gid: int | None = None,
+        config: str | None = None,
     ):
         """Execute the mutation"""
         try:
@@ -114,12 +114,12 @@ class UpdateTemplate(graphene.Mutation):
         self,
         info,
         id: int,
-        name: str = None,
-        description: str = None,
-        category: str = None,
-        game_gid: int = None,
-        config: str = None,
-        is_active: bool = None,
+        name: str | None = None,
+        description: str | None = None,
+        category: str | None = None,
+        game_gid: int | None = None,
+        config: str | None = None,
+        is_active: bool | None = None,
     ):
         """Execute the mutation"""
         try:

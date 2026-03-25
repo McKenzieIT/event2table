@@ -14,13 +14,15 @@ P0-6: 批量操作性能测试
 - 预期性能: <1秒（批量） vs >5秒（串行）
 """
 
-import pytest
 import time
-from unittest.mock import Mock, patch, MagicMock, call
+from unittest.mock import MagicMock, Mock, call, patch
+
+import pytest
+
 from backend.gql_api.mutations.batch_mutations import (
     BatchCreateGames,
-    BatchUpdateGames,
     BatchDeleteGames,
+    BatchUpdateGames,
     GameInput,
 )
 
@@ -379,6 +381,7 @@ class TestBatchOperationsTransaction:
         - 不应该部分成功
         """
         import inspect
+
         from backend.gql_api.mutations.batch_mutations import BatchCreateGames
 
         source = inspect.getsource(BatchCreateGames.mutate)
@@ -408,6 +411,7 @@ class TestBatchOperationsTransaction:
         P0: 测试批量更新使用事务
         """
         import inspect
+
         from backend.gql_api.mutations.batch_mutations import BatchUpdateGames
 
         source = inspect.getsource(BatchUpdateGames.mutate)
@@ -430,6 +434,7 @@ class TestBatchOperationsTransaction:
         P0: 测试批量删除使用事务
         """
         import inspect
+
         from backend.gql_api.mutations.batch_mutations import BatchDeleteGames
 
         source = inspect.getsource(BatchDeleteGames.mutate)

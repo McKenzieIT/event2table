@@ -8,8 +8,9 @@ This is the REAL failing test that will drive our TDD implementation.
 """
 
 import os
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 # Set development mode for all tests
 os.environ['FLASK_ENV'] = 'development'

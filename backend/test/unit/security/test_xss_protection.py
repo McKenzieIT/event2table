@@ -12,11 +12,13 @@ TDD流程:
 - REFACTOR阶段: 重构优化
 """
 
-import pytest
 import html
-from backend.core.utils import execute_write, fetch_one_as_dict
-from backend.core.database.database import get_db_connection
+
+import pytest
+
 from backend.core.config.config import TEST_DB_PATH
+from backend.core.database.database import get_db_connection
+from backend.core.utils import execute_write, fetch_one_as_dict
 
 
 class TestXSSProtection:

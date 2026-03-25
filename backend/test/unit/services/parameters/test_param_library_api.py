@@ -9,11 +9,13 @@
 5. REFACTOR - 重构清理
 """
 
-import pytest
 import os
-from backend.core.database import get_db_connection, init_db
-from backend.core.config import TEST_DB_PATH
+
+import pytest
 from web_app import app
+
+from backend.core.config import TEST_DB_PATH
+from backend.core.database import get_db_connection, init_db
 
 
 @pytest.fixture

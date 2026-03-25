@@ -28,10 +28,10 @@ Version: 1.0.0 (2026-03-18)
 """
 
 import json
-from datetime import datetime, date
+import logging
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Union
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ class JSONSerializer:
         else 0
     )
 
-    def __init__(self, options: int = None):
+    def __init__(self, options: int | None = None):
         """
         Initialize JSON serializer
 

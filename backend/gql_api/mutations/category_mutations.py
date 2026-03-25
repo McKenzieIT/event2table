@@ -57,7 +57,7 @@ class CreateCategory(graphene.Mutation):
 
     @authenticated
     @require_permission("write")
-    def mutate(self, info, name: str, color: str = None):
+    def mutate(self, info, name: str, color: str | None = None):
         """
         Execute the mutation with comprehensive validation
 
@@ -205,7 +205,7 @@ class UpdateCategory(graphene.Mutation):
 
     @authenticated
     @require_permission("write")
-    def mutate(self, info, id: int, name: str = None, color: str = None):
+    def mutate(self, info, id: int, name: str | None = None, color: str | None = None):
         """
         Execute the mutation with comprehensive validation
 

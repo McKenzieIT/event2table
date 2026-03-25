@@ -115,7 +115,7 @@ class Field:
     aggregate_func: Optional[str] = None
     json_path: Optional[str] = None
     custom_expression: Optional[str] = None
-    fixed_value: Any = None
+    fixed_value: Any | None = None
 
     def __post_init__(self) -> None:
         """

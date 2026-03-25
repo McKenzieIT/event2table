@@ -20,11 +20,12 @@
 5. 自动文档: 可导出JSON Schema用于API文档
 """
 
-from typing import Optional, List, Dict, Any, Literal, Union
-from datetime import datetime
-from pydantic import BaseModel, Field, field_validator, ConfigDict, field_serializer
 import html
 import os
+from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional, Union
+
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 
 # ============================================================================
 # Game Entity

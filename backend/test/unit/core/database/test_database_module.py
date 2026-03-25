@@ -6,14 +6,12 @@ Tests for backend.core.database.database module
 Provides database connection and context management testing.
 """
 
-import pytest
 import sqlite3
 from pathlib import Path
 
-from backend.core.database.database import (
-    get_db_connection,
-    get_db,
-)
+import pytest
+
+from backend.core.database.database import get_db, get_db_connection
 
 
 class TestDatabaseConnection:

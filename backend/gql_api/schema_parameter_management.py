@@ -825,6 +825,7 @@ class BatchAddFieldsToCanvasMutation(graphene.Mutation):
     def mutate(self, info, eventId: int, fieldType: str):
         """Execute mutation."""
         import logging
+
         from backend.services.events.event_builder_app_service import EventBuilderAppService
 
         logger = logging.getLogger(__name__)

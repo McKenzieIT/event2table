@@ -59,7 +59,7 @@ def init_cache_monitoring_middleware(app):
     logger.info("✅ 缓存监控中间件已初始化")
 
 
-def set_cache_context(status: str, key: str = None):
+def set_cache_context(status: str, key: str | None = None):
     """
     设置缓存上下文（供装饰器使用）
 

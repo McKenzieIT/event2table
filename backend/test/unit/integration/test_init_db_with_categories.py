@@ -6,11 +6,11 @@ This script creates a fresh test database and verifies that
 categories are automatically seeded during initialization.
 """
 
-import sys
-import sqlite3
-from pathlib import Path
-import tempfile
 import shutil
+import sqlite3
+import sys
+import tempfile
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent

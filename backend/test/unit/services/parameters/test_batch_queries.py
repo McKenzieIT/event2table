@@ -10,10 +10,11 @@ Parameter Batch Query Tests
 测试参数批量查询功能, 验证N+1查询已修复
 """
 
-import pytest
-import sys
 import os
+import sys
 from pathlib import Path
+
+import pytest
 
 # 添加项目路径
 project_root = Path(__file__).parent.parent

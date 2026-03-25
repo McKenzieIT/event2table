@@ -11,12 +11,14 @@ Event Category Module Integration Tests
 """
 
 import os
-import pytest
 from datetime import datetime
-from backend.models.entities import EventCategoryEntity
-from backend.services.event_categories.category_service import CategoryService
-from backend.models.repositories.category_repository import CategoryRepository
+
+import pytest
+
 from backend.core.utils.converters import get_db_connection
+from backend.models.entities import EventCategoryEntity
+from backend.models.repositories.category_repository import CategoryRepository
+from backend.services.event_categories.category_service import CategoryService
 
 
 class TestCategoryModuleIntegration:

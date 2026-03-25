@@ -12,19 +12,20 @@
 - 缓存失效正确工作
 """
 
-import sys
 import os
+import sys
 import time
+
 import pytest
 
 sys.path.insert(
     0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 
-from backend.models.repositories.parameters import ParameterRepository
-from backend.models.repositories.join_config_repository import JoinConfigRepository
-from backend.models.repositories.flow_repository import FlowRepository
 from backend.core.cache.cache_system import hierarchical_cache
+from backend.models.repositories.flow_repository import FlowRepository
+from backend.models.repositories.join_config_repository import JoinConfigRepository
+from backend.models.repositories.parameters import ParameterRepository
 
 
 class TestParameterRepositoryCachePerformance:

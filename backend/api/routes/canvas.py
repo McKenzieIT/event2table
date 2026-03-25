@@ -16,8 +16,8 @@ from backend.core.utils import (
     json_success_response,
     success_response,
 )
-from backend.services.canvas.canvas_service import get_canvas_service
 from backend.services.canvas import node_canvas_flows
+from backend.services.canvas.canvas_service import get_canvas_service
 from backend.services.games.game_service import GameService
 
 logger = get_logger(__name__)

@@ -4,9 +4,10 @@ V2 GraphQL API Test
 Tests for V2 GraphQL queries and mutations.
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..')))

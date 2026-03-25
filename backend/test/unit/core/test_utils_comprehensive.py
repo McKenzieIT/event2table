@@ -7,15 +7,12 @@ Extends existing test_core_utils.py with additional coverage
 for security functions, validation, and utility helpers.
 """
 
-import pytest
 import html
+
+import pytest
 from flask import Flask
 
-from backend.core.utils import (
-    sanitize_html,
-    sanitize_and_validate_string,
-    validate_game_gid,
-)
+from backend.core.utils import sanitize_and_validate_string, sanitize_html, validate_game_gid
 
 
 class TestSanitizationFunctions:

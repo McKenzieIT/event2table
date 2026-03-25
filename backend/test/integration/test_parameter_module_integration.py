@@ -11,12 +11,13 @@ Parameter Module Integration Tests
 """
 
 import pytest
-from backend.models.entities import ParameterEntity, EventEntity, GameEntity
-from backend.services.parameters.parameter_service import ParameterService
-from backend.models.repositories.parameters import ParameterRepository
-from backend.models.repositories.events import EventRepository
-from backend.services.events.event_service import EventService
+
 from backend.core.utils.converters import get_db_connection
+from backend.models.entities import EventEntity, GameEntity, ParameterEntity
+from backend.models.repositories.events import EventRepository
+from backend.models.repositories.parameters import ParameterRepository
+from backend.services.events.event_service import EventService
+from backend.services.parameters.parameter_service import ParameterService
 
 
 class TestParameterModuleIntegration:

@@ -15,7 +15,7 @@ from backend.core.logging import get_logger
 logger = get_logger(__name__)
 
 
-def execute_write(query: str, params: Tuple = None, return_last_id: bool = False) -> int:
+def execute_write(query: str, params: Tuple | None = None, return_last_id: bool = False) -> int:
     """
     Execute a write query (INSERT, UPDATE, DELETE) and return affected row count or last inserted ID
 

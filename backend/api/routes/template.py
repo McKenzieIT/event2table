@@ -11,14 +11,12 @@ Templates API Routes Module
 """
 
 import logging
-from typing import Dict, Any, List
-from flask import request, jsonify
+from typing import Any, Dict, List
+
+from flask import jsonify, request
 
 # Import shared utilities
-from backend.core.utils import (
-    json_error_response,
-    json_success_response,
-)
+from backend.core.utils import json_error_response, json_success_response
 
 # Import Service layer
 from backend.services.template_service import TemplateService

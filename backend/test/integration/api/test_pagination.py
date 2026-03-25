@@ -10,8 +10,9 @@ Tests the pagination functionality of the Events API endpoint:
 - Search + pagination combination
 """
 
+from typing import Dict, List
+
 import pytest
-from typing import List, Dict
 
 
 class TestEventsPagination:

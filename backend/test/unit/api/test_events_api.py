@@ -7,18 +7,19 @@ Tests all event-related API endpoints including CRUD operations,
 parameter management, and game context validation.
 """
 
-import pytest
 import json
+
+import pytest
 from flask import Flask
 
 from backend.api.routes.events import (
-    api_list_events,
-    api_create_event,
-    api_get_event_detail,
-    api_update_event,
-    api_get_event_parameters,
     api_batch_delete_events,
     api_batch_update_events,
+    api_create_event,
+    api_get_event_detail,
+    api_get_event_parameters,
+    api_list_events,
+    api_update_event,
 )
 
 

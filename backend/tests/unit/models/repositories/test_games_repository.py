@@ -7,12 +7,13 @@ Tests cover all public methods with ≥80% coverage target
 Uses mock to avoid database dependencies
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+from unittest.mock import MagicMock, Mock, patch
 
-from backend.models.repositories.games import GameRepository
+import pytest
+
 from backend.models.entities import GameEntity
+from backend.models.repositories.games import GameRepository
 
 
 class TestGameRepository:

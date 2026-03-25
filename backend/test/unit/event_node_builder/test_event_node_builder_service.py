@@ -13,18 +13,18 @@ Tests cover:
 - Field transformations
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock, call
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+from unittest.mock import MagicMock, Mock, call, patch
 
-from backend.services.events.event_node_service import EventNodeService
-from backend.models.entities import EventNodeEntity, GameEntity, EventEntity
-from backend.models.repositories.event_node_repository import EventNodeRepository
-from backend.models.repositories.games import GameRepository
-from backend.models.repositories.events import EventRepository
+import pytest
+
 from backend.core.cache.cache_system import HierarchicalCache
-
+from backend.models.entities import EventEntity, EventNodeEntity, GameEntity
+from backend.models.repositories.event_node_repository import EventNodeRepository
+from backend.models.repositories.events import EventRepository
+from backend.models.repositories.games import GameRepository
+from backend.services.events.event_node_service import EventNodeService
 
 # ============================================================================
 # Fixtures

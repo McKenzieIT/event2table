@@ -18,16 +18,16 @@
 日期: 2026-01-28
 """
 
-import sys
 import os
-import time
 import statistics
-from typing import List, Dict, Any
+import sys
+import time
+from typing import Any, Dict, List
 
 # 添加项目路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.core.cache.cache_system import hierarchical_cache, CacheKeyBuilder
+from backend.core.cache.cache_system import CacheKeyBuilder, hierarchical_cache
 from backend.core.config.config import CacheConfig
 
 

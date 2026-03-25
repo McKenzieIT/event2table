@@ -24,20 +24,21 @@ Author: Event2Table Performance Optimization Team
 Version: 1.0.0 (2026-03-18)
 """
 
+import gzip
+import json
 import sys
 import time
-import json
-import gzip
-import brotli
-from typing import Dict, Any, List
 from pathlib import Path
+from typing import Any, Dict, List
+
+import brotli
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from backend.core.utils.json_serializer import json_dumps, json_loads, HAS_ORJSON
 from backend.core.config.compression import CompressionConfig
+from backend.core.utils.json_serializer import HAS_ORJSON, json_dumps, json_loads
 
 
 class BenchmarkResults:

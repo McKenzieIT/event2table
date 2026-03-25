@@ -5,6 +5,7 @@ Tests for GraphQL schema definition and types.
 """
 
 import pytest
+
 from backend.gql_api.schema import schema
 
 

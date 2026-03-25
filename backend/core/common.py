@@ -21,11 +21,11 @@ Modified: 2026-03-10
 # TODO: Replace loop queries with JOIN or prefetch
 
 import logging
-
-from backend.core.cache.decorators import cached
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import flash, request
+
+from backend.core.cache.decorators import cached
 
 logger = logging.getLogger(__name__)
 

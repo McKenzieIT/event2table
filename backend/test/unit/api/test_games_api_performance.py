@@ -7,9 +7,9 @@ This test measures the performance improvement after optimizing the games list q
 from correlated subqueries to LEFT JOINs.
 """
 
+import statistics
 import sys
 import time
-import statistics
 from pathlib import Path
 
 # Add backend to path

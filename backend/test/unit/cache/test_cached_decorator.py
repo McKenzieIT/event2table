@@ -4,8 +4,10 @@
 @cached装饰器集成测试
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from backend.core.cache.decorators import cached
 
 

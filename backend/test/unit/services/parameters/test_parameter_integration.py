@@ -10,7 +10,8 @@ Parameter Module Integration Test - Entity Architecture
 """
 
 import pytest
-from backend.models.entities import ParameterEntity, CommonParameterEntity
+
+from backend.models.entities import CommonParameterEntity, ParameterEntity
 from backend.models.repositories.parameters import ParameterRepository
 from backend.services.parameters.parameter_service import ParameterService
 

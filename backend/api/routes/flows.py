@@ -34,11 +34,11 @@ from backend.core.utils import (
     validate_json_request,
 )
 
-# Import Service layer
-from backend.services.flows.flow_service import FlowService
-
 # Import Repository layer
 from backend.models.repositories import DomainRepositories
+
+# Import Service layer
+from backend.services.flows.flow_service import FlowService
 
 sys.path.append("..")
 try:

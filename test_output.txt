@@ -1,9 +1,0 @@
-
-> event2table-test-suite@1.0.0 test
-> npm run test:backend && npm run test:frontend
-
-
-> event2table-test-suite@1.0.0 test:backend
-> pytest test/ -v
-
-sh: pytest: command not found

@@ -13,8 +13,9 @@ import sys
 
 sys.path.insert(0, '..')
 import inspect
-from backend.models.repositories.events import EventRepository
+
 from backend.models.entities import EventEntity
+from backend.models.repositories.events import EventRepository
 from backend.services.events.event_service import EventService
 
 

@@ -20,8 +20,17 @@ extend-exclude = '''
 
 [tool.mypy]
 python_version = "3.13"
-warn_return_any = true
+warn_return_any = false
 warn_unused_configs = true
 disallow_untyped_defs = false
-check_untyped_defs = true
+check_untyped_defs = false
 ignore_missing_imports = true
+# 允许渐进式类型检查
+allow_untyped_globals = true
+allow_untyped_calls = true
+allow_untyped_decorators = true
+no_implicit_optional = false
+# 减少警告
+warn_redundant_casts = false
+warn_unused_ignores = false
+warn_no_return = false

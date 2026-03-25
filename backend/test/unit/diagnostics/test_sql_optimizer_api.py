@@ -6,8 +6,8 @@ SQL优化API功能测试脚本
 测试SQL优化模块的API功能
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # 添加项目根目录到路径
@@ -22,7 +22,7 @@ def test_sql_optimizer_module():
     print("=" * 60)
 
     try:
-        from backend.services.sql_optimizer.optimizer import SQLOptimizer, OptimizationResult
+        from backend.services.sql_optimizer.optimizer import OptimizationResult, SQLOptimizer
 
         print("✓ SQL优化器模块加载成功")
         print(f"  - SQLOptimizer: {SQLOptimizer}")

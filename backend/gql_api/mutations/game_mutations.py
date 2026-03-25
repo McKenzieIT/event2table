@@ -66,8 +66,8 @@ class CreateGame(graphene.Mutation):
         gid: int,
         name: str,
         ods_db: str,
-        ods_source_table: str = None,
-        dwd_prefix: str = None,
+        ods_source_table: str | None = None,
+        dwd_prefix: str | None = None,
     ):
         """
         Execute the mutation with comprehensive validation
@@ -268,11 +268,11 @@ class UpdateGame(graphene.Mutation):
         self,
         info,
         gid: int,
-        name: str = None,
-        ods_db: str = None,
-        ods_source_table: str = None,
-        dwd_prefix: str = None,
-        description: str = None,
+        name: str | None = None,
+        ods_db: str | None = None,
+        ods_source_table: str | None = None,
+        dwd_prefix: str | None = None,
+        description: str | None = None,
     ):
         """
         Execute the mutation with comprehensive validation

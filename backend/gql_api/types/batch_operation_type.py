@@ -70,7 +70,7 @@ class BatchOperationResultType(graphene.ObjectType):
 
     @classmethod
     def failure_result(
-        cls, message: str, errors: TypingList[Dict[str, Any]] = None
+        cls, message: str, errors: TypingList[Dict[str, Any]] | None = None
     ) -> 'BatchOperationResultType':
         """Create a failure result."""
         error_types = [BatchOperationErrorType.from_dict(e) for e in errors] if errors else []

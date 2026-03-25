@@ -6,14 +6,16 @@ Database 单元测试
 测试 backend.core.database 中的数据库函数
 """
 
-import pytest
 import sqlite3
 import tempfile
 import uuid
 from pathlib import Path
+
+import pytest
+
+from backend.core.config.config import DB_PATH
 from backend.core.database import get_db_connection, init_db
 from backend.core.utils import execute_write, fetch_one_as_dict
-from backend.core.config.config import DB_PATH
 
 
 class TestDatabaseConnection:

@@ -6,8 +6,9 @@ Verify Missing Methods in ParameterRepository
 This script checks which methods are missing and what they should do.
 """
 
-import sys
 import inspect
+import sys
+
 from backend.models.repositories.parameters import ParameterRepository
 
 

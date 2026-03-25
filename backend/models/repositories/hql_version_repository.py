@@ -16,11 +16,7 @@ from typing import Any, Dict, List, Optional
 
 from backend.core.cache.decorators import cached as cached_decorator
 from backend.core.data_access import GenericRepository
-from backend.core.utils.converters import (
-    fetch_all_as_dict,
-    fetch_one_as_dict,
-    get_db_connection,
-)
+from backend.core.utils.converters import fetch_all_as_dict, fetch_one_as_dict, get_db_connection
 
 logger = logging.getLogger(__name__)
 

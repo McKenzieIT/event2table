@@ -7,9 +7,10 @@ requirement and correctly filters categories by game.
 TDD Phase: RED - Tests are written first to specify expected behavior
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 
 def test_get_categories_requires_game_gid(client):

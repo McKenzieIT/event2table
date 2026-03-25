@@ -14,10 +14,11 @@
 - 其他mutations (Category, JoinConfig, Node, Flow, HQL, Template)
 """
 
-import pytest
 import ast
 import os
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 
 class TestEventMutationsAuth:

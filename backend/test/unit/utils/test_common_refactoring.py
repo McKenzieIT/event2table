@@ -3,10 +3,11 @@ Test suite for code duplication refactoring
 Tests to verify that refactored code uses shared utilities instead of duplicated patterns
 """
 
-import pytest
 import ast
 import os
 from pathlib import Path
+
+import pytest
 
 
 class TestBackendCodeDuplication:

@@ -7,11 +7,12 @@ HQL生成器安全测试套件
 
 import pytest
 from pydantic import ValidationError
+
 from backend.services.hql.builders.field_builder import FieldBuilder
-from backend.services.hql.builders.where_builder import WhereBuilder
 from backend.services.hql.builders.join_builder import JoinBuilder
 from backend.services.hql.builders.union_builder import UnionBuilder
-from backend.services.hql.models.event import Event, Field, Condition
+from backend.services.hql.builders.where_builder import WhereBuilder
+from backend.services.hql.models.event import Condition, Event, Field
 
 
 class TestFieldBuilderSecurity:

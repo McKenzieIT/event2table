@@ -8,9 +8,10 @@ Shared fixtures for integration tests
 IMPORTANT: Integration tests now use TEST_DATABASE to avoid polluting production data.
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
@@ -39,10 +40,11 @@ def test_db():
     The test database is created by copying the schema from
     the production database and then deleting all data.
     """
-    from backend.core.config import DB_PATH, TEST_DB_PATH
-    from pathlib import Path
-    import sqlite3
     import shutil
+    import sqlite3
+    from pathlib import Path
+
+    from backend.core.config import DB_PATH, TEST_DB_PATH
 
     # Ensure test database directory exists
     TEST_DB_PATH.parent.mkdir(parents=True, exist_ok=True)

@@ -70,10 +70,10 @@ class CreateParameter(graphene.Mutation):
         info,
         event_id: int,
         param_name: str,
-        param_name_cn: str = None,
-        param_type: str = None,
-        template_id: int = None,
-        json_path: str = None,
+        param_name_cn: str | None = None,
+        param_type: str | None = None,
+        template_id: int | None = None,
+        json_path: str | None = None,
         is_active: bool = True,
     ):
         """
@@ -290,12 +290,12 @@ class UpdateParameter(graphene.Mutation):
         self,
         info,
         id: int,
-        param_name_cn: str = None,
-        param_type: str = None,
-        template_id: int = None,
-        json_path: str = None,
-        is_active: bool = None,
-        expected_version: int = None,
+        param_name_cn: str | None = None,
+        param_type: str | None = None,
+        template_id: int | None = None,
+        json_path: str | None = None,
+        is_active: bool | None = None,
+        expected_version: int | None = None,
     ):
         """
         Execute the mutation with complete business validation.

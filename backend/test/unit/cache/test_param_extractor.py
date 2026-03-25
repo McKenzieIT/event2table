@@ -5,6 +5,7 @@ Test cache parameter extractor
 """
 
 import pytest
+
 from backend.core.cache.param_extractor import _extract_cache_params
 
 

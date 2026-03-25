@@ -6,10 +6,12 @@ Database Migration 单元测试
 测试新的数据库迁移系统, 使用迁移类模式重构原有的migrate_db函数
 """
 
-import pytest
 import sqlite3
 import tempfile
 from pathlib import Path
+
+import pytest
+
 from backend.core.database.database import MigrationRunner, get_migration_registry
 
 

@@ -7,9 +7,10 @@ TDD Cycle: RED → GREEN → REFACTOR
 注意: 超时阈值已从200ms调整为500ms以适应CI环境性能差异
 """
 
-import pytest
-import time
 import os
+import time
+
+import pytest
 
 # 设置测试环境
 os.environ["TESTING"] = "true"

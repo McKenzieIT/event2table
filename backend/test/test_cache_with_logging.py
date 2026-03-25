@@ -4,8 +4,8 @@
 Cache test with logging enabled
 """
 
-import sys
 import logging
+import sys
 
 sys.path.insert(0, '.')
 
@@ -13,6 +13,7 @@ sys.path.insert(0, '.')
 logging.basicConfig(level=logging.DEBUG, format='%(name)s - %(levelname)s - %(message)s')
 
 from unittest.mock import patch
+
 from backend.models.repositories.parameters import ParameterRepository
 
 # Create repo

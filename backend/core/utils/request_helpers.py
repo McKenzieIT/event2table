@@ -17,7 +17,7 @@ from backend.core.utils.response import json_error_response
 logger = get_logger(__name__)
 
 
-def validate_json_request(required_fields: List[str] = None) -> Tuple[bool, any, str]:
+def validate_json_request(required_fields: List[str] | None = None) -> Tuple[bool, any, str]:
     """
     Validate JSON request data
 
@@ -58,7 +58,8 @@ def handle_errors(func):
             # ... existing code ...
     """
     from functools import wraps
-    from backend.core.errors import ValidationError, DatabaseError, NotFoundError, DuplicateError
+
+    from backend.core.errors import DatabaseError, DuplicateError, NotFoundError, ValidationError
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -92,7 +93,7 @@ def handle_api_errors(func: Callable) -> Callable:
 
     统一处理API异常, 确保所有错误都返回标准JSON格式
     """
-    from backend.core.errors import ValidationError, DatabaseError, NotFoundError, DuplicateError
+    from backend.core.errors import DatabaseError, DuplicateError, NotFoundError, ValidationError
 
     @wraps(func)
     def decorated_function(*args, **kwargs):

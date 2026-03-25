@@ -7,6 +7,7 @@ HQL History Module Integration Tests
 """
 
 import pytest
+
 from backend.models.entities import HQLHistoryEntity
 from backend.models.repositories.hql_history_repository import HQLHistoryRepository
 from backend.services.hql.hql_history_service import HQLHistoryService

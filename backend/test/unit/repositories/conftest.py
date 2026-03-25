@@ -7,6 +7,7 @@ Provides cache cleanup fixture to ensure test isolation.
 """
 
 import pytest
+
 from backend.core.cache.decorators import _cache
 
 

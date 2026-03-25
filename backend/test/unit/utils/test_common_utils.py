@@ -10,12 +10,13 @@
 TDD原则：先写测试，验证重复代码识别，再看测试失败
 """
 
-import pytest
 import ast
 import os
-from pathlib import Path
-from typing import List, Dict, Any
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pytest
 
 
 class CodeDuplicateAnalyzer:

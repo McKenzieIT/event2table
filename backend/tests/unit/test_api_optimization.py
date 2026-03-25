@@ -15,19 +15,19 @@ Author: Event2Table Performance Optimization Team
 Version: 1.0.0 (2026-03-18)
 """
 
-import pytest
+import gzip
 import json
 import time
-import gzip
-import brotli
 from io import BytesIO
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-from flask import Flask, jsonify, Response
+import brotli
+import pytest
+from flask import Flask, Response, jsonify
 from flask_compress import Compress
 
-from backend.core.config.compression import CompressionConfig, init_compression, enable_compression
-from backend.core.utils.json_serializer import JSONSerializer, json_dumps, json_loads, HAS_ORJSON
+from backend.core.config.compression import CompressionConfig, enable_compression, init_compression
+from backend.core.utils.json_serializer import HAS_ORJSON, JSONSerializer, json_dumps, json_loads
 
 
 class TestCompressionConfig:

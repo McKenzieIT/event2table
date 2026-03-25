@@ -12,31 +12,25 @@
 """
 
 import pytest
-from backend.core.utils.business_helpers import (
-    # 验证函数
-    validate_game_gid,
-    validate_table_name,
-    validate_event_name,
-    # 统计函数
+
+from backend.core.utils.business_helpers import (  # 验证函数; 统计函数; 转换函数; HQL辅助函数; 缓存函数; 验证辅助函数; 类型转换函数
+    build_cache_key,
+    build_event_cache_key,
+    build_game_cache_key,
+    build_hql_field_alias,
     calculate_event_statistics,
     calculate_param_usage,
-    # 转换函数
-    sanitize_name,
-    generate_table_name,
-    generate_dwd_table_name,
-    # HQL辅助函数
-    format_json_path,
-    build_hql_field_alias,
     format_hql_field,
-    # 缓存函数
-    build_cache_key,
-    build_game_cache_key,
-    build_event_cache_key,
-    # 验证辅助函数
-    is_valid_game_gid,
+    format_json_path,
+    generate_dwd_table_name,
+    generate_table_name,
     is_safe_table_name,
-    # 类型转换函数
+    is_valid_game_gid,
     python_type_to_hive_type,
+    sanitize_name,
+    validate_event_name,
+    validate_game_gid,
+    validate_table_name,
 )
 from backend.models.entities import EventEntity, ParameterEntity
 

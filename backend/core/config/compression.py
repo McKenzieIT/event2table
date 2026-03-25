@@ -25,9 +25,10 @@ Author: Event2Table Performance Optimization Team
 Version: 1.0.0 (2026-03-18)
 """
 
+import logging
+
 from flask import Flask
 from flask_compress import Compress
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +50,8 @@ class CompressionConfig:
         enabled: bool = True,
         min_size: int = 500,
         level: int = 6,
-        mime_types: set = None,
-        algorithms: list = None,
+        mime_types: set | None = None,
+        algorithms: list | None = None,
     ):
         """
         Initialize compression configuration
@@ -94,7 +95,7 @@ class CompressionConfig:
             self.algorithms = algorithms
 
 
-def init_compression(app: Flask, config: CompressionConfig = None) -> Flask:
+def init_compression(app: Flask, config: CompressionConfig | None = None) -> Flask:
     """
     Initialize Flask response compression
 

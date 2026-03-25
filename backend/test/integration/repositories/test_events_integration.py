@@ -3,8 +3,8 @@ Integration tests for EventRepository N+1 query prevention
 """
 import pytest
 
-from backend.models.repositories.events import EventRepository
 from backend.models.entities import EventEntity
+from backend.models.repositories.events import EventRepository
 
 
 def test_create_batch_single_query(test_db):

@@ -5,7 +5,9 @@ Provides JSON error responses for API routes and SPA fallback for frontend route
 """
 
 from pathlib import Path
-from flask import request, jsonify, render_template, send_from_directory
+
+from flask import jsonify, render_template, request, send_from_directory
+
 from backend.core.config import BASE_DIR
 
 FRONTEND_DIST_DIR = BASE_DIR / 'frontend' / 'dist'

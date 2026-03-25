@@ -7,10 +7,12 @@ These tests use the actual database to verify:
 - Data consistency
 - Transaction behavior
 """
-import pytest
 from unittest.mock import patch
-from backend.models.repositories.games import GameRepository
+
+import pytest
+
 from backend.models.entities import GameEntity
+from backend.models.repositories.games import GameRepository
 
 
 def test_get_all_with_event_count_single_query(test_db):

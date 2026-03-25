@@ -6,9 +6,10 @@ SQL注入防护测试套件
 """
 
 import pytest
-from backend.core.security.sql_validator import SQLValidator
-from backend.models.schemas import GameCreate, EventCreate
 from pydantic import ValidationError
+
+from backend.core.security.sql_validator import SQLValidator
+from backend.models.schemas import EventCreate, GameCreate
 
 
 class TestSQLValidator:

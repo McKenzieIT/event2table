@@ -10,16 +10,18 @@ Entity模型单元测试
 4. 序列化/反序列化
 """
 
-import pytest
 from datetime import datetime
+
+import pytest
 from pydantic import ValidationError
+
 from backend.models.entities import (
-    GameEntity,
-    EventEntity,
-    ParameterEntity,
     CommonParameterEntity,
-    entity_to_dict,
+    EventEntity,
+    GameEntity,
+    ParameterEntity,
     dict_to_entity,
+    entity_to_dict,
 )
 
 # ============================================================================

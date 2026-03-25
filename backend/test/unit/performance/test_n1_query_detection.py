@@ -9,9 +9,11 @@ Date: 2026-03-08
 TDD Phase: RED - Tests should fail due to N+1 query problem
 """
 
-import pytest
 import time
-from unittest.mock import Mock, patch, call
+from unittest.mock import Mock, call, patch
+
+import pytest
+
 from backend.gql_api.resolvers.parameter_resolvers import resolve_common_parameters
 
 

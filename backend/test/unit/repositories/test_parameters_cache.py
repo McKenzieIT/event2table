@@ -15,20 +15,21 @@ TDD Approach:
 - 重构优化,保持测试通过
 """
 
-import sys
 import os
+import sys
 import time
+from typing import Dict, List
+
 import pytest
-from typing import List, Dict
 
 # Add project path
 sys.path.insert(
     0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 
-from backend.models.repositories.parameters import ParameterRepository
-from backend.models.entities import ParameterEntity
 from backend.core.cache.cache_system import hierarchical_cache
+from backend.models.entities import ParameterEntity
+from backend.models.repositories.parameters import ParameterRepository
 
 
 class TestParameterRepositoryCacheHitRate:

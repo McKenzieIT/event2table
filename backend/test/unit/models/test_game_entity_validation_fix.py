@@ -24,8 +24,10 @@ Usage:
 """
 
 import os
+
 import pytest
 from pydantic import ValidationError
+
 from backend.models.entities import GameEntity
 
 

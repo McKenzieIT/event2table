@@ -40,7 +40,7 @@ class SubscriptionErrorHandler:
         self._error_counts = {}
 
     def handle_subscription_error(
-        self, error: Exception, subscription_id: str, operation_name: str = None
+        self, error: Exception, subscription_id: str, operation_name: str | None = None
     ) -> Dict[str, Any]:
         """
         Handle a subscription error.

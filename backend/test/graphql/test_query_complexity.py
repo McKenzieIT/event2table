@@ -8,8 +8,8 @@ import pytest
 from graphql import GraphQLError, parse, validate
 from graphql.execution import execute, execute_sync
 
-from backend.gql_api.schema import schema
 from backend.gql_api.middleware.complexity_limit import ComplexityLimitMiddleware
+from backend.gql_api.schema import schema
 
 
 @pytest.mark.describe("ComplexityLimitMiddleware")

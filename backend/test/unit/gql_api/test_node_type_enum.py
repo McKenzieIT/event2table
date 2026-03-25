@@ -21,6 +21,7 @@ Priority: P0-15 (Critical)
 """
 
 import pytest
+
 from backend.gql_api.types.node_type import NodeTypeEnum
 
 

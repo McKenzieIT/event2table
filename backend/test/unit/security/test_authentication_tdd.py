@@ -6,19 +6,20 @@ This is a complete TDD cycle: RED → GREEN → REFACTOR
 """
 
 import os
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 # Set development mode
 os.environ['FLASK_ENV'] = 'development'
 
 from backend.core.security.authentication import (
     authenticated,
-    require_permission,
-    is_development_mode,
-    is_production_mode,
     check_auth_context,
     check_user_permission,
+    is_development_mode,
+    is_production_mode,
+    require_permission,
 )
 
 
@@ -42,6 +43,7 @@ class TestEnvironmentDetection:
         del os.environ['FLASK_ENV']
         # Re-import to test default behavior
         import importlib
+
         import backend.core.security.authentication
 
         importlib.reload(backend.core.security.authentication)

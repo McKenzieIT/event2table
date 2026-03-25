@@ -8,9 +8,10 @@ import sys
 
 sys.path.insert(0, '.')
 
-from unittest.mock import patch, MagicMock
-from backend.models.repositories.parameters import ParameterRepository
+from unittest.mock import MagicMock, patch
+
 from backend.core.cache.cache_system import cache_result
+from backend.models.repositories.parameters import ParameterRepository
 
 # Create repo
 repo = ParameterRepository()

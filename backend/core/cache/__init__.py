@@ -40,11 +40,11 @@ from .cache_hierarchical import HierarchicalCache, cached_hierarchical, hierarch
 # ============================================================================
 # 快捷方法和兼容性函数
 # ============================================================================
+from .cache_system import cached  # 兼容性函数
 from .cache_system import (
     CacheInvalidator,
     cache_invalidator,
     cache_result,
-    cached,  # 兼容性函数
     clear_cache_pattern,
     clear_event_cache,
     clear_game_cache,

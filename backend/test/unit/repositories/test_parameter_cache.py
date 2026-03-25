@@ -11,11 +11,12 @@ Date: 2026-03-18
 """
 
 import time
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from backend.models.repositories.parameters import ParameterRepository
+import pytest
+
 from backend.models.entities import ParameterEntity
+from backend.models.repositories.parameters import ParameterRepository
 
 
 class TestParameterRepositoryCache:

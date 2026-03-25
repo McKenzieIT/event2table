@@ -5,15 +5,16 @@ Test Environment Configuration
 Tests for environment detection and database path isolation
 """
 
-import pytest
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pytest
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from backend.core.config.config import get_db_path, BASE_DIR
+from backend.core.config.config import BASE_DIR, get_db_path
 
 
 class TestEnvironmentDetection:

@@ -14,8 +14,9 @@ Test GID range: 90000000+ (to avoid conflicts with production data)
 """
 
 import os
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 from pydantic import ValidationError
 
 # Set testing environment before importing
@@ -23,7 +24,6 @@ os.environ["FLASK_ENV"] = "testing"
 
 from backend.models.entities import GameEntity
 from backend.services.games.game_service import GameService
-
 
 # ============================================================================
 # Test Fixtures

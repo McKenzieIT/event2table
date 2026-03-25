@@ -4,12 +4,13 @@ DataLoader Performance Tests
 Tests for DataLoader batch loading functionality to ensure N+1 query prevention.
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 from promise import Promise
 
-from backend.gql_api.dataloaders.game_loader import GameLoader
 from backend.gql_api.dataloaders.event_loader import EventLoader
+from backend.gql_api.dataloaders.game_loader import GameLoader
 from backend.gql_api.dataloaders.parameter_loader import ParameterLoader
 
 

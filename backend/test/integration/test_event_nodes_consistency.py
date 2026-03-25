@@ -7,18 +7,19 @@ Root Cause: Stats API uses 30-min cache returning stale data, search API returns
 Database state: Only 1 node with is_active=0 (soft deleted)
 """
 
-import pytest
-import sqlite3
 import os
+import sqlite3
 import sys
+
+import pytest
 
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
-from backend.services.event_node_builder import event_node_service, game_service
-from backend.models.repositories.event_node_repository import EventNodeRepository
 from backend.core.database.database import get_db_connection
 from backend.models.entities import EventNodeEntity
+from backend.models.repositories.event_node_repository import EventNodeRepository
+from backend.services.event_node_builder import event_node_service, game_service
 
 
 class TestEventNodesConsistency:

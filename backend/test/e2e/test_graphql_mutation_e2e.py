@@ -7,6 +7,7 @@ This test verifies that the TDD fix works end-to-end:
 """
 
 import os
+
 import pytest
 
 # Set development mode
@@ -24,8 +25,9 @@ class TestGraphQLMutationE2E:
         - Before fix: 'NoneType' object has no attribute 'user' error
         - After fix: Mutation succeeds, game is created
         """
-        from backend.gql_api.mutations.game_mutations import CreateGame
         from unittest.mock import Mock
+
+        from backend.gql_api.mutations.game_mutations import CreateGame
 
         # Arrange: Create mock info object (simulating GraphQL context)
         info = Mock()
@@ -58,8 +60,9 @@ class TestGraphQLMutationE2E:
         """
         E2E Test: UpdateGame mutation works in development mode
         """
-        from backend.gql_api.mutations.game_mutations import UpdateGame
         from unittest.mock import Mock
+
+        from backend.gql_api.mutations.game_mutations import UpdateGame
 
         # Arrange: Create mock info object
         info = Mock()
@@ -90,8 +93,9 @@ class TestGraphQLMutationE2E:
         """
         E2E Test: DeleteGame mutation works in development mode
         """
-        from backend.gql_api.mutations.game_mutations import DeleteGame
         from unittest.mock import Mock
+
+        from backend.gql_api.mutations.game_mutations import DeleteGame
 
         # Arrange: Create mock info object
         info = Mock()

@@ -41,10 +41,10 @@ class CreateNode(graphene.Mutation):
         self,
         info,
         name: str,
-        description: str = None,
-        game_gid: int = None,
-        node_type: NodeTypeEnum = None,
-        config: str = None,
+        description: str | None = None,
+        game_gid: int | None = None,
+        node_type: NodeTypeEnum | None = None,
+        config: str | None = None,
         position_x: float = 0,
         position_y: float = 0,
     ):
@@ -149,12 +149,12 @@ class UpdateNode(graphene.Mutation):
         self,
         info,
         id: int,
-        name: str = None,
-        description: str = None,
-        config: str = None,
-        position_x: float = None,
-        position_y: float = None,
-        is_active: bool = None,
+        name: str | None = None,
+        description: str | None = None,
+        config: str | None = None,
+        position_x: float | None = None,
+        position_y: float | None = None,
+        is_active: bool | None = None,
     ):
         """
         Execute the mutation
@@ -345,12 +345,12 @@ class CreateFlow(graphene.Mutation):
         self,
         info,
         name: str,
-        description: str = None,
-        game_gid: int = None,
-        flow_type: FlowTypeEnum = None,
-        config: str = None,
-        nodes: str = None,
-        edges: str = None,
+        description: str | None = None,
+        game_gid: int | None = None,
+        flow_type: FlowTypeEnum | None = None,
+        config: str | None = None,
+        nodes: str | None = None,
+        edges: str | None = None,
     ):
         """Execute the mutation"""
         try:
@@ -410,12 +410,12 @@ class UpdateFlow(graphene.Mutation):
         self,
         info,
         id: int,
-        name: str = None,
-        description: str = None,
-        config: str = None,
-        nodes: str = None,
-        edges: str = None,
-        is_active: bool = None,
+        name: str | None = None,
+        description: str | None = None,
+        config: str | None = None,
+        nodes: str | None = None,
+        edges: str | None = None,
+        is_active: bool | None = None,
     ):
         """Execute the mutation"""
         try:

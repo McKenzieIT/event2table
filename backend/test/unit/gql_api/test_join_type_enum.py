@@ -21,6 +21,7 @@ Priority: P0-14 (Critical)
 """
 
 import pytest
+
 from backend.gql_api.types.join_config_type import JoinTypeEnum
 
 

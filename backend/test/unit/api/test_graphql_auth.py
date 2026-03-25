@@ -8,8 +8,9 @@ Issue: 'Request' object has no attribute 'user' error in GraphQL mutations
 Root Cause: @authenticated decorator expects info.context.user, but it may not exist
 """
 
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 # Import GraphQL mutations
 from backend.gql_api.mutations.game_mutations import CreateGame

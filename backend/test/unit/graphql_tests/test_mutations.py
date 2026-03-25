@@ -5,6 +5,7 @@ Tests for GraphQL mutation operations.
 """
 
 import pytest
+
 from backend.gql_api.schema import schema
 
 

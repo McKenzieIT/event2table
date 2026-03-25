@@ -10,13 +10,15 @@ Event Module Integration Tests
 - 数据验证
 """
 
-import pytest
 from datetime import datetime
+
+import pytest
+
+from backend.core.utils.converters import get_db_connection
 from backend.models.entities import EventEntity, GameEntity
-from backend.services.events.event_service import EventService
 from backend.models.repositories.events import EventRepository
 from backend.models.repositories.games import GameRepository
-from backend.core.utils.converters import get_db_connection
+from backend.services.events.event_service import EventService
 
 
 class TestEventModuleIntegration:

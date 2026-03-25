@@ -7,12 +7,13 @@ Tests cover all public methods with ≥80% coverage target
 Uses mock to avoid dependencies
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+from unittest.mock import MagicMock, Mock, patch
 
-from backend.services.events.event_service import EventService
+import pytest
+
 from backend.models.entities import EventEntity
+from backend.services.events.event_service import EventService
 
 
 class TestEventService:

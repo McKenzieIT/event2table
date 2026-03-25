@@ -10,8 +10,8 @@
 日期: 2026-01-28
 """
 
-import sys
 import os
+import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def test_ttl_jitter():
     """测试TTL抖动功能"""
-    from backend.core.cache.cache_system import hierarchical_cache, CacheKeyBuilder
+    from backend.core.cache.cache_system import CacheKeyBuilder, hierarchical_cache
     from backend.core.config.config import CacheConfig
 
     print("=" * 60)

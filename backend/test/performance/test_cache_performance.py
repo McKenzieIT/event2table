@@ -18,11 +18,12 @@ Author: Event2Table Development Team
 Date: 2026-02-24
 """
 
-from locust import HttpUser, task, between, events
-from locust.runners import MasterRunner
-import time
-import random
 import logging
+import random
+import time
+
+from locust import HttpUser, between, events, task
+from locust.runners import MasterRunner
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

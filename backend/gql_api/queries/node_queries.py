@@ -34,7 +34,7 @@ class NodeQueries:
 
     @staticmethod
     def resolve_nodes(
-        root, info, game_gid: int = None, node_type: str = None, limit: int = 50, offset: int = 0
+        root, info, game_gid: int | None = None, node_type: str | None = None, limit: int = 50, offset: int = 0
     ):
         """Resolve list of nodes with optional filtering."""
         try:
@@ -84,7 +84,7 @@ class FlowQueries:
 
     @staticmethod
     def resolve_flows(
-        root, info, game_gid: int = None, flow_type: str = None, limit: int = 50, offset: int = 0
+        root, info, game_gid: int | None = None, flow_type: str | None = None, limit: int = 50, offset: int = 0
     ):
         """Resolve list of flows with optional filtering."""
         try:

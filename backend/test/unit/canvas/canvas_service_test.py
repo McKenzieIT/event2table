@@ -6,12 +6,13 @@ Canvas Service Tests
 验证CanvasService的Repository模式使用和缓存集成
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
+
+from backend.models.entities import EventEntity, EventNodeEntity, FlowEntity, GameEntity
 from backend.services.canvas.canvas_service import CanvasService
-from backend.models.entities import FlowEntity, EventNodeEntity, GameEntity, EventEntity
 
 
 class TestCanvasService:

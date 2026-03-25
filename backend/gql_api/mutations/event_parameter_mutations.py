@@ -37,11 +37,11 @@ class UpdateEventParameter(graphene.Mutation):
         self,
         info,
         id: int,
-        param_name: str = None,
-        param_name_cn: str = None,
-        param_type: str = None,
-        json_path: str = None,
-        is_active: bool = None,
+        param_name: str | None = None,
+        param_name_cn: str | None = None,
+        param_type: str | None = None,
+        json_path: str | None = None,
+        is_active: bool | None = None,
     ):
         """Execute the mutation"""
         try:
@@ -175,10 +175,10 @@ class SetParamConfig(graphene.Mutation):
         self,
         info,
         param_id: int,
-        array_expand: bool = None,
-        map_expand: bool = None,
-        custom_hql_template: str = None,
-        output_field_name: str = None,
+        array_expand: bool | None = None,
+        map_expand: bool | None = None,
+        custom_hql_template: str | None = None,
+        output_field_name: str | None = None,
     ):
         """Execute the mutation"""
         try:
@@ -333,8 +333,8 @@ class CreateValidationRule(graphene.Mutation):
         info,
         param_id: int,
         rule_type: str,
-        rule_config: str = None,
-        error_message: str = None,
+        rule_config: str | None = None,
+        error_message: str | None = None,
     ):
         """Execute the mutation"""
         try:

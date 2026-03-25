@@ -24,27 +24,27 @@ Each module is responsible for a specific domain:
 """
 
 # Import all route modules to register their routes with the blueprint
+from . import bulk_operations  # Migrated from services/bulk_operations (2026-03-19)
 from . import cache  # Cache management endpoints
+from . import cache_monitor  # Migrated from services/cache_monitor (2026-03-19)
+from . import canvas  # Migrated from services/canvas (2026-03-19)
+from . import common_params  # Migrated from services/parameters (2026-03-19)
+from . import event_node_builder  # Migrated from services/event_node_builder (2026-03-19)
 from . import graphql  # GraphQL API
 from . import health  # Health check endpoint (2026-03-01)
+from . import hql_preview  # ✅ ACTIVE HQL Preview V2 API (renamed from hql_preview_v2)
 from . import monitoring  # Monitoring endpoints
+from . import parameter_aliases  # Migrated from services/parameters (2026-03-19)
 from . import v1_adapter  # V1-to-V2 adapter endpoints (2026-02-17)
 from . import (
-    bulk_operations,  # Migrated from services/bulk_operations (2026-03-19)
-    cache_monitor,  # Migrated from services/cache_monitor (2026-03-19)
-    canvas,  # Migrated from services/canvas (2026-03-19)
     categories,
-    common_params,  # Migrated from services/parameters (2026-03-19)
-    event_node_builder,  # Migrated from services/event_node_builder (2026-03-19)
     event_parameters,
     events,
     field_builder,
     flows,
     games,
     hql_generation,
-    hql_preview,  # ✅ ACTIVE HQL Preview V2 API (renamed from hql_preview_v2)
     join_configs,
-    parameter_aliases,  # Migrated from services/parameters (2026-03-19)
     parameters,
 )
 

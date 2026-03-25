@@ -13,7 +13,7 @@ from flask import jsonify
 
 
 def success_response(
-    data: Any = None, message: str = None, status_code: int = 200, **kwargs
+    data: Any | None = None, message: str | None = None, status_code: int = 200, **kwargs
 ) -> Tuple[dict, int]:
     """
     Create a standardized success response
@@ -67,7 +67,7 @@ def error_response(error: str, status_code: int = 400, **kwargs) -> Tuple[dict, 
     return response, status_code
 
 
-def json_success_response(data: Any = None, message: str = None, **kwargs):
+def json_success_response(data: Any | None = None, message: str | None = None, **kwargs):
     """
     Return a JSON success response with proper headers
 

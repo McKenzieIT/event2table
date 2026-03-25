@@ -10,10 +10,11 @@ Unit Tests for RedisConnectionManager
 - 连接泄露检测
 """
 
-import pytest
-import time
 import threading
-from unittest.mock import Mock, patch, MagicMock
+import time
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 from backend.core.cache.redis_connection_manager import (
     RedisConnectionManager,

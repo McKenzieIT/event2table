@@ -7,17 +7,18 @@ Author: Event2Table Development Team
 Date: 2026-03-09
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 from graphene import Schema
 
 from backend.gql_api.resolvers.parameter_resolvers import (
-    resolve_parameter_changes,
-    resolve_common_parameters,
-    resolve_parameters_management,
-    mutate_change_parameter_type,
     mutate_auto_sync_common_parameters,
     mutate_batch_add_fields_to_canvas,
+    mutate_change_parameter_type,
+    resolve_common_parameters,
+    resolve_parameter_changes,
+    resolve_parameters_management,
 )
 
 

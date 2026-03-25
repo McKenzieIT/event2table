@@ -7,14 +7,15 @@ This enables testing frameworks to create app instances directly.
 
 import os
 from pathlib import Path
+
 from flask import Flask, send_from_directory
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_graphql import GraphQLView
 
-from backend.core.config import FlaskConfig, CacheConfig, BASE_DIR
-from backend.core.logging import get_logger
+from backend.core.config import BASE_DIR, CacheConfig, FlaskConfig
 from backend.core.error_handlers import register_error_handlers
+from backend.core.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -156,15 +157,15 @@ def _init_extensions(app):
 def _register_blueprints(app):
     """Register all API and service blueprints."""
     from backend.api import api_bp
-    from backend.api.routes.hql_preview import hql_preview_bp
-    from backend.api.routes.v1_adapter import v1_adapter_bp
-    from backend.api.routes.health import health_bp
     from backend.api.routes.bulk_operations import bulk_bp
     from backend.api.routes.cache_monitor import cache_monitor_bp
     from backend.api.routes.canvas import canvas_bp
-    from backend.api.routes.event_node_builder import event_node_builder_bp
     from backend.api.routes.common_params import common_params_bp
+    from backend.api.routes.event_node_builder import event_node_builder_bp
+    from backend.api.routes.health import health_bp
+    from backend.api.routes.hql_preview import hql_preview_bp
     from backend.api.routes.parameter_aliases import parameter_aliases_bp
+    from backend.api.routes.v1_adapter import v1_adapter_bp
 
     # Core API blueprints
     app.register_blueprint(health_bp)
@@ -262,8 +263,8 @@ def _register_frontend_routes(app):
 
 def _init_database():
     """Initialize database, run migrations, and create indexes."""
-    from backend.core.database import init_db, migrate_db, create_indexes
     from backend.core.config import get_db_path
+    from backend.core.database import create_indexes, init_db, migrate_db
 
     db_path = get_db_path()
     is_new_database = not Path(db_path).exists()

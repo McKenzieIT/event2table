@@ -6,10 +6,11 @@
 测试所有参数API正确使用game_gid进行查询, 而非game_id
 """
 
-import pytest
-import sys
 import os
+import sys
 from pathlib import Path
+
+import pytest
 
 # 添加项目路径
 project_root = Path(__file__).parent.parent

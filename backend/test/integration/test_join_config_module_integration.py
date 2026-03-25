@@ -11,12 +11,14 @@ Join Config Module Integration Tests
 """
 
 import os
-import pytest
 from datetime import datetime
-from backend.models.entities import JoinConfigEntity
-from backend.services.join_configs.join_config_service import JoinConfigService
-from backend.models.repositories.join_config_repository import JoinConfigRepository
+
+import pytest
+
 from backend.core.utils.converters import get_db_connection
+from backend.models.entities import JoinConfigEntity
+from backend.models.repositories.join_config_repository import JoinConfigRepository
+from backend.services.join_configs.join_config_service import JoinConfigService
 
 
 class TestJoinConfigModuleIntegration:

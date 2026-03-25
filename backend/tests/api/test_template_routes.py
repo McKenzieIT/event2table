@@ -4,20 +4,22 @@
 Unit Tests for Template API Routes
 """
 
-import unittest
 import json
-from unittest.mock import patch, MagicMock
+import unittest
+from unittest.mock import MagicMock, patch
+
+from flask import Flask
+
 from backend.api.routes.template import (
+    api_export_template,
+    api_get_popular_templates,
+    api_get_template,
     api_get_template_categories,
     api_get_template_subcategories,
-    api_search_templates,
-    api_get_popular_templates,
-    api_export_template,
     api_import_template,
-    api_get_template,
     api_increment_template_usage,
+    api_search_templates,
 )
-from flask import Flask
 
 
 class TestTemplateRoutes(unittest.TestCase):

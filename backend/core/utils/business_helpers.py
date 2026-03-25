@@ -441,9 +441,10 @@ def python_type_to_hive_type(python_type: str) -> str:
 # ============================================================================
 
 from typing import Optional, Tuple
+
 from flask import flash, redirect, url_for
 
-from backend.core.config import ODSDatabase, CommonParamConfig
+from backend.core.config import CommonParamConfig, ODSDatabase
 from backend.core.database import get_db_connection
 from backend.core.utils.converters import fetch_one_as_dict
 
@@ -582,7 +583,7 @@ def validate_game_exists(game_gid: int) -> Tuple[bool, Optional[dict], Optional[
 # Query Helper Functions
 # ============================================================================
 
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from backend.core.utils.converters import fetch_all_as_dict
 

@@ -11,12 +11,14 @@ Game Module Integration Tests
 """
 
 import os
-import pytest
 from datetime import datetime
-from backend.models.entities import GameEntity
-from backend.services.games.game_service import GameService
-from backend.models.repositories.games import GameRepository
+
+import pytest
+
 from backend.core.utils.converters import get_db_connection
+from backend.models.entities import GameEntity
+from backend.models.repositories.games import GameRepository
+from backend.services.games.game_service import GameService
 
 
 class TestGameModuleIntegration:

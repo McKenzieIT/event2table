@@ -11,10 +11,11 @@ SecureHasher 模块测试
 TDD Phase: Red - 先写测试, 看测试失败
 """
 
-import pytest
-import tempfile
 import os
+import tempfile
 from pathlib import Path
+
+import pytest
 
 
 class TestSecureHasher:
@@ -137,8 +138,9 @@ class TestSecureHasher:
 
     def test_hash_file_large_file(self):
         """测试大文件哈希(分块读取)"""
-        from backend.core.crypto import SecureHasher
         from pathlib import Path
+
+        from backend.core.crypto import SecureHasher
 
         # 创建项目内的临时目录
         project_root = Path(__file__).parent.parent.parent.parent.parent
@@ -160,8 +162,9 @@ class TestSecureHasher:
 
     def test_hash_file_consistency(self):
         """测试相同文件产生相同哈希"""
-        from backend.core.crypto import SecureHasher
         from pathlib import Path
+
+        from backend.core.crypto import SecureHasher
 
         # 创建项目内的临时目录
         project_root = Path(__file__).parent.parent.parent.parent.parent
@@ -183,8 +186,9 @@ class TestSecureHasher:
 
     def test_hash_file_not_found(self):
         """测试文件不存在抛出错误"""
-        from backend.core.crypto import SecureHasher
         from pathlib import Path
+
+        from backend.core.crypto import SecureHasher
 
         # 使用项目内的不存在的路径（但路径本身是安全的）
         project_root = Path(__file__).parent.parent.parent.parent.parent

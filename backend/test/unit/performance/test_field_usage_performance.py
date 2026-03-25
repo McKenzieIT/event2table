@@ -12,9 +12,11 @@ Date: 2026-03-08
 TDD Phase: RED (failing tests)
 """
 
-import pytest
 import time
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
+
 from backend.gql_api.resolvers.parameter_resolvers import _calculate_field_usage
 
 
@@ -93,6 +95,7 @@ class TestFieldUsagePerformance:
         Expected: @cached or @cache decorator
         """
         import inspect
+
         from backend.gql_api.resolvers.parameter_resolvers import _calculate_field_usage
 
         # Check function source for cache decorators

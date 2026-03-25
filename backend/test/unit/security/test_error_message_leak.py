@@ -9,8 +9,9 @@ P0-9: 测试错误信息不泄露敏感信息
 5. 返回通用, 用户友好的错误消息
 """
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 
 
 def test_create_parameter_does_not_leak_stack_trace():

@@ -7,8 +7,9 @@ Canvas API 端点测试脚本
 - POST /canvas/api/flows/save
 """
 
-import requests
 import json
+
+import requests
 
 BASE_URL = "http://localhost:5001"
 

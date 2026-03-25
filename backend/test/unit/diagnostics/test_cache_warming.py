@@ -5,18 +5,18 @@
 验证表名修复和app_context修复是否有效
 """
 
-import sys
 import os
+import sys
 
 # 添加项目路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from backend.core.cache.cache_hierarchical import hierarchical_cache
 from backend.core.database import get_db_connection
 from backend.core.utils import fetch_all_as_dict
 
 # 使用新CacheWarmer (2026-02-26迁移)
 from backend.services.cache.cache_warmup import CacheWarmer
-from backend.core.cache.cache_hierarchical import hierarchical_cache
 
 
 def test_cache_warming():

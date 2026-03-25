@@ -5,9 +5,10 @@ Repository模式单元测试
 遵循TDD原则: 先写测试, 看测试失败, 再实现功能
 """
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # 添加backend到path
 backend_dir = Path(__file__).parent.parent

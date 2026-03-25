@@ -11,11 +11,12 @@ Performance Goals:
 - Index size: <20MB total
 """
 
-import pytest
 import sqlite3
 import time
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+import pytest
 
 # Test database path
 TEST_DB_PATH = Path(__file__).parent.parent.parent.parent.parent / "data" / "test_database.db"

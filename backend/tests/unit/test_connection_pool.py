@@ -14,18 +14,19 @@ Author: Event2Table Performance Optimization Team
 Version: 1.0.0 (2026-03-18)
 """
 
-import pytest
 import threading
 import time
 from pathlib import Path
 from typing import List
 
+import pytest
+
 # Import the connection pool module (will be created)
 from backend.core.database.connection_pool import (
     ConnectionPool,
-    get_connection_pool,
     ConnectionPoolConfig,
     PoolExhaustedError,
+    get_connection_pool,
 )
 
 

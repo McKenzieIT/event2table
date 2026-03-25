@@ -11,7 +11,7 @@ Intelligently extracts function parameters for building cache keys:
 import inspect
 import json
 import logging
-from typing import Callable, Tuple, Dict, Any
+from typing import Any, Callable, Dict, Tuple
 
 logger = logging.getLogger(__name__)
 

@@ -10,15 +10,15 @@ Tests ParameterService with Entity Architecture:
 - Complete CRUD operations
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, Mock, patch
 
-from backend.models.entities import ParameterEntity, CommonParameterEntity
-from backend.services.parameters.parameter_service import ParameterService
-from backend.models.repositories.parameters import ParameterRepository
+import pytest
+
 from backend.core.cache.cache_system import HierarchicalCache
-
+from backend.models.entities import CommonParameterEntity, ParameterEntity
+from backend.models.repositories.parameters import ParameterRepository
+from backend.services.parameters.parameter_service import ParameterService
 
 # ============================================================================
 # Test Fixtures

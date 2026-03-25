@@ -11,10 +11,11 @@ Testing Strategy:
 P0-10: SQL Injection Risk
 """
 
-import pytest
 import ast
-import re
 import os
+import re
+
+import pytest
 
 
 def test_no_sql_string_concatenation():

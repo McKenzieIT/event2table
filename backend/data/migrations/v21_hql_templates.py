@@ -6,8 +6,8 @@ Migration v21: HQL Templates Table
 创建HQL模板库表,支持模板分类、搜索、导入导出和使用统计
 """
 
-import sqlite3
 import logging
+import sqlite3
 
 logger = logging.getLogger(__name__)
 

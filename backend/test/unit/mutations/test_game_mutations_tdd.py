@@ -6,8 +6,9 @@ This proves the TDD fix works: mutations can execute without authentication erro
 """
 
 import os
+from unittest.mock import MagicMock, Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 # Set development mode
 os.environ['FLASK_ENV'] = 'development'

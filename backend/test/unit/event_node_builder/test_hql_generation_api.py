@@ -15,13 +15,14 @@ Author: Event2Table Development Team
 Created: 2026-03-12
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 from flask import Flask
 
 # Import the blueprint and dependencies
 from backend.services.event_node_builder import event_node_builder_bp
-from backend.services.hql.models.event import Event, Field, Condition, FieldType, Operator
+from backend.services.hql.models.event import Condition, Event, Field, FieldType, Operator
 
 
 @pytest.fixture

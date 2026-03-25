@@ -9,11 +9,12 @@ Parameter Entity Architecture Verification Test
 - 类型安全
 """
 
-import pytest
-from typing import get_type_hints, Union
 from inspect import signature
+from typing import Union, get_type_hints
 
-from backend.models.entities import ParameterEntity, CommonParameterEntity
+import pytest
+
+from backend.models.entities import CommonParameterEntity, ParameterEntity
 from backend.models.repositories.parameters import ParameterRepository
 from backend.services.parameters.parameter_service import ParameterService
 
@@ -61,7 +62,7 @@ class TestParameterRepositoryEntityArchitecture:
         hints = get_type_hints(repository.create)
 
         # ✅ 返回类型应该是Optional[ParameterEntity] (可能为None)
-        from typing import get_origin, get_args
+        from typing import get_args, get_origin
 
         return_type = hints.get('return')
         # 检查是否是Optional[ParameterEntity] (Union[ParameterEntity, None])
@@ -76,7 +77,7 @@ class TestParameterRepositoryEntityArchitecture:
         hints = get_type_hints(repository.find_by_id)
 
         # ✅ 返回类型应该是Optional[ParameterEntity]
-        from typing import get_origin, get_args
+        from typing import get_args, get_origin
 
         return_type = hints.get('return')
         if get_origin(return_type) is Union:
@@ -104,7 +105,7 @@ class TestParameterRepositoryEntityArchitecture:
         hints = get_type_hints(repository.update)
 
         # ✅ 返回类型应该是Optional[ParameterEntity]
-        from typing import get_origin, get_args
+        from typing import get_args, get_origin
 
         return_type = hints.get('return')
         if get_origin(return_type) is Union:
@@ -126,7 +127,7 @@ class TestParameterServiceEntityArchitecture:
         hints = get_type_hints(service.get_parameter_by_id)
 
         # ✅ 返回类型应该是Optional[ParameterEntity]
-        from typing import get_origin, get_args
+        from typing import get_args, get_origin
 
         return_type = hints.get('return')
         if get_origin(return_type) is Union:

@@ -22,9 +22,9 @@ Target (after optimization):
 - Cache hit: <10ms
 """
 
+import statistics
 import sys
 import time
-import statistics
 from pathlib import Path
 from typing import Dict, List
 
@@ -32,14 +32,14 @@ from typing import Dict, List
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
+from backend.core.cache.cache_system import CacheKeyBuilder, hierarchical_cache
 from backend.core.database.database import get_db_connection
-from backend.core.cache.cache_system import hierarchical_cache, CacheKeyBuilder
 
 
 class ParametersPerformanceTest:
     """Performance test suite for parameters API optimization"""
 
-    def __init__(self, db_path: str = None):
+    def __init__(self, db_path: str | None = None):
         """Initialize test with database connection"""
         if db_path:
             self.db_path = db_path

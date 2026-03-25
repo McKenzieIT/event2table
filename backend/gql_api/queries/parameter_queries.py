@@ -88,7 +88,7 @@ class ParameterQueries:
 
     @staticmethod
     @cached(ttl=600, key_prefix="parameters_search")
-    def resolve_search_parameters(root, info, query: str, event_id: int = None):
+    def resolve_search_parameters(root, info, query: str, event_id: int | None = None):
         """
         Search parameters by name.
 

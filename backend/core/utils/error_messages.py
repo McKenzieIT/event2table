@@ -291,7 +291,7 @@ def conflict_error(resource_type: str, identifier: Any, details: Optional[Dict] 
     return build_error_response("conflict", message, details, 409)
 
 
-def server_error(message: str = None, details: Optional[Dict] = None) -> tuple:
+def server_error(message: str | None = None, details: Optional[Dict] = None) -> tuple:
     """Internal server error (500)"""
     if message is None:
         message = ErrorMessages.server_error()

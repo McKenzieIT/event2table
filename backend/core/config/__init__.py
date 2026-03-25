@@ -5,11 +5,11 @@ Configuration package - exports all configuration settings
 """
 
 # Import from config module to make them available at package level
+from .config import OUTPUT_DIR  # Paths; Functions; Config classes
 from .config import (
     BASE_DIR,
     CONFIG_DIR,
     DB_PATH,
-    OUTPUT_DIR,  # Paths; Functions; Config classes
     STATIC_DIR,
     TEMPLATE_DIR,
     TEST_DB_PATH,

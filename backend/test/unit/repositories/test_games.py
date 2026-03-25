@@ -5,9 +5,10 @@ This module contains tests for the GameRepository class, focusing on
 performance optimizations such as N+1 query prevention.
 """
 
+from typing import Any, Dict, List
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from typing import List, Dict, Any
 
 
 def test_get_all_with_event_count_no_n_plus_one(monkeypatch):
@@ -29,8 +30,8 @@ def test_get_all_with_event_count_no_n_plus_one(monkeypatch):
         - Query should use LEFT JOIN with log_events table
         - Results should include event_count for each game
     """
-    from backend.models.repositories.games import GameRepository
     from backend.models.entities import GameEntity
+    from backend.models.repositories.games import GameRepository
 
     repo = GameRepository()
 

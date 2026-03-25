@@ -5,17 +5,19 @@ HQL V2 集成测试
 遵循TDD原则: 先写测试, 看它失败, 然后实现
 """
 
-import pytest
-import sys
 import json
+import sys
 from pathlib import Path
+
+import pytest
 
 # 添加路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# 导入Flask应用和模型
-from backend.services.hql.models.event import Event, Field, Condition
 from web_app import app
+
+# 导入Flask应用和模型
+from backend.services.hql.models.event import Condition, Event, Field
 
 
 @pytest.mark.usefixtures("hql_v2_test_data")

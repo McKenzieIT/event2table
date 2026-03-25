@@ -4,11 +4,12 @@ Test suite for parallel audit functionality.
 Tests the subagent manager and parallel execution features.
 """
 
-import pytest
+import sys
 import time
 from pathlib import Path
 from typing import List
-import sys
+
+import pytest
 
 # Add skill path to sys.path
 skill_path = Path(__file__).parent.parent.parent.parent.parent / ".claude" / "skills" / "code-audit"
@@ -16,8 +17,8 @@ core_path = skill_path / "core"
 sys.path.insert(0, str(core_path))
 
 # Import after path setup
-from base_detector import BaseDetector, Issue, Severity, IssueCategory
-from subagent_manager import SubagentManager, SubagentTask, ParallelAuditRunner
+from base_detector import BaseDetector, Issue, IssueCategory, Severity
+from subagent_manager import ParallelAuditRunner, SubagentManager, SubagentTask
 
 
 class MockDetector(BaseDetector):

@@ -4,8 +4,8 @@
 Test existing cached method
 """
 
-import sys
 import logging
+import sys
 
 sys.path.insert(0, '.')
 

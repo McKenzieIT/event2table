@@ -21,8 +21,9 @@ in sync_common_params functionality.
 """
 
 import pytest
-from backend.models.repositories.parameters import ParameterRepository
+
 from backend.core.utils.converters import fetch_all_as_dict, get_db_connection
+from backend.models.repositories.parameters import ParameterRepository
 
 
 def insert_event(cursor, test_gid, event_name, event_name_cn):

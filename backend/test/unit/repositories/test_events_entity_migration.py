@@ -13,10 +13,12 @@ This test suite verifies:
 5. SQLValidator is used for dynamic SQL
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import MagicMock, patch, Mock
-from backend.models.repositories.events import EventRepository
+
 from backend.models.entities import EventEntity
+from backend.models.repositories.events import EventRepository
 
 
 class TestEventRepositoryEntityReturnTypes:

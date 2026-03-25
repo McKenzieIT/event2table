@@ -9,6 +9,7 @@ import sys
 sys.path.insert(0, '.')
 
 from unittest.mock import patch
+
 from backend.models.repositories.parameters import ParameterRepository
 
 # Patch cache.get to see what keys are requested

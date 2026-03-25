@@ -5,6 +5,7 @@ Tests for GraphQL query operations.
 """
 
 import pytest
+
 from backend.gql_api.schema import schema
 
 

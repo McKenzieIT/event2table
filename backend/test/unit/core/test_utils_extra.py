@@ -6,12 +6,11 @@ Additional Utils 单元测试
 测试 backend.core.utils 中的更多工具函数
 """
 
-import pytest
 from datetime import datetime
-from backend.core.utils import (
-    success_response,
-    error_response,
-)
+
+import pytest
+
+from backend.core.utils import error_response, success_response
 
 
 class TestSuccessResponse:

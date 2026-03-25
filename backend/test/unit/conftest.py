@@ -7,8 +7,8 @@ Pytest配置和共享fixtures
 使用独立的测试数据库以避免污染生产数据. 
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # 添加项目根目录到Python路径
@@ -41,9 +41,10 @@ except Exception as e:
 
 import pytest
 from flask import Flask
+
+from backend.core.config import DB_PATH, TEST_DB_PATH
 from backend.core.database import get_db_connection, init_db, migrate_db
 from backend.core.utils import execute_write
-from backend.core.config import DB_PATH, TEST_DB_PATH
 
 
 @pytest.fixture(scope="session")
@@ -95,7 +96,7 @@ def app(test_database):
         games_bp = None
     # Note: categories routes are part of api_bp, not a separate blueprint
     try:
-        from backend.services.events import events_bp, event_nodes_bp
+        from backend.services.events import event_nodes_bp, events_bp
     except ImportError:
         events_bp, event_nodes_bp = None, None
     try:
