@@ -1,7 +1,7 @@
 """
 加密和哈希工具函数模块
 
-提供安全的哈希算法, 避免使用弱加密算法（如MD5）. 
+提供安全的哈希算法, 避免使用弱加密算法（如MD5）.
 
 作者: Claude Code
 版本: 1.0.0
@@ -24,7 +24,7 @@ import hashlib
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 # Setup logger
 logger = logging.getLogger(__name__)
