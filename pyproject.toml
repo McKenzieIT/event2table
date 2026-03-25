@@ -34,3 +34,8 @@ no_implicit_optional = false
 warn_redundant_casts = false
 warn_unused_ignores = false
 warn_no_return = false
+# 避免重复识别包
+explicit_package_bases = true
+# 模块路径配置
+mypy_path = "./backend"
+explicit_package_bases = true
