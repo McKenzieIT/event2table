@@ -120,7 +120,7 @@ class TestGameEntity:
     def test_default_values(self):
         """测试默认值"""
         game = GameEntity(gid=10000147, name="Test", ods_db="ieu_ods")
-        assert game.dwd_prefix == "dwd"
+        # Note: dwd_prefix field was removed in 2026-02-21 schema cleanup
         assert game.event_count == 0
         assert game.id is None
         assert game.created_at is None
